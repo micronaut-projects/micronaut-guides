@@ -1,0 +1,83 @@
+plugins {
+    id "java-gradle-plugin"
+    id "com.fizzed.rocker" version "1.3.0"
+    id 'groovy'
+}
+
+ext {
+    micronautVersion = '2.2.2'
+    micronautDocsVersion='1.0.25'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://repo.grails.org/grails/core" }
+}
+
+dependencies {
+
+    annotationProcessor(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+    annotationProcessor("io.micronaut:micronaut-inject-java")
+    implementation(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+    implementation("io.micronaut.starter:micronaut-starter-api:$micronautVersion")
+    implementation("io.micronaut:micronaut-inject-java")
+
+    implementation "com.fizzed:rocker-compiler:1.3.0"
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.0")
+
+    implementation "io.micronaut.docs:micronaut-docs-asciidoc-extensions:$micronautDocsVersion", {
+        exclude group: "org.codehaus.groovy"
+    }
+}
+
+gradlePlugin {
+    plugins {
+        guidesPlugin {
+            id = "io.micronaut.guides"
+            implementationClass = "io.micronaut.guides.GuidesPlugin"
+        }
+        rockerPlugin {
+            id = "io.micronaut.starter.rocker"
+            implementationClass = "io.micronaut.starter.rocker.plugin.RockerPlugin"
+        }
+    }
+}
+
+
+sourceSets {
+    main {
+        rocker {
+            srcDir("src/main/java")
+        }
+    }
+}
+
+rocker {
+    // (All settings are shown with their defaults)
+    //
+    // Skips building templates all together
+    skip false
+    // Base directory for generated java sources, actual target is sub directory
+    // with the name of the source set. The value is passed through project.file().
+    outputBaseDirectory = "$buildDir/generated-src/rocker"
+    // Base directory for the directory where the hot reload feature
+    // will (re)compile classes to at runtime (and where `rocker-compiler.conf`
+    // is generated, which is used by RockerRuntime.getInstance().setReloading(true)).
+    // The actual target is a sub directory with the name of the source set.
+    // The value is passed through project.file().
+    classBaseDirectory = "$buildDir/classes"
+    failOnError true
+    skipTouch true
+    // must not be empty when skipTouch is equal to false
+    touchFile ""
+    javaVersion '1.8'
+    extendsClass null
+    extendsModelClass null
+    optimize true
+    discardLogicWhitespace = true
+    targetCharset null
+    suffixRegex null
+    postProcessing = []//['io.micronaut.starter.rocker.WhitespaceProcessor']
+    markAsGenerated null
+}

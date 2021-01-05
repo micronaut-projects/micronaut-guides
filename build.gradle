@@ -1,0 +1,134 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'io.micronaut.docs', name: 'micronaut-docs-asciidoc-extensions', version: '1.0.25'
+    }
+}
+
+plugins {
+    id 'groovy'
+    id("org.asciidoctor.jvm.convert") version "3.3.0"
+}
+
+import io.micronaut.guides.GenerateGuidesTask
+import io.micronaut.guides.GuidesOption
+import io.micronaut.starter.api.TestFramework
+import io.micronaut.starter.options.BuildTool
+import io.micronaut.starter.options.Language
+
+apply from: "gradle/asciidoc.gradle"
+ext {
+    projectFolder = new File("${project.buildDir}/projects")
+}
+
+GuidesOption gradleJava = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)
+GuidesOption gradleKotlin = new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.JUNIT)
+GuidesOption gradleSpock = new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK)
+GuidesOption mavenJava = new GuidesOption(BuildTool.MAVEN, Language.JAVA, TestFramework.JUNIT)
+GuidesOption mavenKotlin = new GuidesOption(BuildTool.MAVEN, Language.KOTLIN, TestFramework.JUNIT)
+GuidesOption mavenSpock = new GuidesOption(BuildTool.MAVEN, Language.GROOVY, TestFramework.SPOCK)
+List<GuidesOption> defaultGuideOptions = [gradleJava, gradleKotlin, gradleSpock, mavenJava, mavenKotlin, mavenSpock]
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+
+task creatingYourFirstMicronautAppProjects(type: GenerateGuidesTask) {
+    output = projectFolder
+    guideName = 'creating-your-first-micronaut-app'
+    features = ['guide-creating-your-first-micronaut-app', 'graalvm']
+    group 'guides'
+}
+
+task creatingYourFirstMicronautAppAsciidoc {
+    group 'guides'
+    ext {
+        fileName = 'creating-your-first-micronaut-app.adoc'
+    }
+    doLast {
+        File asciidocFile = new File("${project.rootDir}/src/docs/guides/${fileName}")
+        assert asciidocFile.exists()
+        File destinationFolder = new File('src/docs/asciidoc')
+        if (!destinationFolder.exists()) {
+            destinationFolder.mkdir()
+        }
+        for (GuidesOption guidesOption : defaultGuideOptions) {
+            String projectName = "${fileName.replace('.adoc', '')}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}"
+            String line = ''
+            List<String> lines = []
+            asciidocFile.withReader { reader ->
+                boolean excludeLine = false
+                while ((line = reader.readLine()) != null) {
+                    if (line == ':exclude-for-languages:') {
+                        excludeLine = false
+                    } else if (line.startsWith(':exclude-for-languages:')) {
+                        String[] languages = line.substring(':exclude-for-languages:'.length()).split(',')
+                        if (languages.any { it == guidesOption.language.toString()}) {
+                            excludeLine = true
+                        }
+                    }
+                    if (!excludeLine) {
+                        lines << line
+                    }
+                }
+            }
+            String text = lines.join('\n')
+            text = text.replace("@languageextension@", guidesOption.language.extension)
+            text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
+            text = text.replace("@language@", guidesOption.language.toString())
+            text = text.replace("@sourceDir@", projectName)
+            File destination = new File("src/docs/asciidoc/${projectName}.adoc")
+            destination.createNewFile()
+            destination.text = text
+        }
+    }
+}
+task creatingYourFirstMicronautApp {
+    group 'guides'
+    dependsOn = ['creatingYourFirstMicronautAppAsciidoc', 'creatingYourFirstMicronautAppProjects']
+}
+
+task generateGuides {
+    dependsOn = [
+            'creatingYourFirstMicronautApp',
+    ]
+}
+
+task copyProjects(type: Copy) {
+    dependsOn('generateGuides')
+    from projectFolder 
+    into 'src/docs/asciidoc'
+}
+task cleanAsciidoctorFolder {
+    doLast {
+        File f = new File('src/docs/asciidoc')
+        if (f.exists()) {
+            f.deleteDir()
+        }
+    }
+}
+task copyImagesToDist(type: Copy) {
+    from 'src/docs/images'
+    into "${project.buildDir}/dist/images"
+    include '*.png'
+}
+task copyHtmlToDist(type: Copy) {
+    from "${project.buildDir}/docs/asciidoc"
+    into "${project.buildDir}/dist"
+    exclude 'common-*.html'
+
+}
+task createDist {
+    dependsOn('copyImagesToDist')
+    dependsOn('copyHtmlToDist')
+}
+clean.dependsOn('cleanAsciidoctorFolder')
+asciidoctor.mustRunAfter('copyProjects')
+build.dependsOn('copyProjects')
+build.dependsOn('asciidoctor')
+build.dependsOn('generateGuides')
+build.finalizedBy('createDist')
