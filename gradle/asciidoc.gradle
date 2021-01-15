@@ -1,15 +1,3 @@
-configurations {
-    asciidoctorExt
-}
-
-dependencies {
-    asciidoctorExt 'io.micronaut.docs:micronaut-docs-asciidoc-extensions:1.0.25'
-}
-
-asciidoctor {
-    configurations 'asciidoctorExt'
-}
-
 asciidoctorj {
     version '2.1.0'
     modules {
@@ -18,8 +6,16 @@ asciidoctorj {
         }
     }
     options doctype: "book", ruby: "erubis"
-
-    attributes "sourcedir": "src/docs/asciidoc",
+    docExtensions {
+        block_macro (name: 'gist') {
+            parent, target, attributes ->
+                String content = """<div class="content">
+<script src="https://gist.github.com/${target}.js"></script>
+</div>"""
+                createBlock(parent, "pass", [content], attributes, config);
+        }
+    }
+    attributes "sourcedir": "build/dist",
             "commondir": "src/docs/common",
             "source-highlighter": "coderay",
             "toc": "left",

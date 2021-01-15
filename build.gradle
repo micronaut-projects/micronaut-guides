@@ -12,6 +12,7 @@ plugins {
     id("org.asciidoctor.jvm.convert") version "3.3.0"
 }
 
+import io.micronaut.guides.DependencyLines
 import io.micronaut.guides.GenerateGuidesTask
 import io.micronaut.guides.GuidesOption
 import io.micronaut.starter.api.TestFramework
@@ -20,7 +21,8 @@ import io.micronaut.starter.options.Language
 
 apply from: "gradle/asciidoc.gradle"
 ext {
-    projectFolder = new File("${project.buildDir}/projects")
+    micronautVersion = new File('version.txt').text
+    distFolder = new File("${project.buildDir}/dist")
 }
 
 GuidesOption gradleJava = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)
@@ -36,72 +38,21 @@ repositories {
     jcenter()
 }
 
-
-task creatingYourFirstMicronautAppProjects(type: GenerateGuidesTask) {
-    output = projectFolder
+task creatingYourFirstMicronautApp(type: GenerateGuidesTask) {
+    output = distFolder
+    asciidocFileName = 'creating-your-first-micronaut-app.adoc'
     guideName = 'creating-your-first-micronaut-app'
+    guideTitle = 'Creating your first Micronaut app'
+    micronaut = micronautVersion
+    guideIntro = 'Learn how to create a Hello World Micronaut app with a controller and a functional test.'
+    authors = ['Iván López', 'Sergio del Amo']
     features = ['guide-creating-your-first-micronaut-app', 'graalvm']
     group 'guides'
 }
-
-task creatingYourFirstMicronautAppAsciidoc {
-    group 'guides'
-    ext {
-        fileName = 'creating-your-first-micronaut-app.adoc'
-    }
-    doLast {
-        File asciidocFile = new File("${project.rootDir}/src/docs/guides/${fileName}")
-        assert asciidocFile.exists()
-        File destinationFolder = new File('src/docs/asciidoc')
-        if (!destinationFolder.exists()) {
-            destinationFolder.mkdir()
-        }
-        for (GuidesOption guidesOption : defaultGuideOptions) {
-            String projectName = "${fileName.replace('.adoc', '')}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}"
-            String line = ''
-            List<String> lines = []
-            asciidocFile.withReader { reader ->
-                boolean excludeLine = false
-                while ((line = reader.readLine()) != null) {
-                    if (line == ':exclude-for-languages:') {
-                        excludeLine = false
-                    } else if (line.startsWith(':exclude-for-languages:')) {
-                        String[] languages = line.substring(':exclude-for-languages:'.length()).split(',')
-                        if (languages.any { it == guidesOption.language.toString()}) {
-                            excludeLine = true
-                        }
-                    }
-                    if (!excludeLine) {
-                        lines << line
-                    }
-                }
-            }
-            String text = lines.join('\n')
-            text = text.replace("@languageextension@", guidesOption.language.extension)
-            text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
-            text = text.replace("@language@", guidesOption.language.toString())
-            text = text.replace("@sourceDir@", projectName)
-            File destination = new File("src/docs/asciidoc/${projectName}.adoc")
-            destination.createNewFile()
-            destination.text = text
-        }
-    }
-}
-task creatingYourFirstMicronautApp {
-    group 'guides'
-    dependsOn = ['creatingYourFirstMicronautAppAsciidoc', 'creatingYourFirstMicronautAppProjects']
-}
-
 task generateGuides {
     dependsOn = [
             'creatingYourFirstMicronautApp',
     ]
-}
-
-task copyProjects(type: Copy) {
-    dependsOn('generateGuides')
-    from projectFolder 
-    into 'src/docs/asciidoc'
 }
 task cleanAsciidoctorFolder {
     doLast {
@@ -127,8 +78,7 @@ task createDist {
     dependsOn('copyHtmlToDist')
 }
 clean.dependsOn('cleanAsciidoctorFolder')
-asciidoctor.mustRunAfter('copyProjects')
-build.dependsOn('copyProjects')
 build.dependsOn('asciidoctor')
+asciidoctor.mustRunAfter('generateGuides')
 build.dependsOn('generateGuides')
 build.finalizedBy('createDist')
