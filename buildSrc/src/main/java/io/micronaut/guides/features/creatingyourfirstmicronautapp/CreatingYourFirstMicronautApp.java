@@ -1,6 +1,7 @@
 package io.micronaut.guides.features.creatingyourfirstmicronautapp;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import io.micronaut.guides.features.GuideFeature;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.Project;
 import io.micronaut.starter.application.generator.GeneratorContext;
@@ -9,23 +10,12 @@ import io.micronaut.guides.features.creatingyourfirstmicronautapp.templates.*;
 import javax.inject.Singleton;
 
 @Singleton
-class CreatingYourFirstMicronautApp implements Feature {
+class CreatingYourFirstMicronautApp extends GuideFeature {
 
     @NonNull
     @Override
     public String getName() {
         return "guide-creating-your-first-micronaut-app";
-    }
-
-    @NonNull
-    @Override
-    public String getTitle() {
-        return "Creating your first Micronaut App";
-    }
-
-    @Override
-    public boolean supports(ApplicationType applicationType) {
-        return applicationType == ApplicationType.DEFAULT;
     }
 
     @Override

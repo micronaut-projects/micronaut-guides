@@ -12,48 +12,15 @@ plugins {
     id("org.asciidoctor.jvm.convert") version "3.3.0"
 }
 
-import io.micronaut.guides.DependencyLines
-import io.micronaut.guides.GenerateGuidesTask
-import io.micronaut.guides.GuidesOption
-import io.micronaut.starter.api.TestFramework
-import io.micronaut.starter.options.BuildTool
-import io.micronaut.starter.options.Language
-
 apply from: "gradle/asciidoc.gradle"
-ext {
-    micronautVersion = new File('version.txt').text
-    distFolder = new File("${project.buildDir}/dist")
-}
+apply from: "gradle/guides.gradle"
 
-GuidesOption gradleJava = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)
-GuidesOption gradleKotlin = new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.JUNIT)
-GuidesOption gradleSpock = new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK)
-GuidesOption mavenJava = new GuidesOption(BuildTool.MAVEN, Language.JAVA, TestFramework.JUNIT)
-GuidesOption mavenKotlin = new GuidesOption(BuildTool.MAVEN, Language.KOTLIN, TestFramework.JUNIT)
-GuidesOption mavenSpock = new GuidesOption(BuildTool.MAVEN, Language.GROOVY, TestFramework.SPOCK)
-List<GuidesOption> defaultGuideOptions = [gradleJava, gradleKotlin, gradleSpock, mavenJava, mavenKotlin, mavenSpock]
 
 repositories {
     mavenCentral()
     jcenter()
 }
 
-task creatingYourFirstMicronautApp(type: GenerateGuidesTask) {
-    output = distFolder
-    asciidocFileName = 'creating-your-first-micronaut-app.adoc'
-    guideName = 'creating-your-first-micronaut-app'
-    guideTitle = 'Creating your first Micronaut app'
-    micronaut = micronautVersion
-    guideIntro = 'Learn how to create a Hello World Micronaut app with a controller and a functional test.'
-    authors = ['Iván López', 'Sergio del Amo']
-    features = ['guide-creating-your-first-micronaut-app', 'graalvm']
-    group 'guides'
-}
-task generateGuides {
-    dependsOn = [
-            'creatingYourFirstMicronautApp',
-    ]
-}
 task cleanAsciidoctorFolder {
     doLast {
         File f = new File('src/docs/asciidoc')
@@ -71,14 +38,59 @@ task copyHtmlToDist(type: Copy) {
     from "${project.buildDir}/docs/asciidoc"
     into "${project.buildDir}/dist"
     exclude 'common-*.html'
-
 }
 task createDist {
     dependsOn('copyImagesToDist')
     dependsOn('copyHtmlToDist')
+    finalizedBy('generateTestScript')
 }
 clean.dependsOn('cleanAsciidoctorFolder')
 build.dependsOn('asciidoctor')
 asciidoctor.mustRunAfter('generateGuides')
 build.dependsOn('generateGuides')
 build.finalizedBy('createDist')
+
+task generateTestScript {
+    ext {
+        excludeDirs = ['images']
+        distDir = 'build/dist'
+        stopIfFailure = true
+    }
+    doLast {
+        File output = new File(distDir + "/test.sh")
+        output.createNewFile()
+        String bashScript = '''\
+#!/usr/bin/env bash
+set -e
+
+export EXIT_STATUS=0
+
+'''
+        new File(distDir).eachDir {dir ->
+            if (!excludeDirs.contains(dir.name)) {
+                println dir.name
+                bashScript += """\
+
+cd ${dir.name}
+  echo "executing ${dir.name} tests"
+  ${dir.name.contains('gradle') ? './gradlew test' : './mvnw test' } || EXIT_STATUS=\$?
+cd ..
+echo "${dir.name} tests failed => exit \$EXIT_STATUS"
+"""
+if (stopIfFailure) {
+bashScript += """                 
+if [ \$EXIT_STATUS -ne 0 ]; then
+  exit \$EXIT_STATUS
+fi
+"""
+}
+            }
+
+        }
+        bashScript += '''\
+exit \$EXIT_STATUS      
+'''
+        output.text = bashScript
+        output.setExecutable(true)
+    }
+}

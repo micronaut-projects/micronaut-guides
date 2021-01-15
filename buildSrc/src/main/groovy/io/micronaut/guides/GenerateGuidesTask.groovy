@@ -10,6 +10,7 @@ import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.options.Language
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
@@ -42,6 +43,10 @@ class GenerateGuidesTask  extends DefaultTask {
     @Input
     List<String> languages = ['java', 'groovy', 'kotlin']
 
+    @Optional
+    @Input
+    String testFramework
+
     @Input
     List<String> features
 
@@ -53,29 +58,43 @@ class GenerateGuidesTask  extends DefaultTask {
 
     private List<GuidesOption> guidesOptions() {
         List<GuidesOption> guidesOptionList = []
-        if (buildTools.any { BuildTool.GRADLE.toString()}) {
-            if (languages.any { Language.JAVA.toString()}) {
-                guidesOptionList << new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)
+        if (buildTools.contains(BuildTool.GRADLE.toString())) {
+            if (languages.contains(Language.JAVA.toString())) {
+                guidesOptionList << createGuidesOption(BuildTool.GRADLE, Language.JAVA)
             }
-            if (languages.any { Language.KOTLIN.toString()}) {
-                guidesOptionList << new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.JUNIT)
+            if (languages.contains(Language.KOTLIN.toString())) {
+                guidesOptionList << createGuidesOption(BuildTool.GRADLE, Language.KOTLIN)
             }
-            if (languages.any { Language.GROOVY.toString()}) {
-                guidesOptionList << new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK)
+            if (languages.contains(Language.GROOVY.toString())) {
+                guidesOptionList << createGuidesOption(BuildTool.GRADLE, Language.GROOVY)
             }
         }
-        if (buildTools.any { BuildTool.MAVEN.toString()}) {
-            if (languages.any { Language.JAVA.toString()}) {
-                guidesOptionList << new GuidesOption(BuildTool.MAVEN, Language.JAVA, TestFramework.JUNIT)
+        if (buildTools.contains(BuildTool.MAVEN.toString())) {
+            if (languages.contains(Language.JAVA.toString())) {
+                guidesOptionList << createGuidesOption(BuildTool.MAVEN, Language.JAVA)
             }
-            if (languages.any { Language.KOTLIN.toString()}) {
-                guidesOptionList << new GuidesOption(BuildTool.MAVEN, Language.KOTLIN, TestFramework.JUNIT)
+            if (languages.contains(Language.KOTLIN.toString())) {
+                guidesOptionList << createGuidesOption(BuildTool.MAVEN, Language.KOTLIN)
             }
-            if (languages.any { Language.GROOVY.toString()}) {
-                guidesOptionList << new GuidesOption(BuildTool.MAVEN, Language.GROOVY, TestFramework.SPOCK)
+            if (languages.contains(Language.GROOVY.toString())) {
+                guidesOptionList << createGuidesOption(BuildTool.MAVEN, Language.GROOVY)
             }
         }
         guidesOptionList
+    }
+
+    GuidesOption createGuidesOption(BuildTool buildTool, Language language) {
+        new GuidesOption(buildTool, language, testFrameworkOption(language))
+    }
+
+    TestFramework testFrameworkOption(Language language) {
+        if (testFramework != null) {
+            return TestFramework.valueOf(testFramework.toUpperCase())
+        }
+        if(language == Language.GROOVY) {
+            return TestFramework.SPOCK
+        }
+        TestFramework.JUNIT
     }
 
     @TaskAction

@@ -47,6 +47,12 @@ TODO describe how you consume the endpoints exposed by the native image with cur
 
 :exclude-for-languages:
 
+TODO Use the generic next step 
+
+include::{commondir}/common-next.adoc[]
+
+TODO or a personalized guide for the guide:
+
 == Next steps
 
 TODO: link to the documentation modules you used in the guide
