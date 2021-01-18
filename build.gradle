@@ -54,7 +54,7 @@ task generateTestScript {
     ext {
         excludeDirs = ['images']
         distDir = 'build/dist'
-        stopIfFailure = true
+        stopIfFailure = false
     }
     doLast {
         File output = new File(distDir + "/test.sh")
@@ -63,8 +63,8 @@ task generateTestScript {
 #!/usr/bin/env bash
 set -e
 
-export EXIT_STATUS=0
-
+FAILED_PROJECTS=()
+EXIT_STATUS=0
 '''
         new File(distDir).eachDir {dir ->
             if (!excludeDirs.contains(dir.name)) {
@@ -72,24 +72,47 @@ export EXIT_STATUS=0
                 bashScript += """\
 
 cd ${dir.name}
-  echo "executing ${dir.name} tests"
-  ${dir.name.contains('gradle') ? './gradlew test' : './mvnw test' } || EXIT_STATUS=\$?
+echo "-------------------------------------------------"
+echo "Executing '${dir.name}' tests"
+${dir.name.contains('gradle') ? './gradlew test' : './mvnw test' } || EXIT_STATUS=\$?
 cd ..
-echo "${dir.name} tests failed => exit \$EXIT_STATUS"
 """
 if (stopIfFailure) {
-bashScript += """                 
+    bashScript += """\
 if [ \$EXIT_STATUS -ne 0 ]; then
+  echo "'${dir.name}' tests failed => exit \$EXIT_STATUS"
   exit \$EXIT_STATUS
 fi
+"""
+} else {
+    bashScript += """\
+if [ \$EXIT_STATUS -ne 0 ]; then
+  FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" ${dir.name})
+  echo "'${dir.name}' tests failed => exit \$EXIT_STATUS"
+fi
+EXIT_STATUS=0
 """
 }
             }
 
         }
-        bashScript += '''\
-exit \$EXIT_STATUS      
+if (!stopIfFailure) {
+    bashScript += '''
+if [ ${#FAILED_PROJECTS[@]} -ne 0 ]; then
+  echo ""
+  echo "-------------------------------------------------"
+  echo "Projects with errors:"
+  for p in `echo ${FAILED_PROJECTS[@]}`; do
+    echo "  $p"
+  done;
+  echo "-------------------------------------------------"
+  exit 1
+else
+  exit 0
+fi
+
 '''
+}
         output.text = bashScript
         output.setExecutable(true)
     }
