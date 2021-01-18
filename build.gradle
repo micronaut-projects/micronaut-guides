@@ -1,3 +1,12 @@
+import groovy.json.JsonSlurper
+import io.micronaut.guides.GenerateGuideZip
+import io.micronaut.guides.GuideAsciidocGenerator
+import io.micronaut.guides.GuideMetadata
+import io.micronaut.guides.GuideProjectGenerator
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
+
+import java.nio.file.Files
+
 buildscript {
     repositories {
         mavenCentral()
@@ -13,8 +22,7 @@ plugins {
 }
 
 apply from: "gradle/asciidoc.gradle"
-apply from: "gradle/guides.gradle"
-
+//apply from: "gradle/guides.gradle"
 
 repositories {
     mavenCentral()
@@ -41,23 +49,51 @@ task copyHtmlToDist(type: Copy) {
 }
 task createDist {
     dependsOn('copyImagesToDist')
-    dependsOn('copyHtmlToDist')
-    finalizedBy('generateTestScript')
 }
 clean.dependsOn('cleanAsciidoctorFolder')
 build.dependsOn('asciidoctor')
-asciidoctor.mustRunAfter('generateGuides')
-build.dependsOn('generateGuides')
-build.finalizedBy('createDist')
+
+asciidoctor.dependsOn('generateCodeZip')
+asciidoctor.finalizedBy('copyHtmlToDist')
+task generateSampleProjects {
+    ext {
+        metadataConfigName = 'metadata.yml'
+        output = "$buildDir/code"
+    }
+    doLast {
+        GuideProjectGenerator generator = new GuideProjectGenerator()
+        new File("guides").eachDir { dir ->
+            File configFile = new File("$dir/$metadataConfigName")
+            if (!configFile.exists()) {
+                throw new GradleException("metadata file not found for ${dir.name}")
+            }
+            def config = new JsonSlurper().parse(configFile)
+            GuideMetadata metadata = new GuideMetadata(asciidoctor: config.asciidoctor,
+                    slug: config.slug,
+                    title: config.title,
+                    intro: config.intro,
+                    features: config.features,
+                    authors: config.authors,
+                    languages: config.languages ?: ['java', 'groovy', 'kotlin'],
+                    buildTools: config.buildTools ?: ['gradle', 'maven'],
+                    testFramework: config.testFramework
+            )
+            generator.generate(metadata, dir, new File(output))
+            GuideAsciidocGenerator.generate(metadata, dir, new File('src/docs/asciidoc'))
+        }
+        generator.close()
+    }
+    finalizedBy('generateTestScript')
+}
+
 
 task generateTestScript {
     ext {
         excludeDirs = ['images']
-        distDir = 'build/dist'
         stopIfFailure = false
     }
     doLast {
-        File output = new File(distDir + "/test.sh")
+        File output = new File(generateSampleProjects.output + "/test.sh")
         output.createNewFile()
         String bashScript = '''\
 #!/usr/bin/env bash
@@ -66,9 +102,8 @@ set -e
 FAILED_PROJECTS=()
 EXIT_STATUS=0
 '''
-        new File(distDir).eachDir {dir ->
+        new File(generateSampleProjects.output).eachDir {dir ->
             if (!excludeDirs.contains(dir.name)) {
-                println dir.name
                 bashScript += """\
 
 cd ${dir.name}
@@ -115,5 +150,16 @@ fi
 }
         output.text = bashScript
         output.setExecutable(true)
+    }
+}
+
+task generateCodeZip {
+    dependsOn 'generateSampleProjects'
+    dependsOn 'createDist'
+    doLast {
+        new File(generateSampleProjects.output).eachDir { dir ->
+            String filename = projectDir.absolutePath + "/build/dist/" + dir.absolutePath.substring(dir.absolutePath.lastIndexOf('/')) + ".zip"
+            GenerateGuideZip.compressZipfile(dir.absolutePath, filename)
+        }
     }
 }

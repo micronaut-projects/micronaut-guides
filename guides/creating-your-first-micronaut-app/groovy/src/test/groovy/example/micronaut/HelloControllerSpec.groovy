@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName()
-}
+package example.micronaut
 
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.RxHttpClient
@@ -16,11 +8,11 @@ import spock.lang.Specification
 
 import javax.inject.Inject
 
-@@MicronautTest // <1>
+@MicronautTest // <1>
 class HelloControllerSpec extends Specification {
 
-    @@Inject
-    @@Client("/")  // <2>
+    @Inject
+    @Client("/")  // <2>
     RxHttpClient client
 
     void "test hello world response"() {

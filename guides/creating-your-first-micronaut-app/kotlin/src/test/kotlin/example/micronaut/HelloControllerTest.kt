@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName()
-}
+package example.micronaut
 
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.RxHttpClient
@@ -16,13 +8,13 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
-@@MicronautTest // <1>
+@MicronautTest // <1>
 class HelloControllerTest {
-    @@Inject
-    @@field:Client("/")  // <2>
+    @Inject
+    @field:Client("/")  // <2>
     lateinit var client : RxHttpClient
 
-    @@Test
+    @Test
     fun testHello() {
         val request: HttpRequest<Any> = HttpRequest.GET("/hello")  // <3>
         val body = client.toBlocking().retrieve(request)

@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName();
-}
+package example.micronaut;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,14 +11,14 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
-@@MicronautTest // <1>
+@MicronautTest // <1>
 public class HelloControllerTest {
 
-    @@Inject
-    @@Client("/")  // <2>
+    @Inject
+    @Client("/")  // <2>
     RxHttpClient client;
 
-    @@Test
+    @Test
     public void testHello() {
         HttpRequest<String> request = HttpRequest.GET("/hello");  // <3>
         String body = client.toBlocking().retrieve(request);
