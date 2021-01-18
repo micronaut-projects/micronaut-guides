@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName();
-}
+package example.micronaut;
 
 import javax.inject.Singleton;
 import javax.validation.ConstraintViolation;
@@ -15,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@@Singleton
+@Singleton
 public class MessageSource {
 
     public List<String> violationsMessages(Set<ConstraintViolation<?>> violations) {

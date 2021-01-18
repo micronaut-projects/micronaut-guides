@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName();
-}
+package example.micronaut;
 
 import io.micronaut.core.annotation.Introspected;
 
@@ -14,13 +6,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-@@Introspected // <1>
+@Introspected // <1>
 public class CommandBookSave {
-    @@NotBlank // <2>
+    @NotBlank // <2>
     private String title;
 
-    @@NotNull // <3>
-    @@Positive // <4>
+    @NotNull // <3>
+    @Positive // <4>
     private Integer pages;
 
     public CommandBookSave() {

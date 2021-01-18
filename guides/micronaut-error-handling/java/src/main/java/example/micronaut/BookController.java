@@ -1,14 +1,6 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
 //tag::package[]
-package @project.getPackageName();
+package example.micronaut;
 //end::package[]
-}
 
 //tag::imports[]
 import io.micronaut.http.HttpRequest;
@@ -31,7 +23,7 @@ import java.util.Optional;
 //end::imports[]
 
 //tag::clazz[]
-@@Controller("/books") // <1>
+@Controller("/books") // <1>
 public class BookController {
 //end::clazz[]
 
@@ -44,32 +36,32 @@ public class BookController {
     //end::di[]
 
     //tag::create[]
-    @@View("bookscreate") // <2>
-    @@Get("/create") // <3>
+    @View("bookscreate") // <2>
+    @Get("/create") // <3>
     public Map<String, Object> create() {
         return createModelWithBlankValues();
     }
     //end::create[]
 
     //tag::stock[]
-    @@Produces(MediaType.TEXT_PLAIN)
-    @@Get("/stock/{isbn}")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Get("/stock/{isbn}")
     public Integer stock(String isbn) {
         throw new OutOfStockException();
     }
     //end::stock[]
 
     //tag::save[]
-    @@Consumes(MediaType.APPLICATION_FORM_URLENCODED) // <4>
-    @@Post("/save") // <5>
-    public HttpResponse save(@@Valid @@Body CommandBookSave cmd) { // <6>
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) // <4>
+    @Post("/save") // <5>
+    public HttpResponse save(@Valid @Body CommandBookSave cmd) { // <6>
         return HttpResponse.ok();
     }
     //end::save[]
 
     //tag::onSavedFailed[]
-    @@View("bookscreate")
-    @@Error(exception = ConstraintViolationException.class) // <2>
+    @View("bookscreate")
+    @Error(exception = ConstraintViolationException.class) // <2>
     public Map<String, Object> onSavedFailed(HttpRequest request, ConstraintViolationException ex) { // <3>
         final Map<String, Object> model = createModelWithBlankValues();
         model.put("errors", messageSource.violationsMessages(ex.getConstraintViolations()));

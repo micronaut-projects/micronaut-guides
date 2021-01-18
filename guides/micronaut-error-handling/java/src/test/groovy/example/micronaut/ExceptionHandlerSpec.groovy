@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName()
-}
+package example.micronaut
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.http.HttpRequest
@@ -18,11 +10,11 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 class ExceptionHandlerSpec extends Specification {
-    @@Shared
-    @@AutoCleanup
+    @Shared
+    @AutoCleanup
     EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer)
 
-    @@Shared
+    @Shared
     BlockingHttpClient client = embeddedServer.applicationContext.createBean(HttpClient, embeddedServer.URL).toBlocking()
 
     void "test OutOfStockException is handled by ExceptionHandler"() {

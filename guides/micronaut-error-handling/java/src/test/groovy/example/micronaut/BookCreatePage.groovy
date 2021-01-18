@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName()
-}
+package example.micronaut
 
 import geb.Page
 import geb.error.RequiredPageContentNotPresent

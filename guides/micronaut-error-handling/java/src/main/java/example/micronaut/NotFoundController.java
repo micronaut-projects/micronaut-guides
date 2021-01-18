@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName();
-}
+package example.micronaut;
 
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -20,7 +12,7 @@ import io.micronaut.views.ViewsRenderer;
 
 import java.util.Collections;
 
-@@Controller("/notfound") // <1>
+@Controller("/notfound") // <1>
 public class NotFoundController {
 
     private final ViewsRenderer viewsRenderer;
@@ -29,7 +21,7 @@ public class NotFoundController {
         this.viewsRenderer = viewsRenderer;
     }
 
-    @@Error(status = HttpStatus.NOT_FOUND, global = true)  // <3>
+    @Error(status = HttpStatus.NOT_FOUND, global = true)  // <3>
     public HttpResponse notFound(HttpRequest request) {
         if (request.getHeaders()
                 .accept()

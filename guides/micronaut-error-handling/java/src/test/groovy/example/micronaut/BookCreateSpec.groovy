@@ -1,12 +1,4 @@
-@import io.micronaut.starter.application.Project
-
-@args (
-Project project
-)
-
-@if (project.getPackageName() != null) {
-package @project.getPackageName()
-}
+package example.micronaut
 
 import geb.spock.GebSpec
 import io.micronaut.context.ApplicationContext
@@ -16,8 +8,8 @@ import spock.lang.Shared
 
 class BookCreateSpec extends GebSpec {
 
-    @@Shared
-    @@AutoCleanup
+    @Shared
+    @AutoCleanup
     EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer)
 
     void "verify validation in the form works"() {
