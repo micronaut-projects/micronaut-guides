@@ -13,6 +13,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class GenerateGuideZip {
+
     public static void compressZipfile(String sourceDir, String outputFile) throws IOException, FileNotFoundException {
         ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(outputFile));
         compressDirectoryToZipfile(sourceDir, sourceDir, zipFile);

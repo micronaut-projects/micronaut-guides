@@ -34,7 +34,7 @@ public class DependencyLines {
 
     static String toGradleScope(Map<String, String> attributes) {
         String s = attributes.get("scope");
-        if (s==null) {
+        if (s == null) {
             return null;
         }
         switch (s) {
@@ -46,7 +46,8 @@ public class DependencyLines {
                 return "testImplementation";
             case "provided":
                 return "developmentOnly";
-            default: return s;
+            default:
+                return s;
         }
     }
 
@@ -61,10 +62,10 @@ public class DependencyLines {
                 attributes.put(keyValues[0], keyValues[1]);
             }
         }
-        String groupId = attributes.containsKey("groupId") ? attributes.get("groupId")  : "io.micronaut";
-        String scope = attributes.containsKey("scope") ? attributes.get("scope"): "implementation";
-        String gradleScope = toGradleScope(attributes) != null ?  toGradleScope(attributes) : SCOPE_IMPLEMENTATION;
-        String mavenScope = toMavenScope(attributes)  != null ? toMavenScope(attributes) : SCOPE_COMPILE;
+        String groupId = attributes.getOrDefault("groupId", "io.micronaut");
+        String scope = attributes.getOrDefault("scope", "implementation");
+        String gradleScope = toGradleScope(attributes) != null ? toGradleScope(attributes) : SCOPE_IMPLEMENTATION;
+        String mavenScope = toMavenScope(attributes) != null ? toMavenScope(attributes) : SCOPE_COMPILE;
         List<String> dependencyLines = new ArrayList<>();
 
         if (buildTool == BuildTool.GRADLE) {
@@ -84,7 +85,7 @@ public class DependencyLines {
             dependencyLines.add("<dependency>");
             dependencyLines.add("    <groupId>" + groupId + "</groupId>");
             dependencyLines.add("     <artifactId>" + artifactId + "</artifactId>");
-            if (mavenScope != SCOPE_COMPILE) {
+            if (!mavenScope.equals(SCOPE_COMPILE)) {
                 dependencyLines.add("    <scope>" + mavenScope + "</scope>");
             }
             dependencyLines.add("</dependency>");

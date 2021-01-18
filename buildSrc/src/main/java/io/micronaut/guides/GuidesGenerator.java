@@ -13,7 +13,6 @@ import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.application.generator.ProjectGenerator;
 import io.micronaut.starter.io.ConsoleOutput;
 import io.micronaut.starter.io.FileSystemOutputHandler;
-import io.micronaut.starter.io.ZipOutputHandler;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.JdkVersion;
 import io.micronaut.starter.options.Language;
@@ -27,7 +26,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +38,7 @@ public class GuidesGenerator {
     public GuidesGenerator(ProjectGenerator projectGenerator) {
         this.projectGenerator = projectGenerator;
     }
+
     public void generateAppIntoDirectory(
             @NonNull File directory,
             @NotNull ApplicationType type,
