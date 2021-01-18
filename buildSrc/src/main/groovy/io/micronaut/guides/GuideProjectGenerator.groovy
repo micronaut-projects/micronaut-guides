@@ -13,7 +13,6 @@ import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 
 class GuideProjectGenerator implements Closeable {
 
@@ -105,7 +104,7 @@ class GuideProjectGenerator implements Closeable {
         if (testFramework != null) {
             return TestFramework.valueOf(testFramework.toUpperCase())
         }
-        if(language == Language.GROOVY) {
+        if (language == Language.GROOVY) {
             return TestFramework.SPOCK
         }
         TestFramework.JUNIT

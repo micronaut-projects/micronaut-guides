@@ -1,7 +1,6 @@
 package io.micronaut.guides
 
 import groovy.transform.CompileStatic
-import org.gradle.api.tasks.Input
 
 @CompileStatic
 class GuideMetadata {

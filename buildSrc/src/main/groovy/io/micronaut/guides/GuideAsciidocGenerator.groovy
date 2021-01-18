@@ -83,7 +83,7 @@ class GuideAsciidocGenerator {
             text = text.replace("@sourceDir@", projectName)
 
             Path destinationPath = Paths.get(destinationFolder.absolutePath, projectName + ".adoc")
-            File destination =  destinationPath.toFile()
+            File destination = destinationPath.toFile()
             destination.createNewFile()
             destination.text = text
         }
