@@ -17,7 +17,7 @@ public class BasicAuthClientTest {
     @Test
     void verifyBasicAuthWorks() {
         String credsEncoded = Base64.getEncoder().encodeToString("sherlock:password".getBytes());
-        String rsp = appClient.home("Basic " +credsEncoded);
+        String rsp = appClient.home("Basic " +credsEncoded); // <3>
         assertEquals(rsp, "sherlock");
     }
 

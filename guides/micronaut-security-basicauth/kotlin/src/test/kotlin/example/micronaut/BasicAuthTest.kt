@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 import javax.inject.Inject
 
-@MicronautTest
+@MicronautTest // <1>
 class BasicAuthTest {
 
     @Inject

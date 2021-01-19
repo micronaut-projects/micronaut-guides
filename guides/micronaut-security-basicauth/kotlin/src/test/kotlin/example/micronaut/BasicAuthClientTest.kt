@@ -15,7 +15,7 @@ class BasicAuthClientTest {
     @Test
     fun verifyBasicAuthWorks() {
         val credsEncoded = Base64.getEncoder().encodeToString("sherlock:password".toByteArray())
-        val rsp = appClient.home("Basic $credsEncoded")
+        val rsp = appClient.home("Basic $credsEncoded") // <3>
         assertEquals(rsp, "sherlock")
     }
 }

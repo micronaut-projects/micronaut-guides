@@ -9,7 +9,7 @@ import io.micronaut.http.client.annotation.Client
 @Client("/")
 interface AppClient {
 
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN) // <1>
     @Get("/")
-    fun home(@Header authorization: String): String
+    fun home(@Header authorization: String): String // <2>
 }
