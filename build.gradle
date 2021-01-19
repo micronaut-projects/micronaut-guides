@@ -27,6 +27,8 @@ repositories {
 }
 
 task cleanAsciidoctorFolder {
+    group 'guides'
+    description 'Cleans src/docs/asciidoc folder'
     doLast {
         File f = new File('src/docs/asciidoc')
         if (f.exists()) {
@@ -35,16 +37,21 @@ task cleanAsciidoctorFolder {
     }
 }
 task copyImagesToDist(type: Copy) {
+    group 'guides'
+    description 'Copies images from src/docs/images to build/dist/images folder'
     from 'src/docs/images'
     into "${project.buildDir}/dist/images"
     include '*.png'
 }
 task copyHtmlToDist(type: Copy) {
+    group 'guides'
+    description 'Copies HTML generated from Asciidoc from build/docs/asciidoc to build/dist'
     from "${project.buildDir}/docs/asciidoc"
     into "${project.buildDir}/dist"
     exclude 'common-*.html'
 }
 task createDist {
+    description 'Creates build/dist folder with static assets'
     dependsOn('copyImagesToDist')
 }
 clean.dependsOn('cleanAsciidoctorFolder')
@@ -52,7 +59,10 @@ build.dependsOn('asciidoctor')
 
 asciidoctor.dependsOn('generateCodeZip')
 asciidoctor.finalizedBy('copyHtmlToDist')
+
 task generateSampleProjects {
+    description 'Generates guide applications at buid/code'
+    group 'guides'
     ext {
         metadataConfigName = 'metadata.json'
         output = "$buildDir/code"
@@ -66,6 +76,8 @@ task generateSampleProjects {
 }
 
 task generateTestScript {
+    group 'guides'
+    description 'Generates a test.sh to runs every guide test at build/code'
     ext {
         excludeDirs = ['images']
         stopIfFailure = false
@@ -80,6 +92,8 @@ task generateTestScript {
 }
 
 task generateCodeZip {
+    group 'guides'
+    description 'Generates a ZIP file for each application at build/code into build/dist'
     dependsOn 'generateSampleProjects'
     dependsOn 'createDist'
     doLast {
