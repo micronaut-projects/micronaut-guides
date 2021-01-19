@@ -2,6 +2,7 @@ package io.micronaut.guides
 
 import edu.umd.cs.findbugs.annotations.NonNull
 import edu.umd.cs.findbugs.annotations.Nullable
+import groovy.json.JsonSlurper
 import io.micronaut.context.ApplicationContext
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
@@ -32,7 +33,35 @@ class GuideProjectGenerator implements Closeable {
         applicationContext.close()
     }
 
-    void generate(GuideMetadata metadata, File inputDir, File outputDir) {
+    void generate(File guidesFolder,
+                  File output,
+                  String metadataConfigName,
+                  boolean merge = true,
+                  File asciidocDir = null) {
+        guidesFolder.eachDir { dir ->
+            File configFile = new File("$dir/$metadataConfigName")
+            if (!configFile.exists()) {
+                throw new GradleException("metadata file not found for ${dir.name}")
+            }
+            def config = new JsonSlurper().parse(configFile)
+            GuideMetadata metadata = new GuideMetadata(asciidoctor: config.asciidoctor,
+                    slug: config.slug,
+                    title: config.title,
+                    intro: config.intro,
+                    features: config.features,
+                    authors: config.authors,
+                    languages: config.languages ?: ['java', 'groovy', 'kotlin'],
+                    buildTools: config.buildTools ?: ['gradle', 'maven'],
+                    testFramework: config.testFramework
+            )
+            generate(metadata, dir, output, merge)
+            if (asciidocDir != null) {
+                GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+            }
+        }
+    }
+
+    void generate(GuideMetadata metadata, File inputDir, File outputDir, boolean merge = true) {
         String packageAndName = "${basePackage}.${appName}"
         ApplicationType type = ApplicationType.DEFAULT
         String name = metadata.slug
@@ -54,11 +83,14 @@ class GuideProjectGenerator implements Closeable {
             File destination = destinationPath.toFile()
             destination.mkdir()
             guidesGenerator.generateAppIntoDirectory(destination, type, packageAndName, guidesFeatures, buildTool, testFramework, lang, javaVersion)
-            Path sourcePath = Paths.get(inputDir.absolutePath, guidesOption.language.toString())
-            if (!sourcePath.toFile().exists()) {
-                throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
+            if (merge) {
+                Path sourcePath = Paths.get(inputDir.absolutePath, guidesOption.language.toString())
+                if (!sourcePath.toFile().exists()) {
+                    throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
+                }
+                Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
             }
-            Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
+
         }
     }
 

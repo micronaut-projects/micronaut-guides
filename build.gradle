@@ -3,6 +3,7 @@ import io.micronaut.guides.GenerateGuideZip
 import io.micronaut.guides.GuideAsciidocGenerator
 import io.micronaut.guides.GuideMetadata
 import io.micronaut.guides.GuideProjectGenerator
+import io.micronaut.guides.TestScriptGenerator
 
 buildscript {
     repositories {
@@ -58,25 +59,7 @@ task generateSampleProjects {
     }
     doLast {
         GuideProjectGenerator generator = new GuideProjectGenerator()
-        new File("${projectDir}/guides").eachDir { dir ->
-            File configFile = new File("$dir/$metadataConfigName")
-            if (!configFile.exists()) {
-                throw new GradleException("metadata file not found for ${dir.name}")
-            }
-            def config = new JsonSlurper().parse(configFile)
-            GuideMetadata metadata = new GuideMetadata(asciidoctor: config.asciidoctor,
-                    slug: config.slug,
-                    title: config.title,
-                    intro: config.intro,
-                    features: config.features,
-                    authors: config.authors,
-                    languages: config.languages ?: ['java', 'groovy', 'kotlin'],
-                    buildTools: config.buildTools ?: ['gradle', 'maven'],
-                    testFramework: config.testFramework
-            )
-            generator.generate(metadata, dir, new File(output))
-            GuideAsciidocGenerator.generate(metadata, dir, new File("${projectDir}/src/docs/asciidoc"))
-        }
+        generator.generate(new File("${projectDir}/guides"), new File(output), metadataConfigName, true, new File("${projectDir}/src/docs/asciidoc"))
         generator.close()
     }
     finalizedBy('generateTestScript')
@@ -88,62 +71,10 @@ task generateTestScript {
         stopIfFailure = false
     }
     doLast {
+        File outputFolder = new File(generateSampleProjects.output)
         File output = new File(generateSampleProjects.output + "/test.sh")
         output.createNewFile()
-        String bashScript = '''\
-#!/usr/bin/env bash
-set -e
-
-FAILED_PROJECTS=()
-EXIT_STATUS=0
-'''
-        new File(generateSampleProjects.output).eachDir {dir ->
-            if (!excludeDirs.contains(dir.name)) {
-                bashScript += """\
-
-cd ${dir.name}
-echo "-------------------------------------------------"
-echo "Executing '${dir.name}' tests"
-${dir.name.contains('gradle') ? './gradlew test' : './mvnw test' } || EXIT_STATUS=\$?
-cd ..
-"""
-if (stopIfFailure) {
-    bashScript += """\
-if [ \$EXIT_STATUS -ne 0 ]; then
-  echo "'${dir.name}' tests failed => exit \$EXIT_STATUS"
-  exit \$EXIT_STATUS
-fi
-"""
-} else {
-    bashScript += """\
-if [ \$EXIT_STATUS -ne 0 ]; then
-  FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" ${dir.name})
-  echo "'${dir.name}' tests failed => exit \$EXIT_STATUS"
-fi
-EXIT_STATUS=0
-"""
-}
-            }
-
-        }
-if (!stopIfFailure) {
-    bashScript += '''
-if [ ${#FAILED_PROJECTS[@]} -ne 0 ]; then
-  echo ""
-  echo "-------------------------------------------------"
-  echo "Projects with errors:"
-  for p in `echo ${FAILED_PROJECTS[@]}`; do
-    echo "  $p"
-  done;
-  echo "-------------------------------------------------"
-  exit 1
-else
-  exit 0
-fi
-
-'''
-}
-        output.text = bashScript
+        output.text = TestScriptGenerator.generateScript(outputFolder)
         output.setExecutable(true)
     }
 }
