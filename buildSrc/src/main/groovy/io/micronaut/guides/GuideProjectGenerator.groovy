@@ -56,7 +56,7 @@ class GuideProjectGenerator implements Closeable {
             guidesGenerator.generateAppIntoDirectory(destination, type, packageAndName, guidesFeatures, buildTool, testFramework, lang, javaVersion)
             Path sourcePath = Paths.get(inputDir.absolutePath, guidesOption.language.toString())
             if (!sourcePath.toFile().exists()) {
-                throw new GradleException("source folder " + source.absolutePath + " does not exist")
+                throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
             }
             Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
         }

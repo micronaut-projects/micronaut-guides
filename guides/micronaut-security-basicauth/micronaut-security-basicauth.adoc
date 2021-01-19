@@ -1,0 +1,106 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+https://tools.ietf.org/html/rfc7617[RFC7617] defines the "Basic" Hypertext Transfer Protocol (HTTP) authentication scheme, which transmits credentials as user-id/password pairs, encoded using Base64.
+
+In this guide you are going to create a Micronaut app and secure it with HTTP Basic Auth.
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+=== Security Dependency
+
+Add Micronaut’s security dependency to your build file.
+
+dependency:micronaut-security[groupId:io.micronaut.security]
+
+=== Authentication Provider
+
+To keep this guide simple, create a naive `AuthenticationProvider` to simulate user's authentication.
+
+source:AuthenticationProviderUserPassword[]
+
+<1> To register a Singleton in Micronaut's application context, annotate your class with `javax.inject.Singleton`
+<2> A Micronaut's Authentication Provider implements the interface `io.micronaut.security.authentication.AuthenticationProvider`
+
+=== Controllers
+
+Create a file named `HomeController` which resolves the base URL `/`:
+
+source:HomeController[]
+
+<1> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
+<2> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut controller.
+<3> You can specify the HTTP verb that a controller's action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<4> If a user is authenticated, Micronaut will bind the user object to an argument of type `java.security.Principal` (if present).
+
+=== Tests
+
+Create a test which verifies the user authentication flow via Basic Auth.
+
+test:BasicAuthTest[]
+
+<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Inject the `RxHttpClient` bean.
+<3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+<4> If you attempt to access a secured endpoint without authentication, 401 is returned
+<5> By using `basicAuth` method, you populate the `Authorization` header with user-id:password pairs, encoded using Base64.
+<6> Micronaut's `HttpClient` simplifies parsing HTTP response payload to Java objects. In this example, we parse the response to `String`.
+<7> Use `.body()` to retrieve the parsed payload.
+
+=== Use Micronaut's HTTP Client and Basic Auth
+
+If you want to access a secured endpoint, you can also use Micronaut's HTTP Client and supply the Basic Auth as the Authorization header value.
+
+First create a `@Client` with a method `home` which accepts an `Authorization` HTTP Header.
+
+test:AppClient[]
+
+<1> The method consumes plain text, because of it Micronaut includes the HTTP Header `Accept: text/plain`.
+<2> The first character of the parameter name is capitalized and that value (`Authorization`) is used the HTTP Header name. If you wish to change the parameter name you can specify the `@Header` annotation value.
+
+Create a test which uses the previous `@Client`
+
+test:BasicAuthClientTest[]
+
+<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Inject the `AppClient` bean.
+<3> Generate Basic Auth header value and pass it as the parameter value.
+
+include::{commondir}/common-testApp.adoc[]
+
+include::{commondir}/common-runapp.adoc[]
+
+To test the running application, issue a GET request to localhost:8080 with a basic authentication header in place.  One way to do this is with the popular curl command:
+----
+curl -v -u sherlock:password localhost:8080
+----
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You can invoke the controller exposed by the native image:
+
+[source,bash]
+----
+curl "http://localhost:8080" -u 'sherlock:password'
+----
+
+:exclude-for-languages:
+
+== Next steps
+
+Check https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html[Micronaut's security documentation] to learn more.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

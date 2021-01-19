@@ -58,7 +58,7 @@ task generateSampleProjects {
     }
     doLast {
         GuideProjectGenerator generator = new GuideProjectGenerator()
-        new File("guides").eachDir { dir ->
+        new File("${projectDir}/guides").eachDir { dir ->
             File configFile = new File("$dir/$metadataConfigName")
             if (!configFile.exists()) {
                 throw new GradleException("metadata file not found for ${dir.name}")
@@ -75,7 +75,7 @@ task generateSampleProjects {
                     testFramework: config.testFramework
             )
             generator.generate(metadata, dir, new File(output))
-            GuideAsciidocGenerator.generate(metadata, dir, new File('src/docs/asciidoc'))
+            GuideAsciidocGenerator.generate(metadata, dir, new File("${projectDir}/src/docs/asciidoc"))
         }
         generator.close()
     }

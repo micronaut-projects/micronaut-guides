@@ -42,7 +42,11 @@ class GuideAsciidocGenerator {
             boolean excludeLineForLanguage = false
             boolean excludeLineForBuild = false
             for (String line : rawLines) {
-                if (line.startsWith('dependency:') && line.contains('[') && line.endsWith(']')) {
+                if (line.startsWith('source:') && line.contains('[') && line.endsWith(']')) {
+                    lines.addAll(sourceIncludeLines(line.substring('source:'.length(), line.indexOf('['))))
+                } else if (line.startsWith('test:') && line.contains('[') && line.endsWith(']')) {
+                    lines.addAll(sourceIncludeLines(line.substring('test:'.length(), line.indexOf('[')), guidesOption.testFramework))
+                } else if (line.startsWith('dependency:') && line.contains('[') && line.endsWith(']')) {
                     lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool))
 
                 } else if (line == ':exclude-for-build:') {
@@ -76,10 +80,11 @@ class GuideAsciidocGenerator {
             text = text.replace("@micronaut@", new File("version.txt").text)
             text = text.replace("@lang@", guidesOption.language.toString())
             text = text.replace("@build@", guidesOption.buildTool.toString())
+            text = text.replace("@testFramework@", guidesOption.testFramework.toString())
             text = text.replace("@authors@", metadata.authors.join(', '))
             text = text.replace("@languageextension@", guidesOption.language.extension)
             text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
-            text = text.replace("@language@", guidesOption.language.toString())
+
             text = text.replace("@sourceDir@", projectName)
 
             Path destinationPath = Paths.get(destinationFolder.absolutePath, projectName + ".adoc")
@@ -87,5 +92,24 @@ class GuideAsciidocGenerator {
             destination.createNewFile()
             destination.text = text
         }
+    }
+
+    static List<String> sourceIncludeLines(String name,
+                                           TestFramework testFramework = null) {
+        String fileName = name
+        if (testFramework) {
+            if (name.endsWith('Test')) {
+                fileName = name.substring(0, name.indexOf('Test'))
+                fileName += testFramework == TestFramework.SPOCK ? 'Spec' : 'Test'
+            }
+        }
+        String folder = testFramework ? 'test' : 'main'
+[
+'[source,@lang@]',
+".src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@",
+'----',
+"include::{sourceDir}/@sourceDir@/src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[]",
+'----',
+]
     }
 }
