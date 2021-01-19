@@ -25,7 +25,7 @@ public class GenerateGuideZip {
             if (file.isDirectory()) {
                 compressDirectoryToZipfile(rootDir, sourceDir + File.separator + file.getName(), out);
             } else {
-                ZipEntry entry = new ZipEntry(sourceDir.replace(rootDir, "") + file.getName());
+                ZipEntry entry = new ZipEntry(sourceDir.replace(rootDir, "") + File.separator + file.getName());
                 out.putNextEntry(entry);
 
                 Path p = Paths.get(sourceDir, file.getName());
