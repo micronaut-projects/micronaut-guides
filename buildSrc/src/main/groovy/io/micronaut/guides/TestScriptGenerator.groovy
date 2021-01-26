@@ -15,7 +15,7 @@ EXIT_STATUS=0
 cd ${dir.name}
 echo "-------------------------------------------------"
 echo "Executing '${dir.name}' tests"
-${dir.name.contains('gradle') ? './gradlew test' : './mvnw test' } || EXIT_STATUS=\$?
+${dir.name.contains('gradle') ? './gradlew -q test' : './mvnw -q test' } || EXIT_STATUS=\$?
 cd ..
 """
             if (stopIfFailure) {
