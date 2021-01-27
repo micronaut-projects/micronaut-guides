@@ -3,7 +3,10 @@ package io.micronaut.guides
 import edu.umd.cs.findbugs.annotations.NonNull
 import edu.umd.cs.findbugs.annotations.Nullable
 import groovy.json.JsonSlurper
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
+import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
@@ -15,6 +18,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+@CompileStatic
 class GuideProjectGenerator implements Closeable {
 
     private final ApplicationContext applicationContext
@@ -33,6 +37,7 @@ class GuideProjectGenerator implements Closeable {
         applicationContext.close()
     }
 
+    @CompileDynamic
     void generate(File guidesFolder,
                   File output,
                   String metadataConfigName,
@@ -48,11 +53,13 @@ class GuideProjectGenerator implements Closeable {
                     slug: config.slug,
                     title: config.title,
                     intro: config.intro,
-                    features: config.features,
                     authors: config.authors,
                     languages: config.languages ?: ['java', 'groovy', 'kotlin'],
                     buildTools: config.buildTools ?: ['gradle', 'maven'],
-                    testFramework: config.testFramework
+                    testFramework: config.testFramework,
+                    skipGradleTests: config.skipGradleTests ?: false,
+                    skipMavenTests: config.skipMavenTests ?: false,
+                    apps: config.apps.collect { it -> new App(name: it.name, features: it.features) }
             )
             generate(metadata, dir, output, merge)
             if (asciidocDir != null) {
@@ -65,32 +72,42 @@ class GuideProjectGenerator implements Closeable {
         String packageAndName = "${basePackage}.${appName}"
         ApplicationType type = ApplicationType.DEFAULT
         String name = metadata.slug
+
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
-            List<String> guidesFeatures = metadata.features
-            if (guidesOption.language == Language.GROOVY) {
-                guidesFeatures.remove('graalvm')
-            }
+
             BuildTool buildTool = guidesOption.buildTool
             TestFramework testFramework = guidesOption.testFramework
             Language lang = guidesOption.language
             JdkVersion javaVersion = JdkVersion.JDK_8
-            String folder = "${name}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}"
+
             if (!outputDir.exists()) {
                 outputDir.mkdir()
             }
-            Path destinationPath = Paths.get(outputDir.absolutePath, folder)
-            File destination = destinationPath.toFile()
-            destination.mkdir()
-            guidesGenerator.generateAppIntoDirectory(destination, type, packageAndName, guidesFeatures, buildTool, testFramework, lang, javaVersion)
-            if (merge) {
-                Path sourcePath = Paths.get(inputDir.absolutePath, guidesOption.language.toString())
-                if (!sourcePath.toFile().exists()) {
-                    throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
-                }
-                Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
-            }
 
+            for (App app: metadata.apps) {
+                List<String> appFeatures = app.features
+                if (guidesOption.language == Language.GROOVY) {
+                    appFeatures.remove('graalvm')
+                }
+
+                // Normal guide use 'default' as name, multi project guides have different modules
+                String appName = app.name == 'default' ? "" : app.name
+
+                String folder = "${name}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}"
+
+                Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
+                File destination = destinationPath.toFile()
+                destination.mkdir()
+                guidesGenerator.generateAppIntoDirectory(destination, type, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
+                if (merge) {
+                    Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
+                    if (!sourcePath.toFile().exists()) {
+                        throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
+                    }
+                    Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
+                }
+            }
         }
     }
 
