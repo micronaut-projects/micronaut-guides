@@ -2,7 +2,7 @@ package io.micronaut.guides
 
 class TestScriptGenerator {
 
-    static String generateScript(File codeDir, boolean stopIfFailure = false) {
+    static String generateScript(File codeDir, boolean stopIfFailure) {
         String bashScript = '''\
 #!/usr/bin/env bash
 set -e
