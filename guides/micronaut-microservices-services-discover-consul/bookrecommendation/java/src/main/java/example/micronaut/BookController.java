@@ -4,19 +4,19 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.reactivex.Flowable;
 
-@Controller("/books")
+@Controller("/books") // <1>
 public class BookController {
 
     private final BookCatalogueOperations bookCatalogueOperations;
     private final BookInventoryOperations bookInventoryOperations;
 
     public BookController(BookCatalogueOperations bookCatalogueOperations,
-                          BookInventoryOperations bookInventoryOperations) {
+                          BookInventoryOperations bookInventoryOperations) { // <2>
         this.bookCatalogueOperations = bookCatalogueOperations;
         this.bookInventoryOperations = bookInventoryOperations;
     }
 
-    @Get
+    @Get // <3>
     public Flowable<BookRecommendation> index() {
         return bookCatalogueOperations.findAll()
                 .flatMapMaybe(b -> bookInventoryOperations.stock(b.getIsbn())
