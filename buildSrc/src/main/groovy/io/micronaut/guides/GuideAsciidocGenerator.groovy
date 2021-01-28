@@ -1,11 +1,13 @@
 package io.micronaut.guides
 
+import groovy.transform.CompileStatic
 import io.micronaut.core.util.StringUtils
 import io.micronaut.starter.api.TestFramework
 
 import java.nio.file.Path
 import java.nio.file.Paths
 
+@CompileStatic
 class GuideAsciidocGenerator {
 
     static void generate(GuideMetadata metadata, File inputDir, File destinationFolder) {
@@ -42,11 +44,19 @@ class GuideAsciidocGenerator {
             boolean excludeLineForLanguage = false
             boolean excludeLineForBuild = false
             for (String line : rawLines) {
-                if (line.startsWith('source:') && line.contains('[') && line.endsWith(']')) {
-                    lines.addAll(sourceIncludeLines(line.substring('source:'.length(), line.indexOf('['))))
-                } else if (line.startsWith('test:') && line.contains('[') && line.endsWith(']')) {
-                    lines.addAll(sourceIncludeLines(line.substring('test:'.length(), line.indexOf('[')), guidesOption.testFramework))
-                } else if (line.startsWith('dependency:') && line.contains('[') && line.endsWith(']')) {
+                if (shouldProcessLine(line, 'source:')) {
+                    lines.addAll(sourceIncludeLines(extractName(line, 'source:'), extractAppName(line)))
+
+                } else if (shouldProcessLine(line, 'test:')) {
+                    lines.addAll(sourceIncludeLines(extractName(line, 'test:'), extractAppName(line), guidesOption.testFramework))
+
+                } else if (shouldProcessLine(line, 'resource:')) {
+                    lines.addAll(resourceIncludeLines(extractName(line, 'resource:'), extractAppName(line), extractTagName(line)))
+
+                } else if (shouldProcessLine(line, 'testResource:')) {
+                    lines.addAll(testResourceIncludeLines(extractName(line, 'testResource:'), extractAppName(line), extractTagName(line)))
+
+                } else if (shouldProcessLine(line, 'dependency:')) {
                     lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool))
 
                 } else if (line == ':exclude-for-build:') {
@@ -94,7 +104,16 @@ class GuideAsciidocGenerator {
         }
     }
 
+    static boolean shouldProcessLine(String line, String macro) {
+        line.startsWith(macro) && line.contains('[') && line.endsWith(']')
+    }
+
+    static String extractName(String line, String macro) {
+        line.substring(macro.length(), line.indexOf('['))
+    }
+
     static List<String> sourceIncludeLines(String name,
+                                           String appName,
                                            TestFramework testFramework = null) {
         String fileName = name
         if (testFramework) {
@@ -104,12 +123,66 @@ class GuideAsciidocGenerator {
             }
         }
         String folder = testFramework ? 'test' : 'main'
-[
-'[source,@lang@]',
-".src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@",
-'----',
-"include::{sourceDir}/@sourceDir@/src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[]",
-'----',
-]
+        String module = appName ? "${appName}/" : ""
+
+        [
+            '[source,@lang@]',
+            ".${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@",
+            '----',
+            "include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[]",
+            '----',
+        ] as List<String>
+    }
+
+    static List<String> resourceIncludeLines(String name,
+                                             String appName,
+                                             String tagName) {
+        String fileName = name
+        String module = appName ? "${appName}/" : ""
+        String tag = tagName ? "tag=${tagName}" : ""
+
+        [
+            '[source,@lang@]',
+            ".${module}src/main/resources/${fileName}",
+            '----',
+            "include::{sourceDir}/@sourceDir@/${module}src/main/resources/${fileName}[${tag}]",
+            '----',
+        ] as List<String>
+    }
+
+    static List<String> testResourceIncludeLines(String name,
+                                                 String appName,
+                                                 String tagName) {
+        String fileName = name
+        String module = appName ? "${appName}/" : ""
+        String tag = tagName ? "tag=${tagName}" : ""
+
+        [
+            '[source,@lang@]',
+            ".${module}src/test/resources/${fileName}",
+            '----',
+            "include::{sourceDir}/@sourceDir@/${module}src/test/resources/${fileName}[${tag}]",
+            '----',
+        ] as List<String>
+    }
+
+    static String extractAppName(String line) {
+        extractFromParametersLine(line, 'app')
+    }
+
+    static String extractTagName(String line) {
+        extractFromParametersLine(line, 'tag')
+    }
+
+    static String extractFromParametersLine(String line, String attributeName) {
+        List<String> attrs = line.substring(line.indexOf("[") + 1, line.indexOf("]")).tokenize(",")
+
+        return attrs
+            .stream()
+            .filter({ it.startsWith(attributeName)})
+            .map( {it.tokenize("=")})
+            .map({it.get(1)})
+            .findFirst()
+            .orElse("")
     }
 }

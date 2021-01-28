@@ -69,27 +69,22 @@ public class DependencyLines {
         List<String> dependencyLines = new ArrayList<>();
 
         if (buildTool == BuildTool.GRADLE) {
-
             dependencyLines.add("[source, groovy]");
             dependencyLines.add(".build.gradle");
             dependencyLines.add("----");
-            //dependencyLines.add("dependencies {");
             dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")");
-            //dependencyLines.add("}");
             dependencyLines.add("----");
         } else if (buildTool == BuildTool.MAVEN) {
             dependencyLines.add("[source, xml]");
             dependencyLines.add(".pom.xml");
             dependencyLines.add("----");
-            //dependencyLines.add("<dependencies>");
             dependencyLines.add("<dependency>");
             dependencyLines.add("    <groupId>" + groupId + "</groupId>");
-            dependencyLines.add("     <artifactId>" + artifactId + "</artifactId>");
+            dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
             if (!mavenScope.equals(SCOPE_COMPILE)) {
                 dependencyLines.add("    <scope>" + mavenScope + "</scope>");
             }
             dependencyLines.add("</dependency>");
-            //dependencyLines.add("</dependencies>");
             dependencyLines.add("----");
         }
         return dependencyLines;
