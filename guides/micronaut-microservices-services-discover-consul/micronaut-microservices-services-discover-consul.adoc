@@ -1,0 +1,541 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+In this guide, we are going to create three microservices and register them with https://www.consul.io[Consul] Service discovery.
+
+____
+Consul is a distributed service mesh to connect, secure, and configure services across any runtime platform and public or private cloud
+____
+
+You will discover how Micronaut eases Consul integration.
+
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+Lets describe the microservices you are going to build through the tutorial.
+
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and isbn.
+
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fullfil an order.  I uses a domain consisting of a stock level and isbn.
+
+* `bookrecommendation` - It consumes previous services and exposes an endpoint which recommends book names which are in stock.
+
+Initially we are going to hardcode the addresses where the different services are in the `bookcatalogue` service.
+
+image::hardcoded.svg[]
+
+As shown in the previous image, the `bookcatalogue` hardcodes references to its collaborators.
+
+In the second part of this tutorial we are going to use a discovery service.
+
+[NOTE]
+====
+About __registration patterns__
+
+We will use a **self‑registration pattern**. Thus, each service instance is responsible for registering and
+deregistering itself with the service registry.
+Also, if required, a service instance sends heartbeat requests to prevent its registration from expiring.
+====
+
+Services register when they start up:
+
+image::discovery-service-registration.svg[]
+
+We will use **client‑side service discovery**, clients query the service registry,
+select an available instance, and make a request.
+
+image::discovery-service-flow.svg[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+
+=== Catalogue Microservice
+
+Create the `bookcatalogue` microservice:
+
+[source,bash]
+----
+mn create-app example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
+----
+
+The previous command creates a folder named `bookcatalogue` and a Micronaut app inside it.
+
+Create a `BooksController` class to handle incoming HTTP requests into the `bookcatalogue` microservice:
+
+source:BooksController[app=bookcatalogue]
+
+<1> The class is defined as a controller with the http://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
+<2> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books`.
+
+The previous controller responds a `List<Book>`. Create the `Book` POJO:
+
+source:Book[app=bookcatalogue]
+
+Write a test:
+
+test:BooksControllerTest[app=bookcatalogue]
+
+<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Inject the `HttpClient` bean in the application context.
+<3> It is easy to create HTTP requests with a fluid API.
+<4> Parse easily JSON into Java objects.
+
+Edit `application.yml`
+
+resource:application.yml[app=bookcatalogue,tag=mn]
+
+<1> Configure the application name. The app name will be use by the discovery service.
+<2> Configure the app to listen at port 8081
+
+
+Create a file named `application-test.yml` which is used in the test environment:
+
+testResource:application-test.yml[app=bookcatalogue,tag=port]
+
+<1> Start the micronaut microservice at a random port when running the tests.
+
+Run the unit test:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+bookcatalogue $ ./gradlew test
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+bookcatalogue $ ./mvnw test
+----
+
+:exclude-for-build:
+
+
+
+=== Inventory Microservice
+
+Create the `bookinventory` microservice:
+
+[source,bash]
+----
+mn create-app example.micronaut.bookinventory --build=@build@ --lang=@lang@
+----
+
+The previous command creates a folder named `bookinventory` and a Micronaut app inside it.
+
+Create a Controller:
+
+source:BooksController[app=bookinventory]
+
+<1> The class is defined as a controller with the http://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
+<2> By default, `Content-Type` of Micronaut's response is `application/json` : override this with `text/plain` since we are returning a String, not a JSON object.
+<3> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books/stock/{isbn}`.
+
+Create the POJO used by the controller:
+
+source:BookInventory[app=bookinventory]
+
+Write a test:
+
+test:BooksControllerTest[app=bookinventory]
+
+
+Edit `application.yml`
+
+resource:application.yml[app=bookinventory,tag=mn]
+
+
+<1> Configure the application name. The app name will be used later in the tutorial.
+<2> Configure the app to listen at port 8082
+
+Create a file named `application-test.yml` which is used in the test environment:
+
+testResource:application-test.yml[app=bookinventory,tag=port]
+
+<1> Start the micronaut microservice at a random port when running the tests.
+
+Run the unit test:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+bookinventory $ ./gradlew test
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+bookinventory $ ./mvnw test
+----
+
+:exclude-for-build:
+
+
+
+=== Recommendation Microservice
+
+Create the `bookrecommendation` microservice:
+
+[source,bash]
+----
+mn create-app example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
+----
+
+The previous command creates a folder named `bookrecommendation` and a Micronaut app inside it.
+
+Create an interface to map operations with `bookcatalogue` and a Micronaut Declarative HTTP Client to consume it.
+
+source:BookCatalogueOperations[app=bookrecommendation]
+
+
+[source,@lang@]
+.bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@
+----
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@[tag=packageandimports]
+
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@[tag=harcoded]
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@[tag=clazz]
+----
+
+<1> Use `@Client` to use https://docs.micronaut.io/latest/guide/index.html#clientAnnotation[declarative HTTP Clients]
+
+The client returns a POJO. Create it in the `bookrecommendation`:
+
+source:Book[app=bookrecommendation]
+
+
+Create an interface to map operations with `bookinventory` and a Micronaut Declarative HTTP Client to consume it.
+
+source:BookInventoryOperations[app=bookrecommendation]
+
+
+[source,@lang@]
+.bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@
+----
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookInventoryClient.@languageextension@[tag=packageandimports]
+
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookInventoryClient.@languageextension@[tag=harcoded]
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookInventoryClient.@languageextension@[tag=clazz]
+----
+
+<1> Use `@Client` to use https://docs.micronaut.io/latest/guide/index.html#clientAnnotation[declarative HTTP Clients]
+
+Create a Controller which injects both clients.
+
+
+source:BookController[app=bookrecommendation]
+
+
+<1> The class is defined as a controller with the http://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
+<2> Clients are injected via constructor injection
+<3> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books`.
+
+The previous controller returns a `Flowable<BookRecommendation>`. Create the `BookRecommendation` POJO:
+
+source:BookRecommendation[app=bookrecommendation]
+
+
+`BookCatalogueClient` and `BookInventoryClient` will fail to consume the `bookcatalogue` and `bookinventory` during the tests phase.
+
+Using the https://docs.micronaut.io/latest/guide/index.html#clientFallback[@Fallback] annotation you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted
+
+Create `@Fallback` alternatives in the `test` classpath.
+
+test:BookInventoryClientStub[app=bookrecommendation]
+
+
+<1> Make this fallback class to be effective only when the micronaut environment __TEST__ is active
+<2> Here we arbitrarily decided that if everything else fails, that book's `stock` would be true
+<3> Similarly, we decided that other book's `stock` method would be false
+<4> Finally, any other book will have their `stock` method return an empty value
+
+test:BookCatalogueClientStub[app=bookrecommendation]
+
+
+Write a test:
+
+test:BookControllerTest[app=bookrecommendation]
+
+
+Edit `application.yml`
+
+resource:application.yml[app=bookrecommendation,tag=mn]
+
+
+<1> Configure the application name. The app name will be used later in the tutorial.
+<2> Configure the app to listen at port 8080
+
+Create a file named `application-test.yml` which is used in the test environment:
+
+testResource:application-test.yml[app=bookrecommendation,tag=port]
+
+
+<1> Start the micronaut microservice at a random port when running the tests.
+
+Run the unit test:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+bookinventory $ ./gradlew test
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+bookinventory $ ./mvnw test
+----
+
+:exclude-for-build:
+
+
+
+== Running the app
+
+
+Run `bookcatalogue` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:28:34.034 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 499ms. Server Running: http://localhost:8081
+----
+
+Run `bookinventory` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:13.104 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 506ms. Server Running: http://localhost:8082
+----
+
+Run `bookrecommendation` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:57.389 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 523ms. Server Running: http://localhost:8080
+----
+
+You can run a cURL command to test the whole application:
+
+[source,bash]
+----
+$ curl http://localhost:8080/books
+[{"name":"Building Microservices"}]
+----
+
+
+== Consul and Micronaut
+
+=== Install Consul via Docker
+
+The quickest way to start using https://hub.docker.com/_/consul/[Consul is via Docker]:
+
+[source,bash]
+----
+$ docker run -p 8500:8500 consul
+----
+
+Alternatively you can https://www.consul.io/docs/install/index.html[install and run a local Consul instance].
+
+The following screenshots show how to install/run Consul via https://kitematic.com[Kitematic]; graphical user interface for Docker.
+
+image::kitematic-consul-1.png[]
+
+Configure ports:
+
+image::kitematic-consul-2.png[]
+
+
+=== Book Catalogue
+
+Modify your build file to add the `discovery-client` feature.
+
+dependency:micronaut-discovery-client[]
+
+Append to `bookcatalogue` service `application.yml` the following snippet:
+
+resource:application.yml[app=bookcatalogue,tag=consul]
+
+This configuration registers a Micronaut app with Consul with minimal configuration. Discover a more complete list of Configuration options at https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/consul/ConsulConfiguration.html[ConsulConfiguration].
+
+Disable consul registration in tests:
+
+testResource:application-test.yml[app=bookcatalogue,tag=consul]
+
+
+=== Book Inventory
+
+Modify your build file to add the `discovery-client` feature.
+
+dependency:micronaut-discovery-client[]
+
+Also, modify the `application.yml` of the `bookinventory` application with the following snippet:
+
+resource:application.yml[app=bookinventory,tag=consul]
+
+Disable consul registration in tests:
+
+testResource:application-test.yml[app=bookinventory,tag=consul]
+
+
+=== Book Recommendation
+
+Modify your build file to add the `discovery-client` feature.
+
+dependency:micronaut-discovery-client[]
+
+Also, append to `bookrecommendation`.`application.yml` the following snippet:
+
+resource:application.yml[app=bookrecommendation,tag=consul]
+
+Modify `BookInventoryClient` and `BookCatalogueClient` to use the service id instead of a harcoded ip.
+
+[source,@lang@]
+.bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@
+----
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@[tag=packageandimports]
+
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@[tag=consul]
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookCatalogueClient.@languageextension@[tag=clazz]
+----
+
+<1> Use the configuration value `micronaut.application.name` used in `bookcatalogue` as service `id`.
+
+[source,@lang@]
+.bookrecommendation/src/main/@lang@/example/micronaut/BookInventoryClient.@languageextension@
+----
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookInventoryClient.@languageextension@[tag=packageandimports]
+
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookInventoryClient.@languageextension@[tag=consul]
+include::{sourceDir}/@sourceDir@/bookrecommendation/src/main/@lang@/example/micronaut/BookInventoryClient.@languageextension@[tag=clazz]
+----
+
+
+<1> Use the configuration value `micronaut.application.name` used in `bookinventory` as service `id`.
+
+Disable consul registration in tests:
+
+testResource:application-test.yml[app=bookrecommendation,tag=consul]
+
+
+== Running the App
+
+Run `bookcatalogue` microservice:
+
+[source,bash]
+----
+bookcatalogue $ ./gradlew run
+...
+14:28:34.034 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 499ms. Server Running: http://localhost:8081
+14:28:34.084 [nioEventLoopGroup-1-3] INFO  i.m.d.registration.AutoRegistration - Registered service [bookcatalogue] with Consul
+----
+
+Run `bookinventory` microservice:
+
+[source,bash]
+----
+bookinventory $ ./gradlew run
+...
+14:31:13.104 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 506ms. Server Running: http://localhost:8082
+14:31:13.154 [nioEventLoopGroup-1-3] INFO  i.m.d.registration.AutoRegistration - Registered service [bookinventory] with Consul
+----
+
+Run `bookrecommendation` microservice:
+
+[source,bash]
+----
+...
+14:31:57.389 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 523ms. Server Running: http://localhost:8080
+14:31:57.439 [nioEventLoopGroup-1-3] INFO  i.m.d.registration.AutoRegistration - Registered service [bookrecommendation] with Consul
+----
+
+Consul comes with a HTML UI. Open http://localhost:8500/ui[http://localhost:8500/ui] in your browser.
+
+You will see the services registered in Consul:
+
+image::consului.png[]
+
+You can run a cURL command to test the whole application:
+
+[source, bash]
+----
+$ curl http://localhost:8080/books
+[{"name":"Building Microservices"}]
+----
+
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Start the native images for the three microservices and run the same `curl` request as before to check that everything works with GraalVM.
+
+:exclude-for-languages:
+
+== Next steps
+
+Read more about https://docs.micronaut.io/latest/guide/index.html#distributedConfigurationConsul[Consul support] inside Micronaut.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
+

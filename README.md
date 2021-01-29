@@ -19,21 +19,13 @@ include::{commondir}/common-create-app.adoc[]
 
 TODO: Describe the user step by step how to write the app. Use includes to reference real code: 
 
-Example of a Controller 
+Example of a Controller
 
-[source,@language@]
-.src/main/@language@/example/micronaut/HelloController.@languageextension@
-----
-include::{sourceDir}/@sourceDir@/src/main/@language@/example/micronaut/HelloController.@languageextension@[]
-----
+source:HelloController[]
 
 Example of a Test
 
-[source,@language@]
-.src/test/@language@/example/micronaut/HelloControllerTest.@languageextension@
-----
-include::{sourceDir}/@sourceDir@/src/test/@language@/example/micronaut/HelloController@testsuffix@.@languageextension@[]
-----
+test:HelloControllerTest[]
 
 include::{commondir}/common-testApp.adoc[]
 
