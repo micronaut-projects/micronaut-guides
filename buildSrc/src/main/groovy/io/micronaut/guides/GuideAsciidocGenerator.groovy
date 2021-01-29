@@ -27,7 +27,8 @@ class GuideAsciidocGenerator {
                 while ((rawLine = reader.readLine()) != null) {
                     if (rawLine.startsWith('include::{commondir}/') && rawLine.endsWith('[]')) {
                         String commonFileName = rawLine.substring(rawLine.indexOf('include::{commondir}/') + 'include::{commondir}/'.length(), rawLine.indexOf('[]'))
-                        File commonFile = new File("src/docs/common/$commonFileName")
+
+                        File commonFile = Paths.get(destinationFolder.absolutePath, "../common/$commonFileName").toFile()
                         assert commonFile.exists()
                         commonFile.withReader { commonReader ->
                             while ((rawLine = commonReader.readLine()) != null) {
@@ -87,7 +88,8 @@ class GuideAsciidocGenerator {
             text = text.replace("@language@", StringUtils.capitalize(guidesOption.language.toString()))
             text = text.replace("@guideTitle@", metadata.title)
             text = text.replace("@guideIntro@", metadata.intro)
-            text = text.replace("@micronaut@", new File("version.txt").text)
+            File versionFile = Paths.get(destinationFolder.absolutePath, "../../../version.txt").toFile()
+            text = text.replace("@micronaut@", versionFile.text)
             text = text.replace("@lang@", guidesOption.language.toString())
             text = text.replace("@build@", guidesOption.buildTool.toString())
             text = text.replace("@testFramework@", guidesOption.testFramework.toString())
