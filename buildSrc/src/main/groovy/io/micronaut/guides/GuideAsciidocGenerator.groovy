@@ -46,16 +46,16 @@ class GuideAsciidocGenerator {
             boolean excludeLineForBuild = false
             for (String line : rawLines) {
                 if (shouldProcessLine(line, 'source:')) {
-                    lines.addAll(sourceIncludeLines(extractName(line, 'source:'), extractAppName(line)))
+                    lines.addAll(sourceIncludeLines(extractName(line, 'source:'), extractAppName(line), null, extractTags(line)))
 
                 } else if (shouldProcessLine(line, 'test:')) {
-                    lines.addAll(sourceIncludeLines(extractName(line, 'test:'), extractAppName(line), guidesOption.testFramework))
+                    lines.addAll(sourceIncludeLines(extractName(line, 'test:'), extractAppName(line), guidesOption.testFramework, extractTags(line)))
 
                 } else if (shouldProcessLine(line, 'resource:')) {
-                    lines.addAll(resourceIncludeLines(extractName(line, 'resource:'), extractAppName(line), extractTagName(line)))
+                    lines.addAll(resourceIncludeLines(extractName(line, 'resource:'), extractAppName(line), extractTags(line)))
 
                 } else if (shouldProcessLine(line, 'testResource:')) {
-                    lines.addAll(testResourceIncludeLines(extractName(line, 'testResource:'), extractAppName(line), extractTagName(line)))
+                    lines.addAll(testResourceIncludeLines(extractName(line, 'testResource:'), extractAppName(line), extractTags(line)))
 
                 } else if (shouldProcessLine(line, 'dependency:')) {
                     lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool))
@@ -116,7 +116,8 @@ class GuideAsciidocGenerator {
 
     static List<String> sourceIncludeLines(String name,
                                            String appName,
-                                           TestFramework testFramework = null) {
+                                           TestFramework testFramework = null,
+                                           List<String> tagNames = null) {
         String fileName = name
         if (testFramework) {
             if (name.endsWith('Test')) {
@@ -126,46 +127,68 @@ class GuideAsciidocGenerator {
         }
         String folder = testFramework ? 'test' : 'main'
         String module = appName ? "${appName}/" : ""
+        List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
 
-        [
+        List<String> lines = [
             '[source,@lang@]',
-            ".${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@",
+            ".${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@".toString(),
             '----',
-            "include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[]",
-            '----',
-        ] as List<String>
+        ]
+        if (tags) {
+            for (String tag : tags) {
+                lines.add("include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[${tag}]".toString())
+            }
+        } else {
+            lines.add("include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[]".toString())
+        }
+
+        lines.add('----')
+        lines
     }
 
     static List<String> resourceIncludeLines(String name,
                                              String appName,
-                                             String tagName) {
+                                             List<String> tagNames) {
         String fileName = name
         String module = appName ? "${appName}/" : ""
-        String tag = tagName ? "tag=${tagName}" : ""
+        List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
 
-        [
+        List<String> lines = [
             '[source,@lang@]',
-            ".${module}src/main/resources/${fileName}",
+            ".${module}src/main/resources/${fileName}".toString(),
             '----',
-            "include::{sourceDir}/@sourceDir@/${module}src/main/resources/${fileName}[${tag}]",
-            '----',
-        ] as List<String>
+        ]
+        if (tags) {
+            for (String tag : tags) {
+                lines.add("include::{sourceDir}/@sourceDir@/${module}src/main/resources/${fileName}[${tag}]".toString())
+            }
+        } else {
+            lines.add("include::{sourceDir}/@sourceDir@/${module}src/main/resources/${fileName}[]".toString())
+        }
+        lines.add('----')
+        lines
     }
 
     static List<String> testResourceIncludeLines(String name,
                                                  String appName,
-                                                 String tagName) {
+                                                 List<String> tagNames) {
         String fileName = name
         String module = appName ? "${appName}/" : ""
-        String tag = tagName ? "tag=${tagName}" : ""
-
-        [
+        List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
+        List<String> lines = [
             '[source,@lang@]',
-            ".${module}src/test/resources/${fileName}",
+            ".${module}src/test/resources/${fileName}".toString(),
             '----',
-            "include::{sourceDir}/@sourceDir@/${module}src/test/resources/${fileName}[${tag}]",
-            '----',
-        ] as List<String>
+        ]
+        if (tags) {
+            for (String tag : tags) {
+                lines.add("include::{sourceDir}/@sourceDir@/${module}src/test/resources/${fileName}[${tag}]".toString())
+            }
+        } else {
+            lines.add("include::{sourceDir}/@sourceDir@/${module}src/test/resources/${fileName}[]".toString())
+        }
+        lines << '----'
+        lines
     }
 
     static String extractAppName(String line) {
@@ -175,8 +198,16 @@ class GuideAsciidocGenerator {
     static String extractTagName(String line) {
         extractFromParametersLine(line, 'tag')
     }
+    static List<String> extractTags(String line, String tagSeparator = '|') {
+        String attributeValue = extractFromParametersLine(line, 'tags')
+        if (attributeValue) {
+            return attributeValue?.split(tagSeparator) as List<String>
+        }
+        [extractTagName(line)]
+    }
 
     static String extractFromParametersLine(String line, String attributeName) {
+
         List<String> attrs = line.substring(line.indexOf("[") + 1, line.indexOf("]")).tokenize(",")
 
         return attrs
