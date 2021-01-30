@@ -204,12 +204,7 @@ class GuideAsciidocGenerator {
             return attributeValue.tokenize(tagSeparator)
         }
 
-        String singleTag = extractTagName(line)
-        if (singleTag.isEmpty()) {
-            return []
-        } else {
-            return [singleTag]
-        }
+        [extractTagName(line)].findAll { it }
     }
 
     static String extractFromParametersLine(String line, String attributeName) {
