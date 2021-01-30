@@ -21,7 +21,7 @@ import java.nio.file.Paths
 
 @CompileStatic
 class GuideProjectGenerator implements Closeable {
-
+    public static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = Arrays.asList(JdkVersion.JDK_8, JdkVersion.JDK_11)
     public static final JdkVersion DEFAULT_JAVA_VERSION = JdkVersion.JDK_11
     public static final String DEFAULT_APP_NAME = 'default'
     public static final String ENV_JDK_VERSION = 'JDK_VERSION'
@@ -125,7 +125,9 @@ class GuideProjectGenerator implements Closeable {
 
             for (App app: metadata.apps) {
                 List<String> appFeatures = app.features
-                if (guidesOption.language == Language.GROOVY) {
+
+                if (guidesOption.language == Language.GROOVY ||
+                        !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(parseJdkVersion())) {
                     appFeatures.remove('graalvm')
                 }
                 // Normal guide use 'default' as name, multi project guides have different modules
