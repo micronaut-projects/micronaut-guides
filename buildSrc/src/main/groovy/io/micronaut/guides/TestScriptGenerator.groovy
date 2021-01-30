@@ -1,8 +1,10 @@
 package io.micronaut.guides
 
+import io.micronaut.starter.options.BuildTool
+
 class TestScriptGenerator {
 
-    static String generateScript(File codeDir, boolean stopIfFailure) {
+    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure) {
         String bashScript = '''\
 #!/usr/bin/env bash
 set -e
@@ -10,31 +12,34 @@ set -e
 FAILED_PROJECTS=()
 EXIT_STATUS=0
 '''
-        codeDir.eachDir {dir ->
-            bashScript += """\
-cd ${dir.name}
-echo "-------------------------------------------------"
-echo "Executing '${dir.name}' tests"
-${dir.name.contains('gradle') ? './gradlew -q test' : './mvnw -q test' } || EXIT_STATUS=\$?
+        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        for (GuideMetadata metadata : metadatas) {
+            List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
+            for (GuidesOption guidesOption : guidesOptionList) {
+                String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
+                BuildTool buildTool = folder.contains(BuildTool.MAVEN.toString()) ? BuildTool.MAVEN : BuildTool.GRADLE
+                if (buildTool == BuildTool.MAVEN && metadata.skipMavenTests) {
+                    continue
+                }
+                if (buildTool == BuildTool.GRADLE && metadata.skipGradleTests) {
+                    continue
+                }
+                if (metadata.apps.any { it.name == GuideProjectGenerator.DEFAULT_APP_NAME } ) {
+                    bashScript += scriptForFolder(folder, folder, stopIfFailure, buildTool)
+                } else {
+                    bashScript += """\
+cd ${folder}
+"""
+                    for (GuideMetadata.App app: metadata.apps) {
+                        bashScript += scriptForFolder(app.name, "${folder}/${app.name}".toString(), stopIfFailure, buildTool)
+                    }
+                    bashScript += """\
 cd ..
 """
-            if (stopIfFailure) {
-                bashScript += """\
-if [ \$EXIT_STATUS -ne 0 ]; then
-  echo "'${dir.name}' tests failed => exit \$EXIT_STATUS"
-  exit \$EXIT_STATUS
-fi
-"""
-            } else {
-                bashScript += """\
-if [ \$EXIT_STATUS -ne 0 ]; then
-  FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" ${dir.name})
-  echo "'${dir.name}' tests failed => exit \$EXIT_STATUS"
-fi
-EXIT_STATUS=0
-"""
+                }
             }
         }
+
         if (!stopIfFailure) {
             bashScript += '''
 if [ ${#FAILED_PROJECTS[@]} -ne 0 ]; then
@@ -52,6 +57,34 @@ fi
 
 '''
         }
+        bashScript
+    }
+
+    static String scriptForFolder(String nestedFolder, String folder, boolean stopIfFailure, BuildTool buildTool) {
+        String bashScript = """\
+cd ${nestedFolder}
+echo "-------------------------------------------------"
+echo "Executing '${folder}' tests"
+${buildTool == BuildTool.MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
+cd ..
+"""
+        if (stopIfFailure) {
+            bashScript += """\
+if [ \$EXIT_STATUS -ne 0 ]; then
+  echo "'${folder}' tests failed => exit \$EXIT_STATUS"
+  exit \$EXIT_STATUS
+fi
+"""
+        } else {
+            bashScript += """\
+if [ \$EXIT_STATUS -ne 0 ]; then
+  FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" ${folder})
+  echo "'${folder}' tests failed => exit \$EXIT_STATUS"
+fi
+EXIT_STATUS=0
+"""
+        }
+
         bashScript
     }
 }

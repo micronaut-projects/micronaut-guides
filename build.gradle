@@ -67,10 +67,11 @@ task generateSampleProjects {
     ext {
         metadataConfigName = 'metadata.json'
         output = "$buildDir/code"
+        guides = "${projectDir}/guides"
     }
     doLast {
         GuideProjectGenerator generator = new GuideProjectGenerator()
-        generator.generate(new File("${projectDir}/guides"), new File(output), metadataConfigName, true, new File("${projectDir}/src/docs/asciidoc"))
+        generator.generate(new File(guides), new File(output), metadataConfigName, true, new File("${projectDir}/src/docs/asciidoc"))
         generator.close()
     }
     finalizedBy('generateTestScript')
@@ -81,13 +82,13 @@ task generateTestScript {
     description 'Generates a test.sh to runs every guide test at build/code'
     ext {
         excludeDirs = ['images']
-        stopIfFailure = false
+        stopIfFailure = true
     }
     doLast {
-        File outputFolder = new File(generateSampleProjects.output)
+        File guides = new File(generateSampleProjects.guides)
         File output = new File(generateSampleProjects.output + "/test.sh")
         output.createNewFile()
-        output.text = TestScriptGenerator.generateScript(outputFolder, stopIfFailure)
+        output.text = TestScriptGenerator.generateScript(guides, generateSampleProjects.metadataConfigName, stopIfFailure)
         output.setExecutable(true)
     }
 }
