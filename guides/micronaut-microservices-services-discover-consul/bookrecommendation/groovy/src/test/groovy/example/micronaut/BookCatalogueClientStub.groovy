@@ -2,9 +2,8 @@ package example.micronaut
 
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
-import io.micronaut.retry.annotation.Fallback
 import io.reactivex.Flowable
-
+import io.micronaut.retry.annotation.Fallback
 import javax.inject.Singleton
 
 @Requires(env = Environment.TEST)

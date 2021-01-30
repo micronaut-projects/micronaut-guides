@@ -2,9 +2,8 @@ package example.micronaut
 
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
-import io.micronaut.retry.annotation.Fallback
 import io.reactivex.Maybe
-
+import io.micronaut.retry.annotation.Fallback
 import javax.inject.Singleton
 import javax.validation.constraints.NotBlank
 
