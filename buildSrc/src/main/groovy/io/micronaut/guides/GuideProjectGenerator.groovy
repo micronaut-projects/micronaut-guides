@@ -22,7 +22,9 @@ import java.nio.file.Paths
 @CompileStatic
 class GuideProjectGenerator implements Closeable {
 
+    public static final JdkVersion DEFAULT_JAVA_VERSION = JdkVersion.JDK_11
     public static final String DEFAULT_APP_NAME = 'default'
+    public static final String ENV_JDK_VERSION = 'JDK_VERSION'
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
 
@@ -91,16 +93,31 @@ class GuideProjectGenerator implements Closeable {
         "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}".toString()
     }
 
+    static JdkVersion parseJdkVersion() {
+        JdkVersion javaVersion = DEFAULT_JAVA_VERSION
+        if (System.getenv(ENV_JDK_VERSION)) {
+            try {
+                int mayorVersion = Integer.valueOf(System.getenv(ENV_JDK_VERSION))
+                javaVersion = JdkVersion.valueOf(mayorVersion)
+            } catch(NumberFormatException e) {
+                throw new GradleException("Could not parse env " + ENV_JDK_VERSION + " to JdkVersion")
+            }
+        }
+        javaVersion
+    }
+
     void generate(GuideMetadata metadata, File inputDir, File outputDir, boolean merge = true) {
         String packageAndName = "${basePackage}.${appName}"
         ApplicationType type = ApplicationType.DEFAULT
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
+        JdkVersion javaVersion = parseJdkVersion()
+
         for (GuidesOption guidesOption : guidesOptionList) {
             BuildTool buildTool = guidesOption.buildTool
             TestFramework testFramework = guidesOption.testFramework
             Language lang = guidesOption.language
-            JdkVersion javaVersion = JdkVersion.JDK_8
+
 
             if (!outputDir.exists()) {
                 outputDir.mkdir()
