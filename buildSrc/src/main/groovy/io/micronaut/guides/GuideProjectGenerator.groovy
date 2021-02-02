@@ -6,6 +6,7 @@ import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
+import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
@@ -20,7 +21,10 @@ import java.nio.file.Paths
 
 @CompileStatic
 class GuideProjectGenerator implements Closeable {
-
+    public static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = Arrays.asList(JdkVersion.JDK_8, JdkVersion.JDK_11)
+    public static final JdkVersion DEFAULT_JAVA_VERSION = JdkVersion.JDK_11
+    public static final String DEFAULT_APP_NAME = 'default'
+    public static final String ENV_JDK_VERSION = 'JDK_VERSION'
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
 
@@ -38,29 +42,44 @@ class GuideProjectGenerator implements Closeable {
     }
 
     @CompileDynamic
+    static List<GuideMetadata> parseGuidesMetadata(File guidesFolder,
+                                                  String metadataConfigName) {
+        List<GuideMetadata> result = []
+        guidesFolder.eachDir { dir ->
+            result << parseGuideMetadata(dir, metadataConfigName)
+        }
+        result
+    }
+
+    @CompileDynamic
+    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+        File configFile = new File("$dir/$metadataConfigName")
+        if (!configFile.exists()) {
+            throw new GradleException("metadata file not found for ${dir.name}")
+        }
+        def config = new JsonSlurper().parse(configFile)
+        new GuideMetadata(asciidoctor: config.asciidoctor,
+                slug: config.slug,
+                title: config.title,
+                intro: config.intro,
+                authors: config.authors,
+                languages: config.languages ?: ['java', 'groovy', 'kotlin'],
+                buildTools: config.buildTools ?: ['gradle', 'maven'],
+                testFramework: config.testFramework,
+                skipGradleTests: config.skipGradleTests ?: false,
+                skipMavenTests: config.skipMavenTests ?: false,
+                apps: config.apps.collect { it -> new App(name: it.name, features: it.features) }
+        )
+    }
+
+    @CompileDynamic
     void generate(File guidesFolder,
                   File output,
                   String metadataConfigName,
                   boolean merge = true,
                   File asciidocDir = null) {
         guidesFolder.eachDir { dir ->
-            File configFile = new File("$dir/$metadataConfigName")
-            if (!configFile.exists()) {
-                throw new GradleException("metadata file not found for ${dir.name}")
-            }
-            def config = new JsonSlurper().parse(configFile)
-            GuideMetadata metadata = new GuideMetadata(asciidoctor: config.asciidoctor,
-                    slug: config.slug,
-                    title: config.title,
-                    intro: config.intro,
-                    authors: config.authors,
-                    languages: config.languages ?: ['java', 'groovy', 'kotlin'],
-                    buildTools: config.buildTools ?: ['gradle', 'maven'],
-                    testFramework: config.testFramework,
-                    skipGradleTests: config.skipGradleTests ?: false,
-                    skipMavenTests: config.skipMavenTests ?: false,
-                    apps: config.apps.collect { it -> new App(name: it.name, features: it.features) }
-            )
+            GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
             generate(metadata, dir, output, merge)
             if (asciidocDir != null) {
                 GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
@@ -68,18 +87,37 @@ class GuideProjectGenerator implements Closeable {
         }
     }
 
+
+    static String folderName(String slug, GuidesOption guidesOption) {
+
+        "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}".toString()
+    }
+
+    static JdkVersion parseJdkVersion() {
+        JdkVersion javaVersion = DEFAULT_JAVA_VERSION
+        if (System.getenv(ENV_JDK_VERSION)) {
+            try {
+                int mayorVersion = Integer.valueOf(System.getenv(ENV_JDK_VERSION))
+                javaVersion = JdkVersion.valueOf(mayorVersion)
+            } catch(NumberFormatException e) {
+                throw new GradleException("Could not parse env " + ENV_JDK_VERSION + " to JdkVersion")
+            }
+        }
+        javaVersion
+    }
+
     void generate(GuideMetadata metadata, File inputDir, File outputDir, boolean merge = true) {
         String packageAndName = "${basePackage}.${appName}"
         ApplicationType type = ApplicationType.DEFAULT
-        String name = metadata.slug
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
-        for (GuidesOption guidesOption : guidesOptionList) {
+        JdkVersion javaVersion = parseJdkVersion()
 
+        for (GuidesOption guidesOption : guidesOptionList) {
             BuildTool buildTool = guidesOption.buildTool
             TestFramework testFramework = guidesOption.testFramework
             Language lang = guidesOption.language
-            JdkVersion javaVersion = JdkVersion.JDK_8
+
 
             if (!outputDir.exists()) {
                 outputDir.mkdir()
@@ -87,14 +125,14 @@ class GuideProjectGenerator implements Closeable {
 
             for (App app: metadata.apps) {
                 List<String> appFeatures = app.features
-                if (guidesOption.language == Language.GROOVY) {
+
+                if (guidesOption.language == Language.GROOVY ||
+                        !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(parseJdkVersion())) {
                     appFeatures.remove('graalvm')
                 }
-
                 // Normal guide use 'default' as name, multi project guides have different modules
-                String appName = app.name == 'default' ? "" : app.name
-
-                String folder = "${name}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}"
+                String appName = app.name == DEFAULT_APP_NAME ? StringUtils.EMPTY_STRING : app.name
+                String folder = folderName(metadata.slug, guidesOption)
 
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
