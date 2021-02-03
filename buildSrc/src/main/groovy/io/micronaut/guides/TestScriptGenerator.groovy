@@ -14,6 +14,10 @@ EXIT_STATUS=0
 '''
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
+            boolean skip = !(System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null ? System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == metadata.slug : true)
+            if (skip) {
+                continue
+            }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)

@@ -25,6 +25,7 @@ class GuideProjectGenerator implements Closeable {
     public static final JdkVersion DEFAULT_JAVA_VERSION = JdkVersion.JDK_11
     public static final String DEFAULT_APP_NAME = 'default'
     public static final String ENV_JDK_VERSION = 'JDK_VERSION'
+    public static final String SYS_PROP_MICRONAUT_GUIDE = 'micronaut.guide'
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
 
@@ -80,9 +81,12 @@ class GuideProjectGenerator implements Closeable {
                   File asciidocDir = null) {
         guidesFolder.eachDir { dir ->
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
-            generate(metadata, dir, output, merge)
-            if (asciidocDir != null) {
-                GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+            boolean process = System.getProperty(SYS_PROP_MICRONAUT_GUIDE) != null ? System.getProperty(SYS_PROP_MICRONAUT_GUIDE) == metadata.slug : true
+            if (process) {
+                generate(metadata, dir, output, merge)
+                if (asciidocDir != null) {
+                    GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+                }
             }
         }
     }
