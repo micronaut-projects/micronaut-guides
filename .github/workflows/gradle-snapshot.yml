@@ -1,11 +1,7 @@
-name: Java CI
+name: Java CI for Micronaut SNAPSHOT
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  schedule:
+    - cron: '0 5 * * SUN'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,6 +22,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
+      - name: Use next snapshot version
+        run: ./increment_version.sh -p
       - name: Build with Gradle
         run: ./gradlew build
       - name: Execute tests
