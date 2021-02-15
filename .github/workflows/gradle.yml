@@ -30,3 +30,18 @@ jobs:
         run: ./gradlew build
       - name: Execute tests
         run: 'cd build/code && ./test.sh ; cd ../..'
+      - name: Calculate version of the guides
+        id: guides_version
+        run: |
+          current_version=`cat version.txt`
+          tmp_version=( ${current_version//./ } )
+          version=`echo "${tmp_version[0]}.${tmp_version[1]}.x"`
+          echo ::set-output name=guides_version::${version}
+      - name: Publish to Github Pages
+        if: success() && github.event_name == 'push' && matrix.java == '8'
+        uses: micronaut-projects/github-pages-deploy-action@master
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: build/dist
+          VERSION: ${{ steps.guides_version.outputs.guides_version }}
