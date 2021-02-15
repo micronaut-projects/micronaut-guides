@@ -1,3 +1,12 @@
+To work on a single guide use the system property `micronaut.guide`
+
+E.g. 
+
+````bash
+%> ./gradlew -Dmicronaut.guide=micronaut-oauth2-github build
+````
+
+---- 
 To create a new guide create a new asciidoc file under `src/docs/guides` with the following template: 
 
 ```asciidoc
