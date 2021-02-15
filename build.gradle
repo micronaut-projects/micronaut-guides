@@ -3,6 +3,7 @@ import io.micronaut.guides.GenerateGuideZip
 import io.micronaut.guides.GuideAsciidocGenerator
 import io.micronaut.guides.GuideMetadata
 import io.micronaut.guides.GuideProjectGenerator
+import io.micronaut.guides.IndexGenerator
 import io.micronaut.guides.TestScriptGenerator
 
 buildscript {
@@ -75,6 +76,7 @@ task generateSampleProjects {
         generator.close()
     }
     finalizedBy('generateTestScript')
+    finalizedBy('generateGuidesIndex')
 }
 
 task generateTestScript {
@@ -103,5 +105,16 @@ task generateCodeZip {
             String filename = projectDir.absolutePath + "/build/dist" + dir.absolutePath.substring(dir.absolutePath.lastIndexOf('/')) + ".zip"
             GenerateGuideZip.compressZipfile(dir.absolutePath, filename)
         }
+    }
+}
+
+task generateGuidesIndex {
+    group 'guides'
+    description 'Generates an index.html with all the guides'
+    doLast {
+        File guides = new File(generateSampleProjects.guides)
+        File output = new File("${project.buildDir}/dist/index.html")
+        output.createNewFile()
+        output.text = IndexGenerator.generateGuidesIndex(guides, generateSampleProjects.metadataConfigName)
     }
 }
