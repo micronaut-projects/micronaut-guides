@@ -1,7 +1,9 @@
 package io.micronaut.guides
 
+import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
 
+@CompileStatic
 class TestScriptGenerator {
 
     static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure) {
