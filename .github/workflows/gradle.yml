@@ -30,3 +30,13 @@ jobs:
         run: ./gradlew build
       - name: Execute tests
         run: 'cd build/code && ./test.sh ; cd ../..'
+      - name: Publish to Github Pages
+        if: success() && github.event_name == 'push' && matrix.java == '8'
+        uses: micronaut-projects/github-pages-deploy-action@master
+        env:
+          BETA: ${{ contains(steps.release_version.outputs.release_version, 'M') || contains(steps.release_version.outputs.release_version, 'RC') }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          BASE_BRANCH: master
+          BRANCH: gh-pages
+          FOLDER: build/dist
+          VERSION: ${{ steps.release_version.outputs.release_version }}
