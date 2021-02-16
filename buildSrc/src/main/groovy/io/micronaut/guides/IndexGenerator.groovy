@@ -5,9 +5,11 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class IndexGenerator {
 
-    private static final String BASE_URL = "https://micronaut-projects.github.io/micronaut-guides-poc/latest"
+    private static final String LATEST_GUIDES_URL = "https://micronaut-projects.github.io/micronaut-guides-poc/latest/"
 
     static String generateGuidesIndex(File guidesFolder, String metadataConfigName) {
+        String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
+
         String index = '''\
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +26,7 @@ class IndexGenerator {
             index += "<H2>${metadata.title}</H2><ul>"
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                index += "<li> <a href='${BASE_URL}/${folder}.html'>${guidesOption.buildTool.toString()} - ${guidesOption.language.toString()}</a></li>"
+                index += "<li><a href='${baseURL}${folder}.html'>${guidesOption.buildTool.toString()} - ${guidesOption.language.toString()}</a></li>"
             }
             index += "</ul>"
         }
