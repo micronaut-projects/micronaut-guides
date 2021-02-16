@@ -14,7 +14,7 @@ import java.util.List;
 
 @Header(name = "User-Agent", value = "https://micronautguides.com")
 @Header(name = "Accept", value = "application/vnd.github.v3+json, application/json") // <1>
-@Client(id = "githubv3")
+@Client(id = "githubv3") // <2>
 public interface GithubApiClient {
 
     @Get("/user") // <3>
