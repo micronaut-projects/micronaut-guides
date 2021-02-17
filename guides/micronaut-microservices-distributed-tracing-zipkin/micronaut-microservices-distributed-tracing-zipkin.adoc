@@ -1,0 +1,260 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+In this guide, we are going to integrate https://zipkin.io[Zipkin] in a Micronaut app composed of three microservices.
+
+____
+Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data.
+____
+
+You will discover how Micronaut eases Zipkin integration.
+
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the app
+
+To learn more about this sample app read
+https://guides.micronaut.io/latest/micronaut-microservices-services-discover-consul-@build@-@lang@.html[Consul and Micronaut - Microservices service discovery]
+guide. The application contains three microservices.
+
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and isbn.
+
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order. It uses a domain consisting of a stock level and isbn.
+
+* `bookrecommendation` - It consumes previous services and exposes and endpoint which recommends book names which are in stock.
+
+The `bookcatalogue` service consumes endpoints exposed by the other services. The following image illustrates the application flow:
+
+image::flow.svg[]
+
+A request to `bookrecommendation` (`http://localhost:8080/books`) triggers several requests through our microservices mesh.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+
+== Zipkin and Micronaut
+
+=== Install Zipkin via Docker
+
+The quickest way to start https://zipkin.io[Zipkin] is via Docker:
+
+[source,bash]
+----
+$ docker run -d -p 9411:9411 openzipkin/zipkin
+----
+
+=== Book catalogue
+
+Add `tracing` dependency.
+
+dependency:micronaut-tracing[]
+
+Also, to send tracing spans to Zipkin the minimal configuration requires you add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-tracing[groupId=io.opentracing.brave]
+dependency:brave-instrumentation-http[groupId=io.zipkin.brave,scope=runtimeOnly]
+dependency:zipkin-reporter[groupId=io.zipkin.reporter,scope=runtimeOnly]
+
+:dependencies:
+
+Append to `bookcatalogue` service `application.yml` the following snippet:
+
+resource:application.yml[app=bookcatalogue,tag=zipkin]
+
+<1> Trace 100% of requests.
+
+In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this tutorial easy, we set it to trace 100%.
+
+Disable distributed tracing in tests:
+
+testResource:application-test.yml[app=bookcatalogue,tag=zipkin]
+
+
+=== Book inventory
+
+Add `tracing` dependency.
+
+dependency:micronaut-tracing[]
+
+Also, to send tracing spans to Zipkin the minimal configuration requires you add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-tracing[groupId=io.opentracing.brave]
+dependency:brave-instrumentation-http[groupId=io.zipkin.brave,scope=runtimeOnly]
+dependency:zipkin-reporter[groupId=io.zipkin.reporter,scope=runtimeOnly]
+
+:dependencies:
+
+
+Append to `bookinventory` service `application.yml` the following snippet:
+
+resource:application.yml[app=bookinventory,tag=zipkin]
+
+<1> Trace 100% of requests.
+
+In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this tutorial easy, we set it to trace 100%.
+
+Disable distributed tracing in tests:
+
+testResource:application-test.yml[app=bookinventory,tag=zipkin]
+
+Annotate `BookController` method with `@ContinueSpan` and the method parameter with `@SpanTag`:
+
+source:BooksController[app=bookinventory]
+
+<1> The `@ContinueSpan` annotation will continue an existing span, wrapping the method call or reactive type.
+<2> The `@SpanTag` annotation can be used on method arguments to include the value of each argument within a Span's tags. When you use `@SpanTag` you need either to annotate the method with `@NewSpan` or `@ContinueSpan`
+
+
+=== Book recommendation
+
+Add `tracing` dependency.
+
+dependency:micronaut-tracing[]
+
+Also, to send tracing spans to Zipkin the minimal configuration requires you add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-tracing[groupId=io.opentracing.brave]
+dependency:brave-instrumentation-http[groupId=io.zipkin.brave,scope=runtimeOnly]
+dependency:zipkin-reporter[groupId=io.zipkin.reporter,scope=runtimeOnly]
+
+:dependencies:
+
+Append to `bookrecommendation` service `application.yml` the following snippet:
+
+resource:application.yml[app=bookrecommendation,tag=zipkin]
+
+<1> Trace 100% of requests.
+
+In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this tutorial easy, we set it to trace 100%.
+
+Disable distributed tracing in tests:
+
+testResource:application-test.yml[app=bookrecommendation,tag=zipkin]
+
+== Running the app
+
+Run `bookcatalogue` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:28:34.034 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 499ms. Server Running: http://localhost:8081
+----
+
+Run `bookinventory` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:13.104 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 506ms. Server Running: http://localhost:8082
+----
+
+Run `bookrecommendation` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:57.389 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 523ms. Server Running: http://localhost:8080
+----
+
+You can run a cURL command to test the whole application:
+
+[source, bash]
+----
+$ curl http://localhost:8080/books
+[{"name":"Building Microservices"}
+----
+
+You can then navigate to http://localhost:9411 t to access the Zipkin UI.
+
+The previous request generates a trace composed by 5 spans.
+
+image::zipkinui.png[]
+
+In the previous image, you can see the requests to `bookinventory` are done in parallel.
+
+You can see the details if you click the span:
+
+image::zipkinclientserver.png[]
+
+In the previous image, you can see that:
+
+- Whenever a Micronaut HTTP client executes a new network request, a span is involved.
+- Whenever a Micronaut Server receives a request, a span is involved.
+
+The `stock.isbn` tags that we configured with `@SpanTag` is present as shown in the next image:
+
+image::zipkintag.png[]
+
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Start the native images for the three microservices and run the same `curl` request as before to check that everything works with GraalVM.
+
+:exclude-for-languages:
+
+
+== Next steps
+
+As you have seen in this tutorial, without any annotations you get distributing tracing up-and-running fast with Micronaut.
+
+Micronaut includes several annotations to give you more flexibility. We introduced the `@ContinueSpan`, `@SpanTag` annotations.
+Also, you have at your disposal the `@NewSpan` annotation which will create a new span, wrapping the method call or reactive type.
+
+Make sure to read more about https://docs.micronaut.io/latest/guide/index.html#zipkin[Tracing with Zipkin] inside Micronaut.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
