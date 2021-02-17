@@ -106,15 +106,15 @@ class GuideAsciidocGenerator {
         }
     }
 
-    static boolean shouldProcessLine(String line, String macro) {
+    private static boolean shouldProcessLine(String line, String macro) {
         line.startsWith(macro) && line.contains('[') && line.endsWith(']')
     }
 
-    static String extractName(String line, String macro) {
+    private static String extractName(String line, String macro) {
         line.substring(macro.length(), line.indexOf('['))
     }
 
-    static List<String> sourceIncludeLines(String name,
+    private static List<String> sourceIncludeLines(String name,
                                            String appName,
                                            TestFramework testFramework = null,
                                            List<String> tagNames = null) {
@@ -136,7 +136,7 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[${tag}]".toString())
+                lines.add("include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[${tag}]\n".toString())
             }
         } else {
             lines.add("include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[]".toString())
@@ -146,59 +146,46 @@ class GuideAsciidocGenerator {
         lines
     }
 
-    static List<String> resourceIncludeLines(String name,
-                                             String appName,
-                                             List<String> tagNames) {
-        String fileName = name
-        String module = appName ? "${appName}/" : ""
-        List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
-
-        List<String> lines = [
-            '[source,@lang@]',
-            ".${module}src/main/resources/${fileName}".toString(),
-            '----',
-        ]
-        if (tags) {
-            for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}src/main/resources/${fileName}[${tag}]".toString())
-            }
-        } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}src/main/resources/${fileName}[]".toString())
-        }
-        lines.add('----')
-        lines
+    private static List<String> resourceIncludeLines(String name, String appName, List<String> tagNames) {
+        appResourceIncludeLines(name, appName, tagNames, 'main')
     }
 
-    static List<String> testResourceIncludeLines(String name,
-                                                 String appName,
-                                                 List<String> tagNames) {
+    private static List<String> testResourceIncludeLines(String name, String appName, List<String> tagNames) {
+        appResourceIncludeLines(name, appName, tagNames, 'test')
+    }
+
+    private static List<String> appResourceIncludeLines(String name, String appName, List<String> tagNames, String resourceDir) {
         String fileName = name
         String module = appName ? "${appName}/" : ""
         List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
+        String asciidoctorLang = resolveAsciidoctorLanguage(fileName)
+
         List<String> lines = [
-            '[source,@lang@]',
-            ".${module}src/test/resources/${fileName}".toString(),
-            '----',
+            "[source,${asciidoctorLang}]".toString(),
+            ".${module}src/${resourceDir}/resources/${fileName}".toString(),
+            "----",
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}src/test/resources/${fileName}[${tag}]".toString())
+                lines.add("include::{sourceDir}/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[${tag}]\n".toString())
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}src/test/resources/${fileName}[]".toString())
+            lines.add("include::{sourceDir}/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[]".toString())
         }
         lines << '----'
         lines
+
     }
 
-    static String extractAppName(String line) {
+    private static String extractAppName(String line) {
         extractFromParametersLine(line, 'app')
     }
 
-    static String extractTagName(String line) {
+    private static String extractTagName(String line) {
         extractFromParametersLine(line, 'tag')
     }
-    static List<String> extractTags(String line, String tagSeparator = '|') {
+
+    private static List<String> extractTags(String line, String tagSeparator = '|') {
         String attributeValue = extractFromParametersLine(line, 'tags')
         if (attributeValue) {
             return attributeValue.tokenize(tagSeparator)
@@ -207,7 +194,7 @@ class GuideAsciidocGenerator {
         [extractTagName(line)].findAll { it }
     }
 
-    static String extractFromParametersLine(String line, String attributeName) {
+    private static String extractFromParametersLine(String line, String attributeName) {
 
         List<String> attrs = line.substring(line.indexOf("[") + 1, line.indexOf("]")).tokenize(",")
 
@@ -218,5 +205,23 @@ class GuideAsciidocGenerator {
             .map({it.get(1)})
             .findFirst()
             .orElse("")
+    }
+
+    private static String resolveAsciidoctorLanguage(String fileName) {
+        String extension = fileName.indexOf(".") > 0 ?
+            fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()) : ''
+
+        switch (extension.toLowerCase()) {
+            case 'yml':
+            case 'yaml':
+                return 'yaml'
+            case 'html':
+            case 'vm':
+                return 'html'
+            case 'xml':
+                return 'xml'
+            default:
+                return ''
+        }
     }
 }
