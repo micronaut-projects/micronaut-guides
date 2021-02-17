@@ -3,6 +3,7 @@ package io.micronaut.guides;
 import io.micronaut.starter.options.BuildTool;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,41 +53,55 @@ public class DependencyLines {
     }
 
     public static List<String> asciidoc(String line, BuildTool buildTool) {
-        String artifactId = line.substring("dependency:".length(), line.indexOf("["));
-        Map<String, String> attributes = new HashMap<>();
-        String attributesStr = line.substring(line.indexOf("[") + "[".length(), line.indexOf("]"));
-        String[] attrs = attributesStr.split(",");
-        for (String att : attrs) {
-            String[] keyValues = att.split("=");
-            if (keyValues.length == 2) {
-                attributes.put(keyValues[0], keyValues[1]);
-            }
-        }
-        String groupId = attributes.getOrDefault("groupId", "io.micronaut");
-        String scope = attributes.getOrDefault("scope", "implementation");
-        String gradleScope = toGradleScope(attributes) != null ? toGradleScope(attributes) : SCOPE_IMPLEMENTATION;
-        String mavenScope = toMavenScope(attributes) != null ? toMavenScope(attributes) : SCOPE_COMPILE;
+        return asciidoc(Collections.singletonList(line), buildTool);
+    }
+
+    public static List<String> asciidoc(List<String> lines, BuildTool buildTool) {
         List<String> dependencyLines = new ArrayList<>();
 
+        // Open Asciidoctor code block
         if (buildTool == BuildTool.GRADLE) {
             dependencyLines.add("[source, groovy]");
             dependencyLines.add(".build.gradle");
-            dependencyLines.add("----");
-            dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")");
             dependencyLines.add("----");
         } else if (buildTool == BuildTool.MAVEN) {
             dependencyLines.add("[source, xml]");
             dependencyLines.add(".pom.xml");
             dependencyLines.add("----");
-            dependencyLines.add("<dependency>");
-            dependencyLines.add("    <groupId>" + groupId + "</groupId>");
-            dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
-            if (!mavenScope.equals(SCOPE_COMPILE)) {
-                dependencyLines.add("    <scope>" + mavenScope + "</scope>");
-            }
-            dependencyLines.add("</dependency>");
-            dependencyLines.add("----");
         }
+
+        for (String line: lines) {
+            String artifactId = line.substring("dependency:".length(), line.indexOf("["));
+            Map<String, String> attributes = new HashMap<>();
+            String attributesStr = line.substring(line.indexOf("[") + "[".length(), line.indexOf("]"));
+            String[] attrs = attributesStr.split(",");
+            for (String att : attrs) {
+                String[] keyValues = att.split("=");
+                if (keyValues.length == 2) {
+                    attributes.put(keyValues[0], keyValues[1]);
+                }
+            }
+            String groupId = attributes.getOrDefault("groupId", "io.micronaut");
+            String scope = attributes.getOrDefault("scope", "implementation");
+            String gradleScope = toGradleScope(attributes) != null ? toGradleScope(attributes) : SCOPE_IMPLEMENTATION;
+            String mavenScope = toMavenScope(attributes) != null ? toMavenScope(attributes) : SCOPE_COMPILE;
+
+            if (buildTool == BuildTool.GRADLE) {
+                dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")");
+            } else if (buildTool == BuildTool.MAVEN) {
+                dependencyLines.add("<dependency>");
+                dependencyLines.add("    <groupId>" + groupId + "</groupId>");
+                dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
+                if (!mavenScope.equals(SCOPE_COMPILE)) {
+                    dependencyLines.add("    <scope>" + mavenScope + "</scope>");
+                }
+                dependencyLines.add("</dependency>");
+            }
+        }
+
+        // Close Asciidoctor code block
+        dependencyLines.add("----");
+
         return dependencyLines;
     }
 }

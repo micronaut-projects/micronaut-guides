@@ -44,6 +44,8 @@ class GuideAsciidocGenerator {
             List<String> lines = []
             boolean excludeLineForLanguage = false
             boolean excludeLineForBuild = false
+            boolean groupDependencies = false
+            List<String> groupedDependencies = []
             for (String line : rawLines) {
                 if (shouldProcessLine(line, 'source:')) {
                     lines.addAll(sourceIncludeLines(extractName(line, 'source:'), extractAppName(line), null, extractTags(line)))
@@ -57,8 +59,20 @@ class GuideAsciidocGenerator {
                 } else if (shouldProcessLine(line, 'testResource:')) {
                     lines.addAll(testResourceIncludeLines(extractName(line, 'testResource:'), extractAppName(line), extractTags(line)))
 
+                } else if (line == ':dependencies:') {
+                    groupDependencies = !groupDependencies
+                    if (!groupDependencies) {
+                        // closing tag. Group and output them all together
+                        lines.addAll(DependencyLines.asciidoc(groupedDependencies, guidesOption.buildTool))
+                        groupedDependencies = []
+                    }
+
                 } else if (shouldProcessLine(line, 'dependency:')) {
-                    lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool))
+                    if (groupDependencies) {
+                        groupedDependencies.add(line)
+                    } else {
+                        lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool))
+                    }
 
                 } else if (line == ':exclude-for-build:') {
                     excludeLineForBuild = false
