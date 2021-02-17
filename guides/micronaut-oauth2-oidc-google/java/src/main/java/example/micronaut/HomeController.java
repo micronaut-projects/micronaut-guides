@@ -9,12 +9,12 @@ import io.micronaut.views.View;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@Controller // <1>
 public class HomeController {
 
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    @View("home")
-    @Get
+    @Secured(SecurityRule.IS_ANONYMOUS) // <2>
+    @View("home") // <3>
+    @Get // <4>
     public Map<String, Object> index() {
         return new HashMap<>();
     }
