@@ -1,0 +1,338 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+In this guide, we are going to create three microservices and communicate each other with https://www.rabbitmq.com/[RabbitMQ]
+using the request-response pattern with https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc[RPC]
+_(Remote Procedure Call)_.
+
+____
+RabbitMQ is an open-source message-broker software that originally implemented the Advanced Message Queuing Protocol (AMQP)
+and has since been extended with a plug-in architecture to support Streaming Text Oriented Messaging Protocol (STOMP),
+Message Queuing Telemetry Transport (MQTT), and other protocols.
+____
+
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the app
+
+Let's describe the microservices you are going to build through the tutorial.
+
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and isbn.
+
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and isbn.
+
+* `bookrecommendation` - It consumes previous services and exposes an endpoint which recommends book names which are in stock.
+
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+
+
+=== Catalogue microservice
+
+Create the `bookcatalogue` microservice:
+
+`mn create-app example.micronaut.bookcatalogue`
+
+The previous command creates a folder named `bookcatalogue, and a Micronaut app inside it with default package:
+`example.micronaut`.
+
+Add `rabbitmq` dependency. As we only want to use RabbitMQ to receive requests we can remove Micronaut HTTP client and Server.
+
+dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
+
+By default Micronaut will connect to a RabbitMQ instance running on `localhost` so it is not necessary to add anything
+to `application.yml`. In case you want to change the configuration, add the following:
+
+resource:application.yml[app=bookcatalogue,tag=rabbitmq]
+
+
+==== Create RabbitMQ exchange, queue and binding
+
+Before being able to send and receive messages using RabbitMQ it is necessary to define the exchange, queue and binding.
+One option is create them directly in the RabbitMQ Admin UI available on `http://localhost:15672`. Use `guest` for both
+username and password.
+
+Another option is create them programmatically with Micronaut. Create the class `ChannelPoolListener.java`:
+
+source:ChannelPoolListener[app=bookcatalogue]
+
+<1> Define an exchange named `micronaut`. From the producer point of view everything is sent to the exchange with the
+appropriate routing key.
+<2> Define a queue named `inventory`. The consumer will listen for messages in that queue.
+<3> Define a binding between the exchange and the queue using the routing key `books.inventory`.
+<4> Define a queue named `catalogue`. The consumer will listen for messages in that queue.
+<5> Define a binding between the exchange and the queue using the routing key `books.catalogue`.
+
+NOTE: In this Catalogue Microservice the only necessary element is the `catalogue` queue, but it is a good practice to define
+all the elements in the same file and share the file between all the projects.
+
+
+==== Create consumer
+
+Create a `BookCatalogueService` class to handle incoming RPC requests into the `bookcatalogue` microservice:
+
+source:BookCatalogueService[app=bookcatalogue]
+
+<1> Annotate the class with `@RabbitListener` to indicate that this bean will consume messages from RabbitMQ.
+<2> Annotate the method with `@Queue`. This listener will listen to messages in `catalogue` queue.
+
+The previous service responds a `List<Book>`. Create the `Book` POJO:
+
+source:Book[app=bookcatalogue]
+
+
+
+
+=== Inventory microservice
+
+Create the `bookinventory` microservice:
+
+`mn create-app example.micronaut.bookinventory`
+
+The previous command creates a folder named `bookinventory`, and a Micronaut app inside it with default package :
+`example.micronaut`.
+
+Add `rabbitmq` dependency. As we only want to use RabbitMQ to receive requests we can remove Micronaut HTTP client and Server.
+
+dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
+
+
+==== Create RabbitMQ exchange, queue and binding
+
+As we did in `Catalogue` Microservice, create the class `ChannelPoolListener.java` in `bookinventory/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java`
+with the same content as before.
+
+
+==== Create consumer
+
+Create a `BookInventoryService` class to handle incoming RPC requests into the `bookinventory` microservice:
+
+source:BookInventoryService[app=bookinventory]
+
+<1> Annotate the class with `@RabbitListener` to indicate that this bean will consume messages from RabbitMQ.
+<2> Annotate the method with `@Queue`. This listener will listen to messages in `inventory` queue.
+
+The previous service uses `BookInventory` POJO. Create it:
+
+source:BookInventory[app=bookinventory]
+
+
+
+
+=== Recommendation microservice
+
+Create the `bookrecommendation` microservice:
+
+`mn create-app example.micronaut.bookrecommendation`
+
+The previous command creates a folder named `bookrecommendation`, and a Micronaut app inside it with
+default package: `example.micronaut`.
+
+Add `rabbitmq` dependency. In this microservice we will use Micronaut HTTP Server to receive REST request, so it is
+not necessary to remove any dependency.
+
+dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
+
+
+==== Create RabbitMQ exchange, queue and binding
+
+As we did in `Catalogue` Microservice, create the class `ChannelPoolListener.java` in `bookrecommendation/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java`
+with the same content as before.
+
+
+==== Create clients
+
+Let's create two interfaces to send messages to RabbitMQ. Micronaut will implement the interfaces at compilation time.
+Create `CatalogueClient.java`:
+
+source:CatalogueClient[app=bookrecommendation]
+
+<1> Send the messages to exchange `micronaut`.
+<2> Set the `replyTo` property to `amq.rabbitmq.reply-to`. This is a special queue that always exists and does not need
+to be created. That it is why we did not create the queue in the `ChannelInitializer`. RabbitMQ uses that queue in a
+special way and setting the value of the property `replyTo` to that queue will enable this call as a RPC one. RabbitMQ
+will create a temporary queue for the callback.
+<3> Set the routing key.
+<4> Define the method that will "mirror" the one in the consumer. Keep in mind that in the consumer it is not possible to
+return a reactive type, but on the client side it is. Also, it is necessary to send something, even if it's not
+used in the consumer.
+
+
+Create `InventoryClient.java`:
+
+source:InventoryClient[app=bookrecommendation]
+
+<1> Send the messages to exchange `micronaut`.
+<2> Set the `replyTo` property to `amq.rabbitmq.reply-to`.
+<3> Set the routing key.
+<4> Define the method that will "mirror" the one in the consumer. As we did with `CatalogueClient` we use a reactive
+type to wrap the result.
+
+
+==== Create the controller
+
+Create a Controller which injects both clients.
+
+source:BookController[app=bookrecommendation]
+
+<1> The class is defined as a controller with the http://docs.micronaut.io/snapshot/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
+<2> Clients are injected via constructor injection
+<3> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books`.
+
+
+The previous controller returns a `Flowable<BookRecommendation>`. Create the `BookRecommendation` POJO:
+
+source:BookRecommendation[app=bookrecommendation]
+
+
+
+
+== RabbitMQ and Micronaut
+
+=== Install RabbitMQ via Docker
+
+The fastest way to start using https://hub.docker.com/_/rabbitmq/[RabbitMQ is via Docker]:
+
+[source,bash]
+----
+docker run --rm -it \
+        -p 5672:5672 \
+        -p 15672:15672 \
+        rabbitmq:3.8.12-management
+----
+
+Alternatively you can https://www.rabbitmq.com/download.html[install and run a local RabbitMQ instance].
+
+
+
+== Running the app
+
+
+Configure `bookinventory` to run on port 8082:
+
+resource:application.yml[app=bookinventory,tag=port]
+
+
+Run `bookinventory` microservice:
+
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+bookinventory $ ./gradlew run
+
+13:30:22.426 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 742ms. Server Running: 1 active message listeners.
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+bookinventory $ ./mvnw mn:run
+
+13:30:22.426 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 742ms. Server Running: 1 active message listeners.
+----
+
+:exclude-for-build:
+
+
+
+Configure `bookcatalogue` to run on port 8081:
+
+resource:application.yml[app=bookcatalogue,tag=port]
+
+
+Run `bookcatalogue` microservice:
+
+:exclude-for-build:maven
+
+
+[source,bash]
+----
+bookcatalogue $ ./gradlew run
+
+13:31:19.887 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 949ms. Server Running: 1 active message listeners.
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+bookcatalogue $ ./mvnw mn:run
+
+13:31:19.887 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 949ms. Server Running: 1 active message listeners.
+----
+
+:exclude-for-build:
+
+
+Configure `bookrecommendation` to run on port 8080:
+
+resource:application.yml[app=bookrecommendation,tag=port]
+
+NOTE: 8080 is the default port if you don't specify `micronaut.server.port` property
+
+
+
+Run `bookrecommendation` microservice:
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+bookcatalogue $ ./gradlew run
+
+13:32:06.045 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 959ms. Server Running: http://localhost:8080
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+bookcatalogue $ ./mvnw mn:run
+
+13:32:06.045 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 959ms. Server Running: http://localhost:8080
+----
+
+:exclude-for-build:
+
+You can run a `curl` command to test the whole application:
+
+[source, bash]
+----
+$ curl http://localhost:8080/books
+[{"name":"Building Microservices"}]
+----
+
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Start the native images for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
+
+:exclude-for-languages:
+
+
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc[RabbitMQ RPC support] inside Micronaut.
