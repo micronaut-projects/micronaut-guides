@@ -16,9 +16,12 @@ class TeamConfigurationBuilderTest {
                 "team.team-admin.coach" to "Tommy O'Neill",
                 "team.team-admin.president" to "Mark Scanell",
                 "team.player-names" to names)
-        val ctx = ApplicationContext.run(ApplicationContext::class.java, items) // <1>
+
+        val ctx = ApplicationContext.run(items) // <1>
+
         //`when`("TeamConfiguration is retrieved from the context") {
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
+
         //then("configuration properties are populated") {
          assertEquals("evolution", teamConfiguration.name)
          assertEquals("green", teamConfiguration.color)

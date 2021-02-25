@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StadiumConfigurationTests {
+public class StadiumConfigurationTest {
 
     @Test
     void testStadiumConfiguration() {
@@ -19,7 +19,8 @@ public class StadiumConfigurationTests {
         items.put("stadium.wrigley.city", "Chicago"); // <1>
         items.put("stadium.wrigley.size", 45000);
 
-        ApplicationContext ctx = ApplicationContext.run(ApplicationContext.class, items);
+        ApplicationContext ctx = ApplicationContext.run(items);
+
         // <2>
         StadiumConfiguration fenwayConfiguration = ctx.getBean(StadiumConfiguration.class, Qualifiers.byName("fenway"));
         StadiumConfiguration wrigleyConfiguration = ctx.getBean(StadiumConfiguration.class, Qualifiers.byName("wrigley"));

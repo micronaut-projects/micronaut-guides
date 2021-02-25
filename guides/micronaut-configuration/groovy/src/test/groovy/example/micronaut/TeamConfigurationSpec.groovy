@@ -1,4 +1,3 @@
-
 package example.micronaut
 
 import example.micronaut.TeamAdmin

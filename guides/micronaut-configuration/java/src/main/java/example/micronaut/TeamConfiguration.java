@@ -5,7 +5,6 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 
 import java.util.List;
 
-//tag::teamConfigClassBuilder[]
 //tag::teamConfigClassNoBuilder[]
 @ConfigurationProperties("team")
 public class TeamConfiguration {
@@ -52,6 +51,5 @@ public class TeamConfiguration {
     public void setPlayerNames(List<String> playerNames) {
         this.playerNames = playerNames;
     }
-    //end::gettersandsetters[]
 }
-//end::teamConfigClassBuilder[]
+//end::gettersandsetters[]

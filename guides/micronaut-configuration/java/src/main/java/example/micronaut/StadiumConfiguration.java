@@ -1,6 +1,5 @@
 package example.micronaut;
 
-
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.Introspected;
