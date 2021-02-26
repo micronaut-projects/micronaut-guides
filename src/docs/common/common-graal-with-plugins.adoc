@@ -6,33 +6,23 @@ We are going to use https://www.graalvm.org/[GraalVM], the polyglot embeddable v
 
 Native images compiled with GraalVM ahead-of-time improve the startup time and reduce the memory footprint of JVM-based applications.
 
+NOTE: Use of GraalVM's `native-image` tool is only supported in Java or Kotlin projects. Groovy relies heavily on
+reflection which is only partially supported by GraalVM.
+
 === Native Image generation
 
 The easiest way to install GraalVM is to use https://sdkman.io/[SDKMan.io].
 
 [source, bash]
 ----
-% sdk list java
-================================================================================
-================================================================================
-Available Java Versions
-================================================================================
- Vendor        | Use | Version      | Dist    | Status     | Identifier
---------------------------------------------------------------------------------
-...
-..
-.
- GraalVM       |     | 21.0.0.r11   | grl     | installed  | 21.0.0.r11-grl
-               |     | 21.0.0.r8    | grl     | installed  | 21.0.0.r8-grl
-
 # For Java 8
-$ sdk install java 21.0.0.r8-grl
+$ sdk install java 21.0.0.2.r8-grl
 
 # For Java 11
-$ sdk install java 21.0.0.r11-grl
+$ sdk install java 21.0.0.2.r11-grl
 ----
 
-You need to install the native-image component which is not installed by default.
+You need to install the `native-image` component which is not installed by default.
 
 [source, bash]
 ----
@@ -48,7 +38,19 @@ To generate a native image using Gradle run:
 $ ./gradlew nativeImage
 ----
 
-The native image will be built to `build/native-image/application` and can be run with `./build/native-image/application`
+The native image will be created in `build/native-image/application` and can be run with `./build/native-image/application`
+
+It is also possible to customize the name of the native image or pass additional parameters to GraalVM:
+
+.build.gradle
+[source,groovy]
+----
+nativeImage {
+    args('--verbose')
+    imageName('mn-graalvm-application') // <1>
+}
+----
+<1> The native image name will now be `mn-graalvm-application`
 
 :exclude-for-build:
 
@@ -58,11 +60,9 @@ To generate a native image using Maven run:
 
 [source, bash]
 ----
-$ ./mvn package -Dpackaging=native-image
+$ ./mvnw package -Dpackaging=native-image
 ----
 
-The native image will be built to `target/application` and can be run with `./target/application`.
+The native image will be created in `target/application` and can be run with `./target/application`.
 
 :exclude-for-build:
-
-:exclude-for-languages:
