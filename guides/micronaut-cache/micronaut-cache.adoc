@@ -1,0 +1,95 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+=== Configure the Application
+
+In this sample application, we cache news headlines. Add https://micronaut-projects.github.io/micronaut-cache/latest/guide/index.html[Micronaut Caffeine Cache] dependency which
+which adds support for cache using https://github.com/ben-manes/caffeine[Caffeine].
+
+dependency:micronaut-cache-caffeine[groupId=io.micronaut.cache]
+
+Configure your caches in `application.yml`:
+
+resource:application.yml[tag=config]
+
+<1> Configure a cache called `headlines`.
+
+TIP: Check the https://micronaut-projects.github.io/micronaut-cache/snapshot/guide/configurationreference.html#io.micronaut.cache.caffeine.DefaultCacheConfiguration[properties (`maximum-size`, `expire-after-write` and `expire-after-access`)] to configure the size and expiration of your caches. It is important to keep the caches' size under control.
+
+=== Micronaut Cache Api
+
+Imagine a service which retrieves headlines for a given month. This operation may be expensive and you may want to cache it.
+
+source:NewsService[]
+
+
+<1> To register a Singleton in Micronaut’s application context annotate your class with `javax.inject.Singleton`.
+<2> Specifies the cache name `headlines` to store cache operation values in.
+<3> Indicates a method is cacheable. The cache name `headlines` specified in `@CacheConfig` is used. Since the method has only one parameter, you don't need to specify the `month` parameters attribute of the the annation.
+<4> Emulate an expensive operation by sleeping for several seconds.
+<5> The return value is cached with name `headlines` for the supplied `month`. The method invocation is never skipped even if the cache `headlines` for the supplied `month` already existed.
+<6> Method invocation causes the invalidation of the cache `headlines` for the supplied `month`.
+
+TIP: If you don't annotate the class with `@CacheConfig`, specify the cache name in the cache annotations. E.g. `@Cacheable(value = "headlines", parameters = {"month"})`
+
+=== Test the Cache
+
+We can verify that the cache works as expected:
+
+test:NewsServiceTest[]
+
+<1> Used to configure the test method execution order for the annotated test class.
+<2> Annotation used to define a Micronaut test
+<3> Inject `NewsService` bean.
+<4> Timeout annotation fails a test if its execution exceeds a given duration. It helps us verify that we are leaveraging the cache.
+<5> Used to configure the order in which the test method should executed relative to other tests in the class.
+
+
+=== Controller
+
+Create a controller which engages the previous service:
+
+source:News[]
+
+source:NewsController[]
+
+Add a test:
+
+test:NewsControllerTest[]
+
+<1> We call the endpoint twice and verify with the `@Timeout` annotation that the cache is being used.
+
+
+----------------------
+-------------------
+----------------------
+
+
+include::{commondir}/common-runapp.adoc[]
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You should be able to execute `curl localhost:8080/NOVEMBER` and see results
+
+:exclude-for-languages:
+
+== Next steps
+
+Read about Micronaut's https://docs.micronaut.io/1.3.0.M1/guide/index.html#caching[Cache Advise]. Moreover, check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/index.html[Micronaut Cache] project for more information.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
