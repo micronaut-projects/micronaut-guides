@@ -19,7 +19,6 @@ public class Application implements ApplicationEventListener<ServerStartupEvent>
         Micronaut.run(Application.class);
     }
 
-
     @Override
     public void onApplicationEvent(ServerStartupEvent event) {  // <4>
         try {
