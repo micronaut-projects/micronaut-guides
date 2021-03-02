@@ -1198,6 +1198,19 @@ class BookController {
 <div class="paragraph">
 <p>Native images compiled with GraalVM ahead-of-time improve the startup time and reduce the memory footprint of JVM-based applications.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Use of GraalVM&#8217;s <code>native-image</code> tool is only supported in Java or Kotlin projects. Groovy relies heavily on
+reflection which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect2">
 <h3 id="native-image-generation">6.1. Native Image generation</h3>
 <div class="paragraph">
@@ -1205,28 +1218,15 @@ class BookController {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">% sdk list java
-================================================================================
-================================================================================
-Available Java Versions
-================================================================================
- Vendor        | Use | Version      | Dist    | Status     | Identifier
---------------------------------------------------------------------------------
-...
-..
-.
- GraalVM       |     | 21.0.0.r11   | grl     | installed  | 21.0.0.r11-grl
-               |     | 21.0.0.r8    | grl     | installed  | 21.0.0.r8-grl
-
-# For Java 8
-$ sdk install java 21.0.0.r8-grl
+<pre class="CodeRay highlight"><code data-lang="bash"># For Java 8
+$ sdk install java 21.0.0.2.r8-grl
 
 # For Java 11
-$ sdk install java 21.0.0.r11-grl</code></pre>
+$ sdk install java 21.0.0.2.r11-grl</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You need to install the native-image component which is not installed by default.</p>
+<p>You need to install the <code>native-image</code> component which is not installed by default.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1242,7 +1242,27 @@ $ sdk install java 21.0.0.r11-grl</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The native image will be built to <code>build/native-image/application</code> and can be run with <code>./build/native-image/application</code></p>
+<p>The native image will be created in <code>build/native-image/application</code> and can be run with <code>./build/native-image/application</code></p>
+</div>
+<div class="paragraph">
+<p>It is also possible to customize the name of the native image or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">nativeImage {
+    args(<span class="string"><span class="delimiter">'</span><span class="content">--verbose</span><span class="delimiter">'</span></span>)
+    imageName(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native image name will now be <code>mn-graalvm-application</code></td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>After you run the native image, execute a curl request:</p>
