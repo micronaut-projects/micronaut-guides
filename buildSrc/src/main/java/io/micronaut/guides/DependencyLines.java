@@ -12,6 +12,7 @@ public class DependencyLines {
 
     private static final String SCOPE_COMPILE = "compile";
     private static final String SCOPE_IMPLEMENTATION = "implementation";
+    private static final String SCOPE_ANNOTATION_PROCESSOR = "annotationProcessor";
 
     static String toMavenScope(Map<String, String> attributes) {
         String s = attributes.get("scope");
@@ -21,15 +22,19 @@ public class DependencyLines {
         switch (s) {
             case "api":
             case "implementation":
+            case "annotationProcessor":
                 return "compile";
             case "testCompile":
             case "testRuntime":
             case "testRuntimeOnly":
             case "testImplementation":
                 return "test";
-            case "compileOnly": return "provided";
-            case "runtimeOnly": return "runtime";
-            default: return s;
+            case "compileOnly":
+                return "provided";
+            case "runtimeOnly":
+                return "runtime";
+            default:
+                return s;
         }
     }
 
@@ -42,7 +47,6 @@ public class DependencyLines {
             case "compile":
                 return "implementation";
             case "testCompile":
-                return "testImplementation";
             case "test":
                 return "testImplementation";
             case "provided":
@@ -70,7 +74,7 @@ public class DependencyLines {
             dependencyLines.add("----");
         }
 
-        for (String line: lines) {
+        for (String line : lines) {
             String artifactId = line.substring("dependency:".length(), line.indexOf("["));
             Map<String, String> attributes = new HashMap<>();
             String attributesStr = line.substring(line.indexOf("[") + "[".length(), line.indexOf("]"));
@@ -82,20 +86,26 @@ public class DependencyLines {
                 }
             }
             String groupId = attributes.getOrDefault("groupId", "io.micronaut");
-            String scope = attributes.getOrDefault("scope", "implementation");
             String gradleScope = toGradleScope(attributes) != null ? toGradleScope(attributes) : SCOPE_IMPLEMENTATION;
             String mavenScope = toMavenScope(attributes) != null ? toMavenScope(attributes) : SCOPE_COMPILE;
+            String callout = extractCallout(attributes);
 
             if (buildTool == BuildTool.GRADLE) {
-                dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")");
+                dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")" + callout);
             } else if (buildTool == BuildTool.MAVEN) {
-                dependencyLines.add("<dependency>");
+                dependencyLines.add("<dependency>" + callout);
                 dependencyLines.add("    <groupId>" + groupId + "</groupId>");
                 dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
-                if (!mavenScope.equals(SCOPE_COMPILE)) {
-                    dependencyLines.add("    <scope>" + mavenScope + "</scope>");
-                }
+                dependencyLines.add("    <scope>" + mavenScope + "</scope>");
                 dependencyLines.add("</dependency>");
+
+                if (gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR)) {
+                    dependencyLines.add("<!-- Add the following to your annotationProcessorPaths element -->");
+                    dependencyLines.add("<path>");
+                    dependencyLines.add("    <groupId>" + groupId + "</groupId>");
+                    dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
+                    dependencyLines.add("</path>");
+                }
             }
         }
 
@@ -103,5 +113,10 @@ public class DependencyLines {
         dependencyLines.add("----");
 
         return dependencyLines;
+    }
+
+    private static String extractCallout(Map<String, String> attributes) {
+        String callout = attributes.getOrDefault("callout", null);
+        return callout != null ? " // <" + callout + ">" : "";
     }
 }
