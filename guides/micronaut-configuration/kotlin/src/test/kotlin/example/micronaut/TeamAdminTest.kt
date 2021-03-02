@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 class TeamAdminTest {
     @Test
-    fun  aTeamAdminIsConstructedWithTheBuilder() {
+    fun aTeamAdminIsConstructedWithTheBuilder() {
         val teamAdmin = TeamAdmin.Builder().withManager("Nirav")
                 .withCoach("Tommy")
                 .withPresident("Mark").build()

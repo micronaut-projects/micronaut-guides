@@ -1,6 +1,5 @@
 package example.micronaut
 
-
 import io.micronaut.context.annotation.EachProperty
 import io.micronaut.context.annotation.Parameter
 
@@ -13,4 +12,5 @@ class StadiumConfiguration {
     StadiumConfiguration(@Parameter String name) { // <2>
         this.name = name
     }
+
 }

@@ -1,9 +1,9 @@
-//tag::teamConfigClassNoBuilder[]
 package example.micronaut
 
 import io.micronaut.context.annotation.ConfigurationBuilder
 import io.micronaut.context.annotation.ConfigurationProperties
 
+//tag::teamConfigClassNoBuilder[]
 @ConfigurationProperties("team")
 class TeamConfiguration  {
     var name: String? = null
@@ -15,3 +15,6 @@ class TeamConfiguration  {
     var builder = TeamAdmin.Builder() // <2>
 //end::teamConfigClassBuilder[]
 }
+
+//tag::gettersandsetters[]
+//end::gettersandsetters[]

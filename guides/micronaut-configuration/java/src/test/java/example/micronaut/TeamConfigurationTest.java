@@ -14,19 +14,18 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TeamConfigurationTests {
+public class TeamConfigurationTest {
 
     //tag::teamConfigSpecNoBuilder[]
     @Test
     void testTeamConfiguration() {
-
         List<String> names = Arrays.asList("Nirav Assar", "Lionel Messi");
         Map<String, Object> items = new HashMap<>();
         items.put("team.name", "evolution");
         items.put("team.color", "green");
         items.put("team.player-names", names);
 
-        ApplicationContext ctx = ApplicationContext.run(ApplicationContext.class, items); // <1>
+        ApplicationContext ctx = ApplicationContext.run(items); // <1>
         TeamConfiguration teamConfiguration = ctx.getBean(TeamConfiguration.class);
 
         assertEquals("evolution", teamConfiguration.getName());
@@ -52,7 +51,6 @@ public class TeamConfigurationTests {
     //tag::teamConfigSpecBuilder[]
     @Test
     void testTeamConfigurationBuilder() {
-
         List<String> names = Arrays.asList("Nirav Assar", "Lionel Messi");
         Map<String, Object> items = new HashMap<>();
         items.put("team.name", "evolution");
@@ -62,7 +60,7 @@ public class TeamConfigurationTests {
         items.put("team.team-admin.president", "Mark Scanell");
         items.put("team.player-names", names);
 
-        ApplicationContext ctx = ApplicationContext.run(ApplicationContext.class, items);
+        ApplicationContext ctx = ApplicationContext.run(items);
         TeamConfiguration teamConfiguration = ctx.getBean(TeamConfiguration.class);
         TeamAdmin teamAdmin = teamConfiguration.builder.build(); // <2>
 

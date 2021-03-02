@@ -6,7 +6,7 @@ import javax.inject.Named
 
 @Controller("/my")
 class MyController(val teamConfiguration: TeamConfiguration,
-                   @Named("pnc") val stadiumConfiguration: StadiumConfiguration) {
+                   @Named("pnc") val stadiumConfiguration: StadiumConfiguration) { // <1>
 
     @Get("/team")
     fun team(): TeamConfiguration {

@@ -16,12 +16,15 @@ class TeamConfigurationTest {
         items["team.name"] = "evolution"
         items["team.color"] = "green"
         items["team.player-names"] = names
-        val ctx = ApplicationContext.run(ApplicationContext::class.java, items) // <1>
+
+        val ctx = ApplicationContext.run(items) // <1>
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
+
         Assertions.assertEquals("evolution", teamConfiguration.name)
         Assertions.assertEquals("green", teamConfiguration.color)
         Assertions.assertEquals(names.size, teamConfiguration.playerNames!!.size)
         names.forEach(Consumer { name: String? -> Assertions.assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
+
         ctx.close()
     }
 
@@ -47,9 +50,11 @@ class TeamConfigurationTest {
         items["team.team-admin.coach"] = "Tommy O'Neill"
         items["team.team-admin.president"] = "Mark Scanell"
         items["team.player-names"] = names
-        val ctx = ApplicationContext.run(ApplicationContext::class.java, items)
+
+        val ctx = ApplicationContext.run(items)
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
         val teamAdmin = teamConfiguration.builder.build() // <2>
+
         Assertions.assertEquals("evolution", teamConfiguration.name)
         Assertions.assertEquals("green", teamConfiguration.color)
         Assertions.assertEquals("Nirav Assar", teamConfiguration.playerNames!![0])

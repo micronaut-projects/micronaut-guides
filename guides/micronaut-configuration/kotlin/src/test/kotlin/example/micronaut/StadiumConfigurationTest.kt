@@ -13,14 +13,18 @@ class StadiumConfigurationTest {
         items["stadium.fenway.size"] = 60000
         items["stadium.wrigley.city"] = "Chicago" // <1>
         items["stadium.wrigley.size"] = 45000
-        val ctx = ApplicationContext.run(ApplicationContext::class.java, items)
+
+        val ctx = ApplicationContext.run(items)
+
         // <2>
         val fenwayConfiguration = ctx.getBean(StadiumConfiguration::class.java, Qualifiers.byName("fenway"))
         val wrigleyConfiguration = ctx.getBean(StadiumConfiguration::class.java, Qualifiers.byName("wrigley"))
+
         Assertions.assertEquals("fenway", fenwayConfiguration.name)
         Assertions.assertEquals(60000, fenwayConfiguration.size)
         Assertions.assertEquals("wrigley", wrigleyConfiguration.name)
         Assertions.assertEquals(45000, wrigleyConfiguration.size)
+
         ctx.close()
     }
 }
