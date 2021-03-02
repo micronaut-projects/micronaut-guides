@@ -20,33 +20,15 @@ class GuideAsciidocGenerator {
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
             String projectName = "${metadata.slug}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}"
-            List<String> rawLines = []
-            String rawLine = ''
-            asciidocFile.withReader { reader ->
 
-                while ((rawLine = reader.readLine()) != null) {
-                    if (rawLine.startsWith('include::{commondir}/') && rawLine.endsWith('[]')) {
-                        String commonFileName = rawLine.substring(rawLine.indexOf('include::{commondir}/') + 'include::{commondir}/'.length(), rawLine.indexOf('[]'))
+            List<String> rawLinesExpanded = expandAllCommonIncludes(asciidocFile.readLines(), destinationFolder)
 
-                        File commonFile = Paths.get(destinationFolder.absolutePath, "../common/$commonFileName").toFile()
-                        assert commonFile.exists()
-                        commonFile.withReader { commonReader ->
-                            while ((rawLine = commonReader.readLine()) != null) {
-                                rawLines << rawLine
-                            }
-                        }
-                    } else {
-                        rawLines << rawLine
-                    }
-
-                }
-            }
             List<String> lines = []
             boolean excludeLineForLanguage = false
             boolean excludeLineForBuild = false
             boolean groupDependencies = false
             List<String> groupedDependencies = []
-            for (String line : rawLines) {
+            for (String line : rawLinesExpanded) {
                 if (shouldProcessLine(line, 'source:')) {
                     lines.addAll(sourceIncludeLines(extractName(line, 'source:'), extractAppName(line), null, extractTags(line)))
 
@@ -118,6 +100,27 @@ class GuideAsciidocGenerator {
             destination.createNewFile()
             destination.text = text
         }
+    }
+
+    private static List<String> expandAllCommonIncludes(List<String> lines, File destinationFolder) {
+        List<String> rawLines = []
+
+        for (String rawLine: lines) {
+            if (rawLine.startsWith('include::{commondir}/') && rawLine.endsWith('[]')) {
+                String commonFileName = rawLine.substring(rawLine.indexOf('include::{commondir}/') + 'include::{commondir}/'.length(), rawLine.indexOf('[]'))
+
+                File commonFile = Paths.get(destinationFolder.absolutePath, "../common/$commonFileName").toFile()
+                assert commonFile.exists()
+
+                rawLines.add("// Start: ${commonFileName}".toString())
+                rawLines.addAll(expandAllCommonIncludes(commonFile.readLines(), destinationFolder))
+                rawLines.add("// End: ${commonFileName}".toString())
+            } else {
+                rawLines << rawLine
+            }
+        }
+
+        return rawLines
     }
 
     private static boolean shouldProcessLine(String line, String macro) {
