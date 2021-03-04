@@ -1,18 +1,21 @@
 package io.micronaut.guides;
 
 import io.micronaut.starter.options.BuildTool;
+import io.micronaut.starter.options.Language;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class DependencyLines {
 
     private static final String SCOPE_COMPILE = "compile";
     private static final String SCOPE_IMPLEMENTATION = "implementation";
     private static final String SCOPE_ANNOTATION_PROCESSOR = "annotationProcessor";
+    private static final String SCOPE_ANNOTATION_PROCESSOR_KAPT = "kapt";
 
     static String toMavenScope(Map<String, String> attributes) {
         String s = attributes.get("scope");
@@ -38,11 +41,12 @@ public class DependencyLines {
         }
     }
 
-    static String toGradleScope(Map<String, String> attributes) {
+    static String toGradleScope(Map<String, String> attributes, Language language) {
         String s = attributes.get("scope");
         if (s == null) {
             return null;
         }
+
         switch (s) {
             case "compile":
                 return "implementation";
@@ -51,16 +55,22 @@ public class DependencyLines {
                 return "testImplementation";
             case "provided":
                 return "developmentOnly";
+            case "annotationProcessor":
+                if (language.equals(Language.KOTLIN)) {
+                    return "kapt";
+                } else if (language.equals(Language.GROOVY)) {
+                    return "compileOnly";
+                }
             default:
                 return s;
         }
     }
 
-    public static List<String> asciidoc(String line, BuildTool buildTool) {
-        return asciidoc(Collections.singletonList(line), buildTool);
+    public static List<String> asciidoc(String line, BuildTool buildTool, Language language) {
+        return asciidoc(Collections.singletonList(line), buildTool, language);
     }
 
-    public static List<String> asciidoc(List<String> lines, BuildTool buildTool) {
+    public static List<String> asciidoc(List<String> lines, BuildTool buildTool, Language language) {
         List<String> dependencyLines = new ArrayList<>();
 
         // Open Asciidoctor code block
@@ -86,25 +96,27 @@ public class DependencyLines {
                 }
             }
             String groupId = attributes.getOrDefault("groupId", "io.micronaut");
-            String gradleScope = toGradleScope(attributes) != null ? toGradleScope(attributes) : SCOPE_IMPLEMENTATION;
-            String mavenScope = toMavenScope(attributes) != null ? toMavenScope(attributes) : SCOPE_COMPILE;
+            String gradleScope = Optional.ofNullable(toGradleScope(attributes, language)).orElse(SCOPE_IMPLEMENTATION);
+            String mavenScope = Optional.ofNullable(toMavenScope(attributes)).orElse(SCOPE_COMPILE);
             String callout = extractCallout(attributes);
 
             if (buildTool == BuildTool.GRADLE) {
                 dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")" + callout);
             } else if (buildTool == BuildTool.MAVEN) {
-                dependencyLines.add("<dependency>" + callout);
-                dependencyLines.add("    <groupId>" + groupId + "</groupId>");
-                dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
-                dependencyLines.add("    <scope>" + mavenScope + "</scope>");
-                dependencyLines.add("</dependency>");
+                if (gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR) || gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR_KAPT)) {
+                    String mavenScopeAnnotationProcessor = getMavenAnnotationScopeXMLPath(language);
 
-                if (gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR)) {
                     dependencyLines.add("<!-- Add the following to your annotationProcessorPaths element -->");
-                    dependencyLines.add("<path>");
+                    dependencyLines.add("<" + mavenScopeAnnotationProcessor + ">");
                     dependencyLines.add("    <groupId>" + groupId + "</groupId>");
                     dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
-                    dependencyLines.add("</path>");
+                    dependencyLines.add("</" + mavenScopeAnnotationProcessor + ">");
+                } else {
+                    dependencyLines.add("<dependency>" + callout);
+                    dependencyLines.add("    <groupId>" + groupId + "</groupId>");
+                    dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
+                    dependencyLines.add("    <scope>" + mavenScope + "</scope>");
+                    dependencyLines.add("</dependency>");
                 }
             }
         }
@@ -118,5 +130,13 @@ public class DependencyLines {
     private static String extractCallout(Map<String, String> attributes) {
         String callout = attributes.getOrDefault("callout", null);
         return callout != null ? " // <" + callout + ">" : "";
+    }
+
+    private static String getMavenAnnotationScopeXMLPath(Language language) {
+        switch (language) {
+            case JAVA: return "path";
+            case KOTLIN: return "annotationProcessorPath";
+            default: return ""; // not used for Groovy
+        }
     }
 }
