@@ -15,13 +15,14 @@ import javax.inject.Singleton;
 
 @Singleton // <1>
 class CustomRefreshTokenPersistence : RefreshTokenPersistence {
+
     private var refreshTokenRepository: RefreshTokenRepository
 
     constructor(refreshTokenRepository: RefreshTokenRepository) {  // <2>
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-    @EventListener  // <3>
+    @EventListener // <3>
     override fun persistToken(event: RefreshTokenGeneratedEvent?) {
         if (event?.refreshToken != null &&
             event.userDetails != null &&

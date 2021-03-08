@@ -23,7 +23,7 @@ public class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
     }
 
     @Override
-    @EventListener  // <3>
+    @EventListener // <3>
     public void persistToken(RefreshTokenGeneratedEvent event) {
         if (event != null &&
                 event.getRefreshToken() != null &&

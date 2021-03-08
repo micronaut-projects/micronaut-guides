@@ -5,7 +5,9 @@ import com.nimbusds.jwt.SignedJWT
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
@@ -13,12 +15,12 @@ import javax.inject.Inject
 class DeclarativeHttpClientWithJwtTest {
 
     @Inject
-    lateinit var appClient : AppClient // <1>
+    lateinit var appClient: AppClient // <1>
 
     @Test
     fun verifyJwtAuthenticationWorksWithDeclarativeClient() {
         val creds: UsernamePasswordCredentials = UsernamePasswordCredentials("sherlock", "password")
-        val loginRsp : BearerAccessRefreshToken  = appClient.login(creds) // <2>
+        val loginRsp: BearerAccessRefreshToken = appClient.login(creds) // <2>
 
         assertNotNull(loginRsp)
         assertNotNull(loginRsp.accessToken)

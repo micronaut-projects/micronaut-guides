@@ -15,8 +15,8 @@ import java.util.*
 import javax.inject.Singleton
 
 @Singleton // <1>
-class AuthenticationProviderUserPassword : AuthenticationProvider {
-    // <2>
+class AuthenticationProviderUserPassword : AuthenticationProvider { // <2>
+
     override fun authenticate(
         httpRequest: HttpRequest<*>?,
         authenticationRequest: AuthenticationRequest<*, *>
