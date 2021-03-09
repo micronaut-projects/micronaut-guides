@@ -30,16 +30,16 @@ class GuideAsciidocGenerator {
             List<String> groupedDependencies = []
             for (String line : rawLinesExpanded) {
                 if (shouldProcessLine(line, 'source:')) {
-                    lines.addAll(sourceIncludeLines(extractName(line, 'source:'), extractAppName(line), null, extractTags(line)))
+                    lines.addAll(sourceIncludeLines(line))
 
                 } else if (shouldProcessLine(line, 'test:')) {
-                    lines.addAll(sourceIncludeLines(extractName(line, 'test:'), extractAppName(line), guidesOption.testFramework, extractTags(line)))
+                    lines.addAll(testIncludeLines(line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'resource:')) {
-                    lines.addAll(resourceIncludeLines(extractName(line, 'resource:'), extractAppName(line), extractTags(line)))
+                    lines.addAll(resourceIncludeLines(line))
 
                 } else if (shouldProcessLine(line, 'testResource:')) {
-                    lines.addAll(testResourceIncludeLines(extractName(line, 'testResource:'), extractAppName(line), extractTags(line)))
+                    lines.addAll(testResourceIncludeLines(line))
 
                 } else if (line == ':dependencies:') {
                     groupDependencies = !groupDependencies
@@ -105,7 +105,7 @@ class GuideAsciidocGenerator {
     private static List<String> expandAllCommonIncludes(List<String> lines, File destinationFolder) {
         List<String> rawLines = []
 
-        for (String rawLine: lines) {
+        for (String rawLine : lines) {
             if (rawLine.startsWith('include::{commondir}/') && rawLine.endsWith('[]')) {
                 String commonFileName = rawLine.substring(rawLine.indexOf('include::{commondir}/') + 'include::{commondir}/'.length(), rawLine.indexOf('[]'))
 
@@ -131,10 +131,27 @@ class GuideAsciidocGenerator {
         line.substring(macro.length(), line.indexOf('['))
     }
 
-    private static List<String> sourceIncludeLines(String name,
-                                           String appName,
-                                           TestFramework testFramework = null,
-                                           List<String> tagNames = null) {
+    private static List<String> sourceIncludeLines(String line) {
+        sourceIncludeLines(line, null, 'source:')
+    }
+
+    private static List<String> testIncludeLines(String line, TestFramework testFramework) {
+        sourceIncludeLines(line, testFramework, 'test:')
+    }
+
+    private static List<String> resourceIncludeLines(String line) {
+        resourceIncludeLines(line, 'main', 'resource:')
+    }
+
+    private static List<String> testResourceIncludeLines(String line) {
+        resourceIncludeLines(line, 'test', 'testResource:')
+    }
+
+    private static List<String> sourceIncludeLines(String line, TestFramework testFramework, String macro) {
+        String name = extractName(line, macro)
+        String appName = extractAppName(line)
+        List<String> tagNames = extractTags(line)
+
         String fileName = name
         if (testFramework) {
             if (name.endsWith('Test')) {
@@ -163,16 +180,11 @@ class GuideAsciidocGenerator {
         lines
     }
 
-    private static List<String> resourceIncludeLines(String name, String appName, List<String> tagNames) {
-        appResourceIncludeLines(name, appName, tagNames, 'main')
-    }
+    private static List<String> resourceIncludeLines(String line, String resourceDir, String macro) {
+        String fileName = extractName(line, macro)
+        String appName = extractAppName(line)
+        List<String> tagNames =  extractTags(line)
 
-    private static List<String> testResourceIncludeLines(String name, String appName, List<String> tagNames) {
-        appResourceIncludeLines(name, appName, tagNames, 'test')
-    }
-
-    private static List<String> appResourceIncludeLines(String name, String appName, List<String> tagNames, String resourceDir) {
-        String fileName = name
         String module = appName ? "${appName}/" : ""
         List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
         String asciidoctorLang = resolveAsciidoctorLanguage(fileName)
@@ -191,7 +203,6 @@ class GuideAsciidocGenerator {
         }
         lines << '----'
         lines
-
     }
 
     private static String extractAppName(String line) {
@@ -217,9 +228,9 @@ class GuideAsciidocGenerator {
 
         return attrs
             .stream()
-            .filter({ it.startsWith(attributeName)})
-            .map( {it.tokenize("=")})
-            .map({it.get(1)})
+            .filter({ it.startsWith(attributeName) })
+            .map({ it.tokenize("=") })
+            .map({ it.get(1) })
             .findFirst()
             .orElse("")
     }
