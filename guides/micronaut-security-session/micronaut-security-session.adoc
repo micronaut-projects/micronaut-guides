@@ -1,0 +1,142 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+In this guide you are going to write a Micronaut app with session based authentication.
+
+The following sequence illustrates the authentication flow:
+
+image::session_based_auth.svg[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the Application
+
+Create an app using the http://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface].
+
+`mn create-app example.micronaut.complete --test=spock --lang=@lang@`
+
+The previous command creates a micronaut app with the default package `example.micronaut` in a folder named `complete`.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+
+=== Security Dependency
+
+Add Micronaut's security dependency to your build file.
+
+Add Micronaut's JWT security dependency.
+
+:dependencies:
+
+dependency:micronaut-security-annotations[groupId=io.micronaut.security,scope=annotationProcessor]
+dependency:micronaut-security-session[groupId=io.micronaut.security]
+
+:dependencies:
+
+
+=== Configuration
+
+Create the next configuration file:
+
+resource:application.yml[tag=security]
+
+<1> Set `micronaut.security.authentication` to `session`. It sets the necessary beans for login and logout using session based authentication.
+<2> After the user logs in, redirect them to the Home page.
+<3> If the login fails, redirect them to /login/authFailed
+
+
+=== Authentication Provider
+
+To keep this guide simple, create a naive `AuthenticationProvider` to simulate user's authentication.
+
+source:AuthenticationProviderUserPassword[]
+
+<1> To register a Singleton in Micronaut's application context annotate your class with `javax.inject.Singleton`
+<2> A Micronaut's Authentication Provider implements the interface `io.micronaut.security.authentication.AuthenticationProvider`
+
+
+=== Apache Velocity
+
+By default, Micronaut's controllers produce JSON. Usually, you consume those endpoints with a mobile phone application,
+or a Javascript front end (Angular, React, Vue.js ...). However, to keep this guide simple we are going to produce
+HTML in our controllers.
+
+In order to do that, we use http://velocity.apache.org[Apache Velocity].
+____
+Velocity is a Java-based template engine. It permits anyone to use a simple yet powerful template language to reference objects defined in Java code.
+____
+
+Add a dependency to Micronaut's https://docs.micronaut.io/latest/guide/index.html#views[Server Side View Rendering Module] and to Velocity:
+
+dependency:micronaut-views-velocity[groupId=io.micronaut.views]
+
+Create two velocity templates in `src/main/resources/views`:
+
+resource:views/home.vm[]
+
+resource:views/auth.vm[]
+
+
+=== Controllers
+
+Create a file named `HomeController` which resolves the base URL `/`:
+
+source:HomeController[]
+
+<1> Annotate with `io.micronaut.security.Secured` to configure security access. Use `isAnonymous()` expression to allow access to authenticated and unauthenticated users.
+<2> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut's controller.
+<3> You can specify the HTTP verb for which a controller's action responds to. To respond to a GET request, use `io.micronaut.http.annotation.Get`
+<4> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template would you like to render the response against.
+<5> If you are authenticated, you can use the `java.security.Principal` as a parameter type. For parameters which maybe null, use `javax.annotation.Nullable`.
+
+== Login Form
+
+Next, create `LoginAuthController` which renders the login form.
+
+source:LoginAuthController[]
+
+<1> Annotate with `io.micronaut.security.Secured` to configure security access. Use `isAnonymous()` expression for anonymous access.
+<2> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut's controller.
+<3> Responds to GET requests at `/login/auth`
+<4> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template would you like to render the response against.
+<5> Responds to GET requests at `/login/authFailed`
+
+
+== Tests
+
+include::{commondir}/common-geb.adoc[]
+
+Create three pages:
+
+rawTest:HomePage[]
+
+rawTest:LoginPage[]
+
+rawTest:LoginFailedPage[]
+
+Create a test which verifies the user authentication flow.
+
+rawTest:SessionAuthenticationSpec[tag=clazz]
+
+<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Inject the `EmbeddedServer` bean.
+
+
+include::{commondir}/common-testApp.adoc[]
+
+include::{commondir}/common-runapp.adoc[]
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+include::{commondir}/common-next.adoc[]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
