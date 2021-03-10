@@ -45,7 +45,7 @@ class GuideAsciidocGenerator {
                     groupDependencies = !groupDependencies
                     if (!groupDependencies) {
                         // closing tag. Group and output them all together
-                        lines.addAll(DependencyLines.asciidoc(groupedDependencies, guidesOption.buildTool))
+                        lines.addAll(DependencyLines.asciidoc(groupedDependencies, guidesOption.buildTool, guidesOption.language))
                         groupedDependencies = []
                     }
 
@@ -53,7 +53,7 @@ class GuideAsciidocGenerator {
                     if (groupDependencies) {
                         groupedDependencies.add(line)
                     } else {
-                        lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool))
+                        lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool, guidesOption.language))
                     }
 
                 } else if (line == ':exclude-for-build:') {
