@@ -1,0 +1,135 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+In this guide, we are going to demonstrate Micronaut https://docs.micronaut.io/latest/guide/index.html#transfers[file transfer] capabilities by creating
+an app which downloads an excel file with a list of books.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+
+== Writing the App
+
+=== Books
+
+Create `Book` POJO:
+
+source:Book[]
+
+Create an interface to encapsulate Book retrieval.
+
+source:BookRepository[]
+
+Create a bean which implements the previous interface:
+
+source:BookRepositoryImpl[]
+
+<1> To register a Singleton in Micronaut’s application context annotate your class with `javax.inject.Singleton`
+
+
+=== Spreadsheet Builder
+
+Add a dependency to http://spreadsheet.dsl.builders[Spreadsheet builder]
+____
+Spreadsheet builder provides convenient way how to read and create MS Excel OfficeOpenXML Documents (XSLX) focus not only on content side but also on easy styling.
+____
+
+dependency:spreadsheet-builder-poi:2.2.1[groupId=builders.dsl]
+
+
+=== Excel Creation
+
+Create a interface to encapsulate Excel generation:
+
+source:BookExcelService[]
+
+<1> `SystemFile` is used as the return value of a route execution to indicate the given file should be downloaded by the client instead of displayed.
+
+Externalize your styles configuration into a class implementing `builders.dsl.spreadsheet.builder.api.Stylesheet` interface to maximize code reuse.
+
+source:BookExcelStylesheet[]
+
+Create a bean which generates the Excel file.
+
+source:BookExcelServiceImpl[]]
+
+<1> To register a Singleton in Micronaut’s application context annotate your class with `javax.inject.Singleton`
+
+=== Controller
+
+Add https://docs.micronaut.io/snapshot/guide/index.html#views[Server Side View Rendering] and https://www.thymeleaf.org/[Thymeleaf] dependencies:
+
+dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+
+Create a controller:
+
+source:HomeController[]
+
+<1> The class is defined as a controller with the `@Controller` annotation mapped to the path `/`
+<2> Constructor injection
+<3> Use `@View` annotation to specify which template would you like to render the response against.
+<4> You can specify the HTTP verb for which a controller's action responds to. To respond to a GET request, use `io.micronaut.http.annotation.Get`
+<5> `SystemFile` is used as the return value of a route execution to indicate the given file should be downloaded by the client instead of displayed.
+
+The previous controller index method renders a simple view with a link to download the Excel file:
+
+resource:views/index.html[]
+
+
+=== Tests
+
+Often, file transfers remain untested in many applications. In this section, you will see how easy is to test that the
+file downloads but also that the downloaded file contents match our expectations.
+
+include::{commondir}/common-geb.adoc[]
+
+Create a Geb Configuration file. We configure some Chrome options to control the download path.
+
+testResource:GebConfig.groovy[]
+
+<1> Disable confirmation popups
+<2> Configure the download folder
+
+Create a Geb Page to encapsulate the Excel link:
+
+rawTest:HomePage[]
+
+include::{commondir}/common-webdriverbinaries.adoc[]
+
+Create a test which verifies the Excel file is downloaded and the content matches our expectations.
+
+rawTest:DownloadExcelSpec[]
+
+<1> Annotate the class with `@MicronatTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html]
+<2> Inject the Embedded Server.
+<3> The `EmbeddedServer` interface provides the URL of the server under test which runs on a random port. We use this port to set http://www.gebish.org/manual/current/#base-url[Geb base url].
+
+
+To run the tests:
+
+[source,bash]
+----
+$ ./gradlew -Dgeb.env=chrome -Ddownload.folder=/tmp test
+$ open build/reports/tests/test/index.html
+----
+
+include::{commondir}/common-runapp.adoc[]
+
+
+== Next Steps
+
+Read more about https://docs.micronaut.io/latest/guide/index.html#transfers[File Transfers] support inside Micronaut.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

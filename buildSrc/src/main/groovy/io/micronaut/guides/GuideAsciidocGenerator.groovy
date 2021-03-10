@@ -281,7 +281,7 @@ class GuideAsciidocGenerator {
             case 'xml':
                 return 'xml'
             default:
-                return ''
+                return extension.toLowerCase()
         }
     }
 }

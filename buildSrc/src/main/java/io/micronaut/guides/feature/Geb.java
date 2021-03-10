@@ -10,7 +10,7 @@ import io.micronaut.starter.options.TestFramework;
 import javax.inject.Singleton;
 
 @Singleton
-public class GebFeature implements Feature {
+public class Geb implements Feature {
 
     @NonNull
     @Override

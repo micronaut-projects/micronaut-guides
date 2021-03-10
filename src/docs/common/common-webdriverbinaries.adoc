@@ -6,12 +6,21 @@ a plugin that downloads and caches WebDriver binaries specific to the OS the bui
 .build.gradle
 ----
 plugins {
-...
-..
-include::{sourceDir}/build.gradle[tag=buildscriptDependenciesWebdriverBinaries]
+    id "com.github.erdi.webdriver-binaries" version "2.4"
 }
 
-include::{sourceDir}/build.gradle[tag=webdriverBinaries]
+webdriverBinaries {
+    chromedriver {
+        version = '88.0.4324.96' // <1>
+    }
+}
 
-include::{sourceDir}/build.gradle[tag=taskWithTypeTest]
+tasks.withType(Test) {
+    systemProperty "geb.env", System.getProperty('geb.env') // <2>
+    systemProperty "download.folder", System.getProperty('download.folder') // <3>
+}
 ----
+
+<1> Replace this with your https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json[Chrome version].
+<2> Pass system property `geb.env` to the tests.
+<3> Pass system property `download.folder` to the tests.
