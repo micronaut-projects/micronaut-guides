@@ -35,6 +35,9 @@ class GuideAsciidocGenerator {
                 } else if (shouldProcessLine(line, 'test:')) {
                     lines.addAll(testIncludeLines(line, guidesOption.testFramework))
 
+                } else if (shouldProcessLine(line, 'rawTest:')) {
+                    lines.addAll(rawTestIncludeLines(line, guidesOption.testFramework))
+
                 } else if (shouldProcessLine(line, 'resource:')) {
                     lines.addAll(resourceIncludeLines(line))
 
@@ -180,10 +183,38 @@ class GuideAsciidocGenerator {
         lines
     }
 
+    private static List<String> rawTestIncludeLines(String line, TestFramework testFramework) {
+        String fileName = extractName(line, 'rawTest:')
+        String appName = extractAppName(line)
+        List<String> tagNames = extractTags(line)
+
+        String module = appName ? "${appName}/" : ""
+        List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
+
+        String fileExtension = testFramework.toTestFramework().defaultLanguage.getExtension()
+        String langTestFolder = testFramework.toTestFramework().defaultLanguage.getTestSrcDir()
+
+        List<String> lines = [
+            "[source,${fileExtension}]".toString(),
+            ".${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}".toString(),
+            '----',
+        ]
+        if (tags) {
+            for (String tag : tags) {
+                lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
+            }
+        } else {
+            lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
+        }
+
+        lines.add('----')
+        lines
+    }
+
     private static List<String> resourceIncludeLines(String line, String resourceDir, String macro) {
         String fileName = extractName(line, macro)
         String appName = extractAppName(line)
-        List<String> tagNames =  extractTags(line)
+        List<String> tagNames = extractTags(line)
 
         String module = appName ? "${appName}/" : ""
         List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
