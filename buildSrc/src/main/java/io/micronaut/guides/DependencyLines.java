@@ -107,7 +107,7 @@ public class DependencyLines {
                     String mavenScopeAnnotationProcessor = getMavenAnnotationScopeXMLPath(language);
 
                     dependencyLines.add("<!-- Add the following to your annotationProcessorPaths element -->");
-                    dependencyLines.add("<" + mavenScopeAnnotationProcessor + ">");
+                    dependencyLines.add("<" + mavenScopeAnnotationProcessor + ">" + callout);
                     dependencyLines.add("    <groupId>" + groupId + "</groupId>");
                     dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
                     dependencyLines.add("</" + mavenScopeAnnotationProcessor + ">");
