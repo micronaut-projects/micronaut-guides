@@ -7,11 +7,6 @@ import io.micronaut.starter.api.TestFramework
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import static io.micronaut.starter.api.TestFramework.JUNIT
-import static io.micronaut.starter.api.TestFramework.KOTEST
-import static io.micronaut.starter.api.TestFramework.KOTLINTEST
-import static io.micronaut.starter.api.TestFramework.SPOCK
-
 @CompileStatic
 class GuideAsciidocGenerator {
 
@@ -99,7 +94,7 @@ class GuideAsciidocGenerator {
             text = text.replace("@testFramework@", guidesOption.testFramework.toString())
             text = text.replace("@authors@", metadata.authors.join(', '))
             text = text.replace("@languageextension@", guidesOption.language.extension)
-            text = text.replace("@testsuffix@", guidesOption.testFramework == SPOCK ? 'Spec' : 'Test')
+            text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
 
             text = text.replace("@sourceDir@", projectName)
 
@@ -164,7 +159,7 @@ class GuideAsciidocGenerator {
         if (testFramework) {
             if (name.endsWith('Test')) {
                 fileName = name.substring(0, name.indexOf('Test'))
-                fileName += testFramework == SPOCK ? 'Spec' : 'Test'
+                fileName += testFramework == TestFramework.SPOCK ? 'Spec' : 'Test'
             }
         }
         String folder = testFramework ? 'test' : 'main'
@@ -196,20 +191,20 @@ class GuideAsciidocGenerator {
         String module = appName ? "${appName}/" : ""
         List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
 
-        String fileExtension = resolveTestExtension(testFramework)
-        String langFolder = resolveLangFolder(testFramework)
+        String fileExtension = testFramework.toTestFramework().defaultLanguage.getExtension()
+        String langTestFolder = testFramework.toTestFramework().defaultLanguage.getTestSrcDir()
 
         List<String> lines = [
-            "[source,${langFolder}]".toString(),
-            ".${module}src/test/${langFolder}/example/micronaut/${fileName}.${fileExtension}".toString(),
+            "[source,${fileExtension}]".toString(),
+            ".${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}".toString(),
             '----',
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}src/test/${langFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
+                lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}src/test/${langFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
+            lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
         }
 
         lines.add('----')
@@ -219,7 +214,7 @@ class GuideAsciidocGenerator {
     private static List<String> resourceIncludeLines(String line, String resourceDir, String macro) {
         String fileName = extractName(line, macro)
         String appName = extractAppName(line)
-        List<String> tagNames =  extractTags(line)
+        List<String> tagNames = extractTags(line)
 
         String module = appName ? "${appName}/" : ""
         List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
@@ -286,34 +281,6 @@ class GuideAsciidocGenerator {
                 return 'xml'
             default:
                 return ''
-        }
-    }
-
-    private static String resolveTestExtension(TestFramework testFramework) {
-        switch (testFramework) {
-            case JUNIT:
-                return 'java'
-            case SPOCK:
-                return 'groovy'
-            case KOTEST:
-            case KOTLINTEST:
-                return 'kt'
-            default:
-                return '@languageextension@'
-        }
-    }
-
-    private static String resolveLangFolder(TestFramework testFramework) {
-        switch (testFramework) {
-            case JUNIT:
-                return 'java'
-            case SPOCK:
-                return 'groovy'
-            case KOTEST:
-            case KOTLINTEST:
-                return 'kotlin'
-            default:
-                return '@lang@'
         }
     }
 }
