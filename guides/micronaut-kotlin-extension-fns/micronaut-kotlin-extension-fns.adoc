@@ -1,0 +1,173 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Kotlin Extension Functions
+
+Before we get started writing the application, let's touch briefly on what extension functions are and why they're useful.
+
+=== What Are Extension Functions?
+
+The https://kotlinlang.org/docs/extensions.html[kotlin documentation] explains that extension functions are
+"an ability to extend a class with new functionality without having to inherit from the class or use design patterns such as Decorator."
+
+They're useful for writing new functions for classes in a third-party library or quickly creating new methods for common use cases of a class you otherwise can't edit directly.
+
+For example, perhaps your application often needs to take a list and swap the index of two items in the list.
+
+To define a `swap` method for any mutable list, you could write:
+
+[source, kotlin]
+----
+fun <T> MutableList<T>.swap(index1: Int, index2: Int) {
+    val tmp = this[index1] // 'this' corresponds to the list
+    this[index1] = this[index2]
+    this[index2] = tmp
+}
+----
+
+Then use it like it was a regular method of `MutableList`
+
+[source, kotlin]
+----
+val languages = mutableListOf('java', 'groovy', 'kotlin')
+
+languages.swap(0,2) // Will swap 'java' and 'kotlin' so kotlin comes first
+----
+
+=== Using Extension Functions in an App
+
+To show off the extension functions available for use in Micronaut (and how to write your own), we'll build a simple application that
+
+- Consumes https://icanhazdadjoke.com/api[this fun dad joke API] (I love a good dad joke) with an http client
+- Schedules the joke to "be sent" to someone [we won't actually be integrating a message sender for simplicity]
+- Writes our own extension function for the client (as if it was provided by a third party)
+- Puts everything together in a controller
+- Starts the application with the `startApplication` extension function
+
+include::{commondir}/common-create-app.adoc[]
+
+=== The Micronaut Kotlin Extension Functions
+
+To aid kotlin developers in writing more idiomatic kotlin code in Micronaut, we have provided a
+https://micronaut-projects.github.io/micronaut-kotlin/latest/guide/index.html#extensionFunctions[kotlin extension function library]
+for use.
+
+To use them in our project, we simply need to include the dependency
+
+dependency:micronaut-kotlin-extension-functions[groupId=io.micronaut.kotlin]
+
+You can see the https://micronaut-projects.github.io/micronaut-kotlin/api/micronaut-kotlin-extension-functions[dokka docs for the full list of functions here]
+
+Big credit is due to https://github.com/ideaplugins[Alejandro Gomez] for allowing for the use of his initial collection of extension functions!
+
+Let's see these functions in action!
+
+=== Application
+
+Right away let's modify the generated `Application.kt` to use the `startApplication` extension function
+
+source:Application[]
+
+<1> Here we import the extension function
+<2> Since the extension function takes a type argument, we'll define our `Application` as a kotlin `object`, which is an easy shortcut for a singleton or place to put a static method like `main`
+<3> `startApplication<Application>` here does the work of `.build().mainClass(Application::class.java).start()`. Convenient!
+
+=== DadJokeClient
+
+Next we'll build out our functionality. We'll start by modelling the response types for the plain `GET` request for the Dad Joke API (that just return a random joke),
+as well as the paged results that are returned from the `/search` endpoint.
+
+source:DadJoke[]
+
+source:DadJokePagedResults[]
+
+Then, we can create a standard Micronaut http client for the DadJoke API endpoint, letting the `@Client` annotation implement the interface we lay out.
+
+source:DadJokeClient[]
+
+Note that while *we* are creating this client for the purposes of this guide, but often times something like this may come from
+a third party library. Perhaps you're getting it from a public dependency you don't have permission to edit, or from
+another team within your company that has different priorities from your own team.
+
+It could also be that you simply have a specific use case for the client involving specific setup for your application
+that doesn't belong in the client proper.
+
+Let's see how we can extend this client to suit our own use case.
+
+=== DadJokeController
+
+We'll create a controller to utilize the client's standard `GET` for a random joke.
+
+source:DadJokeController[tags=fileHead|start|standardGet|end]
+
+Now, say we have a particular way we want to use a client frequently (like attaching common headers, or filling in some parameters by default.
+
+Let's explore how we can extend the client for our benefit. We'll define a method for the client to specifically look for jokes about dogs.
+
+In your controller file, at the bottom, add this extension function definition:
+
+source:DadJokeController[tag=clientExt]
+
+<1> We define a `getDogJokes` method on the `DadJokeClient`. This method will be available anywhere within the `example.micronaut` package
+
+While this is a simplified (and somewhat silly) example, you can imagine how with a more sophisticated API, this could be
+a very powerful tool to encapsulate common functionality and explicitly relate it to the appropriate class, rather than
+defining another class just to encapsulate this common routine.
+
+We can then use this extension function within our controller by defining a `/dogJoke` endpoint
+
+source:DadJokeController[tag=usingExt]
+
+<1> Note how we can use this function as if it were defined on the client class itself.
+
+Now we have our application!
+
+=== Writing some tests
+
+Lastly, let's use a few more convenient functions included in `micronaut-kotlin-extension-functions` in our test
+
+test:DadJokeTest[]
+
+<1> Here we have `run<EmbeddedServer>` as a little syntatic sugar for `ApplicationContext.run(EmbeddedServer::class.java)`
+<2> Same here for `createBean<HttpClient>`, we're reducing our need to type `::class.java` all over the place
+<3> `retrieveObject` and `retrieveList` give us nice shortcuts to reduce the need for `Argument.of` and `Argument.listOf`, in addition to reducing our `::class.java` uses.
+
+Now we can test everything out!
+
+include::{commondir}/common-testApp.adoc[]
+
+include::{commondir}/common-runapp.adoc[]
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Whether you run the app via gradle or as a native image, you should be able to get a good laugh by typing:
+
+`curl localhost:8080/dadJokes/joke`
+
+or
+
+`curl localhost:8080/dadJokes/dogJokes`
+
+Hopefully it brings a smile to your day!
+
+:exclude-for-languages:
+
+
+== Next steps
+
+See all the useful libraries for Micronaut Kotlin developers in the https://micronaut-projects.github.io/micronaut-kotlin/latest/guide/index.html#extensionFunctions[Micronaut Kotlin documentation]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
