@@ -1,0 +1,223 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+
+=== Controller
+
+Create `MailController` which use a collaborator, `emailService` to send and email.
+
+source:MailController[]
+
+<1> The class is defined as a controller with the http://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/mail/send`
+<2> Constructor injection
+<3> The http://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html[@Post] annotation is used to map the index method to all requests that use an HTTP POST
+<4> Add `@Valid` to any method parameter which requires validation. Use a POGO supplied as a JSON payload in the request to populate the email.
+<5> Return 200 OK as the result
+
+
+The previous controller uses a POJO supplied in the request body as a JSON Payload
+
+source:EmailCmd[tags=clazz|properties|settersandgetters]
+
+=== Email Service
+
+Create an interface - `EmailService`. Any email provider present in the application should implement it.
+
+source:EmailService[]
+
+source:Email[]
+
+==== AWS SES
+
+____
+Amazon Simple Email Service (Amazon SES) is a cloud-based email sending service designed to help digital marketers and
+application developers send marketing, notification, and transactional emails. It is a reliable, cost-effective service
+for businesses of all sizes that use email to keep in contact with their customers.
+____
+
+Add a dependency to AWS SES SDK:
+
+dependency:ses:2.16.18[groupId=software.amazon.awssdk]
+
+Create service which uses AWS Simple Email Service client to send the email
+
+source:AwsSesMailService[]
+
+<1> Use `javax.inject.Singleton` to designate a class a a singleton
+<2> Bean will not loaded unless condition is met.
+<3> In case of multiple possible interface implementations of `EmailService`, `@Secondary` reduces the priority.
+<4> Values for region and source email are resolved from environment variables or system properties.
+
+We annotated the previous class with `@Requires(condition = AwsResourceAccessCondition.class)`.
+
+The `AwsResourceAccessCondition` ensures the bean is not loaded unless certain conditions are fulfilled.
+
+https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/java-dg-roles.html[_Configure IAM Roles for Amazon EC2_]
+
+____
+> If your application creates an AWS client using the create method, the client searches for credentials using the default credentials provider chain, in the following order:
+
+> * In the Java system properties: `aws.accessKeyId` and `aws.secretAccessKey`.
+> * In system environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+> * In the default credentials file (the location of this file varies by platform).
+> * n the Amazon ECS environment variable: `AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`.
+> * In the instance profile credentials, which exist within the instance metadata associated with the IAM role for the EC2 instance.
+____
+
+source:AwsResourceAccessCondition[]
+
+Add a test to verify the service is loaded:
+
+test:AwsSesMailServiceTest[]
+
+
+==== SendGrid
+
+http://sendgrid.com[SendGrid] is a transactional email service.
+
+____
+SendGrid is responsible for sending billions of emails for some of the best and brightest companies in the world.
+____
+
+Add a dependency to SendGrid SDK:
+
+dependency:sendgrid-java:4.7.2[groupId=com.sendgrid]
+
+Create a service which encapsulates the integration with SendGrid. The bean will not be loaded if the
+system properties (`sendgrid.apikey`, `sendgrid.fromemail`) or environment variables (`SENDGRID_APIKEY`, `SENDGRID_FROM_EMAIL`) are not present.
+
+source:SendGridEmailCondition[]
+
+Add a test:
+
+test:SendGridEmailConditionTest[]
+
+
+source:SendGridEmailService[]
+
+<1> Use `javax.inject.Singleton` to designate a class a a singleton
+<2> Bean will not loaded unless condition is met.
+<3> Values will be resolved from system properties.
+
+Add a test:
+
+test:SendGridEmailServiceTest[]
+
+
+=== Run the app
+
+Add a logger to get more visibility:
+
+resource:logback.xml[tag=logger]
+
+To use SendGrid, define the required environment variables and run the app
+
+[source, bash]
+----
+$ export SENDGRID_FROM_EMAIL=email@email.com
+$ export SENDGRID_APIKEY=XXXXXX
+:exclude-for-build:maven
+$ ./gradlew run
+:exclude-for-build:
+:exclude-for-build:gradle
+$ ./mvnw mn:run
+:exclude-for-build:
+----
+
+
+To use AWS SES, define the required environment variables and run the app
+
+[source, bash]
+----
+$ export AWS_REGION=eu-west-1
+$ export AWS_SOURCE_EMAIL=email@email.com
+$ export AWS_ACCESS_KEY_ID=XXXXXXXX
+$ export AWS_SECRET_KEY=XXXXXXXX
+:exclude-for-build:maven
+$ ./gradlew run
+:exclude-for-build:
+:exclude-for-build:gradle
+$ ./mvnw mn:run
+:exclude-for-build:
+----
+
+
+If you supply both AWS SES and SendGrid  system properties, the SendGrid `EmailService` implementation will be used due to the `@Secondary` annotation in `AwsSesMailService`.
+
+[source,bash]
+----
+curl -X "POST" "http://localhost:8080/mail/send" \
+-H 'Content-Type: application/json; charset=utf-8' \
+-d $'{
+"subject": "Test Email",
+"recipient": "recipient@email.com",
+"textBody": "Foo"
+}'
+----
+
+=== Test
+
+In our acceptance test, beans `SendGridEmailService` or `AwsSesMailService` will not be loaded since system properties are not present.
+
+Instead, we setup a Mock which we can verify interactions against.
+
+test:MockEmailService[]
+
+Create the next test:
+
+test:MailControllerTest[]
+
+<1> Annotate the class with `@MicronatTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html]
+<2> Define a property used to run the test
+<3> Inject the `ApplicationContext` bean
+<4> Inject the `RxHttpClient` bean
+<5> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+<6> `emailService.send` method is invoked once.
+
+=== Validation
+
+We want to ensure any email request contains a subject, recipient and a text body or html body.
+
+include::{commondir}/common-validation.adoc[]
+
+
+Create the next test:
+
+test:MailControllerValidationTest[]
+
+<1> Annotate the class with `@MicronatTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Define a property available for the application.
+<3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+
+In order to satisfy the test, create an email constraints annotation
+
+source:EmailConstraints[]
+
+and a constraint validator in a `@Factory` class:
+
+source:EmailConstraintsFactory[]
+
+Annotate `EmailCmd` with `EmailConstraints` and `@Introspected` (to generate the
+https://docs.micronaut.io/latest/guide/index.html#introspection[Bean Introspection information]).
+
+source:EmailCmd[tags=clazzwithannotations|clazz|properties|close]
+
+
+include::{commondir}/common-testApp.adoc[]
+
+include::{commondir}/common-next.adoc[]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
