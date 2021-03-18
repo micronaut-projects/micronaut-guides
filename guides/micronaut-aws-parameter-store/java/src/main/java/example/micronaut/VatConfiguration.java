@@ -1,0 +1,38 @@
+package example.micronaut;
+
+import io.micronaut.context.annotation.ConfigurationProperties;
+import io.micronaut.core.annotation.NonNull;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+
+@ConfigurationProperties("vat")
+public class VatConfiguration implements Vat {
+    @NonNull
+    @NotNull
+    private BigDecimal rate;
+
+    @NotBlank
+    @NotNull
+    private String country;
+
+    @Override
+    @NonNull
+    public BigDecimal getRate() {
+        return rate;
+    }
+
+    public void setRate(@NonNull BigDecimal rate) {
+        this.rate = rate;
+    }
+
+    @Override
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+}
