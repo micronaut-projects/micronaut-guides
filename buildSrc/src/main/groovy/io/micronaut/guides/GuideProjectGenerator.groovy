@@ -30,7 +30,7 @@ class GuideProjectGenerator implements Closeable {
     private final GuidesGenerator guidesGenerator
 
     String basePackage = 'example.micronaut'
-    String appName = 'complete'
+    String appName = 'micronaut-guide'
 
     GuideProjectGenerator() {
         this.applicationContext = ApplicationContext.run()
