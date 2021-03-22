@@ -2,10 +2,10 @@ package example.micronaut
 
 import io.micronaut.runtime.startApplication // <1>
 
-object Application { // <2>
+object ApplicationKt { // <2>
 	@JvmStatic
 	fun main(args: Array<String>) {
-		startApplication<Application>(*args) // <3>
+		startApplication<ApplicationKt>(*args) // <3>
 	}
 }
 

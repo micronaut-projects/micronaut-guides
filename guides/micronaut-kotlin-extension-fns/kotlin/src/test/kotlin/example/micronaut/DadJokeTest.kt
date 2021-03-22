@@ -6,11 +6,9 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.retrieveList
 import io.micronaut.http.retrieveObject
 import io.micronaut.runtime.server.EmbeddedServer
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
-@MicronautTest
 class DadJokeTest {
 
     @Test

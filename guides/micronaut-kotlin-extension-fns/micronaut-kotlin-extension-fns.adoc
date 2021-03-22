@@ -80,8 +80,9 @@ Right away let's modify the generated `Application.kt` to use the `startApplicat
 source:Application[]
 
 <1> Here we import the extension function
-<2> Since the extension function takes a type argument, we'll define our `Application` as a kotlin `object`, which is an easy shortcut for a singleton or place to put a static method like `main`
-<3> `startApplication<Application>` here does the work of `.build().mainClass(Application::class.java).start()`. Convenient!
+<2> Since the extension function takes a type argument, we'll define our Application as a kotlin `object`, which is an easy shortcut for a singleton or place to put a static method like `main`.
+We're naming it `ApplicationKt` simply because this guide's build file is auto-generated, and we want to match the mainClass name it generates. `Application` alone would be a preferable name outside the context of this guide.
+<3> `startApplication<ApplicationKt>` here does the work of `.build().mainClass(ApplicationKt::class.java).start()`. Convenient!
 
 === DadJokeClient
 
@@ -92,11 +93,13 @@ source:DadJoke[]
 
 source:DadJokePagedResults[]
 
+<1> We make both of these classes `@Introspected` for compatibility with Graal, you can omit them if you do not plan to build a native image
+
 Then, we can create a standard Micronaut http client for the DadJoke API endpoint, letting the `@Client` annotation implement the interface we lay out.
 
 source:DadJokeClient[]
 
-Note that while *we* are creating this client for the purposes of this guide, but often times something like this may come from
+Note that while *we* are creating this client for the purposes of this guide, often times something like this may come from
 a third party library. Perhaps you're getting it from a public dependency you don't have permission to edit, or from
 another team within your company that has different priorities from your own team.
 
@@ -151,8 +154,6 @@ include::{commondir}/common-runapp.adoc[]
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
-
 Whether you run the app via gradle or as a native image, you should be able to get a good laugh by typing:
 
 `curl localhost:8080/dadJokes/joke`
@@ -162,8 +163,6 @@ or
 `curl localhost:8080/dadJokes/dogJokes`
 
 Hopefully it brings a smile to your day!
-
-:exclude-for-languages:
 
 
 == Next steps
