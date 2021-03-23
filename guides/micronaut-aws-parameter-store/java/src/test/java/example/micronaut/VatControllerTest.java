@@ -10,8 +10,8 @@ import javax.inject.Inject;
 import java.math.BigDecimal;
 
 @MicronautTest // <1>
-@Property(name = "vat.country", value = "Switzerland")
-@Property(name = "vat.rate", value = "7.7")
+@Property(name = "vat.country", value = "Switzerland") // <2>
+@Property(name = "vat.rate", value = "7.7") // <2>
 public class VatControllerTest {
 
     @Inject
