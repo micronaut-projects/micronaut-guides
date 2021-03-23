@@ -1,0 +1,260 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+Let's describe the microservices you are going to build through the tutorial.
+
+* `gateway` - A secured via JWT microservice which exposes an endpoint `/user`. The output of that endpoint is the result of consuming the `userecho` endpoint.
+* `userecho` - A secured via JWT microservice which exposes an endpoint `/user` which responds the username of the authenticated user.
+
+The next diagram illustrates the flow:
+
+image::tokenpropagation.svg[]
+
+We generate a valid JWT in the gateway microservice. Then every microservice in our app is able to validate this JWT. We want every internal request to contain a valid JWT token. If we want to talk to another microservice we need to propagate the valid JWT get received.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+We are going to write the app first without token propagation. Then we are going to configure a token propagation, and you will see how much code we can get rid of.
+
+
+=== Gateway
+
+Create the microservice:
+
+[source,bash]
+----
+mn create-app example.micronaut.gateway --build=@build@ --lang=@lang@
+----
+
+Add the security-jwt module to the configuration:
+
+:dependencies:
+
+dependency:micronaut-security-annotations[groupId=io.micronaut.security,scope=annotationProcessor]
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+:dependencies:
+
+To keep this guide simple, create a naive AuthenticationProvider to simulate user’s authentication.
+
+source:AuthenticationProviderUserPassword[app=intermediate-gateway]
+
+<1> To register a Singleton in Micronaut’s application context, annotate your class with `javax.inject.Singleton`.
+<2> A Micronaut’s Authentication Provider implements the interface `io.micronaut.security.authentication.AuthenticationProvider`.
+
+Create a class `UserController` which exposes `/user` endpoint.
+
+source:UserController[app=intermediate-gateway]
+
+<1> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut’s controller.
+<2> Constructor dependency injection
+<3> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
+<4> Since we return a string which is not valid JSON, set the media type to `text/plain`.
+<5> You can specify the HTTP verb that a controller's action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<6> You can bind an Http Header to a controller method argument.
+
+Create an interface to encapsulate the collaboration with the `userecho` microservice.
+
+source:UsernameFetcher[app=intermediate-gateway]
+
+Create a Micronaut HTTP Declarative client:
+
+source:UserEchoClient[app=intermediate-gateway]
+
+<1> The `@Client` annotation is used with a service id. We will reference the exact service id in the configuration shortly.
+<2> Don't load this bean in the Test environment.
+<3> Use `@Get` annotation to define the client mapping
+<4> Supply the JWT to the HTTP Authorization header value to the `@Client` method.
+
+Add this snippet to `application.yml` to configure the service url of the `echo` service
+
+resource:application.yml[app=intermediate-gateway,tag=httpservices]
+
+<1> This is the same service ID we used in the `@Client` annotation.
+<2> Configure a URL where the `userecho` microservice resides.
+
+Add this snippet to `application.yml` to configure security:
+
+resource:application.yml[app=intermediate-gateway,tag=security]
+
+<1> Set `authentication` to `bearer` to receive a JSON response from the login endpoint.
+<2> You can create a SecretSignatureConfiguration named generator via configuration as illustrated above. The generator signature is used to sign the issued JWT claims.
+<3> Change this by your own secret and keep it safe (do not store this in your VCS)
+
+==== Tests
+
+Provide a `UsernameFetcher` bean replacement for the Test environment.
+
+test:UserEchoClientReplacement[app=intermediate-gateway]
+
+Create a tests which verifies the app is secured and we can access it after login in:
+
+test:UserControllerTest[app=intermediate-gateway]
+
+<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Inject the `RxHttpClient` bean in the application context.
+<3> Test endpoint is secured
+
+
+
+
+=== User echo
+
+Create the microservice:
+
+[source,bash]
+----
+mn create-app example.micronaut.userecho --build=@build@ --lang=@lang@
+----
+
+
+Add the security-jwt module to the configuration:
+
+:dependencies:
+
+dependency:micronaut-security-annotations[groupId=io.micronaut.security,scope=annotationProcessor]
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+:dependencies:
+
+
+Create a class `UserController` which exposes `/user` endpoint.
+
+source:UserController[app=intermediate-userecho]
+
+<1> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut’s controller.
+<2> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
+<3> Since we return a string which is not valid JSON, set the media type to `text/plain`.
+<4> You can specify the HTTP verb that a controller's action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<5> If a user is authenticated, Micronaut will bind the user object to an argument of type `java.security.Principal` (if present).
+
+Add this snippet to `application.yml` to fix the port where `userecho` starts:
+
+resource:application.yml[app=intermediate-userecho,tag=port]
+
+<1> Configure a fix port where the app listens.
+
+Add this snippet to `application.yml`
+
+resource:application.yml[app=intermediate-userecho,tag=security]
+
+<1> You can create a `SecretSignatureConfiguration` named `validation` which is able to validate JWT generated by the `gateway` microservice.
+<2> Change this by your own secret and keep it safe (do not store this in your VCS)
+
+
+=== Token Propagation
+
+As you can see propagating the JWT token to other microservices in our app complicates the code.
+We need to capture the `Authorization` header in the controller method arguments and then pass it to the `@Client` bean.
+In an app with several controllers and declarative clients, it can lead to a lot of repetition. Fortunately, Micronaut
+includes a feature called token propagation. We can tell our app to propagate the incoming token to a set of outgoing requests.
+
+Let's configure token propagation. We need to modify `application.yml` in the `gateway` microservice:
+
+resource:application.yml[app=gateway,tag=tokenpropagation]
+
+<1> Enable token propagation
+<2> We only want to propagate the token to certain services. We can create a regular expression to match those services ids.
+
+We can simplify the code:
+
+Edit `UserController.java` and remove the `@Header` parameter:
+
+source:UserController[app=gateway]
+
+Edit `UsernameFetcher.java` and remove the `@Header` parameter:
+
+source:UsernameFetcher[app=gateway]
+
+Edit `UserEchoClient.java` and remove the `@Header` parameter:
+
+source:UserEchoClient[app=gateway]
+
+Edit `UserEchoClientReplacement.java` and remove the `@Header` parameter:
+
+test:UserEchoClientReplacement[app=gateway]
+
+
+
+== Running the App
+
+Run both microservices:
+
+
+[source,bash]
+----
+:exclude-for-build:maven
+userecho $ ./gradlew run
+:exclude-for-build:
+:exclude-for-build:gradle
+userecho $ ./mvnw mn:run
+:exclude-for-build:
+18:29:26.500 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 671ms. Server Running: http://localhost:8081
+----
+
+[source,bash]
+----
+:exclude-for-build:maven
+gateway $ ./gradlew run
+:exclude-for-build:
+:exclude-for-build:gradle
+gateway $ ./mvnw mn:run
+:exclude-for-build:
+18:28:35.723 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 707ms. Server Running: http://localhost:8080
+----
+
+Send a curl request to authenticate:
+
+[source,bash]
+----
+curl -X "POST" "http://localhost:8080/login" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{"username": "sherlock", "password": "password"}'
+----
+
+response:
+
+[source,bash]
+----
+{"username":"sherlock","access_token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNTkxMDM3Nywicm9sZXMiOltdLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNjE1OTEzOTc3LCJpYXQiOjE2MTU5MTAzNzd9.nWoaNq9YzRzYKDBvDw_QaiUyVyIoc6rHCW_vLfnrtQ8","token_type":"Bearer","expires_in":3600}
+----
+
+Now you can call the `/user` endpoint supplying the access token in the Authorization header.
+
+[source,bash]
+----
+curl "http://localhost:8080/user" -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNTkxMDM3Nywicm9sZXMiOltdLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNjE1OTEzOTc3LCJpYXQiOjE2MTU5MTAzNzd9.nWoaNq9YzRzYKDBvDw_QaiUyVyIoc6rHCW_vLfnrtQ8'
+
+sherlock
+----
+
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+After creating the native images for both microservices, start them and send the same curl requests as before to check that everything works using GraalVM native images.
+
+:exclude-for-languages:
+
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#tokenPropagation[Token Propagation]
+and https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html[Security] inside Micronaut.
+
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

@@ -2,7 +2,7 @@ package example.micronaut
 
 import geb.spock.GebSpec
 import io.micronaut.runtime.server.EmbeddedServer
-import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
 
 import javax.inject.Inject
 
