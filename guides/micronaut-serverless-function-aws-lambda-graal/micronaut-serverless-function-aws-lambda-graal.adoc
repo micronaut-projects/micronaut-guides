@@ -1,0 +1,164 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+In this guide, we are going to deploy a Micronaut function as a GraalVM Native image to an AWS Lambda custom runtime.
+
+The biggest problem with JVM applications and Lambda is how to mitigate Cold startups. Executing GraalVM Native images of a Micronaut function in a Lambda Custom runtime is a solution to this problem.
+
+If you want to respond to triggers such as queue events, s3 events or single endpoints, you should opt to code your Micronaut functions as Serverless functions.
+
+
+include::{commondir}/common-requirements.adoc[]
+
+You will also need an https://aws.amazon.com/account/[AWS Account].
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+=== Application Code
+
+First, we want to support beans as input and output types.
+
+The input will be a `Book` object:
+
+source:Book[]
+
+<1> Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+<2> `name` is required
+<3> Add a nullability annotation to help with Kotlin interoperability and help the IDE.
+
+The output is a `BookSaved` object:
+
+source:BookSaved[]
+
+<1> Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+<2> `name` and `isbn` are required
+<3> Add a nullability annotation to help with Kotlin interoperability and help the IDE.
+
+The application contains a class extending https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler]
+
+source:BookRequestHandler[]
+
+<1> The class extends https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler] and defines input and output types.
+
+The generated test shows how the verify the function behaviour:
+
+source:BookRequestHandlerTest[]
+
+<1> When you instantiate the Handler, the application context starts.
+<2> Remember to close your application context when you end your test. You can use your handler to obtain it.
+<3> Invoke the `execute` method of the handler.
+
+== AWS Lambda
+
+=== Create The Function
+Create a Lambda Function. As a runtime, select Java 11 (Correto).
+
+image:aws-lambda-create-function.png[]
+
+=== Upload The Code
+
+Micronaut's eases the deployment of your functions as a https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html[Custom AWS Lambda runtime].
+
+The main API you will interact with is https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/runtime/AbstractMicronautLambdaRuntime.html[AbstractMicronautLambdaRuntime]. An abstract class which you can extend to create your custom runtime `mainClass`. That class includes the necessary code to perform the https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html#runtimes-custom-build[Processing Tasks] described in the Custom Runtime documentation.
+
+The generated project contains such a class:
+
+source:BookLambdaRuntime[]
+
+==== bootstrap
+
+We deploy our custom runtime code as a ZIP file. At the root of the ZIP file you need a `bootstrap` file.
+
+> If there’s a file named bootstrap in your deployment package, Lambda executes that file.
+
+The generated application contains a `bootstrap` bash script:
+
+[source,bash]
+.bootstrap
+----
+include::{sourceDir}/bootstrap[]
+----
+
+==== native-image.properties
+
+To generate a GraalVM Native image of the application, we need a https://www.graalvm.org/reference-manual/native-image/Configuration/#properties-file-format[native-image.properties] file.
+
+[source,bash]
+.src/main/resources/META-INF/native-image/example.micronaut/complete-application/native-image.properties
+----
+include::{sourceDir}/src/main/resources/META-INF/native-image/example.micronaut/complete-application/native-image.properties[]
+----
+
+- The `H:Class` argument defines the main class of your app.
+- The `H:Name` argument defines  the native image name. The Dockerfile references this name.
+
+The project includes a Dockerfile to generate a GraalVM Native image.
+
+- Uses the amazonlinux image
+- Builds the JAR of the function.
+- Install the necessary dependencies.
+- Downloads GraalVM community edition
+- Installs native-image utility.
+- With the native-image command and the JAR, generates a GraalVM native image
+- Bundles the native image of our function and the bootstrap file into a ZIP file.
+
+[source,docker]
+.Dockerfile
+----
+include::{sourceDir}/Dockerfile[]
+----
+
+The above file references the name used in the `native-image.properties` file.
+
+It includes a bash script to generate the ZIP file:
+
+[source,bash]
+.deploy.sh
+----
+include::{sourceDir}/deploy.sh[]
+----
+
+==== Upload the file
+
+Execute `./deploy.sh` and once you have a ZIP file, upload it
+
+image:aws-lambda-upload-function-code.png[]
+
+=== Handler
+
+The handler used is the one created at https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/runtime/MicronautLambdaRuntime.html[MicronautLambdaRuntime].
+
+Thus, you don't need specify the handler in the AWS Lambda console.
+
+However, I like to specify it in the console as well:
+
+`example.micronaut.BookRequestHandler`
+
+That value is exposed as an environment variable.
+
+image::handler.png[]
+
+=== Test It
+
+You can now easily test the Lambda
+
+image::aws-lambda-test-event.png[]
+
+You should see a 200 response:
+
+image::aws-lambda-test-result.png[]
+
+== Next steps
+
+Please, read about https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support] to learn more about different Lambda runtime, Triggers and Handlers, as well aas how to integrate with a Micronaut application.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
