@@ -69,7 +69,10 @@ class GuideProjectGenerator implements Closeable {
                 testFramework: config.testFramework,
                 skipGradleTests: config.skipGradleTests ?: false,
                 skipMavenTests: config.skipMavenTests ?: false,
-                apps: config.apps.collect { it -> new App(name: it.name, features: it.features) }
+                apps: config.apps.collect { it -> new App(name: it.name,
+                        features: it.features,
+                        applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType) : ApplicationType.DEFAULT)
+                }
         )
     }
 
@@ -112,7 +115,6 @@ class GuideProjectGenerator implements Closeable {
 
     void generate(GuideMetadata metadata, File inputDir, File outputDir, boolean merge = true) {
         String packageAndName = "${basePackage}.${appName}"
-        ApplicationType type = ApplicationType.DEFAULT
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
         JdkVersion javaVersion = parseJdkVersion()
@@ -141,7 +143,7 @@ class GuideProjectGenerator implements Closeable {
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
                 destination.mkdir()
-                guidesGenerator.generateAppIntoDirectory(destination, type, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
+                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
                 if (merge) {
                     Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
                     if (!sourcePath.toFile().exists()) {
