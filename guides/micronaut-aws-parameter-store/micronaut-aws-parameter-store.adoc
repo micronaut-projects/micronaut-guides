@@ -1,0 +1,224 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+In this guide, you are going to use AWS Parameter Store in Micronaut Application to drive configuration.
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+=== Controller
+
+First, create an interface to encapsulate the Value-added Tax rate of a country.
+
+source:Vat[]
+
+Create a GET endpoint `/vat`. It returns the Value-added Tax rate configured in our app.
+
+source:VatController[]
+
+<1> The class is defined as a controller with the @Controller annotation.
+<2> Use constructor injection to inject a bean of type `Vat`
+<3> Since it does not return JSON, set the media type to `text/plain`
+<4> The @Get annotation is used to map the index method to all requests that use an HTTP GET to `/vat`
+
+=== Configuration
+
+source:VatConfiguration[]
+
+<1> The `@ConfigurationProperties` annotation takes the configuration prefix
+<2> By implementing the interface, we can inject a bean of type `Vat` in the previous Controller's constructor.
+
+=== Test
+
+Write a test which verifies a GET `/vat` endpoint returns the value set via configuration.
+
+test:VatControllerTest[]
+
+<1> Annotate the class with `@MicronautTest` so Micronaut will initialize the application context and the embedded server.
+<2> Annotate the class with `@Property` to supply configuration to the test.
+
+=== Dependency
+
+To use https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html[AWS Parameter Store]
+to drive configuration add the following dependency:
+
+dependency:micronaut-aws-parameter-store[groupId=io.micronaut.aws]
+
+=== Bootstrap.yml
+
+To enable distributed configuration a src/main/resources/bootstrap.yml configuration file must be created and configured to use Parameter Store:
+
+resource:bootstrap.yml[]
+
+- `micronaut.application.name` name will be part of the parameter name in AWS Parameter Store.
+- Set `microanut.config-client.enabled: true` which is used read and resolve configuration from distributed sources.  
+- With `aws.client.system-manager.parameterstore.enabled` enable distributed configuration with AWS Parameter Store.
+
+=== Logging
+
+Add loggers to get a more verbose output:
+
+[source, xml]
+----
+...
+    <logger name="io.micronaut.discovery" level="TRACE"/>
+    <logger name="io.micronaut.aws" level="TRACE"/>
+</configuration>
+----
+
+== Populate Configuration at AWS Parameter Store
+
+You can use the AWS CLI or the AWS Console to populate your configuration.
+
+=== Set Parameters via AWS Console
+
+Visit https://console.aws.amazon.com/systems-manager/parameters[AWS Parameter Store] service.
+
+Create two parameters:
+
+image:aws-parameter-store-country.png[Create Country Parameter]
+
+image:aws-parameter-store-rate.png[Create Rate Parameter]
+
+Set the environment to use `ec2`, the programmatic access and region:
+
+[source, bash]
+----
+$ export MICRONAUT_ENVIRONMENTS=ec2
+$ export AWS_ACCESS_KEY_ID=xxx
+$ export AWS_SECRET_ACCESS_KEY=xxx
+$ export AWS_REGION=us-east-1
+----
+
+include::{commondir}/common-runapp-instructions.adoc[]
+
+You will get an output such as:
+
+[source,bash]
+----
+06:41:44.364 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
+06:41:44.377 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
+06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap.yml
+06:41:46.425 [main] DEBUG i.m.d.c.c.DistributedPropertySourceLocator - Resolving configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
+06:41:47.811 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
+06:41:47.813 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application, pagination requested: false
+06:41:47.961 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
+06:41:47.961 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
+06:41:48.084 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide no parameters found
+06:41:48.085 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/micronautguide, pagination requested: false
+06:41:48.222 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide no parameters found
+06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Converted {vat.rate=21, vat.country=Spain}
+06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - param found: parameterBasePath=/config/micronautguide parameter=vat.rate
+06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - param found: parameterBasePath=/config/micronautguide parameter=vat.country
+06:41:48.359 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
+06:41:48.360 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application_ec2, pagination requested: false
+06:41:48.485 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
+06:41:48.485 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
+06:41:48.607 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
+06:41:48.607 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/micronautguide_ec2, pagination requested: false
+06:41:48.732 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
+06:41:48.733 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
+06:41:48.733 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - source=micronautguide got priority=-98
+06:41:48.734 [main] INFO  i.m.d.c.c.DistributedPropertySourceLocator - Resolved 1 configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
+06:41:49.083 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 4874ms. Server Running: http://localhost:8080
+----
+
+You should be able to execute `curl -i localhost:8080/vat` and see `21`.
+
+=== Set Parameters via AWS CLI
+
+Install https://aws.amazon.com/cli/[AWS CLI].
+
+Once you configure the CLI a region and user AWS access ID and secret key is configured.
+
+Run the following commands to
+
+[source, bash]
+----
+$ aws ssm put-parameter --name /config/micronautguide/vat/country --value=Spain --type String
+$ aws ssm put-parameter --name /config/micronautguide/vat/rate --value=21.0 --type String
+----
+
+Set the environment to use `ec2`.
+
+[source, bash]
+----
+$ export MICRONAUT_ENVIRONMENTS=ec2
+----
+
+The AWS region and programmatic access set via the CLI will be used.
+
+include::{commondir}/common-runapp-instructions.adoc[]
+
+You will get an output such as:
+
+[source,bash]
+----
+06:41:44.364 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
+06:41:44.377 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
+06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap.yml
+06:41:46.425 [main] DEBUG i.m.d.c.c.DistributedPropertySourceLocator - Resolving configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
+06:41:47.811 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
+06:41:47.813 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application, pagination requested: false
+06:41:47.961 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
+06:41:47.961 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
+06:41:48.084 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide no parameters found
+06:41:48.085 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/micronautguide, pagination requested: false
+06:41:48.222 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide no parameters found
+06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Converted {vat.rate=21, vat.country=Spain}
+06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - param found: parameterBasePath=/config/micronautguide parameter=vat.rate
+06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - param found: parameterBasePath=/config/micronautguide parameter=vat.country
+06:41:48.359 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
+06:41:48.360 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application_ec2, pagination requested: false
+06:41:48.485 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
+06:41:48.485 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
+06:41:48.607 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
+06:41:48.607 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/micronautguide_ec2, pagination requested: false
+06:41:48.732 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
+06:41:48.733 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
+06:41:48.733 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - source=micronautguide got priority=-98
+06:41:48.734 [main] INFO  i.m.d.c.c.DistributedPropertySourceLocator - Resolved 1 configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
+06:41:49.083 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 4874ms. Server Running: http://localhost:8080
+----
+
+You should be able to execute `curl -i localhost:8080/vat` and see `21`.
+
+
+=== Leverage environments
+
+AWS Parameter Store is specially powerful in combination with https://docs.micronaut.io/latest/guide/index.html#environments[Micronaut environments]. Imagine we deploy our application also for Switzerland. We can have an environment named `ch` and load different configuration based on the environment. Create two parameters:
+
+[source,bash]
+----
+$ aws ssm put-parameter --name /config/micronautguide_ch/vat/country --value=Switzerland --type String
+$ aws ssm put-parameter --name /config/micronautguide_ch/vat/rate --value=7.7 --type String
+----
+
+Set the environment to use `ec2` and `ch`.
+
+[source, bash]
+----
+$ export MICRONAUT_ENVIRONMENTS=ec2,ch
+----
+
+Run the app and you should be able to execute `curl -i localhost:8080/vat` and see `7.7`.
+
+== Next steps
+
+Read about Micronaut's https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#parametersStore[AWS Parameter Store] integration.
+
+Read about https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html[AWS System Manager Parameter Store]
+
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
+
