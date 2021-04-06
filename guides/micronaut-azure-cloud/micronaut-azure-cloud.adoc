@@ -1,0 +1,202 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+* https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest?WT.mc_id=opensource-micronaut-brborges[Azure CLI] installed and https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli?WT.mc_id=opensource-micronaut-brborges&view=azure-cli-latest#sign-in-interactively[authenticated]
+* JDK 8 installed with JAVA_HOME configured appropriately (cannot be Java 9 or later)
+
+=== Costs
+
+This guide uses services available in the https://azure.microsoft.com/free/free-account-faq/?WT.mc_id=opensource-micronaut-brborges[Always Free Tier] of https://azure.microsoft.com/free/?WT.mc_id=opensource-micronaut-brborges[Microsoft Azure Free Account]. If you don't have one already, https://azure.microsoft.com/free/?WT.mc_id=opensource-micronaut-brborges[create your account] to complete this guide.
+
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+Create an app using the http://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface] or with
+https://launch.micronaut.io[Micronaut Launch].
+
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide --build=@build@ --lang=@lang@
+----
+
+NOTE: If you don't specify the `--build` argument, Gradle is used as a build tool. +++<br/>+++ If you don't specify the `--lang` argument, Java is used as a language. For this guide, Maven is the required build tool.
+
+The previous command creates a micronaut app with the default package `example.micronaut` in a folder named `micronautguide`.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+== How to Complete
+
+To get started do the following:
+
+Download and unzip the source or clone the following GitHub repository:
+
+[source, bash]
+----
+git clone https://github.com/micronaut-guides/micronaut-azure-cloud.git
+----
+To get started do the following:
+
+- Install the https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest?WT.mc_id=opensource-micronaut-brborges[Azure CLI]
+
+- https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli?WT.mc_id=opensource-micronaut-brborges&view=azure-cli-latest#sign-in-interactively[Authenticate] with your Azure account
+
+After you've checked out the links above, follow below for the next steps on setting up the Maven plugin for Azure deployment.
+
+== Maven Plugin for Azure App Service
+
+First, make sure you have the Azure CLI installed and authenticated:
+
+`$ az login`
+
+Then, open the `pom.xml` file and add the following `<plugin>` inside the `<plugins>` section of the Maven `<build>` definition of the POM:
+
+.pom.xml
+[source,xml]
+----
+      <plugin>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-webapp-maven-plugin</artifactId>
+        <version>1.6.0</version>
+      </plugin>
+----
+
+Save the file.
+
+Now you can run the following goal to help you configure the required settings:
+
+`mvn azure-webapp:config`
+
+Make sure you select the following options:
+
+ - OS: linux
+ - javaVersion: jre8
+ - runtimeStack: jre8
+
+This is how it looks like:
+
+----
+[INFO] --- azure-webapp-maven-plugin:1.6.0:config (default-cli) @ example-micronaut ---
+[WARNING] The plugin may not work if you change the os of an existing webapp.
+Define value for OS(Default: Linux):
+1. linux [*]
+2. windows
+3. docker
+Enter index to use: 1
+Define value for javaVersion(Default: jre8):
+1. jre8 [*]
+2. java11
+Enter index to use: 1
+Define value for runtimeStack(Default: TOMCAT 8.5):
+1. TOMCAT 9.0
+2. jre8
+3. TOMCAT 8.5 [*]
+4. WILDFLY 14
+Enter index to use: 2
+Please confirm webapp properties
+AppName : example-micronaut-1560245627178
+ResourceGroup : example-micronaut-1560245627178-rg
+Region : westeurope
+PricingTier : Premium_P1V2
+OS : Linux
+RuntimeStack : JAVA 8-jre8
+Deploy to slot : false
+Confirm (Y/N)? :
+[INFO] Saving configuration to pom.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+----
+
+== Sample Controller
+
+Create a controller which we can invoke once the app is deployed.
+
+source:HelloController.java[]
+
+== Deploying the app
+
+To deploy the app to Azure run:
+
+`mvn package azure-webapp:deploy`
+
+With a `BUILD SUCCESS`, you should see a message containing the URL of your newly deployed web app:
+
+----
+...
+[INFO] Authenticate with Azure CLI 2.0
+[INFO] Target Web App doesn't exist. Creating a new one...
+[INFO] Creating App Service Plan 'ServicePlan2ef7a87d-fb15-4d3e'...
+[INFO] Successfully created App Service Plan.
+[INFO] Successfully created Web App.
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources to /azure/projects/micronaut-azure-cloud/initial/target/azure-webapp/example-micronaut-1560242864679
+[INFO] Trying to deploy artifact to example-micronaut-1560242864679...
+[INFO] Renaming /azure/projects/micronaut-azure-cloud/initial/target/azure-webapp/example-micronaut-1560242864679/example-micronaut-0.1.jar to app.jar
+[INFO] Deploying the zip package example-micronaut-1560242864679.zip...
+[INFO] Exception occurred during deployment: java.net.SocketTimeoutException: timeout, retry immediately(1/3)...
+[INFO] Successfully deployed the artifact to https://example-micronaut-1560242864679.azurewebsites.net
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 01:59 min
+[INFO] Finished at: 2019-06-11T02:02:15-07:00
+[INFO] ------------------------------------------------------------------------
+----
+
+== Logging
+
+To see the log of your application running on Azure, you have to first enable storage of your app logging, and then perform a tail for live streaming.
+
+To enable logging storage, use the following Azure CLI command. Check your `pom.xml` for the generated `<resourceGroup>` and the `<appName>`
+
+`az webapp log config --name [appName] -g [resourceGroup] --web-server-logging filesystem`
+
+Once this is done, you can then tail the log live from the cloud:
+
+`az webapp log tail --name [appName] -g [resourceGroup]`
+
+If you don't see any log, try changing the level of the project's Logback configuration in `logback.xml` to a higher value such as `debug`, then run the Maven deployment command again:
+
+`mvn package azure-webapp:deploy`
+
+And then run the tail command above once again.
+
+
+
+Check your `pom.xml` to see the new configuration done for you.
+
+== Cleaning Up
+
+After you've finished this guide, you can clean up the resources you created on
+Azure so you won't take the risk of being billed because of them in the future. The following
+sections describe how to delete or turn off these resources.
+
+Delete the resource group and all of its resources created along this guide with the following command:
+
+`az group delete -g [resourceGroup]`
+
+Answer `y` to confirm.
+
+You can add the `--no-wait` parameter to not wait for the command to finish.
+
+== Learn More
+
+If you want to learn more about Microsoft Azure for Java development, visit https://docs.microsoft.com/java/azure.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
