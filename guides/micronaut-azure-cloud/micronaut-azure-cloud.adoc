@@ -54,54 +54,58 @@ First, make sure you have the Azure CLI installed and authenticated:
 
 `$ az login`
 
-Then, open the `pom.xml` file and add the following `<plugin>` inside the `<plugins>` section of the Maven `<build>` definition of the POM:
+Now you can run the following goal to install the Maven plugin and configure the required settings:
 
-dependency:azure-webapp-maven-plugin:1.6.0[groupId=com.microsoft.azure]
-
-Save the file.
-
-Now you can run the following goal to help you configure the required settings:
-
-`mvn azure-webapp:config`
+`mvn com.microsoft.azure:azure-webapp-maven-plugin:1.13.0:config`
 
 Make sure you select the following options:
 
  - OS: linux
- - javaVersion: jre8
- - runtimeStack: jre8
+ - pricingTier: F1 (Free_F1)
+ - javaVersion: jre11
 
 This is how it looks like:
 
 ----
-[INFO] --- azure-webapp-maven-plugin:1.6.0:config (default-cli) @ example-micronaut ---
-[WARNING] The plugin may not work if you change the os of an existing webapp.
-Define value for OS(Default: Linux):
-1. linux [*]
-2. windows
-3. docker
-Enter index to use: 1
-Define value for javaVersion(Default: jre8):
-1. jre8 [*]
-2. java11
-Enter index to use: 1
-Define value for runtimeStack(Default: TOMCAT 8.5):
-1. TOMCAT 9.0
-2. jre8
-3. TOMCAT 8.5 [*]
-4. WILDFLY 14
-Enter index to use: 2
+Define value for OS [Linux]:
+* 1: Linux
+  2: Windows
+  3: Docker
+Enter your choice: 1
+Define value for pricingTier [P1v2]:
+   1: B1
+   2: B2
+   3: B3
+   4: D1
+   5: F1
+*  6: P1v2
+   7: P2v2
+   8: P3v2
+   9: S1
+  10: S2
+  11: S3
+Enter your choice: 5
+Define value for javaVersion [Java 8]:
+* 1: Java 8
+  2: Java 11
+Enter your choice: 2
 Please confirm webapp properties
-AppName : example-micronaut-1560245627178
-ResourceGroup : example-micronaut-1560245627178-rg
+Subscription Id : a5321e4a-7c82-4c99-8a62-a79f148f7601
+AppName : micronautguide-1617858381368
+ResourceGroup : micronautguide-1617858381368-rg
 Region : westeurope
-PricingTier : Premium_P1V2
+PricingTier : Free_F1
 OS : Linux
-RuntimeStack : JAVA 8-jre8
+Java : Java 11
+Web server stack: Java SE
 Deploy to slot : false
-Confirm (Y/N)? :
+Confirm (Y/N) [Y]: Y
 [INFO] Saving configuration to pom.
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  08:16 min
+[INFO] Finished at: 2021-04-08T00:14:21-05:00
 [INFO] ------------------------------------------------------------------------
 ----
 
@@ -153,15 +157,11 @@ Once this is done, you can then tail the log live from the cloud:
 
 `az webapp log tail --name [appName] -g [resourceGroup]`
 
-If you don't see any log, try changing the level of the project's Logback configuration in `logback.xml` to a higher value such as `debug`, then run the Maven deployment command again:
+If you don't see any log, try changing the level of the project's Logback configuration in `logback.xml` to a higher value such as `debug`, then run the Maven deployment command again (you may need to run `mvn clean` prior to this step):
 
 `mvn package azure-webapp:deploy`
 
-And then run the tail command above once again.
-
-
-
-Check your `pom.xml` to see the new configuration done for you.
+Now, run the tail command above once again to view the logs.
 
 == Cleaning Up
 
