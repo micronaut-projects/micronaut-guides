@@ -9,5 +9,5 @@ import io.reactivex.Flowable;
 public interface LinkedInApiClient {
 
     @Get("/v2/me") // <2>
-    Flowable<LinkedInMe> me(@Header String authorization); // <3>
+    Flowable<LinkedInMe> me(@Header String authorization); // <3> <4>
 }
