@@ -20,7 +20,7 @@ public interface GenreMapper {
     Genre findById(long id);
 
     @Insert("insert into genre(name) values(#{name})")
-    @Options(useGeneratedKeys = true)
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     void save(Genre genre);
 
     @Delete("delete from genre where id=#{id}")
