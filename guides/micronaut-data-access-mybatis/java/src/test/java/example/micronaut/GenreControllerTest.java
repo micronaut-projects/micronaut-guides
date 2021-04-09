@@ -67,10 +67,12 @@ public class GenreControllerTest {
     public void testGenreCrudOperations() {
         List<Long> genreIds = new ArrayList<>();
         HttpResponse response = saveGenre("DevOps");
+        System.out.println(response);
         genreIds.add(entityId(response));
         assertEquals(HttpStatus.CREATED, response.getStatus());
 
         response = saveGenre("Microservices"); // <3>
+                System.out.println(response);
         assertEquals(HttpStatus.CREATED, response.getStatus());
 
         Long id = entityId(response);
@@ -79,6 +81,7 @@ public class GenreControllerTest {
         assertEquals("Microservices", genre.getName());
 
         response = update(id, "Micro-services");
+                System.out.println(response);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
         genre = show(id);
@@ -130,6 +133,8 @@ public class GenreControllerTest {
     protected Long entityId(HttpResponse response) {
         String path = "/genres/";
         String value = response.header(HttpHeaders.LOCATION);
+        System.out.println(value);
+
         if (value == null) {
             return null;
         }

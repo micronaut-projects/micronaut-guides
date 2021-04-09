@@ -23,7 +23,7 @@ Add the next snippet to `build.gradle` to include the necessary dependencies:
 
 :dependencies:
 
-dependency:mybatis:3.4.6[groupId=org.mybatis,callout=1]
+dependency:mybatis:3.5.6[groupId=org.mybatis,callout=1]
 dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=2]
 dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=3]
 
@@ -134,7 +134,7 @@ resource:application.yml[tag=flyway]
 
 Create the file `V1__schema.sql` with the database schema creation:
 
-resource:databasemigrations/V1__schema.sql[]
+resource:db/migration/V1__schema.sql[]
 
 During application startup Flyway will execute the sql file and create the schema needed for the application.
 
@@ -153,24 +153,23 @@ instead of `retrieve` you should use the `exchange` method.
 
 Run the tests:
 
-[source,bash]
+:exclude-for-build:maven
+
+[source, bash]
 ----
 $ ./gradlew test
-
-> Task :complete:test
-
-
-14:55:10.582 [Test worker] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [test]
-14:55:12.407 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-14:55:12.692 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-14:55:12.875 [Test worker] INFO  o.f.c.i.license.VersionPrinter - Flyway Community Edition 5.2.1 by Boxfuse
-14:55:12.915 [Test worker] INFO  o.f.c.i.database.DatabaseFactory - Database: jdbc:h2:mem:default (H2 1.4)
-14:55:13.052 [Test worker] INFO  o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.025s)
-14:55:13.071 [Test worker] INFO  o.f.c.i.s.JdbcTableSchemaHistory - Creating Schema History table: "PUBLIC"."flyway_schema_history"
-14:55:13.112 [Test worker] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "PUBLIC": << Empty Schema >>
-14:55:13.118 [Test worker] INFO  o.f.core.internal.command.DbMigrate - Migrating schema "PUBLIC" to version 1 - schema
-14:55:13.157 [Test worker] INFO  o.f.core.internal.command.DbMigrate - Successfully applied 1 migration to schema "PUBLIC" (execution time 00:00.087s)
 ----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+$ ./mvnw test
+----
+
+:exclude-for-build:
 
 === Running the App
 
@@ -197,6 +196,14 @@ $ curl -X DELETE http://localhost:8080/genres/1
 $ curl http://localhost:8080/genres/list
 [{"id":2,"name":"Science"}]
 ----
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You can execute the same curl request as before to check that the native image works.
+
+:exclude-for-languages:
 
 === Next Steps
 
