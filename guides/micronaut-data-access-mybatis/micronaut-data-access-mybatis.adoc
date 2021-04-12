@@ -1,0 +1,214 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+Learn how to access a database with MyBatis using Micronaut.
+
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+=== Configure Data Source and JPA
+
+Add the following snippet to include the necessary dependencies:
+
+:dependencies:
+
+dependency:mybatis:3.5.6[groupId=org.mybatis,callout=1]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=2]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=3]
+
+:dependencies:
+
+<1> Add MyBatis dependency.
+<2> Configures SQL DataSource instances using Hikari Connection Pool.
+<3> Add dependency to in-memory H2 Database.
+
+Define the data source in `src/main/resources/application.yml`.
+
+resource:application.yml[tag=datasource]
+
+=== MyBatis configuration
+
+As there is no out-of-the-box support yet in Micronaut for MyBatis it is necessary to wire manually `SqlSessionFactory`.
+
+Create the following https://docs.micronaut.io/latest/guide/index.html#factories[@Factory] file `src/main/java/example/micronaut/MybatisFactory.java`:
+
+source:MybatisFactory[]
+<1> Annotate the class with `@Factory`.
+<2> Constructor injection for Micronaut's `dataSource`.
+<3> Define a `@Bean` of type `SqlSessionFactory`.
+<4> Use the `dataSource` to create a new MyBatis environment.
+<5> Define the package to scan for mappers.
+<6> Create a new `SqlSessionFactory` bean.
+
+=== Domain
+
+Create the domain entities:
+
+source:domain/Genre[]
+
+=== Repository Access
+
+Create an interface to define the operations to access the database and use MyBatis' annotations to map the methods
+to sql queries:
+
+source:genre/GenreMapper[]
+
+And the implementation:
+
+source:genre/GenreMapperImpl[]
+<1> Use `javax.inject.Singleton` to designate a class a a singleton.
+<2> Inject easily the `SqlSessionFactory` bean created by the `@Factory`.
+<3> Use _try-with-resources_ to automatically close the sql session.
+<4> Get MyBatis mapper implementation for the interface.
+<5> Execute the desired method using the mapper. This will trigger the sql query.
+<6> In a database write access, commit the transaction.
+
+
+Create an interface to define the high level operations exposed to the application:
+
+source:genre/GenreRepository[]
+
+And the implementation using `GenreMapper`:
+
+source:genre/GenreRepositoryImpl[]
+
+=== Controller
+
+include::{commondir}/common-validation.adoc[]
+
+Create two classes to encapsulate Save and Update operations:
+
+source:genre/GenreSaveCommand[]
+
+source:genre/GenreUpdateCommand[]
+
+Create a POJO to encapsulate Sorting and Pagination:
+
+source:ListingArguments[]
+
+Create a `ConfigurationProperties` object to encapsulate the configuration of the default `max` value.
+
+source:ApplicationConfiguration[]
+
+source:ApplicationConfigurationProperties[]
+
+Create `GenreController`, a controller which exposes a resource with the common CRUD operations:
+
+source:GenreController[]
+<1> The class is defined as a controller with the `@Controller` annotation mapped to the path `/genres`.
+<2> Constructor injection.
+<3> Maps a `GET` request to `/genres/{id}` which attempts to show a genre. This illustrates the use of a URL path variable.
+<4> Returning `null` when the genre doesn't exist makes Micronaut to response with 404 (not found).
+<5> Maps a `PUT` request to `/genres` which attempts to update a genre.
+<6> Add `@Valid` to any method parameter which requires validation. Use a POJO supplied as a JSON payload in the request to populate command.
+<7> It is easy to add custom headers to the response.
+<8> Maps a `GET` request to `/genres` which returns a list of genres. This mapping illustrates optional URL parameters.
+<9> Maps a `POST` request to `/genres` which attempts to save a genre.
+<10> Maps a `DELETE` request to `/genres/{id}` which attempts to remove a genre. This illustrates the use of a URL path variable.
+
+=== DB Schema
+
+Now that Mybatis is setup we need a way to create the database schema. For that we will use
+https://micronaut-projects.github.io/micronaut-flyway/latest/guide/index.html[Micronaut integration with
+Flyway].
+
+
+Add the following snippet to include the necessary dependencies:
+
+dependency:micronaut-flyway[groupId=io.micronaut.flyway]
+
+Configure the database migrations directory for Flyway in `application.yml`.
+
+resource:application.yml[tag=flyway]
+
+Create the file `V1__schema.sql` with the database schema creation:
+
+resource:db/migration/V1__schema.sql[]
+
+During application startup Flyway will execute the sql file and create the schema needed for the application.
+
+=== Tests
+
+Create a Junit test which verifies the CRUD operations:
+
+test:GenreControllerTest[]
+<1> Use Micronaut testing integration with JUnit 5.
+<2> Inject a `RxHttpClient`.
+<3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+<4> If you care just about the object in the response use `retrieve`.
+<5> Sometimes, receiving just the object is not enough and you need information about the response. In this case,
+instead of `retrieve` you should use the `exchange` method.
+
+
+Run the tests:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+$ ./gradlew test
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+$ ./mvnw test
+----
+
+:exclude-for-build:
+
+=== Running the App
+
+include::{commondir}/common-runapp.adoc[]
+
+We can use `curl` to check that everything works as expected:
+
+[source,bash]
+----
+$ curl http://localhost:8080/genres/list
+[]
+
+$ curl -X POST -d '{"name":"Sci-fi"}' -H "Content-Type: application/json" http://localhost:8080/genres
+{"id":1,"name":"Sci-fi"}
+
+$ curl -X POST -d '{"name":"Science"}' -H "Content-Type: application/json" http://localhost:8080/genres
+{"id":2,"name":"Science"}
+
+$ curl http://localhost:8080/genres/list
+[{"id":1,"name":"Sci-fi"},{"id":2,"name":"Science"}]
+
+$ curl -X DELETE http://localhost:8080/genres/1
+
+$ curl http://localhost:8080/genres/list
+[{"id":2,"name":"Science"}]
+----
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You can execute the same curl request as before to check that the native image works.
+
+:exclude-for-languages:
+
+=== Next Steps
+
+Read more about https://docs.micronaut.io/latest/guide/index.html#dataAccess[Configurations for Data Access] section and
+https://micronaut-projects.github.io/micronaut-flyway/latest/guide/index.html[Flyway] support in the Micronaut documentation.
+
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
