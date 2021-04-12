@@ -26,10 +26,10 @@ public class GebFeature implements Feature {
     @Override
     public void apply(GeneratorContext generatorContext) {
         if (generatorContext.getTestFramework().equals(TestFramework.JUNIT)) {
-            generatorContext.addDependency(Dependency.builder().groupId("org.gebish").lookupArtifactId("geb-junit").test());
+            generatorContext.addDependency(Dependency.builder().groupId("org.gebish").lookupArtifactId("geb-junit").test().build());
         } else if (generatorContext.getTestFramework().equals(TestFramework.SPOCK)) {
-            generatorContext.addDependency(Dependency.builder().groupId("org.gebish").lookupArtifactId("geb-spock").test());
+            generatorContext.addDependency(Dependency.builder().groupId("org.gebish").lookupArtifactId("geb-spock").test().build());
         }
-        generatorContext.addDependency(Dependency.builder().groupId("org.seleniumhq.selenium").lookupArtifactId("htmlunit-driver").test());
+        generatorContext.addDependency(Dependency.builder().groupId("org.seleniumhq.selenium").lookupArtifactId("htmlunit-driver").test().build());
     }
 }
