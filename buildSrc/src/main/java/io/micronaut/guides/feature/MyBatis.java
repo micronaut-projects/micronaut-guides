@@ -27,7 +27,6 @@ public class MyBatis implements Feature {
         generatorContext.addDependency(Dependency.builder()
                 .groupId("org.mybatis")
                 .lookupArtifactId("mybatis")
-                .version("3.5.6")
                 .compile()
                 .build());
     }
