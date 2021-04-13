@@ -18,6 +18,7 @@ import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.LocalDate
 
 @CompileStatic
 class GuideProjectGenerator implements Closeable {
@@ -64,6 +65,9 @@ class GuideProjectGenerator implements Closeable {
                 title: config.title,
                 intro: config.intro,
                 authors: config.authors,
+                tags: config.tags,
+                category: config.category,
+                publicationDate: LocalDate.parse(config.publicationDate),
                 languages: config.languages ?: ['java', 'groovy', 'kotlin'],
                 buildTools: config.buildTools ?: ['gradle', 'maven'],
                 testFramework: config.testFramework,
