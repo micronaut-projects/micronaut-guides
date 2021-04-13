@@ -1,5 +1,7 @@
 package io.micronaut.guides
 
+import groovy.json.JsonOutput
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -39,4 +41,29 @@ class IndexGenerator {
 
         return index
     }
+
+    static String generateGuidesJsonIndex(File guidesFolder, String metadataConfigName) {
+        String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
+
+        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+
+        List<Map> result = metadatas
+            .collect {guide -> [
+                title: guide.title,
+                intro: guide.intro,
+                authors: guide.authors,
+                tags: guide.tags,
+                category: guide.category,
+                publicationDate: guide.publicationDate.toString(),
+                slug: guide.slug,
+                options: GuideProjectGenerator.guidesOptions(guide).collect {option -> [
+                    buildTool: option.buildTool,
+                    language: option.language,
+                    url: "${baseURL}${guide.slug}-${option.buildTool.toString().toLowerCase()}-${option.language.toString().toLowerCase()}.html"
+                ]}
+            ]} as List<Map>
+
+        return JsonOutput.toJson(result)
+    }
+
 }
