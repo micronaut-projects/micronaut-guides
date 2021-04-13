@@ -3,6 +3,8 @@ package io.micronaut.guides
 import groovy.transform.CompileStatic
 import io.micronaut.starter.application.ApplicationType
 
+import java.time.LocalDate
+
 @CompileStatic
 class GuideMetadata {
 
@@ -11,6 +13,9 @@ class GuideMetadata {
     String title
     String intro
     List<String> authors
+    List<String> tags
+    String category
+    LocalDate publicationDate
 
     List<String> buildTools
     List<String> languages
