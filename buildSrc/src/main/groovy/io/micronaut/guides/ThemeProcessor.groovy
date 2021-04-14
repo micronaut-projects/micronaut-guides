@@ -24,7 +24,6 @@ class ThemeProcessor {
 
                 String text = templateText
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                println folder
                 File output = new File(dist.path + "/" + folder + ".html")
                 String html = output.text
 
