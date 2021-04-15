@@ -66,7 +66,7 @@ class GuideProjectGenerator implements Closeable {
                 intro: config.intro,
                 authors: config.authors,
                 tags: config.tags,
-                category: config.category,
+                category: Category.values().find {it.toString() == config.category },
                 publicationDate: LocalDate.parse(config.publicationDate),
                 languages: config.languages ?: ['java', 'groovy', 'kotlin'],
                 buildTools: config.buildTools ?: ['gradle', 'maven'],

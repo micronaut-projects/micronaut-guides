@@ -42,6 +42,7 @@ class ThemeProcessor {
 ''' + content) : ''
                 text = text.replace("@title@", metadata.title)
                 text = text.replace("@toctitle@", 'Table of Contents')
+                text = text.replace("@bodyclass@", 'guide')
                 text = text.replace("@toccontent@", toc)
                 text = text.replace("@content@", content)
                 output.text = text
