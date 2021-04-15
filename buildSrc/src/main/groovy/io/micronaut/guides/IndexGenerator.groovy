@@ -209,15 +209,15 @@ class IndexGenerator {
                 return 'https://micronaut.io/wp-content/uploads/2020/12/Security.svg'
             case Category.MESSAGING:
                 return  'https://micronaut.io/wp-content/uploads/2020/11/Messaging.svg'
-            case Category.KOTLIN:
-                return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
+
             case Category.DISTRIBUTED_TRACING:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
-                return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
+
             case Category.APPRENTICE:
-            default:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
+            default:
+                return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
         }
 
     }
