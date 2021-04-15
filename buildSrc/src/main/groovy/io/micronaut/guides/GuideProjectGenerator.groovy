@@ -60,13 +60,17 @@ class GuideProjectGenerator implements Closeable {
             throw new GradleException("metadata file not found for ${dir.name}")
         }
         def config = new JsonSlurper().parse(configFile)
+        Category cat = Category.values().find {it.toString() == config.category }
+        if (!cat) {
+            throw new GradleException("$config.category does not exist in Category enum")
+        }
         new GuideMetadata(asciidoctor: config.asciidoctor,
                 slug: config.slug,
                 title: config.title,
                 intro: config.intro,
                 authors: config.authors,
                 tags: config.tags,
-                category: Category.values().find {it.toString() == config.category },
+                category: cat,
                 publicationDate: LocalDate.parse(config.publicationDate),
                 languages: config.languages ?: ['java', 'groovy', 'kotlin'],
                 buildTools: config.buildTools ?: ['gradle', 'maven'],
