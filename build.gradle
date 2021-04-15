@@ -1,6 +1,7 @@
 import io.micronaut.guides.GenerateGuideZip
 import io.micronaut.guides.GuideProjectGenerator
 import io.micronaut.guides.IndexGenerator
+import io.micronaut.guides.ThemeProcessor
 import io.micronaut.guides.TestScriptGenerator
 
 buildscript {
@@ -43,6 +44,14 @@ task copyImagesToDist(type: Copy) {
     include '*.svg'
     include '*.gif'
 }
+
+task copyStylesheetsToDist(type: Copy) {
+    group 'guides'
+    description 'Copies css files from assets/stylesheets to build/dist folder'
+    from 'assets/stylesheets'
+    into "${project.buildDir}/dist"
+    include '*.css'
+}
 task copyHtmlToDist(type: Copy) {
     group 'guides'
     description 'Copies HTML generated from Asciidoc from build/docs/asciidoc to build/dist'
@@ -53,6 +62,7 @@ task copyHtmlToDist(type: Copy) {
 task createDist {
     description 'Creates build/dist folder with static assets'
     dependsOn('copyImagesToDist')
+    dependsOn('copyStylesheetsToDist')
 }
 clean.dependsOn('cleanAsciidoctorFolder')
 build.dependsOn('asciidoctor')
@@ -75,6 +85,7 @@ task generateSampleProjects {
     }
     finalizedBy('generateTestScript')
     finalizedBy('generateGuidesIndex')
+    finalizedBy('themeGuides')
 }
 
 task generateTestScript {
@@ -110,9 +121,22 @@ task generateGuidesIndex {
     group 'guides'
     description 'Generates an index.html with all the guides'
     doLast {
+        File template = new File(projectDir.absolutePath + "/assets/template.html")
         File guides = new File(generateSampleProjects.guides)
         File output = new File("${project.buildDir}/dist/index.html")
         output.createNewFile()
-        output.text = IndexGenerator.generateGuidesIndex(guides, generateSampleProjects.metadataConfigName)
+        output.text = IndexGenerator.generateGuidesIndex(template, guides, generateSampleProjects.metadataConfigName)
     }
+}
+
+task themeGuides {
+    group 'guides'
+    description 'Generates an index.html with all the guides'
+    doLast {
+        File template = new File(projectDir.absolutePath + "/assets/template.html")
+        File guides = new File(generateSampleProjects.guides)
+        File dist = new File("${project.buildDir}/dist")
+        ThemeProcessor.applyThemes(template, dist, guides, generateSampleProjects.metadataConfigName)
+    }
+    mustRunAfter('copyHtmlToDist')
 }

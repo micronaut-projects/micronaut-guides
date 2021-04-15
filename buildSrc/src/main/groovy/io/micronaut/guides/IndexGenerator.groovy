@@ -7,21 +7,17 @@ class IndexGenerator {
 
     private static final String LATEST_GUIDES_URL = "https://micronaut-projects.github.io/micronaut-guides-poc/latest/"
 
-    static String generateGuidesIndex(File guidesFolder, String metadataConfigName) {
+    static String generateGuidesIndex(File template, File guidesFolder, String metadataConfigName) {
+        String templateText = template.text
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
-        String index = '''\
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<head>
-<body>
-<H1>Micronaut Guides</H1>
-<div>
-'''
+        String index = ''
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
+            if (System.getProperty('micronaut.guide') != null &&
+                    System.getProperty('micronaut.guide') != metadata.slug) {
+                continue
+            }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
             index += "<H2>${metadata.title}</H2><ul>"
             for (GuidesOption guidesOption : guidesOptionList) {
@@ -30,13 +26,12 @@ class IndexGenerator {
             }
             index += "</ul>"
         }
+        String text = templateText
+        text = text.replace("@title@", 'Micronaut Guides')
+        text = text.replace("@toctitle@", 'Micronaut Guides')
+        text = text.replace("@toccontent@", '')
+        text = text.replace("@content@", index)
 
-        index += '''\
-</div>
-</body>
-</html>
-'''
-
-        return index
+        text
     }
 }
