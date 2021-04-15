@@ -85,6 +85,7 @@ task generateSampleProjects {
     }
     finalizedBy('generateTestScript')
     finalizedBy('generateGuidesIndex')
+    finalizedBy('generateGuidesJsonMetadata')
     finalizedBy('themeGuides')
 }
 
@@ -127,6 +128,16 @@ task generateGuidesIndex {
     }
 }
 
+task generateGuidesJsonMetadata {
+    group 'guides'
+    description 'Generates a guides.json with the metadata for all the guides'
+    doLast {
+        File guides = new File(generateSampleProjects.guides)
+        File output = new File("${project.buildDir}/dist/guides.json")
+        output.createNewFile()
+        output.text = IndexGenerator.generateGuidesJsonIndex(guides, generateSampleProjects.metadataConfigName)
+    }
+}
 task themeGuides {
     group 'guides'
     description 'Generates an index.html with all the guides'
