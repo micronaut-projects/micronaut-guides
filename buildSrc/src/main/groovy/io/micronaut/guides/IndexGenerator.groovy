@@ -247,6 +247,7 @@ class IndexGenerator {
                 category: guide.category,
                 publicationDate: guide.publicationDate.toString(),
                 slug: guide.slug,
+                url: "${baseURL}${guide.slug}.html",
                 options: GuideProjectGenerator.guidesOptions(guide).collect {option -> [
                     buildTool: option.buildTool,
                     language: option.language,
