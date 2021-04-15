@@ -29,8 +29,15 @@ class IndexGenerator {
     </div>
 </main>'''))
 
+        save(templateText, 'dist/index.html', buildDir, metadatas)
+        for (GuideMetadata metadata :  metadatas) {
+            save(templateText, "dist/${metadata.slug}.html", buildDir, [metadata])
+        }
+    }
+
+    static void save(String templateText, String filename, File buildDir, List<GuideMetadata> metadatas ) {
         String text = indexText(templateText, metadatas)
-        Path path = Paths.get(buildDir.absolutePath, 'dist/index.html')
+        Path path = Paths.get(buildDir.absolutePath, filename)
         File output = path.toFile()
         output.createNewFile()
         output.text = text
@@ -38,74 +45,36 @@ class IndexGenerator {
 
 
     static String indexText(String templateText, List<GuideMetadata> metadatas) {
+        boolean singleGuide = metadatas.size() == 1
+
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
         String index = ''
-        if (metadatas.findAll { it.category == Category.APPRENTICE }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.APPRENTICE, metadatas.findAll { it.category == Category.APPRENTICE })
-            index += '</div>'
-        }
-        if (metadatas.findAll { it.category == Category.CACHE}) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.CACHE, metadatas.findAll { it.category == Category.CACHE })
-            index += '</div>'
-        }
 
-        if (metadatas.findAll { it.category == Category.DATA_ACCESS }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.DATA_ACCESS, metadatas.findAll { it.category == Category.DATA_ACCESS })
-            index += '</div>'
+        for (Category cat : Category.values()) {
+            if (metadatas.findAll { it.category == cat }) {
+                index += '<div class="categorygrid">'
+                index += renderMetadatas(baseURL, cat, metadatas.findAll { it.category == cat }, singleGuide)
+                index += '</div>'
+            }
         }
-
-        if (metadatas.findAll { it.category == Category.MESSAGING }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.MESSAGING, metadatas.findAll { it.category == Category.MESSAGING })
-            index += '</div>'
-        }
-        if (metadatas.findAll { it.category == Category.SECURITY }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.SECURITY, metadatas.findAll { it.category == Category.SECURITY })
-            index += '</div>'
-        }
-        if (metadatas.findAll { it.category == Category.SERVICE_DISCOVERY }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.SERVICE_DISCOVERY, metadatas.findAll { it.category == Category.SERVICE_DISCOVERY })
-            index += '</div>'
-        }
-        if (metadatas.findAll { it.category == Category.DISTRIBUTED_TRACING }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.DISTRIBUTED_TRACING, metadatas.findAll { it.category == Category.DISTRIBUTED_TRACING })
-            index += '</div>'
-        }
-
-        if (metadatas.findAll { it.category == Category.KOTLIN }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.KOTLIN, metadatas.findAll { it.category == Category.KOTLIN })
-            index += '</div>'
-        }
-
-        if (metadatas.findAll { it.category == Category.AWS }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.AWS, metadatas.findAll { it.category == Category.AWS })
-            index += '</div>'
-        }
-
-        if (metadatas.findAll { it.category == Category.AZURE }) {
-            index += '<div class="categorygrid">'
-            index += renderMetadatas(baseURL, Category.AZURE, metadatas.findAll { it.category == Category.AZURE })
-            index += '</div>'
-        }
-
         String text = templateText
+        if (!singleGuide) {
+            text = text.substring(0, text.indexOf('<div id="breadcrumbs">')) +
+                    text.substring(text.indexOf('<main id="main">'))
+        }
+
+        String breadcrumb = '<span class="breadcrumb_last" aria-current="page">' + metadatas.get(0).title + '</span>'
+        if (singleGuide) {
+            text = text.replace("@breadcrumb@", breadcrumb)
+        }
         text = text.replace("@title@", '')
-        text = text.replace("@toctitle@", '<strong>Micronaut</strong> Guides')
         text = text.replace("@bodyclass@", 'guideindex')
         text = text.replace("@toccontent@", '')
         text = text.replace("@content@", index)
         text
     }
 
-    static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas) {
+    static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
         String index = ''
         int count = 0;
         index += "<div class='row'>"
@@ -126,7 +95,13 @@ class IndexGenerator {
             }
 
 
-            index += "<div class='col-sm-4'>"
+            if (singleGuide) {
+                index += "<div class='col-sm-8'>"
+            } else {
+                index += "<div class='col-sm-4'>"
+            }
+
+
             index += "<div class='inner'>"
             index += "<h2>${metadata.title}</h2>"
             index += "<p>${metadata.intro}</p>"
@@ -218,6 +193,8 @@ class IndexGenerator {
 
     static String imageForCategory(Category cat) {
         switch (cat) {
+            case Category.GCP:
+                return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
             case Category.AWS:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/aws.svg'
             case Category.AZURE:

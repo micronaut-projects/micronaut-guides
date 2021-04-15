@@ -41,6 +41,9 @@ class ThemeProcessor {
 <div class="sectionbody">
 ''' + content) : ''
                 text = text.replace("@title@", metadata.title)
+
+                String breadcrumb = '<a href="'+ metadata.slug +'.html">' + metadata.title + '</a> » <span class="breadcrumb_last" aria-current="page">' + guidesOption.buildTool.toString() + ' | ' + guidesOption.language.toString()  + '</span>'
+                text = text.replace("@breadcrumb@", breadcrumb)
                 text = text.replace("@toctitle@", 'Table of Contents')
                 text = text.replace("@bodyclass@", 'guide')
                 text = text.replace("@toccontent@", toc)

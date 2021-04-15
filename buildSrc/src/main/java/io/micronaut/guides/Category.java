@@ -1,18 +1,17 @@
 package io.micronaut.guides;
 
 public enum Category {
-
+    APPRENTICE("Micronaut Apprentice"),
+    DATA_ACCESS("Data Access"),
+    CACHE("Cache"),
+    MESSAGING("Messaging"),
+    SECURITY("Micronaut Security"),
+    SERVICE_DISCOVERY("Service Discovery"),
+    DISTRIBUTED_TRACING("Distributed Tracing"),
+    KOTLIN("Kotlin"),
     AWS("AWS"),
     AZURE("Micronaut + Microsoft Azure"),
-    CACHE("Cache"),
-    DATA_ACCESS("Data Access"),
-    SERVICE_DISCOVERY("Service Discovery"),
-    SECURITY("Micronaut Security"),
-    MESSAGING("Messaging"),
-    KOTLIN("Kotlin"),
-    DISTRIBUTED_TRACING("Distributed Tracing"),
-    APPRENTICE("Micronaut Apprentice");
-
+    GCP("Micronaut + Google Cloud");
     private String val;
 
     Category(String val) {
