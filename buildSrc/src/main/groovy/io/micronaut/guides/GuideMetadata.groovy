@@ -14,7 +14,7 @@ class GuideMetadata {
     String intro
     List<String> authors
     List<String> tags
-    String category
+    Category category
     LocalDate publicationDate
 
     List<String> buildTools
