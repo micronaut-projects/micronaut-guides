@@ -14,8 +14,8 @@ class HomeController {
         this.bookFetcher = bookFetcher
     }
 
-    @View("home")// <3>
-    @Get// <4>
+    @View("home") // <3>
+    @Get // <4>
     HttpResponse<Map<String, Object>> index() {
         List<Book> books = bookFetcher.fetchBooks()
 

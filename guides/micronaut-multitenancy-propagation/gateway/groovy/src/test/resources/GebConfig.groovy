@@ -8,8 +8,6 @@ driver = {
 }
 
 environments {
-
-
     htmlUnit {
         driver = {
             HtmlUnitDriver htmlUnitDriver = new HtmlUnitDriver()
