@@ -5,8 +5,7 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.views.View
 
-@Controller
-// <1>
+@Controller // <1>
 class HomeController {
 
     private final BookFetcher bookFetcher
@@ -15,17 +14,15 @@ class HomeController {
         this.bookFetcher = bookFetcher
     }
 
-    @View("home")
-    // <3>
-    @Get
-    // <4>
-    HttpResponse<Map<String, Object>> index() { // <5>
+    @View("home")// <3>
+    @Get// <4>
+    HttpResponse<Map<String, Object>> index() {
         List<Book> books = bookFetcher.fetchBooks()
 
         Map<String, Object> model = new HashMap<>()
         model["pagetitle"] = "Home"
         model["books"] = books.collect { it.title }
-        HttpResponse.ok(model)
+        HttpResponse.ok(model)  // <5>
     }
 
 }

@@ -25,15 +25,15 @@ include::{commondir}/common-completesolution.adoc[]
 
 == Writing the App
 
-We are going to write the app first without token propagation. Then we are going to configure token propagation and you will see how much code we can get rid of.
+We will be using Groovy for this guide in order to demonstrate the use of multitenancy with http://gorm.grails.org[GORM], the powerful Groovy-based data access toolkit from the Grails framework.
 
 == Gateway
 
 Create the microservice:
 
-[source, bash]
+[source,bash]
 ----
-mn create-app example.micronaut.gateway --test spock
+mn create-app example.micronaut.gateway --test=spock --lang=groovy
 ----
 
 In the previous command, we are generating a Micronaut app and telling the CLI to use https://spockframework.org[Spock] as the test framework.
@@ -42,22 +42,25 @@ In the previous command, we are generating a Micronaut app and telling the CLI t
 
 Multi-Tenancy, as it relates to software development, is when a single instance of an application is used to service multiple clients (tenants) in a way that each tenants' data is isolated from the other.
 
-To use the Micronaut’s multitenancy capabilities you must have the multitenancy dependency on your classpath. For example in `build.gradle:`
+To use the Micronaut’s multitenancy capabilities you must have the multitenancy dependency on your classpath.
+For example in `build.gradle:`
 
 dependency:micronaut-multitenancy[app=gateway]
 
 resource:application.yml[app=gateway,tag=multitenancy]
 
 <1> Enable tenant propagation.
-<2> Propagate the resolved tenant ID only in requests going to a particular set of services. In our example, we define a regex to match the service id `books`.
+<2> Propagate the resolved tenant ID only in requests going to a particular set of services.
+In our example, we define a regex to match the service id `books`.
 <3> In the gateway we use the https://docs.micronaut.io/snapshot/api/io/micronaut/multitenancy/tenantresolver/CookieTenantResolver.html[CookieTenantResolver] which resolves the current tenant from an HTTP cookie.
 <4> We propagate the tenant with a https://docs.micronaut.io/snapshot/api/io/micronaut/multitenancy/writer/HttpHeaderTenantWriter.html[HttpHeaderTenantWriter] which writes the current tenant to a HTTP Header.
 
-=== Http Filter
+=== Http Filter & Cookie Redirect
 
 The Micronaut HTTP server supports the ability to apply filters to request/response processing in a similar, but reactive, way to Servlet filters in traditional Java applications.
 
-Create a filter to redirect to `/tenant` if you attempt to access `/` without a cookie. That it is to say, in a situation where the application is not able to resolve the tenant ID.
+Create a filter to redirect to `/tenant` if you attempt to access `/` without a cookie.
+That it is to say, in a situation where the application is not able to resolve the tenant ID.
 
 source:HomePageFilter[app=gateway]
 
@@ -79,8 +82,8 @@ source:BookClient[app=gateway]
 <2> We don't want to load this bean in the `test` environment.
 <3> We configure the path `/books` and HTTP method of the endpoint exposed by `books`.
 
-
-Configure the urls for the service id `books`. Modify `application.yml`
+Configure the urls for the service id `books`.
+Modify `application.yml`
 
 resource:application.yml[app=gateway,tag=http-services]
 
@@ -89,7 +92,8 @@ resource:application.yml[app=gateway,tag=http-services]
 
 === Home Controller
 
-The `views` module provides support for view rendering on the server side and does so by rendering views on the I/O thread pool in order to avoid blocking the Netty event loop. Add the `views` dependency to  `build.gradle:`
+The `views` module provides support for view rendering on the server side and does so by rendering views on the I/O thread pool in order to avoid blocking the Netty event loop.
+Add the `views` dependency to  `build.gradle:`
 
 dependency:micronaut-views-handlebars[groupId=io.micronaut.views]
 
@@ -106,11 +110,11 @@ source:HomeController[app=gateway]
 <1> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut’s controller.
 <2> Constructor dependency injection.
 <3> Use `@View` annotation to indicate the view name which should be used to render a view for the route.
-<4> You can specify the HTTP verb that a controller’s action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
-<5> A RxJava http://reactivex.io/RxJava/2.x/javadoc/io/reactivex/Single.html[Single] is returned with the value read from the server.
+<4> You can specify the HTTP verb that a controller’s action responds to.
+To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<5> The model is returned containing the values read from the server
 
-=== Cookie Redirect
-
+=== Tenant Controller
 
 `HomePageFilter` redirects to `/tenant` when the tenant ID is not resolved. Create `TenantController` to handle that endpoint:
 
@@ -122,6 +126,8 @@ source:TenantController[app=gateway]
 <4> You can specify the HTTP verb that a controller’s action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
 <5> Define a path variable `tenant`.
 <6> Do a 302 redirect to `/` setting a cookie with the selected tenant ID.
+
+=== Tenant View
 
 The previous controller renders the `tenant` view.
 
@@ -139,10 +145,8 @@ Add dependencies for Geb:
 
 :dependencies:
 
-dependency:geb-spock:3.4[groupId=org.gebish,scope=testImplementation]
-dependency:htmlunit-driver:2.35.1[groupId=org.seleniumhq.selenium,scope=testCompile]
-dependency:htmlunit:2.35.0[groupId=net.sourceforge.htmlunit,scope=testRuntime]
-dependency:selenium-support:3.141.59[groupId=org.seleniumhq.selenium,scope=testImplementation]
+dependency:geb-spock:4.1[groupId=org.gebish,scope=testImplementation]
+dependency:htmlunit-driver:2.49.1[groupId=org.seleniumhq.selenium,scope=testImplementation]
 
 :dependencies:
 
@@ -155,7 +159,8 @@ Create two Geb Pages:
 test:HomePage[app=gateway]
 test:TenantPage[app=gateway]
 
-Write a test which verifies that when the user visits the home page without a tenant is redirected to the tenant selection page. After tenant selection, the home page loads a set of books.
+Write a test which verifies that when the user visits the home page without a tenant is redirected to the tenant selection page.
+After tenant selection, the home page loads a set of books.
 
 test:HomePageSpec[app=gateway]
 
@@ -166,17 +171,22 @@ test:HomePageSpec[app=gateway]
 
 Create the microservice:
 
-[source, bash]
+[source,bash]
 ----
-mn create-app example.micronaut.books --lang groovy
+mn create-app example.micronaut.books --lang=groovy
 ----
 
 === GORM
 
-http://gorm.grails.org[GORM] is a powerful Groovy-based data access toolkit for the JVM. To use it in Micronaut add the following dependencies to `build.gradle`:
+http://gorm.grails.org[GORM] is a powerful Groovy-based data access toolkit for the JVM.
+To use it in Micronaut add the following dependencies to `build.gradle`:
 
-dependency:micronaut-multitenancy[app=books]
-dependency:micronaut-multitenancy-gorm[groupId=io.micronaut.groovy,app=books]
+:dependencies:
+
+dependency:micronaut-multitenancy[]
+dependency:micronaut-multitenancy-gorm[groupId=io.micronaut.groovy]
+
+:dependencies:
 
 Configure multiple data sources as described in the http://gorm.grails.org/latest/hibernate/manual/index.html#multipleDataSources[GORM Multiple Data Sources] documentation.
 
@@ -184,21 +194,24 @@ resource:application.yml[app=books,tag=datasources]
 
 === Domain
 
-GORM supports several http://gorm.grails.org/latest/hibernate/manual/index.html#_multi_tenancy_modes[tenancy modes]. In this tutorial we use `DATABASE` where a separate database with a separate connection pool is used to store each tenants data.
+GORM supports several http://gorm.grails.org/latest/hibernate/manual/index.html#_multi_tenancy_modes[tenancy modes].
+In this tutorial we use `DATABASE` where a separate database with a separate connection pool is used to store each tenants data.
 
 Add the following configuration to `application.yml`
 
 resource:application.yml[app=books,tag=gorm]
 
 <1> Use `DATABASE` mode.
-<2> Use `HttpHeaderTenantResolver` which resolves the tenant ID from an HTTP header. Remember we configured the `gateway` microservice to propagate the tenant ID in an HTTP Header.
+<2> Use `HttpHeaderTenantResolver` which resolves the tenant ID from an HTTP header.
+Remember we configured the `gateway` microservice to propagate the tenant ID in an HTTP Header.
 
 Create a GORM Entity to persist books:
 
 source:Book[app=books]
 
 <1> GORM entities are annotated with `grails.persistence.Entity`.
-<2> Use of `GormEntity` is merely to aid IDE support outside of Grails. When used inside a Grails context, some IDEs will use the grails-app/domain location as a hint to enable code completion.
+<2> Use of `GormEntity` is merely to aid IDE support outside of Grails.
+When used inside a Grails context, some IDEs will use the grails-app/domain location as a hint to enable code completion.
 <3> Implement the `MultiTenant` trait in the GORM entities you want to be regarded as multi tenant.
 
 === Data Service
@@ -236,7 +249,8 @@ source:Bootstrap[app=books]
 
 === Book Tests
 
-Create a tests which verifies the behaviour. We received the books belonging to the tenant which we send via an HTTP header.
+Create a tests which verifies the behaviour.
+We received the books belonging to the tenant which we send via an HTTP header.
 
 test:BookControllerSpec[app=books]
 
@@ -262,7 +276,7 @@ gateway $ ./gradlew run
 
 You can visit `http://localhost:8080` and change tenant and see the book list change:
 
-image::multitenancy.gif[]
+image:multitenancy.gif[]
 
 == Next Steps
 
