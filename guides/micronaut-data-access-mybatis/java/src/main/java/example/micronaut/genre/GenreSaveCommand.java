@@ -1,7 +1,7 @@
 package example.micronaut.genre;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.NonNull;
 
 import javax.validation.constraints.NotBlank;
 

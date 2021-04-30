@@ -1,11 +1,11 @@
 package io.micronaut.guides
 
-import edu.umd.cs.findbugs.annotations.NonNull
-import edu.umd.cs.findbugs.annotations.Nullable
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework

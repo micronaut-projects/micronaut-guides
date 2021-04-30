@@ -1,6 +1,6 @@
 package io.micronaut.guides;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.options.BuildTool;
