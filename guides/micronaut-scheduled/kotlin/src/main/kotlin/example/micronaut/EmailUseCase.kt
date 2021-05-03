@@ -2,7 +2,7 @@ package example.micronaut
 
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 import javax.inject.Singleton
 
 @Singleton

@@ -6,7 +6,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
 import io.micronaut.tracing.annotation.ContinueSpan
 import io.micronaut.tracing.annotation.SpanTag
-import java.util.*
+import java.util.Optional
 import javax.validation.constraints.NotBlank
 
 @Controller("/books")

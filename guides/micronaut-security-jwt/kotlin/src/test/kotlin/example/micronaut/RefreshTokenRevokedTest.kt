@@ -13,7 +13,7 @@ import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Optional
 
 internal class RefreshTokenRevokedTest {
     var embeddedServer = ApplicationContext.run(EmbeddedServer::class.java, emptyMap())

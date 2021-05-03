@@ -1,7 +1,8 @@
 package example.micronaut;
 
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 
 @Controller("/")
 public class HelloController {
