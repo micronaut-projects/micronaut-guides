@@ -37,7 +37,7 @@ EXIT_STATUS=0
 cd ${folder}
 """
                     for (GuideMetadata.App app: metadata.apps) {
-                        bashScript += scriptForFolder(app.name, "${folder}/${app.name}".toString(), stopIfFailure, buildTool)
+                        bashScript += scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool)
                     }
                     bashScript += """\
 cd ..

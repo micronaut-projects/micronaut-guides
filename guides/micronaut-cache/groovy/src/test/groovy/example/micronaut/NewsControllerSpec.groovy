@@ -29,7 +29,7 @@ class NewsControllerSpec extends Specification {
 
         when:
         HttpRequest request = HttpRequest.GET(UriBuilder.of("/")
-                .path(Month.OCTOBER.toString())
+                .path(Month.OCTOBER.name())
                 .build())
         News news = client.toBlocking().retrieve(request, News)
 

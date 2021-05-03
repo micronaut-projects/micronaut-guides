@@ -38,7 +38,7 @@ public class ReposController {
         String authorization = null;
         Object claim = authentication.getAttributes().get(OauthUserDetailsMapper.ACCESS_TOKEN_KEY);  // <6>
         if (claim instanceof String) {
-            authorization = HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + " " + claim.toString();
+            authorization = HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + ' ' + claim;
         }
         return authorization;
     }
