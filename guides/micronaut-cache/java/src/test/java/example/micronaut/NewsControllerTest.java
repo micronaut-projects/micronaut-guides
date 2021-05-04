@@ -28,7 +28,7 @@ public class NewsControllerTest {
     @Timeout(4) // <1>
     @Test
     void fetchingOctoberHeadlinesUsesCache() {
-        HttpRequest request = HttpRequest.GET(UriBuilder.of("/").path(Month.OCTOBER.toString()).build());
+        HttpRequest request = HttpRequest.GET(UriBuilder.of("/").path(Month.OCTOBER.name()).build());
         News news = client.toBlocking().retrieve(request, News.class);
         String expected = "Micronaut AOP: Awesome flexibility without the complexity";
         assertEquals(Arrays.asList(expected), news.getHeadlines());

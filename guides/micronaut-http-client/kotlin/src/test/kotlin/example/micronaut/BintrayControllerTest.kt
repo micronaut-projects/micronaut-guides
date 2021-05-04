@@ -10,7 +10,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.reactivex.Flowable
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Arrays
 import java.util.stream.StreamSupport
 import javax.inject.Inject
 

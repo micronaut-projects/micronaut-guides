@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.scheduling.annotation.Scheduled
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 import javax.inject.Singleton
 
 @Singleton // <1>

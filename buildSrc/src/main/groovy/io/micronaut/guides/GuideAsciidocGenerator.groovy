@@ -19,7 +19,7 @@ class GuideAsciidocGenerator {
         }
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
-            String projectName = "${metadata.slug}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}"
+            String projectName = "${metadata.slug}-${guidesOption.buildTool.toString()}-${guidesOption.language}"
 
             List<String> rawLinesExpanded = expandAllCommonIncludes(asciidocFile.readLines(), destinationFolder)
 
@@ -164,7 +164,7 @@ class GuideAsciidocGenerator {
         }
         String folder = testFramework ? 'test' : 'main'
         String module = appName ? "${appName}/" : ""
-        List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
+        List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
 
         List<String> lines = [
             '[source,@lang@]',
@@ -189,7 +189,7 @@ class GuideAsciidocGenerator {
         List<String> tagNames = extractTags(line)
 
         String module = appName ? "${appName}/" : ""
-        List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
+        List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
 
         String fileExtension = testFramework.toTestFramework().defaultLanguage.getExtension()
         String langTestFolder = testFramework.toTestFramework().defaultLanguage.getTestSrcDir()
@@ -217,7 +217,7 @@ class GuideAsciidocGenerator {
         List<String> tagNames = extractTags(line)
 
         String module = appName ? "${appName}/" : ""
-        List<String> tags = tagNames ? tagNames.collect { "tag=${it}".toString() } : []
+        List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
         String asciidoctorLang = resolveAsciidoctorLanguage(fileName)
 
         List<String> lines = [

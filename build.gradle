@@ -9,7 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'io.micronaut.docs', name: 'micronaut-docs-asciidoc-extensions', version: '1.0.25'
+        classpath 'io.micronaut.docs:micronaut-docs-asciidoc-extensions:1.0.25'
     }
 }
 
@@ -29,7 +29,7 @@ task cleanAsciidoctorFolder {
     group 'guides'
     description 'Cleans src/docs/asciidoc folder'
     doLast {
-        File f = new File('src/docs/asciidoc')
+        File f = file('src/docs/asciidoc')
         if (f.exists()) {
             f.deleteDir()
         }
@@ -52,6 +52,7 @@ task copyStylesheetsToDist(type: Copy) {
     into "${project.buildDir}/dist"
     include '*.css'
 }
+
 task copyHtmlToDist(type: Copy) {
     group 'guides'
     description 'Copies HTML generated from Asciidoc from build/docs/asciidoc to build/dist'
@@ -59,11 +60,13 @@ task copyHtmlToDist(type: Copy) {
     into "${project.buildDir}/dist"
     exclude 'common-*.html'
 }
+
 task createDist {
     description 'Creates build/dist folder with static assets'
     dependsOn('copyImagesToDist')
     dependsOn('copyStylesheetsToDist')
 }
+
 clean.dependsOn('cleanAsciidoctorFolder')
 build.dependsOn('asciidoctor')
 
@@ -71,7 +74,7 @@ asciidoctor.dependsOn('generateCodeZip')
 asciidoctor.finalizedBy('copyHtmlToDist')
 
 task generateSampleProjects {
-    description 'Generates guide applications at buid/code'
+    description 'Generates guide applications at build/code'
     group 'guides'
     ext {
         metadataConfigName = 'metadata.json'
@@ -80,13 +83,15 @@ task generateSampleProjects {
     }
     doLast {
         GuideProjectGenerator generator = new GuideProjectGenerator()
-        generator.generate(new File(guides), new File(output), metadataConfigName, true, new File("${projectDir}/src/docs/asciidoc"))
+        generator.generate(file(guides), file(output), metadataConfigName, true, new File(projectDir, "src/docs/asciidoc"))
         generator.close()
     }
-    finalizedBy('generateTestScript')
-    finalizedBy('generateGuidesIndex')
-    finalizedBy('generateGuidesJsonMetadata')
-    finalizedBy('themeGuides')
+    finalizedBy(
+            'generateTestScript',
+            'generateGuidesIndex',
+            'generateGuidesJsonMetadata',
+            'themeGuides'
+    )
 }
 
 task generateTestScript {
@@ -97,8 +102,8 @@ task generateTestScript {
         stopIfFailure = false
     }
     doLast {
-        File guides = new File(generateSampleProjects.guides)
-        File output = new File(generateSampleProjects.output + "/test.sh")
+        File guides = file(generateSampleProjects.guides)
+        File output = new File(generateSampleProjects.output, "test.sh")
         output.createNewFile()
         output.text = TestScriptGenerator.generateScript(guides, generateSampleProjects.metadataConfigName, stopIfFailure)
         output.setExecutable(true)
@@ -111,7 +116,7 @@ task generateCodeZip {
     dependsOn 'generateSampleProjects'
     dependsOn 'createDist'
     doLast {
-        new File(generateSampleProjects.output).eachDir { dir ->
+        file(generateSampleProjects.output).eachDir { dir ->
             String filename = projectDir.absolutePath + "/build/dist" + dir.absolutePath.substring(dir.absolutePath.lastIndexOf('/')) + ".zip"
             GenerateGuideZip.compressZipfile(dir.absolutePath, filename)
         }
@@ -122,8 +127,8 @@ task generateGuidesIndex {
     group 'guides'
     description 'Generates an index.html with all the guides'
     doLast {
-        File template = new File(projectDir.absolutePath + "/assets/template.html")
-        File guides = new File(generateSampleProjects.guides)
+        File template = new File(projectDir.absolutePath, "assets/template.html")
+        File guides = file(generateSampleProjects.guides)
         IndexGenerator.generateGuidesIndex(template, guides, project.buildDir, generateSampleProjects.metadataConfigName)
     }
 }
@@ -132,19 +137,20 @@ task generateGuidesJsonMetadata {
     group 'guides'
     description 'Generates a guides.json with the metadata for all the guides'
     doLast {
-        File guides = new File(generateSampleProjects.guides)
-        File output = new File("${project.buildDir}/dist/guides.json")
+        File guides = file(generateSampleProjects.guides)
+        File output = new File(project.buildDir, "dist/guides.json")
         output.createNewFile()
         output.text = IndexGenerator.generateGuidesJsonIndex(guides, generateSampleProjects.metadataConfigName)
     }
 }
+
 task themeGuides {
     group 'guides'
     description 'Generates an index.html with all the guides'
     doLast {
-        File template = new File(projectDir.absolutePath + "/assets/template.html")
-        File guides = new File(generateSampleProjects.guides)
-        File dist = new File("${project.buildDir}/dist")
+        File template = new File(projectDir.absolutePath, "assets/template.html")
+        File guides = file(generateSampleProjects.guides)
+        File dist = new File(project.buildDir, "dist")
         ThemeProcessor.applyThemes(template, dist, guides, generateSampleProjects.metadataConfigName)
     }
     mustRunAfter('copyHtmlToDist')

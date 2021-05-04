@@ -1,7 +1,6 @@
 package io.micronaut.guides
 
 import groovy.json.JsonOutput
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
@@ -42,7 +41,6 @@ class IndexGenerator {
         output.createNewFile()
         output.text = text
     }
-
 
     static String indexText(String templateText, List<GuideMetadata> metadatas) {
         boolean singleGuide = metadatas.size() == 1
@@ -101,14 +99,12 @@ class IndexGenerator {
                 index += "<div class='col-sm-4'>"
             }
 
-
             index += "<div class='inner'>"
             index += "<h2>${metadata.title}</h2>"
             index += "<p>${metadata.intro}</p>"
             index += table(baseURL, metadata)
             index += "</div>"
             index += "</div>"
-
 
             count ++
         }
@@ -119,7 +115,7 @@ class IndexGenerator {
 
     static String guideLink(String baseURL, GuideMetadata metadata, GuidesOption guidesOption, String title = null) {
         String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-        "<a href='${baseURL}${folder}.html'>${title ? title :  (guidesOption.buildTool.toString() + ' - ' + guidesOption.language.toString())}</a>"
+        "<a href='${baseURL}${folder}.html'>${title ? title : (guidesOption.buildTool.toString() + ' - ' + guidesOption.language)}</a>"
     }
 
     static String table(String baseURL, GuideMetadata metadata) {
@@ -179,7 +175,7 @@ class IndexGenerator {
         tableHtml
     }
 
-    static String cell(String baseURL, GuideMetadata metadata, BuildTool buildTool, Language language,  List<GuidesOption> guidesOptionList) {
+    static String cell(String baseURL, GuideMetadata metadata, BuildTool buildTool, Language language, List<GuidesOption> guidesOptionList) {
         String tableHtml = "<td>"
         GuidesOption guidesOption = guidesOptionList.find {GuidesOption option -> option.buildTool == buildTool&& option.language == language }
         if (guidesOption) {
@@ -195,18 +191,25 @@ class IndexGenerator {
         switch (cat) {
             case Category.GCP:
                 return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
+
             case Category.AWS:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/aws.svg'
+
             case Category.AZURE:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/Azure.svg'
+
             case Category.CACHE:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/cache.svg'
+
             case Category.DATA_ACCESS:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/dataaccess.svg'
+
             case Category.SERVICE_DISCOVERY:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/Service_Discovery.svg'
+
             case Category.SECURITY:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/Security.svg'
+
             case Category.MESSAGING:
                 return  'https://micronaut.io/wp-content/uploads/2020/11/Messaging.svg'
 
@@ -226,7 +229,7 @@ class IndexGenerator {
         String html = "<div class='category'>"
         html += '<div class="inner">'
         html += '<img width="100" style="margin-bottom: 30px" src="' + imageForCategory(cat) + '"/>'
-        html += '<h1 class="title title_large first-word-bold first-word-break">' + cat.toString()  + '</h1>'
+        html += '<h1 class="title title_large first-word-bold first-word-break">' + cat  + '</h1>'
         html += '<div class="underline"></div>'
         html += "</div>"
         html += "</div>"
