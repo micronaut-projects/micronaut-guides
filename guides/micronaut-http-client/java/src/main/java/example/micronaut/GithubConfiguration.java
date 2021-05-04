@@ -3,33 +3,17 @@ package example.micronaut;
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Requires;
 
-import java.util.HashMap;
-import java.util.Map;
+@ConfigurationProperties(GithubConfiguration.PREFIX)
+@Requires(property = GithubConfiguration.PREFIX)
+public class GithubConfiguration {
 
-@ConfigurationProperties(BintrayConfiguration.PREFIX)
-@Requires(property = BintrayConfiguration.PREFIX)
-public class BintrayConfiguration {
-
-    public static final String PREFIX = "bintray";
-    public static final String BINTRAY_API_URL = "https://bintray.com";
-
-    private String apiversion;
+    public static final String PREFIX = "github";
+    public static final String GITHUB_API_URL = "https://api.github.com";
 
     private String organization;
-
     private String repository;
-
     private String username;
-
     private String token;
-
-    public String getApiversion() {
-        return apiversion;
-    }
-
-    public void setApiversion(String apiversion) {
-        this.apiversion = apiversion;
-    }
 
     public String getOrganization() {
         return organization;

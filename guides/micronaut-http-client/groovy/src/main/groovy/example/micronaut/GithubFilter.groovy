@@ -10,19 +10,19 @@ import io.micronaut.http.filter.HttpClientFilter
 import org.reactivestreams.Publisher
 
 @CompileStatic
-@Filter('/api/${bintray.apiversion}/repos/**') // <1>
-@Requires(property = "bintray.username") // <2>
-@Requires(property = "bintray.token") // <2>
-class BintrayFilter  implements HttpClientFilter {
+@Filter("/repos/**") // <1>
+@Requires(property = "github.username") // <2>
+@Requires(property = "github.token") // <2>
+class GithubFilter implements HttpClientFilter {
 
-    private final BintrayConfiguration configuration
+    private final GithubConfiguration configuration
 
-    BintrayFilter(BintrayConfiguration configuration ) { // <3>
+    GithubFilter(GithubConfiguration configuration) { // <3>
         this.configuration = configuration
     }
 
     @Override
     Publisher<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
-        return chain.proceed(request.basicAuth(configuration.username, configuration.token)) // <4>
+        chain.proceed(request.basicAuth(configuration.getUsername(), configuration.getToken())) // <4>
     }
 }

@@ -5,20 +5,19 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class BintrayFilterConditionTest {
+class GithubFilterConditionTest {
 
     @Test
     fun verifyBintrayFilterIsLoadedIfBintrayUsernameTokenAreSet() {
-        val applicationContext = ApplicationContext.run(mapOf<String, Any>(Pair("bintray.username", "john"), Pair("bintray.token", "XXX")))
-        assertTrue(applicationContext.containsBean(BintrayFilter::class.java))
+        val applicationContext = ApplicationContext.run(mapOf<String, Any>(Pair("github.username", "john"), Pair("github.token", "XXX")))
+        assertTrue(applicationContext.containsBean(GithubFilter::class.java))
         applicationContext.close()
     }
 
     @Test
     fun verifyBintrayFilterIsNotLoadedIfBintrayUsernameTokenAreSet() {
         val applicationContext = ApplicationContext.run()
-        assertFalse(applicationContext.containsBean(BintrayFilter::class.java))
+        assertFalse(applicationContext.containsBean(GithubFilter::class.java))
         applicationContext.close()
     }
-
 }
