@@ -1,9 +1,9 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 
-import javax.annotation.Nullable;
 import javax.inject.Named;
 
 @Controller("/my")

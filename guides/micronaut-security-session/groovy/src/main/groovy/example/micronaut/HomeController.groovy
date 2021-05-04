@@ -1,12 +1,12 @@
 package example.micronaut
 
+import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.security.annotation.Secured
 import io.micronaut.security.rules.SecurityRule
 import io.micronaut.views.View
 
-import javax.annotation.Nullable
 import java.security.Principal
 
 @Secured(SecurityRule.IS_ANONYMOUS) // <1>

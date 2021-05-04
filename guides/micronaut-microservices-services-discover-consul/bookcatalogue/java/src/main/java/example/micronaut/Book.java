@@ -1,12 +1,13 @@
 package example.micronaut;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.NonNull;
 
 import javax.validation.constraints.NotBlank;
 
 @Introspected
 public class Book {
+
     @NonNull
     @NotBlank
     private String isbn;

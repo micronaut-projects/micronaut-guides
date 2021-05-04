@@ -1,8 +1,6 @@
 package example.micronaut;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-
-import javax.validation.constraints.NotNull;
+import io.micronaut.core.annotation.NonNull;
 
 public interface ApplicationConfiguration {
 
