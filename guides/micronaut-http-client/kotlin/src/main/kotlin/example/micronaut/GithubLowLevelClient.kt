@@ -16,7 +16,7 @@ class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) pri
                            configuration: GithubConfiguration) {  // <3>
     private val uri: URI = UriBuilder.of("/repos")
         .path(configuration.organization)
-        .path(configuration.repository)
+        .path(configuration.repo)
         .path("releases")
         .build()
 

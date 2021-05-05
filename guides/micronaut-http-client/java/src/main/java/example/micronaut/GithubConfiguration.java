@@ -11,7 +11,7 @@ public class GithubConfiguration {
     public static final String GITHUB_API_URL = "https://api.github.com";
 
     private String organization;
-    private String repository;
+    private String repo;
     private String username;
     private String token;
 
@@ -23,12 +23,12 @@ public class GithubConfiguration {
         this.organization = organization;
     }
 
-    public String getRepository() {
-        return repository;
+    public String getRepo() {
+        return repo;
     }
 
-    public void setRepository(String repository) {
-        this.repository = repository;
+    public void setRepo(String repo) {
+        this.repo = repo;
     }
 
     public String getUsername() {

@@ -15,6 +15,6 @@ import io.reactivex.Flowable
 )
 interface GithubApiClient {
 
-    @Get("/repos/\${github.organization}/\${github.repository}/releases") // <4>
+    @Get("/repos/\${github.organization}/\${github.repo}/releases") // <4>
     fun fetchReleases(): Flowable<GithubRelease?>? // <5>
 }

@@ -13,6 +13,6 @@ import static io.micronaut.http.HttpHeaders.USER_AGENT;
 @Header(name = ACCEPT, value = "application/vnd.github.v3+json, application/json") // <3>
 public interface GithubApiClient {
 
-    @Get("/repos/${github.organization}/${github.repository}/releases") // <4>
+    @Get("/repos/${github.organization}/${github.repo}/releases") // <4>
     Flowable<GithubRelease> fetchReleases(); // <5>
 }

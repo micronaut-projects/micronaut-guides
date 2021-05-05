@@ -26,7 +26,7 @@ public class GithubLowLevelClient {
         this.httpClient = httpClient;
         this.uri = UriBuilder.of("/repos")
                 .path(configuration.getOrganization())
-                .path(configuration.getRepository())
+                .path(configuration.getRepo())
                 .path("releases")
                 .build();
     }

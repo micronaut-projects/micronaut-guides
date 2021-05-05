@@ -7,7 +7,7 @@ import io.micronaut.context.annotation.Requires
 @Requires(property = GithubConfiguration.PREFIX)
 class GithubConfiguration {
     var organization: String? = null
-    var repository: String? = null
+    var repo: String? = null
     var username: String? = null
     var token: String? = null
 
