@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.Get
 @Controller
 class HelloController {
 
-    @Get(value = '/', produces = MediaType.TEXT_PLAIN)
+    @Get(produces = MediaType.TEXT_PLAIN)
     String index() {
         'Micronaut on Oracle Cloud'
     }
