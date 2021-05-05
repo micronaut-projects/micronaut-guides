@@ -11,7 +11,8 @@ public enum Category {
     KOTLIN("Kotlin"),
     AWS("AWS"),
     AZURE("Micronaut + Microsoft Azure"),
-    GCP("Micronaut + Google Cloud");
+    GCP("Micronaut + Google Cloud"),
+    ORACLE_CLOUD("Micronaut + Oracle Cloud");
 
     private final String val;
 

@@ -219,6 +219,9 @@ class IndexGenerator {
             case Category.APPRENTICE:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
+            case Category.ORACLE_CLOUD:
+                return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg' // TODO
+
             default:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
         }
