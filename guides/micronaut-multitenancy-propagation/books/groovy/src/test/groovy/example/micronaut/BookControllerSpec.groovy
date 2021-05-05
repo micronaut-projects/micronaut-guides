@@ -22,10 +22,10 @@ class BookControllerSpec extends Specification {
     void "test hello world response"() {
         given:
         List<Long> ids = []
-        Tenants.withId("sherlock") { // <4>
+        Tenants.withId("sherlock") {
             ids << bookService.save('Sherlock diary').id
         }
-        Tenants.withId("watson") { // <4>
+        Tenants.withId("watson") {
             ids << bookService.save('Watson diary').id
         }
 
