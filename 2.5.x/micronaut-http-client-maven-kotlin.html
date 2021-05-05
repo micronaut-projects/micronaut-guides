@@ -121,7 +121,7 @@
 <li><a href="#solution">3. Solution</a></li>
 <li><a href="#writing-the-app">4. Writing the App</a>
 <ul class="sectlevel2">
-<li><a href="#bintray-api">4.1. Bintray API</a></li>
+<li><a href="#github-api">4.1. GitHub API</a></li>
 <li><a href="#low-level-client">4.2. Low Level Client</a></li>
 <li><a href="#declarative-client">4.3. Declarative Client</a></li>
 <li><a href="#controller">4.4. Controller</a></li>
@@ -156,7 +156,7 @@
 <p>Learn how to use Micronaut low-level HTTP Client. Simplify your code with the declarative HTTP client.</p>
 </div>
 <div class="paragraph">
-<p>Authors: Sergio del Amo</p>
+<p>Authors: Sergio del Amo, Iván López</p>
 </div>
 <div class="paragraph">
 <p>Micronaut Version: 2.5.0</p>
@@ -167,7 +167,7 @@
 <h2 id="getting-started">1. Getting Started</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this guide we are going to create a Micronaut app written in Kotlin to consume the Bintray API with the Micronaut HTTP Client.</p>
+<p>In this guide we are going to create a Micronaut app written in Kotlin to consume the GitHub API with the Micronaut HTTP Client.</p>
 </div>
 </div>
 </div>
@@ -243,17 +243,17 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="bintray-api">4.1. Bintray API</h3>
+<h3 id="github-api">4.1. GitHub API</h3>
 <div class="paragraph">
-<p>In this guide, you are going to consume the <a href="https://bintray.com/docs/api/">Bintray API</a> from a Micronaut application.</p>
+<p>In this guide, you are going to consume the <a href="https://docs.github.com/en/rest">GitHub API</a> from a Micronaut application.</p>
 </div>
 <div class="paragraph">
-<p>In particular, we consume the <a href="https://bintray.com/docs/api/#_get_packages">Get Packages</a> endpoint.</p>
+<p>In particular, we consume the <a href="https://docs.github.com/en/rest/reference/repos#list-releases">List releases</a> endpoint.</p>
 </div>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
-<p>Get a list of packages in the specified repository, optionally specify a starting position and/or a name prefix filter.</p>
+<p>This returns a list of releases, which does not include regular Git tags that have not been associated with a release.</p>
 </div>
 </blockquote>
 </div>
@@ -269,64 +269,42 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">bintray</span>:
-  <span class="key">organization</span>: <span class="string"><span class="content">micronaut</span></span>
-  <span class="key">repository</span>: <span class="string"><span class="content">profiles</span></span>
-  <span class="key">apiversion</span>: <span class="string"><span class="content">v1</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">github</span>:
+  <span class="key">organization</span>: <span class="string"><span class="content">micronaut-projects</span></span>
+  <span class="key">repo</span>: <span class="string"><span class="content">micronaut-core</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>To encapsulate type-safe configuration retrieval, we use a <a href="https://docs.micronaut.io/latest/guide/index.html#configurationProperties"><code>@ConfigurationProperties</code></a> object:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BintrayConfiguration.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/GithubConfiguration.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import example.micronaut.BintrayConfiguration.Companion.PREFIX
 import io.micronaut.context.annotation.ConfigurationProperties
+import io.micronaut.context.annotation.Requires
 
-@ConfigurationProperties(PREFIX)
-class BintrayConfiguration {
-    companion object {
-        const val PREFIX = &quot;bintray&quot;
-        const val BINTRAY_URL = &quot;https://bintray.com&quot;
-    }
-
-    var apiversion: String? = null
+@ConfigurationProperties(GithubConfiguration.PREFIX)
+@Requires(property = GithubConfiguration.PREFIX)
+class GithubConfiguration {
     var organization: String? = null
-    var repository: String? = null
+    var repo: String? = null
     var username: String? = null
     var token: String? = null
 
-    fun toMap(): Map&lt;String, Any&gt; {
-        val m = HashMap&lt;String, Any&gt;()
-        apiversion?.let {
-            m[&quot;apiversion&quot;] = it
-        }
-        organization?.let {
-            m[&quot;organization&quot;] = it
-        }
-        repository?.let {
-            m[&quot;repository&quot;] = it
-        }
-        username?.let {
-            m[&quot;username&quot;] = it
-        }
-        token?.let {
-            m[&quot;token&quot;] = it
-        }
-        return m
+    companion object {
+        const val PREFIX = &quot;github&quot;
+        const val GITHUB_API_URL = &quot;https://api.github.com&quot;
     }
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>In this guide, you are going to fetch <a href="https://bintray.com/micronaut/profiles">Micronaut profiles packages</a>. Those packages
-are used by the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">Micronaut CLI</a>.</p>
+<p>In this guide, you are going to fetch <a href="https://github.com/micronaut-projects/micronaut-core/releases">Micronaut Core releases</a>.</p>
 </div>
 <div class="paragraph">
-<p>To consume the Bintray API, you will use Micronaut HTTP Client.</p>
+<p>To consume the GitHub API, you will use Micronaut HTTP Client.</p>
 </div>
 </div>
 <div class="sect2">
@@ -338,47 +316,51 @@ are used by the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">
 <p>Create a POJO to parse the JSON response into an object:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BintrayPackage.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/GithubRelease.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-data class BintrayPackage(var name: String = &quot;&quot;,
-                          var linked: Boolean = false) {
-}</code></pre>
+import io.micronaut.core.annotation.Introspected
+
+@Introspected
+data class GithubRelease(val name: String, val url: String)</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Create <code>BintrayLowLevelClient</code>:</p>
+<p>Create <code>GithubLowLevelClient</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BintrayLowLevelClient.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/GithubLowLevelClient.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.core.type.Argument
+import io.micronaut.http.HttpHeaders.ACCEPT
+import io.micronaut.http.HttpHeaders.USER_AGENT
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
-import io.micronaut.http.uri.UriTemplate
+import io.micronaut.http.uri.UriBuilder
 import io.reactivex.Maybe
+import java.net.URI
 import javax.inject.Singleton
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class BintrayLowLevelClient(@param:Client(BintrayConfiguration.BINTRAY_URL) private val httpClient: RxHttpClient, <i class="conum" data-value="2"></i><b>(2)</b>
-                            bintrayConfiguration: BintrayConfiguration) { <i class="conum" data-value="3"></i><b>(3)</b>
-    private val uri: String
+class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) private val httpClient: RxHttpClient,  <i class="conum" data-value="2"></i><b>(2)</b>
+                           configuration: GithubConfiguration) {  <i class="conum" data-value="3"></i><b>(3)</b>
+    private val uri: URI = UriBuilder.of(&quot;/repos&quot;)
+        .path(configuration.organization)
+        .path(configuration.repo)
+        .path(&quot;releases&quot;)
+        .build()
 
-    init {
-        val path = &quot;/api/{apiversion}/repos/{organization}/{repository}/packages&quot;
-        uri = UriTemplate.of(path).expand(bintrayConfiguration.toMap())
+    fun fetchReleases(): Maybe&lt;List&lt;GithubRelease&gt;&gt; {
+        val req: HttpRequest&lt;*&gt; = HttpRequest.GET&lt;Any&gt;(uri) <i class="conum" data-value="4"></i><b>(4)</b>
+            .header(USER_AGENT, &quot;Micronaut HTTP Client&quot;) <i class="conum" data-value="5"></i><b>(5)</b>
+            .header(ACCEPT, &quot;application/vnd.github.v3+json, application/json&quot;) <i class="conum" data-value="6"></i><b>(6)</b>
+        val flowable = httpClient.retrieve(req, Argument.listOf(GithubRelease::class.java)) <i class="conum" data-value="7"></i><b>(7)</b>
+        return flowable.firstElement() <i class="conum" data-value="8"></i><b>(8)</b>
     }
-
-    internal fun fetchPackages(): Maybe&lt;List&lt;BintrayPackage&gt;&gt; {
-        val req = HttpRequest.GET&lt;Any&gt;(uri)  <i class="conum" data-value="4"></i><b>(4)</b>
-        val flowable = httpClient.retrieve(req, Argument.listOf(BintrayPackage::class.java))  <i class="conum" data-value="5"></i><b>(5)</b>
-        return flowable.firstElement() as Maybe&lt;List&lt;BintrayPackage&gt;&gt;  <i class="conum" data-value="6"></i><b>(6)</b>
-    }
-
 }</code></pre>
 </div>
 </div>
@@ -402,10 +384,18 @@ class BintrayLowLevelClient(@param:Client(BintrayConfiguration.BINTRAY_URL) priv
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Use <code>retrieve</code> to perform an HTTP request for the given request object and convert the full HTTP response&#8217;s body into the specified type. e.g. <code>List&lt;BintrayPackage&gt;</code>.</td>
+<td>GitHub API requires to set the <code>User-Agent</code> header.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>GitHub encourages to explicitly request the version 3 via the <code>Accept</code> header. With <code>@Header</code>, you add the <code>Accept: application/vnd.github.v3+json</code> HTTP header to every request.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Use <code>retrieve</code> to perform an HTTP request for the given request object and convert the full HTTP response&#8217;s body into the specified type. e.g. <code>List&lt;GithubRelease&gt;</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
 <td>The <code>retrieve</code> method returns a Flowable which has a firstElement method that returns the first emitted item or nothing</td>
 </tr>
 </table>
@@ -433,22 +423,30 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <p>It is time to take a look at Micronaut&#8217;s support for declarative clients via the Client annotation.</p>
 </div>
 <div class="paragraph">
-<p>Create <code>BintrayClient</code> which clearly illustrates how a declarative Micronaut HTTP Client, which is generated at compile-time, simplifies our code.</p>
+<p>Create <code>GithubApiClient</code> which clearly illustrates how a declarative Micronaut HTTP Client, which is generated at compile-time, simplifies our code.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BintrayClient.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/GithubApiClient.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.reactivex.Flowable
+import io.micronaut.http.HttpHeaders.ACCEPT
+import io.micronaut.http.HttpHeaders.USER_AGENT
 import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Header
+import io.micronaut.http.annotation.Headers
 import io.micronaut.http.client.annotation.Client
+import io.reactivex.Flowable
 
-@Client(BintrayConfiguration.BINTRAY_URL) <i class="conum" data-value="1"></i><b>(1)</b>
-interface BintrayClient {
+@Client(GithubConfiguration.GITHUB_API_URL) <i class="conum" data-value="1"></i><b>(1)</b>
+@Headers(
+    Header(name = USER_AGENT, value = &quot;Micronaut HTTP Client&quot;), <i class="conum" data-value="2"></i><b>(2)</b>
+    Header(name = ACCEPT, value = &quot;application/vnd.github.v3+json, application/json&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
+)
+interface GithubApiClient {
 
-    @Get(&quot;/api/\${bintray.apiversion}/repos/\${bintray.organization}/\${bintray.repository}/packages&quot;)  <i class="conum" data-value="2"></i><b>(2)</b>
-    fun fetchPackages(): Flowable&lt;BintrayPackage&gt;  <i class="conum" data-value="3"></i><b>(3)</b>
+    @Get(&quot;/repos/\${github.organization}/\${github.repo}/releases&quot;) <i class="conum" data-value="4"></i><b>(4)</b>
+    fun fetchReleases(): Flowable&lt;GithubRelease?&gt;? <i class="conum" data-value="5"></i><b>(5)</b>
 }</code></pre>
 </div>
 </div>
@@ -460,10 +458,18 @@ interface BintrayClient {
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>You can use configuration parameter interpolation when you define the path of the GET endpoint.</td>
+<td>GitHub API requires to set the <code>User-Agent</code> header.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>GitHub encourages to explicitly request the version 3 via the <code>Accept</code> header. With <code>@Header</code>, you add the <code>Accept: application/vnd.github.v3+json</code> HTTP header to every request.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can use configuration parameter interpolation when you define the path of the GET endpoint.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
 <td>You can return reactive types, such as an RxJava <code>Flowable</code>.</td>
 </tr>
 </table>
@@ -486,7 +492,7 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 </ul>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BintrayController.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/GithubController.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
@@ -496,18 +502,18 @@ import io.micronaut.http.annotation.Get
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 
-@Controller(&quot;/bintray&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-class BintrayController(private val bintrayLowLevelClient : BintrayLowLevelClient,  <i class="conum" data-value="2"></i><b>(2)</b>
-                        private val bintrayClient: BintrayClient) {
+@Controller(&quot;/github&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+class GithubController(private val githubLowLevelClient: GithubLowLevelClient, <i class="conum" data-value="2"></i><b>(2)</b>
+                       private val githubApiClient: GithubApiClient) {
 
-    @Get(&quot;/packages-lowlevel&quot;)  <i class="conum" data-value="3"></i><b>(3)</b>
-    fun packagesWithLowLevelClient(): Maybe&lt;List&lt;BintrayPackage&gt;&gt; {  <i class="conum" data-value="4"></i><b>(4)</b>
-        return bintrayLowLevelClient.fetchPackages()
+    @Get(&quot;/releases-lowlevel&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
+    fun releasesWithLowLevelClient(): Maybe&lt;List&lt;GithubRelease&gt;&gt; { <i class="conum" data-value="4"></i><b>(4)</b>
+        return githubLowLevelClient.fetchReleases()
     }
 
-    @Get(uri = &quot;/packages&quot;, produces = arrayOf(MediaType.APPLICATION_JSON_STREAM))  <i class="conum" data-value="5"></i><b>(5)</b>
-    internal fun packages(): Flowable&lt;BintrayPackage&gt; {  <i class="conum" data-value="6"></i><b>(6)</b>
-        return bintrayClient.fetchPackages()
+    @Get(uri = &quot;/releases&quot;, produces = [MediaType.APPLICATION_JSON_STREAM]) <i class="conum" data-value="5"></i><b>(5)</b>
+    fun fetchReleases(): Flowable&lt;GithubRelease?&gt;? { <i class="conum" data-value="6"></i><b>(6)</b>
+        return githubApiClient.fetchReleases()
     }
 }</code></pre>
 </div>
@@ -516,7 +522,7 @@ class BintrayController(private val bintrayLowLevelClient : BintrayLowLevelClien
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/bintray</code>.</td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/github</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -528,7 +534,7 @@ class BintrayController(private val bintrayLowLevelClient : BintrayLowLevelClien
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>The <code>packagesWithLowLevelClient</code> returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.</td>
+<td>The <code>releasesWithLowLevelClient</code> returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
@@ -544,70 +550,70 @@ class BintrayController(private val bintrayLowLevelClient : BintrayLowLevelClien
 <div class="sect2">
 <h3 id="tests">4.5. Tests</h3>
 <div class="paragraph">
-<p>Create a test which verifies both clients work as expected and the controller echoes the output of the Bintray API in a Reactive way.</p>
+<p>Create a test which verifies both clients work as expected and the controller echoes the output of the GitHub API in a Reactive way.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/kotlin/example/micronaut/BintrayControllerTest.kt</div>
+<div class="title">src/test/kotlin/example/micronaut/GithubControllerTest.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.RxStreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import io.reactivex.Flowable
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.util.Arrays
 import java.util.stream.StreamSupport
 import javax.inject.Inject
 
 @MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
-class BintrayControllerTest {
+class GithubControllerTest {
+
     @Inject
     @field:Client(&quot;/&quot;)
-    lateinit var client : RxStreamingHttpClient <i class="conum" data-value="2"></i><b>(2)</b>
+    lateinit var client: RxStreamingHttpClient <i class="conum" data-value="2"></i><b>(2)</b>
 
     @Test
-    fun verifyBintrayPackagesCanBeFetchedWithLowLevelHttpClient() {
+    fun verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {
         //when:
-        val request: HttpRequest&lt;Any&gt; = HttpRequest.GET&lt;Any&gt;(&quot;/bintray/packages-lowlevel&quot;)
-        val rsp: HttpResponse&lt;List&lt;BintrayPackage&gt;&gt; = client.toBlocking().exchange&lt;Any, List&lt;BintrayPackage&gt;&gt;(request,  <i class="conum" data-value="3"></i><b>(3)</b>
-                Argument.listOf(BintrayPackage::class.java)) <i class="conum" data-value="4"></i><b>(4)</b>
+        val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(&quot;/github/releases-lowlevel&quot;)
+        val rsp = client.toBlocking().exchange(request, <i class="conum" data-value="3"></i><b>(3)</b>
+            Argument.listOf(GithubRelease::class.java)) <i class="conum" data-value="4"></i><b>(4)</b>
 
         //then: 'the endpoint can be accessed'
-        Assertions.assertEquals(HttpStatus.OK, rsp.status) <i class="conum" data-value="5"></i><b>(5)</b>
-        Assertions.assertNotNull(rsp.body()) <i class="conum" data-value="6"></i><b>(6)</b>
+        assertEquals(HttpStatus.OK, rsp.status) <i class="conum" data-value="5"></i><b>(5)</b>
+        assertNotNull(rsp.body()) <i class="conum" data-value="6"></i><b>(6)</b>
 
         //when:
-        val packages = rsp.body()!!
+        val releases = rsp.body()
 
         //then:
-        for (name in expectedProfileNames) {
-            Assertions.assertTrue(packages.stream().map(BintrayPackage::name).anyMatch { anObject: String? -&gt; name.equals(anObject) })
+        for (name in expectedReleases) {
+            assertTrue(releases.stream().map(GithubRelease::name).anyMatch { anObject: String? -&gt; name.equals(anObject) })
         }
     }
 
     @Test
-    fun verifyBintrayPackagesCanBeFetchedWithCompileTimeAutoGeneratedAtClient() {
+    fun verifyGithubReleasesCanBeFetchedWithCompileTimeAutoGeneratedAtClient() {
         //when:
-        val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(&quot;/bintray/packages&quot;)
-        val bintrayPackageStream: Flowable&lt;BintrayPackage&gt; = client.jsonStream(request, BintrayPackage::class.java) <i class="conum" data-value="7"></i><b>(7)</b>
-        val bintrayPackages = bintrayPackageStream.blockingIterable()
+        val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(&quot;/github/releases-lowlevel&quot;)
+        val githubReleaseStream = client.jsonStream(request, GithubRelease::class.java) <i class="conum" data-value="7"></i><b>(7)</b>
+        val githubReleases = githubReleaseStream.blockingIterable()
 
         //then:
-        for (name in expectedProfileNames) {
-            Assertions.assertTrue(StreamSupport.stream(bintrayPackages.spliterator(), false)
-                    .map(BintrayPackage::name)
-                    .anyMatch { anObject: String? -&gt; name.equals(anObject) })
+        for (name in expectedReleases) {
+            assertTrue(StreamSupport.stream(githubReleases.spliterator(), false)
+                .map(GithubRelease::name)
+                .anyMatch { anObject: String? -&gt; name.equals(anObject) })
         }
     }
 
     companion object {
-        private val expectedProfileNames = Arrays.asList(&quot;base&quot;, &quot;federation&quot;, &quot;function&quot;, &quot;function-aws&quot;, &quot;service&quot;)
+        private val expectedReleases = listOf(&quot;Micronaut 2.5.0&quot;, &quot;Micronaut 2.4.4&quot;, &quot;Micronaut 2.4.3&quot;)
     }
 }</code></pre>
 </div>
@@ -624,7 +630,7 @@ class BintrayControllerTest {
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
+<td>Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -664,26 +670,21 @@ class BintrayControllerTest {
 <h2 id="http-client-filter">6. HTTP Client Filter</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Often, you need to include the same HTTP headers or URL parameters in a set of requests against a third-party API or when calling another Microservice.</p>
+<p>Often, you need to include the same HTTP headers or URL parameters in a set of requests against a third-party API or when
+calling another Microservice. To simplify this, Micronaut includes the ability to define <code>HttpClientFilter</code> classes that
+are applied to all matching HTTP clients.</p>
 </div>
 <div class="paragraph">
-<p>To simplify this, Micronaut includes the ability to define <code>HttpClientFilter</code> classes that are applied to all matching HTTP clients.</p>
-</div>
-<div class="paragraph">
-<p>For real world example, let us provide Bintray Authentication via a <code>HttpClientFilter</code>:</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>The Bintray REST API requires an applicative API key. An API key can be obtained from the user profile page. Authentication is achieved using HTTP Basic Authentication with the user’s name as username and the API key as the password. Authenticated REST calls should only be used via HTTPs.</p>
-</div>
-</blockquote>
+<p>For a real world example, let us provide GitHub Authentication via an <code>HttpClientFilter</code>. Follow the steps in
+<a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token">to create you own Personal Token</a>.
+Then you can use those credentials to access the GitHub API
+<a href="https://docs.github.com/en/rest/overview/other-authentication-methods#via-oauth-and-personal-access-tokens">using Basic Auth</a>.</p>
 </div>
 <div class="paragraph">
 <p>Create a Filter:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BintrayFilter.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/GithubFilter.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
@@ -695,15 +696,12 @@ import io.micronaut.http.filter.ClientFilterChain
 import io.micronaut.http.filter.HttpClientFilter
 import org.reactivestreams.Publisher
 
-@Filter(&quot;/api/\${bintray.apiversion}/repos/**&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-@Requires(condition = BintrayFilterCondition::class) <i class="conum" data-value="2"></i><b>(2)</b>
-class BintrayFilter(var bintrayConfiguration: BintrayConfiguration) : HttpClientFilter { <i class="conum" data-value="3"></i><b>(3)</b>
+@Filter(&quot;/repos/**&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+@Requires(condition = GithubFilterCondition::class) <i class="conum" data-value="2"></i><b>(2)</b>
+class GithubFilter(val configuration: GithubConfiguration) : HttpClientFilter { <i class="conum" data-value="3"></i><b>(3)</b>
 
-    override fun doFilter(request: MutableHttpRequest&lt;*&gt;, chain: ClientFilterChain): Publisher&lt;out HttpResponse&lt;*&gt;&gt; {
-        if ( bintrayConfiguration.username != null &amp;&amp; bintrayConfiguration.token != null) {
-            return chain.proceed(request.basicAuth(bintrayConfiguration.username, bintrayConfiguration.token)) <i class="conum" data-value="4"></i><b>(4)</b>
-        }
-        return chain.proceed(request)
+    override fun doFilter(request: MutableHttpRequest&lt;*&gt;, chain: ClientFilterChain): Publisher&lt;out HttpResponse&lt;*&gt;?&gt; {
+        return chain.proceed(request.basicAuth(configuration.username, configuration.token)) <i class="conum" data-value="4"></i><b>(4)</b>
     }
 }</code></pre>
 </div>
@@ -716,7 +714,7 @@ class BintrayFilter(var bintrayConfiguration: BintrayConfiguration) : HttpClient
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Bean will not loaded unless configuration properties are set.</td>
+<td>Micronaut will not load the Bean unless configuration properties are set.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -724,23 +722,22 @@ class BintrayFilter(var bintrayConfiguration: BintrayConfiguration) : HttpClient
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Enhance every request sent to Bintray API providing Basic Authentication.</td>
+<td>Enhance every request sent to GitHub API providing Basic Authentication.</td>
 </tr>
 </table>
 </div>
 <div class="sect2">
 <h3 id="configuration-parameters">6.1. Configuration Parameters</h3>
 <div class="paragraph">
-<p>Add your Bintray <code>username</code> and <code>token</code> to <code>src/main/resource/application.yml</code></p>
+<p>Add your GitHub <code>username</code> and <code>token</code> to <code>src/main/resource/application.yml</code></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">bintray</span>:
-  <span class="key">organization</span>: <span class="string"><span class="content">micronaut</span></span>
-  <span class="key">repository</span>: <span class="string"><span class="content">profiles</span></span>
-  <span class="key">apiversion</span>: <span class="string"><span class="content">v1</span></span>
-  <span class="key">username</span>: <span class="string"><span class="content">yourbintrayusername</span></span>
-  <span class="key">token</span>: <span class="string"><span class="content">XXXXXXXXXXX</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">github</span>:
+  <span class="key">organization</span>: <span class="string"><span class="content">micronaut-projects</span></span>
+  <span class="key">repo</span>: <span class="string"><span class="content">micronaut-core</span></span>
+  <span class="key">username</span>: <span class="string"><span class="content">yourgithubusername</span></span>
+  <span class="key">token</span>: <span class="string"><span class="content">xxxxxxxxxxxx</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -752,11 +749,15 @@ class BintrayFilter(var bintrayConfiguration: BintrayConfiguration) : HttpClient
 </div>
 </div>
 <div class="paragraph">
-<p>If you run again the tests, you will see the that the Filter is invoked and HTTP Basic Auth is used against Bintray API.</p>
+<p>If you run again the tests, you will see the that the Filter is invoked and HTTP Basic Auth is used against GitHub API.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">13:21:08.981 [nioEventLoopGroup-1-14] TRACE i.m.http.client.DefaultHttpClient - Authorization: Basic XXXXXXXXXXXXXX</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">13:09:56.662 [default-nioEventLoopGroup-1-4] DEBUG i.m.h.client.netty.DefaultHttpClient - Sending HTTP GET to https://api.github.com/repos/micronaut-projects/micronaut-core/releases
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - User-Agent: Micronaut HTTP Client
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Accept: application/json
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Authorization: Basic xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+13:09:56.664 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - host: api.github.com</code></pre>
 </div>
 </div>
 </div>

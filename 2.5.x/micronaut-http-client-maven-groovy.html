@@ -121,7 +121,7 @@
 <li><a href="#solution">3. Solution</a></li>
 <li><a href="#writing-the-app">4. Writing the App</a>
 <ul class="sectlevel2">
-<li><a href="#bintray-api">4.1. Bintray API</a></li>
+<li><a href="#github-api">4.1. GitHub API</a></li>
 <li><a href="#low-level-client">4.2. Low Level Client</a></li>
 <li><a href="#declarative-client">4.3. Declarative Client</a></li>
 <li><a href="#controller">4.4. Controller</a></li>
@@ -151,7 +151,7 @@
 <p>Learn how to use Micronaut low-level HTTP Client. Simplify your code with the declarative HTTP client.</p>
 </div>
 <div class="paragraph">
-<p>Authors: Sergio del Amo</p>
+<p>Authors: Sergio del Amo, Iván López</p>
 </div>
 <div class="paragraph">
 <p>Micronaut Version: 2.5.0</p>
@@ -162,7 +162,7 @@
 <h2 id="getting-started">1. Getting Started</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this guide we are going to create a Micronaut app written in Groovy to consume the Bintray API with the Micronaut HTTP Client.</p>
+<p>In this guide we are going to create a Micronaut app written in Groovy to consume the GitHub API with the Micronaut HTTP Client.</p>
 </div>
 </div>
 </div>
@@ -230,17 +230,17 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut app with the default package <code>example.micronaut</code> in a folder named <code>micronautguide</code>.</p>
 </div>
 <div class="sect2">
-<h3 id="bintray-api">4.1. Bintray API</h3>
+<h3 id="github-api">4.1. GitHub API</h3>
 <div class="paragraph">
-<p>In this guide, you are going to consume the <a href="https://bintray.com/docs/api/">Bintray API</a> from a Micronaut application.</p>
+<p>In this guide, you are going to consume the <a href="https://docs.github.com/en/rest">GitHub API</a> from a Micronaut application.</p>
 </div>
 <div class="paragraph">
-<p>In particular, we consume the <a href="https://bintray.com/docs/api/#_get_packages">Get Packages</a> endpoint.</p>
+<p>In particular, we consume the <a href="https://docs.github.com/en/rest/reference/repos#list-releases">List releases</a> endpoint.</p>
 </div>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
-<p>Get a list of packages in the specified repository, optionally specify a starting position and/or a name prefix filter.</p>
+<p>This returns a list of releases, which does not include regular Git tags that have not been associated with a release.</p>
 </div>
 </blockquote>
 </div>
@@ -256,17 +256,16 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">bintray</span>:
-  <span class="key">organization</span>: <span class="string"><span class="content">micronaut</span></span>
-  <span class="key">repository</span>: <span class="string"><span class="content">profiles</span></span>
-  <span class="key">apiversion</span>: <span class="string"><span class="content">v1</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">github</span>:
+  <span class="key">organization</span>: <span class="string"><span class="content">micronaut-projects</span></span>
+  <span class="key">repo</span>: <span class="string"><span class="content">micronaut-core</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>To encapsulate type-safe configuration retrieval, we use a <a href="https://docs.micronaut.io/latest/guide/index.html#configurationProperties"><code>@ConfigurationProperties</code></a> object:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/BintrayConfiguration.groovy</div>
+<div class="title">src/main/groovy/example/micronaut/GithubConfiguration.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
@@ -274,42 +273,26 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
 
+<span class="annotation">@ConfigurationProperties</span>(GithubConfiguration.PREFIX)
+<span class="annotation">@Requires</span>(property = GithubConfiguration.PREFIX)
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@ConfigurationProperties</span>(BintrayConfiguration.PREFIX)
-<span class="annotation">@Requires</span>(property = BintrayConfiguration.PREFIX)
-<span class="type">class</span> <span class="class">BintrayConfiguration</span> {
+<span class="type">class</span> <span class="class">GithubConfiguration</span> {
 
-    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> PREFIX = <span class="string"><span class="delimiter">&quot;</span><span class="content">bintray</span><span class="delimiter">&quot;</span></span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> BINTRAY_API_URL = <span class="string"><span class="delimiter">&quot;</span><span class="content">https://bintray.com</span><span class="delimiter">&quot;</span></span>
-
-    <span class="predefined-type">String</span> apiversion
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> PREFIX = <span class="string"><span class="delimiter">&quot;</span><span class="content">github</span><span class="delimiter">&quot;</span></span>
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> GITHUB_API_URL = <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com</span><span class="delimiter">&quot;</span></span>
 
     <span class="predefined-type">String</span> organization
-
-    <span class="predefined-type">String</span> repository
-
+    <span class="predefined-type">String</span> repo
     <span class="predefined-type">String</span> username
-
     <span class="predefined-type">String</span> token
-
-    <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; toMap() {
-        [
-                <span class="key">apiversion</span>: apiversion,
-                <span class="key">organization</span>: organization,
-                <span class="key">repository</span>: repository,
-                <span class="key">username</span>: username,
-                <span class="key">token</span>: token
-        ] <span class="keyword">as</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;
-    }
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>In this guide, you are going to fetch <a href="https://bintray.com/micronaut/profiles">Micronaut profiles packages</a>. Those packages
-are used by the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">Micronaut CLI</a>.</p>
+<p>In this guide, you are going to fetch <a href="https://github.com/micronaut-projects/micronaut-core/releases">Micronaut Core releases</a>.</p>
 </div>
 <div class="paragraph">
-<p>To consume the Bintray API, you will use Micronaut HTTP Client.</p>
+<p>To consume the GitHub API, you will use Micronaut HTTP Client.</p>
 </div>
 </div>
 <div class="sect2">
@@ -321,7 +304,7 @@ are used by the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">
 <p>Create a POJO to parse the JSON response into an object:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/BintrayPackage.groovy</div>
+<div class="title">src/main/groovy/example/micronaut/GithubRelease.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
@@ -330,17 +313,17 @@ are used by the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">
 
 <span class="annotation">@Introspected</span>
 <span class="annotation">@CompileStatic</span>
-<span class="type">class</span> <span class="class">BintrayPackage</span> {
+<span class="type">class</span> <span class="class">GithubRelease</span> {
     <span class="predefined-type">String</span> name
-    <span class="type">boolean</span> linked
+    <span class="predefined-type">String</span> url
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Create <code>BintrayLowLevelClient</code>:</p>
+<p>Create <code>GithubLowLevelClient</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/BintrayLowLevelClient.groovy</div>
+<div class="title">src/main/groovy/example/micronaut/GithubLowLevelClient.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
@@ -349,29 +332,38 @@ are used by the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.RxHttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriTemplate</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>
 <span class="keyword">import</span> <span class="include">io.reactivex.Flowable</span>
 <span class="keyword">import</span> <span class="include">io.reactivex.Maybe</span>
 
 <span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">BintrayLowLevelClient</span> {
-    <span class="directive">private</span> <span class="directive">final</span> RxHttpClient httpClient
-    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> uri
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.ACCEPT</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.USER_AGENT</span>
 
-    BintrayLowLevelClient(<span class="annotation">@Client</span>(BintrayConfiguration.BINTRAY_API_URL) RxHttpClient httpClient, <i class="conum" data-value="2"></i><b>(2)</b>
-                          BintrayConfiguration configuration) { <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@CompileStatic</span>
+<span class="type">class</span> <span class="class">GithubLowLevelClient</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> RxHttpClient httpClient
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">URI</span> uri
+
+    GithubLowLevelClient(<span class="annotation">@Client</span>(GithubConfiguration.GITHUB_API_URL) RxHttpClient httpClient,  <i class="conum" data-value="2"></i><b>(2)</b>
+                         GithubConfiguration configuration) {  <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="local-variable">this</span>.httpClient = httpClient
-        <span class="predefined-type">String</span> path = <span class="string"><span class="delimiter">&quot;</span><span class="content">/api/{apiversion}/repos/{organization}/{repository}/packages</span><span class="delimiter">&quot;</span></span>
-        uri = UriTemplate.of(path).expand(configuration.toMap())
+        <span class="local-variable">this</span>.uri = UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/repos</span><span class="delimiter">&quot;</span></span>)
+            .path(configuration.getOrganization())
+            .path(configuration.getRepo())
+            .path(<span class="string"><span class="delimiter">&quot;</span><span class="content">releases</span><span class="delimiter">&quot;</span></span>)
+            .build()
     }
 
-    Maybe&lt;<span class="predefined-type">List</span>&lt;BintrayPackage&gt;&gt; fetchPackages() {
+    Maybe&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; fetchReleases() {
         HttpRequest&lt;?&gt; req = HttpRequest.GET(uri) <i class="conum" data-value="4"></i><b>(4)</b>
-        Flowable flowable = httpClient.retrieve(req, Argument.listOf(BintrayPackage)) <i class="conum" data-value="5"></i><b>(5)</b>
-        flowable.firstElement() <span class="keyword">as</span> Maybe&lt;<span class="predefined-type">List</span>&lt;BintrayPackage&gt;&gt; <i class="conum" data-value="6"></i><b>(6)</b>
+            .header(USER_AGENT, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut HTTP Client</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
+            .header(ACCEPT, <span class="string"><span class="delimiter">&quot;</span><span class="content">application/vnd.github.v3+json, application/json</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="6"></i><b>(6)</b>
+        Flowable&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; flowable = httpClient.retrieve(req, Argument.listOf(GithubRelease)) <i class="conum" data-value="7"></i><b>(7)</b>
+        <span class="keyword">return</span> flowable.firstElement() <i class="conum" data-value="8"></i><b>(8)</b>
     }
 }</code></pre>
 </div>
@@ -396,10 +388,18 @@ are used by the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Use <code>retrieve</code> to perform an HTTP request for the given request object and convert the full HTTP response&#8217;s body into the specified type. e.g. <code>List&lt;BintrayPackage&gt;</code>.</td>
+<td>GitHub API requires to set the <code>User-Agent</code> header.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>GitHub encourages to explicitly request the version 3 via the <code>Accept</code> header. With <code>@Header</code>, you add the <code>Accept: application/vnd.github.v3+json</code> HTTP header to every request.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Use <code>retrieve</code> to perform an HTTP request for the given request object and convert the full HTTP response&#8217;s body into the specified type. e.g. <code>List&lt;GithubRelease&gt;</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
 <td>The <code>retrieve</code> method returns a Flowable which has a firstElement method that returns the first emitted item or nothing</td>
 </tr>
 </table>
@@ -427,24 +427,28 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <p>It is time to take a look at Micronaut&#8217;s support for declarative clients via the Client annotation.</p>
 </div>
 <div class="paragraph">
-<p>Create <code>BintrayClient</code> which clearly illustrates how a declarative Micronaut HTTP Client, which is generated at compile-time, simplifies our code.</p>
+<p>Create <code>GithubApiClient</code> which clearly illustrates how a declarative Micronaut HTTP Client, which is generated at compile-time, simplifies our code.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/BintrayClient.groovy</div>
+<div class="title">src/main/groovy/example/micronaut/GithubApiClient.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.reactivex.Flowable</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Client</span>(BintrayConfiguration.BINTRAY_API_URL) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">interface</span> BintrayClient {
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.ACCEPT</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.USER_AGENT</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/api/${bintray.apiversion}/repos/${bintray.organization}/${bintray.repository}/packages</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-    Flowable&lt;BintrayPackage&gt; fetchPackages() <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="annotation">@Client</span>(GithubConfiguration.GITHUB_API_URL) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Header</span>(name = USER_AGENT, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut HTTP Client</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@Header</span>(name = ACCEPT, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">application/vnd.github.v3+json, application/json</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="type">interface</span> GithubApiClient {
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/repos/${github.organization}/${github.repo}/releases</span><span class="delimiter">'</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
+    Flowable&lt;GithubRelease&gt; fetchReleases() <i class="conum" data-value="5"></i><b>(5)</b>
 }</code></pre>
 </div>
 </div>
@@ -456,10 +460,18 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>You can use configuration parameter interpolation when you define the path of the GET endpoint.</td>
+<td>GitHub API requires to set the <code>User-Agent</code> header.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>GitHub encourages to explicitly request the version 3 via the <code>Accept</code> header. With <code>@Header</code>, you add the <code>Accept: application/vnd.github.v3+json</code> HTTP header to every request.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can use configuration parameter interpolation when you define the path of the GET endpoint.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
 <td>You can return reactive types, such as an RxJava <code>Flowable</code>.</td>
 </tr>
 </table>
@@ -482,7 +494,7 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 </ul>
 </div>
 <div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/BintrayController.groovy</div>
+<div class="title">src/main/groovy/example/micronaut/GithubController.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
@@ -494,26 +506,26 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 <span class="keyword">import</span> <span class="include">io.reactivex.Maybe</span>
 
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/bintray</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">BintrayController</span> {
-    <span class="directive">private</span> <span class="directive">final</span> BintrayLowLevelClient bintrayLowLevelClient
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/github</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">GithubController</span> {
 
-    <span class="directive">private</span> <span class="directive">final</span> BintrayClient bintrayClient
+    <span class="directive">private</span> <span class="directive">final</span> GithubLowLevelClient githubLowLevelClient
+    <span class="directive">private</span> <span class="directive">final</span> GithubApiClient githubApiClient
 
-    BintrayController(BintrayLowLevelClient bintrayLowLevelClient, <i class="conum" data-value="2"></i><b>(2)</b>
-                             BintrayClient bintrayClient) {
-        <span class="local-variable">this</span>.bintrayLowLevelClient = bintrayLowLevelClient
-        <span class="local-variable">this</span>.bintrayClient = bintrayClient
+    GithubController(GithubLowLevelClient githubLowLevelClient,
+                            GithubApiClient githubApiClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.githubLowLevelClient = githubLowLevelClient
+        <span class="local-variable">this</span>.githubApiClient = githubApiClient
     }
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/packages-lowlevel</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    Maybe&lt;<span class="predefined-type">List</span>&lt;BintrayPackage&gt;&gt; packagesWithLowLevelClient() { <i class="conum" data-value="4"></i><b>(4)</b>
-        <span class="keyword">return</span> bintrayLowLevelClient.fetchPackages()
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/releases-lowlevel</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    Maybe&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; releasesWithLowLevelClient() { <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="keyword">return</span> githubLowLevelClient.fetchReleases()
     }
 
-    <span class="annotation">@Get</span>(uri = <span class="string"><span class="delimiter">&quot;</span><span class="content">/packages</span><span class="delimiter">&quot;</span></span>, produces = MediaType.APPLICATION_JSON_STREAM) <i class="conum" data-value="5"></i><b>(5)</b>
-    Flowable&lt;BintrayPackage&gt; packages() { <i class="conum" data-value="6"></i><b>(6)</b>
-        <span class="keyword">return</span> bintrayClient.fetchPackages()
+    <span class="annotation">@Get</span>(uri = <span class="string"><span class="delimiter">&quot;</span><span class="content">/releases</span><span class="delimiter">&quot;</span></span>, produces = MediaType.APPLICATION_JSON_STREAM) <i class="conum" data-value="5"></i><b>(5)</b>
+    Flowable&lt;GithubRelease&gt; fetchReleases() { <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="keyword">return</span> githubApiClient.fetchReleases()
     }
 }</code></pre>
 </div>
@@ -522,7 +534,7 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/bintray</code>.</td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/github</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -534,7 +546,7 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>The <code>packagesWithLowLevelClient</code> returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.</td>
+<td>The <code>releasesWithLowLevelClient</code> returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
@@ -550,10 +562,10 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 <div class="sect2">
 <h3 id="tests">4.5. Tests</h3>
 <div class="paragraph">
-<p>Create a test which verifies both clients work as expected and the controller echoes the output of the Bintray API in a Reactive way.</p>
+<p>Create a test which verifies both clients work as expected and the controller echoes the output of the GitHub API in a Reactive way.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/groovy/example/micronaut/BintrayControllerSpec.groovy</div>
+<div class="title">src/test/groovy/example/micronaut/GithubControllerSpec.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
@@ -571,45 +583,45 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 <span class="keyword">import</span> <span class="include">javax.inject.Inject</span>
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">BintrayControllerSpec</span> <span class="directive">extends</span> Specification {
+<span class="type">class</span> <span class="class">GithubControllerSpec</span> <span class="directive">extends</span> Specification {
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
     RxStreamingHttpClient client <i class="conum" data-value="2"></i><b>(2)</b>
 
     <span class="annotation">@Shared</span>
-    <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; expectedProfileNames = [<span class="string"><span class="delimiter">'</span><span class="content">base</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">federation</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">function</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">function-aws</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">service</span><span class="delimiter">'</span></span>]
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; expectedReleases = [<span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut 2.5.0</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut 2.4.4</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut 2.4.3</span><span class="delimiter">&quot;</span></span>]
 
-    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Verify bintray packages can be fetched with low level HttpClient</span><span class="delimiter">&quot;</span></span>() {
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">verify github releases can be fetched with low level HttpClient</span><span class="delimiter">'</span></span>() {
         <span class="key">when</span>:
-        HttpRequest request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/bintray/packages-lowlevel</span><span class="delimiter">'</span></span>)
+        HttpRequest request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/github/releases-lowlevel</span><span class="delimiter">'</span></span>)
 
-        HttpResponse&lt;<span class="predefined-type">List</span>&lt;BintrayPackage&gt;&gt; rsp = client.toBlocking().exchange(request, <i class="conum" data-value="3"></i><b>(3)</b>
-                Argument.listOf(BintrayPackage)) <i class="conum" data-value="4"></i><b>(4)</b>
+        HttpResponse&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; rsp = client.toBlocking().exchange(request, <i class="conum" data-value="3"></i><b>(3)</b>
+                Argument.listOf(GithubRelease)) <i class="conum" data-value="4"></i><b>(4)</b>
 
         <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">the endpoint can be accessed</span><span class="delimiter">'</span></span>
         rsp.status == HttpStatus.OK <i class="conum" data-value="5"></i><b>(5)</b>
         rsp.body() <i class="conum" data-value="6"></i><b>(6)</b>
 
         <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;BintrayPackage&gt; packages = rsp.body()
+        <span class="predefined-type">List</span>&lt;GithubRelease&gt; releases = rsp.body()
 
         <span class="key">then</span>:
-        <span class="keyword">for</span> (<span class="predefined-type">String</span> name : expectedProfileNames) {
-            <span class="keyword">assert</span> packages*.name.contains(name)
+        <span class="keyword">for</span> (<span class="predefined-type">String</span> name : expectedReleases) {
+            <span class="keyword">assert</span> releases*.name.contains(name)
         }
     }
 
-    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Verify bintray packages can be fetched with compile-time autogenerated @Client</span><span class="delimiter">&quot;</span></span>() {
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">verify github releases can be fetched with compile-time autogenerated @Client</span><span class="delimiter">'</span></span>() {
         <span class="key">when</span>:
-        HttpRequest request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/bintray/packages</span><span class="delimiter">'</span></span>)
+        HttpRequest request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/github/releases-lowlevel</span><span class="delimiter">'</span></span>)
 
-        Flowable&lt;BintrayPackage&gt; bintrayPackageStream = client.jsonStream(request, BintrayPackage) <i class="conum" data-value="7"></i><b>(7)</b>
-        <span class="predefined-type">Iterable</span>&lt;BintrayPackage&gt; bintrayPackages = bintrayPackageStream.blockingIterable()
+        Flowable&lt;GithubRelease&gt; githubReleaseStream = client.jsonStream(request, GithubRelease) <i class="conum" data-value="7"></i><b>(7)</b>
+        <span class="predefined-type">Iterable</span>&lt;GithubRelease&gt; githubReleases = githubReleaseStream.blockingIterable()
 
         <span class="key">then</span>:
-        <span class="keyword">for</span> (<span class="predefined-type">String</span> name : expectedProfileNames) {
-            <span class="keyword">assert</span> bintrayPackages*.name.contains(name)
+        <span class="keyword">for</span> (<span class="predefined-type">String</span> name : expectedReleases) {
+            <span class="keyword">assert</span> githubReleases*.name.contains(name)
         }
     }
 }</code></pre>
@@ -627,7 +639,7 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
+<td>Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -667,26 +679,21 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 <h2 id="http-client-filter">6. HTTP Client Filter</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Often, you need to include the same HTTP headers or URL parameters in a set of requests against a third-party API or when calling another Microservice.</p>
+<p>Often, you need to include the same HTTP headers or URL parameters in a set of requests against a third-party API or when
+calling another Microservice. To simplify this, Micronaut includes the ability to define <code>HttpClientFilter</code> classes that
+are applied to all matching HTTP clients.</p>
 </div>
 <div class="paragraph">
-<p>To simplify this, Micronaut includes the ability to define <code>HttpClientFilter</code> classes that are applied to all matching HTTP clients.</p>
-</div>
-<div class="paragraph">
-<p>For real world example, let us provide Bintray Authentication via a <code>HttpClientFilter</code>:</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>The Bintray REST API requires an applicative API key. An API key can be obtained from the user profile page. Authentication is achieved using HTTP Basic Authentication with the user’s name as username and the API key as the password. Authenticated REST calls should only be used via HTTPs.</p>
-</div>
-</blockquote>
+<p>For a real world example, let us provide GitHub Authentication via an <code>HttpClientFilter</code>. Follow the steps in
+<a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token">to create you own Personal Token</a>.
+Then you can use those credentials to access the GitHub API
+<a href="https://docs.github.com/en/rest/overview/other-authentication-methods#via-oauth-and-personal-access-tokens">using Basic Auth</a>.</p>
 </div>
 <div class="paragraph">
 <p>Create a Filter:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/BintrayFilter.groovy</div>
+<div class="title">src/main/groovy/example/micronaut/GithubFilter.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
@@ -700,20 +707,20 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@Filter</span>(<span class="string"><span class="delimiter">'</span><span class="content">/api/${bintray.apiversion}/repos/**</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">bintray.username</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">bintray.token</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">BintrayFilter</span>  <span class="directive">implements</span> HttpClientFilter {
+<span class="annotation">@Filter</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/repos/**</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">github.username</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">github.token</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">GithubFilter</span> <span class="directive">implements</span> HttpClientFilter {
 
-    <span class="directive">private</span> <span class="directive">final</span> BintrayConfiguration configuration
+    <span class="directive">private</span> <span class="directive">final</span> GithubConfiguration configuration
 
-    BintrayFilter(BintrayConfiguration configuration ) { <i class="conum" data-value="3"></i><b>(3)</b>
+    GithubFilter(GithubConfiguration configuration) { <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="local-variable">this</span>.configuration = configuration
     }
 
     <span class="annotation">@Override</span>
     Publisher&lt;? <span class="directive">extends</span> HttpResponse&lt;?&gt;&gt; doFilter(MutableHttpRequest&lt;?&gt; request, ClientFilterChain chain) {
-        <span class="keyword">return</span> chain.proceed(request.basicAuth(configuration.username, configuration.token)) <i class="conum" data-value="4"></i><b>(4)</b>
+        chain.proceed(request.basicAuth(configuration.getUsername(), configuration.getToken())) <i class="conum" data-value="4"></i><b>(4)</b>
     }
 }</code></pre>
 </div>
@@ -726,7 +733,7 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Bean will not loaded unless configuration properties are set.</td>
+<td>Micronaut will not load the Bean unless configuration properties are set.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -734,23 +741,22 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Enhance every request sent to Bintray API providing Basic Authentication.</td>
+<td>Enhance every request sent to GitHub API providing Basic Authentication.</td>
 </tr>
 </table>
 </div>
 <div class="sect2">
 <h3 id="configuration-parameters">6.1. Configuration Parameters</h3>
 <div class="paragraph">
-<p>Add your Bintray <code>username</code> and <code>token</code> to <code>src/main/resource/application.yml</code></p>
+<p>Add your GitHub <code>username</code> and <code>token</code> to <code>src/main/resource/application.yml</code></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">bintray</span>:
-  <span class="key">organization</span>: <span class="string"><span class="content">micronaut</span></span>
-  <span class="key">repository</span>: <span class="string"><span class="content">profiles</span></span>
-  <span class="key">apiversion</span>: <span class="string"><span class="content">v1</span></span>
-  <span class="key">username</span>: <span class="string"><span class="content">yourbintrayusername</span></span>
-  <span class="key">token</span>: <span class="string"><span class="content">XXXXXXXXXXX</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">github</span>:
+  <span class="key">organization</span>: <span class="string"><span class="content">micronaut-projects</span></span>
+  <span class="key">repo</span>: <span class="string"><span class="content">micronaut-core</span></span>
+  <span class="key">username</span>: <span class="string"><span class="content">yourgithubusername</span></span>
+  <span class="key">token</span>: <span class="string"><span class="content">xxxxxxxxxxxx</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -762,11 +768,15 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 </div>
 </div>
 <div class="paragraph">
-<p>If you run again the tests, you will see the that the Filter is invoked and HTTP Basic Auth is used against Bintray API.</p>
+<p>If you run again the tests, you will see the that the Filter is invoked and HTTP Basic Auth is used against GitHub API.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">13:21:08.981 [nioEventLoopGroup-1-14] TRACE i.m.http.client.DefaultHttpClient - Authorization: Basic XXXXXXXXXXXXXX</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">13:09:56.662 [default-nioEventLoopGroup-1-4] DEBUG i.m.h.client.netty.DefaultHttpClient - Sending HTTP GET to https://api.github.com/repos/micronaut-projects/micronaut-core/releases
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - User-Agent: Micronaut HTTP Client
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Accept: application/json
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Authorization: Basic xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+13:09:56.664 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - host: api.github.com</code></pre>
 </div>
 </div>
 </div>
