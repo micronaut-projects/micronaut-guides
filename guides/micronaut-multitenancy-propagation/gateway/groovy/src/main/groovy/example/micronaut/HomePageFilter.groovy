@@ -12,7 +12,6 @@ import io.micronaut.multitenancy.exceptions.TenantNotFoundException
 import io.micronaut.multitenancy.tenantresolver.TenantResolver
 import org.reactivestreams.Publisher
 
-
 @Filter("/") // <1>
 class HomePageFilter extends OncePerRequestHttpServerFilter {
 
@@ -24,7 +23,8 @@ class HomePageFilter extends OncePerRequestHttpServerFilter {
     }
 
     @Override
-    protected Publisher<MutableHttpResponse<?>> doFilterOnce(HttpRequest<?> request, ServerFilterChain chain) {
+    protected Publisher<MutableHttpResponse<?>> doFilterOnce(HttpRequest<?> request,
+                                                             ServerFilterChain chain) {
         try {
             tenantResolver.resolveTenantIdentifier()
         } catch (TenantNotFoundException e) {
