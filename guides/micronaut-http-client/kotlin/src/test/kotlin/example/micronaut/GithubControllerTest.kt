@@ -6,14 +6,15 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.RxStreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.util.*
 import java.util.stream.StreamSupport
 import javax.inject.Inject
 
 @MicronautTest // <1>
-internal class GithubControllerTest {
+class GithubControllerTest {
 
     @Inject
     @field:Client("/")
@@ -27,15 +28,15 @@ internal class GithubControllerTest {
             Argument.listOf(GithubRelease::class.java)) // <4>
 
         //then: 'the endpoint can be accessed'
-        Assertions.assertEquals(HttpStatus.OK, rsp.status) // <5>
-        Assertions.assertNotNull(rsp.body()) // <6>
+        assertEquals(HttpStatus.OK, rsp.status) // <5>
+        assertNotNull(rsp.body()) // <6>
 
         //when:
         val releases = rsp.body()
 
         //then:
         for (name in expectedReleases) {
-            Assertions.assertTrue(releases.stream().map(GithubRelease::name).anyMatch { anObject: String? -> name.equals(anObject) })
+            assertTrue(releases.stream().map(GithubRelease::name).anyMatch { anObject: String? -> name.equals(anObject) })
         }
     }
 
@@ -48,13 +49,13 @@ internal class GithubControllerTest {
 
         //then:
         for (name in expectedReleases) {
-            Assertions.assertTrue(StreamSupport.stream(githubReleases.spliterator(), false)
+            assertTrue(StreamSupport.stream(githubReleases.spliterator(), false)
                 .map(GithubRelease::name)
                 .anyMatch { anObject: String? -> name.equals(anObject) })
         }
     }
 
     companion object {
-        private val expectedReleases = Arrays.asList("Micronaut 2.5.0", "Micronaut 2.4.4", "Micronaut 2.4.3")
+        private val expectedReleases = listOf("Micronaut 2.5.0", "Micronaut 2.4.4", "Micronaut 2.4.3")
     }
 }

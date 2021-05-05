@@ -26,7 +26,7 @@ class GithubController {
     }
 
     @Get(uri = "/releases", produces = MediaType.APPLICATION_JSON_STREAM) // <5>
-    Flowable<GithubRelease> packages() { // <6>
+    Flowable<GithubRelease> fetchReleases() { // <6>
         return githubApiClient.fetchReleases()
     }
 }

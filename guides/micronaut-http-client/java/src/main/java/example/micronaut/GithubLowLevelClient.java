@@ -12,6 +12,9 @@ import javax.inject.Singleton;
 import java.net.URI;
 import java.util.List;
 
+import static io.micronaut.http.HttpHeaders.ACCEPT;
+import static io.micronaut.http.HttpHeaders.USER_AGENT;
+
 @Singleton // <1>
 public class GithubLowLevelClient {
 
@@ -30,8 +33,9 @@ public class GithubLowLevelClient {
 
     Maybe<List<GithubRelease>> fetchReleases() {
         HttpRequest<?> req = HttpRequest.GET(uri) // <4>
-                .header("User-Agent", "Micronaut HTTP Client"); // <5>
-        Flowable<List<GithubRelease>> flowable = httpClient.retrieve(req, Argument.listOf(GithubRelease.class)); // <6>
-        return flowable.firstElement(); // <7>
+                .header(USER_AGENT, "Micronaut HTTP Client") // <5>
+                .header(ACCEPT, "application/vnd.github.v3+json, application/json"); // <6>
+        Flowable<List<GithubRelease>> flowable = httpClient.retrieve(req, Argument.listOf(GithubRelease.class)); // <7>
+        return flowable.firstElement(); // <8>
     }
 }

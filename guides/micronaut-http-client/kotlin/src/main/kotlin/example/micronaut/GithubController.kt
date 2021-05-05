@@ -16,7 +16,7 @@ class GithubController(private val githubLowLevelClient: GithubLowLevelClient, /
     }
 
     @Get(uri = "/releases", produces = [MediaType.APPLICATION_JSON_STREAM]) // <5>
-    fun packages(): Flowable<GithubRelease?>? { // <6>
+    fun fetchReleases(): Flowable<GithubRelease?>? { // <6>
         return githubApiClient.fetchReleases()
     }
 }

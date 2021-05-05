@@ -1,6 +1,8 @@
 package example.micronaut
 
 import io.micronaut.core.type.Argument
+import io.micronaut.http.HttpHeaders.ACCEPT
+import io.micronaut.http.HttpHeaders.USER_AGENT
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
@@ -20,8 +22,9 @@ class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) pri
 
     fun fetchReleases(): Maybe<List<GithubRelease>> {
         val req: HttpRequest<*> = HttpRequest.GET<Any>(uri) // <4>
-            .header("User-Agent", "Micronaut HTTP Client") // <5>
-        val flowable = httpClient.retrieve(req, Argument.listOf(GithubRelease::class.java)) // <6>
-        return flowable.firstElement() // <7>
+            .header(USER_AGENT, "Micronaut HTTP Client") // <5>
+            .header(ACCEPT, "application/vnd.github.v3+json, application/json") // <6>
+        val flowable = httpClient.retrieve(req, Argument.listOf(GithubRelease::class.java)) // <7>
+        return flowable.firstElement() // <8>
     }
 }
