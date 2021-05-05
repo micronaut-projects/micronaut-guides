@@ -3,13 +3,12 @@ package example.micronaut;
 import io.micronaut.core.annotation.Introspected;
 
 @Introspected
-public class BintrayPackage {
+public class GithubRelease {
 
     private String name;
-    private boolean linked;
+    private String url;
 
-    public BintrayPackage() {
-
+    public GithubRelease() {
     }
 
     public String getName() {
@@ -20,11 +19,11 @@ public class BintrayPackage {
         this.name = name;
     }
 
-    public boolean isLinked() {
-        return linked;
+    public String getUrl() {
+        return url;
     }
 
-    public void setLinked(boolean linked) {
-        this.linked = linked;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

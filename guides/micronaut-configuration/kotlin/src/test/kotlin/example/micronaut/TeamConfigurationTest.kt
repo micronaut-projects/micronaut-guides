@@ -3,9 +3,8 @@ package example.micronaut
 import io.micronaut.context.ApplicationContext
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Arrays
 import java.util.function.Consumer
-import kotlin.collections.HashMap
 
 class TeamConfigurationTest {
     //tag::teamConfigSpecNoBuilder[]

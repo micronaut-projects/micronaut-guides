@@ -70,7 +70,7 @@ class SendGridEmailService(@Value("\${SENDGRID_APIKEY:none}") apiKeyEnv: String,
             request.body = mail.build()
             val response = sg.api(request)
             if (LOG.isInfoEnabled) {
-                LOG.info("Status Code: {}", response.statusCode.toString())
+                LOG.info("Status Code: {}", response.statusCode)
                 LOG.info("Body: {}", response.body)
                 for (k in response.headers.keys) {
                     val v = response.headers[k]

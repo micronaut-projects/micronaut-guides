@@ -1,6 +1,6 @@
 package example.micronaut;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import io.micronaut.core.annotation.NonNull;
 import io.reactivex.Maybe;
 import javax.validation.constraints.NotBlank;
 

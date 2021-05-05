@@ -8,7 +8,7 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-In this guide we are going to create a Micronaut app written in @language@ to consume the Bintray API with the Micronaut HTTP Client.
+In this guide we are going to create a Micronaut app written in @language@ to consume the GitHub API with the Micronaut HTTP Client.
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -18,14 +18,14 @@ include::{commondir}/common-completesolution.adoc[]
 include::{commondir}/common-create-app.adoc[]
 
 
-=== Bintray API
+=== GitHub API
 
-In this guide, you are going to consume the https://bintray.com/docs/api/[Bintray API] from a Micronaut application.
+In this guide, you are going to consume the https://docs.github.com/en/rest[GitHub API] from a Micronaut application.
 
-In particular, we consume the https://bintray.com/docs/api/#_get_packages[Get Packages] endpoint.
+In particular, we consume the https://docs.github.com/en/rest/reference/repos#list-releases[List releases] endpoint.
 
 ____
-Get a list of packages in the specified repository, optionally specify a starting position and/or a name prefix filter.
+This returns a list of releases, which does not include regular Git tags that have not been associated with a release.
 ____
 
 This API resource can be consumed by both authenticated and anonymous clients.
@@ -34,16 +34,15 @@ Initially, you will consume it anonymously, later we will discuss authentication
 
 Modify `src/main/resources/application.yml` to create some configuration parameters.
 
-resource:application.yml[tag=bintrayconfig]
+resource:application.yml[tag=githubconfig]
 
 To encapsulate type-safe configuration retrieval, we use a https://docs.micronaut.io/latest/guide/index.html#configurationProperties[`@ConfigurationProperties`] object:
 
-source:BintrayConfiguration[]
+source:GithubConfiguration[]
 
-In this guide, you are going to fetch https://bintray.com/micronaut/profiles[Micronaut profiles packages]. Those packages
-are used by the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut CLI].
+In this guide, you are going to fetch https://github.com/micronaut-projects/micronaut-core/releases[Micronaut Core releases].
 
-To consume the Bintray API, you will use Micronaut HTTP Client.
+To consume the GitHub API, you will use Micronaut HTTP Client.
 
 
 === Low Level Client
@@ -52,18 +51,20 @@ Initially, you will create a Bean which uses the low-level Client API.
 
 Create a POJO to parse the JSON response into an object:
 
-source:BintrayPackage[]
+source:GithubRelease[]
 
-Create `BintrayLowLevelClient`:
+Create `GithubLowLevelClient`:
 
-source:BintrayLowLevelClient[]
+source:GithubLowLevelClient[]
 
 <1> Use `javax.inject.Singleton` to designate a class as a singleton.
 <2> Inject `RxClient` via constructor injection.
 <3> Inject the previously defined configuration parameters.
 <4> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
-<5> Use `retrieve` to perform an HTTP request for the given request object and convert the full HTTP response's body into the specified type. e.g. `List<BintrayPackage>`.
-<6> The `retrieve` method returns a Flowable which has a firstElement method that returns the first emitted item or nothing
+<5> GitHub API requires to set the `User-Agent` header.
+<6> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
+<7> Use `retrieve` to perform an HTTP request for the given request object and convert the full HTTP response's body into the specified type. e.g. `List<GithubRelease>`.
+<8> The `retrieve` method returns a Flowable which has a firstElement method that returns the first emitted item or nothing
 
 NOTE: Instead of `retrieve` we could have used `jsonStream`. You can use `jsonStream()` to stream arrays of type `application/json` or
 JSON streams of type `application/x-json-stream`. If we use `retrieve`, such as in the previous code listing, the operation will not block.
@@ -77,13 +78,15 @@ For example, `jsonStream().firstElement()` will only parse the first item in a J
 
 It is time to take a look at Micronaut's support for declarative clients via the Client annotation.
 
-Create `BintrayClient` which clearly illustrates how a declarative Micronaut HTTP Client, which is generated at compile-time, simplifies our code.
+Create `GithubApiClient` which clearly illustrates how a declarative Micronaut HTTP Client, which is generated at compile-time, simplifies our code.
 
-source:BintrayClient[]
+source:GithubApiClient[]
 
 <1> URL of the remote service
-<2> You can use configuration parameter interpolation when you define the path of the GET endpoint.
-<3> You can return reactive types, such as an RxJava `Flowable`.
+<2> GitHub API requires to set the `User-Agent` header.
+<3> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
+<4> You can use configuration parameter interpolation when you define the path of the GET endpoint.
+<5> You can return reactive types, such as an RxJava `Flowable`.
 
 
 
@@ -96,25 +99,25 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 * Micronaut enables you to consume/produce https://docs.micronaut.io/latest/guide/index.html#clientStreaming[JSON Streams].
 
 
-source:BintrayController[]
+source:GithubController[]
 
-<1> The class is defined as a controller with the http://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/bintray`.
+<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/github`.
 <2> Inject beans via constructor injection.
-<3> The http://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the index method to all requests that use an HTTP GET
-<4> The `packagesWithLowLevelClient` returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.
+<3> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the index method to all requests that use an HTTP GET
+<4> The `releasesWithLowLevelClient` returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.
 <5> In order to do JSON streaming you can declare a controller method that returns a `application/x-json-stream` of JSON objects.
 <6> You can return reactive types, such as an RxJava `Flowable`.
 
 
 === Tests
 
-Create a test which verifies both clients work as expected and the controller echoes the output of the Bintray API in a Reactive way.
+Create a test which verifies both clients work as expected and the controller echoes the output of the GitHub API in a Reactive way.
 
-test:BintrayControllerTest[]
+test:GithubControllerTest[]
 
 <1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
 <2> Inject the `RxStreamingHttpClient` bean in the application context.
-<3> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
+<3> Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 <4> Micronaut makes it easy to parse JSON into Java objects.
 <5> Use `status` to check the HTTP status code.
 <6> Use `.body()` to retrieve the parsed payload.
@@ -126,37 +129,35 @@ include::{commondir}/common-testApp.adoc[]
 
 == HTTP Client Filter
 
-Often, you need to include the same HTTP headers or URL parameters in a set of requests against a third-party API or when calling another Microservice.
+Often, you need to include the same HTTP headers or URL parameters in a set of requests against a third-party API or when
+calling another Microservice. To simplify this, Micronaut includes the ability to define `HttpClientFilter` classes that
+are applied to all matching HTTP clients.
 
-To simplify this, Micronaut includes the ability to define `HttpClientFilter` classes that are applied to all matching HTTP clients.
-
-For real world example, let us provide Bintray Authentication via a `HttpClientFilter`:
-
-____
-The Bintray REST API requires an applicative API key. An API key can be obtained from the user profile page. Authentication is achieved using HTTP Basic Authentication with the user’s name as username and the API key as the password. Authenticated REST calls should only be used via HTTPs.
-____
+For a real world example, let us provide GitHub Authentication via an `HttpClientFilter`. Follow the steps in
+https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token[to create you own Personal Token].
+Then you can use those credentials to access the GitHub API
+https://docs.github.com/en/rest/overview/other-authentication-methods#via-oauth-and-personal-access-tokens[using Basic Auth].
 
 Create a Filter:
 
-source:BintrayFilter[]
+source:GithubFilter[]
 
 <1> Supply the pattern you want to match to the `@Filter` annotation.
-<2> Bean will not loaded unless configuration properties are set.
+<2> Micronaut will not load the Bean unless configuration properties are set.
 <3> Constructor injection of the configuration parameters.
-<4> Enhance every request sent to Bintray API providing Basic Authentication.
+<4> Enhance every request sent to GitHub API providing Basic Authentication.
 
 === Configuration Parameters
 
-Add your Bintray `username` and `token` to `src/main/resource/application.yml`
+Add your GitHub `username` and `token` to `src/main/resource/application.yml`
 
 [source, yaml]
 ----
-bintray:
-  organization: micronaut
-  repository: profiles
-  apiversion: v1
-  username: yourbintrayusername
-  token: XXXXXXXXXXX
+github:
+  organization: micronaut-projects
+  repo: micronaut-core
+  username: yourgithubusername
+  token: xxxxxxxxxxxx
 ----
 
 Add to `src/main/resources/logback.xml`, a logger to see Micronaut's HTTP client output.
@@ -166,11 +167,15 @@ Add to `src/main/resources/logback.xml`, a logger to see Micronaut's HTTP client
 <logger name="io.micronaut.http.client" level="TRACE"/>
 ----
 
-If you run again the tests, you will see the that the Filter is invoked and HTTP Basic Auth is used against Bintray API.
+If you run again the tests, you will see the that the Filter is invoked and HTTP Basic Auth is used against GitHub API.
 
 [source, bash]
 -----
-13:21:08.981 [nioEventLoopGroup-1-14] TRACE i.m.http.client.DefaultHttpClient - Authorization: Basic XXXXXXXXXXXXXX
+13:09:56.662 [default-nioEventLoopGroup-1-4] DEBUG i.m.h.client.netty.DefaultHttpClient - Sending HTTP GET to https://api.github.com/repos/micronaut-projects/micronaut-core/releases
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - User-Agent: Micronaut HTTP Client
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Accept: application/json
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Authorization: Basic xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+13:09:56.664 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - host: api.github.com
 -----
 
 

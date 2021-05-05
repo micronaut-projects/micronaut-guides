@@ -5,7 +5,7 @@ import io.micronaut.core.annotation.Introspected
 
 @Introspected
 @CompileStatic
-class BintrayPackage {
+class GithubRelease {
     String name
-    boolean linked
+    String url
 }

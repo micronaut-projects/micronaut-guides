@@ -1,11 +1,11 @@
 package io.micronaut.guides
 
-import edu.umd.cs.findbugs.annotations.NonNull
-import edu.umd.cs.findbugs.annotations.Nullable
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
@@ -34,7 +34,7 @@ class GuideProjectGenerator implements Closeable {
     String appName = 'micronautguide'
 
     GuideProjectGenerator() {
-        this.applicationContext = ApplicationContext.run()
+        applicationContext = ApplicationContext.run()
         guidesGenerator = applicationContext.getBean(GuidesGenerator)
     }
 
@@ -45,7 +45,7 @@ class GuideProjectGenerator implements Closeable {
 
     @CompileDynamic
     static List<GuideMetadata> parseGuidesMetadata(File guidesFolder,
-                                                  String metadataConfigName) {
+                                                   String metadataConfigName) {
         List<GuideMetadata> result = []
         guidesFolder.eachDir { dir ->
             result << parseGuideMetadata(dir, metadataConfigName)
@@ -55,7 +55,7 @@ class GuideProjectGenerator implements Closeable {
 
     @CompileDynamic
     static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
-        File configFile = new File("$dir/$metadataConfigName")
+        File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
             throw new GradleException("metadata file not found for ${dir.name}")
         }
@@ -64,7 +64,8 @@ class GuideProjectGenerator implements Closeable {
         if (!cat) {
             throw new GradleException("$config.category does not exist in Category enum")
         }
-        new GuideMetadata(asciidoctor: config.asciidoctor,
+        new GuideMetadata(
+                asciidoctor: config.asciidoctor,
                 slug: config.slug,
                 title: config.title,
                 intro: config.intro,
@@ -102,10 +103,8 @@ class GuideProjectGenerator implements Closeable {
         }
     }
 
-
     static String folderName(String slug, GuidesOption guidesOption) {
-
-        "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language.toString()}".toString()
+        "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language}"
     }
 
     static JdkVersion parseJdkVersion() {
@@ -114,7 +113,7 @@ class GuideProjectGenerator implements Closeable {
             try {
                 int mayorVersion = Integer.valueOf(System.getenv(ENV_JDK_VERSION))
                 javaVersion = JdkVersion.valueOf(mayorVersion)
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
                 throw new GradleException("Could not parse env " + ENV_JDK_VERSION + " to JdkVersion")
             }
         }
@@ -132,9 +131,8 @@ class GuideProjectGenerator implements Closeable {
             TestFramework testFramework = guidesOption.testFramework
             Language lang = guidesOption.language
 
-
             if (!outputDir.exists()) {
-                outputDir.mkdir()
+                assert outputDir.mkdir()
             }
 
             for (App app: metadata.apps) {

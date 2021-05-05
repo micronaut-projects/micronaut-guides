@@ -1,6 +1,6 @@
 package example.micronaut.genre;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import io.micronaut.core.annotation.NonNull;
 import example.micronaut.ListingArguments;
 import example.micronaut.domain.Genre;
 

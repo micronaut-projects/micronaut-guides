@@ -1,6 +1,6 @@
 package example.micronaut;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.uri.UriBuilder;
 

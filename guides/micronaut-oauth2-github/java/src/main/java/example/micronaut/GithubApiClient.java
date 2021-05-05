@@ -1,6 +1,7 @@
 //tag::clazz[]
 package example.micronaut;
 
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
@@ -8,7 +9,6 @@ import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.client.annotation.Client;
 import io.reactivex.Flowable;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 

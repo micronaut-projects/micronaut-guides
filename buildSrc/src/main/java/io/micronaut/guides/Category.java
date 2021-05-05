@@ -12,7 +12,8 @@ public enum Category {
     AWS("AWS"),
     AZURE("Micronaut + Microsoft Azure"),
     GCP("Micronaut + Google Cloud");
-    private String val;
+
+    private final String val;
 
     Category(String val) {
         this.val = val;

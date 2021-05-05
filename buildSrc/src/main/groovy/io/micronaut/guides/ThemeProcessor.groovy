@@ -24,7 +24,7 @@ class ThemeProcessor {
 
                 String text = templateText
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                File output = new File(dist.path + "/" + folder + ".html")
+                File output = new File(dist.path, folder + ".html")
                 String html = output.text
 
                 String toc = html.indexOf(startDivContent) != -1 ? html.substring(html.indexOf(tocStart) + tocStart.length(),
@@ -42,7 +42,7 @@ class ThemeProcessor {
 ''' + content) : ''
                 text = text.replace("@title@", metadata.title)
 
-                String breadcrumb = '<a href="'+ metadata.slug +'.html">' + metadata.title + '</a> » <span class="breadcrumb_last" aria-current="page">' + guidesOption.buildTool.toString() + ' | ' + guidesOption.language.toString()  + '</span>'
+                String breadcrumb = '<a href="'+ metadata.slug +'.html">' + metadata.title + '</a> » <span class="breadcrumb_last" aria-current="page">' + guidesOption.buildTool + ' | ' + guidesOption.language  + '</span>'
                 text = text.replace("@breadcrumb@", breadcrumb)
                 text = text.replace("@toctitle@", 'Table of Contents')
                 text = text.replace("@bodyclass@", 'guide')
