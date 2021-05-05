@@ -8,14 +8,14 @@ import io.micronaut.http.filter.ClientFilterChain;
 import io.micronaut.http.filter.HttpClientFilter;
 import org.reactivestreams.Publisher;
 
-@Filter("/api/${bintray.apiversion}/repos/**") // <1>
-@Requires(property = BintrayConfiguration.PREFIX + ".username") // <2>
-@Requires(property = BintrayConfiguration.PREFIX + ".token") // <2>
-public class BintrayFilter implements HttpClientFilter {
+@Filter("/repos/**") // <1>
+@Requires(property = GithubConfiguration.PREFIX + ".username") // <2>
+@Requires(property = GithubConfiguration.PREFIX + ".token") // <2>
+public class GithubFilter implements HttpClientFilter {
 
-    private final BintrayConfiguration configuration;
+    private final GithubConfiguration configuration;
 
-    public BintrayFilter(BintrayConfiguration configuration) { // <3>
+    public GithubFilter(GithubConfiguration configuration) { // <3>
         this.configuration = configuration;
     }
 
