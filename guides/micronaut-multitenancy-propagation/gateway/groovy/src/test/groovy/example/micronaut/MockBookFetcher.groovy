@@ -20,6 +20,6 @@ class MockBookFetcher implements BookFetcher {
             "The Geek Interpreter",
             "The Great Game",
             "The Blind Banker",
-            "A Study in Pink"].collect { new Book(it) }
+            "A Study in Pink"].collect { new Book(title: it) }
     }
 }
