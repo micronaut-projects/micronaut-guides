@@ -276,6 +276,7 @@ class GuideAsciidocGenerator {
                 return 'yaml'
             case 'html':
             case 'vm':
+            case 'hbs':
                 return 'html'
             case 'xml':
                 return 'xml'
