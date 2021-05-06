@@ -1,0 +1,115 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide --feature=aws-lambda --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], add `aws-lambda` feature.
+
+include::{commondir}/common-default-package.adoc[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+
+The generated application contains a `BookController`. It responds to POST request to `/`.
+
+source:BookController[]
+
+* The class is defined as a controller with the `@Controller` annotation mapped to the path /
+* The `@Post` annotation is used to map HTTP request to `/` to the the `save` method.
+* Add the `@Valid` annotation to any method parameter's object which requires validation.
+
+The controller's method parameter is a `Book` object:
+
+source:Book[]
+
+* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+
+It returns a `BookSaved` object:
+
+source:BookSaved[]
+
+* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+
+The generated tests illustrates how the code works when the lambda gets invoked:
+
+test:BookControllerTest[]
+
+* When you instantiate the Handler, the application context starts.
+* Remember to close your application context when you end your test. You can use your handler to obtain it.
+* You don't invoke the controller directly. Instead, your handler receives a AWS Proxy Request event which it is routed transparently to your controller.
+
+include::{commondir}/common-testApp.adoc[]
+
+== Lambda
+
+Create a Lambda Function. As a runtime, select Java 11 (Correto).
+
+image::create-function.png[]
+
+=== Upload Code
+
+include::{commondir}/common-executable-jar.adoc[]
+
+Upload it:
+
+image::upload-function-code.png[]
+
+=== Handler
+
+As Handler, set:
+
+`io.micronaut.function.aws.proxy.MicronautLambdaHandler`
+
+image::handler.png[]
+
+=== Test
+
+You can test it easily. As `Event Template` use `apigateway-aws-proxy` to get you started:
+
+image::test-event.png[]
+
+[source, json]
+----
+{
+  "body": "{\"name\": \"Building Microservices\"}",
+  "resource": "/",
+  "path": "/",
+  "httpMethod": "POST",
+  "isBase64Encoded": false,
+  "queryStringParameters": {},
+  "multiValueQueryStringParameters": {},
+  "pathParameters": {},
+  "stageVariables": {},
+  ...
+}
+----
+
+You should see a 200 response:
+
+image::test-result.png[]
+
+include::{commondir}/common-next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
