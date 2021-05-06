@@ -71,7 +71,7 @@ fi
 cd ${nestedFolder}
 echo "-------------------------------------------------"
 echo "Executing '${folder}' tests"
-${buildTool == BuildTool.MAVEN ? './mvnw test' : './gradlew test' } || EXIT_STATUS=\$?
+${buildTool == BuildTool.MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
 cd ..
 """
         if (stopIfFailure) {
