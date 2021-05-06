@@ -80,7 +80,7 @@ class GuideProjectGenerator implements Closeable {
                 skipMavenTests: config.skipMavenTests ?: false,
                 apps: config.apps.collect { it -> new App(name: it.name,
                         features: it.features,
-                        applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType) : ApplicationType.DEFAULT)
+                        applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT)
                 }
         )
     }
