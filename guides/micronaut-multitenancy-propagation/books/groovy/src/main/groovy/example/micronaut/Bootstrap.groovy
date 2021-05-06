@@ -8,7 +8,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
+import groovy.transform.CompileStatic
 
+@CompileStatic
 @Requires(notEnv = Environment.TEST) // <1>
 @Singleton // <2>
 class Bootstrap implements ApplicationEventListener<StartupEvent> { // <3>

@@ -2,7 +2,9 @@ package example.micronaut
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
+import groovy.transform.CompileStatic
 
+@CompileStatic
 @Controller("/books") // <1>
 class BookController {
 
@@ -14,6 +16,6 @@ class BookController {
 
     @Get
     List<BookResponse> index() {
-        bookService.findAll().collect { it -> new BookResponse(title: it.title) }
+        bookService.findAll().collect { new BookResponse(title: it.title) }
     }
 }

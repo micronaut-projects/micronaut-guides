@@ -5,6 +5,9 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.views.View
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 @Controller // <1>
 class HomeController {
 
@@ -17,12 +20,10 @@ class HomeController {
     @View("home") // <3>
     @Get // <4>
     HttpResponse<Map<String, Object>> index() {
-        List<Book> books = bookFetcher.fetchBooks()
-
-        Map<String, Object> model = new HashMap<>()
-        model["pagetitle"] = "Home"
-        model["books"] = books.collect { it.title }
-        HttpResponse.ok(model)  // <5>
+        HttpResponse.ok([
+                pagetitle: "Home",
+                books: bookFetcher.fetchBooks().collect { it.title }
+        ] as Map<String, Object>) // <5>
     }
 
 }

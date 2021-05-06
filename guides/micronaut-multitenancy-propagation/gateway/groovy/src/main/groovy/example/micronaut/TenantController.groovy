@@ -7,8 +7,9 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.cookie.Cookie
 import io.micronaut.multitenancy.tenantresolver.CookieTenantResolverConfiguration
 import io.micronaut.views.View
+import groovy.transform.CompileStatic
 
-
+@CompileStatic
 @Controller("/tenant") // <1>
 class TenantController {
     private final CookieTenantResolverConfiguration cookieTenantResolverConfiguration
@@ -20,10 +21,10 @@ class TenantController {
     @View("tenant") // <3>
     @Get // <4>
     HttpResponse<Map<String, Object>> index() {
-        Map<String, Object> model = new HashMap<>()
-        model["pagetitle"] = "Tenants"
-        model["tenants"] = ["sherlock", "watson"]
-        HttpResponse.ok(model)
+        HttpResponse.ok([
+                pagetitle: "Tenants",
+                tenants: ["sherlock", "watson"]
+        ] as Map<String, Object>)
     }
 
     @Get("/{tenant}") // <5>

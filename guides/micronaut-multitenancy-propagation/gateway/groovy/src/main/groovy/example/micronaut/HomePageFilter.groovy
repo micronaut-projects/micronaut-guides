@@ -12,6 +12,9 @@ import io.micronaut.multitenancy.exceptions.TenantNotFoundException
 import io.micronaut.multitenancy.tenantresolver.TenantResolver
 import org.reactivestreams.Publisher
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 @Filter("/") // <1>
 class HomePageFilter extends OncePerRequestHttpServerFilter {
 
