@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Micronaut Multitenancy Propagation</title>
+    <link rel="canonical" href="@canonical@"/>
+
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut Framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-multitenancy-propagation.html">Micronaut Multitenancy Propagation</a> » <span class="breadcrumb_last" aria-current="page">gradle | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-app">4. Writing the App</a></li>
+<li><a href="#gateway">5. Gateway</a>
+<ul class="sectlevel2">
+<li><a href="#multitenancy-configuration">5.1. Multitenancy Configuration</a></li>
+<li><a href="#http-filter-cookie-redirect">5.2. Http Filter &amp; Cookie Redirect</a></li>
+<li><a href="#http-client">5.3. Http Client</a></li>
+<li><a href="#home-controller">5.4. Home Controller</a></li>
+<li><a href="#tenant-controller">5.5. Tenant Controller</a></li>
+<li><a href="#tenant-view">5.6. Tenant View</a></li>
+<li><a href="#tests">5.7. Tests</a></li>
+</ul>
+</li>
+<li><a href="#books-microservice">6. Books Microservice</a>
+<ul class="sectlevel2">
+<li><a href="#gorm">6.1. GORM</a></li>
+<li><a href="#domain">6.2. Domain</a></li>
+<li><a href="#data-service">6.3. Data Service</a></li>
+<li><a href="#controller">6.4. Controller</a></li>
+<li><a href="#bootstrap">6.5. Bootstrap</a></li>
+<li><a href="#book-tests">6.6. Book Tests</a></li>
+</ul>
+</li>
+<li><a href="#running-the-app">7. Running the app</a></li>
+<li><a href="#next-steps">8. Next Steps</a></li>
+<li><a href="#help-with-micronaut">9. Help with Micronaut</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Micronaut Multitenancy Propagation</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to Micronaut helps you implement Multitenancy in a set of Microservices.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 2.5.0</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we are going to create two microservices and configure them to use multitenancy with tenant propagation.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s describe the microservices you are going to build through the tutorial.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>gateway</code> - A microservice which resolves a Tenant ID with a Cookie and propagates the Tenant ID to outgoing requests via HTTP Header.</p>
+</li>
+<li>
+<p><code>books</code> - A microservice which uses <a href="http://gorm.grails.org">GORM</a> to provide data access layer with multitenacy support.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The next diagram illustrates the flow:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/tokenpropagation.svg" alt="tokenpropagation">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the app step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-multitenancy-propagation-gradle-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-app">4. Writing the App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will be using Groovy for this guide in order to demonstrate the use of multitenancy with <a href="http://gorm.grails.org">GORM</a>, the powerful Groovy-based data access toolkit from the Grails framework.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="gateway">5. Gateway</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create the microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.gateway --test=spock --lang=groovy</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the previous command, we are generating a Micronaut app and telling the CLI to use <a href="https://spockframework.org">Spock</a> as the test framework.</p>
+</div>
+<div class="sect2">
+<h3 id="multitenancy-configuration">5.1. Multitenancy Configuration</h3>
+<div class="paragraph">
+<p>Multi-Tenancy, as it relates to software development, is when a single instance of an application is used to service multiple clients (tenants) in a way that each tenants' data is isolated from the other.</p>
+</div>
+<div class="paragraph">
+<p>To use the Micronaut’s multitenancy capabilities you must have the multitenancy dependency on your classpath.
+For example in <code>build.gradle:</code></p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.multitenancy:micronaut-multitenancy</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">multitenancy</span>:
+    <span class="key">propagation</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="key">service-id-regex</span>: <span class="string"><span class="content">'books' </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="key">tenantresolver</span>:
+      <span class="key">cookie</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="key">tenantwriter</span>:
+      <span class="key">httpheader</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Enable tenant propagation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Propagate the resolved tenant ID only in requests going to a particular set of services.
+In our example, we define a regex to match the service id <code>books</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>In the gateway we use the <a href="https://docs.micronaut.io/snapshot/api/io/micronaut/multitenancy/tenantresolver/CookieTenantResolver.html">CookieTenantResolver</a> which resolves the current tenant from an HTTP cookie.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>We propagate the tenant with a <a href="https://docs.micronaut.io/snapshot/api/io/micronaut/multitenancy/writer/HttpHeaderTenantWriter.html">HttpHeaderTenantWriter</a> which writes the current tenant to a HTTP Header.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="http-filter-cookie-redirect">5.2. Http Filter &amp; Cookie Redirect</h3>
+<div class="paragraph">
+<p>The Micronaut HTTP server supports the ability to apply filters to request/response processing in a similar, but reactive, way to Servlet filters in traditional Java applications.</p>
+</div>
+<div class="paragraph">
+<p>Create a filter to redirect to <code>/tenant</code> if you attempt to access <code>/</code> without a cookie.
+That it is to say, in a situation where the application is not able to resolve the tenant ID.</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/groovy/example/micronaut/HomePageFilter.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.filter.ServerFilterPhase</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.async.publisher.Publishers</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.MutableHttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Filter</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.filter.OncePerRequestHttpServerFilter</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.filter.ServerFilterChain</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.multitenancy.exceptions.TenantNotFoundException</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.multitenancy.tenantresolver.TenantResolver</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Filter</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">HomePageFilter</span> <span class="directive">extends</span> OncePerRequestHttpServerFilter {
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> TENANT = <span class="string"><span class="delimiter">&quot;</span><span class="content">/tenant</span><span class="delimiter">&quot;</span></span>
+    <span class="directive">private</span> <span class="directive">final</span> TenantResolver tenantResolver
+
+    HomePageFilter(TenantResolver tenantResolver) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.tenantResolver = tenantResolver
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">protected</span> Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilterOnce(HttpRequest&lt;?&gt; request,
+                                                             ServerFilterChain chain) {
+        <span class="keyword">try</span> {
+            tenantResolver.resolveTenantIdentifier()
+        } <span class="keyword">catch</span> (TenantNotFoundException e) {
+            <span class="keyword">return</span> Publishers.just(HttpResponse.seeOther(<span class="predefined-type">URI</span>.create(TENANT)))
+        }
+        chain.proceed(request)
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">int</span> getOrder() {
+        ServerFilterPhase.SECURITY.order()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>You can match only a subset of paths with a server filter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Constructor injection.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="http-client">5.3. Http Client</h3>
+<div class="paragraph">
+<p>Create an interface to encapsulate the communication with the <code>books</code> microservice which we will create shortly.</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/groovy/example/micronaut/Book.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">Book</span> {
+    <span class="predefined-type">String</span> title
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/groovy/example/micronaut/BookFetcher.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="type">interface</span> BookFetcher {
+
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; fetchBooks()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a <a href="https://docs.micronaut.io/snapshot/guide/index.html#clientAnnotation">declarative HTTP client</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/groovy/example/micronaut/BookClient.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+
+<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Requires</span>(notEnv = Environment.TEST) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">interface</span> BookClient <span class="directive">extends</span> BookFetcher {
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; fetchBooks()
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>@Client</code> annotation uses a service id which matches the regular expression we defined in the propagation configuration.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We don&#8217;t want to load this bean in the <code>test</code> environment.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>We configure the path <code>/books</code> and HTTP method of the endpoint exposed by <code>books</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Configure the urls for the service id <code>books</code>.
+Modify <code>application.yml</code></p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">http</span>:
+    <span class="key">services</span>:
+      <span class="key">books</span>: <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="key">urls</span>:
+          - <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:8081</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Same id we used with <code>@Client</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>url where the <code>books</code> service will reside.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="home-controller">5.4. Home Controller</h3>
+<div class="paragraph">
+<p>The <code>views</code> module provides support for view rendering on the server side and does so by rendering views on the I/O thread pool in order to avoid blocking the Netty event loop.
+Add the <code>views</code> dependency to  <code>build.gradle:</code></p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.views:micronaut-views-handlebars</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous dependency includes <a href="https://micronaut-projects.github.io/micronaut-views/latest/api/index.html">HandlebarsViewsRenderer</a> which uses the <a href="http://jknack.github.io/handlebars.java/">Handlebars.java</a> project.</p>
+</div>
+<div class="paragraph">
+<p>Create a view which we will use in the <code>HomeController</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/resources/views/home.hbs</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;title&gt;</span>{{ pagetitle }}<span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+<span class="tag">&lt;ul&gt;</span>
+{{#each books}}
+    <span class="tag">&lt;li&gt;</span><span class="tag">&lt;span&gt;</span>{{ this }}<span class="tag">&lt;/span&gt;</span><span class="tag">&lt;/li&gt;</span>
+{{/each}}
+<span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;p&gt;</span><span class="tag">&lt;a</span> <span class="attribute-name">href</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/tenant</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>change tenant<span class="tag">&lt;/a&gt;</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a <code>HomeController</code> which invokes <code>BookClient::fetchBooks()</code> and renders the books using the previous handlebar view.</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/groovy/example/micronaut/HomeController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.views.View</span>
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">HomeController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> BookFetcher bookFetcher
+
+    HomeController(BookFetcher bookFetcher) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.bookFetcher = bookFetcher
+    }
+
+    <span class="annotation">@View</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">home</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Get</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    HttpResponse&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;&gt; index() {
+        HttpResponse.ok([
+                <span class="key">pagetitle</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Home</span><span class="delimiter">&quot;</span></span>,
+                <span class="key">books</span>: bookFetcher.fetchBooks().collect { <span class="local-variable">it</span>.title }
+        ] <span class="keyword">as</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;) <i class="conum" data-value="5"></i><b>(5)</b>
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate with <code>io.micronaut.http.annotation.Controller</code> to designate a class as a Micronaut’s controller.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Constructor dependency injection.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <code>@View</code> annotation to indicate the view name which should be used to render a view for the route.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can specify the HTTP verb that a controller’s action responds to.
+To respond to a GET request, use the <code>io.micronaut.http.annotation.Get</code> annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The model is returned containing the values read from the server</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tenant-controller">5.5. Tenant Controller</h3>
+<div class="paragraph">
+<p><code>HomePageFilter</code> redirects to <code>/tenant</code> when the tenant ID is not resolved. Create <code>TenantController</code> to handle that endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/groovy/example/micronaut/TenantController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.cookie.Cookie</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.multitenancy.tenantresolver.CookieTenantResolverConfiguration</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.views.View</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/tenant</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">TenantController</span> {
+    <span class="directive">private</span> <span class="directive">final</span> CookieTenantResolverConfiguration cookieTenantResolverConfiguration
+
+    TenantController(CookieTenantResolverConfiguration cookieTenantResolverConfiguration) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.cookieTenantResolverConfiguration = cookieTenantResolverConfiguration
+    }
+
+    <span class="annotation">@View</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">tenant</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Get</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    HttpResponse&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;&gt; index() {
+        HttpResponse.ok([
+                <span class="key">pagetitle</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Tenants</span><span class="delimiter">&quot;</span></span>,
+                <span class="key">tenants</span>: [<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">watson</span><span class="delimiter">&quot;</span></span>]
+        ] <span class="keyword">as</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;)
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/{tenant}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
+    HttpResponse tenant(<span class="predefined-type">String</span> tenant) {
+        <span class="directive">final</span> <span class="predefined-type">String</span> path = <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>
+        <span class="directive">final</span> <span class="predefined-type">String</span> cookieName = cookieTenantResolverConfiguration.getCookiename()
+        <span class="keyword">return</span> HttpResponse.status(HttpStatus.FOUND).headers((headers) -&gt;
+                headers.location(<span class="predefined-type">URI</span>.create(path))
+        ).cookie(Cookie.of(cookieName, tenant).path(path)) <i class="conum" data-value="6"></i><b>(6)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <code>@Controller</code> annotation mapped to the path <code>/tenant</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Constructor injection of <code>CookieTenantResolverConfiguration</code>. A configuration object which is used by the <code>CookieTenantResolver`</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <code>@View</code> annotation to indicate the view name which should be used to render a view for the route.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can specify the HTTP verb that a controller’s action responds to. To respond to a GET request, use the <code>io.micronaut.http.annotation.Get</code> annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Define a path variable <code>tenant</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Do a 302 redirect to <code>/</code> setting a cookie with the selected tenant ID.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tenant-view">5.6. Tenant View</h3>
+<div class="paragraph">
+<p>The previous controller renders the <code>tenant</code> view.</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/resources/views/tenant.hbs</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;title&gt;</span>{{ pagetitle }}<span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+<span class="tag">&lt;ul&gt;</span>
+{{#each tenants}}
+    <span class="tag">&lt;li&gt;</span><span class="tag">&lt;a</span> <span class="attribute-name">href</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/tenant/{{ this }}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>{{ this }}<span class="tag">&lt;/a&gt;</span><span class="tag">&lt;/li&gt;</span>
+{{/each}}
+<span class="tag">&lt;/ul&gt;</span>
+
+<span class="tag">&lt;p&gt;</span><span class="tag">&lt;a</span> <span class="attribute-name">href</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Go to Home<span class="tag">&lt;/a&gt;</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tests">5.7. Tests</h3>
+<div class="paragraph">
+<p>Provide a <code>BookFetcher</code> bean replacement for the Test environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/test/groovy/example/micronaut/MockBookFetcher.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
+
+<span class="annotation">@Singleton</span>
+<span class="annotation">@Requires</span>(env = Environment.TEST)
+<span class="type">class</span> <span class="class">MockBookFetcher</span> <span class="directive">implements</span> BookFetcher {
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; fetchBooks() {
+        [
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Empty Hearse</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Hounds of Baskerville</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Woman</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Six Thatchers</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Aluminium Crutch</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Speckled Blonde</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Geek Interpreter</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Great Game</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">The Blind Banker</span><span class="delimiter">&quot;</span></span>,
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">A Study in Pink</span><span class="delimiter">&quot;</span></span>].collect { <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="key">title</span>: <span class="local-variable">it</span>) }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a tests which verifies the flow using <a href="https://gebish.org">Geb</a>.</p>
+</div>
+<div class="paragraph">
+<p>Add dependencies for Geb:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.gebish:geb-spock:4.1</span><span class="delimiter">&quot;</span></span>)
+testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.seleniumhq.selenium:htmlunit-driver:2.49.1</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add a <a href="https://gebish.org/manual/current/#configuration">Geb configuration script</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/test/resources/GebConfig.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code>import org.openqa.selenium.htmlunit.HtmlUnitDriver
+
+// default to use htmlunit
+driver = {
+    HtmlUnitDriver htmlUnitDriver = new HtmlUnitDriver()
+    htmlUnitDriver.javascriptEnabled = true
+    htmlUnitDriver
+}
+
+environments {
+    htmlUnit {
+        driver = {
+            HtmlUnitDriver htmlUnitDriver = new HtmlUnitDriver()
+            htmlUnitDriver.javascriptEnabled = true
+            htmlUnitDriver
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create two Geb Pages:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/test/groovy/example/micronaut/HomePage.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">geb.Page</span>
+
+<span class="type">class</span> <span class="class">HomePage</span> <span class="directive">extends</span> Page {
+
+    <span class="directive">static</span> url = <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>
+
+    <span class="directive">static</span> at = { title == <span class="string"><span class="delimiter">&quot;</span><span class="content">Home</span><span class="delimiter">&quot;</span></span> }
+
+    <span class="directive">static</span> content = {
+        li(<span class="key">required</span>: <span class="predefined-constant">false</span>) { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">li</span><span class="delimiter">'</span></span>) }
+    }
+
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; books() {
+        li.collect { <span class="local-variable">it</span>.text() }
+    }
+
+    <span class="type">int</span> numberOfBooks() {
+        <span class="keyword">if</span> (li.empty) {
+           <span class="keyword">return</span> <span class="integer">0</span>
+        }
+        li.size()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/test/groovy/example/micronaut/TenantPage.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">geb.Page</span>
+
+<span class="type">class</span> <span class="class">TenantPage</span> <span class="directive">extends</span> Page {
+
+    <span class="directive">static</span> url = <span class="string"><span class="delimiter">&quot;</span><span class="content">/tenant</span><span class="delimiter">&quot;</span></span>
+
+    <span class="directive">static</span> at = { title == <span class="string"><span class="delimiter">&quot;</span><span class="content">Tenants</span><span class="delimiter">&quot;</span></span> }
+
+    <span class="directive">static</span> content = {
+        link { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">a</span><span class="delimiter">'</span></span>, <span class="key">text</span>: <span class="local-variable">it</span>) }
+    }
+
+    <span class="type">void</span> select(<span class="predefined-type">String</span> text) {
+        link(text).click()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Write a test which verifies that when the user visits the home page without a tenant is redirected to the tenant selection page.
+After tenant selection, the home page loads a set of books.</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/test/groovy/example/micronaut/HomePageSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">geb.spock.GebSpec</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>
+<span class="keyword">import</span> <span class="include">spock.lang.AutoCleanup</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Shared</span>
+
+<span class="type">class</span> <span class="class">HomePageSpec</span> <span class="directive">extends</span> GebSpec {
+
+    <span class="annotation">@AutoCleanup</span>
+    <span class="annotation">@Shared</span>
+    EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer, [:]) <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">verify tenant can be selected works</span><span class="delimiter">&quot;</span></span>() {
+        <span class="key">given</span>:
+        browser.baseUrl = <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:</span><span class="inline"><span class="inline-delimiter">${</span>embeddedServer.port<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+        <span class="key">when</span>:
+        via HomePage
+
+        <span class="key">then</span>:
+        at TenantPage
+
+        <span class="key">when</span>:
+        TenantPage page = browser.page(TenantPage)
+        page.select(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>)
+
+        <span class="key">then</span>:
+        at HomePage
+
+        <span class="key">when</span>:
+        HomePage homePage = browser.page(HomePage)
+
+        <span class="key">then</span>:
+        homePage.numberOfBooks()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Start an <code>EmbeddedServer</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Point the browser base url to the embedded server url.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="books-microservice">6. Books Microservice</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create the microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.books --lang=groovy</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="gorm">6.1. GORM</h3>
+<div class="paragraph">
+<p><a href="http://gorm.grails.org">GORM</a> is a powerful Groovy-based data access toolkit for the JVM.
+To use it in Micronaut add the following dependencies to <code>build.gradle</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut:micronaut-multitenancy</span><span class="delimiter">&quot;</span></span>)
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.groovy:micronaut-multitenancy-gorm</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure multiple data sources as described in the <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#multipleDataSources">GORM Multiple Data Sources</a> documentation.</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">hibernate</span>:
+  <span class="key">hbm2ddl</span>:
+    <span class="key">auto</span>: <span class="string"><span class="content">'update'</span></span>
+<span class="key">dataSources</span>:
+  <span class="key">sherlock</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">'jdbc:h2:mem:sherlockDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE'</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">'sa'</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">''</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">'org.h2.Driver'</span></span>
+  <span class="key">watson</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">'jdbc:h2:mem:watsonDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE'</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">'sa'</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">''</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">'org.h2.Driver'</span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain">6.2. Domain</h3>
+<div class="paragraph">
+<p>GORM supports several <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#_multi_tenancy_modes">tenancy modes</a>.
+In this tutorial we use <code>DATABASE</code> where a separate database with a separate connection pool is used to store each tenants data.</p>
+</div>
+<div class="paragraph">
+<p>Add the following configuration to <code>application.yml</code></p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">grails</span>:
+  <span class="key">gorm</span>:
+    <span class="key">multiTenancy</span>:
+      <span class="key">mode</span>: <span class="string"><span class="content">'DATABASE' </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="key">tenantResolverClass</span>: <span class="string"><span class="content">'io.micronaut.multitenancy.gorm.HttpHeaderTenantResolver' </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>DATABASE</code> mode.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>HttpHeaderTenantResolver</code> which resolves the tenant ID from an HTTP header.
+Remember we configured the <code>gateway</code> microservice to propagate the tenant ID in an HTTP Header.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a GORM Entity to persist books:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/Book.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">grails.gorm.MultiTenant</span>
+<span class="keyword">import</span> <span class="include">grails.gorm.annotation.Entity</span>
+<span class="keyword">import</span> <span class="include">org.grails.datastore.gorm.GormEntity</span>
+
+<span class="annotation">@Entity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">Book</span> <span class="directive">implements</span> GormEntity&lt;<span class="predefined-type">Book</span>&gt;, <i class="conum" data-value="2"></i><b>(2)</b>
+                MultiTenant { <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="predefined-type">String</span> title
+
+    <span class="directive">static</span> constraints = {
+        title <span class="key">nullable</span>: <span class="predefined-constant">false</span>, <span class="key">blank</span>: <span class="predefined-constant">false</span>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>GORM entities are annotated with <code>grails.persistence.Entity</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use of <code>GormEntity</code> is merely to aid IDE support outside of Grails.
+When used inside a Grails context, some IDEs will use the grails-app/domain location as a hint to enable code completion.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Implement the <code>MultiTenant</code> trait in the GORM entities you want to be regarded as multi tenant.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="data-service">6.3. Data Service</h3>
+<div class="paragraph">
+<p><a href="http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices">GORM Data Services</a> take the work out of implemented service layer logic by adding the ability to automatically implement abstract classes or interfaces using GORM logic.</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/BookService.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">grails.gorm.multitenancy.WithoutTenant</span>
+<span class="keyword">import</span> <span class="include">grails.gorm.multitenancy.CurrentTenant</span>
+<span class="keyword">import</span> <span class="include">grails.gorm.services.Service</span>
+
+<span class="annotation">@CurrentTenant</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Service</span>(<span class="predefined-type">Book</span>) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">interface</span> BookService {
+    <span class="predefined-type">Book</span> save(<span class="predefined-type">String</span> title)
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; findAll()
+
+    <span class="annotation">@WithoutTenant</span>
+    <span class="type">void</span> delete(<span class="predefined-type">Serializable</span> id)
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Resolve the current tenant for the context of a class or method</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>@Service</code> annotation is an AST transformation that will automatically implement the service for you.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controller">6.4. Controller</h3>
+<div class="paragraph">
+<p>Create a controller to expose the <code>/books</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/BookResponse.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="type">class</span> <span class="class">BookResponse</span> {
+    <span class="predefined-type">String</span> title
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/BookController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">BookController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> BookService bookService
+
+    BookController(BookService bookService) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.bookService = bookService
+    }
+
+    <span class="annotation">@Get</span>
+    <span class="predefined-type">List</span>&lt;BookResponse&gt; index() {
+        bookService.findAll().collect { <span class="keyword">new</span> BookResponse(<span class="key">title</span>: <span class="local-variable">it</span>.title) }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate with <code>io.micronaut.http.annotation.Controller</code> to designate a class as a Micronaut’s controller.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Constructor dependency injection.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bootstrap">6.5. Bootstrap</h3>
+<div class="paragraph">
+<p>To listen to an event, register a bean that implements <code>ApplicationEventListener</code> where the generic type is the type of event the listener should be executed for.</p>
+</div>
+<div class="paragraph">
+<p>We want to listen for the <code>StartupEvent</code> to save some elements in the databases when the app starts:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/Bootstrap.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">grails.gorm.multitenancy.Tenants</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.ApplicationEventListener</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.StartupEvent</span>
+
+<span class="keyword">import</span> <span class="include">javax.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Requires</span>(notEnv = Environment.TEST) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">Bootstrap</span> <span class="directive">implements</span> ApplicationEventListener&lt;StartupEvent&gt; { <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="annotation">@Inject</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    BookService bookService
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> onApplicationEvent(StartupEvent event) {
+        Tenants.withId(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>) { <i class="conum" data-value="5"></i><b>(5)</b>
+            bookService.save(<span class="string"><span class="delimiter">'</span><span class="content">Sherlock diary</span><span class="delimiter">'</span></span>)
+        }
+        Tenants.withId(<span class="string"><span class="delimiter">&quot;</span><span class="content">watson</span><span class="delimiter">&quot;</span></span>) { <i class="conum" data-value="6"></i><b>(6)</b>
+            bookService.save(<span class="string"><span class="delimiter">'</span><span class="content">Watson diary</span><span class="delimiter">'</span></span>)
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This bean will not be loaded for the test environment.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>To register a Singleton in Micronaut’s application context, annotate your class with <code>javax.inject.Singleton</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Listen to <code>StartupEvent</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Field injection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>You can specify the tenant ID with the <code>Tenants.withId</code> method.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="book-tests">6.6. Book Tests</h3>
+<div class="paragraph">
+<p>Create a tests which verifies the behaviour.
+We received the books belonging to the tenant which we send via an HTTP header.</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/test/groovy/example/micronaut/BookControllerSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">grails.gorm.multitenancy.Tenants</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.RxHttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="keyword">import</span> <span class="include">javax.inject.Inject</span>
+
+<span class="annotation">@MicronautTest</span>
+<span class="type">class</span> <span class="class">BookControllerSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
+    RxHttpClient client
+
+    <span class="annotation">@Inject</span>
+    BookService bookService
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">test hello world response</span><span class="delimiter">&quot;</span></span>() {
+        <span class="key">given</span>:
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Long</span>&gt; ids = <span class="type">[]</span>
+        Tenants.withId(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>) {
+            ids &lt;&lt; bookService.save(<span class="string"><span class="delimiter">'</span><span class="content">Sherlock diary</span><span class="delimiter">'</span></span>).id
+        }
+        Tenants.withId(<span class="string"><span class="delimiter">&quot;</span><span class="content">watson</span><span class="delimiter">&quot;</span></span>) {
+            ids &lt;&lt; bookService.save(<span class="string"><span class="delimiter">'</span><span class="content">Watson diary</span><span class="delimiter">'</span></span>).id
+        }
+
+        <span class="key">when</span>:
+        HttpRequest&lt;?&gt; request = booksRequest(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>)
+        <span class="predefined-type">List</span>&lt;BookResponse&gt; rsp  = client.toBlocking().retrieve(request, Argument.listOf(BookResponse))
+
+        <span class="key">then</span>:
+        rsp
+        rsp.size() == <span class="integer">1</span>
+        rsp.first().title == <span class="string"><span class="delimiter">'</span><span class="content">Sherlock diary</span><span class="delimiter">'</span></span>
+
+        <span class="key">when</span>:
+        request = booksRequest(<span class="string"><span class="delimiter">&quot;</span><span class="content">watson</span><span class="delimiter">&quot;</span></span>)
+        rsp  = client.toBlocking().retrieve(request, Argument.listOf(BookResponse))
+
+        <span class="key">then</span>:
+        rsp.size() == <span class="integer">1</span>
+        rsp.first().title == <span class="string"><span class="delimiter">'</span><span class="content">Watson diary</span><span class="delimiter">'</span></span>
+
+        <span class="key">cleanup</span>:
+        ids.each {
+            bookService.delete(<span class="local-variable">it</span>)
+        }
+    }
+
+    <span class="directive">private</span> <span class="directive">static</span> HttpRequest&lt;?&gt; booksRequest(<span class="predefined-type">String</span> tenantId) {
+        HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/books</span><span class="delimiter">'</span></span>)
+                .header(<span class="string"><span class="delimiter">&quot;</span><span class="content">tenantId</span><span class="delimiter">&quot;</span></span>, tenantId)
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-app">7. Running the app</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Run both microservices:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">books $ ./gradlew run
+
+18:29:26.500 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 671ms. Server Running: http://localhost:8081
+&lt;=========----&gt; 75% EXECUTING [10s]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gateway $ ./gradlew run
+
+18:28:35.723 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 707ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can visit <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code> and change tenant and see the book list change:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/multitenancy.gif" alt="multitenancy"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://docs.micronaut.io/snapshot/guide/index.html#multitenancy">Multitenancy</a> inside Micronaut and <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#multiTenancy">GORM Multitenancy support</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-micronaut">9. Help with Micronaut</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="https://micronaut.io/wp-content/uploads/2021/03/Micronaut_byobjectcomputing_w.svg" alt=""/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li id="menu-item-2885" class="show-on-blog menu-item menu-item-type-custom menu-item-object-custom menu-item-2885">
+                                <a target="_blank" rel="noopener" href="https://micronaut.io/feed/rss/">
+                                    <i class="fas fa-rss">
+                                        <span class="sr-only">RSS</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2886" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2886">
+                                <a target="_blank" rel="noopener" href="https://twitter.com/micronautfw">
+                                    <i class="fab fa-twitter">
+                                        <span class="sr-only">Twitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2887" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2887">
+                                <a href="mailto:info@micronaut.io">
+                                    <i class="fas fa-envelope">
+                                        <span class="sr-only">Mail</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2888" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2888">
+                                <a target="_blank" rel="noopener" href="https://gitter.im/micronautfw/">
+                                    <i class="fab fa-gitter">
+                                        <span class="sr-only">Gitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2889" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2889">
+                                <a target="_blank" rel="noopener" href="https://github.com/micronaut-projects/">
+                                    <i class="fab fa-github">
+                                        <span class="sr-only">GitHub</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2890" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2890">
+                                <a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLI74De5M9T72YshO4Sc90wtGr286nM8Yu">
+                                    <i class="fab fa-youtube">
+                                        <span class="sr-only">YouTube</span>
+                                    </i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 Object Computing, Inc. All rights reserved</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+
