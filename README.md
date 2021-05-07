@@ -1,4 +1,4 @@
-[Micronaut Guides](https://micronaut-projects.github.io/micronaut-guides-poc/latest/index.html)
+[Micronaut Guides](https://guides.micronaut.io)
 
 
 To work on a single guide use the system property `micronaut.guide`
