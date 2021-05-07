@@ -1,0 +1,115 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+Please, read about https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support] to learn more about different Lambda runtime, Triggers and Handlers and how to integrate with a Micronaut application.
+
+If you want to respond to triggers such as queue events, s3 events or single endpoints you should opt to code your Micronaut functions as Serverless functions.
+
+In this guide, we are going to deploy a Micronaut serverless function to AWS Lambda.
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app example.micronaut.micronautguide --feature=aws-lambda --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add `aws-lambda` feature.
+
+include::{commondir}/common-default-package.adoc[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+We want to support a JavaBean as input and output types.
+
+The input is a  `Book` object:
+
+source:Book[]
+
+* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+
+The output is a `BookSaved` object:
+
+source:BookSaved[]
+
+* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+
+The application contains a class extending https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler]
+
+source:BookRequestHandler[]
+
+* The class extends https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler] and defines input and output types.
+
+The generated test shows how the verify the function behaviour:
+
+test:BookRequestHandlerTest[]
+
+* When you instantiate the Handler, the application context starts.
+* Remember to close your application context when you end your test. You can use your handler to obtain it.
+* Invoke the `execute` method of the handler.
+
+include::{commondir}/common-testApp.adoc[]
+
+== Lambda
+
+Create a Lambda Function. As a runtime, select Java 11 (Correto).
+
+image::create-function.png[]
+
+=== Upload Code
+
+include::{commondir}/common-executable-jar.adoc[]
+
+Upload it:
+
+image::upload-function-code.png[]
+
+=== Handler
+
+As Handler, set:
+
+`example.micronaut.BookRequestHandler`
+
+image::handler-2.png[]
+
+=== Test
+
+You can test it easily.
+
+image::test-event-2.png[]
+
+[source, json]
+----
+{
+  "name": "Building Microservices"
+}
+----
+
+You should see a 200 response:
+
+image::test-result-2.png[]
+
+include::{commondir}/common-next.adoc[]
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support]
+
+* https://aws.amazon.com/lambda/[AWS Lambda]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
