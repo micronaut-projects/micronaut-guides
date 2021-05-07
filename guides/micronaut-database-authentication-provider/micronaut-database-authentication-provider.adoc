@@ -6,7 +6,11 @@ Authors: @authors@
 
 Micronaut Version: @micronaut@
 
-include::{commondir}/common-gettingStarted.adoc[]
+== Getting Started
+
+In this guide, you will create a Micronaut app which uses multiple authentication providers - an LDAP and a database authentication providers.
+
+image:diagram-ldap-authentication.provider.svg[]
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -14,30 +18,228 @@ include::{commondir}/common-completesolution.adoc[]
 
 include::{commondir}/common-create-app.adoc[]
 
-TODO: Describe the user step by step how to write the app. Use includes to reference real code:
 
+Add `security-jwt` dependency:
+
+:dependencies:
+
+dependency:micronaut-security-annotations[groupId=io.micronaut.security,scope=annotationProcessor]
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+:dependencies:
+
+Modify `application.yml` to enable security:
+
+resource:application.yml[tag=security]
+
+<1> Set `micronaut.security.authentication` as `bearer`
+<2> You can create a SecretSignatureConfiguration named `generator` via configuration as illustrated above. The generator signature is used to sign the issued JWT claims.
+<3> Change this by your own secret and keep it safe (do not store this in your VCS)
+
+
+=== Security LDAP
+
+Micronaut supports authentication with LDAP out of the box. To get started, add the `security-ldap` dependency to your application.
+
+dependency:micronaut-security-ldap[groupId=io.micronaut.security]
+
+We are going to use an https://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/[Online LDAP test server] for this guide.
+
+Create several configuration properties matching those of the test LDAP Server.
+
+resource:application.yml[tag=ldap]
+
+<1> The LDAP authentication in Micronaut supports configuration of one or more LDAP servers to authenticate with. You need to name each one. In this tutorial, we use `default`.
+<2> Each server has it's own settings and can be enabled or disabled.
+<3> Sets the manager DN
+<4> Sets the manager password.
+<5> Sets the base DN to search.
+<6> Enable group search.
+<7> Sets the base DN to search from.
+
+
+=== GORM
+
+include::{commondir}/common-gorm.adoc[]
+
+Add a GORM dependency to the project:
+
+:dependencies:
+
+dependency:micronaut-hibernate-validator[groupId=io.micronaut.beanvalidation]
+dependency:micronaut-hibernate-gorm[groupId=io.micronaut.groovy]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly]
+dependency:tomcat-jdbc[groupId=org.apache.tomcat,scope=runtimeOnly]
+
+:dependencies:
+
+And the database configuration:
+
+resource:application.yml[tag=datasource]
+
+==== Domain Classes
+
+include::{commondir}/common-quotedomainclass.adoc[]
+
+===== User
+
+Create a interface `UserState` to model the user state.
+
+source:UserState[]
+
+Create `User` domain class to store users within our application.
+
+source:domain/User[]
+
+<1> GORM entities should be annotated with `grails.persistence.Entity`.
+<2> Use of `GormEntity` to aid IDE support.
+
+===== Role
+
+Create `Role` domain class to store authorities within our application.
+
+source:domain/Role[]
+
+<1> GORM entities should be annotated with `grails.persistence.Entity`.
+<2> Use of `GormEntity` to aid IDE support.
+
+===== UserRole
+
+Create a `UserRole` which stores a many-to-many relationship between `User` and `Role`.
+
+source:domain/UserRole[]
+
+<1> GORM entities should be annotated with `grails.persistence.Entity`.
+<2> Use of `GormEntity` to aid IDE support.
+
+
+==== Data Services
+
+include::{commondir}/common-gormdataservices.adoc[]
+
+Create various GORM Data services:
+
+source:UserGormService[]
+
+<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Services] which is registered as a `Singleton`.
+
+source:RoleGormService[]
+
+<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Services] which is registered as a `Singleton`.
+
+source:UserRoleGormService[]
+
+<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Services] which is registered as a `Singleton`.
+<2> GORM allows Statically-compiled JPA-QL Queries
+
+
+=== Register Service
+
+We are going to register a user when the app starts up.
+
+source:Application[]
+
+<1> Implements `ServerStartupEvent` which enables to execute a method when the application starts.
+<2> `RegisterService` is injected via constructor injection.
+<3> Register a new user when the app starts.
+
+Create `RegisterService`
+
+source:RegisterService[]
+
+
+=== Delegating Authentication Provider
+
+We are going to setup a http://docs.micronaut.io/snapshot/api/io/micronaut/security/authentication/AuthenticationProvider.html[AuthenticationProvider] a described in the next diagramm.
+
+image::delegating_authentication_provider.svg[]
+
+Next, we create interfaces and implementations for each of the pieces of the previous diagram.
+
+==== User Fetcher
+
+Create an interface to retrieve a `UserState` given a username.
+
+source:UserFetcher[]
+
+Provide an implementation:
+
+source:UserFetcherService[]
+
+<1> Use `javax.inject.Singleton` to designate a class a a singleton.
+<2> `UserGormService` is injected via constructor injection.
+
+
+==== Authorities Fetcher
+
+Create an interface to retrieve roles given a username.
+
+source:AuthoritiesFetcher[]
+
+Provide an implementation:
+
+source:AuthoritiesFetcherService[]
+
+<1> Use `javax.inject.Singleton` to designate a class a a singleton.
+<2> `UserRoleGormService` is injected via constructor injection.
+
+
+==== Password Encoder
+
+Create an interface to handle password encoding:
+
+source:PasswordEncoder[]
+
+To provide an implementation, first include a dependency to https://docs.spring.io/spring-security/site/docs/3.1.x/reference/crypto.html[Spring Security Crypto] to ease password encoding.
+
+Add the dependency:
+
+dependency:spring-security-crypto[groupId=org.springframework.security,version=@spring-security-cryptoVersion@]
+
+Then, write the implementation:
+
+source:BCryptPasswordEncoderService[]
+
+<1> Use `javax.inject.Singleton` to designate a class a a singleton.
+
+==== Authentication Provider
+
+Create an authentication provider which uses the interfaces you wrote in the previous sections.
+
+source:DelegatingAuthenticationProvider[]
+
+<1> The configured I/O executor service is injected
+<2> RxJava’s subscribeOn method is used to schedule the operation on the I/O thread pool
+
+IMPORTANT: It is critical that any blocking I/O operations (such as fetching the user from the database in the previous code sample) are offloaded to a separate thread pool that does not block the Event loop.
+
+
+
+=== LDAP Authentication Provider test
+
+Create a test which verifies an LDAP user can login.
+
+test:LoginLdapTest[]
+
+<1> Annotate the class with `@MicronatTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Inject the `HttpClient` bean in the application context.
+<3> Inject to `TokenValidator` bean.
+<4> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+<5> If you attempt to access a secured endpoint without authentication, 401 is returned
+<6> Use the `tokenValidator` bean previously injected.
+
+
+=== Login Testing
+
+Test `/login` endpoint. We verify both LDAP and DB authentication providers work.
+
+test:LoginControllerTest[]
 
 
 include::{commondir}/common-testApp.adoc[]
 
 include::{commondir}/common-runapp.adoc[]
 
-include::{commondir}/common-graal-with-plugins.adoc[]
-
-:exclude-for-languages:groovy
-
-TODO describe how you consume the endpoints exposed by the native image with curl
-
-:exclude-for-languages:
-
-TODO Use the generic next step
-
 include::{commondir}/common-next.adoc[]
-
-TODO or a personalized guide for the guide:
-
-== Next steps
-
-TODO: link to the documentation modules you used in the guide
 
 include::{commondir}/common-helpWithMicronaut.adoc[]
