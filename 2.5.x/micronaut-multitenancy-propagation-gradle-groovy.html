@@ -162,7 +162,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 2.5.0</p>
+<p>Micronaut Version: 2.5.1</p>
 </div>
 </div>
 </div>
@@ -329,9 +329,8 @@ That it is to say, in a situation where the application is not able to resolve t
 <span class="keyword">import</span> <span class="include">io.micronaut.http.filter.OncePerRequestHttpServerFilter</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.filter.ServerFilterChain</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.multitenancy.exceptions.TenantNotFoundException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.multitenancy.tenantresolver.TenantResolver</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.multitenancy.tenantresolver.HttpRequestTenantResolver</span>
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
-
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 
 <span class="annotation">@CompileStatic</span>
@@ -339,9 +338,9 @@ That it is to say, in a situation where the application is not able to resolve t
 <span class="type">class</span> <span class="class">HomePageFilter</span> <span class="directive">extends</span> OncePerRequestHttpServerFilter {
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> TENANT = <span class="string"><span class="delimiter">&quot;</span><span class="content">/tenant</span><span class="delimiter">&quot;</span></span>
-    <span class="directive">private</span> <span class="directive">final</span> TenantResolver tenantResolver
+    <span class="directive">private</span> <span class="directive">final</span> HttpRequestTenantResolver tenantResolver
 
-    HomePageFilter(TenantResolver tenantResolver) { <i class="conum" data-value="2"></i><b>(2)</b>
+    HomePageFilter(HttpRequestTenantResolver tenantResolver) { <i class="conum" data-value="2"></i><b>(2)</b>
         <span class="local-variable">this</span>.tenantResolver = tenantResolver
     }
 
@@ -349,7 +348,7 @@ That it is to say, in a situation where the application is not able to resolve t
     <span class="directive">protected</span> Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilterOnce(HttpRequest&lt;?&gt; request,
                                                              ServerFilterChain chain) {
         <span class="keyword">try</span> {
-            tenantResolver.resolveTenantIdentifier()
+            tenantResolver.resolveTenantIdentifier(request)
         } <span class="keyword">catch</span> (TenantNotFoundException e) {
             <span class="keyword">return</span> Publishers.just(HttpResponse.seeOther(<span class="predefined-type">URI</span>.create(TENANT)))
         }
