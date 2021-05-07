@@ -9,9 +9,8 @@ import io.micronaut.http.annotation.Filter
 import io.micronaut.http.filter.OncePerRequestHttpServerFilter
 import io.micronaut.http.filter.ServerFilterChain
 import io.micronaut.multitenancy.exceptions.TenantNotFoundException
-import io.micronaut.multitenancy.tenantresolver.TenantResolver
+import io.micronaut.multitenancy.tenantresolver.HttpRequestTenantResolver
 import org.reactivestreams.Publisher
-
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -19,9 +18,9 @@ import groovy.transform.CompileStatic
 class HomePageFilter extends OncePerRequestHttpServerFilter {
 
     public static final String TENANT = "/tenant"
-    private final TenantResolver tenantResolver
+    private final HttpRequestTenantResolver tenantResolver
 
-    HomePageFilter(TenantResolver tenantResolver) { // <2>
+    HomePageFilter(HttpRequestTenantResolver tenantResolver) { // <2>
         this.tenantResolver = tenantResolver
     }
 
@@ -29,7 +28,7 @@ class HomePageFilter extends OncePerRequestHttpServerFilter {
     protected Publisher<MutableHttpResponse<?>> doFilterOnce(HttpRequest<?> request,
                                                              ServerFilterChain chain) {
         try {
-            tenantResolver.resolveTenantIdentifier()
+            tenantResolver.resolveTenantIdentifier(request)
         } catch (TenantNotFoundException e) {
             return Publishers.just(HttpResponse.seeOther(URI.create(TENANT)))
         }
