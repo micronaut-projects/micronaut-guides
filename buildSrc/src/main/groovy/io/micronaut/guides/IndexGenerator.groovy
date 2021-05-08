@@ -11,7 +11,7 @@ import java.nio.file.Paths
 @CompileStatic
 class IndexGenerator {
 
-    private static final String LATEST_GUIDES_URL = "https://micronaut-projects.github.io/micronaut-guides-poc/latest/"
+    private static final String LATEST_GUIDES_URL = "https://guides.micronaut.io/latest/"
 
     static String generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
