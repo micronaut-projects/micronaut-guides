@@ -38,7 +38,6 @@ public class GoogleAppEngineGradle implements Feature {
                             "    stage.artifact = \"${buildDir}/libs/${project.name}-${project.version}-all.jar\"",
                             "    deploy {",
                             "        projectId = \"changethistoyourprojectid\"",
-                            "        version = project.version",
                             "    }",
                             "}")).getBytes(StandardCharsets.UTF_8));
                         }
