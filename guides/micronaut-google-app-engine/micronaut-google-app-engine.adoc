@@ -1,0 +1,203 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Introduction
+
+In this guide, you are going to deploy a Micronaut application
+to https://cloud.google.com/appengine/docs/flexible/[Google App Engine Flexible Environment].
+
+== Costs
+
+This guide uses paid services; you may need to enable Billing in Google Cloud
+to complete some steps in this guide.
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Configuration
+
+In order to deploy the app you would need to complete several configuration steps in Google Cloud:
+
+* Signup for Cloud SDK and install Cloud SDK.
+
+* Initialize an App Engine application within the current Google Cloud project.
+
+Checkout the guide steps for more details.
+
+== Cloud SDK
+
+Signup for https://console.cloud.google.com/[Google Cloud Platform] and create a new project:
+
+image::google-cloud-create-project.png[]
+
+image::google-cloud-create-project-2.png[]
+
+We named the project `micronautgooglecloud`
+
+Install https://cloud.google.com/sdk/downloads[Cloud SDK] for your operating system.
+
+After you have installed the SDK, run the init command in your terminal:
+
+`$ gcloud init`
+
+It will prompt you to select the Google account and the project which you want to use.
+
+== Google App Engine
+
+We are going to deploy the Micronaut application developed in this guide to the
+https://cloud.google.com/appengine/docs/flexible/[Google App Engine Flexible Environment]
+
+> App Engine allows developers to focus on doing what they do best: writing code. Based on Google Compute Engine, the App Engine flexible environment automatically scales your app up and down while balancing the load. Microservices, authorization, SQL and NoSQL databases, traffic splitting, logging, versioning, security scanning, and content delivery networks are all supported natively.
+
+Run the command:
+
+`gcloud app create`
+
+to initialize an App Engine application within the current Google Cloud project.
+
+NOTE: You will need to choose the region where you want your App Engine Application located.
+
+include::{commondir}/common-create-app.adoc[]
+
+:exclude-for-build:maven
+
+== Google App Engine Gradle Plugin
+
+To deploy to App Engine, add the https://github.com/GoogleCloudPlatform/app-gradle-plugin[Google App Engine Gradle Plugin] to your project.
+
+Configure the deployment properties:
+
+[source,groovy]
+----
+appengine {
+    stage.artifact = "${buildDir}/libs/${project.name}-${project.version}-all.jar"
+    deploy {
+        projectId = "changethis" // Project ID from Google Cloud Dashboard
+        version = "1"
+    }
+}
+----
+
+:exclude-for-build:
+
+== Application Deployment Configuration
+
+To deploy to Google App Engine, we need to add the file `src/main/appengine/app.yaml`
+
+We are going to configure the https://cloud.google.com/appengine/docs/flexible/java/dev-java-only[Java 8 runtime] in the Flexible environment
+
+____
+The Java 8 runtime does not include any web-serving framework. The only requirement is that your app should listen and respond on port 8080. The sample code here shows how you can add your own framework, such as Spring Boot, to the Java 8 runtime.
+____
+
+It describes the application’s deployment configuration:
+
+resource:../appengine/app.yaml[]
+
+== Sample Controller
+
+Create a controller which we can invoke once the app is deployed.
+
+source:HelloController[]
+
+== Deploying the app
+
+To deploy the app to Google App Engine run:
+
+`$ ./gradlew appengineDeploy`
+
+Initial deployment may take a while. When finished, you will be able to
+access your app:
+
+[source, bash]
+----
+Deployed service [default] to [https://calm-history-228704.appspot.com]
+
+You can stream logs from the command line by running:
+  $ gcloud app logs tail -s default
+
+To view your application in the web browser run:
+  $ gcloud app browse
+
+BUILD SUCCESSFUL in 7m 26s
+13 actionable tasks: 11 executed, 2 up-to-date
+$ curl https://calm-history-228704.appspot.com
+Micronaut on App Engine
+----
+
+If you go to the https://console.cloud.google.com/appengine/versions[Versions] section
+in the App Engine administration panel, you will see the deployed app.
+
+== Logging
+
+For the version which you would like to inspect, select Logs in the diagnose dropdown:
+
+image::google-cloud-logs.png[]
+
+Application log messages written to stdout and stderr are automatically collected and can be
+viewed in the Logs Viewer.
+
+Check https://cloud.google.com/appengine/docs/flexible/java/writing-application-logs[Writing Application Logs]
+documentation to read more about logs in the Flexible Environment.
+
+== Cleaning Up
+
+After you've finished this guide, you can clean up the resources you created on
+Google Cloud Platform so you won't be billed for them in the future. The following
+sections describe how to delete or turn off these resources.
+
+=== Deleting the project
+
+The easiest way to eliminate billing is to delete the project you created for the tutorial.
+
+To delete the project:
+
+WARNING: Deleting a project has the following consequences:
+
+- If you used an existing project, you'll also delete any other work you've done in the project.
+
+- You can't reuse the project ID of a deleted project. If you created a custom project ID that you plan to use in the future, you should delete the resources inside the project instead. This ensures that URLs that use the project ID, such as an appspot.com URL, remain available.
+
+- If you are exploring multiple tutorials and quickstarts, reusing projects instead of deleting them prevents you from exceeding project quota limits.
+
+In the Cloud Platform Console, go to the Projects page.
+
+https://console.cloud.google.com/iam-admin/projects[GO TO THE PROJECTS PAGE]
+
+In the project list, select the project you want to delete and click Delete project. After selecting the checkbox next to the project name, click `Delete project`
+
+In the dialog, type the project ID, and then click Shut down to delete the project.
+
+Deleting or turning off specific resources
+
+You can individually delete or turn off some of the resources that you created during the tutorial.
+
+=== Deleting app versions
+
+To delete an app version:
+
+In the Cloud Platform Console, go to the App Engine Versions page.
+
+https://console.cloud.google.com/appengine/versions[GO TO THE VERSIONS PAGE]
+
+Click the checkbox next to the non-default app version you want to delete.
+
+NOTE: The only way you can delete the default version of your App Engine app is by deleting your project. However, you can stop the default version in the Cloud Platform Console. This action shuts down all instances associated with the version. You can restart these instances later if needed.
+
+In the App Engine standard environment, you can stop the default version only if your app has manual or basic scaling.
+
+Click the Delete button at the top of the page to delete the app version.
+
+== Next Steps
+
+If you want to learn more about Google Cloud and Micronaut integration, checkout the codelab https://codelabs.developers.google.com/codelabs/cloud-micronaut-kubernetes/[Deploy a Micronaut application containerized with Jib to Google Kubernetes Engine].
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
