@@ -76,6 +76,8 @@ include::{commondir}/common-testApp.adoc[]
 
 :exclude-for-build:maven
 
+The generated application includes the https://plugins.gradle.org/plugin/com.microsoft.azure.azurefunctions[Azure Functions plugin for Gradle]
+
 To run the application use the `./gradlew azureFunctionsRun` command which will start the application on port 8080.
 
 :exclude-for-build:
@@ -113,6 +115,85 @@ Transfer-Encoding: chunked
 
 {"returnMessage":"Hello John Snow, thank you for sending the message"}
 ----
+
+== Create Azure Function App
+
+Create a `Function App` in the https://portal.azure.com/#home[Microsoft Azure Portal]. If you prefer, use the Azure CLI.
+
+image::azure-functions-1.jpg[]
+
+image::azure-functions-2.png[]
+
+image::azure-functions-3.png[]
+
+=== Basics | Create Function App
+
+Select:
+
+* Runtime stack: Java
+*  Version: 11
+* Region Central US
+
+image::azure-functions-4.png[]
+
+=== Hosting | Create Function App
+
+image::azure-functions-5.png[]
+
+Select:
+
+* `Operating System`: `Linux`.
+* `Plan type`: `Consumption`.
+
+=== Monitoring | Create Function App
+
+Enable Application Insights.
+
+image::azure-functions-6.png[]
+
+=== Tags | Create Function App
+
+image::azure-functions-7.png[]
+
+=== Review & Create | Create Function App
+
+image::azure-functions-8.png[]
+
+== Deploy Azure Function App
+
+Login to azure portal in your terminal.
+
+[source, bash]
+----
+az login
+----
+
+:exclude-for-build:maven
+
+Edit `build.gradle`. Set the `azurefunctions` extension values to match the values you introduced in the Microsoft Azure Portal.
+
+Use `./gradlew azureFunctionsDeploy` to deploy your Azure Function App.
+
+[source, bash]
+----
+% ./gradlew azureFunctionsDeploy
+...
+Successfully updated the function app testmicronaut.
+Trying to deploy the function app...
+Trying to deploy artifact to testmicronaut...
+Successfully deployed the artifact to https://storageaccountexamp9ec5.blob.core.windows.net/java-functions-run-from-packages/subscriptions-9825e0b9-244a-4eeb-9194-d3e8123fe1a0-resourceGroups-examplemicronaut-providers-Microsoft.Web-sites-testmicronaut-testmicronaut.zip
+Successfully deployed the function app at https://testmicronaut.azurewebsites.net
+----
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Run `./mvnw package azure-functions:deploy`  to deploy your Azure Function App.
+
+:exclude-for-build:
+
+If you visit `https://testmicronaut.azurewebsites.net/` you will get an HTML page informing you that the function is up and running.
+
 
 == Next steps
 
