@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Micronaut Azure HTTP Functions</title>
+    <link rel="canonical" href="@canonical@"/>
+
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut Framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-azure-http-functions.html">Micronaut Azure HTTP Functions</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-app">4. Writing the App</a></li>
+<li><a href="#azure-cli">5. Azure CLI</a></li>
+<li><a href="#azure-functions-core-tools">6. Azure Functions Core Tools</a></li>
+<li><a href="#function">7. Function</a></li>
+<li><a href="#controller">8. Controller</a></li>
+<li><a href="#tests">9. Tests</a></li>
+<li><a href="#testing-the-application">10. Testing the Application</a></li>
+<li><a href="#running-the-application">11. Running the Application</a></li>
+<li><a href="#create-azure-function-app">12. Create Azure Function App</a>
+<ul class="sectlevel2">
+<li><a href="#basics-create-function-app">12.1. Basics | Create Function App</a></li>
+<li><a href="#hosting-create-function-app">12.2. Hosting | Create Function App</a></li>
+<li><a href="#monitoring-create-function-app">12.3. Monitoring | Create Function App</a></li>
+<li><a href="#tags-create-function-app">12.4. Tags | Create Function App</a></li>
+<li><a href="#review-create-create-function-app">12.5. Review &amp; Create | Create Function App</a></li>
+</ul>
+</li>
+<li><a href="#deploy-azure-function-app">13. Deploy Azure Function App</a></li>
+<li><a href="#next-steps">14. Next steps</a></li>
+<li><a href="#help-with-micronaut">15. Help with Micronaut</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Micronaut Azure HTTP Functions</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to create an Azure HTTP Function with Micronaut</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 2.5.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide we are going to create a Micronaut app written in Java.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the app step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-azure-http-functions-gradle-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-app">4. Writing the App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an app using the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">Micronaut Command Line Interface</a> or with
+<a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --feature=azure-function --build=gradle --lang=java</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as a build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as a language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut app with the default package <code>example.micronaut</code> in a folder named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "Micronaut Application" as application type and add the <code>azure-function</code> feature.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you are using Java or Kotlin and IntelliJ IDEA, make sure you have enabled annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="azure-cli">5. Azure CLI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Install <a href="https://docs.microsoft.com/en-us/cli/azure/">Azure CLI</a></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Azure  CLI  is a set of commands used to create and manage Azure resources. The Azure CLI is available across Azure services and is designed to get you working quickly with Azure, with an emphasis on automation.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="azure-functions-core-tools">6. Azure Functions Core Tools</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Install the <a href="https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=macos%2Ccsharp%2Cbash#install-the-azure-functions-core-tools">Azure Functions Core Tools</a></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Azure  Function Core Tools includes a version of the same runtime that powers Azure Functions runtime that you can run on your local development computer. It also provides commands to create functions, connect to Azure, and deploy function projects.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="function">7. Function</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The created application contains class which extends <code>AzureHttpFunction</code></p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Function.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<span class="keyword">import</span> <span class="include">java.util</span>.*;
+<span class="keyword">import</span> <span class="include">com.microsoft.azure.functions.annotation</span>.*;
+<span class="keyword">import</span> <span class="include">com.microsoft.azure.functions</span>.*;
+<span class="keyword">import</span> <span class="include">io.micronaut.azure.function.http.AzureHttpFunction</span>;
+
+<span class="comment">/**
+ * Azure Functions with HTTP Trigger.
+ */</span>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">Function</span> <span class="directive">extends</span> AzureHttpFunction {
+    <span class="comment">/**
+     * This function listens at endpoint &quot;/api/*&quot;. Two ways to invoke it using &quot;curl&quot; command in bash:
+     * 1. curl -d &quot;HTTP Body&quot; {your host}/api/*&amp;code={your function key}
+     * 2. curl &quot;{your host}/api/*?name=HTTP%20Query&amp;code={your function key}&quot;
+     * Function Key is not needed when running locally, it is used to invoke function deployed to Azure.
+     * More details: https://aka.ms/functions_authorization_keys
+     */</span>
+    <span class="annotation">@FunctionName</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">ExampleTrigger</span><span class="delimiter">&quot;</span></span>)
+    <span class="directive">public</span> HttpResponseMessage invoke(
+            <span class="annotation">@HttpTrigger</span>(
+                name = <span class="string"><span class="delimiter">&quot;</span><span class="content">req</span><span class="delimiter">&quot;</span></span>,
+                methods = {HttpMethod.GET, HttpMethod.POST},
+                route = <span class="string"><span class="delimiter">&quot;</span><span class="content">{*route}</span><span class="delimiter">&quot;</span></span>,
+                authLevel = AuthorizationLevel.ANONYMOUS)
+                HttpRequestMessage&lt;Optional&lt;<span class="predefined-type">String</span>&gt;&gt; request,
+                <span class="directive">final</span> ExecutionContext context) {
+        <span class="keyword">return</span> <span class="local-variable">super</span>.route(request, context);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When you write a Micronaut Azure HTTP function, you will write your application as you will normally do when developing outside of Azure functions. That it is to say, you will create routes with classes annotated with <code>@Controller</code>. The above class bridges both worlds. It adapts from an Azure to a Micronaut HTTP Request, and based on the route, it delegates to the appropriate Micronaut&#8217;s controller.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="controller">8. Controller</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The generated application contains a <code>Controller</code> which exposes two routes (<code>GET</code> and <code>POST</code>):</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/MicronautguideController.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation</span>.*;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/micronautguide</span><span class="delimiter">&quot;</span></span>)
+<span class="directive">public</span> <span class="type">class</span> <span class="class">MicronautguideController</span> {
+
+    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN)
+    <span class="annotation">@Get</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> index() {
+        <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Example Response</span><span class="delimiter">&quot;</span></span>;
+    }
+
+    <span class="annotation">@Post</span>
+    <span class="directive">public</span> SampleReturnMessage postMethod(<span class="annotation">@Body</span> SampleInputMessage inputMessage){
+      SampleReturnMessage retMessage = <span class="keyword">new</span> SampleReturnMessage();
+      retMessage.setReturnMessage(<span class="string"><span class="delimiter">&quot;</span><span class="content">Hello </span><span class="delimiter">&quot;</span></span> + inputMessage.getName() + <span class="string"><span class="delimiter">&quot;</span><span class="content">, thank you for sending the message</span><span class="delimiter">&quot;</span></span>);
+      <span class="keyword">return</span> retMessage;
+    }
+}
+
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">SampleInputMessage</span>{
+    <span class="directive">private</span> <span class="predefined-type">String</span> name;
+
+    <span class="directive">public</span> SampleInputMessage() {
+    }
+
+    <span class="directive">public</span> SampleInputMessage(<span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name;
+    }
+
+    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
+        <span class="keyword">return</span> name;
+    }
+    <span class="directive">public</span> <span class="type">void</span> setName(<span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name;
+    }
+}
+
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">SampleReturnMessage</span>{
+    <span class="directive">private</span> <span class="predefined-type">String</span> returnMessage;
+    <span class="directive">public</span> <span class="predefined-type">String</span> getReturnMessage() {
+        <span class="keyword">return</span> returnMessage;
+    }
+    <span class="directive">public</span> <span class="type">void</span> setReturnMessage(<span class="predefined-type">String</span> returnMessage) {
+        <span class="local-variable">this</span>.returnMessage = returnMessage;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/micronautguide</code></p>
+</li>
+<li>
+<p>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation is used to map the <code>index</code> method to all requests that use an HTTP GET.</p>
+</li>
+<li>
+<p>By default a Micronaut&#8217;s response uses <code>application/json</code> as <code>Content-Type</code>. <code>index</code> method returns a String not a JSON object. Because of that, we set the response content-type to <code>text/plain</code> with the <code>@Produces</code> annotation.</p>
+</li>
+<li>
+<p>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html">@Post</a> annotation is used to map the <code>postMethod</code> method to all requests that use an HTTP GET.</p>
+</li>
+<li>
+<p><code>@Introspected</code> annotation generates bean meta-information at compile time.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tests">9. Tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The generated application contains a test which shows how to write a Micronaut Azure HTTP Function tests.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/MicronautguideFunctionTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<span class="keyword">import</span> <span class="include">com.microsoft.azure.functions.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.azure.function.http.HttpRequestMessageBuilder</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpMethod</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+
+<span class="directive">public</span> <span class="type">class</span> <span class="class">MicronautguideFunctionTest</span> {
+
+    <span class="annotation">@Test</span>
+    <span class="directive">public</span> <span class="type">void</span> testFunction() <span class="directive">throws</span> <span class="exception">Exception</span> {
+        <span class="keyword">try</span> (Function function = <span class="keyword">new</span> Function()) {
+            HttpRequestMessageBuilder.AzureHttpResponseMessage response =
+                function.request(HttpMethod.GET, <span class="string"><span class="delimiter">&quot;</span><span class="content">/micronautguide</span><span class="delimiter">&quot;</span></span>)
+                        .invoke();
+
+            assertEquals(HttpStatus.OK, response.getStatus());
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Instantiating the function starts the Micronaut&#8217;s application context.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">10. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ ./gradlew test
+$ open build/reports/tests/test/index.html</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">11. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The generated application includes the <a href="https://plugins.gradle.org/plugin/com.microsoft.azure.azurefunctions">Azure Functions plugin for Gradle</a></p>
+</div>
+<div class="paragraph">
+<p>To run the application use the <code>./gradlew azureFunctionsRun</code> command which will start the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>You can invoke the GET route:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i localhost:7071/api/micronautguide
+HTTP/1.1 200 OK
+Date: Sat, 08 May 2021 03:55:11 GMT
+Content-Type: text/plain
+Server: Kestrel
+Transfer-Encoding: chunked
+
+Example Response</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or the POST route:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i -d '{&quot;name&quot;:&quot;John Snow&quot;}' -H &quot;Content-Type: application/json&quot; -X POST http://localhost:7071/api/micronautguide
+HTTP/1.1 200 OK
+Date: Sat, 08 May 2021 03:57:56 GMT
+Content-Type: application/json
+Server: Kestrel
+Transfer-Encoding: chunked
+
+{&quot;returnMessage&quot;:&quot;Hello John Snow, thank you for sending the message&quot;}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-azure-function-app">12. Create Azure Function App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a <code>Function App</code> in the <a href="https://portal.azure.com/#home">Microsoft Azure Portal</a>. If you prefer, use the Azure CLI.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/azure-functions-1.jpg" alt="azure functions 1">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/azure-functions-2.png" alt="azure functions 2">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/azure-functions-3.png" alt="azure functions 3">
+</div>
+</div>
+<div class="sect2">
+<h3 id="basics-create-function-app">12.1. Basics | Create Function App</h3>
+<div class="paragraph">
+<p>Select:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Runtime stack: Java</p>
+</li>
+<li>
+<p>Version: 11</p>
+</li>
+<li>
+<p>Region Central US</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/azure-functions-4.png" alt="azure functions 4">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hosting-create-function-app">12.2. Hosting | Create Function App</h3>
+<div class="imageblock">
+<div class="content">
+<img src="images/azure-functions-5.png" alt="azure functions 5">
+</div>
+</div>
+<div class="paragraph">
+<p>Select:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Operating System</code>: <code>Windows</code>.</p>
+</li>
+<li>
+<p><code>Plan type</code>: <code>Consumption</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="monitoring-create-function-app">12.3. Monitoring | Create Function App</h3>
+<div class="paragraph">
+<p>Enable Application Insights.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/azure-functions-6.png" alt="azure functions 6">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tags-create-function-app">12.4. Tags | Create Function App</h3>
+<div class="imageblock">
+<div class="content">
+<img src="images/azure-functions-7.png" alt="azure functions 7">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="review-create-create-function-app">12.5. Review &amp; Create | Create Function App</h3>
+<div class="imageblock">
+<div class="content">
+<img src="images/azure-functions-8.png" alt="azure functions 8">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploy-azure-function-app">13. Deploy Azure Function App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Login to azure portal in your terminal.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">az login</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Edit <code>build.gradle</code>. Set the <code>azurefunctions</code> extension values to match the values you introduced in the Microsoft Azure Portal.</p>
+</div>
+<div class="paragraph">
+<p>Use <code>./gradlew azureFunctionsDeploy</code> to deploy your Azure Function App.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">% ./gradlew azureFunctionsDeploy
+...
+Successfully updated the function app testmicronaut.
+Trying to deploy the function app...
+Trying to deploy artifact to testmicronaut...
+Successfully deployed the artifact to https://storageaccountexamp9ec5.blob.core.windows.net/java-functions-run-from-packages/subscriptions-9825e0b9-244a-4eeb-9194-d3e8123fe1a0-resourceGroups-examplemicronaut-providers-Microsoft.Web-sites-testmicronaut-testmicronaut.zip
+Successfully deployed the function app at https://testmicronaut.azurewebsites.net</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you visit <code><a href="https://testmicronaut.azurewebsites.net/" class="bare">https://testmicronaut.azurewebsites.net/</a></code> you will get an HTML page informing you that the function is up and running.</p>
+</div>
+<div class="paragraph">
+<p>You can invoke the GET route:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i https://testmicronaut.azurewebsites.net/api/micronautguide
+HTTP/1.1 200 OK
+...
+..
+.
+Example Response</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">14. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://micronaut-projects.github.io/micronaut-azure/latest/guide/">Micronaut Azure</a> integration.</p>
+</li>
+<li>
+<p><a href="https://github.com/Azure/azure-functions-java-library">Library for Azure Java Functions</a></p>
+</li>
+<li>
+<p><a href="https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-java">Azure functions for Java developers</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-micronaut">15. Help with Micronaut</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="https://micronaut.io/wp-content/uploads/2021/03/Micronaut_byobjectcomputing_w.svg" alt=""/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li id="menu-item-2885" class="show-on-blog menu-item menu-item-type-custom menu-item-object-custom menu-item-2885">
+                                <a target="_blank" rel="noopener" href="https://micronaut.io/feed/rss/">
+                                    <i class="fas fa-rss">
+                                        <span class="sr-only">RSS</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2886" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2886">
+                                <a target="_blank" rel="noopener" href="https://twitter.com/micronautfw">
+                                    <i class="fab fa-twitter">
+                                        <span class="sr-only">Twitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2887" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2887">
+                                <a href="mailto:info@micronaut.io">
+                                    <i class="fas fa-envelope">
+                                        <span class="sr-only">Mail</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2888" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2888">
+                                <a target="_blank" rel="noopener" href="https://gitter.im/micronautfw/">
+                                    <i class="fab fa-gitter">
+                                        <span class="sr-only">Gitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2889" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2889">
+                                <a target="_blank" rel="noopener" href="https://github.com/micronaut-projects/">
+                                    <i class="fab fa-github">
+                                        <span class="sr-only">GitHub</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2890" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2890">
+                                <a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLI74De5M9T72YshO4Sc90wtGr286nM8Yu">
+                                    <i class="fab fa-youtube">
+                                        <span class="sr-only">YouTube</span>
+                                    </i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 Object Computing, Inc. All rights reserved</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+
