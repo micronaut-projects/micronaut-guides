@@ -1,13 +1,12 @@
 package io.micronaut.guides.feature;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.guides.feature.template.gebGradleChrome;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
 import io.micronaut.starter.build.gradle.GradlePlugin;
-import io.micronaut.starter.template.RockerWritable;
 
 import javax.inject.Singleton;
+import java.nio.charset.StandardCharsets;
 
 @Singleton
 public class GebChrome extends Geb {
@@ -28,8 +27,23 @@ public class GebChrome extends Geb {
             generatorContext.addBuildPlugin(GradlePlugin.builder()
                     .id("com.github.erdi.webdriver-binaries")
                     .lookupArtifactId("webdriver-binaries-gradle-plugin")
-                    .extension(new RockerWritable(gebGradleChrome.template()))
+                    .extension(outputStream -> outputStream.write(gradleChromeTemplate().getBytes(StandardCharsets.UTF_8)))
                     .build());
         }
+    }
+
+    private String gradleChromeTemplate() {
+        return "webdriverBinaries {\n" +
+                "    chromedriver {\n" +
+                "        // Get latest for your OS and Chrome from\n" +
+                "        // https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json\n" +
+                "        version = '88.0.4324.96'\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "tasks.withType(Test) {\n" +
+                "    systemProperty \"geb.env\", System.getProperty('geb.env')\n" +
+                "    systemProperty \"download.folder\", System.getProperty('download.folder')\n" +
+                "}\n";
     }
 }
