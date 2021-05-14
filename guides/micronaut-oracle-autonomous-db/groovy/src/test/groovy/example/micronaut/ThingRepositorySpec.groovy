@@ -1,59 +1,61 @@
-package example.micronaut;
+package example.micronaut
 
-import example.micronaut.domain.Thing;
-import example.micronaut.repository.ThingRepository;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Test;
+import example.micronaut.domain.Thing
+import example.micronaut.repository.ThingRepository
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import spock.lang.Specification
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import javax.inject.Inject
+import java.util.stream.Collectors
 
 @MicronautTest
-class ThingRepositoryTest {
+class ThingRepositorySpec extends Specification {
 
     @Inject
-    ThingRepository thingRepository;
+    ThingRepository thingRepository
 
-    @Test
-    void testFindAll() {
+    void 'test findAll'() {
 
+        when:
         // clear out existing data; safe because each
         // test runs in a transaction that's rolled back
-        thingRepository.deleteAll();
-        assertEquals(0, thingRepository.count());
+        thingRepository.deleteAll()
 
+        then:
+        !thingRepository.count()
+
+        when:
         thingRepository.saveAll(Arrays.asList(
-                new Thing("t1"),
-                new Thing("t2"),
-                new Thing("t3")));
+                new Thing('t1'),
+                new Thing('t2'),
+                new Thing('t3')))
 
-        List<Thing> things = thingRepository.findAll();
-        assertEquals(3, things.size());
-        assertEquals(
-                Arrays.asList("t1", "t2", "t3"),
-                things.stream()
-                        .map(Thing::getName)
-                        .sorted()
-                        .collect(Collectors.toList()));
+        List<Thing> things = thingRepository.findAll()
+
+        then:
+        things.size() == 3
+        ['t1', 't2', 't3'] == things.stream()
+                .map(Thing::getName)
+                .sorted()
+                .collect(Collectors.toList())
     }
 
-    @Test
-    void testFindByName() {
-        String name = UUID.randomUUID().toString();
+    void 'test findByName'() {
+        given:
+        String name = UUID.randomUUID()
 
-        Thing thing = thingRepository.findByName(name).orElse(null);
-        assertNull(thing);
+        when:
+        Thing thing = thingRepository.findByName(name).orElse(null)
 
-        thingRepository.save(new Thing(name));
-        thing = thingRepository.findByName(name).orElse(null);
-        assertNotNull(thing);
-        assertEquals(name, thing.getName());
+        then:
+        !thing
+
+        when:
+        thingRepository.save(new Thing(name))
+        thing = thingRepository.findByName(name).orElse(null)
+
+        then:
+        thing
+        name == thing.name
     }
 }

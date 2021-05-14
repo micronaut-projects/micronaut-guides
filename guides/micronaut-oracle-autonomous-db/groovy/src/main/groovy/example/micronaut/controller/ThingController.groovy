@@ -1,33 +1,33 @@
-package example.micronaut.controller;
+package example.micronaut.controller
 
-import example.micronaut.domain.Thing;
-import example.micronaut.repository.ThingRepository;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.scheduling.TaskExecutors;
-import io.micronaut.scheduling.annotation.ExecuteOn;
+import example.micronaut.domain.Thing
+import example.micronaut.repository.ThingRepository
+import groovy.transform.CompileStatic
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
 
-import javax.validation.constraints.NotBlank;
-import java.util.List;
-import java.util.Optional;
+import javax.validation.constraints.NotBlank
 
-@Controller("/things")
+@Controller('/things')
 @ExecuteOn(TaskExecutors.IO)
+@CompileStatic
 class ThingController {
 
-    private final ThingRepository thingRepository;
+    private final ThingRepository thingRepository
 
     ThingController(ThingRepository thingRepository) {
-        this.thingRepository = thingRepository;
+        this.thingRepository = thingRepository
     }
 
     @Get
     List<Thing> all() {
-        return thingRepository.findAll();
+        thingRepository.findAll()
     }
 
-    @Get("/{name}")
+    @Get('/{name}')
     Optional<Thing> byName(@NotBlank String name) {
-        return thingRepository.findByName(name);
+        thingRepository.findByName(name)
     }
 }
