@@ -1,11 +1,16 @@
 package io.micronaut.guides
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import io.micronaut.context.ApplicationContext
 import io.micronaut.core.util.StringUtils
 import io.micronaut.starter.api.TestFramework
+import io.micronaut.starter.build.dependencies.Coordinate
+import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
 
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.Map.Entry
 
 @CompileStatic
 class GuideAsciidocGenerator {
@@ -97,6 +102,10 @@ class GuideAsciidocGenerator {
             text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
 
             text = text.replace("@sourceDir@", projectName)
+
+            for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
+                text = text.replace("@${entry.key}Version@", entry.value.version)
+            }
 
             Path destinationPath = Paths.get(destinationFolder.absolutePath, projectName + ".adoc")
             File destination = destinationPath.toFile()
@@ -281,7 +290,17 @@ class GuideAsciidocGenerator {
             case 'xml':
                 return 'xml'
             default:
-                return ''
+                return extension.toLowerCase()
         }
+    }
+
+    private static Map<String, Coordinate> getCoordinates() {
+        ApplicationContext context = ApplicationContext.run()
+        PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
+        Map<String, Coordinate> coordinates = pomDependencyVersionResolver.getCoordinates()
+
+        context.close()
+
+        return coordinates
     }
 }
