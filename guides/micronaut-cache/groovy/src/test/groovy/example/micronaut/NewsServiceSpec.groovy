@@ -9,7 +9,7 @@ import javax.inject.Inject
 import java.time.Month
 
 @Stepwise // <1>
-@MicronautTest // <2>
+@MicronautTest(startApplication = false)  // <2>
 class NewsServiceSpec extends Specification {
 
     @Inject // <3>

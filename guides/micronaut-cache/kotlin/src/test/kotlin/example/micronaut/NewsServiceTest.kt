@@ -11,7 +11,7 @@ import java.time.Month
 import javax.inject.Inject
 
 @TestMethodOrder(OrderAnnotation::class) // <1>
-@MicronautTest // <2>
+@MicronautTest(startApplication = false)  // <2>
 internal class NewsServiceTest {
     @Inject
     lateinit var newsService : NewsService // <3>
