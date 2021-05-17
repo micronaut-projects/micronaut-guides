@@ -1,5 +1,6 @@
 package io.micronaut.guides;
 
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 
@@ -98,10 +99,15 @@ public class DependencyLines {
             String groupId = attributes.getOrDefault("groupId", "io.micronaut");
             String gradleScope = Optional.ofNullable(toGradleScope(attributes, language)).orElse(SCOPE_IMPLEMENTATION);
             String mavenScope = Optional.ofNullable(toMavenScope(attributes)).orElse(SCOPE_COMPILE);
+            String version = attributes.getOrDefault("version", "");
             String callout = extractCallout(attributes);
 
             if (buildTool == BuildTool.GRADLE) {
-                dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")" + callout);
+                if (StringUtils.isEmpty(version)) {
+                    dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")" + callout);
+                } else {
+                    dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + ":" + version + "\")" + callout);
+                }
             } else if (buildTool == BuildTool.MAVEN) {
                 if (gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR) || gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR_KAPT)) {
                     String mavenScopeAnnotationProcessor = getMavenAnnotationScopeXMLPath(language);
@@ -110,11 +116,17 @@ public class DependencyLines {
                     dependencyLines.add("<" + mavenScopeAnnotationProcessor + ">" + callout);
                     dependencyLines.add("    <groupId>" + groupId + "</groupId>");
                     dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
+                    if (StringUtils.isNotEmpty(version)) {
+                        dependencyLines.add("    <version>" + version + "</version>");
+                    }
                     dependencyLines.add("</" + mavenScopeAnnotationProcessor + ">");
                 } else {
                     dependencyLines.add("<dependency>" + callout);
                     dependencyLines.add("    <groupId>" + groupId + "</groupId>");
                     dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
+                    if (StringUtils.isNotEmpty(version)) {
+                        dependencyLines.add("    <version>" + version + "</version>");
+                    }
                     dependencyLines.add("    <scope>" + mavenScope + "</scope>");
                     dependencyLines.add("</dependency>");
                 }

@@ -1,0 +1,217 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide --feature=azure-function --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+include::{commondir}/common-default-package.adoc[]
+
+NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add the `azure-function` feature.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+
+== Azure CLI
+
+Install https://docs.microsoft.com/en-us/cli/azure/[Azure CLI]
+
+> Azure  CLI  is a set of commands used to create and manage Azure resources. The Azure CLI is available across Azure services and is designed to get you working quickly with Azure, with an emphasis on automation.
+
+== Azure Functions Core Tools
+
+Install the https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=macos%2Ccsharp%2Cbash#install-the-azure-functions-core-tools[Azure Functions Core Tools]
+
+> Azure  Function Core Tools includes a version of the same runtime that powers Azure Functions runtime that you can run on your local development computer. It also provides commands to create functions, connect to Azure, and deploy function projects.
+
+== Function
+
+The created application contains class which extends `AzureHttpFunction`
+
+source:Function[]
+
+When you write a Micronaut Azure HTTP function, you will write your application as you will normally do when developing outside of Azure functions. That it is to say, you will create routes with classes annotated with `@Controller`. The above class bridges both worlds. It adapts from an Azure to a Micronaut HTTP Request, and based on the route, it delegates to the appropriate Micronaut's controller.
+
+== Controller
+
+The generated application contains a `Controller` which exposes two routes (`GET` and `POST`):
+
+source:MicronautguideController[]
+
+* The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/micronautguide`
+* The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the `index` method to all requests that use an HTTP GET.
+* By default a Micronaut's response uses `application/json` as `Content-Type`. `index` method returns a String not a JSON object. Because of that, we set the response content-type to `text/plain` with the `@Produces` annotation.
+* The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html[@Post] annotation is used to map the `postMethod` method to all requests that use an HTTP GET.
+* `@Introspected` annotation generates bean meta-information at compile time.
+
+== Tests
+
+The generated application contains a test which shows how to write a Micronaut Azure HTTP Function tests.
+
+test:MicronautguideFunctionTest[]
+
+* Instantiating the function starts the Micronaut's application context.
+
+include::{commondir}/common-testApp.adoc[]
+
+== Running the Application
+
+:exclude-for-build:maven
+
+The generated application includes the https://plugins.gradle.org/plugin/com.microsoft.azure.azurefunctions[Azure Functions plugin for Gradle]
+
+To run the application use the `./gradlew azureFunctionsRun` command which will start the application on port 8080.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application use the `./mvnw package azure-functions:run` command which will start the application on port 8080.
+
+:exclude-for-build:
+
+You can invoke the GET route:
+
+[source,bash]
+----
+curl -i localhost:7071/api/micronautguide
+HTTP/1.1 200 OK
+Date: Sat, 08 May 2021 03:55:11 GMT
+Content-Type: text/plain
+Server: Kestrel
+Transfer-Encoding: chunked
+
+Example Response
+----
+
+or the POST route:
+
+[source,bash]
+----
+curl -i -d '{"name":"John Snow"}' -H "Content-Type: application/json" -X POST http://localhost:7071/api/micronautguide
+HTTP/1.1 200 OK
+Date: Sat, 08 May 2021 03:57:56 GMT
+Content-Type: application/json
+Server: Kestrel
+Transfer-Encoding: chunked
+
+{"returnMessage":"Hello John Snow, thank you for sending the message"}
+----
+
+== Create Azure Function App
+
+Create a `Function App` in the https://portal.azure.com/#home[Microsoft Azure Portal]. If you prefer, use the Azure CLI.
+
+image::azure-functions-1.jpg[]
+
+image::azure-functions-2.png[]
+
+image::azure-functions-3.png[]
+
+=== Basics | Create Function App
+
+Select:
+
+* Runtime stack: Java
+*  Version: 11
+* Region Central US
+
+image::azure-functions-4.png[]
+
+=== Hosting | Create Function App
+
+image::azure-functions-5.png[]
+
+Select:
+
+* `Operating System`: `Windows`.
+* `Plan type`: `Consumption`.
+
+=== Monitoring | Create Function App
+
+Enable Application Insights.
+
+image::azure-functions-6.png[]
+
+=== Tags | Create Function App
+
+image::azure-functions-7.png[]
+
+=== Review & Create | Create Function App
+
+image::azure-functions-8.png[]
+
+== Deploy Azure Function App
+
+Login to azure portal in your terminal.
+
+[source, bash]
+----
+az login
+----
+
+:exclude-for-build:maven
+
+Edit `build.gradle`. Set the `azurefunctions` extension values to match the values you introduced in the Microsoft Azure Portal.
+
+Use `./gradlew azureFunctionsDeploy` to deploy your Azure Function App.
+
+[source, bash]
+----
+% ./gradlew azureFunctionsDeploy
+...
+Successfully updated the function app testmicronaut.
+Trying to deploy the function app...
+Trying to deploy artifact to testmicronaut...
+Successfully deployed the artifact to https://storageaccountexamp9ec5.blob.core.windows.net/java-functions-run-from-packages/subscriptions-9825e0b9-244a-4eeb-9194-d3e8123fe1a0-resourceGroups-examplemicronaut-providers-Microsoft.Web-sites-testmicronaut-testmicronaut.zip
+Successfully deployed the function app at https://testmicronaut.azurewebsites.net
+----
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Run `./mvnw package azure-functions:deploy`  to deploy your Azure Function App.
+
+:exclude-for-build:
+
+If you visit `https://testmicronaut.azurewebsites.net/` you will get an HTML page informing you that the function is up and running.
+
+You can invoke the GET route:
+
+[source,bash]
+----
+curl -i https://testmicronaut.azurewebsites.net/api/micronautguide
+HTTP/1.1 200 OK
+...
+..
+.
+Example Response
+----
+
+== Next steps
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-azure/latest/guide/[Micronaut Azure] integration.
+* https://github.com/Azure/azure-functions-java-library[Library for Azure Java Functions]
+* https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-java[Azure functions for Java developers]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
