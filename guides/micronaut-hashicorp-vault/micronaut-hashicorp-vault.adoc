@@ -1,0 +1,95 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+== OAuth 2.0 Dependency
+
+To use OAuth 2.0 integration, add the next dependency:
+
+dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
+
+== Micronaut Discovery client
+
+Add the next dependency:
+
+dependency:micronaut-discovery-client[groupId=io.micronaut.discovery]
+
+== Bootstrap.yml
+
+To enable distributed configuration a src/main/resources/bootstrap.yml configuration file must be created:
+
+resource:bootstrap.yml[]
+
+* You need to enable `micronaut.config-client.enabled`
+* Moreover, we need to set the application name in `bootstrap.yml` instead of `application.yml` so that its value is available for Bootstrap Context compatible beans.
+* Enable Hashicorp Vault client and configure its uri.
+
+== Controller
+
+Create a controller which exposes the value read from AWS Secrets Manager.
+
+source:ClientIdController[]
+
+== Logs
+
+Add the following configuration to `src/main/resources/logback.xml` to get a more verbose output when the app startsup:
+
+[source, xml]
+----
+<logger name="io.micronaut.discovery.vault" level="TRACE"/>
+----
+
+== Start Vault via Docker
+
+[source, bash]
+----
+docker run --cap-add=IPC_LOCK -d --name=dev-vault vault
+----
+
+The above runs a completely in-memory Vault server, which is useful for development but should not be used in production.
+
+
+
+include::{commondir}/common-runapp.adoc[]
+
+You should see traces such as:
+
+```
+TODO
+```
+
+[source, bash]
+----
+curl localhost:8080
+XXXX
+----
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+[source, bash]
+----
+curl localhost:8080
+XXXX
+----
+
+:exclude-for-languages:
+
+include::{commondir}/common-next.adoc[]
+
+Read about https://aws.amazon.com/secrets-manager/[AWS Secrets Manager]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
