@@ -44,6 +44,17 @@ source:HomeController[]
 <3> You can specify the HTTP verb that a controller's action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
 <4> If a user is authenticated, Micronaut will bind the user object to an argument of type `java.security.Principal` (if present).
 
+=== WWW-Authenticate
+
+https://docs.micronaut.io/latest/guide/#replaces[Replace] the default https://docs.micronaut.io/latest/guide/#exceptionHandler[Exception Handler] for `AuthorizationExceptionHandler`; the exception raised when a request is not authorized.
+
+source:DefaultAuthorizationExceptionHandlerReplacement[]
+
+The previous code adds the https://datatracker.ietf.org/doc/html/rfc7235#section-4.1[WWW-Authenticate] header to indicate the authentication scheme.
+
+<1> To register a Singleton in Micronaut’s application context annotate your class with `javax.inject.Singleton`.
+<2> Specify that `DefaultAuthorizationExceptionHandlerReplacement` replaces the bean `DefaultAuthorizationExceptionHandler`
+
 === Tests
 
 Create a test which verifies the user authentication flow via Basic Auth.
@@ -85,6 +96,8 @@ To test the running application, issue a GET request to localhost:8080 with a ba
 ----
 curl -v -u sherlock:password localhost:8080
 ----
+
+If you open the `localhost:8080` in your browser a login dialog pops up due to the `WWW-Authenticate` header.
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
