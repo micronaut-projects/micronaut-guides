@@ -124,8 +124,9 @@
 <li><a href="#security-dependency">4.1. Security Dependency</a></li>
 <li><a href="#authentication-provider">4.2. Authentication Provider</a></li>
 <li><a href="#controllers">4.3. Controllers</a></li>
-<li><a href="#tests">4.4. Tests</a></li>
-<li><a href="#use-micronauts-http-client-and-basic-auth">4.5. Use Micronaut&#8217;s HTTP Client and Basic Auth</a></li>
+<li><a href="#www-authenticate">4.4. WWW-Authenticate</a></li>
+<li><a href="#tests">4.5. Tests</a></li>
+<li><a href="#use-micronauts-http-client-and-basic-auth">4.6. Use Micronaut&#8217;s HTTP Client and Basic Auth</a></li>
 </ul>
 </li>
 <li><a href="#testing-the-application">5. Testing the Application</a></li>
@@ -363,7 +364,57 @@ class HomeController {
 </div>
 </div>
 <div class="sect2">
-<h3 id="tests">4.4. Tests</h3>
+<h3 id="www-authenticate">4.4. WWW-Authenticate</h3>
+<div class="paragraph">
+<p><a href="https://docs.micronaut.io/latest/guide/#replaces">Replace</a> the default <a href="https://docs.micronaut.io/latest/guide/#exceptionHandler">Exception Handler</a> for <code>AuthorizationExceptionHandler</code>; the exception raised when a request is not authorized.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/DefaultAuthorizationExceptionHandlerReplacement.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.annotation.Replaces
+import io.micronaut.security.authentication.AuthorizationException
+import io.micronaut.security.authentication.DefaultAuthorizationExceptionHandler
+import javax.inject.Singleton
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.MutableHttpResponse
+
+@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
+@Replaces(DefaultAuthorizationExceptionHandler::class)  <i class="conum" data-value="2"></i><b>(2)</b>
+class DefaultAuthorizationExceptionHandlerReplacement : DefaultAuthorizationExceptionHandler() {
+    override fun httpResponseWithStatus(
+        request: HttpRequest&lt;*&gt;?,
+        exception: AuthorizationException?
+    ): MutableHttpResponse&lt;*&gt; {
+        return if (exception?.isForbidden == true) {
+            HttpResponse.status&lt;Any&gt;(HttpStatus.FORBIDDEN);
+        } else HttpResponse.status&lt;Any&gt;(HttpStatus.UNAUTHORIZED)
+            .header(&quot;WWW-Authenticate&quot;, &quot;Basic realm=\&quot;Micronaut Guide\&quot;&quot;);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous code adds the <a href="https://datatracker.ietf.org/doc/html/rfc7235#section-4.1">WWW-Authenticate</a> header to indicate the authentication scheme.</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>To register a Singleton in Micronaut’s application context annotate your class with <code>javax.inject.Singleton</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specify that <code>DefaultAuthorizationExceptionHandlerReplacement</code> replaces the bean <code>DefaultAuthorizationExceptionHandler</code></td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tests">4.5. Tests</h3>
 <div class="paragraph">
 <p>Create a test which verifies the user authentication flow via Basic Auth.</p>
 </div>
@@ -381,6 +432,7 @@ import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 import javax.inject.Inject
@@ -401,6 +453,9 @@ class BasicAuthTest {
         // then: 'returns unauthorized'
         val thrown = assertThrows(HttpClientResponseException::class.java, e) <i class="conum" data-value="4"></i><b>(4)</b>
         assertEquals(thrown.status, HttpStatus.UNAUTHORIZED)
+
+        assertTrue(thrown.response.headers.contains(&quot;WWW-Authenticate&quot;))
+        assertEquals(thrown.response.headers.get(&quot;WWW-Authenticate&quot;), &quot;Basic realm=\&quot;Micronaut Guide\&quot;&quot;)
 
         //when: 'A secured URL is accessed with Basic Auth'
         val rsp = client.toBlocking().exchange(HttpRequest.GET&lt;Any&gt;(&quot;/&quot;)
@@ -448,7 +503,7 @@ class BasicAuthTest {
 </div>
 </div>
 <div class="sect2">
-<h3 id="use-micronauts-http-client-and-basic-auth">4.5. Use Micronaut&#8217;s HTTP Client and Basic Auth</h3>
+<h3 id="use-micronauts-http-client-and-basic-auth">4.6. Use Micronaut&#8217;s HTTP Client and Basic Auth</h3>
 <div class="paragraph">
 <p>If you want to access a secured endpoint, you can also use Micronaut&#8217;s HTTP Client and supply the Basic Auth as the Authorization header value.</p>
 </div>
@@ -561,6 +616,9 @@ class BasicAuthClientTest {
 <div class="content">
 <pre>curl -v -u sherlock:password localhost:8080</pre>
 </div>
+</div>
+<div class="paragraph">
+<p>If you open the <code>localhost:8080</code> in your browser a login dialog pops up due to the <code>WWW-Authenticate</code> header.</p>
 </div>
 </div>
 </div>

@@ -124,8 +124,9 @@
 <li><a href="#security-dependency">4.1. Security Dependency</a></li>
 <li><a href="#authentication-provider">4.2. Authentication Provider</a></li>
 <li><a href="#controllers">4.3. Controllers</a></li>
-<li><a href="#tests">4.4. Tests</a></li>
-<li><a href="#use-micronauts-http-client-and-basic-auth">4.5. Use Micronaut&#8217;s HTTP Client and Basic Auth</a></li>
+<li><a href="#www-authenticate">4.4. WWW-Authenticate</a></li>
+<li><a href="#tests">4.5. Tests</a></li>
+<li><a href="#use-micronauts-http-client-and-basic-auth">4.6. Use Micronaut&#8217;s HTTP Client and Basic Auth</a></li>
 </ul>
 </li>
 <li><a href="#testing-the-application">5. Testing the Application</a></li>
@@ -369,7 +370,58 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="tests">4.4. Tests</h3>
+<h3 id="www-authenticate">4.4. WWW-Authenticate</h3>
+<div class="paragraph">
+<p><a href="https://docs.micronaut.io/latest/guide/#replaces">Replace</a> the default <a href="https://docs.micronaut.io/latest/guide/#exceptionHandler">Exception Handler</a> for <code>AuthorizationExceptionHandler</code>; the exception raised when a request is not authorized.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DefaultAuthorizationExceptionHandlerReplacement.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.MutableHttpResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthorizationException</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.DefaultAuthorizationExceptionHandler</span>;
+
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>;
+
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Replaces</span>(DefaultAuthorizationExceptionHandler.class) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">DefaultAuthorizationExceptionHandlerReplacement</span> <span class="directive">extends</span> DefaultAuthorizationExceptionHandler {
+
+    <span class="annotation">@Override</span>
+    <span class="directive">protected</span> MutableHttpResponse&lt;?&gt; httpResponseWithStatus(HttpRequest request, AuthorizationException exception) {
+        <span class="keyword">if</span> (exception.isForbidden()) {
+            <span class="keyword">return</span> HttpResponse.status(HttpStatus.FORBIDDEN);
+        }
+        <span class="keyword">return</span> HttpResponse.status(HttpStatus.UNAUTHORIZED)
+                .header(<span class="string"><span class="delimiter">&quot;</span><span class="content">WWW-Authenticate</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Basic realm=</span><span class="char">\&quot;</span><span class="content">Micronaut Guide</span><span class="char">\&quot;</span><span class="delimiter">&quot;</span></span>);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous code adds the <a href="https://datatracker.ietf.org/doc/html/rfc7235#section-4.1">WWW-Authenticate</a> header to indicate the authentication scheme.</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>To register a Singleton in Micronaut’s application context annotate your class with <code>javax.inject.Singleton</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specify that <code>DefaultAuthorizationExceptionHandlerReplacement</code> replaces the bean <code>DefaultAuthorizationExceptionHandler</code></td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tests">4.5. Tests</h3>
 <div class="paragraph">
 <p>Create a test which verifies the user authentication flow via Basic Auth.</p>
 </div>
@@ -392,8 +444,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">javax.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.function.Executable</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions</span>.*;
 
 <span class="annotation">@MicronautTest</span>  <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">BasicAuthTest</span> {
@@ -411,10 +463,13 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, e); <i class="conum" data-value="4"></i><b>(4)</b>
         assertEquals(thrown.getStatus(), HttpStatus.UNAUTHORIZED);
 
+        assertTrue(thrown.getResponse().getHeaders().contains(<span class="string"><span class="delimiter">&quot;</span><span class="content">WWW-Authenticate</span><span class="delimiter">&quot;</span></span>));
+        assertEquals(thrown.getResponse().getHeaders().get(<span class="string"><span class="delimiter">&quot;</span><span class="content">WWW-Authenticate</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">Basic realm=</span><span class="char">\&quot;</span><span class="content">Micronaut Guide</span><span class="char">\&quot;</span><span class="delimiter">&quot;</span></span>);
+
         <span class="comment">//when: 'A secured URL is accessed with Basic Auth'</span>
         HttpResponse&lt;<span class="predefined-type">String</span>&gt; rsp = client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-                .accept(MediaType.TEXT_PLAIN)
-                .basicAuth(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>), <i class="conum" data-value="5"></i><b>(5)</b>
+                        .accept(MediaType.TEXT_PLAIN)
+                        .basicAuth(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>), <i class="conum" data-value="5"></i><b>(5)</b>
                 <span class="predefined-type">String</span>.class); <i class="conum" data-value="6"></i><b>(6)</b>
         <span class="comment">//then: 'the endpoint can be accessed'</span>
         assertEquals(rsp.getStatus(),  HttpStatus.OK);
@@ -457,7 +512,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="use-micronauts-http-client-and-basic-auth">4.5. Use Micronaut&#8217;s HTTP Client and Basic Auth</h3>
+<h3 id="use-micronauts-http-client-and-basic-auth">4.6. Use Micronaut&#8217;s HTTP Client and Basic Auth</h3>
 <div class="paragraph">
 <p>If you want to access a secured endpoint, you can also use Micronaut&#8217;s HTTP Client and supply the Basic Auth as the Authorization header value.</p>
 </div>
@@ -573,6 +628,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre>curl -v -u sherlock:password localhost:8080</pre>
 </div>
+</div>
+<div class="paragraph">
+<p>If you open the <code>localhost:8080</code> in your browser a login dialog pops up due to the <code>WWW-Authenticate</code> header.</p>
 </div>
 </div>
 </div>
