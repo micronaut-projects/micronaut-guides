@@ -1,7 +1,7 @@
 package io.micronaut.guides;
 
 public enum Category {
-    APPRENTICE("Micronaut Apprentice"),
+    GETTING_STARTED("Getting Started"),
     DATA_ACCESS("Data Access"),
     CACHE("Cache"),
     MESSAGING("Messaging"),
