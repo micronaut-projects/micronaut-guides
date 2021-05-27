@@ -80,7 +80,10 @@ class GuideProjectGenerator implements Closeable {
                 skipMavenTests: config.skipMavenTests ?: false,
                 apps: config.apps.collect { it -> new App(name: it.name,
                         features: it.features,
-                        applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT)
+                        applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
+                        excludeSource:  it.excludeSource,
+                        excludeTest:  it.excludeTest,
+                )
                 }
         )
     }
@@ -157,8 +160,27 @@ class GuideProjectGenerator implements Closeable {
                     }
                     Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
                 }
+                if (app.excludeSource) {
+                    for (String mainSource : app.excludeSource) {
+                        deleteFile(destination, GuideAsciidocGenerator.mainPath(appName, mainSource), guidesOption)
+                    }
+                }
+                if (app.excludeTest) {
+                    for (String testSource : app.excludeTest) {
+                        deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
+                    }
+                }
+
             }
         }
+    }
+
+    private deleteFile(File destination, String path, GuidesOption guidesOption) {
+        Paths.get(destination.absolutePath, path
+                .replace("@lang@", guidesOption.language.toString())
+                .replace("@languageextension@", guidesOption.language.extension))
+                .toFile()
+                .delete()
     }
 
     static List<GuidesOption> guidesOptions(GuideMetadata guideMetadata) {

@@ -3,10 +3,13 @@ package io.micronaut.guides
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.util.StringUtils
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
+import io.micronaut.starter.options.Language
 
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -164,6 +167,36 @@ class GuideAsciidocGenerator {
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
 
+        List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
+
+        String sourcePath = testFramework ? testPath(appName, name, testFramework) : mainPath(appName, name)
+        List<String> lines = [
+            '[source,@lang@]',
+            ".${sourcePath}".toString(),
+            '----',
+        ]
+        if (tags) {
+            for (String tag : tags) {
+                lines.add("include::{sourceDir}/@sourceDir@/${sourcePath}[${tag}]\n".toString())
+            }
+        } else {
+            lines.add("include::{sourceDir}/@sourceDir@/${sourcePath}[]".toString())
+        }
+
+        lines.add('----')
+        lines
+    }
+
+    @NonNull
+    static String mainPath(@NonNull String appName,
+                           @NonNull String fileName) {
+        pathByFolder(appName, fileName, 'main')
+    }
+
+    @NonNull
+    static String testPath(@NonNull String appName,
+                           @NonNull String name,
+                            @NonNull TestFramework testFramework) {
         String fileName = name
         if (testFramework) {
             if (name.endsWith('Test')) {
@@ -171,25 +204,17 @@ class GuideAsciidocGenerator {
                 fileName += testFramework == TestFramework.SPOCK ? 'Spec' : 'Test'
             }
         }
-        String folder = testFramework ? 'test' : 'main'
+
+        pathByFolder(appName, fileName, 'test')
+    }
+
+    @NonNull
+    static String pathByFolder(@NonNull String appName,
+                               @NonNull String fileName,
+                               String folder) {
+
         String module = appName ? "${appName}/" : ""
-        List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
-
-        List<String> lines = [
-            '[source,@lang@]',
-            ".${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@".toString(),
-            '----',
-        ]
-        if (tags) {
-            for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[${tag}]\n".toString())
-            }
-        } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@[]".toString())
-        }
-
-        lines.add('----')
-        lines
+        "${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@".toString()
     }
 
     private static List<String> rawTestIncludeLines(String line, TestFramework testFramework) {
