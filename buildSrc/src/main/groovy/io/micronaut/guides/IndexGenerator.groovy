@@ -216,7 +216,7 @@ class IndexGenerator {
             case Category.DISTRIBUTED_TRACING:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
 
-            case Category.APPRENTICE:
+            case Category.GETTING_STARTED:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
             case Category.ORACLE_CLOUD:
