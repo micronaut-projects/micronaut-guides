@@ -25,14 +25,7 @@ public class S3 implements Feature {
     @Override
     public void apply(GeneratorContext generatorContext) {
         generatorContext.addDependency(Dependency.builder()
-                .groupId("io.micronaut.aws")
-                .artifactId("micronaut-aws-sdk-v2")
-                .compile()
-                .build());
-        generatorContext.addDependency(Dependency.builder()
-                .groupId("software.amazon.awssdk")
                 .lookupArtifactId("s3")
-                .compile()
-                .build());
+                .compile());
     }
 }
