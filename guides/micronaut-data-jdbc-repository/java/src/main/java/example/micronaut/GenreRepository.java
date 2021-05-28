@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@JdbcRepository(dialect = Dialect.H2)
-public interface GenreRepository extends CrudRepository<Genre, Long> {
+@JdbcRepository(dialect = Dialect.H2) // <1>
+public interface GenreRepository extends CrudRepository<Genre, Long> { // <2>
 
     Optional<Genre> findById(@NotNull Long id);
 

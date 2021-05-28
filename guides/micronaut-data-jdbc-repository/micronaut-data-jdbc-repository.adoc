@@ -8,10 +8,8 @@ Micronaut Version: @micronaut@
 
 include::{commondir}/common-gettingStarted.adoc[]
 
-
 In this guide, we are going to write a Micronaut application that exposes some REST endpoints and store data in a
-database using JPA and Hibernate.
-
+database using Micronaut Data JDBC.
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -26,15 +24,23 @@ Add the following dependencies:
 
 :dependencies:
 
-dependency:micronaut-hibernate-jpa[groupId=io.micronaut.sql,callout=1]
-dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=2]
-dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=3]
+
+implementation("io.micronaut:micronaut-http-client")
+implementation("io.micronaut:micronaut-runtime")
+implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+implementation("io.micronaut.flyway:micronaut-flyway")
+
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor,callout=1]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data,callout=2]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=3]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=4]
 
 :dependencies:
 
-<1> Configures Hibernate/JPA EntityManagerFactory beans.
-<2> Configures SQL DataSource instances using Hikari Connection Pool.
-<3> Add dependency to in-memory H2 Database.
+<1> Add Micronaut Data annotation processor.
+<2> Configures  a compile scoped dependency on the `micronaut-data-jdbc`
+<3> Configures SQL DataSource instances using Hikari Connection Pool.
+<4> Add dependency to in-memory H2 Database.
 
 Define the data source in `src/main/resources/application.yml`.
 
@@ -45,14 +51,32 @@ production environment, and also provide a default value for development. If the
 Micronaut will use the default values. +
 Also keep in mind that it is necessary to escape the `:` in the connection url using back ticks ```.
 
-=== JPA configuration
+=== DB Schema
 
-Add the next snippet to `src/main/resources/application.yml` to configure JPA:
+Now that Mybatis is setup we need a way to create the database schema. For that we will use
+https://micronaut-projects.github.io/micronaut-flyway/latest/guide/index.html[Micronaut integration with
+Flyway].
 
-resource:application.yml[tag=jpa]
 
+Add the following snippet to include the necessary dependencies:
+
+dependency:micronaut-flyway[groupId=io.micronaut.flyway]
+
+Configure the database migrations directory for Flyway in `application.yml`.
+
+resource:application.yml[tag=flyway]
+
+Create the file `V1__schema.sql` with the database schema creation:
+
+resource:db/migration/V1__schema.sql[]
+
+During application startup Flyway will execute the sql file and create the schema needed for the application.
 
 === Domain
+
+To use JPA annotations include the following `compileOnly` scoped dependency:
+
+dependency:jakarta.persistence-api[groupId=jakarta.persistence,version=@jakarta.persistence-apiVersion@,scope=compileOnly,callout=1]
 
 Create the domain entities:
 
@@ -86,25 +110,13 @@ resource:application.yml[tag=application]
 
 === Repository Access
 
-To mark the transaction demarcations, we use the https://docs.oracle.com/javaee/7/api/javax/transaction/Transactional.html[Java EE 7 javax.transaction.Transactional annotation].
-
-To use it, you have to include the `micronaut-data-processor` dependency in your annotation processor configuration:
-
-dependency:micronaut-data-hibernate-jpa[groupId=io.micronaut.data,scope=annotationProcessor]
-
 Next, create an interface to define the operations to access the database:
 
 source:GenreRepository[]
 
-The implementation:
+<1> `@JdbcRepository` with a specific dialect.
+<2> The entity to treat as the root entity for the purposes of querying is established either from the method signature or from the generic type parameter specified to the `GenericRepository` interface.
 
-source:GenreRepositoryImpl[]
-
-<1> Use `javax.inject.Singleton` to designate a class as a singleton.
-<2> Inject easily an `EntityManager`.
-<3> All database access needs to be wrapped inside a transaction. As the method
-only reads data from the database, annotate it with `@ReadOnly`.
-<4> This method modifies the database, thus it is annoated with `@Transactional`.
 
 === Controller
 
@@ -182,6 +194,8 @@ Add Postgresql driver dependency:
 
 dependency:postgresql[groupId=org.postgresql,scope=runtimeOnly]
 
+IMPORTANT: Change the dialect in the `GenreRepository` `@JdbcRepository` annotation.
+
 To use postgresql, setup several environment variables which match those defined in `application.yml`:
 
 [source,bash]
@@ -218,6 +232,6 @@ curl -X "POST" "http://localhost:8080/genres" \
 
 == Next steps
 
-Read more about https://docs.micronaut.io/latest/guide/index.html#dataAccess[Configurations for Data Access] section in the Micronaut documentation.
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data].
 
 include::{commondir}/common-helpWithMicronaut.adoc[]
