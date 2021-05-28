@@ -105,7 +105,7 @@ public class GenreControllerTest {
         genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(1, genres.size());
-        assertEquals("Micro-services", genres.get(0).getName());
+        assertEquals("DevOps", genres.get(0).getName());
 
         request = HttpRequest.GET("/genres/list?max=1&offset=10");
         genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
