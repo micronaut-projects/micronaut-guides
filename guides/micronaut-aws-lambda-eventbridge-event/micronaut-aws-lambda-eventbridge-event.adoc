@@ -1,0 +1,100 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app example.micronaut.micronautguide --feature=aws-lambda --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add `aws-lambda` feature.
+
+include::{commondir}/common-default-package.adoc[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+=== Delete Sample Code
+
+Micronaut generates some sample code by default. Delete the following files:
+
+* `src/main/java/example/micronaut/Book.java`
+* `src/main/java/example/micronaut/BookRequest.java`
+* `src/main/java/example/micronaut/BookSaved.java`
+* `src/test/java/example/micronaut/BookRequestHandlerTest.java`
+
+=== Handler
+
+Create a Handler which receives a Event Bridge (Cloud Watch Events) notification event and log the notification:
+
+source:Handler[]
+
+=== Logback
+
+Replace `src/main/resources/logback.xml` with the following content to get a more verbose output:
+
+resource:logback.xml[]
+
+== Lambda
+
+Create a Lambda Function. As a runtime, select Java 11 (Correto).
+
+image::create-function.png[]
+
+=== Triggers
+
+Create trigger which fires every 5 minutes:
+
+image::eventbridgetrigger.png[]
+
+=== Upload Code
+
+include::{commondir}/common-executable-jar.adoc[]
+
+
+Upload it:
+
+image::upload-function-code.png[]
+
+=== Handler
+
+As Handler, set:
+
+`example.micronaut.Handler`
+
+image::handler-2.png[]
+
+=== Test
+
+After you upload the code, wait for 5 minutes and you should see in Cloud Watch logs such as:
+
+[source, bash]
+----
+TRACE c.s.e.f.d.Handler - {version=0, id=ed9bd6b2-0429-9b03-742b-fe294946f272, detail-type=Scheduled Event, source=aws.events, account=1234567899, time=2021-05-19T09:03:02Z, region=us-east-1, resources=[arn:aws:events:us-east-1:1234567899:rule/5minutes], detail={}}
+2021-05-19 09:03:31 b4e05b4e-ae9f-4844-b7fb-5e70016b41fd eurorates-daily-java11 $LATEST arn:aws:lambda:us-east-1:1234567899:function:micronautguide-java11 512 14990 1-60a4d463-1fa098426b0ff44e24a69bf8 TRACE c.s.e.f.d.Handler - {version=0, id=ed9bd6b2-0429-9b03-742b-fe294946f272, detail-type=Scheduled Event, source=aws.events, account=1234567899, time=2021-05-19T09:03:02Z, region=us-east-1, resources=[arn:aws:events:us-east-1:1234567899:rule/5minutes], detail={}}
+
+
+----
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support]
+
+* https://aws.amazon.com/lambda/[AWS Lambda]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
