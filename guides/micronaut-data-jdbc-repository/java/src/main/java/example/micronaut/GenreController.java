@@ -49,11 +49,11 @@ public class GenreController {
     }
 
     @Get(value = "/list") // <9>
-    public List<Genre> list(@Valid Pageable pageable) {
+    public List<Genre> list(@Valid Pageable pageable) { // <10>
         return genreRepository.findAll(pageable).getContent();
     }
 
-    @Post // <10>
+    @Post // <11>
     public HttpResponse<Genre> save(@Body @Valid GenreSaveCommand cmd) {
         Genre genre = genreRepository.save(cmd.getName());
 
@@ -62,7 +62,7 @@ public class GenreController {
                 .headers(headers -> headers.location(location(genre.getId())));
     }
 
-    @Post("/ex") // <11>
+    @Post("/ex") // <12>
     public HttpResponse<Genre> saveExceptions(@Body @Valid GenreSaveCommand cmd) {
         try {
             Genre genre = genreRepository.saveWithException(cmd.getName());
@@ -74,7 +74,7 @@ public class GenreController {
         }
     }
 
-    @Delete("/{id}") // <12>
+    @Delete("/{id}") // <13>
     @Status(HttpStatus.NO_CONTENT)
     public void delete(Long id) {
         genreRepository.deleteById(id);
