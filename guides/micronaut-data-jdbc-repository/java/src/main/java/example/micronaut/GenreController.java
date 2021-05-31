@@ -41,8 +41,7 @@ public class GenreController {
 
     @Put // <6>
     public HttpResponse update(@Body @Valid GenreUpdateCommand command) { // <7>
-        int numberOfEntitiesUpdated = genreRepository.update(command.getId(), command.getName());
-
+        genreRepository.update(command.getId(), command.getName());
         return HttpResponse
                 .noContent()
                 .header(HttpHeaders.LOCATION, location(command.getId()).getPath()); // <8>
