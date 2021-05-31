@@ -53,16 +53,6 @@ public class GenreController {
         return genreRepository.findAll(pageable).getContent();
     }
 
-    private Optional<Sort> parseSort(SortingAndOrderArguments args) {
-        if (args.getSort().isPresent() && args.getOrder().isPresent()) {
-            return Optional.of(Sort.of(args.getOrder().get().equals("desc") ?
-                    Sort.Order.desc(args.getSort().get()) :
-                    Sort.Order.asc(args.getSort().get())));
-
-        }
-        return Optional.empty();
-    }
-
     @Post // <10>
     public HttpResponse<Genre> save(@Body @Valid GenreSaveCommand cmd) {
         Genre genre = genreRepository.save(cmd.getName());
