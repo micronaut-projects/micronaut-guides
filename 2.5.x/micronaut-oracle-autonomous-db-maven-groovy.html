@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Access an Oracle Autonomous Database</title>
+    <link rel="canonical" href="@canonical@"/>
+
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut Framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-oracle-autonomous-db.html">Access an Oracle Autonomous Database</a> » <span class="breadcrumb_last" aria-current="page">maven | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#provision-oracle-autonomous-database">4. Provision Oracle Autonomous Database</a></li>
+<li><a href="#writing-the-app">5. Writing the App</a>
+<ul class="sectlevel2">
+<li><a href="#dependencies">5.1. Dependencies</a></li>
+<li><a href="#entity-class">5.2. Entity class</a></li>
+<li><a href="#repository-class">5.3. Repository class</a></li>
+<li><a href="#data-populator-class">5.4. Data populator class</a></li>
+<li><a href="#controller-class">5.5. Controller class</a></li>
+<li><a href="#configuration">5.6. Configuration</a></li>
+<li><a href="#writing-tests">5.7. Writing Tests</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">6. Testing the Application</a></li>
+<li><a href="#running-the-application">7. Running the Application</a></li>
+<li><a href="#next-steps">8. Next steps</a></li>
+<li><a href="#help-with-micronaut">9. Help with Micronaut</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Access an Oracle Autonomous Database</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to access an Oracle Autonomous Database using Micronaut.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Burt Beckwith</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 2.5.4</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide we are going to create a Micronaut app written in Groovy.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 11 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+<li>
+<p>An Oracle Cloud account (create a free trial account at <a href="https://signup.oraclecloud.com">signup.oraclecloud.com</a>)</p>
+</li>
+<li>
+<p><a href="https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm">Oracle Cloud CLI</a> installed, with local access to Oracle Cloud configured by running <code>oci setup config</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the app step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-oracle-autonomous-db-maven-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="provision-oracle-autonomous-database">4. Provision Oracle Autonomous Database</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Login to your Oracle Cloud tenancy, and from the Oracle Cloud Menu select "Oracle Database" and then "Autonomous Transaction Processing":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.1.png" alt="autonomous.database.1">
+</div>
+</div>
+<div class="paragraph">
+<p>Enter "MicronautDemo" as the display name and database name:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.2.png" alt="autonomous.database.2">
+</div>
+</div>
+<div class="paragraph">
+<p>Select "Transaction Processing" and "Shared Infrastructure", and if you&#8217;re using a trial account be sure to select "Always Free":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.3.png" alt="autonomous.database.3">
+</div>
+</div>
+<div class="paragraph">
+<p>Create an Admin password (must be at least 12 characters and contain a number and an uppercase letter) and select "Secure access from everywhere":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.4.png" alt="autonomous.database.4">
+</div>
+</div>
+<div class="paragraph">
+<p>Select "License Included" and click "Create Autonomous Database" to create your instance:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.5.png" alt="autonomous.database.5">
+</div>
+</div>
+<div class="paragraph">
+<p>On the "Autonomous Database Details" page click the "Copy" link in the <code>OCID</code> row; this is the unique identifier for your database instance and you&#8217;ll need it later in your application&#8217;s <code>application.yml</code>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.6.png" alt="autonomous.database.6">
+</div>
+</div>
+<div class="paragraph">
+<p>Next, create a schema user. On the "Autonomous Database Details" page select the "Tools" tab and click "Open Database Actions":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.7.png" alt="autonomous.database.7">
+</div>
+</div>
+<div class="paragraph">
+<p>Login with username "ADMIN" and the admin password you defined earlier:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.8.png" alt="autonomous.database.8">
+</div>
+</div>
+<div class="paragraph">
+<p>Under "Development" click the "SQL" button to open the SQL console:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.9.png" alt="autonomous.database.9">
+</div>
+</div>
+<div class="paragraph">
+<p>Copy and paste the following SQL which will create a schema user into the worksheet:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">CREATE</span> USER micronautdemo IDENTIFIED <span class="keyword">BY</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">XXXXXXXXX</span><span class="delimiter">&quot;</span></span>;
+<span class="class">GRANT</span> CONNECT, RESOURCE <span class="keyword">TO</span> micronautdemo;
+<span class="class">GRANT</span> UNLIMITED TABLESPACE <span class="keyword">TO</span> micronautdemo;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a schema user password (must be at least 12 characters and contain a number and an uppercase letter) and replace the text "XXXXXXXXX" with that password.</p>
+</div>
+<div class="paragraph">
+<p>Click the <span class="image"><img src="images/oracleautodb/runscript.png" alt="runscript"></span> ("Run Script") button to execute the SQL:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/autonomous.database.10.png" alt="autonomous.database.10">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-app">5. Writing the App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an app using the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">Micronaut Command Line Interface</a> or with
+<a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=maven --lang=groovy --jdk=11 --features=oracle,data-jdbc,oracle-cloud-sdk,flyway,testcontainers</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as a build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as a language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut app with the default package <code>example.micronaut</code> in a folder named <code>micronautguide</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="dependencies">5.1. Dependencies</h3>
+<div class="paragraph">
+<p>Oracle Cloud Autonomous Database connection information and credentials are stored in the <a href="https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm">Oracle Wallet</a>. In addition to the dependencies added by the features specified when creating the app, we need a few more for Autonomous Database connectivity and automatic wallet configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="comment">&lt;!-- Add the following to your dependencyManagement element --&gt;</span>
+<span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>com.oracle.database.jdbc<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>ojdbc-bom<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;version&gt;</span>21.1.0.0<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;type&gt;</span>pom<span class="tag">&lt;/type&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>import<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span>
+
+<span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut.oraclecloud<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-oraclecloud-atp<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/">Micronaut Oracle Cloud integration documentation</a> for more details and options for working with Oracle Cloud in Micronaut apps.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="entity-class">5.2. Entity class</h3>
+<div class="paragraph">
+<p>Create a <code>Thing</code> entity class to represent database data:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/domain/Thing.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.domain
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Creator</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.GeneratedValue</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Id</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.MappedEntity</span>
+
+<span class="annotation">@MappedEntity</span>
+<span class="annotation">@CompileStatic</span>
+<span class="type">class</span> <span class="class">Thing</span> {
+
+    <span class="annotation">@Id</span>
+    <span class="annotation">@GeneratedValue</span>
+    <span class="predefined-type">Long</span> id
+
+    <span class="directive">final</span> <span class="predefined-type">String</span> name
+
+    <span class="annotation">@Creator</span>
+    Thing(<span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repository-class">5.3. Repository class</h3>
+<div class="paragraph">
+<p>Create a <code>ThingRepository</code> class to read and write <code>Thing</code> database data:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/repository/ThingRepository.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.repository
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Thing</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.jdbc.annotation.JdbcRepository</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.repository.CrudRepository</span>
+
+<span class="annotation">@JdbcRepository</span>(dialect = Dialect.ORACLE)
+<span class="type">interface</span> ThingRepository <span class="directive">extends</span> CrudRepository&lt;Thing, <span class="predefined-type">Long</span>&gt; {
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">List</span>&lt;Thing&gt; findAll()
+
+    Optional&lt;Thing&gt; findByName(<span class="predefined-type">String</span> name)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="data-populator-class">5.4. Data populator class</h3>
+<div class="paragraph">
+<p>Create a <code>DataPopulator</code> class to create some example database entries when the application starts:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/DataPopulator.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Thing</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.repository.ThingRepository</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.StartupEvent</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.event.annotation.EventListener</span>
+
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">javax.transaction.Transactional</span>
+
+<span class="annotation">@Singleton</span>
+<span class="annotation">@Requires</span>(notEnv = <span class="string"><span class="delimiter">'</span><span class="content">test</span><span class="delimiter">'</span></span>)
+<span class="annotation">@CompileStatic</span>
+<span class="type">class</span> <span class="class">DataPopulator</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> ThingRepository thingRepository
+
+    DataPopulator(ThingRepository thingRepository) {
+        <span class="local-variable">this</span>.thingRepository = thingRepository
+    }
+
+    <span class="annotation">@EventListener</span>
+    <span class="annotation">@Transactional</span>
+    <span class="type">void</span> init(StartupEvent event) {
+        <span class="comment">// clear out any existing data</span>
+        thingRepository.deleteAll()
+
+        <span class="comment">// create data</span>
+        Thing fred = <span class="keyword">new</span> Thing(<span class="string"><span class="delimiter">'</span><span class="content">Fred</span><span class="delimiter">'</span></span>)
+        Thing barney = <span class="keyword">new</span> Thing(<span class="string"><span class="delimiter">'</span><span class="content">Barney</span><span class="delimiter">'</span></span>)
+        thingRepository.saveAll([fred, barney])
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controller-class">5.5. Controller class</h3>
+<div class="paragraph">
+<p>Create a <code>ThingController</code> class to view persisted data:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/controller/ThingController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.controller
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Thing</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.repository.ThingRepository</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/things</span><span class="delimiter">'</span></span>)
+<span class="annotation">@ExecuteOn</span>(TaskExecutors.IO)
+<span class="annotation">@CompileStatic</span>
+<span class="type">class</span> <span class="class">ThingController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> ThingRepository thingRepository
+
+    ThingController(ThingRepository thingRepository) {
+        <span class="local-variable">this</span>.thingRepository = thingRepository
+    }
+
+    <span class="annotation">@Get</span>
+    <span class="predefined-type">List</span>&lt;Thing&gt; all() {
+        thingRepository.findAll()
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/{name}</span><span class="delimiter">'</span></span>)
+    Optional&lt;Thing&gt; byName(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        thingRepository.findByName(name)
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration">5.6. Configuration</h3>
+<div class="paragraph">
+<p>Replace the generated <code>application.yml</code> with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">application</span>:
+    <span class="key">name</span>: <span class="string"><span class="content">micronautguide</span></span>
+  <span class="key">executors</span>:
+    <span class="key">io</span>:
+      <span class="key">type</span>: <span class="string"><span class="content">fixed</span></span>
+      <span class="key">nThreads</span>: <span class="string"><span class="content">75 </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="key">datasources</span>:
+  <span class="key">default</span>:
+    <span class="comment"># ocid: </span><i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="comment"># walletPassword: </span><i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="key">username</span>: <span class="string"><span class="content">micronautdemo</span></span>
+    <span class="key">password</span>: <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="key">oci</span>:
+  <span class="key">config</span>:
+    <span class="key">profile</span>: <span class="string"><span class="content">DEFAULT </span></span><i class="conum" data-value="5"></i><b>(5)</b>
+<span class="key">flyway</span>:
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This is optional, but it&#8217;s a good idea to configure the IO pool size when using <code>@ExecuteOn(TaskExecutors.IO)</code> in controllers</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Uncomment the <code>ocid</code> property and set its value with the database OCID unique identifier you saved when creating the database</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Uncomment the <code>walletPassword</code> property and set its value with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Set the <code>password</code> property with the <code>micronautdemo</code> schema user password you created</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Change the profile name if you&#8217;re not using the default, and optionally add a value for the path to the config file if necessary as described in the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth">Authentication section</a> of the Micronaut Oracle Cloud docs</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Replace the generated <code>application-test.yml</code> with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/application-test.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+  <span class="key">default</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">jdbc:tc:oracle:thin:@/xe</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">org.testcontainers.jdbc.ContainerDatabaseDriver</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">system</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">oracle</span></span>
+<span class="key">flyway</span>:
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">locations</span>: <span class="string"><span class="content">classpath:db/migration</span></span>
+      <span class="key">baseline-version</span>: <span class="string"><span class="content">0</span></span>
+      <span class="key">baseline-on-migrate</span>: <span class="string"><span class="content">true</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a <code>testcontainers.properties</code> file in <code>src/test/resources</code> with this content:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/testcontainers.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">oracle.container.image=registry.gitlab.com/micronaut-projects/micronaut-graal-tests/oracle-database:18.4.0-xe</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a new Flyway migration SQL script in <code>src/main/resources/db/migration/V1__create-schema.sql</code> and add the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/migration/V1__create-schema.sql</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">CREATE</span> <span class="type">TABLE</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">THING</span><span class="delimiter">&quot;</span></span> (<span class="string"><span class="delimiter">&quot;</span><span class="content">ID</span><span class="delimiter">&quot;</span></span> NUMBER(<span class="integer">19</span>) <span class="directive">PRIMARY</span> <span class="type">KEY</span> <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,<span class="string"><span class="delimiter">&quot;</span><span class="content">NAME</span><span class="delimiter">&quot;</span></span> <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>) <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>);
+<span class="class">CREATE</span> SEQUENCE <span class="string"><span class="delimiter">&quot;</span><span class="content">THING_SEQ</span><span class="delimiter">&quot;</span></span> MINVALUE <span class="integer">1</span> START WITH <span class="integer">1</span> NOCACHE NOCYCLE;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And finally, you can optionally edit <code>src/main/resources/logback.xml</code> and add the following to monitor the SQL queries that Micronaut Data performs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;logger</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">'</span><span class="content">io.micronaut.data.query</span><span class="delimiter">'</span></span> <span class="attribute-name">level</span>=<span class="string"><span class="delimiter">'</span><span class="content">debug</span><span class="delimiter">'</span></span> <span class="tag">/&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="writing-tests">5.7. Writing Tests</h3>
+<div class="paragraph">
+<p>Create a test to verify that database access works:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/ThingRepositorySpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Thing</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.repository.ThingRepository</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="keyword">import</span> <span class="include">javax.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">java.util.stream.Collectors</span>
+
+<span class="annotation">@MicronautTest</span>
+<span class="type">class</span> <span class="class">ThingRepositorySpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@Inject</span>
+    ThingRepository thingRepository
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test findAll</span><span class="delimiter">'</span></span>() {
+
+        <span class="key">when</span>:
+        <span class="comment">// clear out existing data; safe because each</span>
+        <span class="comment">// test runs in a transaction that's rolled back</span>
+        thingRepository.deleteAll()
+
+        <span class="key">then</span>:
+        !thingRepository.count()
+
+        <span class="key">when</span>:
+        thingRepository.saveAll(<span class="predefined-type">Arrays</span>.asList(
+                <span class="keyword">new</span> Thing(<span class="string"><span class="delimiter">'</span><span class="content">t1</span><span class="delimiter">'</span></span>),
+                <span class="keyword">new</span> Thing(<span class="string"><span class="delimiter">'</span><span class="content">t2</span><span class="delimiter">'</span></span>),
+                <span class="keyword">new</span> Thing(<span class="string"><span class="delimiter">'</span><span class="content">t3</span><span class="delimiter">'</span></span>)))
+
+        <span class="predefined-type">List</span>&lt;Thing&gt; things = thingRepository.findAll()
+
+        <span class="key">then</span>:
+        things.size() == <span class="integer">3</span>
+        [<span class="string"><span class="delimiter">'</span><span class="content">t1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">t2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">t3</span><span class="delimiter">'</span></span>] == things.stream()
+                .map(<span class="key">Thing</span>::getName)
+                .sorted()
+                .collect(Collectors.toList())
+    }
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test findByName</span><span class="delimiter">'</span></span>() {
+        <span class="key">given</span>:
+        <span class="predefined-type">String</span> name = <span class="predefined-type">UUID</span>.randomUUID()
+
+        <span class="key">when</span>:
+        Thing thing = thingRepository.findByName(name).orElse(<span class="predefined-constant">null</span>)
+
+        <span class="key">then</span>:
+        !thing
+
+        <span class="key">when</span>:
+        thingRepository.save(<span class="keyword">new</span> Thing(name))
+        thing = thingRepository.findByName(name).orElse(<span class="predefined-constant">null</span>)
+
+        <span class="key">then</span>:
+        thing
+        name == thing.name
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">6. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ ./mvnw test</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">7. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application use the <code>./mvnw mn:run</code> command which will start the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>You should see output similar to the following, indicating that the database connectivity and wallet configuration is all handled automatically, and the Flyway migration runs since the database is determined to be out of date. Also, if you added the Logback logger above, you&#8217;ll see the results of the work done by <code>DataPopulator</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">INFO  com.oracle.bmc.Region - Loaded service 'DATABASE' endpoint mappings: {US_ASHBURN_1=https://database.us-ashburn-1.oraclecloud.com}
+INFO  c.oracle.bmc.database.DatabaseClient - Setting endpoint to https://database.us-ashburn-1.oraclecloud.com
+INFO  i.m.o.a.j.OracleWalletArchiveProvider - Using default serviceAlias: MicronautDemo_high
+INFO  i.m.flyway.AbstractFlywayMigration - Running migrations for database with qualifier [default]
+INFO  o.f.c.i.database.base.DatabaseType - Database: jdbc:oracle:thin:@(description=(retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.us-ashburn-1.oraclecloud.com))(connect_data=(service_name=rxfmolsmtfaakhf_micronautdemo_high.adb.oraclecloud.com))(security=(ssl_server_cert_dn=&quot;CN=adwc.uscom-east-1.oraclecloud.com,OU=Oracle BMCS US,O=Oracle Corporation,L=Redwood City,ST=California,C=US&quot;))) (Oracle 19.0)
+INFO  o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.069s)
+INFO  o.f.c.i.s.JdbcTableSchemaHistory - Creating Schema History table &quot;MICRONAUTDEMO&quot;.&quot;flyway_schema_history&quot; ...
+INFO  o.f.core.internal.command.DbMigrate - Migrating schema &quot;MICRONAUTDEMO&quot; to version &quot;1 - create-schema&quot;
+INFO  o.f.core.internal.command.DbMigrate - Successfully applied 1 migration to schema &quot;MICRONAUTDEMO&quot;, now at version v1 (execution time 00:01.020s)
+DEBUG io.micronaut.data.query - Executing Query: DELETE  FROM &quot;THING&quot;
+DEBUG io.micronaut.data.query - Executing SQL Insert: INSERT INTO &quot;THING&quot; (&quot;NAME&quot;,&quot;ID&quot;) VALUES (?,&quot;THING_SEQ&quot;.nextval)
+DEBUG io.micronaut.data.query - Executing SQL Insert: INSERT INTO &quot;THING&quot; (&quot;NAME&quot;,&quot;ID&quot;) VALUES (?,&quot;THING_SEQ&quot;.nextval)
+INFO  io.micronaut.runtime.Micronaut - Startup completed in 12776ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can run some cURL requests to test the application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">complete $ curl -i localhost:8080/things
+HTTP/1.1 200 OK
+Content-Type: application/json
+content-length: 49
+connection: keep-alive
+
+[{&quot;id&quot;:1,&quot;name&quot;:&quot;Fred&quot;},{&quot;id&quot;:2,&quot;name&quot;:&quot;Barney&quot;}]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">complete $ curl -i localhost:8080/things/Fred
+HTTP/1.1 200 OK
+Content-Type: application/json
+content-length: 22
+connection: keep-alive
+
+{&quot;id&quot;:1,&quot;name&quot;:&quot;Fred&quot;}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">complete $ curl -i localhost:8080/things/Ralph
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+content-length: 89
+connection: keep-alive
+
+{&quot;message&quot;:&quot;Page Not Found&quot;,&quot;_links&quot;:{&quot;self&quot;:{&quot;href&quot;:&quot;/things/Ralph&quot;,&quot;templated&quot;:false}}}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Read more about the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/">Micronaut Oracle Cloud</a> integration.</p>
+</div>
+<div class="paragraph">
+<p>Optionally, you can use the approach described in <a href="https://guides.micronaut.io/latest/micronaut-oracle-cloud.html">Deploy a Micronaut app to Oracle Cloud</a> to deploy this application to Oracle Cloud.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-micronaut">9. Help with Micronaut</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="https://micronaut.io/wp-content/uploads/2021/03/Micronaut_byobjectcomputing_w.svg" alt=""/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li id="menu-item-2885" class="show-on-blog menu-item menu-item-type-custom menu-item-object-custom menu-item-2885">
+                                <a target="_blank" rel="noopener" href="https://micronaut.io/feed/rss/">
+                                    <i class="fas fa-rss">
+                                        <span class="sr-only">RSS</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2886" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2886">
+                                <a target="_blank" rel="noopener" href="https://twitter.com/micronautfw">
+                                    <i class="fab fa-twitter">
+                                        <span class="sr-only">Twitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2887" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2887">
+                                <a href="mailto:info@micronaut.io">
+                                    <i class="fas fa-envelope">
+                                        <span class="sr-only">Mail</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2888" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2888">
+                                <a target="_blank" rel="noopener" href="https://gitter.im/micronautfw/">
+                                    <i class="fab fa-gitter">
+                                        <span class="sr-only">Gitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2889" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2889">
+                                <a target="_blank" rel="noopener" href="https://github.com/micronaut-projects/">
+                                    <i class="fab fa-github">
+                                        <span class="sr-only">GitHub</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2890" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2890">
+                                <a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLI74De5M9T72YshO4Sc90wtGr286nM8Yu">
+                                    <i class="fab fa-youtube">
+                                        <span class="sr-only">YouTube</span>
+                                    </i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 Object Computing, Inc. All rights reserved</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+
