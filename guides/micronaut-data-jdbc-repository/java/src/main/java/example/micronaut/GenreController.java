@@ -32,10 +32,9 @@ public class GenreController {
     }
 
     @Get("/{id}") // <4>
-    public Genre show(Long id) {
+    public Optional<Genre> show(Long id) {
         return genreRepository
-                .findById(id)
-                .orElse(null); // <5>
+                .findById(id); // <5>
     }
 
     @Put // <6>
