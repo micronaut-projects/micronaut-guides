@@ -8,10 +8,7 @@ import javax.validation.constraints.NotBlank;
 public class GenreSaveCommand {
 
     @NotBlank
-    private String name;
-
-    public GenreSaveCommand() {
-    }
+    private final String name;
 
     public GenreSaveCommand(String name) {
         this.name = name;
@@ -21,7 +18,4 @@ public class GenreSaveCommand {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 }
