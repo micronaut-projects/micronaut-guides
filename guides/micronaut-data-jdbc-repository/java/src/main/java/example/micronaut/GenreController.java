@@ -48,21 +48,9 @@ public class GenreController {
                 .header(HttpHeaders.LOCATION, location(command.getId()).getPath()); // <8>
     }
 
-    @Get(value = "/list{?args*}") // <9>
-    public List<Genre> list(@Valid SortingAndOrderArguments args) {
-        Optional<Sort> sortOptional = parseSort(args);
-        if (args.getMax().isPresent()) {
-            int size = args.getMax().get();
-            int page = args.getOffset().isPresent() ? (args.getOffset().get() / size) : 0;
-            Pageable pageable = sortOptional
-                    .map(sort -> Pageable.from(page, size, sort))
-                    .orElseGet(() -> Pageable.from(page, size));
-            return genreRepository.findAll(pageable).getContent();
-        }
-        Iterable<Genre> genreIterable = sortOptional.map(genreRepository::findAll)
-                .orElseGet(genreRepository::findAll);
-        return StreamSupport.stream(genreIterable.spliterator(), false)
-                .collect(Collectors.toList());
+    @Get(value = "/list") // <9>
+    public List<Genre> list(@Valid Pageable pageable) {
+        return genreRepository.findAll(pageable).getContent();
     }
 
     private Optional<Sort> parseSort(SortingAndOrderArguments args) {

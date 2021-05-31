@@ -28,16 +28,6 @@ public class GenreControllerTest {
     HttpClient client; // <2>
 
     @Test
-    public void supplyAnInvalidOrderTriggersValidationFailure() {
-        HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -> {
-            client.toBlocking().exchange(HttpRequest.GET("/genres/list?order=foo"));
-        });
-
-        assertNotNull(thrown.getResponse());
-        assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
-    }
-
-    @Test
     public void testFindNonExistingGenreReturns404() {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -> {
             client.toBlocking().exchange(HttpRequest.GET("/genres/99"));
@@ -95,19 +85,19 @@ public class GenreControllerTest {
 
         assertEquals(2, genres.size());
 
-        request = HttpRequest.GET("/genres/list?max=1");
+        request = HttpRequest.GET("/genres/list?size=1");
         genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(1, genres.size());
         assertEquals("DevOps", genres.get(0).getName());
 
-        request = HttpRequest.GET("/genres/list?max=1&order=desc&sort=name");
+        request = HttpRequest.GET("/genres/list?size=1&sort=name,desc");
         genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(1, genres.size());
         assertEquals("Micro-services", genres.get(0).getName());
 
-        request = HttpRequest.GET("/genres/list?max=1&offset=10");
+        request = HttpRequest.GET("/genres/list?size=1&page=2");
         genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(0, genres.size());
