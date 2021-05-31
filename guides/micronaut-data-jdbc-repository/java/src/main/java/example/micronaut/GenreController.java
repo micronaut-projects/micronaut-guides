@@ -11,6 +11,8 @@ import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.Status;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.data.exceptions.DataAccessException;
@@ -95,9 +97,9 @@ public class GenreController {
     }
 
     @Delete("/{id}") // <12>
-    public HttpResponse delete(Long id) {
+    @Status(HttpStatus.NO_CONTENT)
+    public void delete(Long id) {
         genreRepository.deleteById(id);
-        return HttpResponse.noContent();
     }
 
     protected URI location(Long id) {
