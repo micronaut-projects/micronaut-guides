@@ -110,12 +110,33 @@ resource:application.yml[tag=application]
 
 === Repository Access
 
-Next, create an interface to define the operations to access the database:
+Next, create an interface to define the operations to access the database. The implementation of the following repository is created at compilation time by Micronaut Data.
 
 source:GenreRepository[]
 
 <1> `@JdbcRepository` with a specific dialect.
-<2> The entity to treat as the root entity for the purposes of querying is established either from the method signature or from the generic type parameter specified to the `GenericRepository` interface.
+<2> `Genre`, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the `GenericRepository` interface.
+
+
+The repository extends from `PageableRepository`. It inherits the hierarchy `PageableRepository` -> `CrudRepository` -> `GenericRepository`.
+
+|===
+|Repository | Description
+
+|`PageableRepository`
+| A repository that supports pagination. It provides `findAll(Pageable)` and `findAll(Sort)`.
+
+|`CrudRepository`
+| A repository interface for performing CRUD (Create, Read, Update, Delete). It provides methods such as `findAll()`, `save(Genre)`, `deleteById(Long)` and `findById(Long)`.
+
+|`GenericRepository`
+| A root interface that features no methods but defines the entity type and ID type as generic arguments.
+
+|===
+
+
+
+
 
 
 === Controller
@@ -153,7 +174,6 @@ source:GenreController[]
 <11> Maps a `POST` request to `/ex` which generates an exception.
 <12> Maps a `DELETE` request to `/genres/{id}` which attempts to remove a genre. This illustrates the use of a URL path variable.
 
-
 === Writing Tests
 
 Create a test which verifies the CRUD operations:
@@ -166,13 +186,9 @@ test:GenreControllerTest[]
 <4> If you care just about the object in the response use `retrieve`.
 <5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
-
 include::{commondir}/common-testApp.adoc[]
 
-
 include::{commondir}/common-runapp.adoc[]
-
-
 
 == Using Postgresql
 
