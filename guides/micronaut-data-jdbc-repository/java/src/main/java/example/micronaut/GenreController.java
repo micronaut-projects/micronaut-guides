@@ -1,6 +1,8 @@
 package example.micronaut;
 
 import example.micronaut.domain.Genre;
+import io.micronaut.data.model.Pageable;
+import io.micronaut.data.model.Sort;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
@@ -15,6 +17,8 @@ import io.micronaut.data.exceptions.DataAccessException;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
+
 
 @ExecuteOn(TaskExecutors.IO)  // <1>
 @Controller("/genres")  // <2>
@@ -44,7 +48,25 @@ public class GenreController {
 
     @Get(value = "/list{?args*}") // <9>
     public List<Genre> list(@Valid SortingAndOrderArguments args) {
-        return genreRepository.findAll(args);
+        if (args.getMax().isPresent()) {
+            int size = args.getMax().get();
+            int page = args.getOffset().isPresent() ? (args.getOffset().get() / size) : 0;
+            Pageable pageable = parseSort(args)
+                    .map(sort -> Pageable.from(page, size, sort))
+                    .orElseGet(() -> Pageable.from(page, size));
+            return genreRepository.findAll(pageable);
+        }
+        return genreRepository.findAll();
+    }
+
+    private Optional<Sort> parseSort(SortingAndOrderArguments args) {
+        if (args.getSort().isPresent() && args.getOrder().isPresent()) {
+            return Optional.of(Sort.of(args.getOrder().get().equals("desc") ?
+                    Sort.Order.desc(args.getSort().get()) :
+                    Sort.Order.asc(args.getSort().get())));
+
+        }
+        return Optional.empty();
     }
 
     @Post // <10>
