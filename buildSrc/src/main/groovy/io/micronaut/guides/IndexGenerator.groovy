@@ -30,19 +30,19 @@ class IndexGenerator {
 
         save(templateText, 'dist/index.html', buildDir, metadatas)
         for (GuideMetadata metadata :  metadatas) {
-            save(templateText, "dist/${metadata.slug}.html", buildDir, [metadata])
+            save(templateText, "dist/${metadata.slug}.html", buildDir, [metadata], metadata.title)
         }
     }
 
-    static void save(String templateText, String filename, File buildDir, List<GuideMetadata> metadatas ) {
-        String text = indexText(templateText, metadatas)
+    static void save(String templateText, String filename, File buildDir, List<GuideMetadata> metadatas, String title = 'Micronaut Guides') {
+        String text = indexText(templateText, metadatas, title)
         Path path = Paths.get(buildDir.absolutePath, filename)
         File output = path.toFile()
         output.createNewFile()
         output.text = text
     }
 
-    static String indexText(String templateText, List<GuideMetadata> metadatas) {
+    static String indexText(String templateText, List<GuideMetadata> metadatas, String title) {
         boolean singleGuide = metadatas.size() == 1
 
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
@@ -63,7 +63,7 @@ class IndexGenerator {
         if (singleGuide) {
             text = text.replace("@breadcrumb@", breadcrumb)
         }
-        text = text.replace("@title@", '')
+        text = text.replace("@title@", title)
         text = text.replace("@bodyclass@", 'guideindex')
         text = text.replace("@toccontent@", '')
         text = text.replace("@content@", index)
