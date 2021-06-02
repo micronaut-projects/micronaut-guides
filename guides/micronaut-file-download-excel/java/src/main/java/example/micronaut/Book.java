@@ -9,14 +9,11 @@ import javax.validation.constraints.NotBlank;
 public class Book {
     @NonNull
     @NotBlank
-    private String isbn;
+    private final String isbn;
 
     @NonNull
     @NotBlank
-    private String name;
-
-    public Book() {
-    }
+    private final String name;
 
     public Book(@NonNull @NotBlank String isbn, @NonNull @NotBlank String name) {
         this.isbn = isbn;
@@ -28,17 +25,9 @@ public class Book {
         return isbn;
     }
 
-    public void setIsbn(@NonNull String isbn) {
-        this.isbn = isbn;
-    }
-
     @NonNull
     public String getName() {
         return name;
-    }
-
-    public void setName(@NonNull String name) {
-        this.name = name;
     }
 
     @Override
