@@ -27,7 +27,7 @@ class GraphQLControllerTest {
         assertEquals(HttpStatus.OK, rsp.status())
         Assertions.assertNotNull(rsp.body())
 
-        val bookInfo = rsp.getBody(Map::class.java).get().get("data") as Map<*, *>
+        val bookInfo = rsp.getBody(Map::class.java).get()["data"] as Map<*, *>
         val bookById = bookInfo["bookById"] as Map<*, *>?
         assertEquals("Harry Potter and the Philosopher's Stone", bookById!!["name"])
         assertEquals(223, bookById["pageCount"])
