@@ -5,7 +5,7 @@ import builders.dsl.spreadsheet.query.api.SpreadsheetCriteriaResult
 import builders.dsl.spreadsheet.query.poi.PoiSpreadsheetCriteria
 import geb.spock.GebSpec
 import io.micronaut.runtime.server.EmbeddedServer
-import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.IgnoreIf
 import spock.util.concurrent.PollingConditions
 import javax.inject.Inject
