@@ -50,9 +50,7 @@ class IndexGenerator {
 
         for (Category cat : Category.values()) {
             if (metadatas.findAll { it.category == cat }) {
-                index += '<div class="categorygrid">'
                 index += renderMetadatas(baseURL, cat, metadatas.findAll { it.category == cat }, singleGuide)
-                index += '</div>'
             }
         }
         String text = templateText
@@ -74,19 +72,21 @@ class IndexGenerator {
 
     static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
         String index = ''
-        int count = 0;
+        int count = 0
+        List<GuideMetadata> filteredMetadatas = System.getProperty('micronaut.guide') ?
+                metadatas.findAll { it.slug == System.getProperty('micronaut.guide') } :
+                metadatas
+        if (!filteredMetadatas) {
+            return index
+        }
+        index += '<div class="categorygrid">'
         index += "<div class='row'>"
         index += "<div class='col-sm-4'>"
         index += category(cat)
         index += "</div>"
         count++
 
-        for (GuideMetadata metadata : metadatas) {
-            if (System.getProperty('micronaut.guide') != null &&
-                    System.getProperty('micronaut.guide') != metadata.slug) {
-                continue
-            }
-
+        for (GuideMetadata metadata : filteredMetadatas) {
             if ((count % 3) == 0) {
                 index += "</div>"
                 index += "<div class='row'>"
@@ -110,6 +110,7 @@ class IndexGenerator {
         }
 
         index += "</div>"
+        index += '</div>'
         index
     }
 
@@ -216,7 +217,7 @@ class IndexGenerator {
             case Category.DISTRIBUTED_TRACING:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
 
-            case Category.APPRENTICE:
+            case Category.GETTING_STARTED:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
             case Category.ORACLE_CLOUD:

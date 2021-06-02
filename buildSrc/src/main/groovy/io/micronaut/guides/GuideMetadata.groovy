@@ -30,5 +30,7 @@ class GuideMetadata {
         ApplicationType applicationType
         String name
         List<String> features
+        List<String> excludeSource
+        List<String> excludeTest
     }
 }
