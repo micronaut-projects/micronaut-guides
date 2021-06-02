@@ -1,39 +1,26 @@
 package example.micronaut.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import io.micronaut.data.annotation.GeneratedValue;
+import io.micronaut.data.annotation.Id;
+import io.micronaut.data.annotation.MappedEntity;
+import io.micronaut.data.annotation.Relation;
+
 import javax.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "book")
+@MappedEntity
 public class Book {
 
-    public Book() {}
-
-    public Book(@NotNull String isbn, @NotNull String name, Genre genre) {
-        this.isbn = isbn;
-        this.name = name;
-        this.genre = genre;
-    }
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(GeneratedValue.Type.AUTO)
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
     private String name;
 
     @NotNull
-    @Column(name = "isbn", nullable = false)
     private String isbn;
 
-    @ManyToOne
+    @Relation(value = Relation.Kind.MANY_TO_ONE)
     private Genre genre;
 
     public Long getId() {
