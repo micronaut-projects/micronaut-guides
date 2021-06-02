@@ -1,0 +1,152 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app example.micronaut.micronautguide --features=aws-lambda --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add `aws-lambda` feature.
+
+include::{commondir}/common-default-package.adoc[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+=== Delete Sample Code
+
+Micronaut generates some sample code by default. Delete the following files:
+
+* `src/main/java/example/micronaut/Book.java`
+* `src/main/java/example/micronaut/BookRequest.java`
+* `src/main/java/example/micronaut/BookSaved.java`
+* `src/test/java/example/micronaut/BookRequestHandlerTest.java`
+
+=== Thumbnail Configuration
+
+Add the following configuration:
+
+resource:application.yml[tag=thumbnail]
+
+Create an interface to encapsulate configuration:
+
+source:ThumbnailConfiguration[]
+
+source:ThumbnailConfigurationProperties[]
+
+<1> The `@ConfigurationProperties` annotation takes the configuration prefix
+<2> You can use validation constraints in the `@ConfigurationProperties` objects.
+
+=== Thumbnail Generation
+
+Create a contract for thumbnail generation. We leverage the `@Pattern` annotation to accept only `jpg` and `png` files.
+
+source:ThumbnailGenerator[]
+
+Add a dependency to https://github.com/coobird/thumbnailator[Thumbnailator] - a thumbnail generation library for Java.
+
+dependency:thumbnailator[groupId=net.coobird,version=@thumbnailatorVersion@]
+
+Create an implementation of `ThumbnailGenerator` which uses `Thumbnailator`.
+
+source:ThumbnailatorThumbnailGenerator[]
+
+<1> Use `javax.inject.Singleton` to designate a class a a singleton.
+<2> Constructor injection for `ThumbnailConfiguration`.
+
+=== Handler
+
+Add the following dependency to subscribe to `S3NotificationEvent`:
+
+dependency:aws-lambda-java-events[groupId=com.amazonaws,version=@aws-lambda-java-eventsVersion@]
+
+To be able to inject an `S3Client` Add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-aws-sdk-v2[groupId=io.micronaut.aws]
+
+dependency:s3[groupId=software.amazon.awssdk]
+
+:dependencies:
+
+Create a Handler which receives a S3 notification event and for each S3 event of type `ObjectCreated`
+creates a thumbnail if the S3 object is a png or jpg in the `thumbnails` folder of the same S3 bucket which trigger the event.
+
+source:Handler[]
+
+<1> We want to handle `S3EventNotification` events.
+<2> Injection for `S3Client`.
+<3> Injection for `ThumbnailGenerator`.
+<4> Extra verification that the event is a `ObjectCreated` event.
+
+== S3
+
+Create an https://aws.amazon.com/s3/[S3] bucket.
+
+Inside the bucket create two folders `thumbnails` and `images`.
+
+== Lambda
+
+Create a Lambda Function. As a runtime, select Java 11 (Correto).
+
+image::create-function.png[]
+
+=== IAM Role
+
+Grant permissions to access the S3 bucket to the IAM role associated with the Lambda.
+
+=== Triggers
+
+Create two S3 trigger one for PNGs and one for JPGs:
+
+image::s3trigger.png[]
+
+Configure the trigger to:
+
+- Listen only to PUT events.
+- Only for files uploaded to the `images` folder
+- Only for file suffixed `jpg`
+
+=== Upload Code
+
+include::{commondir}/common-executable-jar.adoc[]
+
+
+Upload it:
+
+image::upload-function-code.png[]
+
+=== Handler
+
+In the AWS Console, as Handler, set:
+
+`example.micronaut.Handler`
+
+=== Test
+
+You can test it easily upload a JPG file to the images folder of the S3 bucket you. You can do it directly in the AWS Console. In a few seconds, you will see a thumbnail saved within the `thumbnails` folder of the bucket.
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support]
+
+* https://aws.amazon.com/lambda/[AWS Lambda]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

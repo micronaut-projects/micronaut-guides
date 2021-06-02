@@ -1,0 +1,227 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+* JDK 11 or greater installed with `JAVA_HOME` configured appropriately
+* An Oracle Cloud account (create a free trial account at https://signup.oraclecloud.com[signup.oraclecloud.com])
+* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Provision Oracle Autonomous Database
+
+Login to your Oracle Cloud tenancy, and from the Oracle Cloud Menu select "Oracle Database" and then "Autonomous Transaction Processing":
+
+image::oracleautodb/autonomous.database.1.png[]
+
+Enter "MicronautDemo" as the display name and database name:
+
+image::oracleautodb/autonomous.database.2.png[]
+
+Select "Transaction Processing" and "Shared Infrastructure", and if you're using a trial account be sure to select "Always Free":
+
+image::oracleautodb/autonomous.database.3.png[]
+
+Create an Admin password (must be at least 12 characters and contain a number and an uppercase letter) and select "Secure access from everywhere":
+
+image::oracleautodb/autonomous.database.4.png[]
+
+Select "License Included" and click "Create Autonomous Database" to create your instance:
+
+image::oracleautodb/autonomous.database.5.png[]
+
+On the "Autonomous Database Details" page click the "Copy" link in the `OCID` row; this is the unique identifier for your database instance and you'll need it later in your application's `application.yml`.
+
+image::oracleautodb/autonomous.database.6.png[]
+
+Next, create a schema user. On the "Autonomous Database Details" page select the "Tools" tab and click "Open Database Actions":
+
+image::oracleautodb/autonomous.database.7.png[]
+
+Login with username "ADMIN" and the admin password you defined earlier:
+
+image::oracleautodb/autonomous.database.8.png[]
+
+Under "Development" click the "SQL" button to open the SQL console:
+
+image::oracleautodb/autonomous.database.9.png[]
+
+Copy and paste the following SQL which will create a schema user into the worksheet:
+
+[source,sql]
+----
+CREATE USER micronautdemo IDENTIFIED BY "XXXXXXXXX";
+GRANT CONNECT, RESOURCE TO micronautdemo;
+GRANT UNLIMITED TABLESPACE TO micronautdemo;
+----
+
+Create a schema user password (must be at least 12 characters and contain a number and an uppercase letter) and replace the text "XXXXXXXXX" with that password.
+
+Click the image:oracleautodb/runscript.png[] ("Run Script") button to execute the SQL:
+
+image::oracleautodb/autonomous.database.10.png[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11 --features=oracle,data-jdbc,oracle-cloud-sdk,flyway,testcontainers
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+include::{commondir}/common-default-package.adoc[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+=== Dependencies
+
+Oracle Cloud Autonomous Database connection information and credentials are stored in the https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm[Oracle Wallet]. In addition to the dependencies added by the features specified when creating the app, we need a few more for Autonomous Database connectivity and automatic wallet configuration:
+
+:dependencies:
+dependency:ojdbc-bom[groupId=com.oracle.database.jdbc,version=@ojdbc-bomVersion@,pom=true]
+dependency:micronaut-oraclecloud-atp[groupId=io.micronaut.oraclecloud]
+:dependencies:
+
+See the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud integration documentation] for more details and options for working with Oracle Cloud in Micronaut apps.
+
+=== Entity class
+
+Create a `Thing` entity class to represent database data:
+
+source:domain/Thing[]
+
+=== Repository class
+
+Create a `ThingRepository` class to read and write `Thing` database data:
+
+source:repository/ThingRepository[]
+
+=== Data populator class
+
+Create a `DataPopulator` class to create some example database entries when the application starts:
+
+source:DataPopulator[]
+
+=== Controller class
+
+Create a `ThingController` class to view persisted data:
+
+source:controller/ThingController[]
+
+=== Configuration
+
+Replace the generated `application.yml` with this:
+
+resource:application.yml[]
+
+<1> This is optional, but it's a good idea to configure the IO pool size when using `@ExecuteOn(TaskExecutors.IO)` in controllers
+<2> Uncomment the `ocid` property and set its value with the database OCID unique identifier you saved when creating the database
+<3> Uncomment the `walletPassword` property and set its value with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
+<4> Set the `password` property with the `micronautdemo` schema user password you created
+<5> Change the profile name if you're not using the default, and optionally add a value for the path to the config file if necessary as described in the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth[Authentication section] of the Micronaut Oracle Cloud docs
+
+Replace the generated `application-test.yml` with this:
+
+testResource:application-test.yml[]
+
+Create a `testcontainers.properties` file in `src/test/resources` with this content:
+
+testResource:testcontainers.properties[]
+
+Create a new Flyway migration SQL script in `src/main/resources/db/migration/V1__create-schema.sql` and add the following:
+
+resource:db/migration/V1__create-schema.sql[]
+
+And finally, you can optionally edit `src/main/resources/logback.xml` and add the following to monitor the SQL queries that Micronaut Data performs:
+
+[source,xml]
+----
+<logger name='io.micronaut.data.query' level='debug' />
+----
+
+=== Writing Tests
+
+Create a test to verify that database access works:
+
+test:ThingRepositoryTest[]
+
+include::{commondir}/common-testApp.adoc[]
+
+include::{commondir}/common-runapp.adoc[]
+
+You should see output similar to the following, indicating that the database connectivity and wallet configuration is all handled automatically, and the Flyway migration runs since the database is determined to be out of date. Also, if you added the Logback logger above, you'll see the results of the work done by `DataPopulator`:
+
+[source, bash]
+----
+INFO  com.oracle.bmc.Region - Loaded service 'DATABASE' endpoint mappings: {US_ASHBURN_1=https://database.us-ashburn-1.oraclecloud.com}
+INFO  c.oracle.bmc.database.DatabaseClient - Setting endpoint to https://database.us-ashburn-1.oraclecloud.com
+INFO  i.m.o.a.j.OracleWalletArchiveProvider - Using default serviceAlias: MicronautDemo_high
+INFO  i.m.flyway.AbstractFlywayMigration - Running migrations for database with qualifier [default]
+INFO  o.f.c.i.database.base.DatabaseType - Database: jdbc:oracle:thin:@(description=(retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.us-ashburn-1.oraclecloud.com))(connect_data=(service_name=rxfmolsmtfaakhf_micronautdemo_high.adb.oraclecloud.com))(security=(ssl_server_cert_dn="CN=adwc.uscom-east-1.oraclecloud.com,OU=Oracle BMCS US,O=Oracle Corporation,L=Redwood City,ST=California,C=US"))) (Oracle 19.0)
+INFO  o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.069s)
+INFO  o.f.c.i.s.JdbcTableSchemaHistory - Creating Schema History table "MICRONAUTDEMO"."flyway_schema_history" ...
+INFO  o.f.core.internal.command.DbMigrate - Migrating schema "MICRONAUTDEMO" to version "1 - create-schema"
+INFO  o.f.core.internal.command.DbMigrate - Successfully applied 1 migration to schema "MICRONAUTDEMO", now at version v1 (execution time 00:01.020s)
+DEBUG io.micronaut.data.query - Executing Query: DELETE  FROM "THING"
+DEBUG io.micronaut.data.query - Executing SQL Insert: INSERT INTO "THING" ("NAME","ID") VALUES (?,"THING_SEQ".nextval)
+DEBUG io.micronaut.data.query - Executing SQL Insert: INSERT INTO "THING" ("NAME","ID") VALUES (?,"THING_SEQ".nextval)
+INFO  io.micronaut.runtime.Micronaut - Startup completed in 12776ms. Server Running: http://localhost:8080
+----
+
+You can run some cURL requests to test the application:
+
+[source,bash]
+----
+complete $ curl -i localhost:8080/things
+HTTP/1.1 200 OK
+Content-Type: application/json
+content-length: 49
+connection: keep-alive
+
+[{"id":1,"name":"Fred"},{"id":2,"name":"Barney"}]
+----
+
+[source,bash]
+----
+complete $ curl -i localhost:8080/things/Fred
+HTTP/1.1 200 OK
+Content-Type: application/json
+content-length: 22
+connection: keep-alive
+
+{"id":1,"name":"Fred"}
+----
+
+[source,bash]
+----
+complete $ curl -i localhost:8080/things/Ralph
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+content-length: 89
+connection: keep-alive
+
+{"message":"Page Not Found","_links":{"self":{"href":"/things/Ralph","templated":false}}}
+----
+
+include::{commondir}/common-next.adoc[]
+
+Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud] integration.
+
+Optionally, you can use the approach described in https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[Deploy a Micronaut app to Oracle Cloud] to deploy this application to Oracle Cloud.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

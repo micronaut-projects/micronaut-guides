@@ -9,6 +9,7 @@ import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 import javax.inject.Inject
@@ -29,6 +30,9 @@ class BasicAuthTest {
         // then: 'returns unauthorized'
         val thrown = assertThrows(HttpClientResponseException::class.java, e) // <4>
         assertEquals(thrown.status, HttpStatus.UNAUTHORIZED)
+
+        assertTrue(thrown.response.headers.contains("WWW-Authenticate"))
+        assertEquals(thrown.response.headers.get("WWW-Authenticate"), "Basic realm=\"Micronaut Guide\"")
 
         //when: 'A secured URL is accessed with Basic Auth'
         val rsp = client.toBlocking().exchange(HttpRequest.GET<Any>("/")

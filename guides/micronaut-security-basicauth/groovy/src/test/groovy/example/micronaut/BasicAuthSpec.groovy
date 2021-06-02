@@ -25,6 +25,9 @@ class BasicAuthSpec extends Specification {
         then: 'returns unauthorized'
         HttpClientResponseException e = thrown() // <4>
         e.status == HttpStatus.UNAUTHORIZED
+        e.response.headers.contains("WWW-Authenticate")
+        e.response.headers.get("WWW-Authenticate") ==  'Basic realm=\"Micronaut Guide"'
+
     }
 
     def "Verify HTTP Basic Auth works"() {
