@@ -11,9 +11,7 @@ class DbRepository {
     }
 
     fun findAllAuthors(): List<Author> {
-        return books.stream()
-            .map(Book::author)
-            .collect(Collectors.toList())
+        return books.map(Book::author)
     }
 
     companion object {
