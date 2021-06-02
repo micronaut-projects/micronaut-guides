@@ -93,37 +93,16 @@ resource:views/index.html[]
 Often, file transfers remain untested in many applications. In this section, you will see how easy is to test that the
 file downloads but also that the downloaded file contents match our expectations.
 
-include::{commondir}/common-geb.adoc[]
-
-Create a Geb Configuration file. We configure some Chrome options to control the download path.
-
-testResource:GebConfig.groovy[]
-
-<1> Disable confirmation popups
-<2> Configure the download folder
-
-Create a Geb Page to encapsulate the Excel link:
-
-rawTest:HomePage[]
-
-include::{commondir}/common-webdriverbinaries.adoc[]
-
 Create a test which verifies the Excel file is downloaded and the content matches our expectations.
 
-rawTest:DownloadExcelSpec[]
+test:DownloadExcelTest[]
 
-<1> Annotate the class with `@MicronatTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html]
-<2> Inject the Embedded Server.
-<3> The `EmbeddedServer` interface provides the URL of the server under test which runs on a random port. We use this port to set http://www.gebish.org/manual/current/#base-url[Geb base url].
+<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Inject the `HttpClient` bean in the application context.
+<3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+<4> Use `.body()` to retrieve the excel bytes.
 
-
-To run the tests:
-
-[source,bash]
-----
-$ ./gradlew -Dgeb.env=chrome -Ddownload.folder=/tmp test
-$ open build/reports/tests/test/index.html
-----
+include::{commondir}/common-testApp.adoc[]
 
 include::{commondir}/common-runapp.adoc[]
 
