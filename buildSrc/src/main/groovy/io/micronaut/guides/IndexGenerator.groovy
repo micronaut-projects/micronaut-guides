@@ -100,7 +100,11 @@ class IndexGenerator {
             }
 
             index += "<div class='inner'>"
-            index += "<h2>${metadata.title}</h2>"
+            if (singleGuide) {
+                index += "<h2>${metadata.title}</h2>"
+            } else {
+                index += "<h2><a href=\"${metadata.slug}.html\">${metadata.title}</a></h2>"
+            }
             index += "<p>${metadata.intro}</p>"
             index += table(baseURL, metadata)
             index += "</div>"
