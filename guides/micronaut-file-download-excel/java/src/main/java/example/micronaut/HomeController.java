@@ -28,7 +28,7 @@ public class HomeController {
         return new HashMap<>();
     }
 
-    @Produces(value = "application/vnd.ms-excel")
+    @Produces(value = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     @Get("/excel") // <4>
     public SystemFile excel() { // <5>
         return bookExcelService.excelFileFromBooks(bookRepository.findAll());
