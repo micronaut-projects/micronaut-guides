@@ -1,6 +1,7 @@
 package io.micronaut.guides
 
 import groovy.json.JsonOutput
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
@@ -254,7 +255,7 @@ class IndexGenerator {
                 title: guide.title,
                 intro: guide.intro,
                 authors: guide.authors,
-                tags: guide.tags + guide.languages.collect { it.toString() } + guide.buildTools.collect { it.toString() },
+                tags: generateTags(guide),
                 category: guide.category.toString(),
                 publicationDate: guide.publicationDate.toString(),
                 slug: guide.slug,
@@ -267,6 +268,19 @@ class IndexGenerator {
             ]} as List<Map>
 
         return JsonOutput.toJson(result)
+    }
+
+    @CompileDynamic
+    private static List<String> generateTags(GuideMetadata guide) {
+        [
+            guide.tags +
+            guide.languages.collect { it.toString() } +
+            guide.buildTools.collect { it.toString() } +
+            guide.apps.collect { it.features }.flatten().unique()
+        ]
+            .flatten()
+            .unique()
+            as List<String>
     }
 
 }
