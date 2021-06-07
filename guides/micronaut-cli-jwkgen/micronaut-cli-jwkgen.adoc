@@ -1,0 +1,116 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-cli-app example.micronaut.micronautguide --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+include::{commondir}/common-default-package.adoc[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+== Code
+
+=== JSON Web Key Generation
+
+Create an interface to encapsulate the contract to generate a https://datatracker.ietf.org/doc/html/rfc7517[JWK (JSON Web Key)]
+
+source:JsonWebKeyGenerator[]
+
+To generate a JWK, use https://connect2id.com/products/nimbus-jose-jwt[Nimbus JOSE + JWT], an open source Java library to generate JSON Web Tokens (JWT).
+
+Add the following dependency:
+
+dependency:nimbus-jose-jwt[groupId=com.nimbusds,version=@nimbus-jose-jwtVersion@]
+
+Create an implementation of `JsonWebKeyGenerator`
+
+source:RS256JsonWebKeyGenerator[]
+
+<1> Annotate the class with `@Singleton` to register it in the application context.
+
+=== CLI Command
+
+Micronaut CLI applications use https://picocli.info[Picocli].
+
+Replace the contents of `MicronautguideCommand`:
+
+source:MicronautguideCommand[]
+
+<1> Annotate with `@Command` and provide the command description.
+<2> Create an optional https://picocli.info/#_options_and_parameters[Picocli Option] for the key identifier.
+<3> You can use dependency injection in your CLI application.
+
+Replace the contents of `MicronautguideCommandTest`:
+
+test:MicronautguideCommandTest[]
+
+<1> With Micronaut, it is easy and to start the application context and run the command in a test.
+
+include::{commondir}/common-testApp.adoc[]
+
+== Running the CLI App
+
+include::{commondir}/common-executable-jar.adoc[]
+
+Execute the CLI with the `help` argument.
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+$ java -jar build/libs/micronautguide-0.1-all.jar --help
+12:16:33.257 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [cli]
+Usage: keysgen [-hV] [-kid=<kid>]
+Generates a Json Web Key (JWT) with RS256 algorithm.
+  -h, --help       Show this help message and exit.
+      -kid=<kid>   Key ID. Parameter is used to match a specific key. If not
+                     specified a random Key ID is generated.
+  -V, --version    Print version information and exit.
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+$ java -jar target/micronautguide-0.1.jar --help
+12:14:47.355 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [cli]
+Usage: keysgen [-hV] [-kid=<kid>]
+Generates a Json Web Key (JWT) with RS256 algorithm.
+  -h, --help       Show this help message and exit.
+      -kid=<kid>   Key ID. Parameter is used to match a specific key. If not
+                     specified a random Key ID is generated.
+  -V, --version    Print version information and exit.
+
+----
+
+:exclude-for-build:
+
+== Next steps
+
+Read https://picocli.info[Picocli] documentation.
+
+Explore more features with https://micronaut.io/guides/[Micronaut Guides].
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
