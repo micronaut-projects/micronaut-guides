@@ -6,6 +6,8 @@ import io.micronaut.security.rules.SecurityRule
 import javax.inject.Named
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Produces
+import io.micronaut.http.annotation.Controller
 
 @Controller
 class ClientIdController(@Named("companyauthserver") oauthClientConfiguration: OauthClientConfiguration) {
