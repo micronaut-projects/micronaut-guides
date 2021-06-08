@@ -1,6 +1,7 @@
 package io.micronaut.guides
 
 import groovy.json.JsonOutput
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
@@ -30,19 +31,19 @@ class IndexGenerator {
 
         save(templateText, 'dist/index.html', buildDir, metadatas)
         for (GuideMetadata metadata :  metadatas) {
-            save(templateText, "dist/${metadata.slug}.html", buildDir, [metadata])
+            save(templateText, "dist/${metadata.slug}.html", buildDir, [metadata], metadata.title)
         }
     }
 
-    static void save(String templateText, String filename, File buildDir, List<GuideMetadata> metadatas ) {
-        String text = indexText(templateText, metadatas)
+    static void save(String templateText, String filename, File buildDir, List<GuideMetadata> metadatas, String title = 'Micronaut Guides') {
+        String text = indexText(templateText, metadatas, title)
         Path path = Paths.get(buildDir.absolutePath, filename)
         File output = path.toFile()
         output.createNewFile()
         output.text = text
     }
 
-    static String indexText(String templateText, List<GuideMetadata> metadatas) {
+    static String indexText(String templateText, List<GuideMetadata> metadatas, String title) {
         boolean singleGuide = metadatas.size() == 1
 
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
@@ -50,9 +51,7 @@ class IndexGenerator {
 
         for (Category cat : Category.values()) {
             if (metadatas.findAll { it.category == cat }) {
-                index += '<div class="categorygrid">'
                 index += renderMetadatas(baseURL, cat, metadatas.findAll { it.category == cat }, singleGuide)
-                index += '</div>'
             }
         }
         String text = templateText
@@ -65,7 +64,7 @@ class IndexGenerator {
         if (singleGuide) {
             text = text.replace("@breadcrumb@", breadcrumb)
         }
-        text = text.replace("@title@", '')
+        text = text.replace("@title@", title)
         text = text.replace("@bodyclass@", 'guideindex')
         text = text.replace("@toccontent@", '')
         text = text.replace("@content@", index)
@@ -74,19 +73,21 @@ class IndexGenerator {
 
     static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
         String index = ''
-        int count = 0;
+        int count = 0
+        List<GuideMetadata> filteredMetadatas = System.getProperty('micronaut.guide') ?
+                metadatas.findAll { it.slug == System.getProperty('micronaut.guide') } :
+                metadatas
+        if (!filteredMetadatas) {
+            return index
+        }
+        index += '<div class="categorygrid">'
         index += "<div class='row'>"
         index += "<div class='col-sm-4'>"
         index += category(cat)
         index += "</div>"
         count++
 
-        for (GuideMetadata metadata : metadatas) {
-            if (System.getProperty('micronaut.guide') != null &&
-                    System.getProperty('micronaut.guide') != metadata.slug) {
-                continue
-            }
-
+        for (GuideMetadata metadata : filteredMetadatas) {
             if ((count % 3) == 0) {
                 index += "</div>"
                 index += "<div class='row'>"
@@ -100,7 +101,11 @@ class IndexGenerator {
             }
 
             index += "<div class='inner'>"
-            index += "<h2>${metadata.title}</h2>"
+            if (singleGuide) {
+                index += "<h2>${metadata.title}</h2>"
+            } else {
+                index += "<h2><a href=\"${metadata.slug}.html\">${metadata.title}</a></h2>"
+            }
             index += "<p>${metadata.intro}</p>"
             index += table(baseURL, metadata)
             index += "</div>"
@@ -110,6 +115,7 @@ class IndexGenerator {
         }
 
         index += "</div>"
+        index += '</div>'
         index
     }
 
@@ -216,7 +222,7 @@ class IndexGenerator {
             case Category.DISTRIBUTED_TRACING:
                 return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
 
-            case Category.APPRENTICE:
+            case Category.GETTING_STARTED:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
             case Category.ORACLE_CLOUD:
@@ -249,7 +255,7 @@ class IndexGenerator {
                 title: guide.title,
                 intro: guide.intro,
                 authors: guide.authors,
-                tags: guide.tags + guide.languages.collect { it.toString() } + guide.buildTools.collect { it.toString() },
+                tags: generateTags(guide),
                 category: guide.category.toString(),
                 publicationDate: guide.publicationDate.toString(),
                 slug: guide.slug,
@@ -262,6 +268,19 @@ class IndexGenerator {
             ]} as List<Map>
 
         return JsonOutput.toJson(result)
+    }
+
+    @CompileDynamic
+    private static List<String> generateTags(GuideMetadata guide) {
+        [
+            guide.tags +
+            guide.languages*.toString() +
+            guide.buildTools*.toString() +
+            guide.apps.collect { it.features }.flatten().unique()
+        ]
+            .flatten()
+            .unique()
+            as List<String>
     }
 
 }

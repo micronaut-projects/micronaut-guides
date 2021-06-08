@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Assertions;
 
 import javax.inject.Inject;
 import org.junit.jupiter.api.function.Executable;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest  // <1>
 public class BasicAuthTest {
@@ -33,10 +33,13 @@ public class BasicAuthTest {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, e); // <4>
         assertEquals(thrown.getStatus(), HttpStatus.UNAUTHORIZED);
 
+        assertTrue(thrown.getResponse().getHeaders().contains("WWW-Authenticate"));
+        assertEquals(thrown.getResponse().getHeaders().get("WWW-Authenticate"), "Basic realm=\"Micronaut Guide\"");
+
         //when: 'A secured URL is accessed with Basic Auth'
         HttpResponse<String> rsp = client.toBlocking().exchange(HttpRequest.GET("/")
-                .accept(MediaType.TEXT_PLAIN)
-                .basicAuth("sherlock", "password"), // <5>
+                        .accept(MediaType.TEXT_PLAIN)
+                        .basicAuth("sherlock", "password"), // <5>
                 String.class); // <6>
         //then: 'the endpoint can be accessed'
         assertEquals(rsp.getStatus(),  HttpStatus.OK);

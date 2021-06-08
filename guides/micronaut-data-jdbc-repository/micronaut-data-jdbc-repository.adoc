@@ -1,0 +1,247 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+The application exposes some REST endpoints and stores data in a database using Micronaut Data JDBC.
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+
+=== Data Source configuration
+
+Add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor,callout=1]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data,callout=2]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=3]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=4]
+
+:dependencies:
+
+<1> Add Micronaut Data annotation processor.
+<2> Configures  a compile scoped dependency on the `micronaut-data-jdbc`
+<3> Configures SQL DataSource instances using Hikari Connection Pool.
+<4> Add dependency to in-memory H2 Database.
+
+Define the data source in `src/main/resources/application.yml`.
+
+resource:application.yml[tag=datasource]
+
+NOTE: This way of defining the datasource properties means that we can externalize the configuration, for example for
+production environment, and also provide a default value for development. If the environment variables are not defined
+Micronaut will use the default values. +
+Also keep in mind that it is necessary to escape the `:` in the connection url using back ticks ```.
+
+=== DB Schema
+
+We need a way to create the database schema. For that we will use
+https://micronaut-projects.github.io/micronaut-flyway/latest/guide/index.html[Micronaut integration with
+Flyway].
+
+
+Add the following snippet to include the necessary dependencies:
+
+dependency:micronaut-flyway[groupId=io.micronaut.flyway]
+
+Configure the database migrations directory for Flyway in `application.yml`.
+
+resource:application.yml[tag=flyway]
+
+Create the file `V1__schema.sql` with the database schema creation:
+
+resource:db/migration/V1__schema.sql[]
+
+During application startup Flyway will execute the sql file and create the schema needed for the application.
+
+=== Domain
+
+To use JPA annotations include the following `compileOnly` scoped dependency:
+
+dependency:jakarta.persistence-api[groupId=jakarta.persistence,version=@jakarta.persistence-apiVersion@,scope=compileOnly,callout=1]
+
+Create the domain entities:
+
+source:domain/Genre[]
+
+The previous domain has a `OneToMany` relationship with the domain `Book`.
+
+source:domain/Book[]
+
+
+=== Application Configuration
+
+Create an interface to encapsulate the application configuration settings:
+
+source:ApplicationConfiguration[]
+
+In Micronaut, you can create type safe configuration by creating classes that are annotated
+with https://docs.micronaut.io/latest/guide/index.html#configurationProperties[@ConfigurationProperties].
+
+Create a `ApplicationConfigurationProperties` class:
+
+source:ApplicationConfigurationProperties[]
+
+<1> `@ConfigurationProperties` annotation takes a configuration prefix.
+
+You can override `max` if you add to your `src/main/resources/application.yml`:
+
+resource:application.yml[tag=application]
+
+
+=== Repository Access
+
+Next, create an interface to define the operations to access the database. The implementation of the following repository is created at compilation time by Micronaut Data.
+
+source:GenreRepository[]
+
+<1> `@JdbcRepository` with a specific dialect.
+<2> `Genre`, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the `GenericRepository` interface.
+
+
+The repository extends from `PageableRepository`. It inherits the hierarchy `PageableRepository` -> `CrudRepository` -> `GenericRepository`.
+
+|===
+|Repository | Description
+
+|`PageableRepository`
+| A repository that supports pagination. It provides `findAll(Pageable)` and `findAll(Sort)`.
+
+|`CrudRepository`
+| A repository interface for performing CRUD (Create, Read, Update, Delete). It provides methods such as `findAll()`, `save(Genre)`, `deleteById(Long)` and `findById(Long)`.
+
+|`GenericRepository`
+| A root interface that features no methods but defines the entity type and ID type as generic arguments.
+
+|===
+
+=== Controller
+
+include::{commondir}/common-validation.adoc[]
+
+Create two classes to encapsulate Save and Update operations:
+
+source:GenreSaveCommand[]
+
+<1> Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+
+source:GenreUpdateCommand[]
+
+Create `GenreController`, a controller which exposes a resource with the common CRUD operations:
+
+source:GenreController[]
+
+<1> It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.
+<2> The class is defined as a controller with the `@Controller` annotation mapped to the path `/genres`.
+<3> Constructor injection.
+<4> Maps a `GET` request to `/genres/{id}` which attempts to show a genre. This illustrates the use of a URL path variable.
+<5> Returning `an empty optional when the genre doesn't exist makes Micronaut to response with 404 (not found).
+<6> Maps a `PUT` request to `/genres` which attempts to update a genre.
+<7> Add `@Valid` to any method parameter which requires validation. Use a POJO supplied as a JSON payload in the request to populate command.
+<8> It is easy to add custom headers to the response.
+<9> Maps a `GET` request to `/genres` which returns a list of genres. This mapping illustrates URL parameters being mapped to a single POJO.
+<10> You can bind `Pageable` as a controller method argument. Check the examples in the following test section and read the https://micronaut-projects.github.io/micronaut-data/latest/guide/configurationreference.html#io.micronaut.data.runtime.config.DataConfiguration.PageableConfiguration[Pageable configuration] options.
+<11> Maps a `POST` request to `/genres` which attempts to save a genre.
+<12> Maps a `POST` request to `/ex` which generates an exception.
+<13> Maps a `DELETE` request to `/genres/{id}` which attempts to remove a genre. This illustrates the use of a URL path variable.
+
+=== Writing Tests
+
+Create a test which verifies the CRUD operations:
+
+test:GenreControllerTest[]
+
+<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<2> Inject the `HttpClient` bean in the application context.
+<3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+<4> If you care just about the object in the response use `retrieve`.
+<5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
+
+include::{commondir}/common-testApp.adoc[]
+
+include::{commondir}/common-runapp.adoc[]
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You can execute the `genres` endpoints exposed by the native image. For example:
+
+[source, bash]
+----
+ curl localhost:8080//genres/list
+----
+
+:exclude-for-languages:
+
+== Using Postgresql
+
+When running on production you want to use a real database instead of using H2. Let's explain how to use Postgres.
+
+After installing Docker, execute the following command to run a postgresql container:
+
+[source,bash]
+----
+docker run -it --rm \
+    -p 5432:5432 \
+    -e POSTGRES_USER=dbuser \
+    -e POSTGRES_PASSWORD=theSecretPassword \
+    -e POSTGRES_DB=micronaut \
+    postgres:11.5-alpine
+----
+
+Add Postgresql driver dependency:
+
+dependency:postgresql[groupId=org.postgresql,scope=runtimeOnly]
+
+IMPORTANT: Change the dialect in the `GenreRepository` `@JdbcRepository` annotation.
+
+To use postgresql, setup several environment variables which match those defined in `application.yml`:
+
+[source,bash]
+----
+$ export JDBC_URL=jdbc:postgresql://localhost:5432/micronaut
+$ export JDBC_USER=dbuser
+$ export JDBC_PASSWORD=theSecretPassword
+$ export JDBC_DRIVER=org.postgresql.Driver
+----
+
+Run the app again. If you take a close look to the output, you can see that the app uses postgresql:
+
+[source, bash]
+----
+..
+...
+08:40:02.746 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+....
+----
+
+Connect to your postgresql database, and you will see both `genre` and `book` tables.
+
+image::datagrip.png[]
+
+Save one genre, and your `genre` table will now contain an entry.
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data].
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // <1>
-@MicronautTest // <2>
+@MicronautTest(startApplication = false) // <2>
 class NewsServiceTest {
 
     @Inject // <3>
