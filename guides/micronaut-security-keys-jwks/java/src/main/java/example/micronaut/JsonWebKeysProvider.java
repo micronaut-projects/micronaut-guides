@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Refreshable // <1>
-public class JsonWebKeysProvider implements  JwkProvider { // <3>
+public class JsonWebKeysProvider implements  JwkProvider { // <2>
     private List<JWK> jwks;
 
     public JsonWebKeysProvider(PrimarySignatureConfiguration primaryRsaPrivateKey,
