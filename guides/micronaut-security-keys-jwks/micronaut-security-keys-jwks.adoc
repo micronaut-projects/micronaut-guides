@@ -118,6 +118,20 @@ test:KeysTest[]
 
 <1> See how to generate a JSON Web Key in the guide: https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with a Micronaut command line application]
 
+
+== Refresh endpoint
+
+> The refresh endpoint refreshes the application state, causing all `Refreshable` beans in the context to be destroyed and reinstantiated upon further requests. This is accomplished by publishing a `RefreshEvent` in the Application Context.
+
+You could use Micronaut's distributed configuration feature to fetch the JSON Web Keys from a secret repository such as https://docs.micronaut.io/latest/guide/#distributedConfigurationVault[HashiCorp Vault] or https://micronaut-projects.github.io/micronaut-aws/latest/guide/#distributedconfigurationsecretsmanager[AWS Secrets Manager]. Set a rotation policy and hit the refresh endpoint to reload configuration upon keys' rotation.
+
+Enable the https://docs.micronaut.io/latest/guide/#refreshEndpoint[Refresh Endpoint]:
+
+resource:application.yml[tag=endpoints]
+
+<1> Enable the https://docs.micronaut.io/latest/guide/#refreshEndpoint[Refresh Endpoint]
+<2> Set the endpoint as non sensitive. Learn more about https://micronaut-projects.github.io/micronaut-security/latest/guide/#builtInEndpointsAccess[Built-In Endpoints Security].
+
 include::{commondir}/common-testApp.adoc[]
 
 include::{commondir}/common-runapp.adoc[]
