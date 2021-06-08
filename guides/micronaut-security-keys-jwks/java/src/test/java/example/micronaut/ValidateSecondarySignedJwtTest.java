@@ -13,7 +13,8 @@ import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator;
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGeneratorConfiguration;
 import io.micronaut.security.token.validator.TokenValidator;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import java.security.interfaces.RSAPrivateKey;
@@ -42,15 +43,15 @@ public class ValidateSecondarySignedJwtTest {
 
         Optional<String> jwtOptional = tokenGenerator.generateToken(Collections.singletonMap("sub", "sergio"));
 
-        Assertions.assertTrue(jwtOptional.isPresent());
+        assertTrue(jwtOptional.isPresent());
 
         String jwtString = jwtOptional.get();
 
-        Assertions.assertDoesNotThrow(() -> JWTParser.parse(jwtString));
+        assertDoesNotThrow(() -> JWTParser.parse(jwtString));
 
         JWT jwt = JWTParser.parse(jwtString);
 
-        Assertions.assertTrue(jwt instanceof SignedJWT);
+        assertTrue(jwt instanceof SignedJWT);
 
         tokenValidator.validateToken(jwtString, null);
     }

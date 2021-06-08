@@ -1,13 +1,14 @@
 package example.micronaut;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.runtime.context.scope.Refreshable;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest(startApplication = false)
 public class PrimarySignatureConfigurationTest {
@@ -17,14 +18,14 @@ public class PrimarySignatureConfigurationTest {
 
     @Test
     void primarySignatureConfigurationIsAnnotatedWithRefreshable() {
-        Assertions.assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class)
+        assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class)
                 .getAnnotationNameByStereotype(Refreshable.class)
                 .isPresent());
     }
 
     @Test
     void primarySignatureConfigurationIsAnnotatedNamedGenerator() {
-        Assertions.assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class)
+        assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class)
                 .getAnnotationNameByStereotype(Named.class)
                 .isPresent());
         Optional<String> nameOptional = applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class)
@@ -33,7 +34,7 @@ public class PrimarySignatureConfigurationTest {
                 .filter(annValue -> annValue.getValue(String.class).isPresent())
                 .map(annValue -> annValue.getValue(String.class).get())
                 .findFirst();
-        Assertions.assertTrue(nameOptional.isPresent());
-        Assertions.assertEquals("generator", nameOptional.get());
+        assertTrue(nameOptional.isPresent());
+        assertEquals("generator", nameOptional.get());
     }
 }

@@ -3,10 +3,9 @@ package example.micronaut;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.runtime.context.scope.Refreshable;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import javax.inject.Inject;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
 public class SecondarySignatureConfigurationTest {
@@ -15,7 +14,7 @@ public class SecondarySignatureConfigurationTest {
 
     @Test
     void secondarySignatureConfigurationIsAnnotatedWithRefreshable() {
-        Assertions.assertTrue(applicationContext.getBeanDefinition(SecondarySignatureConfiguration.class)
+        assertTrue(applicationContext.getBeanDefinition(SecondarySignatureConfiguration.class)
                 .getAnnotationNameByStereotype(Refreshable.class)
                 .isPresent());
     }
