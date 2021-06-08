@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 class SecretsManagerRotationStepSpec extends Specification {
 
-    @ParameterizedTest(name = "value to pay for invoice {0} should be {1}")
+    @ParameterizedTest(name = "for {0} string inferred SecretsManagerRotationStep should be {1}")
     @MethodSource("stepProvider")
     void shouldCalculateToPayValueForInvoice(String str, SecretsManagerRotationStep step) {
         assertTrue(SecretsManagerRotationStep.of(str).isPresent())
