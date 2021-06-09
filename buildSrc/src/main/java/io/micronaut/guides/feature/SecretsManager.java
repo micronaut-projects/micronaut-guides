@@ -15,6 +15,9 @@ public class SecretsManager implements Feature {
         generatorContext.addDependency(Dependency.builder()
                 .lookupArtifactId("micronaut-aws-secretsmanager")
                 .compile());
+        generatorContext.addDependency(Dependency.builder()
+                .lookupArtifactId("micronaut-aws-sdk-v2")
+                .compile());
     }
 
     @NonNull
