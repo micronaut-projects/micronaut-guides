@@ -6,6 +6,10 @@ import io.micronaut.starter.options.BuildTool
 @CompileStatic
 class TestScriptGenerator {
 
+
+    public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
+    public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
+
     static String emptyScript() {
         '''\
 #!/usr/bin/env bash
@@ -23,9 +27,9 @@ exit 0
         }.unique()
     }
 
-    static boolean shouldSkip(String slug, List<String> guidesChanged, boolean cron) {
-        if (cron) {
-            return false;
+    static boolean shouldSkip(String slug, List<String> guidesChanged) {
+        if (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)  {
+            return false
         }
         if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) {
             if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == slug) {
@@ -37,7 +41,7 @@ exit 0
         return !guidesChanged.contains(slug)
     }
 
-    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles, boolean cron) {
+    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
         String bashScript = '''\
 #!/usr/bin/env bash
 set -e
@@ -49,7 +53,7 @@ EXIT_STATUS=0
 
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = shouldSkip(metadata.slug, guidesChanged, cron)
+            boolean skip = shouldSkip(metadata.slug, guidesChanged)
             if (skip) {
                 continue
             }
