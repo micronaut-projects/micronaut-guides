@@ -14,7 +14,30 @@ exit 0
 '''
     }
 
-    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure) {
+    static List<String> guidesChanged(String[] changedFiles) {
+        changedFiles.findAll { path ->
+            path.startsWith('guides')
+        }.collect { path ->
+            String guideFolder = path.substring('guides/'.length())
+            guideFolder.substring(0, guideFolder.indexOf('/'))
+        }.unique()
+    }
+
+    static boolean shouldSkip(String slug, List<String> guidesChanged, boolean cron) {
+        if (cron) {
+            return false;
+        }
+        if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) {
+            if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == slug) {
+                return false;
+            } else {
+                return true
+            }
+        }
+        return !guidesChanged.contains(slug)
+    }
+
+    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles, boolean cron) {
         String bashScript = '''\
 #!/usr/bin/env bash
 set -e
@@ -22,9 +45,11 @@ set -e
 FAILED_PROJECTS=()
 EXIT_STATUS=0
 '''
+        List<String> guidesChanged = guidesChanged(changedFiles)
+
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = !(System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null ? System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == metadata.slug : true)
+            boolean skip = shouldSkip(metadata.slug, guidesChanged, cron)
             if (skip) {
                 continue
             }
