@@ -106,7 +106,19 @@ task generateTestScript {
         File guides = file(generateSampleProjects.guides)
         File output = new File(generateSampleProjects.output, "test.sh")
         output.createNewFile()
-        output.text = TestScriptGenerator.generateScript(guides, generateSampleProjects.metadataConfigName, stopIfFailure)
+
+        def gitDiff = "git diff --name-only HEAD HEAD~1".execute()
+        gitDiff.waitFor()
+        boolean onlyImagesOrMarkdownOrAsciidocChanged = gitDiff.text.split("\n").every {String str ->
+            str.endsWith('adoc') ||
+                    str.endsWith('md')   ||
+                    str.endsWith('png')  ||
+                    str.endsWith('jpeg') ||
+                    str.endsWith('jpg')  ||
+                    str.endsWith('svg')  ||
+                    str.endsWith('gif')
+        }
+        output.text = onlyImagesOrMarkdownOrAsciidocChanged  ? TestScriptGenerator.emptyScript() : TestScriptGenerator.generateScript(guides, generateSampleProjects.metadataConfigName, stopIfFailure)
         output.setExecutable(true)
     }
 }

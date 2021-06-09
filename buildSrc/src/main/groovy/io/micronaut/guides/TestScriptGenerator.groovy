@@ -6,6 +6,14 @@ import io.micronaut.starter.options.BuildTool
 @CompileStatic
 class TestScriptGenerator {
 
+    static String emptyScript() {
+        '''\
+#!/usr/bin/env bash
+set -e
+exit 0
+'''
+    }
+
     static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure) {
         String bashScript = '''\
 #!/usr/bin/env bash
