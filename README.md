@@ -1,6 +1,6 @@
 [Micronaut Guides](https://guides.micronaut.io) or [Guides Index](https://guides.micronaut.io/latest/index.html)
 
-----
+--- 
 
 ## Working on a single guide 
 
@@ -76,3 +76,10 @@ TODO: link to the documentation modules you used in the guide
 
 include::{commondir}/common-helpWithMicronaut.adoc[]
 ```
+
+----
+
+## Deployment
+
+Guides are published to [gh-pages](https://pages.github.com).
+
