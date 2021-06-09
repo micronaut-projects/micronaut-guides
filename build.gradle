@@ -109,7 +109,8 @@ task generateTestScript {
 
         def gitDiff = "git diff --name-only HEAD HEAD~1".execute()
         gitDiff.waitFor()
-        boolean onlyImagesOrMarkdownOrAsciidocChanged = gitDiff.text.split("\n").every {String str ->
+        String text = gitDiff.text
+        boolean onlyImagesOrMarkdownOrAsciidocChanged = text.split("\n").every {String str ->
             str.endsWith('adoc') ||
                     str.endsWith('md')   ||
                     str.endsWith('png')  ||
@@ -118,7 +119,7 @@ task generateTestScript {
                     str.endsWith('svg')  ||
                     str.endsWith('gif')
         }
-        println gitDiff.text
+        println text
         println "Only Images or Markdown Or AsciidocChanged $onlyImagesOrMarkdownOrAsciidocChanged"
         output.text = onlyImagesOrMarkdownOrAsciidocChanged  ? TestScriptGenerator.emptyScript() : TestScriptGenerator.generateScript(guides, generateSampleProjects.metadataConfigName, stopIfFailure)
         output.setExecutable(true)
