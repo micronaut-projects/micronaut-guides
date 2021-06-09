@@ -18,10 +18,6 @@ public class Genre {
     @NotNull
     private String name;
 
-    @JsonIgnore
-    @Relation(value = Relation.Kind.ONE_TO_MANY, mappedBy = "genre")
-    private Set<Book> books;
-
     public Long getId() {
         return id;
     }
@@ -36,14 +32,6 @@ public class Genre {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Set<Book> getBooks() {
-        return books;
-    }
-
-    public void setBooks(Set<Book> books) {
-        this.books = books;
     }
 
     @Override
