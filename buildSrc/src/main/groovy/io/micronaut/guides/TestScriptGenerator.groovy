@@ -6,6 +6,10 @@ import io.micronaut.starter.options.BuildTool
 @CompileStatic
 class TestScriptGenerator {
 
+
+    public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
+    public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
+
     static String emptyScript() {
         '''\
 #!/usr/bin/env bash
@@ -14,7 +18,30 @@ exit 0
 '''
     }
 
-    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure) {
+    static List<String> guidesChanged(String[] changedFiles) {
+        changedFiles.findAll { path ->
+            path.startsWith('guides')
+        }.collect { path ->
+            String guideFolder = path.substring('guides/'.length())
+            guideFolder.substring(0, guideFolder.indexOf('/'))
+        }.unique()
+    }
+
+    static boolean shouldSkip(String slug, List<String> guidesChanged) {
+        if (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)  {
+            return false
+        }
+        if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) {
+            if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == slug) {
+                return false;
+            } else {
+                return true
+            }
+        }
+        return !guidesChanged.contains(slug)
+    }
+
+    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
         String bashScript = '''\
 #!/usr/bin/env bash
 set -e
@@ -22,9 +49,11 @@ set -e
 FAILED_PROJECTS=()
 EXIT_STATUS=0
 '''
+        List<String> guidesChanged = guidesChanged(changedFiles)
+
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = !(System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null ? System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == metadata.slug : true)
+            boolean skip = shouldSkip(metadata.slug, guidesChanged)
             if (skip) {
                 continue
             }
