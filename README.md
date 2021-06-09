@@ -1,4 +1,4 @@
-[Micronaut Guides](https://guides.micronaut.io)
+[Micronaut Guides](https://guides.micronaut.io) or [Guides Index](https://guides.micronaut.io/latest/index.html)
 
 
 To work on a single guide use the system property `micronaut.guide`
