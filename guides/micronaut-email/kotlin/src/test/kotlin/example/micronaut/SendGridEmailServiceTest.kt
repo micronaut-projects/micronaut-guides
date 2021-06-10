@@ -1,7 +1,8 @@
 package example.micronaut
 
 import io.micronaut.context.ApplicationContext
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
 class SendGridEmailServiceTest {
@@ -9,7 +10,7 @@ class SendGridEmailServiceTest {
     @Test
     fun sendGridEmailServiceIsNotLoadedIfSystemPropertyIsNotPresent() {
         val ctx = ApplicationContext.run()
-        Assertions.assertFalse(ctx.containsBean(SendGridEmailService::class.java))
+        assertFalse(ctx.containsBean(SendGridEmailService::class.java))
         ctx.close()
     }
 
@@ -23,8 +24,8 @@ class SendGridEmailServiceTest {
         val ctx = ApplicationContext.run()
         val bean = ctx.getBean(SendGridEmailService::class.java)
 
-        Assertions.assertEquals("XXXX", bean.apiKey)
-        Assertions.assertEquals("me@micronaut.example", bean.fromEmail)
+        assertEquals("XXXX", bean.apiKey)
+        assertEquals("me@micronaut.example", bean.fromEmail)
 
         ctx.close()
 
