@@ -31,26 +31,17 @@ exit 0
         changedFiles.any { str -> str.contains("version.txt") }
     }
 
-    static boolean changesDependencies(String[] changedFiles) {
+    static boolean changesDependencies(String[] changedFiles, List<String> changedGuides) {
+        if (changedGuides) {
+            return false
+        }
         changedFiles.any { str -> str.contains("pom.xml") }
     }
 
-    static boolean shouldSkip(String slug, String[] changedFiles) {
-        if (changesMicronautVersion(changedFiles) || changesDependencies(changedFiles)) {
-            return false
-        }
-        List<String> guidesChanged = guidesChanged()
-        if (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)  {
-            return false
-        }
-        if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) {
-            if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == slug) {
-                return false
-            } else {
-                return true
-            }
-        }
-        return !guidesChanged.contains(slug)
+    static boolean shouldSkip(String slug, List<String> guidesChanged) {
+        return  (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) ?
+                !(System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == slug) :
+                !guidesChanged.contains(slug)
     }
 
     static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
@@ -61,11 +52,14 @@ set -e
 FAILED_PROJECTS=()
 EXIT_STATUS=0
 '''
-
+        List<String> slugsChanged = guidesChanged(changedFiles)
+        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
+                changesDependencies(changedFiles, slugsChanged) ||
+                (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = shouldSkip(metadata.slug, changedFiles)
-            if (skip) {
+            boolean skip = shouldSkip(metadata.slug, slugsChanged)
+            if (!forceExecuteEveryTest && skip) {
                 continue
             }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
