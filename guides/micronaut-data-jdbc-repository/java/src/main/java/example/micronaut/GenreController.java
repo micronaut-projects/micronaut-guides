@@ -54,7 +54,7 @@ public class GenreController {
     }
 
     @Post // <11>
-    public HttpResponse<Genre> save(@Body @NotBlank String name) {
+    public HttpResponse<Genre> save(@Body("name") @NotBlank String name) {
         Genre genre = genreRepository.save(name);
 
         return HttpResponse
@@ -63,9 +63,9 @@ public class GenreController {
     }
 
     @Post("/ex") // <12>
-    public HttpResponse<Genre> saveExceptions(@Body @Valid GenreSaveCommand cmd) {
+    public HttpResponse<Genre> saveExceptions(@Body @NotBlank String name) {
         try {
-            Genre genre = genreRepository.saveWithException(cmd.getName());
+            Genre genre = genreRepository.saveWithException(name);
             return HttpResponse
                     .created(genre)
                     .headers(headers -> headers.location(location(genre.getId())));
