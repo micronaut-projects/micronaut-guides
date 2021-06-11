@@ -11,7 +11,7 @@ import io.micronaut.starter.feature.function.awslambda.AwsLambda;
 import io.micronaut.starter.feature.other.HttpClient;
 
 import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class S3 implements Feature {

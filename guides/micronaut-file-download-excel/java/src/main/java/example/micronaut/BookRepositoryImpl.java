@@ -2,7 +2,7 @@ package example.micronaut;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.List;
 
 import java.util.Arrays;
