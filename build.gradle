@@ -74,16 +74,6 @@ build.dependsOn('asciidoctor')
 asciidoctor.dependsOn('generateCodeZip')
 asciidoctor.finalizedBy('copyHtmlToDist')
 
-
-task replaceWithJakarta(type: Copy) {
-    from "$buildDir/code"
-    into "$buildDir/code"
-    include "**/*.groovy"
-    include "**/*.kt"
-    include "**/*.java"
-    filter { line -> line.replaceAll('javax.inject', 'jakarta.inject') }
-}
-
 task generateSampleProjects {
     description 'Generates guide applications at build/code'
     group 'guides'
@@ -93,6 +83,9 @@ task generateSampleProjects {
         guides = "${projectDir}/guides"
     }
     doLast {
+	if (!file(buildDir).exists()) {
+	   file(buildDir).mkdir()
+	}
         GuideProjectGenerator generator = new GuideProjectGenerator()
         generator.generate(file(guides), file(output), metadataConfigName, true, new File(projectDir, "src/docs/asciidoc"))
         generator.close()
@@ -104,6 +97,19 @@ task generateSampleProjects {
             'generateGuidesJsonMetadata',
             'themeGuides'
     )
+}
+import static groovy.io.FileType.FILES
+task replaceWithJakarta {
+    doLast {
+        String token = 'javax.inject'
+        String value = 'jakarta.inject'
+	List<String> suffixes = ['.groovy','.kt','.java']
+        file(generateSampleProjects.output).eachFileRecurse(FILES) { f ->
+            if(suffixes.any { suf -> f.name.endsWith(suf) }) {
+                ant.replace(file: f, token: token, value: value)
+            }
+        }
+    }
 }
 
 task generateTestScript {
@@ -186,8 +192,3 @@ task themeGuides {
     }
     mustRunAfter('copyHtmlToDist')
 }
-
-generateTestScript.mustRunAfter('replaceWithJakarta')
-generateGuidesIndex.mustRunAfter('replaceWithJakarta')
-generateGuidesJsonMetadata.mustRunAfter('replaceWithJakarta')
-themeGuides.mustRunAfter('replaceWithJakarta')
