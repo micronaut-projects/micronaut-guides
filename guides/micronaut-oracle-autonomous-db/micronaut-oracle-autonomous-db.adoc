@@ -174,39 +174,7 @@ To test using the live database, replace the generated `application-test.yml` wi
 
 testResource:application-test.yml[tags=flyway]
 
-Then configure your build to specify the `oraclecloud` environment so the datasource configured in `application-oraclecloud.yml` is used:
-
-:exclude-for-build:maven
-
-Edit `build.gradle` and add
-
-[source, groovy]
-----
-test.systemProperty('micronaut.environments', 'oraclecloud')
-----
-
-:exclude-for-build:
-
-:exclude-for-build:gradle
-
-Edit `pom.xml` and add
-
-[source, xml]
-----
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <configuration>
-        <systemPropertyVariables>
-            <micronaut.environments>oraclecloud</micronaut.environments>
-        </systemPropertyVariables>
-    </configuration>
-</plugin>
-----
-
-in the `<plugins>` node under `<build>`.
-
-:exclude-for-build:
+Then replace the `@MicronautTest` annotation on `ThingRepositoryTest` with `@MicronautTest(environments = Environment.ORACLE_CLOUD)` (and add an import for `io.micronaut.context.env.Environment`) to use the datasource configured in `application-oraclecloud.yml`.
 
 To run the tests:
 
@@ -233,13 +201,41 @@ $ ./mvnw test
 
 :exclude-for-build:maven
 
-To run the application use the `MICRONAUT_ENVIRONMENTS=oraclecloud ./gradlew run` command which will start the application on port 8080.
+To run the application use:
+
+[source, bash]
+----
+$ MICRONAUT_ENVIRONMENTS=oraclecloud ./gradlew run
+----
+
+or if you use Windows:
+
+[source, bash]
+----
+> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
+----
+
+which will start the application on port 8080.
 
 :exclude-for-build:
 
 :exclude-for-build:gradle
 
-To run the application use the `MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run` command which will start the application on port 8080.
+To run the application use
+
+[source, bash]
+----
+$ MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run
+----
+
+or if you use Windows:
+
+[source, bash]
+----
+> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
+----
+
+which will start the application on port 8080.
 
 :exclude-for-build:
 
