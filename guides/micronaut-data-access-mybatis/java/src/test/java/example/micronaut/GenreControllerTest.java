@@ -17,7 +17,7 @@ import io.micronaut.http.uri.UriTemplate;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;

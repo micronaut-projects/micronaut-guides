@@ -4,7 +4,7 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.http.SdkHttpClient;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)

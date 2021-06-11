@@ -3,7 +3,7 @@ package example.micronaut
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import javax.inject.Inject
+import jakarta.inject.Inject
 //end::fileHead[]
 
 //tag::start[]

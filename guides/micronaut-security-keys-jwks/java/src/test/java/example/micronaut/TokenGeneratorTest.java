@@ -10,7 +10,7 @@ import io.micronaut.security.token.generator.TokenGenerator;
 import io.micronaut.security.token.validator.TokenValidator;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Optional;

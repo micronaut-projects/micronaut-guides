@@ -3,7 +3,7 @@ package example.micronaut;
 import io.micronaut.configuration.picocli.PicocliRunner;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Command(name = "keysgen",
         description = "Generates a Json Web Key (JWT) with RS256 algorithm.",

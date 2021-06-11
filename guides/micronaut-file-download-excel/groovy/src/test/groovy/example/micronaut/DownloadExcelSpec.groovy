@@ -9,7 +9,7 @@ import spock.lang.Specification
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
-import javax.inject.Inject
+import jakarta.inject.Inject
 import io.micronaut.http.HttpResponse
 
 @MicronautTest // <1>

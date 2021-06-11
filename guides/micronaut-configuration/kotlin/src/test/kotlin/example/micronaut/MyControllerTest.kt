@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.util.Arrays
 import java.util.function.Consumer
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest
 class MyControllerTest {
