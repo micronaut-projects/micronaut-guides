@@ -4,7 +4,7 @@ import grails.gorm.multitenancy.Tenants
 import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.context.event.StartupEvent
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 import javax.inject.Singleton
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment

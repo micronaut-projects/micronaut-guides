@@ -16,7 +16,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.Test;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.security.interfaces.RSAPrivateKey;
 import java.text.ParseException;
 import java.util.Collections;

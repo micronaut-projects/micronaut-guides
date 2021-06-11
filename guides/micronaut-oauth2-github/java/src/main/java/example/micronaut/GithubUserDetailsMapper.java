@@ -5,7 +5,7 @@ import io.micronaut.security.oauth2.endpoint.token.response.TokenResponse;
 import org.reactivestreams.Publisher;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;

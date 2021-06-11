@@ -8,7 +8,7 @@ import io.micronaut.http.uri.UriBuilder;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.net.URI;
 import java.util.List;
 

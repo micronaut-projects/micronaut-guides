@@ -56,6 +56,9 @@ EXIT_STATUS=0
         boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
                 changesDependencies(changedFiles, slugsChanged) ||
                 (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
+        if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) {
+            forceExecuteEveryTest = false
+        }
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
             boolean skip = shouldSkip(metadata.slug, slugsChanged)

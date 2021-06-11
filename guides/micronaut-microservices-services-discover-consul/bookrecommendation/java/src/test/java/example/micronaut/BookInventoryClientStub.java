@@ -6,7 +6,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.retry.annotation.Fallback;
 import io.reactivex.Maybe;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 
 @Requires(env = Environment.TEST) // <1>

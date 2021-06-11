@@ -4,7 +4,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.Base64
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest // <1>
 class BasicAuthClientTest {

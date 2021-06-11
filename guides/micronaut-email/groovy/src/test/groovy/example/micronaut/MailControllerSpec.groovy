@@ -10,7 +10,7 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest // <1>
 @Property(name = "spec.name", value = "mailcontroller") // <2>

@@ -5,7 +5,7 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.runtime.context.scope.Refreshable;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
