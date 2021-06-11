@@ -74,6 +74,16 @@ build.dependsOn('asciidoctor')
 asciidoctor.dependsOn('generateCodeZip')
 asciidoctor.finalizedBy('copyHtmlToDist')
 
+
+task replaceWithJakarta(type: Copy) {
+    from "$buildDir/code"
+    into "$buildDir/code"
+    include "**/*.groovy"
+    include "**/*.kt"
+    include "**/*.java"
+    filter { line -> line.replaceAll('javax.inject', 'jakarta.inject') }
+}
+
 task generateSampleProjects {
     description 'Generates guide applications at build/code'
     group 'guides'
@@ -88,6 +98,7 @@ task generateSampleProjects {
         generator.close()
     }
     finalizedBy(
+            'replaceWithJakarta',
             'generateTestScript',
             'generateGuidesIndex',
             'generateGuidesJsonMetadata',
@@ -175,3 +186,8 @@ task themeGuides {
     }
     mustRunAfter('copyHtmlToDist')
 }
+
+generateTestScript.mustRunAfter('replaceWithJakarta')
+generateGuidesIndex.mustRunAfter('replaceWithJakarta')
+generateGuidesJsonMetadata.mustRunAfter('replaceWithJakarta')
+themeGuides.mustRunAfter('replaceWithJakarta')
