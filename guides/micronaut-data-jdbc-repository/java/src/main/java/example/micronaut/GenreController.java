@@ -13,6 +13,7 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.http.annotation.Status;
 import io.micronaut.http.HttpStatus;
+import javax.validation.constraints.NotBlank;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.data.exceptions.DataAccessException;
@@ -53,8 +54,8 @@ public class GenreController {
     }
 
     @Post // <11>
-    public HttpResponse<Genre> save(@Body @Valid GenreSaveCommand cmd) {
-        Genre genre = genreRepository.save(cmd.getName());
+    public HttpResponse<Genre> save(@Body("name") @NotBlank String name) {
+        Genre genre = genreRepository.save(name);
 
         return HttpResponse
                 .created(genre)
@@ -62,9 +63,9 @@ public class GenreController {
     }
 
     @Post("/ex") // <12>
-    public HttpResponse<Genre> saveExceptions(@Body @Valid GenreSaveCommand cmd) {
+    public HttpResponse<Genre> saveExceptions(@Body @NotBlank String name) {
         try {
-            Genre genre = genreRepository.saveWithException(cmd.getName());
+            Genre genre = genreRepository.saveWithException(name);
             return HttpResponse
                     .created(genre)
                     .headers(headers -> headers.location(location(genre.getId())));

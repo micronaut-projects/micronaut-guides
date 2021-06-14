@@ -19,7 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import java.util.Collections;
 @MicronautTest // <1>
 public class GenreControllerTest {
 
@@ -42,13 +42,13 @@ public class GenreControllerTest {
 
         List<Long> genreIds = new ArrayList<>();
 
-        HttpRequest request = HttpRequest.POST("/genres", new GenreSaveCommand("DevOps")); // <3>
+        HttpRequest request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <3>
         HttpResponse response = client.toBlocking().exchange(request);
         genreIds.add(entityId(response));
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
 
-        request = HttpRequest.POST("/genres", new GenreSaveCommand("Microservices")); // <3>
+        request = HttpRequest.POST("/genres", Collections.singletonMap("name", "Microservices")); // <3>
         response = client.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
@@ -75,7 +75,7 @@ public class GenreControllerTest {
 
         assertEquals(2, genres.size());
 
-        request = HttpRequest.POST("/genres/ex", new GenreSaveCommand("Microservices")); // <3>
+        request = HttpRequest.POST("/genres/ex", Collections.singletonMap("name", "Microservices")); // <3>
         response = client.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
