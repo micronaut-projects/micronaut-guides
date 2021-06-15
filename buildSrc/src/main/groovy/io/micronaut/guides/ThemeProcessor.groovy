@@ -1,7 +1,8 @@
 package io.micronaut.guides
 
 class ThemeProcessor {
-    static String applyThemes(File template, File dist, File guidesFolder, String metadataConfigName) {
+
+    static void applyThemes(File template, File dist, File guidesFolder, String metadataConfigName) {
         String templateText = template.text
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         String tocStart = '''\
@@ -15,8 +16,7 @@ class ThemeProcessor {
 '''
         String sectionbody = '<div class="sectionbody">'
         for (GuideMetadata metadata : metadatas) {
-            if (System.getProperty('micronaut.guide') != null &&
-                    System.getProperty('micronaut.guide') != metadata.slug) {
+            if (!Utils.process(metadata)) {
                 continue
             }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
