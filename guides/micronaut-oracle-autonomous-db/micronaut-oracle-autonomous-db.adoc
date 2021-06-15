@@ -17,6 +17,7 @@ To complete this guide, you will need the following:
 * JDK 11 or greater installed with `JAVA_HOME` configured appropriately
 * An Oracle Cloud account (create a free trial account at https://signup.oraclecloud.com[signup.oraclecloud.com])
 * https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
+* Docker installed (optional, only needed if using Testcontainers for the persistence tests)
 
 include::{commondir}/common-completesolution.adoc[]
 
@@ -125,34 +126,31 @@ source:controller/ThingController[]
 
 === Configuration
 
-Replace the generated `application.yml` with this:
-
-resource:application.yml[]
-
-<1> This is optional, but it's a good idea to configure the IO pool size when using `@ExecuteOn(TaskExecutors.IO)` in controllers
-<2> Uncomment the `ocid` property and set its value with the database OCID unique identifier you saved when creating the database
-<3> Uncomment the `walletPassword` property and set its value with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
-<4> Set the `password` property with the `micronautdemo` schema user password you created
-<5> Change the profile name if you're not using the default, and optionally add a value for the path to the config file if necessary as described in the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth[Authentication section] of the Micronaut Oracle Cloud docs
-
-Replace the generated `application-test.yml` with this:
-
-testResource:application-test.yml[]
-
-Create a `testcontainers.properties` file in `src/test/resources` with this content:
-
-testResource:testcontainers.properties[]
-
 Create a new Flyway migration SQL script in `src/main/resources/db/migration/V1__create-schema.sql` and add the following:
 
 resource:db/migration/V1__create-schema.sql[]
 
-And finally, you can optionally edit `src/main/resources/logback.xml` and add the following to monitor the SQL queries that Micronaut Data performs:
+Edit `src/main/resources/logback.xml` and add the following to monitor the SQL queries that Micronaut Data performs:
 
 [source,xml]
 ----
 <logger name='io.micronaut.data.query' level='debug' />
 ----
+
+Replace the generated `application.yml` with this:
+
+resource:application.yml[]
+
+<1> This is optional, but it's a good idea to configure the IO pool size when using `@ExecuteOn(TaskExecutors.IO)` in controllers
+
+Create an `application-oraclecloud.yml` file in `src/main/resources` with this content:
+
+resource:application-oraclecloud.yml[]
+
+<1> Set the value of the `ocid` property with the database OCID unique identifier you saved when creating the database
+<2> Set the `walletPassword` property with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
+<3> Set the `password` property with the `micronautdemo` schema user password you created
+<4> Change the profile name if you're not using the default, and optionally add a value for the path to the config file if necessary as described in the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth[Authentication section] of the Micronaut Oracle Cloud docs
 
 === Writing Tests
 
@@ -160,9 +158,86 @@ Create a test to verify that database access works:
 
 test:ThingRepositoryTest[]
 
-include::{commondir}/common-testApp.adoc[]
+== Testing the Application
 
-include::{commondir}/common-runapp.adoc[]
+There are two options for running the tests; one is to run against the live database, and the other is to run tests locally with an Oracle database in a Docker container using https://www.testcontainers.org/[Testcontainers].
+
+To test using Testcontainers, create a `testcontainers.properties` file in `src/test/resources` with this content:
+
+testResource:testcontainers.properties[]
+
+and replace the generated `application-test.yml` with this:
+
+testResource:application-test.yml[tags=datasource|flyway]
+
+To test using the live database, replace the generated `application-test.yml` with this:
+
+testResource:application-test.yml[tags=flyway]
+
+Then replace the `@MicronautTest` annotation on `ThingRepositoryTest` with `@MicronautTest(environments = Environment.ORACLE_CLOUD)` (and add an import for `io.micronaut.context.env.Environment`) to use the datasource configured in `application-oraclecloud.yml`.
+
+To run the tests:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+$ ./gradlew test
+$ open build/reports/tests/test/index.html
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+$ ./mvnw test
+----
+
+:exclude-for-build:
+
+== Running the Application
+
+:exclude-for-build:maven
+
+To run the application use:
+
+[source, bash]
+----
+$ MICRONAUT_ENVIRONMENTS=oraclecloud ./gradlew run
+----
+
+or if you use Windows:
+
+[source, bash]
+----
+> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
+----
+
+which will start the application on port 8080.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application use
+
+[source, bash]
+----
+$ MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run
+----
+
+or if you use Windows:
+
+[source, bash]
+----
+> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
+----
+
+which will start the application on port 8080.
+
+:exclude-for-build:
 
 You should see output similar to the following, indicating that the database connectivity and wallet configuration is all handled automatically, and the Flyway migration runs since the database is determined to be out of date. Also, if you added the Logback logger above, you'll see the results of the work done by `DataPopulator`:
 
