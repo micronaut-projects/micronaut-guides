@@ -34,6 +34,16 @@ class GuideAsciidocGenerator {
             boolean groupDependencies = false
             List<String> groupedDependencies = []
             for (String line : rawLinesExpanded) {
+
+                if (line == ':exclude-for-build:') {
+                    excludeLineForBuild = false
+                } else if (line == ':exclude-for-languages:') {
+                    excludeLineForLanguage = false
+                }
+                if (excludeLineForLanguage || excludeLineForBuild) {
+                    continue
+                }
+
                 if (shouldProcessLine(line, 'source:')) {
                     lines.addAll(sourceIncludeLines(line))
 
@@ -64,12 +74,6 @@ class GuideAsciidocGenerator {
                         lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool, guidesOption.language))
                     }
 
-                } else if (line == ':exclude-for-build:') {
-                    excludeLineForBuild = false
-
-                } else if (line == ':exclude-for-languages:') {
-                    excludeLineForLanguage = false
-
                 } else if (line.startsWith(':exclude-for-build:')) {
                     String[] builds = line.substring(':exclude-for-build:'.length()).split(',')
                     if (builds.any { it == guidesOption.buildTool.toString() }) {
@@ -82,9 +86,7 @@ class GuideAsciidocGenerator {
                         excludeLineForLanguage = true
                     }
                 } else {
-                    if (!excludeLineForLanguage && !excludeLineForBuild) {
-                        lines << line
-                    }
+                    lines << line
                 }
             }
             String text = lines.join('\n')
@@ -193,7 +195,7 @@ class GuideAsciidocGenerator {
     @NonNull
     static String testPath(@NonNull String appName,
                            @NonNull String name,
-                            @NonNull TestFramework testFramework) {
+                           @NonNull TestFramework testFramework) {
         String fileName = name
         if (testFramework) {
             if (name.endsWith('Test')) {
