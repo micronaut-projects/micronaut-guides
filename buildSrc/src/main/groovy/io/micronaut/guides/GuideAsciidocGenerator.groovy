@@ -1,15 +1,12 @@
 package io.micronaut.guides
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
-import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.util.StringUtils
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
-import io.micronaut.starter.options.Language
 
 import java.nio.file.Path
 import java.nio.file.Paths
