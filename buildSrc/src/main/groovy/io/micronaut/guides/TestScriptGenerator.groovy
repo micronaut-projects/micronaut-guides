@@ -6,7 +6,6 @@ import io.micronaut.starter.options.BuildTool
 @CompileStatic
 class TestScriptGenerator {
 
-
     public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
     public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
 

@@ -14,7 +14,7 @@ class IndexGenerator {
 
     private static final String LATEST_GUIDES_URL = "https://guides.micronaut.io/latest/"
 
-    static String generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
+    static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
 
         String templateText = template.text
@@ -127,7 +127,6 @@ class IndexGenerator {
     }
 
     private static String table(String baseURL, GuideMetadata metadata) {
-        String readCopy = 'Read'
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         String kotlinImg = '<img src="./images/kotlin.svg" width="60" alt="Kotlin"/>'
         String groovyImg = '<img src="./images/groovy.svg" width="60" alt="Groovy"/>'
@@ -141,9 +140,9 @@ class IndexGenerator {
 <tr>
 <th></th>
 """
-            tableHtml += "<th>${javaImg}</th>"
-            tableHtml += "<th>${kotlinImg}</th>"
-            tableHtml += "<th>${groovyImg}</th>"
+        tableHtml += "<th>${javaImg}</th>"
+        tableHtml += "<th>${kotlinImg}</th>"
+        tableHtml += "<th>${groovyImg}</th>"
         tableHtml += """\
 </tr>
 </thead>
