@@ -188,6 +188,9 @@
 <li>
 <p><a href="https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm">Oracle Cloud CLI</a> installed, with local access to Oracle Cloud configured by running <code>oci setup config</code></p>
 </li>
+<li>
+<p>Docker installed (optional, only needed if using Testcontainers for the persistence tests)</p>
+</li>
 </ul>
 </div>
 </div>
@@ -491,6 +494,24 @@ class ThingController(private val thingRepository: ThingRepository) {
 <div class="sect2">
 <h3 id="configuration">5.6. Configuration</h3>
 <div class="paragraph">
+<p>Create a new Flyway migration SQL script in <code>src/main/resources/db/migration/V1__create-schema.sql</code> and add the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/migration/V1__create-schema.sql</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">CREATE</span> <span class="type">TABLE</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">THING</span><span class="delimiter">&quot;</span></span> (<span class="string"><span class="delimiter">&quot;</span><span class="content">ID</span><span class="delimiter">&quot;</span></span> NUMBER(<span class="integer">19</span>) <span class="directive">PRIMARY</span> <span class="type">KEY</span> <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,<span class="string"><span class="delimiter">&quot;</span><span class="content">NAME</span><span class="delimiter">&quot;</span></span> <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>) <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>);
+<span class="class">CREATE</span> SEQUENCE <span class="string"><span class="delimiter">&quot;</span><span class="content">THING_SEQ</span><span class="delimiter">&quot;</span></span> MINVALUE <span class="integer">1</span> START WITH <span class="integer">1</span> NOCACHE NOCYCLE;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Edit <code>src/main/resources/logback.xml</code> and add the following to monitor the SQL queries that Micronaut Data performs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;logger</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">'</span><span class="content">io.micronaut.data.query</span><span class="delimiter">'</span></span> <span class="attribute-name">level</span>=<span class="string"><span class="delimiter">'</span><span class="content">debug</span><span class="delimiter">'</span></span> <span class="tag">/&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>Replace the generated <code>application.yml</code> with this:</p>
 </div>
 <div class="listingblock">
@@ -503,15 +524,6 @@ class ThingController(private val thingRepository: ThingRepository) {
     <span class="key">io</span>:
       <span class="key">type</span>: <span class="string"><span class="content">fixed</span></span>
       <span class="key">nThreads</span>: <span class="string"><span class="content">75 </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-<span class="key">datasources</span>:
-  <span class="key">default</span>:
-    <span class="comment"># ocid: </span><i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="comment"># walletPassword: </span><i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="key">username</span>: <span class="string"><span class="content">micronautdemo</span></span>
-    <span class="key">password</span>: <i class="conum" data-value="4"></i><b>(4)</b>
-<span class="key">oci</span>:
-  <span class="key">config</span>:
-    <span class="key">profile</span>: <span class="string"><span class="content">DEFAULT </span></span><i class="conum" data-value="5"></i><b>(5)</b>
 <span class="key">flyway</span>:
   <span class="key">datasources</span>:
     <span class="key">default</span>:
@@ -524,70 +536,44 @@ class ThingController(private val thingRepository: ThingRepository) {
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>This is optional, but it&#8217;s a good idea to configure the IO pool size when using <code>@ExecuteOn(TaskExecutors.IO)</code> in controllers</td>
 </tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Uncomment the <code>ocid</code> property and set its value with the database OCID unique identifier you saved when creating the database</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Uncomment the <code>walletPassword</code> property and set its value with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Set the <code>password</code> property with the <code>micronautdemo</code> schema user password you created</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Change the profile name if you&#8217;re not using the default, and optionally add a value for the path to the config file if necessary as described in the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth">Authentication section</a> of the Micronaut Oracle Cloud docs</td>
-</tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Replace the generated <code>application-test.yml</code> with this:</p>
+<p>Create an <code>application-oraclecloud.yml</code> file in <code>src/main/resources</code> with this content:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/resources/application-test.yml</div>
+<div class="title">src/main/resources/application-oraclecloud.yml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
   <span class="key">default</span>:
-    <span class="key">url</span>: <span class="string"><span class="content">jdbc:tc:oracle:thin:@/xe</span></span>
-    <span class="key">driverClassName</span>: <span class="string"><span class="content">org.testcontainers.jdbc.ContainerDatabaseDriver</span></span>
-    <span class="key">username</span>: <span class="string"><span class="content">system</span></span>
-    <span class="key">password</span>: <span class="string"><span class="content">oracle</span></span>
-<span class="key">flyway</span>:
-  <span class="key">datasources</span>:
-    <span class="key">default</span>:
-      <span class="key">locations</span>: <span class="string"><span class="content">classpath:db/migration</span></span>
-      <span class="key">baseline-version</span>: <span class="string"><span class="content">0</span></span>
-      <span class="key">baseline-on-migrate</span>: <span class="string"><span class="content">true</span></span></code></pre>
+    <span class="key">ocid</span>: <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">walletPassword</span>: <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="key">username</span>: <span class="string"><span class="content">micronautdemo</span></span>
+    <span class="key">password</span>: <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="key">oci</span>:
+  <span class="key">config</span>:
+    <span class="key">profile</span>: <span class="string"><span class="content">DEFAULT </span></span><i class="conum" data-value="4"></i><b>(4)</b></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Create a <code>testcontainers.properties</code> file in <code>src/test/resources</code> with this content:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/test/resources/testcontainers.properties</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">oracle.container.image=registry.gitlab.com/micronaut-projects/micronaut-graal-tests/oracle-database:18.4.0-xe</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Create a new Flyway migration SQL script in <code>src/main/resources/db/migration/V1__create-schema.sql</code> and add the following:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/resources/db/migration/V1__create-schema.sql</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">CREATE</span> <span class="type">TABLE</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">THING</span><span class="delimiter">&quot;</span></span> (<span class="string"><span class="delimiter">&quot;</span><span class="content">ID</span><span class="delimiter">&quot;</span></span> NUMBER(<span class="integer">19</span>) <span class="directive">PRIMARY</span> <span class="type">KEY</span> <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,<span class="string"><span class="delimiter">&quot;</span><span class="content">NAME</span><span class="delimiter">&quot;</span></span> <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>) <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>);
-<span class="class">CREATE</span> SEQUENCE <span class="string"><span class="delimiter">&quot;</span><span class="content">THING_SEQ</span><span class="delimiter">&quot;</span></span> MINVALUE <span class="integer">1</span> START WITH <span class="integer">1</span> NOCACHE NOCYCLE;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And finally, you can optionally edit <code>src/main/resources/logback.xml</code> and add the following to monitor the SQL queries that Micronaut Data performs:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;logger</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">'</span><span class="content">io.micronaut.data.query</span><span class="delimiter">'</span></span> <span class="attribute-name">level</span>=<span class="string"><span class="delimiter">'</span><span class="content">debug</span><span class="delimiter">'</span></span> <span class="tag">/&gt;</span></code></pre>
-</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the value of the <code>ocid</code> property with the database OCID unique identifier you saved when creating the database</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the <code>walletPassword</code> property with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set the <code>password</code> property with the <code>micronautdemo</code> schema user password you created</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Change the profile name if you&#8217;re not using the default, and optionally add a value for the path to the config file if necessary as described in the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth">Authentication section</a> of the Micronaut Oracle Cloud docs</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -658,6 +644,56 @@ class ThingRepositoryTest(private val thingRepository: ThingRepository) {
 <h2 id="testing-the-application">6. Testing the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
+<p>There are two options for running the tests; one is to run against the live database, and the other is to run tests locally with an Oracle database in a Docker container using <a href="https://www.testcontainers.org/">Testcontainers</a>.</p>
+</div>
+<div class="paragraph">
+<p>To test using Testcontainers, create a <code>testcontainers.properties</code> file in <code>src/test/resources</code> with this content:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/testcontainers.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">oracle.container.image=registry.gitlab.com/micronaut-projects/micronaut-graal-tests/oracle-database:18.4.0-xe</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and replace the generated <code>application-test.yml</code> with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/application-test.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+  <span class="key">default</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">jdbc:tc:oracle:thin:@/xe</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">org.testcontainers.jdbc.ContainerDatabaseDriver</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">system</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">oracle</span></span>
+
+<span class="key">flyway</span>:
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">locations</span>: <span class="string"><span class="content">classpath:db/migration</span></span>
+      <span class="key">baseline-version</span>: <span class="string"><span class="content">0</span></span>
+      <span class="key">baseline-on-migrate</span>: <span class="string"><span class="content">true</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To test using the live database, replace the generated <code>application-test.yml</code> with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/application-test.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">flyway</span>:
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">locations</span>: <span class="string"><span class="content">classpath:db/migration</span></span>
+      <span class="key">baseline-version</span>: <span class="string"><span class="content">0</span></span>
+      <span class="key">baseline-on-migrate</span>: <span class="string"><span class="content">true</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then replace the <code>@MicronautTest</code> annotation on <code>ThingRepositoryTest</code> with <code>@MicronautTest(environments = Environment.ORACLE_CLOUD)</code> (and add an import for <code>io.micronaut.context.env.Environment</code>) to use the datasource configured in <code>application-oraclecloud.yml</code>.</p>
+</div>
+<div class="paragraph">
 <p>To run the tests:</p>
 </div>
 <div class="listingblock">
@@ -671,7 +707,23 @@ class ThingRepositoryTest(private val thingRepository: ThingRepository) {
 <h2 id="running-the-application">7. Running the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To run the application use the <code>./mvnw mn:run</code> command which will start the application on port 8080.</p>
+<p>To run the application use</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or if you use Windows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">&gt; cmd /C &quot;set MICRONAUT_ENVIRONMENTS=oraclecloud &amp;&amp; mvnw mn:run&quot;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>which will start the application on port 8080.</p>
 </div>
 <div class="paragraph">
 <p>You should see output similar to the following, indicating that the database connectivity and wallet configuration is all handled automatically, and the Flyway migration runs since the database is determined to be out of date. Also, if you added the Logback logger above, you&#8217;ll see the results of the work done by <code>DataPopulator</code>:</p>
