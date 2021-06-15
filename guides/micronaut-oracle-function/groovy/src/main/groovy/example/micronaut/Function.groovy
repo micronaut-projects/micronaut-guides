@@ -15,7 +15,7 @@ class Function extends OciFunction {
     @Inject
     TenancyIdProvider tenantIdProvider
 
-    @ReflectiveAccess
+    @ReflectiveAccess // <1>
     String handleRequest() {
         String tenancyId = tenantIdProvider.tenancyId
         return "Your tenancy is: $tenancyId"

@@ -12,7 +12,7 @@ class Function : OciFunction() {
     @Inject
     lateinit var tenantIdProvider : TenancyIdProvider
 
-    @ReflectiveAccess
+    @ReflectiveAccess // <1>
     fun handleRequest() : String {
         val tenancyId = tenantIdProvider.tenancyId
         return "Your tenancy is: $tenancyId"
