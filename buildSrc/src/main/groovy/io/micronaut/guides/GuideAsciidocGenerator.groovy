@@ -206,9 +206,9 @@ class GuideAsciidocGenerator {
     }
 
     @NonNull
-    static String pathByFolder(@NonNull String appName,
-                               @NonNull String fileName,
-                               String folder) {
+    private static String pathByFolder(@NonNull String appName,
+                                       @NonNull String fileName,
+                                       String folder) {
 
         String module = appName ? "${appName}/" : ""
         "${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@".toString()

@@ -35,7 +35,8 @@ class IndexGenerator {
         }
     }
 
-    static void save(String templateText, String filename, File buildDir, List<GuideMetadata> metadatas, String title = 'Micronaut Guides') {
+    private static void save(String templateText, String filename, File buildDir,
+                             List<GuideMetadata> metadatas, String title = 'Micronaut Guides') {
         String text = indexText(templateText, metadatas, title)
         Path path = Paths.get(buildDir.absolutePath, filename)
         File output = path.toFile()
@@ -43,7 +44,7 @@ class IndexGenerator {
         output.text = text
     }
 
-    static String indexText(String templateText, List<GuideMetadata> metadatas, String title) {
+    private static String indexText(String templateText, List<GuideMetadata> metadatas, String title) {
         boolean singleGuide = metadatas.size() == 1
 
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
@@ -71,7 +72,7 @@ class IndexGenerator {
         text
     }
 
-    static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
+    private static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
         String index = ''
         int count = 0
         List<GuideMetadata> filteredMetadatas = System.getProperty('micronaut.guide') ?
@@ -119,12 +120,13 @@ class IndexGenerator {
         index
     }
 
-    static String guideLink(String baseURL, GuideMetadata metadata, GuidesOption guidesOption, String title = null) {
+    private static String guideLink(String baseURL, GuideMetadata metadata,
+                                    GuidesOption guidesOption, String title = null) {
         String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
         "<a href='${baseURL}${folder}.html'>${title ? title : (guidesOption.buildTool.toString() + ' - ' + guidesOption.language)}</a>"
     }
 
-    static String table(String baseURL, GuideMetadata metadata) {
+    private static String table(String baseURL, GuideMetadata metadata) {
         String readCopy = 'Read'
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         String kotlinImg = '<img src="./images/kotlin.svg" width="60" alt="Kotlin"/>'
@@ -181,7 +183,8 @@ class IndexGenerator {
         tableHtml
     }
 
-    static String cell(String baseURL, GuideMetadata metadata, BuildTool buildTool, Language language, List<GuidesOption> guidesOptionList) {
+    private static String cell(String baseURL, GuideMetadata metadata, BuildTool buildTool,
+                               Language language, List<GuidesOption> guidesOptionList) {
         String tableHtml = "<td>"
         GuidesOption guidesOption = guidesOptionList.find {GuidesOption option -> option.buildTool == buildTool&& option.language == language }
         if (guidesOption) {
@@ -193,7 +196,7 @@ class IndexGenerator {
         tableHtml
     }
 
-    static String imageForCategory(Category cat) {
+    private static String imageForCategory(Category cat) {
         switch (cat) {
             case Category.GCP:
                 return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
@@ -234,7 +237,7 @@ class IndexGenerator {
 
     }
 
-    static String category(Category cat) {
+    private static String category(Category cat) {
         String html = "<div class='category'>"
         html += '<div class="inner">'
         html += '<img width="100" style="margin-bottom: 30px" src="' + imageForCategory(cat) + '"/>'

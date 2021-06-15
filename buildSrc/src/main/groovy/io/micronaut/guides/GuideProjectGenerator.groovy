@@ -54,7 +54,7 @@ class GuideProjectGenerator implements Closeable {
     }
 
     @CompileDynamic
-    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    private static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
             throw new GradleException("metadata file not found for ${dir.name}")
@@ -214,14 +214,14 @@ class GuideProjectGenerator implements Closeable {
         guidesOptionList
     }
 
-    static GuidesOption createGuidesOption(@NonNull BuildTool buildTool,
-                                           @NonNull Language language,
-                                           @Nullable String testFramework) {
+    private static GuidesOption createGuidesOption(@NonNull BuildTool buildTool,
+                                                   @NonNull Language language,
+                                                   @Nullable String testFramework) {
         new GuidesOption(buildTool, language, testFrameworkOption(language, testFramework))
     }
 
-    static TestFramework testFrameworkOption(@NonNull Language language,
-                                             @Nullable String testFramework) {
+    private static TestFramework testFrameworkOption(@NonNull Language language,
+                                                     @Nullable String testFramework) {
         if (testFramework != null) {
             return TestFramework.valueOf(testFramework.toUpperCase())
         }
