@@ -37,10 +37,8 @@ exit 0
         changedFiles.any { str -> str.contains("pom.xml") }
     }
 
-    private static boolean shouldSkip(String slug, List<String> guidesChanged) {
-        return  (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) ?
-                !(System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == slug) :
-                !guidesChanged.contains(slug)
+    private static boolean shouldSkip(GuideMetadata metadata, List<String> guidesChanged) {
+        return !Utils.process(metadata) || !guidesChanged.contains(metadata.slug)
     }
 
     static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
@@ -55,12 +53,12 @@ EXIT_STATUS=0
         boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
                 changesDependencies(changedFiles, slugsChanged) ||
                 (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
-        if (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) {
+        if (Utils.singleGuide()) {
             forceExecuteEveryTest = false
         }
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = shouldSkip(metadata.slug, slugsChanged)
+            boolean skip = shouldSkip(metadata, slugsChanged)
             if (!forceExecuteEveryTest && skip) {
                 continue
             }

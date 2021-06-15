@@ -75,8 +75,8 @@ class IndexGenerator {
     private static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
         String index = ''
         int count = 0
-        List<GuideMetadata> filteredMetadatas = System.getProperty('micronaut.guide') ?
-                metadatas.findAll { it.slug == System.getProperty('micronaut.guide') } :
+        List<GuideMetadata> filteredMetadatas = Utils.singleGuide() ?
+                metadatas.findAll { it.slug == Utils.singleGuide() } :
                 metadatas
         if (!filteredMetadatas) {
             return index

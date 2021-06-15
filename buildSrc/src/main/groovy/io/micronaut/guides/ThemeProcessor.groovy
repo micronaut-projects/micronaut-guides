@@ -16,8 +16,7 @@ class ThemeProcessor {
 '''
         String sectionbody = '<div class="sectionbody">'
         for (GuideMetadata metadata : metadatas) {
-            if (System.getProperty('micronaut.guide') != null &&
-                    System.getProperty('micronaut.guide') != metadata.slug) {
+            if (!Utils.process(metadata)) {
                 continue
             }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
