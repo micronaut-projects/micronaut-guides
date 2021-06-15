@@ -1,8 +1,10 @@
 package io.micronaut.guides
 
+import groovy.transform.CompileStatic
 import io.micronaut.starter.options.JdkVersion
 import org.gradle.api.GradleException
 
+@CompileStatic
 class Utils {
 
     private static final String SYS_PROP_MICRONAUT_GUIDE = 'micronaut.guide'
