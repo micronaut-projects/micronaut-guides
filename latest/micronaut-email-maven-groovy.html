@@ -546,7 +546,9 @@ for businesses of all sizes that use email to keep in contact with their custome
 <span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 <span class="keyword">import</span> <span class="include">spock.util.environment.RestoreSystemProperties</span>
+<span class="keyword">import</span> <span class="include">spock.lang.IgnoreIf</span>
 
+<span class="annotation">@IgnoreIf</span>({ env[<span class="string"><span class="delimiter">'</span><span class="content">AWS_SECRET_ACCESS_KEY</span><span class="delimiter">'</span></span>] })
 <span class="type">class</span> <span class="class">AwsSesMailServiceSpec</span> <span class="directive">extends</span> Specification {
 
     <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">aws ses mail service is not loaded if system property is not present</span><span class="delimiter">&quot;</span></span>() {
@@ -962,12 +964,6 @@ $ ./mvnw mn:run</code></pre>
         <span class="key">given</span>:
         EmailCmd cmd = <span class="keyword">new</span> EmailCmd(<span class="key">subject</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Test</span><span class="delimiter">&quot;</span></span>, <span class="key">recipient</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">delamos@grails.example</span><span class="delimiter">&quot;</span></span>, <span class="key">textBody</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Hola hola</span><span class="delimiter">&quot;</span></span>)
         HttpRequest&lt;EmailCmd&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/mail/send</span><span class="delimiter">&quot;</span></span>, cmd) <i class="conum" data-value="5"></i><b>(5)</b>
-
-        <span class="key">when</span>:
-        <span class="predefined-type">Collection</span>&lt;EmailService&gt; emailServices = applicationContext.getBeansOfType(EmailService.class)
-
-        <span class="key">then</span>:
-        <span class="integer">1</span> == emailServices.size()
 
         <span class="key">when</span>:
         EmailService emailService = applicationContext.getBean(EmailService.class)
