@@ -386,7 +386,8 @@ If you don&#8217;t annotate the class with <code>@CacheConfig</code>, specify th
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -406,7 +407,7 @@ internal class NewsServiceTest {
     @Order(1) <i class="conum" data-value="5"></i><b>(5)</b>
     fun firstInvocationOfNovemberDoesNotHitCache() {
         val headlines = newsService.headlines(Month.NOVEMBER)
-        Assertions.assertEquals(2, headlines!!.size)
+        assertEquals(2, headlines!!.size)
     }
 
     @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
@@ -414,7 +415,7 @@ internal class NewsServiceTest {
     @Order(2) <i class="conum" data-value="5"></i><b>(5)</b>
     fun secondInvocationOfNovemberHitsCache() {
         val headlines = newsService.headlines(Month.NOVEMBER)
-        Assertions.assertEquals(2, headlines!!.size)
+        assertEquals(2, headlines!!.size)
     }
 
     @Timeout(4) <i class="conum" data-value="4"></i><b>(4)</b>
@@ -422,7 +423,7 @@ internal class NewsServiceTest {
     @Order(3) <i class="conum" data-value="5"></i><b>(5)</b>
     fun firstInvocationOfOctoberDoesNotHitCache() {
         val headlines = newsService.headlines(Month.OCTOBER)
-        Assertions.assertEquals(1, headlines!!.size)
+        assertEquals(1, headlines!!.size)
     }
 
     @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
@@ -430,7 +431,7 @@ internal class NewsServiceTest {
     @Order(4) <i class="conum" data-value="5"></i><b>(5)</b>
     fun secondInvocationOfOctoberHitsCache() {
         val headlines = newsService.headlines(Month.OCTOBER)
-        Assertions.assertEquals(1, headlines!!.size)
+        assertEquals(1, headlines!!.size)
     }
 
     @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
@@ -438,7 +439,7 @@ internal class NewsServiceTest {
     @Order(5) <i class="conum" data-value="5"></i><b>(5)</b>
     fun addingAHeadlineToNovemberUpdatesCache() {
         val headlines = newsService.addHeadline(Month.NOVEMBER, &quot;Micronaut 1.3 Milestone 1 Released&quot;)
-        Assertions.assertEquals(3, headlines!!.size)
+        assertEquals(3, headlines!!.size)
     }
 
     @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
@@ -446,14 +447,14 @@ internal class NewsServiceTest {
     @Order(6) <i class="conum" data-value="5"></i><b>(5)</b>
     fun novemberCacheWasUpdatedByCachePutAndThusTheValueIsRetrievedFromTheCache() {
         val headlines = newsService.headlines(Month.NOVEMBER)
-        Assertions.assertEquals(3, headlines!!.size)
+        assertEquals(3, headlines!!.size)
     }
 
     @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
     @Test
     @Order(7) <i class="conum" data-value="5"></i><b>(5)</b>
     fun invalidateNovemberCacheWithCacheInvalidate() {
-        Assertions.assertDoesNotThrow { newsService.removeHeadline(Month.NOVEMBER, &quot;Micronaut 1.3 Milestone 1 Released&quot;) }
+        assertDoesNotThrow { newsService.removeHeadline(Month.NOVEMBER, &quot;Micronaut 1.3 Milestone 1 Released&quot;) }
     }
 
     @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
@@ -461,7 +462,7 @@ internal class NewsServiceTest {
     @Order(8) <i class="conum" data-value="5"></i><b>(5)</b>
     fun octoberCacheIsStillValid() {
         val headlines = newsService.headlines(Month.OCTOBER)
-        Assertions.assertEquals(1, headlines!!.size)
+        assertEquals(1, headlines!!.size)
     }
 
     @Timeout(4) <i class="conum" data-value="4"></i><b>(4)</b>
@@ -469,7 +470,7 @@ internal class NewsServiceTest {
     @Order(9) <i class="conum" data-value="5"></i><b>(5)</b>
     fun novemberCacheWasInvalidated() {
         val headlines = newsService.headlines(Month.NOVEMBER)
-        Assertions.assertEquals(2, headlines!!.size)
+        assertEquals(2, headlines!!.size)
     }
 }</code></pre>
 </div>
@@ -547,7 +548,7 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.uri.UriBuilder
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import java.time.Month
@@ -566,9 +567,9 @@ class NewsControllerTest {
         val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(UriBuilder.of(&quot;/&quot;).path(Month.OCTOBER.name).build())
         var news: News = client.toBlocking().retrieve(request, News::class.java)
         val expected = &quot;Micronaut AOP: Awesome flexibility without the complexity&quot;
-        Assertions.assertEquals(listOf(expected), news.headlines)
+        assertEquals(listOf(expected), news.headlines)
         news = client.toBlocking().retrieve(request, News::class.java)
-        Assertions.assertEquals(listOf(expected), news.headlines)
+        assertEquals(listOf(expected), news.headlines)
     }
 }</code></pre>
 </div>

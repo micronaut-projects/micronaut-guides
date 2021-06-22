@@ -439,7 +439,6 @@ sent over unsecure URL’s.</p>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Assertions</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.function.Executable</span>;
 
@@ -1059,7 +1058,6 @@ to ensure the refresh token supplied is valid.</p>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Assertions</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
 <span class="keyword">import</span> <span class="include">javax.inject.Inject</span>;
@@ -1067,6 +1065,8 @@ to ensure the refresh token supplied is valid.</p>
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
 
 <span class="annotation">@MicronautTest</span>
 <span class="type">class</span> <span class="class">UnsignedRefreshTokenTest</span> {
@@ -1083,7 +1083,7 @@ to ensure the refresh token supplied is valid.</p>
         Argument&lt;BearerAccessRefreshToken&gt; bodyArgument = Argument.of(BearerAccessRefreshToken.class);
         Argument&lt;<span class="predefined-type">Map</span>&gt; errorArgument = Argument.of(<span class="predefined-type">Map</span>.class);
 
-        HttpClientResponseException e = Assertions.assertThrows(HttpClientResponseException.class, () -&gt; {
+        HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () -&gt; {
             client.toBlocking().exchange(
                     HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(unsignedRefreshedToken)), bodyArgument, errorArgument
             );
@@ -1091,7 +1091,7 @@ to ensure the refresh token supplied is valid.</p>
         assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
 
         Optional&lt;<span class="predefined-type">Map</span>&gt; mapOptional = e.getResponse().getBody(<span class="predefined-type">Map</span>.class);
-        Assertions.assertTrue(mapOptional.isPresent());
+        assertTrue(mapOptional.isPresent());
 
         <span class="predefined-type">Map</span> m = mapOptional.get();
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">invalid_grant</span><span class="delimiter">&quot;</span></span>, m.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">error</span><span class="delimiter">&quot;</span></span>));

@@ -665,7 +665,9 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.text.ParseException
 import javax.inject.Inject
@@ -684,10 +686,10 @@ class LoginIncludesRefreshTokenTest {
         val request: HttpRequest&lt;Any&gt; = HttpRequest.POST(&quot;/login&quot;, creds)
         val rsp: BearerAccessRefreshToken =
             client!!.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
-        Assertions.assertEquals(&quot;sherlock&quot;, rsp.username)
-        Assertions.assertNotNull(rsp.accessToken)
-        Assertions.assertNotNull(rsp.refreshToken) <i class="conum" data-value="1"></i><b>(1)</b>
-        Assertions.assertTrue(JWTParser.parse(rsp.accessToken) is SignedJWT)
+        assertEquals(&quot;sherlock&quot;, rsp.username)
+        assertNotNull(rsp.accessToken)
+        assertNotNull(rsp.refreshToken) <i class="conum" data-value="1"></i><b>(1)</b>
+        assertTrue(JWTParser.parse(rsp.accessToken) is SignedJWT)
     }
 }</code></pre>
 </div>
@@ -1024,7 +1026,9 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Optional
 import javax.inject.Inject
@@ -1041,21 +1045,21 @@ internal class UnsignedRefreshTokenTest {
         val unsignedRefreshedToken = &quot;foo&quot; <i class="conum" data-value="1"></i><b>(1)</b>
         val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
         val errorArgument = Argument.of(Map::class.java)
-        val e = Assertions.assertThrows(HttpClientResponseException::class.java) {
+        val e = assertThrows(HttpClientResponseException::class.java) {
             client!!.toBlocking().exchange(
                 HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(unsignedRefreshedToken)),
                 bodyArgument,
                 errorArgument
             )
         }
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(HttpStatus.BAD_REQUEST, e.status)
 
         val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
-        Assertions.assertTrue(mapOptional.isPresent)
+        assertTrue(mapOptional.isPresent)
 
         val m = mapOptional.get()
-        Assertions.assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
-        Assertions.assertEquals(&quot;Refresh token is invalid&quot;, m[&quot;error_description&quot;])
+        assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
+        assertEquals(&quot;Refresh token is invalid&quot;, m[&quot;error_description&quot;])
     }
 }</code></pre>
 </div>
@@ -1090,7 +1094,9 @@ import io.micronaut.security.token.generator.RefreshTokenGenerator
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Optional
 import javax.inject.Inject
@@ -1110,23 +1116,23 @@ internal class RefreshTokenNotFoundTest {
         val user = UserDetails(&quot;sherlock&quot;, emptyList())
         val refreshToken = refreshTokenGenerator!!.createKey(user)
         val refreshTokenOptional = refreshTokenGenerator!!.generate(user, refreshToken)
-        Assertions.assertTrue(refreshTokenOptional.isPresent)
+        assertTrue(refreshTokenOptional.isPresent)
 
         val signedRefreshToken = refreshTokenOptional.get() <i class="conum" data-value="1"></i><b>(1)</b>
         val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
         val errorArgument = Argument.of(MutableMap::class.java)
         val req: HttpRequest&lt;Any&gt; = HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(signedRefreshToken))
-        val e = Assertions.assertThrows(HttpClientResponseException::class.java) {
+        val e = assertThrows(HttpClientResponseException::class.java) {
             client!!.toBlocking().exchange(req, bodyArgument, errorArgument)
         }
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(HttpStatus.BAD_REQUEST, e.status)
 
         val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
-        Assertions.assertTrue(mapOptional.isPresent)
+        assertTrue(mapOptional.isPresent)
 
         val m = mapOptional.get()
-        Assertions.assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
-        Assertions.assertEquals(&quot;refresh token not found&quot;, m[&quot;error_description&quot;])
+        assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
+        assertEquals(&quot;refresh token not found&quot;, m[&quot;error_description&quot;])
     }
 }</code></pre>
 </div>
@@ -1161,7 +1167,9 @@ import io.micronaut.security.authentication.UserDetails
 import io.micronaut.security.token.generator.RefreshTokenGenerator
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Optional
 
@@ -1176,30 +1184,30 @@ internal class RefreshTokenRevokedTest {
         val user = UserDetails(&quot;sherlock&quot;, emptyList())
         val refreshToken = refreshTokenGenerator.createKey(user)
         val refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
-        Assertions.assertTrue(refreshTokenOptional.isPresent)
+        assertTrue(refreshTokenOptional.isPresent)
 
         val oldTokenCount = refreshTokenRepository.count()
         val signedRefreshToken = refreshTokenOptional.get()
         refreshTokenRepository.save(user.username, refreshToken, true) <i class="conum" data-value="1"></i><b>(1)</b>
-        Assertions.assertEquals(oldTokenCount + 1, refreshTokenRepository.count())
+        assertEquals(oldTokenCount + 1, refreshTokenRepository.count())
 
         val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
         val errorArgument = Argument.of(Map::class.java)
-        val e = Assertions.assertThrows(HttpClientResponseException::class.java) {
+        val e = assertThrows(HttpClientResponseException::class.java) {
             client.toBlocking().exchange(
                 HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(signedRefreshToken)),
                 bodyArgument,
                 errorArgument
             )
         }
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(HttpStatus.BAD_REQUEST, e.status)
 
         val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
-        Assertions.assertTrue(mapOptional.isPresent)
+        assertTrue(mapOptional.isPresent)
 
         val m = mapOptional.get()
-        Assertions.assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
-        Assertions.assertEquals(&quot;refresh token revoked&quot;, m[&quot;error_description&quot;])
+        assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
+        assertEquals(&quot;refresh token revoked&quot;, m[&quot;error_description&quot;])
         refreshTokenRepository.deleteAll()
     }
 }</code></pre>
@@ -1232,7 +1240,9 @@ import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
@@ -1256,9 +1266,9 @@ internal class OauthAccessTokenTest {
         val rsp: BearerAccessRefreshToken =
             client!!.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
         Thread.sleep(3000)
-        Assertions.assertEquals(oldTokenCount + 1, refreshTokenRepository!!.count())
-        Assertions.assertNotNull(rsp.accessToken)
-        Assertions.assertNotNull(rsp.refreshToken)
+        assertEquals(oldTokenCount + 1, refreshTokenRepository!!.count())
+        assertNotNull(rsp.accessToken)
+        assertNotNull(rsp.refreshToken)
 
         Thread.sleep(1000) // sleep for one second to give time for the issued at `iat` Claim to change
         val refreshResponse = client!!.toBlocking().retrieve(
@@ -1268,8 +1278,8 @@ internal class OauthAccessTokenTest {
             ), AccessRefreshToken::class.java <i class="conum" data-value="1"></i><b>(1)</b>
         )
 
-        Assertions.assertNotNull(refreshResponse.accessToken)
-        Assertions.assertNotEquals(rsp.accessToken, refreshResponse.accessToken) <i class="conum" data-value="2"></i><b>(2)</b>
+        assertNotNull(refreshResponse.accessToken)
+        assertNotEquals(rsp.accessToken, refreshResponse.accessToken) <i class="conum" data-value="2"></i><b>(2)</b>
         refreshTokenRepository!!.deleteAll()
     }
 }</code></pre>

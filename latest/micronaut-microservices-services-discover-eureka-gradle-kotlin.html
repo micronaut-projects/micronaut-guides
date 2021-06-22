@@ -336,7 +336,8 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
@@ -350,9 +351,9 @@ class BooksControllerTest {
     fun testRetrieveBooks() {
         val request: HttpRequest&lt;*&gt; = HttpRequest.GET&lt;Any&gt;(&quot;/books&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
         val books: List&lt;*&gt; = client.toBlocking().retrieve(request, Argument.listOf(Book::class.java)) <i class="conum" data-value="4"></i><b>(4)</b>
-        Assertions.assertEquals(3, books.size)
-        Assertions.assertTrue(books.contains(Book(&quot;1491950358&quot;, &quot;Building Microservices&quot;)))
-        Assertions.assertTrue(books.contains(Book(&quot;1680502395&quot;, &quot;Release It!&quot;)))
+        assertEquals(3, books.size)
+        assertTrue(books.contains(Book(&quot;1491950358&quot;, &quot;Building Microservices&quot;)))
+        assertTrue(books.contains(Book(&quot;1680502395&quot;, &quot;Release It!&quot;)))
     }
 }</code></pre>
 </div>
@@ -520,7 +521,9 @@ import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
@@ -533,14 +536,14 @@ class BooksControllerTest {
     @Test
     fun testBooksController() {
         val rsp = rxHttpClient.toBlocking().exchange(HttpRequest.GET&lt;Any&gt;(&quot;/books/stock/1491950358&quot;), Boolean::class.java)
-        Assertions.assertEquals(rsp.status(), HttpStatus.OK)
-        Assertions.assertTrue(rsp.body()!!)
+        assertEquals(rsp.status(), HttpStatus.OK)
+        assertTrue(rsp.body()!!)
     }
 
     @Test
     fun testBooksControllerWithNonExistingIsbn() {
-        val thrown = Assertions.assertThrows(HttpClientResponseException::class.java) { rxHttpClient.toBlocking().exchange(HttpRequest.GET&lt;Any&gt;(&quot;/books/stock/XXXXX&quot;), Boolean::class.java) }
-        Assertions.assertEquals(
+        val thrown = assertThrows(HttpClientResponseException::class.java) { rxHttpClient.toBlocking().exchange(HttpRequest.GET&lt;Any&gt;(&quot;/books/stock/XXXXX&quot;), Boolean::class.java) }
+        assertEquals(
                 HttpStatus.NOT_FOUND,
                 thrown.response.status
         )
@@ -865,7 +868,7 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.RxStreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
@@ -878,8 +881,8 @@ class BookControllerTest {
     @Test
     fun testRetrieveBooks() {
         val books = client.jsonStream(HttpRequest.GET&lt;Any&gt;(&quot;/books&quot;), BookRecommendation::class.java)
-        Assertions.assertEquals(books.toList().blockingGet().size, 1)
-        Assertions.assertEquals(books.toList().blockingGet()[0].name, &quot;Building Microservices&quot;)
+        assertEquals(books.toList().blockingGet().size, 1)
+        assertEquals(books.toList().blockingGet()[0].name, &quot;Building Microservices&quot;)
     }
 }</code></pre>
 </div>

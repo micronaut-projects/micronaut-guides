@@ -303,10 +303,10 @@ class TeamConfiguration  {
         val ctx = ApplicationContext.run(items) <i class="conum" data-value="1"></i><b>(1)</b>
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
 
-        Assertions.assertEquals(&quot;evolution&quot;, teamConfiguration.name)
-        Assertions.assertEquals(&quot;green&quot;, teamConfiguration.color)
-        Assertions.assertEquals(names.size, teamConfiguration.playerNames!!.size)
-        names.forEach(Consumer { name: String? -&gt; Assertions.assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
+        assertEquals(&quot;evolution&quot;, teamConfiguration.name)
+        assertEquals(&quot;green&quot;, teamConfiguration.color)
+        assertEquals(names.size, teamConfiguration.playerNames!!.size)
+        names.forEach(Consumer { name: String? -&gt; assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
 
         ctx.close()
     }</code></pre>
@@ -479,20 +479,20 @@ class TeamConfiguration  {
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
         val teamAdmin = teamConfiguration.builder.build() <i class="conum" data-value="2"></i><b>(2)</b>
 
-        Assertions.assertEquals(&quot;evolution&quot;, teamConfiguration.name)
-        Assertions.assertEquals(&quot;green&quot;, teamConfiguration.color)
-        Assertions.assertEquals(&quot;Nirav Assar&quot;, teamConfiguration.playerNames!![0])
-        Assertions.assertEquals(&quot;Lionel Messi&quot;, teamConfiguration.playerNames!![1])
+        assertEquals(&quot;evolution&quot;, teamConfiguration.name)
+        assertEquals(&quot;green&quot;, teamConfiguration.color)
+        assertEquals(&quot;Nirav Assar&quot;, teamConfiguration.playerNames!![0])
+        assertEquals(&quot;Lionel Messi&quot;, teamConfiguration.playerNames!![1])
 
         // check the builder has values set
-        Assertions.assertEquals(&quot;Jerry Jones&quot;, teamConfiguration.builder.manager)
-        Assertions.assertEquals(&quot;Tommy O'Neill&quot;, teamConfiguration.builder.coach)
-        Assertions.assertEquals(&quot;Mark Scanell&quot;, teamConfiguration.builder.president)
+        assertEquals(&quot;Jerry Jones&quot;, teamConfiguration.builder.manager)
+        assertEquals(&quot;Tommy O'Neill&quot;, teamConfiguration.builder.coach)
+        assertEquals(&quot;Mark Scanell&quot;, teamConfiguration.builder.president)
 
         // check the object can be built
-        Assertions.assertEquals(&quot;Jerry Jones&quot;, teamAdmin.manager) <i class="conum" data-value="3"></i><b>(3)</b>
-        Assertions.assertEquals(&quot;Tommy O'Neill&quot;, teamAdmin.coach)
-        Assertions.assertEquals(&quot;Mark Scanell&quot;, teamAdmin.president)
+        assertEquals(&quot;Jerry Jones&quot;, teamAdmin.manager) <i class="conum" data-value="3"></i><b>(3)</b>
+        assertEquals(&quot;Tommy O'Neill&quot;, teamAdmin.coach)
+        assertEquals(&quot;Mark Scanell&quot;, teamAdmin.president)
         ctx.close()</code></pre>
 </div>
 </div>
@@ -589,7 +589,7 @@ inject a particular <code>StadiumConfiguration</code> instance bean by using the
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.inject.qualifiers.Qualifiers
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class StadiumConfigurationTest {
@@ -607,10 +607,10 @@ class StadiumConfigurationTest {
         val fenwayConfiguration = ctx.getBean(StadiumConfiguration::class.java, Qualifiers.byName(&quot;fenway&quot;))
         val wrigleyConfiguration = ctx.getBean(StadiumConfiguration::class.java, Qualifiers.byName(&quot;wrigley&quot;))
 
-        Assertions.assertEquals(&quot;fenway&quot;, fenwayConfiguration.name)
-        Assertions.assertEquals(60000, fenwayConfiguration.size)
-        Assertions.assertEquals(&quot;wrigley&quot;, wrigleyConfiguration.name)
-        Assertions.assertEquals(45000, wrigleyConfiguration.size)
+        assertEquals(&quot;fenway&quot;, fenwayConfiguration.name)
+        assertEquals(60000, fenwayConfiguration.size)
+        assertEquals(&quot;wrigley&quot;, wrigleyConfiguration.name)
+        assertEquals(45000, wrigleyConfiguration.size)
 
         ctx.close()
     }
@@ -705,7 +705,8 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Arrays
 import java.util.function.Consumer
@@ -721,19 +722,19 @@ class MyControllerTest {
     fun testMyTeam() {
         val teamConfiguration = client.toBlocking()
                 .retrieve(HttpRequest.GET&lt;Any&gt;(&quot;/my/team&quot;), TeamConfiguration::class.java)
-        Assertions.assertEquals(&quot;Steelers&quot;, teamConfiguration.name)
-        Assertions.assertEquals(&quot;Black&quot;, teamConfiguration.color)
+        assertEquals(&quot;Steelers&quot;, teamConfiguration.name)
+        assertEquals(&quot;Black&quot;, teamConfiguration.color)
         val expectedPlayers = Arrays.asList(&quot;Mason Rudolph&quot;, &quot;James Connor&quot;)
-        Assertions.assertEquals(expectedPlayers.size, teamConfiguration.playerNames!!.size)
-        expectedPlayers.forEach(Consumer { name: String? -&gt; Assertions.assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
+        assertEquals(expectedPlayers.size, teamConfiguration.playerNames!!.size)
+        expectedPlayers.forEach(Consumer { name: String? -&gt; assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
     }
 
     @Test
     fun testMyStadium() {
         val conf = client.toBlocking()
                 .retrieve(HttpRequest.GET&lt;Any&gt;(&quot;/my/stadium&quot;), StadiumConfiguration::class.java)
-        Assertions.assertEquals(&quot;Pittsburgh&quot;, conf.city)
-        Assertions.assertEquals(35000, conf.size)
+        assertEquals(&quot;Pittsburgh&quot;, conf.city)
+        assertEquals(35000, conf.size)
     }
 }</code></pre>
 </div>
