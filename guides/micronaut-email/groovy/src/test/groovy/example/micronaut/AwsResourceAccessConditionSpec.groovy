@@ -1,10 +1,12 @@
 package example.micronaut;
 
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
+@IgnoreIf({ env['AWS_SECRET_ACCESS_KEY'] })
 class AwsResourceAccessConditionSpec extends Specification {
-
+    
     @RestoreSystemProperties
     void "condition is true if system properties are present"() {
         when:
