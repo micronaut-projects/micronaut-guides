@@ -1,10 +1,11 @@
 package example.micronaut;
 
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DisabledIfEnvironmentVariable(named = "AWS_SECRET_ACCESS_KEY", matches = ".*")
 class AwsResourceAccessConditionTest {
 
     @Test
