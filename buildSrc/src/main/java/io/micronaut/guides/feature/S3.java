@@ -7,8 +7,6 @@ import io.micronaut.starter.build.dependencies.Dependency;
 import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.feature.FeatureContext;
 import io.micronaut.starter.feature.aws.AwsV2Sdk;
-import io.micronaut.starter.feature.function.awslambda.AwsLambda;
-import io.micronaut.starter.feature.other.HttpClient;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
