@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Deploy a Micronaut Function (Serverless) app to Oracle Cloud</title>
+    <link rel="canonical" href="@canonical@"/>
+
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut Framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-oracle-function.html">Deploy a Micronaut Function (Serverless) app to Oracle Cloud</a> » <span class="breadcrumb_last" aria-current="page">maven | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-app">4. Writing the App</a></li>
+<li><a href="#testing-the-application">5. Testing the Application</a></li>
+<li><a href="#configuring-oracle-cloud-resources">6. Configuring Oracle Cloud Resources</a>
+<ul class="sectlevel2">
+<li><a href="#compartment">6.1. Compartment</a></li>
+<li><a href="#function-user-and-group">6.2. Function user and group</a></li>
+<li><a href="#oracle-cloud-infrastructure-registry-ocir-repository">6.3. Oracle Cloud Infrastructure Registry (OCIR) repository</a></li>
+<li><a href="#ocir-authentication">6.4. OCIR authentication</a></li>
+<li><a href="#virtual-cloud-network-vcn-and-subnet">6.5. Virtual Cloud Network (VCN) and Subnet</a></li>
+<li><a href="#policies">6.6. Policies</a></li>
+</ul>
+</li>
+<li><a href="#enable-tracing-and-logs">7. Enable Tracing and Logs</a></li>
+<li><a href="#creating-the-function">8. Creating the function</a></li>
+<li><a href="#invoking-the-function">9. Invoking the function</a></li>
+<li><a href="#next-steps">10. Next steps</a></li>
+<li><a href="#help-with-micronaut">11. Help with Micronaut</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Deploy a Micronaut Function (Serverless) app to Oracle Cloud</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to deploy a Micronaut Function (Serverless) application to Oracle Cloud.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Burt Beckwith</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 2.5.5</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we are going to create a Micronaut app written in Java.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 11 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+<li>
+<p>Docker installed</p>
+</li>
+<li>
+<p>A paid Oracle Cloud account (create an account at <a href="https://signup.oraclecloud.com">signup.oraclecloud.com</a>)</p>
+</li>
+<li>
+<p><a href="https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm">Oracle Cloud CLI</a> installed, with local access to Oracle Cloud configured by running <code>oci setup config</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the app step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-oracle-function-maven-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-app">4. Writing the App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an app using the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">Micronaut Command Line Interface</a> or with
+<a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app --features=oracle-function example.micronaut.micronautguide --build=maven --lang=java</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as a build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as a language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select serverless function as application type and add the <code>oracle-function</code> feature.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut app with the default package <code>example.micronaut</code> in a folder named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you are using Java or Kotlin and IntelliJ IDEA, make sure you have enabled annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+<div class="paragraph">
+<p>The generated application contains a <code>Function</code> class with a simple Oracle Cloud API call to retrieve the tenancy OCID from the injected <code>TenancyIdProvider</code> bean. That will be sufficient to ensure that the deployed function works correctly:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Function.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.ReflectiveAccess</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.oraclecloud.core.TenancyIdProvider</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.oraclecloud.function.OciFunction</span>;
+
+<span class="keyword">import</span> <span class="include">javax.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">java.util.Date</span>;
+
+<span class="annotation">@Singleton</span>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">Function</span> <span class="directive">extends</span> OciFunction {
+
+    <span class="annotation">@Inject</span>
+    TenancyIdProvider tenantIdProvider;
+
+    <span class="annotation">@ReflectiveAccess</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="directive">public</span> <span class="predefined-type">String</span> handleRequest() {
+        <span class="predefined-type">String</span> tenancyId = tenantIdProvider.getTenancyId();
+        <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Your tenancy is: </span><span class="delimiter">&quot;</span></span> + tenancyId;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This is needed because Project.fn invokes the function handler via reflection</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ ./mvnw test</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-oracle-cloud-resources">6. Configuring Oracle Cloud Resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We need to configure some cloud infrastructure to support deploying functions.</p>
+</div>
+<div class="paragraph">
+<p>First, login to your Oracle Cloud tenancy as an administrator, or a user with sufficient permissions to create the infrastructure described below.</p>
+</div>
+<div class="sect2">
+<h3 id="compartment">6.1. Compartment</h3>
+<div class="paragraph">
+<p>Use an existing compartment to create your function in, or create a new one by opening the Oracle Cloud Menu and clicking "Identity &amp; Security", and then "Compartments"</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="function-user-and-group">6.2. Function user and group</h3>
+<div class="paragraph">
+<p>Create a group for Oracle Functions users by clicking the Oracle Cloud menu and selecting "Identity &amp; Security", and then click "Groups":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user1.png" alt="user1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create Group":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user2.png" alt="user2">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name and a description, e.g. "mn-function-group", and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user3.png" alt="user3">
+</div>
+</div>
+<div class="paragraph">
+<p>Create a user by clicking the Oracle Cloud menu and selecting "Identity &amp; Security", and then click "Users":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user4.png" alt="user4">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create User":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user5.png" alt="user5">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name and a description, e.g. "mn-function-user", and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user6.png" alt="user6">
+</div>
+</div>
+<div class="paragraph">
+<p>Scroll down and click "Add User to Group":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user7.png" alt="user7">
+</div>
+</div>
+<div class="paragraph">
+<p>Select the group you created and click "Add":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user8.png" alt="user8">
+</div>
+</div>
+<div class="paragraph">
+<p>You&#8217;ll need an auth token to authenticate to the container registry that will contain the Docker images for your functions. Click "Auth Tokens" and then "Generate Token":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user9.png" alt="user9">
+</div>
+</div>
+<div class="paragraph">
+<p>Enter a name for the token, e.g. "mn-ocir", and click "Generate Token":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user10.png" alt="user10">
+</div>
+</div>
+<div class="paragraph">
+<p>Copy the token to the clipboard and save it for later:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user11.png" alt="user11">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oracle-cloud-infrastructure-registry-ocir-repository">6.3. Oracle Cloud Infrastructure Registry (OCIR) repository</h3>
+<div class="paragraph">
+<p>Your function will be deployed as a Docker image, so you need to choose a repo name in your tenancy. The repo will be created for you the first time you push an image to it.</p>
+</div>
+<div class="paragraph">
+<p>The name can be simple, e.g. "mn-functions", or you can add a path prefix to help group the repos when there are many of them, e.g. "my-username/my-repo/mn-functions"</p>
+</div>
+<div class="paragraph">
+<p>Update your build script with the location to deploy the docker container.</p>
+</div>
+<div class="paragraph">
+<p>Edit <code>pom.xml</code> and add these three properties in the <code>&lt;properties&gt;</code> section, replacing <code>REGION</code>, <code>TENANCY</code>, and <code>REPO</code> with appropriate values:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;exec.mainClass&gt;</span>example.micronaut.Function<span class="tag">&lt;/exec.mainClass&gt;</span>
+
+<span class="tag">&lt;jib.docker.image&gt;</span>[REGION].ocir.io/[TENANCY]/[REPO]/${project.artifactId}<span class="tag">&lt;/jib.docker.image&gt;</span>
+
+<span class="tag">&lt;jib.docker.tag&gt;</span>${project.version}<span class="tag">&lt;/jib.docker.tag&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For <code>REGION</code>, use the lowercase value from the "Region Key" column in <a href="https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm">Regions and Availability Domains</a>, e.g. <code>iad</code>.</p>
+</div>
+<div class="paragraph">
+<p>For <code>TENANCY</code>, use the Object Storage namespace string of the tenancy (as shown on the Tenancy Information page), e.g. <code>my-tenancy</code>.</p>
+</div>
+<div class="paragraph">
+<p>For <code>REPO</code>, use the name of the repository to use, e.g. <code>mn-functions</code> (or <code>my-username/my-repo/mn-functions</code>).</p>
+</div>
+<div class="paragraph">
+<p>The final properties should look something like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;exec.mainClass&gt;</span>example.micronaut.Function<span class="tag">&lt;/exec.mainClass&gt;</span>
+
+<span class="tag">&lt;jib.docker.image&gt;</span>iad.ocir.io/my-tenancy/mn-functions/${project.artifactId}<span class="tag">&lt;/jib.docker.image&gt;</span>
+
+<span class="tag">&lt;jib.docker.tag&gt;</span>${project.version}<span class="tag">&lt;/jib.docker.tag&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ocir-authentication">6.4. OCIR authentication</h3>
+<div class="paragraph">
+<p>Login to OCIR by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker login &lt;region-key&gt;.ocir.io</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Replace <code>&lt;region-key&gt;</code> with the value you used for <code>REGION</code> above, e.g. <code>iad.ocir.io</code>.</p>
+</div>
+<div class="paragraph">
+<p>For the username, enter &lt;tenancy-namespace&gt;/&lt;username&gt;, e.g. <code>my-tenancy/mn-function-user</code>. If your tenancy is federated with Oracle Identity Cloud Service, use the format <code>&lt;tenancy-namespace&gt;/oracleidentitycloudservice/&lt;username&gt;</code>.</p>
+</div>
+<div class="paragraph">
+<p>For the password, use the auth token you copied earlier.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="virtual-cloud-network-vcn-and-subnet">6.5. Virtual Cloud Network (VCN) and Subnet</h3>
+<div class="paragraph">
+<p>If you have a suitable VCN and subnet you can use those, or create new ones.</p>
+</div>
+<div class="paragraph">
+<p>To create a VCN, open the Oracle Cloud Menu and click "Networking", then "Virtual Cloud Networks":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/vcn1.png" alt="vcn1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Start VCN Wizard":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/vcn2.png" alt="vcn2">
+</div>
+</div>
+<div class="paragraph">
+<p>Select "VCN with Internet Connectivity" and click "Start VCN Wizard":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/vcn3.png" alt="vcn3">
+</div>
+</div>
+<div class="paragraph">
+<p>Enter a name for the VCN, e.g. "mn-functions-vcn", and change the CIDR block values if needed:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/vcn4.png" alt="vcn4">
+</div>
+</div>
+<div class="paragraph">
+<p>Review the settings and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/vcn5.png" alt="vcn5">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="policies">6.6. Policies</h3>
+<div class="paragraph">
+<p>We&#8217;ll need to create some policies to grant various function-related permissions.</p>
+</div>
+<div class="paragraph">
+<p>Open the Oracle Cloud Menu and click "Identity &amp; Security", and then "Policies":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/policy1.png" alt="policy1">
+</div>
+</div>
+<div class="paragraph">
+<p>Select the root compartment from the drop-down and click "Create Policy":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/policy2.png" alt="policy2">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name and description, e.g. "mn-functions-root-policy", and click "Show Manual Editor". Copy the following and paste it into the "Policy Builder" field, replacing "&lt;group-name&gt;" with the name of the group created earlier (e.g. "mn-function-group") and "&lt;compartment-name&gt;" with the name of the compartment you&#8217;re using, and click "Create":</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>Allow group &lt;group-name&gt; to manage repos in tenancy
+Allow group &lt;group-name&gt; to read objectstorage-namespaces in tenancy
+Allow group &lt;group-name&gt; to manage logging-family in compartment &lt;compartment-name&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/policy3.png" alt="policy3">
+</div>
+</div>
+<div class="paragraph">
+<p>Create another policy in the compartment where your function will be and choose a name and description, e.g. "mn-functions-compartment-policy". Copy the following and paste it into the "Policy Builder" field, again replacing "&lt;group-name&gt;" and "&lt;compartment-name&gt;", and click "Create":</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>Allow group &lt;group-name&gt; to manage functions-family in compartment &lt;compartment-name&gt;
+Allow group &lt;group-name&gt; to read metrics in compartment &lt;compartment-name&gt;
+Allow group &lt;group-name&gt; to use virtual-network-family in compartment &lt;compartment-name&gt;
+Allow group &lt;group-name&gt; to use apm-domains in compartment &lt;compartment-name&gt;
+Allow service faas to use apm-domains in compartment &lt;compartment-name&gt;</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/policy4.png" alt="policy4">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enable-tracing-and-logs">7. Enable Tracing and Logs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Open the Oracle Cloud Menu and click "Observability &amp; Management", and then "Administraction" under "Application Performance&#8230;&#8203;":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/logs1.png" alt="logs1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create APM Domain":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/logs2.png" alt="logs2">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name and description, e.g. "mn-function-apm", the compartment (and optionally check "Create as Always Free Domain"), then click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/logs3.png" alt="logs3">
+</div>
+</div>
+<div class="paragraph">
+<p>Navigate back to the function application page and click "Logs" (under "Resources") in the lower left:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/logs4.png" alt="logs4">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the slider to enable logs, then choose the compartment to store them in, a log group, a log name, and the retention policy, and click "Enable Log":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/logs5.png" alt="logs5">
+</div>
+</div>
+<div class="paragraph">
+<p>Next, click "Traces" in the lower left:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/logs6.png" alt="logs6">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Configure", then choose the compartment, and the APM domain created earlier, and click "Enable Trace":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/logs7.png" alt="logs7">
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, navigate to the application&#8217;s function page and click the button to enable function tracing:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/logs8.png" alt="logs8">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-function">8. Creating the function</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First we&#8217;ll need to build the function as a Docker image and push it to the OCIR repository.</p>
+</div>
+<div class="paragraph">
+<p>Run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./mvnw deploy -Dpackaging=docker</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you&#8217;ve pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.</p>
+</div>
+<div class="paragraph">
+<p>Open the Oracle Cloud Menu and click "Developer Services", and then "Applications" under "Functions":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function1.png" alt="function1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create Application":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function2.png" alt="function2">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name for the application, e.g. "mn-guide-function-app", and select the VCN created earlier. Select the private subnet, and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function3.png" alt="function3">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the application link in the list, and then click "Create Function":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function4.png" alt="function4">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name for the function, e.g. "mn-guide-function", select the repository where you pushed the Docker image, and select the uploaded image. Select 512MB memory and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function5.png" alt="function5">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the function link in the list, and click the "Copy" link in the OCID row; you&#8217;ll need the OCID of the function to invoke the function:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function6.png" alt="function6">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="invoking-the-function">9. Invoking the function</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We&#8217;ll use the OCI command line to invoke the function. Run the following, replacing <code>&lt;OCID&gt;</code> with the OCID of the function you copied above:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci fn function invoke --function-id &lt;OCID&gt; --file &quot;-&quot; --body &quot;&quot;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should look something like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">Your tenancy is: ocid1.tenancy.oc1..aaaaaaaaud4g4e5ovjawn5cij7ke.................</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The first invocation will take a while, probably 10-20 seconds or more (because a JVM needs to be started) but subsequent invocations should return in 1-2 seconds.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Read more about the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/">Micronaut Oracle Cloud</a> integration.</p>
+</div>
+<div class="paragraph">
+<p>Also check out the <a href="https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm">Oracle Cloud Function documentation</a> for more information on the available functionality.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-micronaut">11. Help with Micronaut</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="https://micronaut.io/wp-content/uploads/2021/03/Micronaut_byobjectcomputing_w.svg" alt=""/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li id="menu-item-2885" class="show-on-blog menu-item menu-item-type-custom menu-item-object-custom menu-item-2885">
+                                <a target="_blank" rel="noopener" href="https://micronaut.io/feed/rss/">
+                                    <i class="fas fa-rss">
+                                        <span class="sr-only">RSS</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2886" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2886">
+                                <a target="_blank" rel="noopener" href="https://twitter.com/micronautfw">
+                                    <i class="fab fa-twitter">
+                                        <span class="sr-only">Twitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2887" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2887">
+                                <a href="mailto:info@micronaut.io">
+                                    <i class="fas fa-envelope">
+                                        <span class="sr-only">Mail</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2888" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2888">
+                                <a target="_blank" rel="noopener" href="https://gitter.im/micronautfw/">
+                                    <i class="fab fa-gitter">
+                                        <span class="sr-only">Gitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2889" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2889">
+                                <a target="_blank" rel="noopener" href="https://github.com/micronaut-projects/">
+                                    <i class="fab fa-github">
+                                        <span class="sr-only">GitHub</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2890" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2890">
+                                <a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLI74De5M9T72YshO4Sc90wtGr286nM8Yu">
+                                    <i class="fab fa-youtube">
+                                        <span class="sr-only">YouTube</span>
+                                    </i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 Object Computing, Inc. All rights reserved</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+
