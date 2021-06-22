@@ -35,9 +35,6 @@ class MailControllerTest {
         cmd.setTextBody("Hola hola");
 
         HttpRequest<EmailCmd> request = HttpRequest.POST("/mail/send", cmd); // <5>
-        Collection<EmailService> emailServices = applicationContext.getBeansOfType(EmailService.class);
-        assertEquals(1, emailServices.size());
-
         EmailService emailService = applicationContext.getBean(EmailService.class);
         assertTrue(emailService instanceof MockEmailService);
 
