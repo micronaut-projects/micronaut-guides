@@ -38,6 +38,9 @@ exit 0
     }
 
     private static boolean shouldSkip(GuideMetadata metadata, List<String> guidesChanged) {
+        if (Utils.singleGuide()) {
+            return !Utils.process(metadata)
+        }
         return !Utils.process(metadata) || !guidesChanged.contains(metadata.slug)
     }
 
