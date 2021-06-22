@@ -4,7 +4,8 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Arrays
 import java.util.function.Consumer
@@ -20,18 +21,18 @@ class MyControllerTest {
     fun testMyTeam() {
         val teamConfiguration = client.toBlocking()
                 .retrieve(HttpRequest.GET<Any>("/my/team"), TeamConfiguration::class.java)
-        Assertions.assertEquals("Steelers", teamConfiguration.name)
-        Assertions.assertEquals("Black", teamConfiguration.color)
+        assertEquals("Steelers", teamConfiguration.name)
+        assertEquals("Black", teamConfiguration.color)
         val expectedPlayers = Arrays.asList("Mason Rudolph", "James Connor")
-        Assertions.assertEquals(expectedPlayers.size, teamConfiguration.playerNames!!.size)
-        expectedPlayers.forEach(Consumer { name: String? -> Assertions.assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
+        assertEquals(expectedPlayers.size, teamConfiguration.playerNames!!.size)
+        expectedPlayers.forEach(Consumer { name: String? -> assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
     }
 
     @Test
     fun testMyStadium() {
         val conf = client.toBlocking()
                 .retrieve(HttpRequest.GET<Any>("/my/stadium"), StadiumConfiguration::class.java)
-        Assertions.assertEquals("Pittsburgh", conf.city)
-        Assertions.assertEquals(35000, conf.size)
+        assertEquals("Pittsburgh", conf.city)
+        assertEquals(35000, conf.size)
     }
 }

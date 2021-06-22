@@ -6,8 +6,8 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
 
@@ -25,7 +25,7 @@ class GraphQLControllerTest {
 
         val rsp = client.toBlocking().exchange(request, Argument.of(Map::class.java))
         assertEquals(HttpStatus.OK, rsp.status())
-        Assertions.assertNotNull(rsp.body())
+        assertNotNull(rsp.body())
 
         val bookInfo = rsp.getBody(Map::class.java).get()["data"] as Map<*, *>
         val bookById = bookInfo["bookById"] as Map<*, *>?

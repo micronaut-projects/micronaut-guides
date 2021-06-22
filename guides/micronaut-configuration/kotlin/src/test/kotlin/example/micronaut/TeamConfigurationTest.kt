@@ -1,7 +1,8 @@
 package example.micronaut
 
 import io.micronaut.context.ApplicationContext
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Arrays
 import java.util.function.Consumer
@@ -19,10 +20,10 @@ class TeamConfigurationTest {
         val ctx = ApplicationContext.run(items) // <1>
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
 
-        Assertions.assertEquals("evolution", teamConfiguration.name)
-        Assertions.assertEquals("green", teamConfiguration.color)
-        Assertions.assertEquals(names.size, teamConfiguration.playerNames!!.size)
-        names.forEach(Consumer { name: String? -> Assertions.assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
+        assertEquals("evolution", teamConfiguration.name)
+        assertEquals("green", teamConfiguration.color)
+        assertEquals(names.size, teamConfiguration.playerNames!!.size)
+        names.forEach(Consumer { name: String? -> assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
 
         ctx.close()
     }
@@ -33,9 +34,9 @@ class TeamConfigurationTest {
         val teamAdmin = TeamAdmin.Builder().withManager("Nirav")
                 .withCoach("Tommy")
                 .withPresident("Mark").build()
-        Assertions.assertEquals("Nirav", teamAdmin.manager)
-        Assertions.assertEquals("Tommy", teamAdmin.coach)
-        Assertions.assertEquals("Mark", teamAdmin.president)
+        assertEquals("Nirav", teamAdmin.manager)
+        assertEquals("Tommy", teamAdmin.coach)
+        assertEquals("Mark", teamAdmin.president)
     }
 
     //tag::teamConfigSpecBuilder[]
@@ -54,20 +55,20 @@ class TeamConfigurationTest {
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
         val teamAdmin = teamConfiguration.builder.build() // <2>
 
-        Assertions.assertEquals("evolution", teamConfiguration.name)
-        Assertions.assertEquals("green", teamConfiguration.color)
-        Assertions.assertEquals("Nirav Assar", teamConfiguration.playerNames!![0])
-        Assertions.assertEquals("Lionel Messi", teamConfiguration.playerNames!![1])
+        assertEquals("evolution", teamConfiguration.name)
+        assertEquals("green", teamConfiguration.color)
+        assertEquals("Nirav Assar", teamConfiguration.playerNames!![0])
+        assertEquals("Lionel Messi", teamConfiguration.playerNames!![1])
 
         // check the builder has values set
-        Assertions.assertEquals("Jerry Jones", teamConfiguration.builder.manager)
-        Assertions.assertEquals("Tommy O'Neill", teamConfiguration.builder.coach)
-        Assertions.assertEquals("Mark Scanell", teamConfiguration.builder.president)
+        assertEquals("Jerry Jones", teamConfiguration.builder.manager)
+        assertEquals("Tommy O'Neill", teamConfiguration.builder.coach)
+        assertEquals("Mark Scanell", teamConfiguration.builder.president)
 
         // check the object can be built
-        Assertions.assertEquals("Jerry Jones", teamAdmin.manager) // <3>
-        Assertions.assertEquals("Tommy O'Neill", teamAdmin.coach)
-        Assertions.assertEquals("Mark Scanell", teamAdmin.president)
+        assertEquals("Jerry Jones", teamAdmin.manager) // <3>
+        assertEquals("Tommy O'Neill", teamAdmin.coach)
+        assertEquals("Mark Scanell", teamAdmin.president)
         ctx.close()
     } //end::teamConfigSpecBuilder[]
 }

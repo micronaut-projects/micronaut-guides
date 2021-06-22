@@ -29,12 +29,6 @@ class MailControllerSpec extends Specification {
         HttpRequest<EmailCmd> request = HttpRequest.POST("/mail/send", cmd) // <5>
 
         when:
-        Collection<EmailService> emailServices = applicationContext.getBeansOfType(EmailService.class)
-
-        then:
-        1 == emailServices.size()
-
-        when:
         EmailService emailService = applicationContext.getBean(EmailService.class)
 
         then:

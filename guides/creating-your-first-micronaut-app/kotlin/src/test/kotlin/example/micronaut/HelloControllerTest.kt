@@ -4,7 +4,8 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
 
@@ -18,7 +19,7 @@ class HelloControllerTest {
     fun testHello() {
         val request: HttpRequest<Any> = HttpRequest.GET("/hello")  // <3>
         val body = client.toBlocking().retrieve(request)
-        Assertions.assertNotNull(body)
-        Assertions.assertEquals("Hello World", body)
+        assertNotNull(body)
+        assertEquals("Hello World", body)
     }
 }

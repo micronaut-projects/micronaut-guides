@@ -22,11 +22,10 @@ import java.time.LocalDate
 
 @CompileStatic
 class GuideProjectGenerator implements Closeable {
+
     public static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = Arrays.asList(JdkVersion.JDK_8, JdkVersion.JDK_11)
-    public static final JdkVersion DEFAULT_JAVA_VERSION = JdkVersion.JDK_11
     public static final String DEFAULT_APP_NAME = 'default'
-    public static final String ENV_JDK_VERSION = 'JDK_VERSION'
-    public static final String SYS_PROP_MICRONAUT_GUIDE = 'micronaut.guide'
+
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
 
@@ -54,7 +53,7 @@ class GuideProjectGenerator implements Closeable {
     }
 
     @CompileDynamic
-    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    private static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
             throw new GradleException("metadata file not found for ${dir.name}")
@@ -78,6 +77,7 @@ class GuideProjectGenerator implements Closeable {
                 testFramework: config.testFramework,
                 skipGradleTests: config.skipGradleTests ?: false,
                 skipMavenTests: config.skipMavenTests ?: false,
+                minimumJavaVersion: config.minimumJavaVersion,
                 apps: config.apps.collect { it -> new App(name: it.name,
                         features: it.features,
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
@@ -94,10 +94,10 @@ class GuideProjectGenerator implements Closeable {
                   String metadataConfigName,
                   boolean merge = true,
                   File asciidocDir = null) {
+
         guidesFolder.eachDir { dir ->
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
-            boolean process = System.getProperty(SYS_PROP_MICRONAUT_GUIDE) != null ? System.getProperty(SYS_PROP_MICRONAUT_GUIDE) == metadata.slug : true
-            if (process) {
+            if (Utils.process(metadata)) {
                 generate(metadata, dir, output, merge)
                 if (asciidocDir != null) {
                     GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
@@ -110,24 +110,11 @@ class GuideProjectGenerator implements Closeable {
         "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language}"
     }
 
-    static JdkVersion parseJdkVersion() {
-        JdkVersion javaVersion = DEFAULT_JAVA_VERSION
-        if (System.getenv(ENV_JDK_VERSION)) {
-            try {
-                int mayorVersion = Integer.valueOf(System.getenv(ENV_JDK_VERSION))
-                javaVersion = JdkVersion.valueOf(mayorVersion)
-            } catch (NumberFormatException ignored) {
-                throw new GradleException("Could not parse env " + ENV_JDK_VERSION + " to JdkVersion")
-            }
-        }
-        javaVersion
-    }
-
     void generate(GuideMetadata metadata, File inputDir, File outputDir, boolean merge = true) {
         String packageAndName = "${basePackage}.${appName}"
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
-        JdkVersion javaVersion = parseJdkVersion()
+        JdkVersion javaVersion = Utils.parseJdkVersion()
 
         for (GuidesOption guidesOption : guidesOptionList) {
             BuildTool buildTool = guidesOption.buildTool
@@ -142,7 +129,7 @@ class GuideProjectGenerator implements Closeable {
                 List<String> appFeatures = app.features
 
                 if (guidesOption.language == Language.GROOVY ||
-                        !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(parseJdkVersion())) {
+                        !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(javaVersion)) {
                     appFeatures.remove('graalvm')
                 }
                 // Normal guide use 'default' as name, multi project guides have different modules
@@ -214,14 +201,14 @@ class GuideProjectGenerator implements Closeable {
         guidesOptionList
     }
 
-    static GuidesOption createGuidesOption(@NonNull BuildTool buildTool,
-                                           @NonNull Language language,
-                                           @Nullable String testFramework) {
+    private static GuidesOption createGuidesOption(@NonNull BuildTool buildTool,
+                                                   @NonNull Language language,
+                                                   @Nullable String testFramework) {
         new GuidesOption(buildTool, language, testFrameworkOption(language, testFramework))
     }
 
-    static TestFramework testFrameworkOption(@NonNull Language language,
-                                             @Nullable String testFramework) {
+    private static TestFramework testFrameworkOption(@NonNull Language language,
+                                                     @Nullable String testFramework) {
         if (testFramework != null) {
             return TestFramework.valueOf(testFramework.toUpperCase())
         }
