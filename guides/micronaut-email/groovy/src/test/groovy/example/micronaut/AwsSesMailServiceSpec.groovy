@@ -3,7 +3,9 @@ package example.micronaut;
 import io.micronaut.context.ApplicationContext
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ env['AWS_SECRET_ACCESS_KEY'] })
 class AwsSesMailServiceSpec extends Specification {
 
     void "aws ses mail service is not loaded if system property is not present"() {
