@@ -37,6 +37,10 @@ exit 0
         changedFiles.any { str -> str.contains("pom.xml") }
     }
 
+    private static boolean changesBuildScr(String[] changedFiles) {
+        changedFiles.any { str -> str.contains('buildSrc') }
+    }
+
     private static boolean shouldSkip(GuideMetadata metadata,
                                       List<String> guidesChanged,
                                       boolean forceExecuteEveryTest) {
@@ -62,8 +66,9 @@ EXIT_STATUS=0
 '''
         List<String> slugsChanged = guidesChanged(changedFiles)
         boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
-                changesDependencies(changedFiles, slugsChanged) ||
-                (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
+                                        changesDependencies(changedFiles, slugsChanged) ||
+                                        changesBuildScr(changedFiles) ||
+                                        (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
             boolean skip = shouldSkip(metadata, slugsChanged, forceExecuteEveryTest)
@@ -86,7 +91,7 @@ EXIT_STATUS=0
                     bashScript += """\
 cd ${folder}
 """
-                    for (GuideMetadata.App app: metadata.apps) {
+                    for (GuideMetadata.App app : metadata.apps) {
                         bashScript += scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool)
                     }
                     bashScript += """\
