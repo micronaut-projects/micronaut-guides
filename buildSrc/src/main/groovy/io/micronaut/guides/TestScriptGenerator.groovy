@@ -41,11 +41,19 @@ exit 0
         changedFiles.any { str -> str.contains('buildSrc') }
     }
 
-    private static boolean shouldSkip(GuideMetadata metadata, List<String> guidesChanged) {
-        if (Utils.singleGuide()) {
-            return !Utils.process(metadata)
+    private static boolean shouldSkip(GuideMetadata metadata,
+                                      List<String> guidesChanged,
+                                      boolean forceExecuteEveryTest) {
+
+        if (!Utils.process(metadata, true)) {
+            return true
         }
-        return !Utils.process(metadata) || !guidesChanged.contains(metadata.slug)
+
+        if (forceExecuteEveryTest) {
+            return false
+        }
+
+        return !guidesChanged.contains(metadata.slug)
     }
 
     static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
@@ -61,13 +69,10 @@ EXIT_STATUS=0
                                         changesDependencies(changedFiles, slugsChanged) ||
                                         changesBuildScr(changedFiles) ||
                                         (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
-        if (Utils.singleGuide()) {
-            forceExecuteEveryTest = false
-        }
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = shouldSkip(metadata, slugsChanged)
-            if (!forceExecuteEveryTest && skip) {
+            boolean skip = shouldSkip(metadata, slugsChanged, forceExecuteEveryTest)
+            if (skip) {
                 continue
             }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)

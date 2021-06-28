@@ -15,12 +15,19 @@ class Utils {
         System.getProperty(SYS_PROP_MICRONAUT_GUIDE)
     }
 
-    static boolean process(GuideMetadata metadata) {
+    static boolean process(GuideMetadata metadata, boolean checkJdk = false) {
 
         boolean processGuide = singleGuide() == null || singleGuide() == metadata.slug
-        boolean jdk = metadata.minimumJavaVersion == null || parseJdkVersion().majorVersion() >= metadata.minimumJavaVersion
+        if (!processGuide) {
+            return false
+        }
 
-        return processGuide && jdk
+        if (checkJdk) {
+            return metadata.minimumJavaVersion == null ||
+                    parseJdkVersion().majorVersion() >= metadata.minimumJavaVersion
+        }
+
+        return true
     }
 
     static JdkVersion parseJdkVersion() {
