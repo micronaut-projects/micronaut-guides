@@ -1,33 +1,12 @@
 package io.micronaut.guides.feature;
 
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.starter.application.ApplicationType;
-import io.micronaut.starter.application.generator.GeneratorContext;
-import io.micronaut.starter.build.dependencies.Dependency;
-import io.micronaut.starter.feature.Feature;
-
 import jakarta.inject.Singleton;
+import static io.micronaut.starter.build.dependencies.Scope.RUNTIME;
 
 @Singleton
-public class OracleCloudAtpFeature implements Feature {
+public class OracleCloudAtpFeature extends AbstractFeature {
 
-    @Override
-    public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(Dependency.builder()
-                .groupId("io.micronaut.oraclecloud")
-                .lookupArtifactId("micronaut-oraclecloud-atp")
-                .runtime()
-                .build());
-    }
-
-    @NonNull
-    @Override
-    public String getName() {
-        return "micronaut-oraclecloud-atp";
-    }
-
-    @Override
-    public boolean supports(ApplicationType applicationType) {
-        return true;
+    public OracleCloudAtpFeature() {
+        super("micronaut-oraclecloud-atp", RUNTIME);
     }
 }

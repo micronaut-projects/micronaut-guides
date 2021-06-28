@@ -37,8 +37,23 @@ exit 0
         changedFiles.any { str -> str.contains("pom.xml") }
     }
 
-    private static boolean shouldSkip(GuideMetadata metadata, List<String> guidesChanged) {
-        return !Utils.process(metadata) || !guidesChanged.contains(metadata.slug)
+    private static boolean changesBuildScr(String[] changedFiles) {
+        changedFiles.any { str -> str.contains('buildSrc') }
+    }
+
+    private static boolean shouldSkip(GuideMetadata metadata,
+                                      List<String> guidesChanged,
+                                      boolean forceExecuteEveryTest) {
+
+        if (!Utils.process(metadata, true)) {
+            return true
+        }
+
+        if (forceExecuteEveryTest) {
+            return false
+        }
+
+        return !guidesChanged.contains(metadata.slug)
     }
 
     static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
@@ -51,15 +66,13 @@ EXIT_STATUS=0
 '''
         List<String> slugsChanged = guidesChanged(changedFiles)
         boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
-                changesDependencies(changedFiles, slugsChanged) ||
-                (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
-        if (Utils.singleGuide()) {
-            forceExecuteEveryTest = false
-        }
+                                        changesDependencies(changedFiles, slugsChanged) ||
+                                        changesBuildScr(changedFiles) ||
+                                        (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = shouldSkip(metadata, slugsChanged)
-            if (!forceExecuteEveryTest && skip) {
+            boolean skip = shouldSkip(metadata, slugsChanged, forceExecuteEveryTest)
+            if (skip) {
                 continue
             }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
@@ -78,7 +91,7 @@ EXIT_STATUS=0
                     bashScript += """\
 cd ${folder}
 """
-                    for (GuideMetadata.App app: metadata.apps) {
+                    for (GuideMetadata.App app : metadata.apps) {
                         bashScript += scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool)
                     }
                     bashScript += """\
