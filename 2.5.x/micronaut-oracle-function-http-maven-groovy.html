@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Deploy a Micronaut HTTP API Gateway Function (Serverless) app to Oracle Cloud</title>
+    <link rel="canonical" href="@canonical@"/>
+
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut Framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-oracle-function-http.html">Deploy a Micronaut HTTP API Gateway Function (Serverless) app to Oracle Cloud</a> » <span class="breadcrumb_last" aria-current="page">maven | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-app">4. Writing the App</a>
+<ul class="sectlevel2">
+<li><a href="#dependencies">4.1. Dependencies</a></li>
+<li><a href="#instancedata">4.2. InstanceData</a></li>
+<li><a href="#micronautguidecontroller">4.3. MicronautguideController</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">5. Testing the Application</a></li>
+<li><a href="#configuring-oracle-cloud-resources">6. Configuring Oracle Cloud Resources</a></li>
+<li><a href="#creating-the-function">7. Creating the function</a></li>
+<li><a href="#configuring-oracle-cloud-resources-continued">8. Configuring Oracle Cloud Resources (continued)</a>
+<ul class="sectlevel2">
+<li><a href="#api-gateway">8.1. API Gateway</a></li>
+<li><a href="#remaining-configuration">8.2. Remaining Configuration</a></li>
+</ul>
+</li>
+<li><a href="#invoking-the-function">9. Invoking the function</a></li>
+<li><a href="#next-steps">10. Next steps</a></li>
+<li><a href="#help-with-micronaut">11. Help with Micronaut</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Deploy a Micronaut HTTP API Gateway Function (Serverless) app to Oracle Cloud</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to deploy a Micronaut HTTP API Gateway Function (Serverless) application to Oracle Cloud.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Burt Beckwith</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 2.5.7</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we are going to create a Micronaut app written in Groovy.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 11 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+<li>
+<p>Docker installed</p>
+</li>
+<li>
+<p>A paid or free trial Oracle Cloud account (create an account at <a href="https://signup.oraclecloud.com">signup.oraclecloud.com</a>)</p>
+</li>
+<li>
+<p><a href="https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm">Oracle Cloud CLI</a> installed, with local access to Oracle Cloud configured by running <code>oci setup config</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the app step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-oracle-function-http-maven-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-app">4. Writing the App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an app using the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">Micronaut Command Line Interface</a> or with
+<a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=oracle-function,oracle-cloud-sdk example.micronaut.micronautguide --build=maven --lang=groovy</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as a build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as a language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select Micronaut Application as application type and add the <code>oracle-function</code> and <code>oracle-cloud-sdk</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut app with the default package <code>example.micronaut</code> in a folder named <code>micronautguide</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="dependencies">4.1. Dependencies</h3>
+<div class="paragraph">
+<p>Add a dependency for <code>oci-java-sdk-core</code> so we have access to classes for managing compute instances:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>com.oracle.oci.sdk<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>oci-java-sdk-core<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="instancedata">4.2. InstanceData</h3>
+<div class="paragraph">
+<p>Then create an <code>InstanceData</code> DTO class to represent Compute Instance properties:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/InstanceData.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.model.Instance</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">InstanceData</span> {
+
+    <span class="directive">final</span> <span class="predefined-type">String</span> availabilityDomain
+    <span class="directive">final</span> <span class="predefined-type">String</span> compartmentOcid
+    <span class="directive">final</span> <span class="predefined-type">String</span> displayName
+    <span class="directive">final</span> LifecycleState lifecycleState
+    <span class="directive">final</span> <span class="predefined-type">String</span> ocid
+    <span class="directive">final</span> <span class="predefined-type">String</span> region
+    <span class="directive">final</span> <span class="predefined-type">Date</span> timeCreated
+
+    InstanceData(Instance instance) {
+        availabilityDomain = instance.availabilityDomain
+        compartmentOcid = instance.compartmentId
+        displayName = instance.displayName
+        lifecycleState = instance.lifecycleState
+        ocid = instance.id
+        region = instance.region
+        timeCreated = instance.timeCreated
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="micronautguidecontroller">4.3. MicronautguideController</h3>
+<div class="paragraph">
+<p>The generated application contains a <code>MicronautguideController</code> class which is good for getting started, but we&#8217;ll update it to demonstrate working with OCI SDK APIs, in this case working with Compute Instances.</p>
+</div>
+<div class="paragraph">
+<p>Replace the generated <code>MicronautguideController</code> with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/MicronautguideController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.ComputeClient</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.model.Instance</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.requests.GetInstanceRequest</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.requests.InstanceActionRequest</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.responses.InstanceActionResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>
+<span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>
+<span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState.Running</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState.Stopped</span>
+
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/compute</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">MicronautguideController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> log = LoggerFactory.getLogger(getClass().name)
+
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> START = <span class="string"><span class="delimiter">'</span><span class="content">START</span><span class="delimiter">'</span></span>
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> STOP = <span class="string"><span class="delimiter">'</span><span class="content">STOP</span><span class="delimiter">'</span></span>
+
+    <span class="directive">private</span> <span class="directive">final</span> ComputeClient computeClient
+
+    MicronautguideController(ComputeClient computeClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.computeClient = computeClient
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/status/{ocid}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    InstanceData status(<span class="predefined-type">String</span> ocid) {
+        <span class="keyword">return</span> <span class="keyword">new</span> InstanceData(getInstance(ocid))
+    }
+
+    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">'</span><span class="content">/start/{ocid}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
+    InstanceData start(<span class="predefined-type">String</span> ocid) {
+        log.info(<span class="string"><span class="delimiter">'</span><span class="content">Starting Instance: {}</span><span class="delimiter">'</span></span>, ocid)
+
+        Instance instance = getInstance(ocid)
+        <span class="keyword">if</span> (instance.lifecycleState == Stopped) {
+            InstanceActionResponse response = instanceAction(ocid, START)
+            log.info(<span class="string"><span class="delimiter">'</span><span class="content">Start response code: {}</span><span class="delimiter">'</span></span>, response.__httpStatusCode__)
+            instance = response.instance
+        }
+        <span class="keyword">else</span> {
+            log.info(<span class="string"><span class="delimiter">'</span><span class="content">The instance was in the incorrect state ({}) to start: {}</span><span class="delimiter">'</span></span>,
+                    instance.lifecycleState, ocid)
+        }
+
+        log.info(<span class="string"><span class="delimiter">'</span><span class="content">Started Instance: {}</span><span class="delimiter">'</span></span>, ocid)
+        <span class="keyword">return</span> <span class="keyword">new</span> InstanceData(instance)
+    }
+
+    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">'</span><span class="content">/stop/{ocid}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
+    InstanceData stop(<span class="predefined-type">String</span> ocid) {
+        log.info(<span class="string"><span class="delimiter">'</span><span class="content">Stopping Instance: {}</span><span class="delimiter">'</span></span>, ocid)
+
+        Instance instance = getInstance(ocid)
+        <span class="keyword">if</span> (instance.lifecycleState == Running) {
+            InstanceActionResponse response = instanceAction(ocid, STOP)
+            log.info(<span class="string"><span class="delimiter">'</span><span class="content">Stop response code: {}</span><span class="delimiter">'</span></span>, response.__httpStatusCode__)
+            instance = response.instance
+        }
+        <span class="keyword">else</span> {
+            log.info(<span class="string"><span class="delimiter">'</span><span class="content">The instance was in the incorrect state ({}) to stop: {}</span><span class="delimiter">'</span></span>,
+                    instance.lifecycleState, ocid)
+        }
+
+        log.info(<span class="string"><span class="delimiter">'</span><span class="content">Stopped Instance: {}</span><span class="delimiter">'</span></span>, ocid)
+        <span class="keyword">return</span> <span class="keyword">new</span> InstanceData(instance)
+    }
+
+    <span class="directive">private</span> InstanceActionResponse instanceAction(<span class="predefined-type">String</span> ocid, <span class="predefined-type">String</span> action) {
+        InstanceActionRequest request = InstanceActionRequest.builder()
+                .instanceId(ocid)
+                .action(action)
+                .build()
+        <span class="keyword">return</span> computeClient.instanceAction(request)
+    }
+
+    <span class="directive">private</span> Instance getInstance(<span class="predefined-type">String</span> ocid) {
+        GetInstanceRequest getInstanceRequest = GetInstanceRequest.builder()
+                .instanceId(ocid)
+                .build()
+        <span class="keyword">return</span> computeClient.getInstance(getInstanceRequest).instance
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The controller&#8217;s root uri  is <code>/compute</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Here we dependency-inject the SDK <code>ComputeClient</code> instance</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>This endpoint accepts <code>GET</code> requests and returns current instance properties for the specified instance OCID</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>This endpoint accepts <code>POST</code> requests and starts the specified instance if it is stopped</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>This endpoint accepts <code>POST</code> requests and stops the specified instance if it is running</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The code in this guide should work with recent versions of Micronaut 2.5+, but the tests require at least version 2.5.7
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We need to update the generated <code>MicronautguideControllerTest</code> to test the changes we made in <code>MicronautguideController</code>.</p>
+</div>
+<div class="paragraph">
+<p>This will be a unit test, so we&#8217;ll need some mock beans to replace the beans auto-registered by the <code>oracle-cloud-sdk</code> module which make requests to Oracle Cloud. We also need to take into consideration the strict class loader isolation used by <a href="https://fnproject.io/">Fn Project</a> (which powers Oracle Cloud Functions).</p>
+</div>
+<div class="paragraph">
+<p>When running our tests, the test and mock classes are loaded by the regular Micronaut classloader, but the function invocations are made in a custom <code>Fn</code> classloader, so it is not <em>directly</em> possible to share state between the two, which complicates traditional approaches to mocking. There is support in <code>Fn</code> for sharing classes however, so instead of setting values in mock instances from the test to be used by the controller we&#8217;ll set values in a <code>MockData</code> helper class that&#8217;s registered as a class that&#8217;s shared between classloaders.</p>
+</div>
+<div class="paragraph">
+<p>Create the <code>MockData</code> class:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/mock/MockData.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.mock
+
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState</span>
+
+<span class="type">class</span> <span class="class">MockData</span> {
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="predefined-type">String</span> instanceOcid = <span class="string"><span class="delimiter">'</span><span class="content">test-instance-id</span><span class="delimiter">'</span></span>
+    <span class="directive">public</span> <span class="directive">static</span> LifecycleState instanceLifecycleState
+
+    <span class="directive">static</span> <span class="type">void</span> reset() {
+        instanceOcid = <span class="string"><span class="delimiter">'</span><span class="content">test-instance-id</span><span class="delimiter">'</span></span>
+        instanceLifecycleState = <span class="predefined-constant">null</span>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next create the <code>MockAuthenticationDetailsProvider</code> class. The methods all return <code>null</code> since they won&#8217;t be called; the bean merely needs to exist for dependency injection:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/mock/MockAuthenticationDetailsProvider.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.mock
+
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.auth.AuthCachingPolicy</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.auth.BasicAuthenticationDetailsProvider</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>
+
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
+
+<span class="annotation">@AuthCachingPolicy</span>(cacheKeyId = <span class="predefined-constant">false</span>, cachePrivateKey = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Singleton</span>
+<span class="annotation">@Replaces</span>(ConfigFileAuthenticationDetailsProvider) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">MockAuthenticationDetailsProvider</span> <span class="directive">implements</span> BasicAuthenticationDetailsProvider {
+    <span class="predefined-type">String</span> keyId
+    <span class="predefined-type">InputStream</span> privateKey
+    <span class="predefined-type">String</span> passPhrase
+    <span class="type">char</span><span class="type">[]</span> passphraseCharacters
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>AuthCachingPolicy</code> annotation is used to disable caching; without this we would need to provide a valid private key since the provider methods would be invoked when constructing SDK client classes</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We use <code>@Replaces</code> to replace the previously auto-configuration Oracle Cloud authentication method</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Next create the <code>MockComputeClient</code> class which will replace the real <code>ComputeClient</code> bean:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/mock/MockComputeClient.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.mock
+
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.auth.BasicAuthenticationDetailsProvider</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.ComputeClient</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.model.Instance</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.requests.GetInstanceRequest</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.requests.InstanceActionRequest</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.responses.GetInstanceResponse</span>
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.responses.InstanceActionResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>
+
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState.Starting</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState.Stopping</span>
+
+<span class="annotation">@Singleton</span>
+<span class="annotation">@Replaces</span>(ComputeClient) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">MockComputeClient</span> <span class="directive">extends</span> ComputeClient { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    MockComputeClient(BasicAuthenticationDetailsProvider provider) { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">super</span>(provider)
+    }
+
+    <span class="annotation">@Override</span>
+    GetInstanceResponse getInstance(GetInstanceRequest request) {
+        <span class="keyword">return</span> GetInstanceResponse.builder()
+                .instance(buildInstance(MockData.instanceLifecycleState))
+                .build()
+    }
+
+    <span class="annotation">@Override</span>
+    InstanceActionResponse instanceAction(InstanceActionRequest request) {
+        LifecycleState lifecycleState = <span class="string"><span class="delimiter">'</span><span class="content">START</span><span class="delimiter">'</span></span> == request.getAction() ? Starting : Stopping
+        <span class="keyword">return</span> InstanceActionResponse.builder()
+                .instance(buildInstance(lifecycleState))
+                .build()
+    }
+
+    <span class="directive">private</span> Instance buildInstance(LifecycleState lifecycleState) {
+        <span class="keyword">return</span> Instance.builder()
+                .id(MockData.instanceOcid)
+                .lifecycleState(lifecycleState)
+                .build()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We use <code>@Replaces</code> to replace a previously auto-registered <code>ComputeClient</code> bean</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The mock class subclasses the real <code>ComputeClient</code> class and overrides only the methods used by the controller</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <code>BasicAuthenticationDetailsProvider</code> bean (in this case the <code>MockAuthenticationDetailsProvider</code> bean created earlier) is dependency-injected because it&#8217;s needed by the <code>ComputeClient</code> constructor</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Finally, replace the generated <code>MicronautguideControllerTest</code> with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/MicronautguideControllerSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.mock.MockData</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.oraclecloud.function.http.test.FnHttpTest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState.Running</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.oracle.bmc.core.model.Instance.LifecycleState.Stopped</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.OK</span>
+
+<span class="annotation">@MicronautTest</span>
+<span class="type">class</span> <span class="class">MicronautguideControllerSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Class</span>&lt;?&gt;&gt; SHARED_CLASSES = [MockData, LifecycleState] <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test status</span><span class="delimiter">'</span></span>() {
+        <span class="key">given</span>:
+        <span class="predefined-type">String</span> instanceOcid = <span class="predefined-type">UUID</span>.randomUUID()
+        MockData.instanceOcid = instanceOcid <i class="conum" data-value="2"></i><b>(2)</b>
+        MockData.instanceLifecycleState = Running
+
+        <span class="key">when</span>:
+        HttpResponse&lt;<span class="predefined-type">String</span>&gt; response = FnHttpTest.invoke( <i class="conum" data-value="3"></i><b>(3)</b>
+                HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/compute/status/</span><span class="inline"><span class="inline-delimiter">$</span>instanceOcid</span><span class="delimiter">&quot;</span></span>),
+                SHARED_CLASSES)
+
+        <span class="key">then</span>:
+        response.status() == OK
+        response.body() == <span class="string"><span class="delimiter">'</span><span class="content">{&quot;lifecycleState&quot;:&quot;Running&quot;,&quot;ocid&quot;:&quot;</span><span class="delimiter">'</span></span> + instanceOcid + <span class="string"><span class="delimiter">'</span><span class="content">&quot;}</span><span class="delimiter">'</span></span> <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test start</span><span class="delimiter">'</span></span>() {
+        <span class="key">given</span>:
+        <span class="predefined-type">String</span> instanceOcid = <span class="predefined-type">UUID</span>.randomUUID()
+        MockData.instanceOcid = instanceOcid
+        MockData.instanceLifecycleState = Stopped
+
+        <span class="key">when</span>:
+        HttpResponse&lt;<span class="predefined-type">String</span>&gt; response = FnHttpTest.invoke(
+                HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/compute/start/</span><span class="inline"><span class="inline-delimiter">$</span>instanceOcid</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">null</span>),
+                SHARED_CLASSES)
+
+        <span class="key">then</span>:
+        response.status() == OK
+        response.body() == <span class="string"><span class="delimiter">'</span><span class="content">{&quot;lifecycleState&quot;:&quot;Starting&quot;,&quot;ocid&quot;:&quot;</span><span class="delimiter">'</span></span> + instanceOcid + <span class="string"><span class="delimiter">'</span><span class="content">&quot;}</span><span class="delimiter">'</span></span>
+    }
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test stop</span><span class="delimiter">'</span></span>() {
+        <span class="key">given</span>:
+        <span class="predefined-type">String</span> instanceOcid = <span class="predefined-type">UUID</span>.randomUUID()
+        MockData.instanceOcid = instanceOcid
+        MockData.instanceLifecycleState = Running
+
+        <span class="key">when</span>:
+        HttpResponse&lt;<span class="predefined-type">String</span>&gt; response = FnHttpTest.invoke(
+                HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/compute/stop/</span><span class="inline"><span class="inline-delimiter">$</span>instanceOcid</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">null</span>),
+                SHARED_CLASSES)
+
+        <span class="key">then</span>:
+        response.status() == OK
+        response.body() == <span class="string"><span class="delimiter">'</span><span class="content">{&quot;lifecycleState&quot;:&quot;Stopping&quot;,&quot;ocid&quot;:&quot;</span><span class="delimiter">'</span></span> + instanceOcid + <span class="string"><span class="delimiter">'</span><span class="content">&quot;}</span><span class="delimiter">'</span></span>
+    }
+
+    <span class="type">void</span> cleanup() {
+        MockData.reset()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>MockData</code> and <code>LifecycleState</code> need to be passed to test function invocations as shared classes</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Here we set data to be used by the mocks in the <code>MockData</code> class</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The controller is invoked with the <code>FnHttpTest</code> class that, along with <code>MockFnHttpServer</code>, provides a bridge between Micronaut controllers and an Fn Project gateway in tests</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>We expect the String response to be the JSON generated from the <code>InstanceData</code> returned by the controller</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ ./mvnw test</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-oracle-cloud-resources">6. Configuring Oracle Cloud Resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We need to configure some cloud infrastructure to support deploying functions.</p>
+</div>
+<div class="paragraph">
+<p>Initially, do all the configuration steps described in the <a href="https://guides.micronaut.io/latest/micronaut-oracle-function.html">Deploy a Micronaut Function (Serverless) app to Oracle Cloud</a> guide&#8217;s "Configuring Oracle Cloud Resources" and "Enable Tracing and Logs" sections since they&#8217;re the same as for HTTP Gateway functions.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+One difference in the configuration steps is that for this guide, do not add a <code>exec.mainClass</code> property in <code>pom.xml</code> since the property exists in the generated application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>There is some more infrastructure configuration to do, but we&#8217;ll need to create the function first.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-function">7. Creating the function</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First, build the function as a Docker image and push it to the OCIR repository by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./mvnw deploy -Dpackaging=docker</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you&#8217;ve pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.</p>
+</div>
+<div class="paragraph">
+<p>Open the Oracle Cloud Menu and click "Developer Services", and then "Applications" under "Functions":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function1.png" alt="function1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create Application":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function2.png" alt="function2">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name for the application, e.g. <code>mn-guide-http-function-app</code>, and select the VCN created earlier. Select the private subnet, and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/function3.png" alt="function3">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the application link in the list, and then click "Create Function":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/function4.png" alt="function4">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name for the function, e.g. <code>mn-guide-http-function</code>, select the repository where you pushed the Docker image, and select the uploaded image. Select 512MB memory and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/function5.png" alt="function5">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-oracle-cloud-resources-continued">8. Configuring Oracle Cloud Resources (continued)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Next we&#8217;ll create an API Gateway, plus a few smaller tasks.</p>
+</div>
+<div class="sect2">
+<h3 id="api-gateway">8.1. API Gateway</h3>
+<div class="paragraph">
+<p>Create an API gateway by clicking the Oracle Cloud menu and selecting "Developer Services", and then click "Gateways":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/gateway1.png" alt="gateway1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create Gateway"</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/gateway2.png" alt="gateway2">
+</div>
+</div>
+<div class="paragraph">
+<p>then choose a name, e.g. <code>mn-guide-gateway</code>, then choose a compartment, VCN, and subnet as before:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/gateway3.png" alt="gateway3">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Deployments", then "Create Deployment":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/gateway4.png" alt="gateway4">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name for the deployment (e.g. <code>mn-guide-deployment</code>), and use the controller&#8217;s root uri (<code>/compute</code>) as the "Path Prefix" value, then click "Next".</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/gateway5.png" alt="gateway5">
+</div>
+</div>
+<div class="paragraph">
+<p>Enter <code>/{path*}</code> as the "Path" value to capture all incoming requests; the Micronaut router will match the incoming path and request method with the proper controller method. Choose <code>ANY</code> under "Methods", and <code>Oracle Functions</code> as the "Type". Choose <code>mn-guide-http-function-app</code> as the "Application" and <code>mn-guide-http-function</code> as the "Function Name", then click "Next":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/gateway6.png" alt="gateway6">
+</div>
+</div>
+<div class="paragraph">
+<p>Verify that everything looks ok and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/gateway7.png" alt="gateway7">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the "Copy" link in the "Endpoint" column; this is the base controller URL which will be needed later when testing the function:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/gateway8.png" alt="gateway8">
+</div>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.oracle.com/en-us/iaas/Content/APIGateway/Concepts/apigatewayoverview.htm">API Gateway docs</a> for more information.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="remaining-configuration">8.2. Remaining Configuration</h3>
+<div class="sect3">
+<h4 id="ingress-rule">8.2.1. Ingress Rule</h4>
+<div class="paragraph">
+<p>First, add an ingress rule for HTTPS on port 443. Open the Oracle Cloud Menu and click "Networking", then "Virtual Cloud Networks":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/vcn1.png" alt="vcn1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the link for <code>mn-functions-vcn</code>:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/ingress1.png" alt="ingress1">
+</div>
+</div>
+<div class="paragraph">
+<p>Then click "Security Lists", and click the link for "Default Security List for mn-functions-vcn":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/ingress2.png" alt="ingress2">
+</div>
+</div>
+<div class="paragraph">
+<p>Then click "Add Ingress Rules":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/ingress3.png" alt="ingress3">
+</div>
+</div>
+<div class="paragraph">
+<p>Enter <code>0.0.0.0/0</code> for the source CIDR value, and <code>433</code> for the destination port range, and click "Add Ingress Rules":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/ingress4.png" alt="ingress4">
+</div>
+</div>
+<div class="paragraph">
+<p>Next we need to grant the function permission to access other cloud resources, in this case compute instances. That will involve creating a dynamic group and adding a new policy statement.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dynamic-group">8.2.2. Dynamic Group</h4>
+<div class="paragraph">
+<p>Create a Dynamic Group by clicking the Oracle Cloud menu and selecting "Identity &amp; Security", and then click "Dynamic Groups":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/dynamicgroup1.png" alt="dynamicgroup1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create Dynamic Group":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/dynamicgroup2.png" alt="dynamicgroup2">
+</div>
+</div>
+<div class="paragraph">
+<p>Then enter a name and description for the group, e.g. "mn-guide-dg", and a matching rule, i.e. the logic that will be used to determine group membership. We&#8217;ll make the rule fairly broad - enter <code>ALL {resource.type = 'fnfunc', resource.compartment.id = 'ocid1.compartment.oc1..aaaaaxxxxx'}</code> replacing <code>ocid1.compartment.oc1..aaaaaxxxxx</code> with the compartment OCID where you&#8217;re defining your functions, and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/dynamicgroup3.png" alt="dynamicgroup3">
+</div>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm">Dynamic Group docs</a> for more information.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dynamic-group-policy-statement">8.2.3. Dynamic Group Policy Statement</h4>
+<div class="paragraph">
+<p>Next create a policy statement granting members of the dynamic group permission to manage compute instances. Open the Oracle Cloud Menu and click "Identity &amp; Security", and then "Policies":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/policy1.png" alt="policy1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the link for the Policy you created earlier (i.e. <code>mn-functions-compartment-policy</code>):</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/policy2.png" alt="policy2">
+</div>
+</div>
+<div class="paragraph">
+<p>Then click "Edit Policy Statements":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/policy3.png" alt="policy3">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "+ Another Statement":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/policy4.png" alt="policy4">
+</div>
+</div>
+<div class="paragraph">
+<p>and enter <code>Allow dynamic-group mn-guide-dg to manage instances in compartment &lt;compartment-name&gt;</code>, replacing <code>&lt;compartment-name&gt;</code> with the compartment OCID where you&#8217;re defining your functions, and click "Save Changes":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefnhttp/policy5.png" alt="policy5">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="invoking-the-function">9. Invoking the function</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Since the function works with Compute Instances, make sure you have at least one running. If you don&#8217;t have any, one easy option is with the <a href="https://guides.micronaut.io/latest/micronaut-oracle-cloud.html">Deploy a Micronaut app to Oracle Cloud</a> guide.</p>
+</div>
+<div class="paragraph">
+<p>Now is when you need the base controller URL that you copied when creating the API Gateway; it should look something like <code>https://cjrgh5e3lfqz&#8230;&#8203;.apigateway.us-ashburn-1.oci.customer-oci.com/compute</code> and end in <code>/compute</code> since that&#8217;s the root URI of the controller.</p>
+</div>
+<div class="paragraph">
+<p>First, get the status of an instance in a web browser or with cURL by appending <code>/status/INSTANCE_OCID</code> to the base controller URL, replacing <code>INSTANCE_OCID</code> with the OCID of the Compute Instance to query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl -i https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/status/ocid1.instance.oc1.iad.anuwcljrbnqp5k...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and the output should look something like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+<span class="key"><span class="delimiter">&quot;</span><span class="content">availabilityDomain</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">nFuS:US-ASHBURN-AD-1</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">compartmentOcid</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbmqnj...</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">displayName</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">dribneb</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycleState</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">RUNNING</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">ocid</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.instance.oc1.iad.anuwcljrbnqp5k...</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">region</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">iad</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">timeCreated</span><span class="delimiter">&quot;</span></span>:<span class="integer">1624594779093</span>
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You can also invoke the <code>/status</code> action in a web browser since it&#8217;s a GET method, but the others require cURL or some other application that can make POST requests
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The first invocation ("cold start") will take a while as the infrastructure is configured, probably 10-20 seconds or more but subsequent invocations should return in 1-2 seconds.</p>
+</div>
+<div class="paragraph">
+<p>Next, stop the instance with the same URL, except replace <code>/status/</code> with <code>/stop/</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl -i -H &quot;Content-Type: application/json&quot; -X POST https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/stop/ocid1.instance.oc1.iad.anuwcljrbnqp5k...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and the output should look something like this (it should be the same as before except <code>lifecycleState</code> should be <code>STOPPING</code>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+<span class="key"><span class="delimiter">&quot;</span><span class="content">availabilityDomain</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">nFuS:US-ASHBURN-AD-1</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">compartmentOcid</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbmqnj...</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">displayName</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">dribneb</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycleState</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">STOPPING</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">ocid</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.instance.oc1.iad.anuwcljrbnqp5k...</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">region</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">iad</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">timeCreated</span><span class="delimiter">&quot;</span></span>:<span class="integer">1624594779093</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once the status is <code>STOPPED</code> you can start it again with the same URL, except replace <code>/stop/</code> with <code>/start/</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl -i -H &quot;Content-Type: application/json&quot; -X POST https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/start/ocid1.instance.oc1.iad.anuwcljrbnqp5k...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and the output should look something like this (it should be the same as before except <code>lifecycleState</code> should be <code>STARTING</code>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+<span class="key"><span class="delimiter">&quot;</span><span class="content">availabilityDomain</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">nFuS:US-ASHBURN-AD-1</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">compartmentOcid</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbmqnj...</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">displayName</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">dribneb</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycleState</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">STARTING</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">ocid</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.instance.oc1.iad.anuwcljrbnqp5k...</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">region</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">iad</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">timeCreated</span><span class="delimiter">&quot;</span></span>:<span class="integer">1624594779093</span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Read more about the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/">Micronaut Oracle Cloud</a> integration.</p>
+</div>
+<div class="paragraph">
+<p>Also check out the <a href="https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm">Oracle Cloud Function documentation</a> for more information on the available functionality.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-micronaut">11. Help with Micronaut</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="https://micronaut.io/wp-content/uploads/2021/03/Micronaut_byobjectcomputing_w.svg" alt=""/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li id="menu-item-2885" class="show-on-blog menu-item menu-item-type-custom menu-item-object-custom menu-item-2885">
+                                <a target="_blank" rel="noopener" href="https://micronaut.io/feed/rss/">
+                                    <i class="fas fa-rss">
+                                        <span class="sr-only">RSS</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2886" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2886">
+                                <a target="_blank" rel="noopener" href="https://twitter.com/micronautfw">
+                                    <i class="fab fa-twitter">
+                                        <span class="sr-only">Twitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2887" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2887">
+                                <a href="mailto:info@micronaut.io">
+                                    <i class="fas fa-envelope">
+                                        <span class="sr-only">Mail</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2888" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2888">
+                                <a target="_blank" rel="noopener" href="https://gitter.im/micronautfw/">
+                                    <i class="fab fa-gitter">
+                                        <span class="sr-only">Gitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2889" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2889">
+                                <a target="_blank" rel="noopener" href="https://github.com/micronaut-projects/">
+                                    <i class="fab fa-github">
+                                        <span class="sr-only">GitHub</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2890" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2890">
+                                <a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLI74De5M9T72YshO4Sc90wtGr286nM8Yu">
+                                    <i class="fab fa-youtube">
+                                        <span class="sr-only">YouTube</span>
+                                    </i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 Object Computing, Inc. All rights reserved</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+
