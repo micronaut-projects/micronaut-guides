@@ -8,9 +8,9 @@ import io.micronaut.context.annotation.Replaces;
 import javax.inject.Singleton;
 import java.io.InputStream;
 
-@AuthCachingPolicy(cacheKeyId = false, cachePrivateKey = false)
+@AuthCachingPolicy(cacheKeyId = false, cachePrivateKey = false) // <1>
 @Singleton
-@Replaces(ConfigFileAuthenticationDetailsProvider.class)
+@Replaces(ConfigFileAuthenticationDetailsProvider.class) // <2>
 public class MockAuthenticationDetailsProvider implements BasicAuthenticationDetailsProvider {
 
     @Override

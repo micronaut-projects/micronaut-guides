@@ -16,10 +16,10 @@ import static com.oracle.bmc.core.model.Instance.LifecycleState.Starting;
 import static com.oracle.bmc.core.model.Instance.LifecycleState.Stopping;
 
 @Singleton
-@Replaces(ComputeClient.class)
-public class MockComputeClient extends ComputeClient {
+@Replaces(ComputeClient.class) // <1>
+public class MockComputeClient extends ComputeClient { // <2>
 
-    public MockComputeClient(BasicAuthenticationDetailsProvider provider) {
+    public MockComputeClient(BasicAuthenticationDetailsProvider provider) { // <3>
         super(provider);
     }
 

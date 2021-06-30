@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @MicronautTest
 class MicronautguideControllerTest {
 
-    private static final List<Class<?>> SHARED_CLASSES = Arrays.asList(
+    private static final List<Class<?>> SHARED_CLASSES = Arrays.asList( // <1>
             MockData.class,
             LifecycleState.class);
 
@@ -29,15 +29,16 @@ class MicronautguideControllerTest {
     void testStatus() {
 
         String instanceOcid = UUID.randomUUID().toString();
-        MockData.instanceOcid = instanceOcid;
+        MockData.instanceOcid = instanceOcid; // <2>
         MockData.instanceLifecycleState = Running;
 
-        HttpResponse<String> response = FnHttpTest
-                .invoke(HttpRequest.GET("/compute/status/" + instanceOcid), SHARED_CLASSES);
+        HttpResponse<String> response = FnHttpTest.invoke( // <3>
+                HttpRequest.GET("/compute/status/" + instanceOcid),
+                SHARED_CLASSES);
 
         assertEquals(OK, response.status());
         assertEquals(
-                "{\"lifecycleState\":\"Running\",\"ocid\":\"" + instanceOcid + "\"}",
+                "{\"lifecycleState\":\"Running\",\"ocid\":\"" + instanceOcid + "\"}", // <4>
                 response.body());
     }
 
