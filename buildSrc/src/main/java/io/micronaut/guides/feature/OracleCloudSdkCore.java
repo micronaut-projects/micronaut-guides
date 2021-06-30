@@ -1,6 +1,6 @@
 package io.micronaut.guides.feature;
 
-import io.micronaut.guides.feature.AbstractFeature;
+import io.micronaut.starter.application.generator.GeneratorContext;
 
 import javax.inject.Singleton;
 
@@ -9,5 +9,10 @@ public class OracleCloudSdkCore extends AbstractFeature {
 
     public OracleCloudSdkCore() {
         super("oci-java-sdk-core");
+    }
+
+    @Override
+    public void apply(GeneratorContext generatorContext) {
+        addDependencyWithoutLookup(generatorContext, "com.oracle.oci.sdk");
     }
 }
