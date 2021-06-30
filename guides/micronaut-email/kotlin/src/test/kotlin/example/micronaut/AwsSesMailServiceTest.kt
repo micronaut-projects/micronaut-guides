@@ -1,7 +1,8 @@
 package example.micronaut
 
 import io.micronaut.context.ApplicationContext
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
 class AwsSesMailServiceTest {
@@ -9,7 +10,7 @@ class AwsSesMailServiceTest {
     @Test
     fun awsSesMailServiceIsNotLoadedIfSystemPropertyIsNotPresent() {
         val ctx = ApplicationContext.run()
-        Assertions.assertFalse(ctx.containsBean(AwsSesMailService::class.java))
+        assertFalse(ctx.containsBean(AwsSesMailService::class.java))
         ctx.close()
     }
 
@@ -27,7 +28,7 @@ class AwsSesMailServiceTest {
 
         val ctx = ApplicationContext.run()
         val bean = ctx.getBean(AwsSesMailService::class.java)
-        Assertions.assertEquals("me@micronaut.example", bean.sourceEmail)
+        assertEquals("me@micronaut.example", bean.sourceEmail)
 
         ctx.close()
 

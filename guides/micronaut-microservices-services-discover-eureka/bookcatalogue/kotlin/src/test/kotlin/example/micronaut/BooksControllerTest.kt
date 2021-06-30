@@ -5,7 +5,8 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
@@ -19,8 +20,8 @@ class BooksControllerTest {
     fun testRetrieveBooks() {
         val request: HttpRequest<*> = HttpRequest.GET<Any>("/books") // <3>
         val books: List<*> = client.toBlocking().retrieve(request, Argument.listOf(Book::class.java)) // <4>
-        Assertions.assertEquals(3, books.size)
-        Assertions.assertTrue(books.contains(Book("1491950358", "Building Microservices")))
-        Assertions.assertTrue(books.contains(Book("1680502395", "Release It!")))
+        assertEquals(3, books.size)
+        assertTrue(books.contains(Book("1491950358", "Building Microservices")))
+        assertTrue(books.contains(Book("1680502395", "Release It!")))
     }
 }

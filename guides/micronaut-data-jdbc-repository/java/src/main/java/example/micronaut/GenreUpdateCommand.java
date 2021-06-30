@@ -4,7 +4,7 @@ import io.micronaut.core.annotation.Introspected;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Introspected
+@Introspected // <1>
 public class GenreUpdateCommand {
     @NotNull
     private final Long id;

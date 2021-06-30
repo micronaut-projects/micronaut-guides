@@ -1,0 +1,370 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+include::{commondir}/common-gettingStarted.adoc[]
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+* JDK 11 or greater installed with `JAVA_HOME` configured appropriately
+* Docker installed
+* A paid or free trial Oracle Cloud account (create an account at https://signup.oraclecloud.com[signup.oraclecloud.com])
+* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app --features=oracle-function,oracle-cloud-sdk example.micronaut.micronautguide --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select Micronaut Application as application type and add the `oracle-function` and `oracle-cloud-sdk` features.
+
+include::{commondir}/common-default-package.adoc[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+=== Dependencies
+
+Add a dependency for `oci-java-sdk-core` so we have access to classes for managing compute instances:
+
+dependency:oci-java-sdk-core[groupId=com.oracle.oci.sdk]
+
+=== InstanceData
+
+Then create an `InstanceData` DTO class to represent Compute Instance properties:
+
+source:InstanceData[]
+
+=== MicronautguideController
+
+The generated application contains a `MicronautguideController` class which is good for getting started, but we'll update it to demonstrate working with OCI SDK APIs, in this case working with Compute Instances.
+
+Replace the generated `MicronautguideController` with this:
+
+source:MicronautguideController[]
+
+<1> The controller's root uri  is `/compute`
+<2> Here we dependency-inject the SDK `ComputeClient` instance
+<3> This endpoint accepts `GET` requests and returns current instance properties for the specified instance OCID
+<4> This endpoint accepts `POST` requests and starts the specified instance if it is stopped
+<5> This endpoint accepts `POST` requests and stops the specified instance if it is running
+
+== Testing the Application
+
+NOTE: The code in this guide should work with recent versions of Micronaut 2.5+, but the tests require at least version 2.5.7
+
+We need to update the generated `MicronautguideControllerTest` to test the changes we made in `MicronautguideController`.
+
+This will be a unit test, so we'll need some mock beans to replace the beans auto-registered by the `oracle-cloud-sdk` module which make requests to Oracle Cloud. We also need to take into consideration the strict class loader isolation used by https://fnproject.io/[Fn Project] (which powers Oracle Cloud Functions).
+
+When running our tests, the test and mock classes are loaded by the regular Micronaut classloader, but the function invocations are made in a custom `Fn` classloader, so it is not _directly_ possible to share state between the two, which complicates traditional approaches to mocking. There is support in `Fn` for sharing classes however, so instead of setting values in mock instances from the test to be used by the controller we'll set values in a `MockData` helper class that's registered as a class that's shared between classloaders.
+
+Create the `MockData` class:
+
+test:mock/MockData[]
+
+Next create the `MockAuthenticationDetailsProvider` class. The methods all return `null` since they won't be called; the bean merely needs to exist for dependency injection:
+
+test:mock/MockAuthenticationDetailsProvider[]
+
+<1> The `AuthCachingPolicy` annotation is used to disable caching; without this we would need to provide a valid private key since the provider methods would be invoked when constructing SDK client classes
+<2> We use `@Replaces` to replace the previously auto-configuration Oracle Cloud authentication method
+
+Next create the `MockComputeClient` class which will replace the real `ComputeClient` bean:
+
+test:mock/MockComputeClient[]
+
+<1> We use `@Replaces` to replace a previously auto-registered `ComputeClient` bean
+<2> The mock class subclasses the real `ComputeClient` class and overrides only the methods used by the controller
+<3> The `BasicAuthenticationDetailsProvider` bean (in this case the `MockAuthenticationDetailsProvider` bean created earlier) is dependency-injected because it's needed by the `ComputeClient` constructor
+
+Finally, replace the generated `MicronautguideControllerTest` with this:
+
+test:MicronautguideControllerTest[]
+
+<1> The `MockData` and `LifecycleState` need to be passed to test function invocations as shared classes
+<2> Here we set data to be used by the mocks in the `MockData` class
+<3> The controller is invoked with the `FnHttpTest` class that, along with `MockFnHttpServer`, provides a bridge between Micronaut controllers and an Fn Project gateway in tests
+<4> We expect the String response to be the JSON generated from the `InstanceData` returned by the controller
+
+To run the tests:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+$ ./gradlew test
+$ open build/reports/tests/test/index.html
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+$ ./mvnw test
+----
+
+:exclude-for-build:
+
+== Configuring Oracle Cloud Resources
+
+We need to configure some cloud infrastructure to support deploying functions.
+
+Initially, do all the configuration steps described in the https://guides.micronaut.io/latest/micronaut-oracle-function.html[Deploy a Micronaut Function (Serverless) app to Oracle Cloud] guide's "Configuring Oracle Cloud Resources" and "Enable Tracing and Logs" sections since they're the same as for HTTP Gateway functions.
+
+:exclude-for-build:gradle
+
+NOTE: One difference in the configuration steps is that for this guide, do not add a `exec.mainClass` property in `pom.xml` since the property exists in the generated application.
+
+:exclude-for-build:
+
+There is some more infrastructure configuration to do, but we'll need to create the function first.
+
+== Creating the function
+
+First, build the function as a Docker image and push it to the OCIR repository by running:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerPush
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw deploy -Dpackaging=docker
+----
+
+:exclude-for-build:
+
+Once you've pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.
+
+Open the Oracle Cloud Menu and click "Developer Services", and then "Applications" under "Functions":
+
+image::oraclefn/function1.png[]
+
+Click "Create Application":
+
+image::oraclefn/function2.png[]
+
+Choose a name for the application, e.g. `mn-guide-http-function-app`, and select the VCN created earlier. Select the private subnet, and click "Create":
+
+image::oraclefnhttp/function3.png[]
+
+Click the application link in the list, and then click "Create Function":
+
+image::oraclefnhttp/function4.png[]
+
+Choose a name for the function, e.g. `mn-guide-http-function`, select the repository where you pushed the Docker image, and select the uploaded image. Select 512MB memory and click "Create":
+
+image::oraclefnhttp/function5.png[]
+
+== Configuring Oracle Cloud Resources (continued)
+
+Next we'll create an API Gateway, plus a few smaller tasks.
+
+=== API Gateway
+
+Create an API gateway by clicking the Oracle Cloud menu and selecting "Developer Services", and then click "Gateways":
+
+image::oraclefnhttp/gateway1.png[]
+
+Click "Create Gateway"
+
+image::oraclefnhttp/gateway2.png[]
+
+then choose a name, e.g. `mn-guide-gateway`, then choose a compartment, VCN, and subnet as before:
+
+image::oraclefnhttp/gateway3.png[]
+
+Click "Deployments", then "Create Deployment":
+
+image::oraclefnhttp/gateway4.png[]
+
+Choose a name for the deployment (e.g. `mn-guide-deployment`), and use the controller's root uri (`/compute`) as the "Path Prefix" value, then click "Next".
+
+image::oraclefnhttp/gateway5.png[]
+
+Enter `/{path*}` as the "Path" value to capture all incoming requests; the Micronaut router will match the incoming path and request method with the proper controller method. Choose `ANY` under "Methods", and `Oracle Functions` as the "Type". Choose `mn-guide-http-function-app` as the "Application" and `mn-guide-http-function` as the "Function Name", then click "Next":
+
+image::oraclefnhttp/gateway6.png[]
+
+Verify that everything looks ok and click "Create":
+
+image::oraclefnhttp/gateway7.png[]
+
+Click the "Copy" link in the "Endpoint" column; this is the base controller URL which will be needed later when testing the function:
+
+image::oraclefnhttp/gateway8.png[]
+
+See the https://docs.oracle.com/en-us/iaas/Content/APIGateway/Concepts/apigatewayoverview.htm[API Gateway docs] for more information.
+
+=== Remaining Configuration
+
+==== Ingress Rule
+
+First, add an ingress rule for HTTPS on port 443. Open the Oracle Cloud Menu and click "Networking", then "Virtual Cloud Networks":
+
+image::oraclefn/vcn1.png[]
+
+Click the link for `mn-functions-vcn`:
+
+image::oraclefnhttp/ingress1.png[]
+
+Then click "Security Lists", and click the link for "Default Security List for mn-functions-vcn":
+
+image::oraclefnhttp/ingress2.png[]
+
+Then click "Add Ingress Rules":
+
+image::oraclefnhttp/ingress3.png[]
+
+Enter `0.0.0.0/0` for the source CIDR value, and `433` for the destination port range, and click "Add Ingress Rules":
+
+image::oraclefnhttp/ingress4.png[]
+
+Next we need to grant the function permission to access other cloud resources, in this case compute instances. That will involve creating a dynamic group and adding a new policy statement.
+
+==== Dynamic Group
+
+Create a Dynamic Group by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Dynamic Groups":
+
+image::oraclefnhttp/dynamicgroup1.png[]
+
+Click "Create Dynamic Group":
+
+image::oraclefnhttp/dynamicgroup2.png[]
+
+Then enter a name and description for the group, e.g. "mn-guide-dg", and a matching rule, i.e. the logic that will be used to determine group membership. We'll make the rule fairly broad - enter `ALL {resource.type = 'fnfunc', resource.compartment.id = 'ocid1.compartment.oc1..aaaaaxxxxx'}` replacing `ocid1.compartment.oc1..aaaaaxxxxx` with the compartment OCID where you're defining your functions, and click "Create":
+
+image::oraclefnhttp/dynamicgroup3.png[]
+
+See the https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm[Dynamic Group docs] for more information.
+
+==== Dynamic Group Policy Statement
+
+Next create a policy statement granting members of the dynamic group permission to manage compute instances. Open the Oracle Cloud Menu and click "Identity & Security", and then "Policies":
+
+image::oraclefn/policy1.png[]
+
+Click the link for the Policy you created earlier (i.e. `mn-functions-compartment-policy`):
+
+image::oraclefnhttp/policy2.png[]
+
+Then click "Edit Policy Statements":
+
+image::oraclefnhttp/policy3.png[]
+
+Click "+ Another Statement":
+
+image::oraclefnhttp/policy4.png[]
+
+and enter `Allow dynamic-group mn-guide-dg to manage instances in compartment <compartment-name>`, replacing `<compartment-name>` with the compartment OCID where you're defining your functions, and click "Save Changes":
+
+image::oraclefnhttp/policy5.png[]
+
+== Invoking the function
+
+Since the function works with Compute Instances, make sure you have at least one running. If you don't have any, one easy option is with the https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[Deploy a Micronaut app to Oracle Cloud] guide.
+
+Now is when you need the base controller URL that you copied when creating the API Gateway; it should look something like `\https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute` and end in `/compute` since that's the root URI of the controller.
+
+First, get the status of an instance in a web browser or with cURL by appending `/status/INSTANCE_OCID` to the base controller URL, replacing `INSTANCE_OCID` with the OCID of the Compute Instance to query:
+
+[source, bash]
+----
+$ curl -i https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/status/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
+----
+
+and the output should look something like this:
+
+[source, json]
+----
+{
+"availabilityDomain":"nFuS:US-ASHBURN-AD-1",
+"compartmentOcid":"ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbmqnj...",
+"displayName":"dribneb",
+"lifecycleState":"RUNNING",
+"ocid":"ocid1.instance.oc1.iad.anuwcljrbnqp5k...",
+"region":"iad",
+"timeCreated":1624594779093
+}
+----
+
+NOTE: You can also invoke the `/status` action in a web browser since it's a GET method, but the others require cURL or some other application that can make POST requests
+
+The first invocation ("cold start") will take a while as the infrastructure is configured, probably 10-20 seconds or more but subsequent invocations should return in 1-2 seconds.
+
+Next, stop the instance with the same URL, except replace `/status/` with `/stop/`:
+
+[source, bash]
+----
+$ curl -i -H "Content-Type: application/json" -X POST https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/stop/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
+----
+
+and the output should look something like this (it should be the same as before except `lifecycleState` should be `STOPPING`):
+
+[source, json]
+----
+{
+"availabilityDomain":"nFuS:US-ASHBURN-AD-1",
+"compartmentOcid":"ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbmqnj...",
+"displayName":"dribneb",
+"lifecycleState":"STOPPING",
+"ocid":"ocid1.instance.oc1.iad.anuwcljrbnqp5k...",
+"region":"iad",
+"timeCreated":1624594779093
+}
+----
+
+Once the status is `STOPPED` you can start it again with the same URL, except replace `/stop/` with `/start/`:
+
+[source, bash]
+----
+$ curl -i -H "Content-Type: application/json" -X POST https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/start/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
+----
+
+and the output should look something like this (it should be the same as before except `lifecycleState` should be `STARTING`):
+
+[source, json]
+----
+{
+"availabilityDomain":"nFuS:US-ASHBURN-AD-1",
+"compartmentOcid":"ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbmqnj...",
+"displayName":"dribneb",
+"lifecycleState":"STARTING",
+"ocid":"ocid1.instance.oc1.iad.anuwcljrbnqp5k...",
+"region":"iad",
+"timeCreated":1624594779093
+}
+----
+
+include::{commondir}/common-next.adoc[]
+
+Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud] integration.
+
+Also check out the https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm[Oracle Cloud Function documentation] for more information on the available functionality.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

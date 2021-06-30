@@ -6,7 +6,6 @@ import io.micronaut.starter.options.BuildTool
 @CompileStatic
 class TestScriptGenerator {
 
-
     public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
     public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
 
@@ -18,7 +17,7 @@ exit 0
 '''
     }
 
-    static List<String> guidesChanged(String[] changedFiles) {
+    private static List<String> guidesChanged(String[] changedFiles) {
         changedFiles.findAll { path ->
             path.startsWith('guides')
         }.collect { path ->
@@ -27,21 +26,34 @@ exit 0
         }.unique()
     }
 
-    static boolean changesMicronautVersion(String[] changedFiles) {
+    private static boolean changesMicronautVersion(String[] changedFiles) {
         changedFiles.any { str -> str.contains("version.txt") }
     }
 
-    static boolean changesDependencies(String[] changedFiles, List<String> changedGuides) {
+    private static boolean changesDependencies(String[] changedFiles, List<String> changedGuides) {
         if (changedGuides) {
             return false
         }
         changedFiles.any { str -> str.contains("pom.xml") }
     }
 
-    static boolean shouldSkip(String slug, List<String> guidesChanged) {
-        return  (System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null) ?
-                !(System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == slug) :
-                !guidesChanged.contains(slug)
+    private static boolean changesBuildScr(String[] changedFiles) {
+        changedFiles.any { str -> str.contains('buildSrc') }
+    }
+
+    private static boolean shouldSkip(GuideMetadata metadata,
+                                      List<String> guidesChanged,
+                                      boolean forceExecuteEveryTest) {
+
+        if (!Utils.process(metadata, true)) {
+            return true
+        }
+
+        if (forceExecuteEveryTest) {
+            return false
+        }
+
+        return !guidesChanged.contains(metadata.slug)
     }
 
     static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
@@ -54,12 +66,13 @@ EXIT_STATUS=0
 '''
         List<String> slugsChanged = guidesChanged(changedFiles)
         boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
-                changesDependencies(changedFiles, slugsChanged) ||
-                (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
+                                        changesDependencies(changedFiles, slugsChanged) ||
+                                        changesBuildScr(changedFiles) ||
+                                        (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = shouldSkip(metadata.slug, slugsChanged)
-            if (!forceExecuteEveryTest && skip) {
+            boolean skip = shouldSkip(metadata, slugsChanged, forceExecuteEveryTest)
+            if (skip) {
                 continue
             }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
@@ -78,7 +91,7 @@ EXIT_STATUS=0
                     bashScript += """\
 cd ${folder}
 """
-                    for (GuideMetadata.App app: metadata.apps) {
+                    for (GuideMetadata.App app : metadata.apps) {
                         bashScript += scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool)
                     }
                     bashScript += """\
@@ -108,7 +121,7 @@ fi
         bashScript
     }
 
-    static String scriptForFolder(String nestedFolder, String folder, boolean stopIfFailure, BuildTool buildTool) {
+    private static String scriptForFolder(String nestedFolder, String folder, boolean stopIfFailure, BuildTool buildTool) {
         String bashScript = """\
 cd ${nestedFolder}
 echo "-------------------------------------------------"

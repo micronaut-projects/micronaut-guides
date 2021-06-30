@@ -8,7 +8,8 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
@@ -32,14 +33,14 @@ internal class MailControllerTest {
 
         val request: HttpRequest<EmailCmd> = HttpRequest.POST("/mail/send", cmd) // <5>
         val emailServices = applicationContext.getBeansOfType(EmailService::class.java)
-        Assertions.assertEquals(1, emailServices.size)
+        assertEquals(1, emailServices.size)
 
         val emailService = applicationContext.getBean(EmailService::class.java)
-        Assertions.assertTrue(emailService is MockEmailService)
+        assertTrue(emailService is MockEmailService)
 
         val oldEmailsSize = (emailService as MockEmailService).emails.size
         val rsp: HttpResponse<*> = client.toBlocking().exchange<EmailCmd, Any>(request)
-        Assertions.assertEquals(HttpStatus.OK, rsp.status)
-        Assertions.assertEquals(oldEmailsSize + 1, emailService.emails.size) // <6>
+        assertEquals(HttpStatus.OK, rsp.status)
+        assertEquals(oldEmailsSize + 1, emailService.emails.size) // <6>
     }
 }

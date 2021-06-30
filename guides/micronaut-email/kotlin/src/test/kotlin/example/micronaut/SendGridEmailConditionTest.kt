@@ -1,6 +1,7 @@
 package example.micronaut
 
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class SendGridEmailConditionTest {
@@ -13,7 +14,7 @@ class SendGridEmailConditionTest {
         System.setProperty("sendgrid.fromemail", "me@micronaut.example")
 
         val condition = SendGridEmailCondition()
-        Assertions.assertTrue(condition.matches(null))
+        assertTrue(condition.matches(null))
 
         if (sendGridApiKey == null) {
             System.clearProperty("sendgrid.apikey")
@@ -33,6 +34,6 @@ class SendGridEmailConditionTest {
         val sendGrindFromEmail = System.getProperty("sendgrid.fromemail")
 
         val condition = SendGridEmailCondition()
-        Assertions.assertFalse(condition.matches(null))
+        assertFalse(condition.matches(null))
     }
 }
