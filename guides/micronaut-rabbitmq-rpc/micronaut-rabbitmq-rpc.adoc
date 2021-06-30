@@ -18,7 +18,6 @@ and has since been extended with a plug-in architecture to support Streaming Tex
 Message Queuing Telemetry Transport (MQTT), and other protocols.
 ____
 
-
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
@@ -33,10 +32,7 @@ Let's describe the microservices you are going to build through the tutorial.
 
 * `bookrecommendation` - It consumes previous services and exposes an endpoint which recommends book names which are in stock.
 
-
 include::{commondir}/common-annotationprocessors.adoc[]
-
-
 
 === Catalogue microservice
 
@@ -55,7 +51,6 @@ By default Micronaut will connect to a RabbitMQ instance running on `localhost` 
 to `application.yml`. In case you want to change the configuration, add the following:
 
 resource:application.yml[app=bookcatalogue,tag=rabbitmq]
-
 
 ==== Create RabbitMQ exchange, queue and binding
 
@@ -77,7 +72,6 @@ appropriate routing key.
 NOTE: In this Catalogue Microservice the only necessary element is the `catalogue` queue, but it is a good practice to define
 all the elements in the same file and share the file between all the projects.
 
-
 ==== Create consumer
 
 Create a `BookCatalogueService` class to handle incoming RPC requests into the `bookcatalogue` microservice:
@@ -90,9 +84,6 @@ source:BookCatalogueService[app=bookcatalogue]
 The previous service responds a `List<Book>`. Create the `Book` POJO:
 
 source:Book[app=bookcatalogue]
-
-
-
 
 === Inventory microservice
 
@@ -107,12 +98,10 @@ Add `rabbitmq` dependency. As we only want to use RabbitMQ to receive requests w
 
 dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
 
-
 ==== Create RabbitMQ exchange, queue and binding
 
 As we did in `Catalogue` Microservice, create the class `ChannelPoolListener.java` in `bookinventory/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java`
 with the same content as before.
-
 
 ==== Create consumer
 
@@ -126,9 +115,6 @@ source:BookInventoryService[app=bookinventory]
 The previous service uses `BookInventory` POJO. Create it:
 
 source:BookInventory[app=bookinventory]
-
-
-
 
 === Recommendation microservice
 
@@ -144,12 +130,10 @@ not necessary to remove any dependency.
 
 dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
 
-
 ==== Create RabbitMQ exchange, queue and binding
 
 As we did in `Catalogue` Microservice, create the class `ChannelPoolListener.java` in `bookrecommendation/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java`
 with the same content as before.
-
 
 ==== Create clients
 
@@ -168,7 +152,6 @@ will create a temporary queue for the callback.
 return a reactive type, but on the client side it is. Also, it is necessary to send something, even if it's not
 used in the consumer.
 
-
 Create `InventoryClient.java`:
 
 source:InventoryClient[app=bookrecommendation]
@@ -178,7 +161,6 @@ source:InventoryClient[app=bookrecommendation]
 <3> Set the routing key.
 <4> Define the method that will "mirror" the one in the consumer. As we did with `CatalogueClient` we use a reactive
 type to wrap the result.
-
 
 ==== Create the controller
 
@@ -190,13 +172,9 @@ source:BookController[app=bookrecommendation]
 <2> Clients are injected via constructor injection
 <3> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books`.
 
-
 The previous controller returns a `Flowable<BookRecommendation>`. Create the `BookRecommendation` POJO:
 
 source:BookRecommendation[app=bookrecommendation]
-
-
-
 
 == RabbitMQ and Micronaut
 
@@ -214,18 +192,13 @@ docker run --rm -it \
 
 Alternatively you can https://www.rabbitmq.com/download.html[install and run a local RabbitMQ instance].
 
-
-
 == Running the app
-
 
 Configure `bookinventory` to run on port 8082:
 
 resource:application.yml[app=bookinventory,tag=port]
 
-
 Run `bookinventory` microservice:
-
 
 :exclude-for-build:maven
 
@@ -249,17 +222,13 @@ bookinventory $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
-
 Configure `bookcatalogue` to run on port 8081:
 
 resource:application.yml[app=bookcatalogue,tag=port]
 
-
 Run `bookcatalogue` microservice:
 
 :exclude-for-build:maven
-
 
 [source,bash]
 ----
@@ -281,14 +250,11 @@ bookcatalogue $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
 Configure `bookrecommendation` to run on port 8080:
 
 resource:application.yml[app=bookrecommendation,tag=port]
 
 NOTE: 8080 is the default port if you don't specify `micronaut.server.port` property
-
-
 
 Run `bookrecommendation` microservice:
 
@@ -322,7 +288,6 @@ $ curl http://localhost:8080/books
 [{"name":"Building Microservices"}]
 ----
 
-
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
@@ -330,8 +295,6 @@ include::{commondir}/common-graal-with-plugins.adoc[]
 Start the native images for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
 
 :exclude-for-languages:
-
-
 
 == Next steps
 

@@ -11,7 +11,6 @@ Micronaut Version: @micronaut@
 In this guide, we are going to create three microservices and register them with https://github.com/Netflix/eureka[Netflix Eureka] service discovery.
 You will discover how Micronaut eases Eureka integration.
 
-
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
@@ -43,7 +42,6 @@ When a service wants to do a request to other service, it uses the discovery ser
 image::discovery-service-flow.svg[]
 
 include::{commondir}/common-annotationprocessors.adoc[]
-
 
 === Catalogue Microservice
 
@@ -85,7 +83,7 @@ Create a file named `application-test.yml` which is used in the test environment
 
 testResource:application-test.yml[app=bookcatalogue,tag=port]
 
-<1> Start the micronaut microservice at a random port when running the tests.
+<1> Start the Micronaut microservice at a random port when running the tests.
 
 Run the unit test:
 
@@ -107,9 +105,7 @@ bookcatalogue $ ./mvnw test
 
 :exclude-for-build:
 
-
 === Inventory Microservice
-
 
 Create the `bookinventory` microservice:
 
@@ -132,16 +128,13 @@ The previous controller uses a POJO:
 
 source:BookInventory[app=bookinventory]
 
-
 Write a test:
 
 test:BooksControllerTest[app=bookinventory]
 
-
 Edit `application.yml`
 
 resource:application.yml[app=bookinventory,tag=mn]
-
 
 <1> Configure the application name. The app name will be used later in the tutorial.
 <2> Configure the app to listen at port 8082
@@ -150,8 +143,7 @@ Create a file named `application-test.yml` which is used in the test environment
 
 testResource:application-test.yml[app=bookinventory,tag=port]
 
-
-<1> Start the micronaut microservice at a random port when running the tests.
+<1> Start the Micronaut microservice at a random port when running the tests.
 
 Run the unit test:
 
@@ -173,10 +165,7 @@ bookinventory $ ./mvnw test
 
 :exclude-for-build:
 
-
-
 === Recommendation Microservice
-
 
 Create the `bookrecommendation` microservice:
 
@@ -219,7 +208,6 @@ The previous controller returns a `Flowable<BookRecommendation>`. Create the `Bo
 
 source:BookRecommendation[app=bookrecommendation]
 
-
 `BookCatalogueClient` and `BookInventoryClient` will fail to consume the `bookcatalogue` and `bookinventory` during the tests phase.
 
 Using the https://docs.micronaut.io/latest/guide/index.html#clientFallback[@Fallback] annotation you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted
@@ -228,25 +216,20 @@ Create `@Fallback` alternatives in the `test` classpath.
 
 test:BookInventoryClientStub[app=bookrecommendation]
 
-
-<1> Make this fallback class to be effective only when the micronaut environment __TEST__ is active
+<1> Make this fallback class to be effective only when the Micronaut environment __TEST__ is active
 <2> Here we arbitrarily decided that if everything else fails, that book's `stock` would be true
 <3> Similarly, we decided that other book's `stock` method would be false
 <4> Finally, any other book will have their `stock` method return an empty value
 
-
 test:BookCatalogueClientStub[app=bookrecommendation]
-
 
 Write a test:
 
 test:BookControllerTest[app=bookrecommendation]
 
-
 Edit `application.yml`
 
 resource:application.yml[app=bookrecommendation,tag=mn]
-
 
 <1> Configure the application name. The app name will be used later in the tutorial.
 <2> Configure the app to listen at port 8080
@@ -255,9 +238,7 @@ Create a file named `application-test.yml` which is used in the test environment
 
 testResource:application-test.yml[app=bookrecommendation,tag=port]
 
-
-<1> Start the micronaut microservice at a random port when running the tests.
-
+<1> Start the Micronaut microservice at a random port when running the tests.
 
 Run the unit test:
 
@@ -279,9 +260,7 @@ bookinventory $ ./mvnw test
 
 :exclude-for-build:
 
-
 === Running the app
-
 
 Run `bookcatalogue` microservice:
 
@@ -351,8 +330,6 @@ $ curl http://localhost:8080/books
 [{"name":"Building Microservices"}]
 ----
 
-
-
 == Eureka and Micronaut
 
 https://github.com/Netflix/eureka[Netflix Eureka]:
@@ -360,7 +337,6 @@ https://github.com/Netflix/eureka[Netflix Eureka]:
 ____
 Eureka is a REST (Representational State Transfer) based service that is primarily used in the AWS cloud for locating services for the purpose of load balancing and failover of middle-tier servers.
 ____
-
 
 === Eureka Server
 
@@ -372,7 +348,6 @@ To bring up Eureka server using Spring-Cloud-Netflix:
 main method, or use `mvn spring-boot:run` or `./gradlew bootRun`). It will start up on port 8761 and serve the Eureka
 API from `/eureka`.
 
-
 === Book Catalogue
 
 Add `discovery-client` dependency.
@@ -383,15 +358,12 @@ Append to `bookcatalogue` service `application.yml` the following snippet:
 
 resource:application.yml[app=bookcatalogue,tag=eureka]
 
-
 Previous configuration registers a Micronaut app with Eureka with minimal configuration. Discover a more complete list
 of Configuration options at https://docs.micronaut.io/latest/api/io/micronaut/discovery/eureka/EurekaConfiguration.html[EurekaConfiguration].
 
 Disable Eureka registration in tests:
 
 testResource:application-test.yml[app=bookcatalogue,tag=eureka]
-
-
 
 === Book Inventory
 
@@ -407,7 +379,6 @@ Disable Eureka registration in tests:
 
 testResource:application-test.yml[app=bookinventory,tag=eureka]
 
-
 === Book Recommendation
 
 Add `discovery-client` dependency.
@@ -417,7 +388,6 @@ dependency:micronaut-discovery-client[groupId=io.micronaut.discovery]
 Also, append to `bookrecommendation`.`application.yml` the following snippet:
 
 resource:application.yml[app=bookrecommendation,tag=eureka]
-
 
 Modify `BookInventoryClient` and `BookCatalogueClient` to use the service id instead of a harcoded ip.
 
@@ -432,7 +402,6 @@ source:BookInventoryClient[app=bookrecommendation,tags=packageandimports|eureka|
 Disable Eureka registration in tests:
 
 testResource:application-test.yml[app=bookrecommendation,tag=eureka]
-
 
 === Running the App
 
@@ -518,7 +487,6 @@ $ curl http://localhost:8080/books
 [{"name":"Building Microservices"}]
 ----
 
-
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
@@ -526,7 +494,6 @@ include::{commondir}/common-graal-with-plugins.adoc[]
 Start the native images for the three microservices and run the same `curl` request as before to check that everything works with GraalVM.
 
 :exclude-for-languages:
-
 
 == Next steps
 

@@ -16,7 +16,6 @@ ____
 
 You will discover how Micronaut eases Consul integration.
 
-
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
@@ -59,7 +58,6 @@ image::discovery-service-flow.svg[]
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
-
 === Catalogue Microservice
 
 Create the `bookcatalogue` microservice:
@@ -98,12 +96,11 @@ resource:application.yml[app=bookcatalogue,tag=mn]
 <1> Configure the application name. The app name will be use by the discovery service.
 <2> Configure the app to listen at port 8081
 
-
 Create a file named `application-test.yml` which is used in the test environment:
 
 testResource:application-test.yml[app=bookcatalogue,tag=port]
 
-<1> Start the micronaut microservice at a random port when running the tests.
+<1> Start the Micronaut microservice at a random port when running the tests.
 
 Run the unit test:
 
@@ -124,8 +121,6 @@ bookcatalogue $ ./mvnw test
 ----
 
 :exclude-for-build:
-
-
 
 === Inventory Microservice
 
@@ -154,11 +149,9 @@ Write a test:
 
 test:BooksControllerTest[app=bookinventory]
 
-
 Edit `application.yml`
 
 resource:application.yml[app=bookinventory,tag=mn]
-
 
 <1> Configure the application name. The app name will be used later in the tutorial.
 <2> Configure the app to listen at port 8082
@@ -167,7 +160,7 @@ Create a file named `application-test.yml` which is used in the test environment
 
 testResource:application-test.yml[app=bookinventory,tag=port]
 
-<1> Start the micronaut microservice at a random port when running the tests.
+<1> Start the Micronaut microservice at a random port when running the tests.
 
 Run the unit test:
 
@@ -188,8 +181,6 @@ bookinventory $ ./mvnw test
 ----
 
 :exclude-for-build:
-
-
 
 === Recommendation Microservice
 
@@ -214,7 +205,6 @@ The client returns a POJO. Create it in the `bookrecommendation`:
 
 source:Book[app=bookrecommendation]
 
-
 Create an interface to map operations with `bookinventory`, and a Micronaut Declarative HTTP Client to consume it.
 
 source:BookInventoryOperations[app=bookrecommendation]
@@ -225,9 +215,7 @@ source:BookCatalogueClient[app=bookrecommendation,tags=packageandimports|harcode
 
 Create a Controller which injects both clients.
 
-
 source:BookController[app=bookrecommendation]
-
 
 <1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
 <2> Clients are injected via constructor injection
@@ -237,7 +225,6 @@ The previous controller returns a `Flowable<BookRecommendation>`. Create the `Bo
 
 source:BookRecommendation[app=bookrecommendation]
 
-
 `BookCatalogueClient` and `BookInventoryClient` will fail to consume the `bookcatalogue` and `bookinventory` during the tests phase.
 
 Using the https://docs.micronaut.io/latest/guide/index.html#clientFallback[@Fallback] annotation you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted
@@ -246,24 +233,20 @@ Create `@Fallback` alternatives in the `test` classpath.
 
 test:BookInventoryClientStub[app=bookrecommendation]
 
-
-<1> Make this fallback class to be effective only when the micronaut environment __TEST__ is active
+<1> Make this fallback class to be effective only when the Micronaut environment __TEST__ is active
 <2> Here we arbitrarily decided that if everything else fails, that book's `stock` would be true
 <3> Similarly, we decided that other book's `stock` method would be false
 <4> Finally, any other book will have their `stock` method return an empty value
 
 test:BookCatalogueClientStub[app=bookrecommendation]
 
-
 Write a test:
 
 test:BookControllerTest[app=bookrecommendation]
 
-
 Edit `application.yml`
 
 resource:application.yml[app=bookrecommendation,tag=mn]
-
 
 <1> Configure the application name. The app name will be used later in the tutorial.
 <2> Configure the app to listen at port 8080
@@ -272,8 +255,7 @@ Create a file named `application-test.yml` which is used in the test environment
 
 testResource:application-test.yml[app=bookrecommendation,tag=port]
 
-
-<1> Start the micronaut microservice at a random port when running the tests.
+<1> Start the Micronaut microservice at a random port when running the tests.
 
 Run the unit test:
 
@@ -295,10 +277,7 @@ bookinventory $ ./mvnw test
 
 :exclude-for-build:
 
-
-
 === Running the app
-
 
 Run `bookcatalogue` microservice:
 
@@ -368,7 +347,6 @@ $ curl http://localhost:8080/books
 [{"name":"Building Microservices"}]
 ----
 
-
 == Consul and Micronaut
 
 === Install Consul via Docker
@@ -390,7 +368,6 @@ Configure ports:
 
 image::kitematic-consul-2.png[]
 
-
 === Book Catalogue
 
 Modify your build file to add the `discovery-client` feature.
@@ -407,7 +384,6 @@ Disable consul registration in tests:
 
 testResource:application-test.yml[app=bookcatalogue,tag=consul]
 
-
 === Book Inventory
 
 Modify your build file to add the `discovery-client` feature.
@@ -421,7 +397,6 @@ resource:application.yml[app=bookinventory,tag=consul]
 Disable consul registration in tests:
 
 testResource:application-test.yml[app=bookinventory,tag=consul]
-
 
 === Book Recommendation
 
@@ -446,7 +421,6 @@ source:BookInventoryClient[app=bookrecommendation,tags=packageandimports|consul|
 Disable consul registration in tests:
 
 testResource:application-test.yml[app=bookrecommendation,tag=consul]
-
 
 === Running the App
 
@@ -492,7 +466,6 @@ You can run a cURL command to test the whole application:
 $ curl http://localhost:8080/books
 [{"name":"Building Microservices"}]
 ----
-
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
