@@ -49,8 +49,9 @@ class MicronautguideControllerTest {
         MockData.instanceOcid = instanceOcid;
         MockData.instanceLifecycleState = Stopped;
 
-        HttpResponse<String> response = FnHttpTest
-                .invoke(HttpRequest.POST("/compute/start/" + instanceOcid, null), SHARED_CLASSES);
+        HttpResponse<String> response = FnHttpTest.invoke(
+                HttpRequest.POST("/compute/start/" + instanceOcid, null),
+                SHARED_CLASSES);
 
         assertEquals(OK, response.status());
         assertEquals(
@@ -65,8 +66,9 @@ class MicronautguideControllerTest {
         MockData.instanceOcid = instanceOcid;
         MockData.instanceLifecycleState = Running;
 
-        HttpResponse<String> response = FnHttpTest
-                .invoke(HttpRequest.POST("/compute/stop/" + instanceOcid, null), SHARED_CLASSES);
+        HttpResponse<String> response = FnHttpTest.invoke(
+                HttpRequest.POST("/compute/stop/" + instanceOcid, null),
+                SHARED_CLASSES);
 
         assertEquals(OK, response.status());
         assertEquals(
