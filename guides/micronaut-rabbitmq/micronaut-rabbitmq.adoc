@@ -17,7 +17,6 @@ and has since been extended with a plug-in architecture to support Streaming Tex
 Message Queuing Telemetry Transport (MQTT), and other protocols.
 ____
 
-
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
@@ -119,13 +118,11 @@ analytics $ ./mvnw test
 
 :exclude-for-build:
 
-
 Finally edit `application.yml` to run the application on a different port that `books` microservice.
 
 resource:application.yml[app=analytics,tag=port]
 
 <1> Start the Micronaut microservice on port 8081.
-
 
 == Running the app
 
@@ -171,7 +168,6 @@ analytics $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
 You can run a `curl` command to test the application:
 
 [source, bash]
@@ -187,8 +183,6 @@ $ curl http://localhost:8081/analytics
 ----
 
 Please note that getting the analytics returns an empty list because the applications are not communicating to each other (yet).
-
-
 
 == RabbitMQ and Micronaut
 
@@ -206,7 +200,6 @@ docker run --rm -it \
 
 Alternatively you can https://www.rabbitmq.com/download.html[install and run a local RabbitMQ instance].
 
-
 === Books microservice
 
 Add `rabbitmq` dependency.
@@ -217,7 +210,6 @@ By default Micronaut will connect to a RabbitMQ instance running on `localhost` 
 to `application.yml`. In case you want to change the configuration, add the following:
 
 resource:application.yml[app=books,tag=rabbitmq]
-
 
 ==== Create RabbitMQ exchange, queue and binding
 
@@ -234,7 +226,6 @@ appropriate routing key
 <2> Define a queue named `analytics`.The consumer will listen for messages in that queue.
 <3> Define a binding between the exchange and the queue using the routing key `analytics`.
 
-
 ==== Create RabbitMQ client (producer)
 
 Let's create an interface to send messages to RabbitMQ. Micronaut will implement the interface at compilation time:
@@ -244,7 +235,6 @@ source:AnalyticsClient[app=books]
 <1> Set the exchange used to send the messages.
 <2> Set the routing key.
 <3> Send the `Book` POJO. Micronaut will automatically convert it to JSON before sending it.
-
 
 ==== Send Analytics information automatically
 
@@ -263,14 +253,11 @@ source:AnalyticsFilter[app=books]
 <6> Get the response from the controller and return the body as a `Book`.
 <7> If the book is found, use RabbitMQ client to send a message.
 
-
-
 === Analytics microservice
 
 Add `rabbitmq` dependency.
 
 dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
-
 
 ==== Create RabbitMQ exchange, queue and binding
 
@@ -281,7 +268,6 @@ source:ChannelPoolListener[app=analytics]
 
 TIP: Instead of copy-paste the class in every project it would be better to create a new Gradle (or Maven) module and
 share it among all the microservices.
-
 
 ==== Create RabbitMQ consumer
 
@@ -295,8 +281,6 @@ source:AnalyticsListener[app=analytics]
 <3> Constructor injection for `AnalyticsService`.
 <4> Annotate the method with `@Queue`. This listener will listen to messages in `analytics` queue.
 <5> Call the previously created method to update the analytics for the book.
-
-
 
 === Running the app
 
@@ -324,7 +308,6 @@ books $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
 Execute a `curl` request to get one book:
 
 [source, bash]
@@ -343,9 +326,7 @@ Expand the "Get messages" option and get one message. You can see all the inform
 
 image::rabbitmq-message-detail.png[]
 
-
 Run `analytics` microservice:
-
 
 :exclude-for-build:maven
 
@@ -369,12 +350,9 @@ analytics $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
-The application will consume and process the message automatically after the startup. Go to RabbitMQ Admin UI and check
-that the message has been consumed:
+The application will consume and process the message automatically after the startup. Go to RabbitMQ Admin UI and check that the message has been consumed:
 
 image::rabbitmq-message-consumed.png[]
-
 
 Now, run a `curl` to get the analytics:
 
@@ -384,7 +362,6 @@ $ curl http://localhost:8081/analytics
 [{"bookIsbn":"1491950358","count":1}]
 ----
 
-
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
@@ -392,7 +369,6 @@ include::{commondir}/common-graal-with-plugins.adoc[]
 Start the native images for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
 
 :exclude-for-languages:
-
 
 == Next steps
 
