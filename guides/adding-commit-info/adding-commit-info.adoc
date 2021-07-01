@@ -22,18 +22,14 @@ include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-NOTE: Before running the downloaded project, follow the steps described in
-the *Initialize Git Repository* section below.
-
+NOTE: Before running the downloaded project, follow the steps described in the *Initialize Git Repository* section below.
 
 include::{commondir}/common-create-app.adoc[]
 
 == Initialize Git Repository
 
 The project aims to demonstrate how to provide Git commit information to the
-`/info` endpoint and in order for that to work the project needs to be in a Git
-repository.  After creating the project, initialize a Git repository from the root
-of the newly created project:
+`/info` endpoint and in order for that to work the project needs to be in a Git repository.  After creating the project, initialize a Git repository from the root of the newly created project:
 
 [source,bash]
 ----
@@ -63,7 +59,18 @@ resource:application.yml[tag=endpoints]
 
 == Gradle Git Properties Plugin
 
-If a `git.properties` file is available on the classpath, the http://docs.micronaut.io/latest/api/io/micronaut/management/endpoint/info/source/GitInfoSource.html[GitInfoSource] will expose the values in that file under the `git` key. Generation of a `git.properties` file will need to be configured as part of your build; for example, you may choose to use the https://plugins.gradle.org/plugin/com.gorylenko.gradle-git-properties[Gradle Git Properties] plugin. The plugin provides a task named `generateGitProperties` responsible for the `git.properties` file generation. It is automatically invoked upon the execution of the `classes` task. You can find the generated file in the directory `build/resources/main`.
+:exclude-for-build:
+:exclude-for-build:gradle
+
+== Maven Git Commit Id Plugin
+
+:exclude-for-build:
+
+If a `git.properties` file is available on the classpath, the http://docs.micronaut.io/latest/api/io/micronaut/management/endpoint/info/source/GitInfoSource.html[GitInfoSource] will expose the values in that file under the `git` key. Generation of a `git.properties` file will need to be configured as part of your build.
+
+:exclude-for-build:maven
+
+For example, you may choose to use the https://plugins.gradle.org/plugin/com.gorylenko.gradle-git-properties[Gradle Git Properties] plugin. The plugin provides a task named `generateGitProperties` responsible for the `git.properties` file generation. It is automatically invoked upon the execution of the `classes` task. You can find the generated file in the directory `build/resources/main`.
 
 Modify `build.gradle` file to add the plugin:
 
@@ -79,32 +86,21 @@ plugins {
 
 :exclude-for-build:gradle
 
-== Maven Git Commit Id Plugin
-
-If a `git.properties` file is available on the classpath, the http://docs.micronaut.io/latest/api/io/micronaut/management/endpoint/info/source/GitInfoSource.html[GitInfoSource] will expose the values in that file under the `git` key. Generation of a `git.properties` file will need to be configured as part of your build; for example, you may choose to use the https://github.com/git-commit-id/git-commit-id-maven-plugin[Maven Git Commit Id Plugin] plugin. The plugin provides a goal named `git-commit-id:revision` responsible for the `git.properties` file generation. It is automatically invoked upon the execution of the `classes` goal. You can find the generated file in the directory `target/classes`.
+For example, you may choose to use the https://github.com/git-commit-id/git-commit-id-maven-plugin[Maven Git Commit Id Plugin] plugin. The plugin provides a goal named `git-commit-id:revision` responsible for the `git.properties` file generation. It is automatically invoked upon the execution of the `classes` goal. You can find the generated file in the directory `target/classes`.
 
 Modify `pom.xml` file to add the plugin:
 
 [source,xml]
 .pom.xml
 ----
-<plugin>
-  <groupId>pl.project13.maven</groupId>
-  <artifactId>git-commit-id-plugin</artifactId>
-  <version>@git-commit-id-pluginVersion@</version>
-  <executions>
-    <execution>
-      <id>get-the-git-infos</id>
-      <goals>
-        <goal>revision</goal>
-      </goals>
-      <phase>compile</phase>
-    </execution>
-  </executions>
-  <configuration>
-    <generateGitPropertiesFile>true</generateGitPropertiesFile>
-  </configuration>
-</plugin>
+<properties>
+   ...
+   <gitCommitIdPlugin.version>@git-commit-id-pluginVersion@</gitCommitIdPlugin.version>
+</properties>
+
+...
+
+rocker:gitCommitIdPlugin[]
 ----
 
 :exclude-for-build:

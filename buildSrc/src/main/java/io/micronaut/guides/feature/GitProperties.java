@@ -1,33 +1,25 @@
 package io.micronaut.guides.feature;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.io.IOUtils;
-import io.micronaut.core.io.ResourceLoader;
+import io.micronaut.guides.feature.template.gitCommitIdPlugin;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
+import io.micronaut.starter.build.BuildProperties;
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver;
 import io.micronaut.starter.build.gradle.GradlePlugin;
 import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.feature.Feature;
+import io.micronaut.starter.template.RockerWritable;
 
 import javax.inject.Singleton;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 
 @Singleton
 public class GitProperties implements Feature {
 
     private final PomDependencyVersionResolver resolver;
-    private final ResourceLoader loader;
 
-    public GitProperties(PomDependencyVersionResolver resolver,
-                         ResourceLoader loader) {
+    public GitProperties(PomDependencyVersionResolver resolver) {
         this.resolver = resolver;
-        this.loader = loader;
     }
 
     @Override
@@ -46,29 +38,16 @@ public class GitProperties implements Feature {
             return;
         }
 
-        String version = resolver.resolve("git-commit-id-plugin")
-                .orElseThrow(() -> new RuntimeException("git-commit-id-plugin not found in pom.xml"))
-                .getVersion();
-        String pluginXml = loadPluginXml().replace("@VERSION@", version);
+        String artifactId = "git-commit-id-plugin";
+
+        BuildProperties props = generatorContext.getBuildProperties();
+        resolver.resolve(artifactId)
+                .ifPresent(coordinate -> props.put("gitCommitIdPlugin.version", coordinate.getVersion()));
 
         generatorContext.addBuildPlugin(MavenPlugin.builder()
-                .artifactId("git-commit-id-plugin")
-                .extension(out -> {
-                    try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(out))) {
-                        writer.println(pluginXml);
-                    }
-                })
+                .artifactId(artifactId)
+                .extension(new RockerWritable(gitCommitIdPlugin.template()))
                 .build());
-    }
-
-    private String loadPluginXml() {
-        InputStream is = loader.getResourceAsStream("git-commit-id-plugin.xml")
-                .orElseThrow(() -> new RuntimeException("resource git-commit-id-plugin.xml not found"));
-        try {
-            return IOUtils.readText(new BufferedReader(new InputStreamReader(is)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
