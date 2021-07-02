@@ -8,7 +8,7 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-Let's describe the microservices you are going to build through the tutorial.
+Let's describe the microservices you will build through the guide.
 
 * `gateway` - A secured via JWT microservice which exposes an endpoint `/user`. The output of that endpoint is the result of consuming the `userecho` endpoint.
 * `userecho` - A secured via JWT microservice which exposes an endpoint `/user` which responds the username of the authenticated user.
@@ -17,7 +17,7 @@ The next diagram illustrates the flow:
 
 image::tokenpropagation.svg[]
 
-We generate a valid JWT in the gateway microservice. Then every microservice in our app is able to validate this JWT. We want every internal request to contain a valid JWT token. If we want to talk to another microservice we need to propagate the valid JWT get received.
+We generate a valid JWT in the gateway microservice. Then every microservice in our application is able to validate this JWT. We want every internal request to contain a valid JWT token. If we want to talk to another microservice we need to propagate the valid JWT get received.
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
@@ -27,7 +27,7 @@ include::{commondir}/common-completesolution.adoc[]
 
 == Writing the App
 
-We are going to write the app first without token propagation. Then we are going to configure a token propagation, and you will see how much code we can get rid of.
+We will write the application first without token propagation. Then we will configure token propagation, and you will see how much code we can remove.
 
 === Gateway
 
@@ -99,7 +99,7 @@ Provide a `UsernameFetcher` bean replacement for the Test environment.
 
 test:UserEchoClientReplacement[app=intermediate-gateway]
 
-Create a tests which verifies the app is secured and we can access it after login in:
+Create a tests to verify the application is secured and we can access it after login:
 
 test:UserControllerTest[app=intermediate-gateway]
 
@@ -139,7 +139,7 @@ Add this snippet to `application.yml` to fix the port where `userecho` starts:
 
 resource:application.yml[app=intermediate-userecho,tag=port]
 
-<1> Configure a fix port where the app listens.
+<1> Configure a fix port where the application listens.
 
 Add this snippet to `application.yml`
 
@@ -150,10 +150,10 @@ resource:application.yml[app=intermediate-userecho,tag=security]
 
 === Token Propagation
 
-As you can see propagating the JWT token to other microservices in our app complicates the code.
+As you can see propagating the JWT token to other microservices in our application complicates the code.
 We need to capture the `Authorization` header in the controller method arguments and then pass it to the `@Client` bean.
-In an app with several controllers and declarative clients, it can lead to a lot of repetition. Fortunately, Micronaut
-includes a feature called token propagation. We can tell our app to propagate the incoming token to a set of outgoing requests.
+In an application with several controllers and declarative clients, it can lead to a lot of repetition. Fortunately, Micronaut
+includes a feature called token propagation. We can tell our application to propagate the incoming token to a set of outgoing requests.
 
 Let's configure token propagation. We need to modify `application.yml` in the `gateway` microservice:
 

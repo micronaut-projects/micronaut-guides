@@ -8,9 +8,9 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-In this guide, we are going to create two microservices and configure them to use multitenancy with tenant propagation.
+In this guide, we will create two microservices and configure them to use multitenancy with tenant propagation.
 
-Let's describe the microservices you are going to build through the tutorial.
+Let's describe the microservices you will build through the guide.
 
 * `gateway` - A microservice which resolves a Tenant ID with a Cookie and propagates the Tenant ID to outgoing requests via HTTP Header.
 * `books` - A microservice which uses https://gorm.grails.org[GORM] to provide data access layer with multitenacy support.
@@ -36,14 +36,13 @@ Create the microservice:
 mn create-app example.micronaut.gateway --test=spock --lang=groovy
 ----
 
-In the previous command, we are generating a Micronaut app and telling the CLI to use https://spockframework.org[Spock] as the test framework.
+In the previous command, we generate a Micronaut application and tell the CLI to use https://spockframework.org[Spock] as the test framework.
 
 === Multitenancy Configuration
 
-Multi-Tenancy, as it relates to software development, is when a single instance of an application is used to service multiple clients (tenants) in a way that each tenants' data is isolated from the other.
+Multi-Tenancy, as it relates to software development, is when a single instance of an application services multiple clients (tenants) in a way that each tenant's data is isolated from the other.
 
-To use Micronaut's multitenancy capabilities you must have the multitenancy dependency on your classpath.
-For example in `build.gradle:`
+To use Micronaut's multitenancy capabilities you must have the multitenancy dependency on your classpath. For example in `build.gradle:`
 
 dependency:micronaut-multitenancy[app=gateway,groupId=io.micronaut.multitenancy]
 
@@ -92,8 +91,7 @@ resource:application.yml[app=gateway,tag=http-services]
 
 === Home Controller
 
-The `views` module provides support for view rendering on the server side and does so by rendering views on the I/O thread pool in order to avoid blocking the Netty event loop.
-Add the `views` dependency to  `build.gradle:`
+The `views` module provides support for view rendering on the server side and does so by rendering views on the I/O thread pool in order to avoid blocking the Netty event loop. Add the `views` dependency to  `build.gradle:`
 
 dependency:micronaut-views-handlebars[groupId=io.micronaut.views]
 
@@ -139,7 +137,7 @@ Provide a `BookFetcher` bean replacement for the Test environment.
 
 test:MockBookFetcher[app=gateway]
 
-Create a tests which verifies the flow using https://gebish.org[Geb].
+Create a test to verify the flow using https://gebish.org[Geb].
 
 Add dependencies for Geb:
 
@@ -159,8 +157,7 @@ Create two Geb Pages:
 test:HomePage[app=gateway]
 test:TenantPage[app=gateway]
 
-Write a test which verifies that when the user visits the home page without a tenant is redirected to the tenant selection page.
-After tenant selection, the home page loads a set of books.
+Write a test to verify that a user visiting the home page without a tenant is redirected to the tenant selection page. After tenant selection, the home page loads a set of books.
 
 test:HomePageSpec[app=gateway]
 
@@ -195,7 +192,7 @@ resource:application.yml[app=books,tag=datasources]
 === Domain
 
 GORM supports several https://gorm.grails.org/latest/hibernate/manual/index.html#_multi_tenancy_modes[tenancy modes].
-In this tutorial we use `DATABASE` where a separate database with a separate connection pool is used to store each tenants data.
+In this guide we use `DATABASE` where a separate database with a separate connection pool stores each tenant's data.
 
 Add the following configuration to `application.yml`
 
@@ -238,7 +235,7 @@ source:BookController[app=books]
 
 To listen to an event, register a bean that implements `ApplicationEventListener` where the generic type is the type of event the listener should be executed for.
 
-We want to listen for the `StartupEvent` to save some elements in the databases when the app starts:
+We want to listen for the `StartupEvent` to save some elements in the databases when the application starts:
 
 source:Bootstrap[app=books]
 
@@ -250,12 +247,11 @@ source:Bootstrap[app=books]
 
 === Book Tests
 
-Create a tests which verifies the behaviour.
-We received the books belonging to the tenant which we send via an HTTP header.
+Create a test to verify the behaviour. We received the books belonging to the tenant which we send via an HTTP header.
 
 test:BookControllerSpec[app=books]
 
-== Running the app
+== Running the application
 
 Run both microservices:
 

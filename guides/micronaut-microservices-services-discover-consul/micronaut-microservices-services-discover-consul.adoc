@@ -8,7 +8,7 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-In this guide, we are going to create three microservices and register them with https://www.consul.io[Consul] Service discovery.
+In this guide, we will create three microservices and register them with https://www.consul.io[Consul] Service discovery.
 
 ____
 Consul is a distributed service mesh to connect, secure, and configure services across any runtime platform and public or private cloud
@@ -22,21 +22,21 @@ include::{commondir}/common-completesolution.adoc[]
 
 == Writing the App
 
-Let's describe the microservices you are going to build through the tutorial.
+Let's describe the microservices you will build through the guide.
 
-* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and isbn.
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and ISBN.
 
-* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and isbn.
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and ISBN.
 
 * `bookrecommendation` - It consumes previous services and exposes an endpoint which recommends book names which are in stock.
 
-Initially we are going to hardcode the addresses where the different services are in the `bookcatalogue` service.
+Initially we will hard-code the addresses where the different services are in the `bookcatalogue` service.
 
 image::hardcoded.svg[]
 
 As shown in the previous image, the `bookcatalogue` hardcodes references to its collaborators.
 
-In the second part of this tutorial we are going to use a discovery service.
+In the second part of this guide we will use a discovery service.
 
 [NOTE]
 ====
@@ -67,14 +67,14 @@ Create the `bookcatalogue` microservice:
 mn create-app example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
 ----
 
-The previous command creates a folder named `bookcatalogue` and a Micronaut app inside it.
+The previous command creates a directory named `bookcatalogue` and a Micronaut application inside it.
 
 Create a `BooksController` class to handle incoming HTTP requests into the `bookcatalogue` microservice:
 
 source:BooksController[app=bookcatalogue]
 
 <1> The class is defined as a controller with the @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
-<2> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books`.
+<2> The `@Get` annotation maps the index method to an HTTP GET request on `/books`.
 
 The previous controller responds a `List<Book>`. Create the `Book` POJO:
 
@@ -93,8 +93,8 @@ Edit `application.yml`
 
 resource:application.yml[app=bookcatalogue,tag=mn]
 
-<1> Configure the application name. The app name will be use by the discovery service.
-<2> Configure the app to listen at port 8081
+<1> Configure the application name. The application name will be use by the discovery service.
+<2> Configure the application to listen on port 8081
 
 Create a file named `application-test.yml` which is used in the test environment:
 
@@ -131,7 +131,7 @@ Create the `bookinventory` microservice:
 mn create-app example.micronaut.bookinventory --build=@build@ --lang=@lang@
 ----
 
-The previous command creates a folder named `bookinventory` and a Micronaut app inside it.
+The previous command creates a directory named `bookinventory` and a Micronaut application inside it.
 
 Create a Controller:
 
@@ -139,7 +139,7 @@ source:BooksController[app=bookinventory]
 
 <1> The class is defined as a controller with the @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
 <2> By default, `Content-Type` of Micronaut's response is `application/json` : override this with `text/plain` since we are returning a String, not a JSON object.
-<3> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books/stock/{isbn}`.
+<3> The `@Get` annotation maps the index method to an HTTP GET request on `/books/stock/{isbn}`.
 
 Create the POJO used by the controller:
 
@@ -153,8 +153,8 @@ Edit `application.yml`
 
 resource:application.yml[app=bookinventory,tag=mn]
 
-<1> Configure the application name. The app name will be used later in the tutorial.
-<2> Configure the app to listen at port 8082
+<1> Configure the application name. The name will be used later in the guide.
+<2> Configure the application to listen on port 8082
 
 Create a file named `application-test.yml` which is used in the test environment:
 
@@ -191,7 +191,7 @@ Create the `bookrecommendation` microservice:
 mn create-app example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
 ----
 
-The previous command creates a folder named `bookrecommendation` and a Micronaut app inside it.
+The previous command creates a directory named `bookrecommendation` and a Micronaut application inside it.
 
 Create an interface to map operations with `bookcatalogue`, and a Micronaut Declarative HTTP Client to consume it.
 
@@ -219,7 +219,7 @@ source:BookController[app=bookrecommendation]
 
 <1> The class is defined as a controller with the @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
 <2> Clients are injected via constructor injection
-<3> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books`.
+<3> The `@Get` annotation maps the index method to an HTTP GET request on `/books`.
 
 The previous controller returns a `Flowable<BookRecommendation>`. Create the `BookRecommendation` POJO:
 
@@ -248,8 +248,8 @@ Edit `application.yml`
 
 resource:application.yml[app=bookrecommendation,tag=mn]
 
-<1> Configure the application name. The app name will be used later in the tutorial.
-<2> Configure the app to listen at port 8080
+<1> Configure the application name. The name will be used later in the guide.
+<2> Configure the application to listen on port 8080
 
 Create a file named `application-test.yml` which is used in the test environment:
 
@@ -277,7 +277,7 @@ bookinventory $ ./mvnw test
 
 :exclude-for-build:
 
-=== Running the app
+=== Running the application
 
 Run `bookcatalogue` microservice:
 
@@ -378,7 +378,7 @@ Append to `bookcatalogue` service `application.yml` the following snippet:
 
 resource:application.yml[app=bookcatalogue,tag=consul]
 
-This configuration registers a Micronaut app with Consul with minimal configuration. Discover a more complete list of Configuration options at https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/consul/ConsulConfiguration.html[ConsulConfiguration].
+This configuration registers a Micronaut application with Consul with minimal configuration. Discover a more complete list of configuration options at https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/consul/ConsulConfiguration.html[ConsulConfiguration].
 
 Disable consul registration in tests:
 
