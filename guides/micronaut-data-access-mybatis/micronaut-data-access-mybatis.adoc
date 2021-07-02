@@ -38,7 +38,7 @@ resource:application.yml[tag=datasource]
 
 === MyBatis configuration
 
-As there is no out-of-the-box support yet in Micronaut for MyBatis it is necessary to manually wire `SqlSessionFactory`.
+As there is no out-of-the-box support yet in Micronaut for MyBatis, it is necessary to manually wire `SqlSessionFactory`.
 
 Create the following https://docs.micronaut.io/latest/guide/index.html#factories[@Factory] file `src/main/java/example/micronaut/MybatisFactory.java`:
 
@@ -58,19 +58,18 @@ source:domain/Genre[]
 
 === Repository Access
 
-Create an interface to define the operations to access the database and use MyBatis' annotations to map the methods
-to sql queries:
+Create an interface to define the operations to access the database and use MyBatis annotations to map the methods to SQL queries:
 
 source:genre/GenreMapper[]
 
 And the implementation:
 
 source:genre/GenreMapperImpl[]
-<1> Use `javax.inject.Singleton` to designate a class a a singleton.
-<2> Inject easily the `SqlSessionFactory` bean created by the `@Factory`.
-<3> Use _try-with-resources_ to automatically close the sql session.
+<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+<2> Easily inject the `SqlSessionFactory` bean created by the `@Factory`.
+<3> Use _try-with-resources_ to automatically close the SQL session.
 <4> Get MyBatis mapper implementation for the interface.
-<5> Execute the desired method using the mapper. This will trigger the sql query.
+<5> Execute the desired method using the mapper. This will trigger the SQL query.
 <6> In a database write access, commit the transaction.
 
 Create an interface to define the high level operations exposed to the application:
@@ -95,7 +94,7 @@ Create a POJO to encapsulate Sorting and Pagination:
 
 source:ListingArguments[]
 
-Create a `ConfigurationProperties` object to encapsulate the configuration of the default `max` value.
+Create a `ConfigurationProperties` class to encapsulate the configuration of the default `max` value.
 
 source:ApplicationConfiguration[]
 
@@ -117,8 +116,7 @@ source:GenreController[]
 
 === DB Schema
 
-Now that MyBatis is set up we need a way to create the database schema. For that we will use
-https://micronaut-projects.github.io/micronaut-flyway/latest/guide/index.html[Micronaut integration with Flyway].
+Now that MyBatis is set up, we need a way to create the database schema. For that we will use https://micronaut-projects.github.io/micronaut-flyway/latest/guide/index.html[Micronaut integration with Flyway].
 
 Add the following snippet to include the necessary dependencies:
 
@@ -128,23 +126,22 @@ Configure the database migrations directory for Flyway in `application.yml`.
 
 resource:application.yml[tag=flyway]
 
-Create the file `V1__schema.sql` with the database schema creation:
+Create the file `V1__schema.sql` with the database schema creation statements:
 
 resource:db/migration/V1__schema.sql[]
 
-During application startup Flyway will execute the sql file and create the schema needed for the application.
+During application startup, Flyway will execute the SQL file and create the schema needed for the application.
 
 === Tests
 
-Create a Junit test which verifies the CRUD operations:
+Create a JUnit test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 <1> Use Micronaut testing integration with JUnit 5.
 <2> Inject a `RxHttpClient`.
 <3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
 <4> If you care just about the object in the response use `retrieve`.
-<5> Sometimes, receiving just the object is not enough and you need information about the response. In this case,
-instead of `retrieve` you should use the `exchange` method.
+<5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
 Run the tests:
 
