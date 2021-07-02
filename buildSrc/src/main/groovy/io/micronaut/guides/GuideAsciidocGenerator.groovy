@@ -92,12 +92,12 @@ class GuideAsciidocGenerator {
                     lines << line
                 }
             }
+            File versionFile = Paths.get(destinationFolder.absolutePath, "../../../version.txt").toFile()
             String text = lines.join('\n')
             text = text.replace("{githubSlug}", metadata.slug)
             text = text.replace("@language@", StringUtils.capitalize(guidesOption.language.toString()))
             text = text.replace("@guideTitle@", metadata.title)
             text = text.replace("@guideIntro@", metadata.intro)
-            File versionFile = Paths.get(destinationFolder.absolutePath, "../../../version.txt").toFile()
             text = text.replace("@micronaut@", versionFile.text)
             text = text.replace("@lang@", guidesOption.language.toString())
             text = text.replace("@build@", guidesOption.buildTool.toString())
@@ -106,6 +106,7 @@ class GuideAsciidocGenerator {
             text = text.replace("@languageextension@", guidesOption.language.extension)
             text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
             text = text.replace("@sourceDir@", projectName)
+            text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
                 text = text.replace("@${entry.key}Version@", entry.value.version)

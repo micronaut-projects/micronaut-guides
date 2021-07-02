@@ -32,7 +32,7 @@ You will also need to create OAuth 2.0 credentials for the project since Google 
 
 image::google-2.png[]
 
-The Google Console will prompt for some information about your application such as the product name, a home page and a logo. On the next page, select *Web Application* type, and enter the redirect URL where the Micronaut app we will build next will wait for the callback.
+The Google Console will prompt for some information about your application such as the product name, a home page, and a logo. On the next page, select *Web Application* type, and enter the redirect URL where the Micronaut application we will build next will wait for the callback.
 
 image::google-4.png[]
 
@@ -44,11 +44,11 @@ To use OAuth 2.0 integration in your Micronaut App, add the following dependency
 
 dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
 
-Add also JWT https://docs.micronaut.io/latest/guide/index.html#jwt[Micronaut’s JWT support] dependencies:
+Also add https://docs.micronaut.io/latest/guide/index.html#jwt[Micronaut JWT support] dependencies:
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
-Add the following Oauth2 Configuration:
+Add the following OAuth2 Configuration:
 
 resource:application.yml[tag=oauth2]
 
@@ -56,7 +56,7 @@ resource:application.yml[tag=oauth2]
 <2> You can choose any name. The name you select, will be used in your routes. E.g. If you set `google` the login route for this OAuth 2.0 client is `/oauth/login/google`
 <3> Client Secret. See previous screenshot.
 <4> Client ID. See previous screenshot.
-<5> `issuer` url. It allows micronaut to discover the configuration of the OpenID Connect server.
+<5> `issuer` URL. It allows Micronaut to discover the configuration of the OpenID Connect server.
 <6> Accept GET request to the `/logout` endpoint.
 
 The previous configuration uses several placeholders. You will need to setup `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
@@ -75,14 +75,14 @@ image::diagramm.png[]
 
 === Home
 
-Create a controller to handle the requests to `/`. You are going to display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we are going to use a Thymeleaf template.
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
 
 source:HomeController[]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/`.
+<1> The class is defined as a controller with the @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/`.
 <2> Annotate with `io.micronaut.security.Secured` to configure secured access. The `SecurityRule.IS_ANONYMOUS` expression will allow access without authentication.
 <3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template would you like to render the response against.
-<4> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the `index` method to GET `/` requests.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
 
 Create a thymeleaf template:
 
@@ -90,13 +90,11 @@ resource:views/home.html[]
 
 Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
 
-- The https://docs.micronaut.io/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor] injects into the model a `security` map with the authenticated user. See https://micronaut-projects.github.io/micronaut-views/latest/guide/index.html#views-security[User in a view] documentation.
-
+- The @api@/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor] injects into the model a `security` map with the authenticated user. See https://micronaut-projects.github.io/micronaut-views/latest/guide/index.html#views-security[User in a view] documentation.
 
 include::{commondir}/common-runapp.adoc[]
 
 image::googlevideo.gif[]
-
 
 === Custom ID token claims validation
 
@@ -128,7 +126,7 @@ app:
   hosted-domain: 'objectcomputing.com'
 ----
 
-if you start the app, you will only be able to sign in with a Google Account within OCI organization.
+if you start the application, you will only be able to sign in with a Google Account within the OCI organization.
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
