@@ -329,12 +329,9 @@ class GuideAsciidocGenerator {
     }
 
     private static Map<String, Coordinate> getCoordinates() {
-        ApplicationContext context = ApplicationContext.run()
-        PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
-        Map<String, Coordinate> coordinates = pomDependencyVersionResolver.getCoordinates()
-
-        context.close()
-
-        return coordinates
+        try (ApplicationContext context = ApplicationContext.run()) {
+            PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
+            return pomDependencyVersionResolver.getCoordinates()
+        }
     }
 }
