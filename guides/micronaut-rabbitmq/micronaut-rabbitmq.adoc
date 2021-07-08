@@ -1,15 +1,6 @@
-= @guideTitle@
+include::{commondir}/common-header.adoc[]
 
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
-
-In this guide, we are going to create two microservices that will use https://www.rabbitmq.com/[RabbitMQ] to communicate
-each other in an asynchronous and decoupled way.
+In this guide, we will create two microservices that will use https://www.rabbitmq.com/[RabbitMQ] to communicate with each other in an asynchronous and decoupled way.
 
 ____
 RabbitMQ is an open-source message-broker software that originally implemented the Advanced Message Queuing Protocol (AMQP)
@@ -17,16 +8,15 @@ and has since been extended with a plug-in architecture to support Streaming Tex
 Message Queuing Telemetry Transport (MQTT), and other protocols.
 ____
 
-
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-== Writing the app
+== Writing the application
 
-Let's describe the microservices you are going to build through the tutorial.
+Let's describe the microservices you will build through the guide.
 
-* `books` - It returns a list of books. It uses a domain consisting of a book name and isbn. It also publishes a message in
+* `books` - It returns a list of books. It uses a domain consisting of a book name and ISBN. It also publishes a message in
 RabbitMQ every time a book is accessed.
 
 * `analytics` - It connects to RabbitMQ to update the analytics for every book (a counter). It also exposes an endpoint
@@ -40,18 +30,17 @@ Create the `books` microservice:
 
 `mn create-app example.micronaut.books`
 
-The previous command creates a folder named `books` and a Micronaut app inside it with default package:
-`example.micronaut`.
+The previous command creates a directory named `books` and a Micronaut application inside it with default package `example.micronaut`.
 
 Create a `BookController` class to handle incoming HTTP requests into the `books` microservice:
 
 source:BookController[app=books]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller]
+<1> The class is defined as a controller with the @api@/io/micronaut/http/annotation/Controller.html[@Controller]
 annotation mapped to the path `/books`
 <2> Inject `BookService` using constructor injection.
-<3> The `@Get` annotation is used to map the `listAll` method to an HTTP GET request on `/books`.
-<4> The `@Get` annotation is used to map the `findBook` method to an HTTP GET request on `/books/{isbn}`.
+<3> The `@Get` annotation maps the `listAll` method to an HTTP GET request on `/books`.
+<4> The `@Get` annotation maps the `findBook` method to an HTTP GET request on `/books/{isbn}`.
 
 The previous controller responds a `List<Book>`. Create the `Book` POJO:
 
@@ -119,17 +108,15 @@ analytics $ ./mvnw test
 
 :exclude-for-build:
 
-
 Finally edit `application.yml` to run the application on a different port that `books` microservice.
 
 resource:application.yml[app=analytics,tag=port]
 
 <1> Start the Micronaut microservice on port 8081.
 
+== Running the application
 
-== Running the app
-
-Run `books` microservice:
+Run the `books` microservice:
 
 :exclude-for-build:maven
 
@@ -170,7 +157,6 @@ analytics $ ./mvnw mn:run
 ----
 
 :exclude-for-build:
-
 
 You can run a `curl` command to test the application:
 
@@ -188,8 +174,6 @@ $ curl http://localhost:8081/analytics
 
 Please note that getting the analytics returns an empty list because the applications are not communicating to each other (yet).
 
-
-
 == RabbitMQ and Micronaut
 
 === Install RabbitMQ via Docker
@@ -206,7 +190,6 @@ docker run --rm -it \
 
 Alternatively you can https://www.rabbitmq.com/download.html[install and run a local RabbitMQ instance].
 
-
 === Books microservice
 
 Add `rabbitmq` dependency.
@@ -217,7 +200,6 @@ By default Micronaut will connect to a RabbitMQ instance running on `localhost` 
 to `application.yml`. In case you want to change the configuration, add the following:
 
 resource:application.yml[app=books,tag=rabbitmq]
-
 
 ==== Create RabbitMQ exchange, queue and binding
 
@@ -234,7 +216,6 @@ appropriate routing key
 <2> Define a queue named `analytics`.The consumer will listen for messages in that queue.
 <3> Define a binding between the exchange and the queue using the routing key `analytics`.
 
-
 ==== Create RabbitMQ client (producer)
 
 Let's create an interface to send messages to RabbitMQ. Micronaut will implement the interface at compilation time:
@@ -245,12 +226,11 @@ source:AnalyticsClient[app=books]
 <2> Set the routing key.
 <3> Send the `Book` POJO. Micronaut will automatically convert it to JSON before sending it.
 
-
 ==== Send Analytics information automatically
 
 Sending a message to RabbitMQ is as simple as injecting `AnalyticsClient` and calling `updateAnalytics` method. The goal
 is to do it automatically every time a book is returned, i.e., every time there is a call to `http://localhost:8080/books/{isbn}`.
-To achieve this we are going to create an https://docs.micronaut.io/latest/guide/index.html#filters[Http Server Filter].
+To achieve this we will create an https://docs.micronaut.io/latest/guide/index.html#filters[Http Server Filter].
 Create the file `AnalyticsFilter`:
 
 source:AnalyticsFilter[app=books]
@@ -263,14 +243,11 @@ source:AnalyticsFilter[app=books]
 <6> Get the response from the controller and return the body as a `Book`.
 <7> If the book is found, use RabbitMQ client to send a message.
 
-
-
 === Analytics microservice
 
 Add `rabbitmq` dependency.
 
 dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
-
 
 ==== Create RabbitMQ exchange, queue and binding
 
@@ -281,7 +258,6 @@ source:ChannelPoolListener[app=analytics]
 
 TIP: Instead of copy-paste the class in every project it would be better to create a new Gradle (or Maven) module and
 share it among all the microservices.
-
 
 ==== Create RabbitMQ consumer
 
@@ -296,9 +272,7 @@ source:AnalyticsListener[app=analytics]
 <4> Annotate the method with `@Queue`. This listener will listen to messages in `analytics` queue.
 <5> Call the previously created method to update the analytics for the book.
 
-
-
-=== Running the app
+=== Running the application
 
 Run `books` microservice:
 
@@ -324,7 +298,6 @@ books $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
 Execute a `curl` request to get one book:
 
 [source, bash]
@@ -339,13 +312,11 @@ Open RabbitMQ Admin UI on `http://localhost:15672` and use `guest` for both user
 image::rabbitmq-message.png[]
 
 Expand the "Get messages" option and get one message. You can see all the information: `exchange`, `routing key, and the
-`payload` serialized to json:
+`payload` serialized to JSON:
 
 image::rabbitmq-message-detail.png[]
 
-
 Run `analytics` microservice:
-
 
 :exclude-for-build:maven
 
@@ -369,12 +340,9 @@ analytics $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
-The application will consume and process the message automatically after the startup. Go to RabbitMQ Admin UI and check
-that the message has been consumed:
+The application will consume and process the message automatically after the startup. Go to RabbitMQ Admin UI and check that the message has been consumed:
 
 image::rabbitmq-message-consumed.png[]
-
 
 Now, run a `curl` to get the analytics:
 
@@ -384,7 +352,6 @@ $ curl http://localhost:8081/analytics
 [{"bookIsbn":"1491950358","count":1}]
 ----
 
-
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
@@ -392,7 +359,6 @@ include::{commondir}/common-graal-with-plugins.adoc[]
 Start the native images for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
 
 :exclude-for-languages:
-
 
 == Next steps
 

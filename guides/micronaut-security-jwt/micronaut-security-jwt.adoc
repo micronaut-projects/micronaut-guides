@@ -10,35 +10,32 @@ Micronaut Version: @micronaut@
 
 Micronaut ships with security capabilities based on https://jwt.io/[Json Web Token (JWT)]. JWT is an
 https://tools.ietf.org/html/rfc7519[IETF standard] which defines a secure way to encapsulate arbitrary data that can be
-sent over unsecure URL’s.
+sent over unsecure URLs.
 
-In this guide you are going to create a Micronaut app and secure it with JWT.
+In this guide you will create a Micronaut application and secure it with JWT.
 
 The following sequence illustrates the authentication flow:
 
 image::jwt-bearer-token.svg[]
 
-
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
-
 
 == Writing the application
 
 === Create an App with the Command Line Interface
 
-Create an app using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface].
+Create an application using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface].
 
 [source,bash]
 ----
 mn create-app example.micronaut.micronautguide --build=@build@ --lang=@lang@
 ----
 
-The previous command creates a micronaut app with the default package `example.micronaut` in a folder named `micronautguide`.
+The previous command creates a Micronaut application with the default package `example.micronaut` in a directory named `micronautguide`.
 
 include::{commondir}/common-annotationprocessors.adoc[]
-
 
 === Security Dependency
 
@@ -60,7 +57,6 @@ resource:application.yml[tag=security]
 <1> Set `authentication` to `bearer` to receive a JSON response from the login endpoint.
 <2> Change this by your own secret and keep it safe (do not store this in your VCS).
 
-
 === Authentication Provider
 
 To keep this guide simple, create a naive `AuthenticationProvider` to simulate user's authentication.
@@ -69,7 +65,6 @@ source:AuthenticationProviderUserPassword[]
 
 <1> To register a Singleton in Micronaut's application context, annotate your class with `javax.inject.Singleton`
 <2> A Micronaut's Authentication Provider implements the interface `io.micronaut.security.authentication.AuthenticationProvider`
-
 
 === Controller
 
@@ -81,7 +76,6 @@ source:HomeController[]
 <2> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut's controller.
 <3> You can specify the HTTP verb that a controller's action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
 <4> If a user is authenticated, Micronaut will bind the user object to an argument of type `java.security.Principal` (if present).
-
 
 == Tests
 
@@ -96,7 +90,6 @@ test:JwtAuthenticationTest[]
 <5> Micronaut makes it easy to bind JSON responses into Java objects.
 <6> Micronaut supports https://tools.ietf.org/html/rfc6750[RFC 6750 Bearer Token] specification out-of-the-box. We supply the JWT token in the `Authorization` HTTP Header.
 <7> Use `.body()` to retrieve the parsed payload.
-
 
 === Use Micronaut's HTTP Client and JWT
 
@@ -114,7 +107,6 @@ test:DeclarativeHttpClientWithJwtTest[]
 <2> To login, do a POST request to `/login` with your credentials as a JSON payload in the body of the request.
 <3> Supply the JWT to the HTTP `Authorization` header value to the `@Client` method.
 
-
 == Issuing a Refresh Token
 
 Access tokens expire. You can control the expiration with `micronaut.security.token.jwt.generator.access-token-expiration`.
@@ -125,7 +117,7 @@ First, add the following configuration:
 
 resource:application.yml[tag=refresh]
 
-<1> To generate a refresh token your app must have beans of type:
+<1> To generate a refresh token your application must have beans of type:
 https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/generator/RefreshTokenGenerator.html[RefreshTokenGenerator],
 https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/validator/RefreshTokenValidator.html[RefreshTokenValidator].
 https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/refresh/RefreshTokenPersistence.html[RefreshTokenPersistence].
@@ -139,7 +131,6 @@ Create a test to verify the login endpoint responds both access and refresh toke
 test:LoginIncludesRefreshTokenTest[]
 
 <1> A refresh token is returned.
-
 
 === Save Refresh Token
 
@@ -193,8 +184,6 @@ and specifies a dialect of H2 used to generate queries
 <4> Before issuing a new access token, we will use this method to see if the supplied refresh token exists
 <5> We can revoke the refresh tokens of a particular user with this method
 
-
-
 === Refresh Controller
 
 To enable the https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#refresh[Refresh Controller],
@@ -207,14 +196,13 @@ which leverages the Micronaut Data repository we coded in the previous section:
 
 source:CustomRefreshTokenPersistence[]
 
-<1> To register a Singleton in Micronaut’s application context annotate your class with `javax.inject.Singleton`
+<1> To register a Singleton in Micronaut's application context annotate your class with `javax.inject.Singleton`
 <2> Constructor injection of `RefreshTokenRepository`.
-<3> When a new refresh token is issued, the app emits an event of type https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/event/RefreshTokenGeneratedEvent.html[RefreshTokenGeneratedEvent]. We listen to it and save it in the database.
+<3> When a new refresh token is issued, the application emits an event of type https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/event/RefreshTokenGeneratedEvent.html[RefreshTokenGeneratedEvent]. We listen to it and save it in the database.
 <4> The event contains both the refresh token and the user details associated to the token.
 <5> Throw an exception if the token is revoked.
 <6> Return the user details associated to the refresh token. E.g. username, roles, attributes...
 <7> Throw an exception if the token is not found.
-
 
 === Test Refresh Token
 
@@ -227,8 +215,7 @@ are signed.
 `SignedRefreshTokenGenerator` implements both https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/generator/RefreshTokenGenerator.html[RefreshTokenGenerator]
 and https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/validator/RefreshTokenValidator.html[RefreshTokenValidator].
 
-The bean of type `RefreshTokenValidator` is used by the https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#refresh[Refresh Controller]
-to ensure the refresh token supplied is valid.
+The bean of type `RefreshTokenValidator` is used by the https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#refresh[Refresh Controller] to ensure the refresh token supplied is valid.
 
 Create a test for this:
 
@@ -238,7 +225,7 @@ test:UnsignedRefreshTokenTest[]
 
 ==== Test Refresh Token Not Found
 
-Create a test which verifies a that sending a valid refresh token but which was not persisted returns HTTP Status 400.
+Create a test to verify that sending a valid refresh token that was not persisted returns HTTP Status 400.
 
 test:RefreshTokenNotFoundTest[]
 
@@ -252,7 +239,6 @@ test:RefreshTokenRevokedTest[]
 
 <1> Save the token but flag it as revoked
 
-
 ==== Test Access Token Refresh
 
 Login, obtain both access token and refresh token, with the refresh token obtain a different access token:
@@ -261,7 +247,6 @@ test:OauthAccessTokenTest[]
 
 <1> Make a POST request to `/oauth/access_token` with the refresh token in the JSON payload to get a new access token
 <2> A different access token is retrieved.
-
 
 include::{commondir}/common-testApp.adoc[]
 
@@ -277,7 +262,6 @@ $ curl -X "POST" "http://localhost:8080/login" -H 'Content-Type: application/jso
 ----
 
 include::{commondir}/common-graal-with-plugins.adoc[]
-
 
 :exclude-for-languages:groovy
 

@@ -8,7 +8,7 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-Let's describe the microservices you are going to build through the tutorial.
+Let's describe the microservices you will build through the guide.
 
 * `gateway` - A secured via JWT microservice which exposes an endpoint `/user`. The output of that endpoint is the result of consuming the `userecho` endpoint.
 * `userecho` - A secured via JWT microservice which exposes an endpoint `/user` which responds the username of the authenticated user.
@@ -17,7 +17,7 @@ The next diagram illustrates the flow:
 
 image::tokenpropagation.svg[]
 
-We generate a valid JWT in the gateway microservice. Then every microservice in our app is able to validate this JWT. We want every internal request to contain a valid JWT token. If we want to talk to another microservice we need to propagate the valid JWT get received.
+We generate a valid JWT in the gateway microservice. Then every microservice in our application is able to validate this JWT. We want every internal request to contain a valid JWT token. If we want to talk to another microservice we need to propagate the valid JWT get received.
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
@@ -27,8 +27,7 @@ include::{commondir}/common-completesolution.adoc[]
 
 == Writing the App
 
-We are going to write the app first without token propagation. Then we are going to configure a token propagation, and you will see how much code we can get rid of.
-
+We will write the application first without token propagation. Then we will configure token propagation, and you will see how much code we can remove.
 
 === Gateway
 
@@ -48,18 +47,18 @@ dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
 :dependencies:
 
-To keep this guide simple, create a naive AuthenticationProvider to simulate user’s authentication.
+To keep this guide simple, create a naive AuthenticationProvider to simulate user's authentication.
 
 source:AuthenticationProviderUserPassword[app=intermediate-gateway]
 
-<1> To register a Singleton in Micronaut’s application context, annotate your class with `javax.inject.Singleton`.
-<2> A Micronaut’s Authentication Provider implements the interface `io.micronaut.security.authentication.AuthenticationProvider`.
+<1> To register a Singleton in Micronaut's application context, annotate your class with `javax.inject.Singleton`.
+<2> A Micronaut Authentication Provider implements the interface `io.micronaut.security.authentication.AuthenticationProvider`.
 
 Create a class `UserController` which exposes `/user` endpoint.
 
 source:UserController[app=intermediate-gateway]
 
-<1> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut’s controller.
+<1> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut controller.
 <2> Constructor dependency injection
 <3> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
 <4> Since we return a string which is not valid JSON, set the media type to `text/plain`.
@@ -79,7 +78,7 @@ source:UserEchoClient[app=intermediate-gateway]
 <3> Use `@Get` annotation to define the client mapping
 <4> Supply the JWT to the HTTP Authorization header value to the `@Client` method.
 
-Add this snippet to `application.yml` to configure the service url of the `echo` service
+Add this snippet to `application.yml` to configure the service URL of the `echo` service
 
 resource:application.yml[app=intermediate-gateway,tag=httpservices]
 
@@ -100,16 +99,13 @@ Provide a `UsernameFetcher` bean replacement for the Test environment.
 
 test:UserEchoClientReplacement[app=intermediate-gateway]
 
-Create a tests which verifies the app is secured and we can access it after login in:
+Create a tests to verify the application is secured and we can access it after login:
 
 test:UserControllerTest[app=intermediate-gateway]
 
 <1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
 <2> Inject the `RxHttpClient` bean in the application context.
 <3> Test endpoint is secured
-
-
-
 
 === User echo
 
@@ -120,7 +116,6 @@ Create the microservice:
 mn create-app example.micronaut.userecho --build=@build@ --lang=@lang@
 ----
 
-
 Add the security-jwt module to the configuration:
 
 :dependencies:
@@ -130,12 +125,11 @@ dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
 :dependencies:
 
-
 Create a class `UserController` which exposes `/user` endpoint.
 
 source:UserController[app=intermediate-userecho]
 
-<1> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut’s controller.
+<1> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut controller.
 <2> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
 <3> Since we return a string which is not valid JSON, set the media type to `text/plain`.
 <4> You can specify the HTTP verb that a controller's action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
@@ -145,7 +139,7 @@ Add this snippet to `application.yml` to fix the port where `userecho` starts:
 
 resource:application.yml[app=intermediate-userecho,tag=port]
 
-<1> Configure a fix port where the app listens.
+<1> Configure a fix port where the application listens.
 
 Add this snippet to `application.yml`
 
@@ -154,13 +148,12 @@ resource:application.yml[app=intermediate-userecho,tag=security]
 <1> You can create a `SecretSignatureConfiguration` named `validation` which is able to validate JWT generated by the `gateway` microservice.
 <2> Change this by your own secret and keep it safe (do not store this in your VCS)
 
-
 === Token Propagation
 
-As you can see propagating the JWT token to other microservices in our app complicates the code.
+As you can see propagating the JWT token to other microservices in our application complicates the code.
 We need to capture the `Authorization` header in the controller method arguments and then pass it to the `@Client` bean.
-In an app with several controllers and declarative clients, it can lead to a lot of repetition. Fortunately, Micronaut
-includes a feature called token propagation. We can tell our app to propagate the incoming token to a set of outgoing requests.
+In an application with several controllers and declarative clients, it can lead to a lot of repetition. Fortunately, Micronaut
+includes a feature called token propagation. We can tell our application to propagate the incoming token to a set of outgoing requests.
 
 Let's configure token propagation. We need to modify `application.yml` in the `gateway` microservice:
 
@@ -187,12 +180,9 @@ Edit `UserEchoClientReplacement.java` and remove the `@Header` parameter:
 
 test:UserEchoClientReplacement[app=gateway]
 
-
-
 == Running the App
 
 Run both microservices:
-
 
 [source,bash]
 ----
@@ -241,7 +231,6 @@ curl "http://localhost:8080/user" -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9
 sherlock
 ----
 
-
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
@@ -250,11 +239,9 @@ After creating the native images for both microservices, start them and send the
 
 :exclude-for-languages:
 
-
 == Next steps
 
 Read more about https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#tokenPropagation[Token Propagation]
 and https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html[Security] inside Micronaut.
-
 
 include::{commondir}/common-helpWithMicronaut.adoc[]

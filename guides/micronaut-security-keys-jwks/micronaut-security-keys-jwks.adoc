@@ -1,19 +1,10 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 In this guide, you load a primary and secondary JWK from their JSON representation. Both keys participate as token validators. Moreover, the primary participates in token generatation. Also, you expose their public keys in as JWKS in a `/keys` endpoint.
 
 A https://tools.ietf.org/html/rfc7517[JSON Web Key (JWK)] is a JSON object that represents a cryptographic key. You can use a remote JWK Set, A JSON object that represents a set of JWKs, to validate JWT signatures.
 
 Meanwhile, a JWK Set is a JSON object that represents a set of JWKs. The JSON object MUST have a "keys" member, which is an array of JWKs.
-
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -45,7 +36,6 @@ source:JwkConfigurationProperties[]
 <1> The `@ConfigurationProperties` annotation takes the configuration prefix
 <2> You can use validation constraints in the `@ConfigurationProperties` objects.
 
-
 === Secondary Key
 
 Create an abstract class which parses RSA Keys from JWK JSON Strings.
@@ -62,7 +52,7 @@ Create a refreshable bean to load the secondary key:
 
 source:SecondarySignatureConfiguration[]
 
-<1> `@Refreshable` scope is a custom scope that allows a bean’s state to be refreshed via the https://docs.micronaut.io/latest/guide/index.html#refreshEndpoint[/refresh] endpoint.
+<1> `@Refreshable` scope is a custom scope that allows a bean's state to be refreshed via the https://docs.micronaut.io/latest/guide/index.html#refreshEndpoint[/refresh] endpoint.
 
 === Primary Key
 
@@ -78,7 +68,7 @@ Create a refreshable bean to load the primary key:
 
 source:PrimarySignatureConfiguration[]
 
-<1> `@Refreshable` scope is a custom scope that allows a bean’s state to be refreshed via the https://docs.micronaut.io/latest/guide/index.html#refreshEndpoint[/refresh] endpoint.
+<1> `@Refreshable` scope is a custom scope that allows a bean's state to be refreshed via the https://docs.micronaut.io/latest/guide/index.html#refreshEndpoint[/refresh] endpoint.
 <2> You need to qualify with @Named `generator` the signature configuration bean which you wish to use to sign your JSON web tokens.
 
 === JWKProvider
@@ -87,37 +77,34 @@ To enable the https://micronaut-projects.github.io/micronaut-security/latest/gui
 
 source:JsonWebKeysProvider[]
 
-<1> `@Refreshable` scope is a custom scope that allows a bean’s state to be refreshed via the https://docs.micronaut.io/latest/guide/index.html#refreshEndpoint[/refresh] endpoint.
+<1> `@Refreshable` scope is a custom scope that allows a bean's state to be refreshed via the https://docs.micronaut.io/latest/guide/index.html#refreshEndpoint[/refresh] endpoint.
 <2> Create a bean of type `JwkProvider`
 
 == Writing Tests
 
 === Test Generation Test
 
-Create a test which verifies that the application can generate a signed JSON Web Token.
+Create a test to verify that the application can generate a signed JSON Web Token.
 
 test:TokenGeneratorTest[]
 
 <1> See how to generate a JSON Web Key in the guide: https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with a Micronaut command line application]
 
-
 === Secondary signature validation
 
-Create a test which verifies that the application can validate a JSON Web Token signed with the secondary key.
+Create a test to verify that the application can validate a JSON Web Token signed with the secondary key.
 
 test:ValidateSecondarySignedJwtTest[]
 
 <1> See how to generate a JSON Web Key in the guide: https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with a Micronaut command line application]
 
-
 === Keys test
 
-Create a test which verifies that the application exposes a keys endpoint:
+Create a test to verify that the application exposes a keys endpoint:
 
 test:KeysTest[]
 
 <1> See how to generate a JSON Web Key in the guide: https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with a Micronaut command line application]
-
 
 == Refresh endpoint
 
@@ -171,6 +158,6 @@ include::{commondir}/common-next.adoc[]
 
 Read more about https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html[Micronaut Security].
 
-Checkout the tutorial https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with Micronaut Command Line Application].
+Check out the guide https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with Micronaut Command Line Application].
 
 include::{commondir}/common-helpWithMicronaut.adoc[]

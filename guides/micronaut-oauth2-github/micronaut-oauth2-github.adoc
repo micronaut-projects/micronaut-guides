@@ -1,12 +1,4 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -24,14 +16,14 @@ dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
 
 === Home
 
-Create a controller to handle the requests to `/`. You are going to display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we are going to use a Thymeleaf template.
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
 
 source:HomeController[]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/`.
+<1> The class is defined as a controller with the @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/`.
 <2> Annotate with `io.micronaut.security.Secured` to configure secured access. The `SecurityRule.IS_ANONYMOUS` expression will allow access without authentication.
 <3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template would you like to render the response against.
-<4> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the `index` method to GET `/` requests.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
 
 Create a thymeleaf template:
 
@@ -39,13 +31,13 @@ resource:views/home.html[]
 
 Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
 
-- The https://docs.micronaut.io/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
+- The @api@/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
 injects into the model a `security` map with the authenticated user.  See
 https://micronaut-projects.github.io/micronaut-views/latest/guide/index.html#views-security[User in a view] documentation.
 
-=== Github OAuth App
+=== GitHub OAuth App
 
-To provide authentication, create a https://developer.github.com/apps/about-apps/[Github Oauth App].
+To provide authentication, create a https://developer.github.com/apps/about-apps/[GitHub OAuth App].
 
 image::github-1.png[]
 
@@ -59,24 +51,23 @@ To use OAuth 2.0 integration, add the following dependency:
 
 dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
 
-Add the following Oauth2 Configuration:
-Add also JWT https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwt[Micronaut’s JWT support] dependencies:
+Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwt[Micronaut JWT support] dependencies:
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
-Add the following Oauth2 Configuration:
+Add the following OAuth2 Configuration:
 
 resource:application.yml[tag=oauth2]
 
-<1> Once validated, we are going to save the ID Token in a Cookie. To read in subsequent requests, set `micronaut.security.authentication` to `cookie`.
+<1> Once validated, we will save the ID Token in a Cookie. To read in subsequent requests, set `micronaut.security.authentication` to `cookie`.
 <2> You can create a https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/jwt/signature/secret/SecretSignatureConfiguration.html[SecretSignatureConfiguration] named `generator` via configuration as illustrated above. The `generator` signature is used to sign the issued JWT claims.
 <3> Change this by your own secret and keep it safe (do not store this in your VCS).
-<4> The provider identifier should match the last part of the url you entered as a redirect url `/oauth/callback/github`
+<4> The provider identifier should match the last part of the URL you entered as a redirect URL `/oauth/callback/github`
 <5> Client Secret. See previous screenshot.
 <6> Client ID. See previous screenshot.
-<7> Specify the scopes you want to request. https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/[Github Scopes] let you sepcify exactly what type of access you need.
-<8> Map manually the Github's https://tools.ietf.org/html/rfc6749#section-3.1[Authorization endpoint].
-<9> Map manually the Github's https://tools.ietf.org/html/rfc6749#section-3.2[Token endpoint].
+<7> Specify the scopes you want to request. https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/[GitHub Scopes] let you sepcify exactly what type of access you need.
+<8> Map manually the GitHub https://tools.ietf.org/html/rfc6749#section-3.1[Authorization endpoint].
+<9> Map manually the Github https://tools.ietf.org/html/rfc6749#section-3.2[Token endpoint].
 <10> Accept GET request to the `/logout` endpoint.
 
 The previous configuration uses several placeholders. You will need to setup `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
@@ -89,42 +80,41 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY
 
 === User Details Mapper
 
-Here is a high level diagram of how the authorization code grant flow works with an OAuth 2.0 provider such as Github.
+Here is a high level diagram of how the authorization code grant flow works with an OAuth 2.0 provider such as GitHub.
 
 image::standard-oauth.svg[]
 
-We need an HTTP Client to retrieve the user info. Create a POJO to represent a Github user:
+We need an HTTP Client to retrieve the user info. Create a POJO to represent a GitHub user:
 
 source:GithubUser[]
 
-Then, create a Micronaut Declarative HTTP Client to consume https://developer.github.com/v3/[Github REST API v3]
+Then, create a Micronaut Declarative HTTP Client to consume https://developer.github.com/v3/[GitHub REST API v3]
 
 source:GithubApiClient[tag=clazz]
 
-<1> Github encourages to explicitly request the version 3 via the Accept header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
-<2> Add the id `githubv3` to the `@Client` annotation. Later, you will provide url for this client id.
+<1> GitHub encourages explicitly requesting version 3 via the Accept header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
+<2> Add the id `githubv3` to the `@Client` annotation. Later, you will provide URL for this client id.
 <3> Define a HTTP GET request to `/user` endpoint.
 <4> You can return reactive types in a Micronaut declarative HTTP client.
 <5> You can specify that a parameter binds to a HTTP Header such as the *Authorization* header.
 
-
-Specify the url for the `githubv3` service.
+Specify the URL for the `githubv3` service.
 
 resource:application.yml[tag=micronaut-http-services]
 
-For Github we need to provide a UserDetails Mapper. The easiest way is to create a bean which implements `OauthUserDetailsMapper`.
+For GitHub we need to provide a UserDetails Mapper. The easiest way is to create a bean which implements `OauthUserDetailsMapper`.
 
 source:GithubUserDetailsMapper[]
 
 <1> Usa a name qualifier for the bean which matches the name you used in the OAuth 2.0 configuration in `application.yml`
 <2> Consume the `/user` endpoint with the Micronaut HTTP Client.
-<3> Save the original Github access token in a claim. We will use to to contact Github's api later.
+<3> Save the original GitHub access token in a claim. We will use it to contact GitHub's API later.
 
-=== Retrieve User Github repositories
+=== Retrieve User GitHub repositories
 
-With the access token, we retrieved during the login we are going to contact the Github API to fetch the user's repositories.
+With the access token, we retrieved during the login we will contact the GitHub API to fetch the user's repositories.
 
-First, create a POJO to represent a Github repository:
+First, create a POJO to represent a GitHub repository:
 
 source:GithubRepo[]
 
@@ -139,12 +129,12 @@ Create a controller to expose `/repos` endpoint:
 
 source:ReposController[]
 
-<1> Qualify the `@Controller` annotation with `/repos` to designate the endpoint url.
+<1> Qualify the `@Controller` annotation with `/repos` to designate the endpoint URL.
 <2> We want this endpoint to be only accessible to authenticated users.
-<3> We specify the view name `repos` which is used to render the model.
+<3> We specify the view name `repos` which renders the model.
 <4> Declare a GET endpoint.
-<5> Consume the Github API.
-<6> Use the previously obtained access token to get access against the Github API.
+<5> Consume the GitHub API.
+<6> Use the previously obtained access token to get access against the GitHub API.
 
 Create a thymeleaf template:
 
@@ -158,7 +148,7 @@ include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-Visit localhost:8080 and authenticate with Github
+Visit localhost:8080 and authenticate with GitHub
 
 :exclude-for-languages:
 

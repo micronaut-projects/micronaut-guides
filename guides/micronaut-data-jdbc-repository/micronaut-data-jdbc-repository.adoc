@@ -1,12 +1,4 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 The application exposes some REST endpoints and stores data in a database using Micronaut Data JDBC.
 
@@ -15,7 +7,6 @@ include::{commondir}/common-requirements.adoc[]
 include::{commondir}/common-completesolution.adoc[]
 
 include::{commondir}/common-create-app.adoc[]
-
 
 === Data Source configuration
 
@@ -42,14 +33,12 @@ resource:application.yml[tag=datasource]
 NOTE: This way of defining the datasource properties means that we can externalize the configuration, for example for
 production environment, and also provide a default value for development. If the environment variables are not defined
 Micronaut will use the default values. +
-Also keep in mind that it is necessary to escape the `:` in the connection url using back ticks ```.
+Also keep in mind that it is necessary to escape the `:` in the connection URL using backticks ```.
 
 === DB Schema
 
 We need a way to create the database schema. For that we will use
-https://micronaut-projects.github.io/micronaut-flyway/latest/guide/index.html[Micronaut integration with
-Flyway].
-
+https://micronaut-projects.github.io/micronaut-flyway/latest/guide/index.html[Micronaut integration with Flyway].
 
 Add the following snippet to include the necessary dependencies:
 
@@ -63,7 +52,7 @@ Create the file `V1__schema.sql` with the database schema creation:
 
 resource:db/migration/V1__schema.sql[]
 
-During application startup Flyway will execute the sql file and create the schema needed for the application.
+During application startup Flyway will execute the SQL file and create the schema needed for the application.
 
 === Domain
 
@@ -81,7 +70,6 @@ source:GenreRepository[]
 
 <1> `@JdbcRepository` with a specific dialect.
 <2> `Genre`, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the `GenericRepository` interface.
-
 
 The repository extends from `PageableRepository`. It inherits the hierarchy `PageableRepository` -> `CrudRepository` -> `GenericRepository`.
 
@@ -129,7 +117,7 @@ source:GenreController[]
 
 === Writing Tests
 
-Create a test which verifies the CRUD operations:
+Create a test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 
@@ -156,11 +144,11 @@ You can execute the `genres` endpoints exposed by the native image. For example:
 
 :exclude-for-languages:
 
-== Using Postgresql
+== Using PostgreSQL
 
 When running on production you want to use a real database instead of using H2. Let's explain how to use Postgres.
 
-After installing Docker, execute the following command to run a postgresql container:
+After installing Docker, execute the following command to run a PostgreSQL container:
 
 [source,bash]
 ----
@@ -172,13 +160,13 @@ docker run -it --rm \
     postgres:11.5-alpine
 ----
 
-Add Postgresql driver dependency:
+Add PostgreSQL driver dependency:
 
 dependency:postgresql[groupId=org.postgresql,scope=runtimeOnly]
 
 IMPORTANT: Change the dialect in the `GenreRepository` `@JdbcRepository` annotation.
 
-To use postgresql, setup several environment variables which match those defined in `application.yml`:
+To use PostgreSQL, setup several environment variables which match those defined in `application.yml`:
 
 [source,bash]
 ----
@@ -188,7 +176,7 @@ $ export JDBC_PASSWORD=theSecretPassword
 $ export JDBC_DRIVER=org.postgresql.Driver
 ----
 
-Run the app again. If you take a close look to the output, you can see that the app uses postgresql:
+Run the application again. If you look at the output you can see that the application uses PostgreSQL:
 
 [source, bash]
 ----
@@ -198,7 +186,7 @@ Run the app again. If you take a close look to the output, you can see that the 
 ....
 ----
 
-Connect to your postgresql database, and you will see both `genre` and `book` tables.
+Connect to your PostgreSQL database, and you will see both `genre` and `book` tables.
 
 image::datagrip.png[]
 

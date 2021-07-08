@@ -8,7 +8,7 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-In this guide, we are going to integrate https://zipkin.io[Zipkin] in a Micronaut app composed of three microservices.
+In this guide, we will integrate https://zipkin.io[Zipkin] in a Micronaut application composed of three microservices.
 
 ____
 Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data.
@@ -16,20 +16,18 @@ ____
 
 You will discover how Micronaut eases Zipkin integration.
 
-
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-== Writing the app
+== Writing the application
 
-To learn more about this sample app read
-https://guides.micronaut.io/latest/micronaut-microservices-services-discover-consul-@build@-@lang@.html[Consul and Micronaut - Microservices service discovery]
+To learn more about this sample application read https://guides.micronaut.io/latest/micronaut-microservices-services-discover-consul-@build@-@lang@.html[Consul and Micronaut - Microservices service discovery]
 guide. The application contains three microservices.
 
-* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and isbn.
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and ISBN.
 
-* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order. It uses a domain consisting of a stock level and isbn.
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order. It uses a domain consisting of a stock level and ISBN.
 
 * `bookrecommendation` - It consumes previous services and exposes and endpoint which recommends book names which are in stock.
 
@@ -40,7 +38,6 @@ image::flow.svg[]
 A request to `bookrecommendation` (`http://localhost:8080/books`) triggers several requests through our microservices mesh.
 
 include::{commondir}/common-annotationprocessors.adoc[]
-
 
 == Zipkin and Micronaut
 
@@ -75,12 +72,11 @@ resource:application.yml[app=bookcatalogue,tag=zipkin]
 
 <1> Trace 100% of requests.
 
-In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this tutorial easy, we set it to trace 100%.
+In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this guide simple, we set it to trace 100%.
 
 Disable distributed tracing in tests:
 
 testResource:application-test.yml[app=bookcatalogue,tag=zipkin]
-
 
 === Book inventory
 
@@ -98,14 +94,13 @@ dependency:zipkin-reporter[groupId=io.zipkin.reporter,scope=runtimeOnly]
 
 :dependencies:
 
-
 Append to `bookinventory` service `application.yml` the following snippet:
 
 resource:application.yml[app=bookinventory,tag=zipkin]
 
 <1> Trace 100% of requests.
 
-In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this tutorial easy, we set it to trace 100%.
+In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this guide simple, we set it to trace 100%.
 
 Disable distributed tracing in tests:
 
@@ -117,7 +112,6 @@ source:BooksController[app=bookinventory]
 
 <1> The `@ContinueSpan` annotation will continue an existing span, wrapping the method call or reactive type.
 <2> The `@SpanTag` annotation can be used on method arguments to include the value of each argument within a Span's tags. When you use `@SpanTag` you need either to annotate the method with `@NewSpan` or `@ContinueSpan`
-
 
 === Book recommendation
 
@@ -141,13 +135,13 @@ resource:application.yml[app=bookrecommendation,tag=zipkin]
 
 <1> Trace 100% of requests.
 
-In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this tutorial easy, we set it to trace 100%.
+In production, you will probably want to trace a smaller percentage of the requests. However, in order to keep this guide simple, we set it to trace 100%.
 
 Disable distributed tracing in tests:
 
 testResource:application-test.yml[app=bookrecommendation,tag=zipkin]
 
-== Running the app
+== Running the application
 
 Run `bookcatalogue` microservice:
 
@@ -238,7 +232,6 @@ The `stock.isbn` tags that we configured with `@SpanTag` is present as shown in 
 
 image::zipkintag.png[]
 
-
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
@@ -247,10 +240,9 @@ Start the native images for the three microservices and run the same `curl` requ
 
 :exclude-for-languages:
 
-
 == Next steps
 
-As you have seen in this tutorial, without any annotations you get distributing tracing up-and-running fast with Micronaut.
+As you have seen in this guide, without any annotations you get distributing tracing up-and-running fast with Micronaut.
 
 Micronaut includes several annotations to give you more flexibility. We introduced the `@ContinueSpan`, `@SpanTag` annotations.
 Also, you have at your disposal the `@NewSpan` annotation which will create a new span, wrapping the method call or reactive type.

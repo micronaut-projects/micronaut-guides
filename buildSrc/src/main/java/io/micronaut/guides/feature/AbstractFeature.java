@@ -65,4 +65,12 @@ public abstract class AbstractFeature implements Feature {
                 .lookupArtifactId(artifactId)
                 .scope(scope));
     }
+
+    protected void addDependencyWithoutLookup(GeneratorContext generatorContext,
+                                              String groupId) {
+        generatorContext.addDependency(Dependency.builder()
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .scope(scope));
+    }
 }

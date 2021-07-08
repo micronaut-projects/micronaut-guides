@@ -1,12 +1,4 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -14,19 +6,17 @@ include::{commondir}/common-completesolution.adoc[]
 
 include::{commondir}/common-create-app.adoc[]
 
-
 === Controller
 
 Create `MailController` which use a collaborator, `emailService` to send and email.
 
 source:MailController[]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/mail/send`
+<1> The class is defined as a controller with the @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/mail/send`
 <2> Constructor injection
-<3> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html[@Post] annotation is used to map the index method to all requests that use an HTTP POST
+<3> The @api@/io/micronaut/http/annotation/Post.html[@Post] annotation maps the index method to all requests that use an HTTP POST
 <4> Add `@Valid` to any method parameter which requires validation. Use a POGO supplied as a JSON payload in the request to populate the email.
 <5> Return 200 OK as the result
-
 
 The previous controller uses a POJO supplied in the request body as a JSON Payload
 
@@ -83,7 +73,6 @@ Add a test to verify the service is loaded:
 
 test:AwsSesMailServiceTest[]
 
-
 ==== SendGrid
 
 https://sendgrid.com/[SendGrid] is a transactional email service.
@@ -105,7 +94,6 @@ Add a test:
 
 test:SendGridEmailConditionTest[]
 
-
 source:SendGridEmailService[]
 
 <1> Use `javax.inject.Singleton` to designate a class a a singleton
@@ -116,14 +104,13 @@ Add a test:
 
 test:SendGridEmailServiceTest[]
 
-
-=== Run the app
+=== Run the application
 
 Add a logger to get more visibility:
 
 resource:logback.xml[tag=logger]
 
-To use SendGrid, define the required environment variables and run the app
+To use SendGrid, define the required environment variables and run the application.
 
 [source, bash]
 ----
@@ -137,8 +124,7 @@ $ ./mvnw mn:run
 :exclude-for-build:
 ----
 
-
-To use AWS SES, define the required environment variables and run the app
+To use AWS SES, define the required environment variables and run the application.
 
 [source, bash]
 ----
@@ -153,7 +139,6 @@ $ ./gradlew run
 $ ./mvnw mn:run
 :exclude-for-build:
 ----
-
 
 If you supply both AWS SES and SendGrid  system properties, the SendGrid `EmailService` implementation will be used due to the `@Secondary` annotation in `AwsSesMailService`.
 
@@ -193,7 +178,6 @@ We want to ensure any email request contains a subject, recipient and a text bod
 
 include::{commondir}/common-validation.adoc[]
 
-
 Create the next test:
 
 test:MailControllerValidationTest[]
@@ -214,7 +198,6 @@ Annotate `EmailCmd` with `EmailConstraints` and `@Introspected` (to generate the
 https://docs.micronaut.io/latest/guide/index.html#introspection[Bean Introspection information]).
 
 source:EmailCmd[tags=clazzwithannotations|clazz|properties|close]
-
 
 include::{commondir}/common-testApp.adoc[]
 

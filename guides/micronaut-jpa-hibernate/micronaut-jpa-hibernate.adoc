@@ -1,24 +1,12 @@
-= @guideTitle@
+include::{commondir}/common-header.adoc[]
 
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
-
-
-In this guide, we are going to write a Micronaut application that exposes some REST endpoints and store data in a
-database using JPA and Hibernate.
-
+In this guide, we will write a Micronaut application that exposes some REST endpoints and stores data in a database using JPA and Hibernate.
 
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
 include::{commondir}/common-create-app.adoc[]
-
 
 === Data Source configuration
 
@@ -43,14 +31,13 @@ resource:application.yml[tag=datasource]
 NOTE: This way of defining the datasource properties means that we can externalize the configuration, for example for
 production environment, and also provide a default value for development. If the environment variables are not defined
 Micronaut will use the default values. +
-Also keep in mind that it is necessary to escape the `:` in the connection url using back ticks ```.
+Also keep in mind that it is necessary to escape the `:` in the connection URL using backticks ```.
 
 === JPA configuration
 
 Add the next snippet to `src/main/resources/application.yml` to configure JPA:
 
 resource:application.yml[tag=jpa]
-
 
 === Domain
 
@@ -61,7 +48,6 @@ source:domain/Genre[]
 The previous domain has a `OneToMany` relationship with the domain `Book`.
 
 source:domain/Book[]
-
 
 === Application Configuration
 
@@ -78,11 +64,9 @@ source:ApplicationConfigurationProperties[]
 
 <1> @ConfigurationProperties` annotation takes a configuration prefix.
 
-
 You can override `max` if you add to your `src/main/resources/application.yml`:
 
 resource:application.yml[tag=application]
-
 
 === Repository Access
 
@@ -141,10 +125,9 @@ source:GenreController[]
 <11> Maps a `POST` request to `/ex` which generates an exception.
 <12> Maps a `DELETE` request to `/genres/{id}` which attempts to remove a genre. This illustrates the use of a URL path variable.
 
-
 === Writing Tests
 
-Create a test which verifies the CRUD operations:
+Create a test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 
@@ -154,19 +137,15 @@ test:GenreControllerTest[]
 <4> If you care just about the object in the response use `retrieve`.
 <5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
-
 include::{commondir}/common-testApp.adoc[]
-
 
 include::{commondir}/common-runapp.adoc[]
 
-
-
-== Using Postgresql
+== Using PostgreSQL
 
 When running on production you want to use a real database instead of using H2. Let's explain how to use Postgres.
 
-After installing Docker, execute the following command to run a postgresql container:
+After installing Docker, execute the following command to run a PostgreSQL container:
 
 [source,bash]
 ----
@@ -178,11 +157,11 @@ docker run -it --rm \
     postgres:11.5-alpine
 ----
 
-Add Postgresql driver dependency:
+Add PostgreSQL driver dependency:
 
 dependency:postgresql[groupId=org.postgresql,scope=runtimeOnly]
 
-To use postgresql, setup several environment variables which match those defined in `application.yml`:
+To use PostgreSQL, setup several environment variables which match those defined in `application.yml`:
 
 [source,bash]
 ----
@@ -192,7 +171,7 @@ $ export JDBC_PASSWORD=theSecretPassword
 $ export JDBC_DRIVER=org.postgresql.Driver
 ----
 
-Run the app again. If you take a close look to the output, you can see that the app uses postgresql:
+Run the application again. If you look at the output you can see that the application uses PostgreSQL:
 
 [source, bash]
 ----
@@ -202,7 +181,7 @@ Run the app again. If you take a close look to the output, you can see that the 
 ....
 ----
 
-Connect to your postgresql database, and you will see both `genre` and `book` tables.
+Connect to your PostgreSQL database, and you will see both `genre` and `book` tables.
 
 image::datagrip.png[]
 
@@ -214,7 +193,6 @@ curl -X "POST" "http://localhost:8080/genres" \
      -H 'Content-Type: application/json; charset=utf-8' \
      -d $'{ "name": "music" }'
 ----
-
 
 == Next steps
 
