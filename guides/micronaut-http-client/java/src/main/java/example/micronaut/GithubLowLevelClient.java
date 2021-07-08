@@ -2,7 +2,7 @@ package example.micronaut;
 
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.client.RxHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.uri.UriBuilder;
 import io.reactivex.Flowable;
@@ -18,10 +18,10 @@ import static io.micronaut.http.HttpHeaders.USER_AGENT;
 @Singleton // <1>
 public class GithubLowLevelClient {
 
-    private final RxHttpClient httpClient;
+    private final HttpClient httpClient;
     private final URI uri;
 
-    public GithubLowLevelClient(@Client(GithubConfiguration.GITHUB_API_URL) RxHttpClient httpClient,  // <2>
+    public GithubLowLevelClient(@Client(GithubConfiguration.GITHUB_API_URL) HttpClient httpClient,  // <2>
                                 GithubConfiguration configuration) {  // <3>
         this.httpClient = httpClient;
         this.uri = UriBuilder.of("/repos")

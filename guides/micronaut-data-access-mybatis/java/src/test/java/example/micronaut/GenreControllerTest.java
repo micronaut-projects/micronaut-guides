@@ -9,7 +9,7 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.BlockingHttpClient;
-import io.micronaut.http.client.RxHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.http.uri.UriBuilder;
@@ -33,10 +33,10 @@ public class GenreControllerTest {
 
     @Inject
     @Client("/")
-    public RxHttpClient rxHttpClient; // <2>
+    public HttpClient httpClient; // <2>
 
     BlockingHttpClient getClient() {
-        return rxHttpClient.toBlocking();
+        return httpClient.toBlocking();
     }
 
     @Test

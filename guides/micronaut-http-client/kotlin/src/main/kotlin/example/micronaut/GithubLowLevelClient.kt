@@ -4,7 +4,7 @@ import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpHeaders.ACCEPT
 import io.micronaut.http.HttpHeaders.USER_AGENT
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.uri.UriBuilder
 import io.reactivex.Maybe
@@ -12,7 +12,7 @@ import java.net.URI
 import javax.inject.Singleton
 
 @Singleton // <1>
-class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) private val httpClient: RxHttpClient,  // <2>
+class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) private val httpClient: HttpClient,  // <2>
                            configuration: GithubConfiguration) {  // <3>
     private val uri: URI = UriBuilder.of("/repos")
         .path(configuration.organization)
