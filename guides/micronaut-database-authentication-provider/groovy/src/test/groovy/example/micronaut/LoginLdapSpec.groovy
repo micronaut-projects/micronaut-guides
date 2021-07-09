@@ -74,7 +74,7 @@ class LoginLdapSpec extends Specification {
         accessToken
 
         when:
-        Publisher authentication = tokenValidator.validateToken(accessToken) // <6>
+        Publisher authentication = tokenValidator.validateToken(accessToken, null) // <6>
 
         then:
         Flowable.fromPublisher(authentication).blockingFirst()

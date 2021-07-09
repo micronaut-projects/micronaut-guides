@@ -2,8 +2,10 @@ package example.micronaut;
 import io.micronaut.security.authentication.UserDetails;
 import io.micronaut.security.oauth2.endpoint.token.response.OauthUserDetailsMapper;
 import io.micronaut.security.oauth2.endpoint.token.response.TokenResponse;
+import io.micronaut.security.oauth2.endpoint.authorization.state.State;
 import org.reactivestreams.Publisher;
-
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.security.authentication.AuthenticationResponse;
 import javax.inject.Named;
 import jakarta.inject.Singleton;
 import java.util.Collections;
@@ -24,7 +26,7 @@ public class GithubUserDetailsMapper implements OauthUserDetailsMapper {
     }
 
     @Override
-    public Publisher<UserDetails> createUserDetails(TokenResponse tokenResponse) {
+    public Publisher<AuthenticationResponse> createAuthenticationResponse(TokenResponse tokenResponse, @Nullable State state) {
         return apiClient.getUser(TOKEN_PREFIX + tokenResponse.getAccessToken()) // <2>
                 .map(user -> new UserDetails(user.getLogin(),
                         Collections.singletonList(ROLE_GITHUB),

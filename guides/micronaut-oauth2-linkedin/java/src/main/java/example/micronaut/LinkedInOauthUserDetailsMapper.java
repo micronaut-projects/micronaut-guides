@@ -29,12 +29,6 @@ public class LinkedInOauthUserDetailsMapper implements OauthUserDetailsMapper {
         this.linkedInApiClient = linkedInApiClient;
     }
 
-    @Deprecated
-    @Override
-    public Publisher<UserDetails> createUserDetails(TokenResponse tokenResponse) {
-        return null;
-    }
-
     @Override
     public Publisher<AuthenticationResponse> createAuthenticationResponse(TokenResponse tokenResponse,
                                                                           @Nullable State state) {
