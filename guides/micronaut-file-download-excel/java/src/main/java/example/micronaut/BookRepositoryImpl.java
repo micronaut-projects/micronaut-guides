@@ -1,10 +1,8 @@
 package example.micronaut;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-
 import javax.inject.Singleton;
+import io.micronaut.core.annotation.NonNull;
 import java.util.List;
-
 import java.util.Arrays;
 
 @Singleton // <1>
