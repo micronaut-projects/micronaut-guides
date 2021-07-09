@@ -1,6 +1,6 @@
 package example.micronaut;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.context.annotation.DefaultImplementation;
 
 import java.util.List;
