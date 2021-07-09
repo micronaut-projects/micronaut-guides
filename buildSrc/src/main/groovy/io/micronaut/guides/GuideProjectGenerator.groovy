@@ -20,6 +20,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
+
 @CompileStatic
 class GuideProjectGenerator implements Closeable {
 
@@ -78,6 +80,7 @@ class GuideProjectGenerator implements Closeable {
                 skipGradleTests: config.skipGradleTests ?: false,
                 skipMavenTests: config.skipMavenTests ?: false,
                 minimumJavaVersion: config.minimumJavaVersion,
+                zipIncludes: config.zipIncludes ?: [],
                 apps: config.apps.collect { it -> new App(name: it.name,
                         features: it.features,
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
@@ -152,6 +155,12 @@ class GuideProjectGenerator implements Closeable {
                         deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
                     }
                 }
+                if (metadata.zipIncludes) {
+                    File destinationRoot = new File(outputDir.absolutePath, folder)
+                    for (String zipInclude : metadata.zipIncludes) {
+                        copyFile(inputDir, destinationRoot, zipInclude)
+                    }
+                }
             }
         }
     }
@@ -162,6 +171,18 @@ class GuideProjectGenerator implements Closeable {
                 .replace("@languageextension@", guidesOption.language.extension))
                 .toFile()
                 .delete()
+    }
+
+    private void copyFile(File inputDir, File destinationRoot, String filePath) {
+        File sourceFile = new File(inputDir, filePath)
+        File destinationFile = new File(destinationRoot, filePath)
+
+        File destinationFileDir = destinationFile.getParentFile()
+        if (!destinationFileDir.exists()) {
+            Files.createDirectories destinationFileDir.toPath()
+        }
+
+        Files.copy sourceFile.toPath(), destinationFile.toPath(), REPLACE_EXISTING
     }
 
     static List<GuidesOption> guidesOptions(GuideMetadata guideMetadata) {
