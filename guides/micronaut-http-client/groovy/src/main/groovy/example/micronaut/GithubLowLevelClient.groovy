@@ -35,7 +35,7 @@ class GithubLowLevelClient {
         HttpRequest<?> req = HttpRequest.GET(uri) // <4>
             .header(USER_AGENT, "Micronaut HTTP Client") // <5>
             .header(ACCEPT, "application/vnd.github.v3+json, application/json") // <6>
-        Flowable<List<GithubRelease>> flowable = httpClient.retrieve(req, Argument.listOf(GithubRelease)) // <7>
+        Flowable<List<GithubRelease>> flowable = Flowable.fromPublisher(httpClient.retrieve(req, Argument.listOf(GithubRelease))) // <7>
         return flowable.firstElement() // <8>
     }
 }
