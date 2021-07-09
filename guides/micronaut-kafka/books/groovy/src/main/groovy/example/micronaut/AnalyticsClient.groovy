@@ -6,6 +6,6 @@ import io.micronaut.configuration.kafka.annotation.Topic
 @KafkaClient
 interface AnalyticsClient {
 
-    @Topic('analytics')
-    void updateAnalytics(Book book)
+    @Topic('analytics') // <1>
+    void updateAnalytics(Book book) // <2>
 }

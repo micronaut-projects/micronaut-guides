@@ -4,12 +4,12 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import java.util.Optional
 
-@Controller("/books")
-class BookController(private val bookService: BookService) {
+@Controller("/books") // <1>
+class BookController(private val bookService: BookService) { // <2>
 
-    @Get
+    @Get // <3>
     fun listAll(): List<Book> = bookService.listAll()
 
-    @Get("/{isbn}")
+    @Get("/{isbn}") // <4>
     fun findBook(isbn: String): Optional<Book> = bookService.findByIsbn(isbn)
 }
