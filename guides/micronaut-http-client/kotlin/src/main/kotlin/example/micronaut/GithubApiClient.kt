@@ -6,7 +6,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Header
 import io.micronaut.http.annotation.Headers
 import io.micronaut.http.client.annotation.Client
-import io.reactivex.Flowable
+import org.reactivestreams.Publisher;
 
 @Client(GithubConfiguration.GITHUB_API_URL) // <1>
 @Headers(
@@ -16,5 +16,5 @@ import io.reactivex.Flowable
 interface GithubApiClient {
 
     @Get("/repos/\${github.organization}/\${github.repo}/releases") // <4>
-    fun fetchReleases(): Flowable<GithubRelease?>? // <5>
+    fun fetchReleases(): Publisher<GithubRelease?>? // <5>
 }
