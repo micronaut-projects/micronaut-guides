@@ -61,7 +61,7 @@ class LoginControllerSpec extends Specification {
 
         when:
         String accessToken = rsp.body.get().accessToken
-        Authentication authentication = Flowable.fromPublisher(tokenValidator.validateToken(accessToken)).blockingFirst()
+        Authentication authentication = Flowable.fromPublisher(tokenValidator.validateToken(accessToken, null)).blockingFirst()
 
         then:
         authentication.getAttributes()
