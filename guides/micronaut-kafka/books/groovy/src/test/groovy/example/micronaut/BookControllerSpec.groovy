@@ -1,37 +1,66 @@
 package example.micronaut
 
-import io.micronaut.context.annotation.Primary
+import io.micronaut.configuration.kafka.annotation.KafkaListener
+import io.micronaut.configuration.kafka.annotation.Topic
+import io.micronaut.context.ApplicationContext
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.test.annotation.MockBean
-import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import io.micronaut.runtime.server.EmbeddedServer
+import org.testcontainers.containers.KafkaContainer
+import org.testcontainers.utility.DockerImageName
+import spock.lang.AutoCleanup
+import spock.lang.Shared
 import spock.lang.Specification
+import spock.util.concurrent.PollingConditions
 
-import javax.inject.Inject
+import java.util.concurrent.ConcurrentLinkedDeque
 
-@MicronautTest
+import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
+
 class BookControllerSpec extends Specification {
 
-    private int clientInvocationCount
+    private static final Collection<Book> received = new ConcurrentLinkedDeque<>();
+    private static final PollingConditions conditions = new PollingConditions(timeout: 5)
 
-    @Inject
-    AnalyticsClient analyticsClient
+    @Shared
+    @AutoCleanup
+    static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse('confluentinc/cp-kafka:latest'))
 
-    @Inject
-    @Client('/')
-    HttpClient client
+    @Shared @AutoCleanup EmbeddedServer embeddedServer
+    @Shared @AutoCleanup ApplicationContext context
+    @Shared @AutoCleanup HttpClient client
+
+    void setupSpec() {
+        kafka.start()
+        embeddedServer = ApplicationContext.run(EmbeddedServer,
+                ['kafka.bootstrap.servers': kafka.bootstrapServers])
+        context = embeddedServer.applicationContext
+        client = context.createBean(HttpClient, embeddedServer.URL)
+    }
 
     void 'test message is published to Kafka when book found'() {
         when:
-        Optional<Book> result = retrieveGet('/books/1491950358')
+        String isbn = '1491950358'
+        Optional<Book> result = retrieveGet('/books/' + isbn)
 
         then:
         result != null
         result.present
-        1 == clientInvocationCount
+        isbn == result.get().isbn
+
+        conditions.eventually {
+            !received.isEmpty()
+            1 == received.size()
+        }
+
+        when:
+        Book bookFromKafka = received[0]
+
+        then:
+        bookFromKafka
+        isbn == bookFromKafka.isbn
     }
 
     void 'test message is not published to Kafka when book not found'() {
@@ -40,16 +69,24 @@ class BookControllerSpec extends Specification {
 
         then:
         thrown HttpClientResponseException
-        0 == clientInvocationCount
+
+        when:
+        sleep 5000
+
+        then:
+        0 == received.size()
     }
 
-    @Primary
-    @MockBean
-    AnalyticsClient analyticsClient() {
-        return new AnalyticsClient() {
-            void updateAnalytics(Book book) {
-                clientInvocationCount++
-            }
+    void cleanup() {
+        received.clear()
+    }
+
+    @KafkaListener(offsetReset = EARLIEST)
+    static class AnalyticsListener {
+
+        @Topic('analytics')
+        void updateAnalytics(Book book) {
+            received.add(book);
         }
     }
 
