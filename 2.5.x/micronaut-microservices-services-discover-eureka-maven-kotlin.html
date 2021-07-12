@@ -386,9 +386,7 @@ class BooksControllerTest {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
   <span class="key">application</span>:
-    <span class="key">name</span>: <span class="string"><span class="content">bookcatalogue </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">8081 </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+    <span class="key">name</span>: <span class="string"><span class="content">bookcatalogue </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -397,8 +395,54 @@ class BooksControllerTest {
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Configure the application name. The name will be use by the discovery service.</td>
 </tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Modify the <code>Application</code> class to use <code>dev</code> as a default environment:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Micronaut supports the concept of one or many default environments. A default environment is one that is only applied if no other environments are explicitly specified or deduced.</p>
+</div>
+</blockquote>
+</div>
+<div class="listingblock">
+<div class="title">bookcatalogue/src/main/kotlin/example/micronaut/Application.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.env.Environment
+import io.micronaut.runtime.Micronaut
+
+class Application {
+    companion object {
+        @JvmStatic
+        fun main(args: Array&lt;String&gt;) {
+            Micronaut.build(*args)
+                    .mainClass(Application::class.java)
+                    .defaultEnvironments(Environment.DEVELOPMENT)
+                    .start()
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>src/main/resources/application-dev.yml</code>. Micronaut applies this configuration file only for the <code>dev</code> environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">bookcatalogue/src/main/resources/application-dev.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">server</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">8081 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
 <tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Configure the application to listen on port 8081</td>
 </tr>
 </table>
@@ -409,18 +453,13 @@ class BooksControllerTest {
 <div class="listingblock">
 <div class="title">bookcatalogue/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">-1 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::eureka[]</span>
+<span class="key">eureka</span>:
+  <span class="key">client</span>:
+    <span class="key">registration</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
+<span class="comment">#end::eureka[]</span></code></pre>
 </div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Start the Micronaut microservice at a random port when running the tests.</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
 <p>Run the unit test:</p>
@@ -559,9 +598,7 @@ class BooksControllerTest {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
   <span class="key">application</span>:
-    <span class="key">name</span>: <span class="string"><span class="content">bookinventory </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">8082 </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+    <span class="key">name</span>: <span class="string"><span class="content">bookinventory </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -570,8 +607,54 @@ class BooksControllerTest {
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Configure the application name. The name will be used later in the guide.</td>
 </tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Modify the <code>Application</code> class to use <code>dev</code> as a default environment:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Micronaut supports the concept of one or many default environments. A default environment is one that is only applied if no other environments are explicitly specified or deduced.</p>
+</div>
+</blockquote>
+</div>
+<div class="listingblock">
+<div class="title">bookinventory/src/main/kotlin/example/micronaut/Application.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.env.Environment
+import io.micronaut.runtime.Micronaut
+
+class Application {
+    companion object {
+        @JvmStatic
+        fun main(args: Array&lt;String&gt;) {
+            Micronaut.build(*args)
+                    .mainClass(Application::class.java)
+                    .defaultEnvironments(Environment.DEVELOPMENT)
+                    .start()
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>src/main/resources/application-dev.yml</code>. Micronaut applies this configuration file only for the <code>dev</code> environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">bookinventory/src/main/resources/application-dev.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">server</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">8082 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
 <tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Configure the application to listen on port 8082</td>
 </tr>
 </table>
@@ -582,18 +665,13 @@ class BooksControllerTest {
 <div class="listingblock">
 <div class="title">bookinventory/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">-1 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::eureka[]</span>
+<span class="key">eureka</span>:
+  <span class="key">client</span>:
+    <span class="key">registration</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
+<span class="comment">#end::eureka[]</span></code></pre>
 </div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Start the Micronaut microservice at a random port when running the tests.</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
 <p>Run the unit test:</p>
@@ -897,9 +975,7 @@ class BookControllerTest {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
   <span class="key">application</span>:
-    <span class="key">name</span>: <span class="string"><span class="content">bookrecommendation </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">8080 </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+    <span class="key">name</span>: <span class="string"><span class="content">bookrecommendation </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -908,8 +984,54 @@ class BookControllerTest {
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Configure the application name. The name will be used later in the guide.</td>
 </tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Modify the <code>Application</code> class to use <code>dev</code> as a default environment:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Micronaut supports the concept of one or many default environments. A default environment is one that is only applied if no other environments are explicitly specified or deduced.</p>
+</div>
+</blockquote>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/main/kotlin/example/micronaut/Application.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.env.Environment
+import io.micronaut.runtime.Micronaut
+
+class Application {
+    companion object {
+        @JvmStatic
+        fun main(args: Array&lt;String&gt;) {
+            Micronaut.build(*args)
+                    .mainClass(Application::class.java)
+                    .defaultEnvironments(Environment.DEVELOPMENT)
+                    .start()
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>src/main/resources/application-dev.yml</code>. Micronaut applies this configuration file only for the <code>dev</code> environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/main/resources/application-dev.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">server</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">8080 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
 <tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Configure the application to listen on port 8080</td>
 </tr>
 </table>
@@ -920,18 +1042,13 @@ class BookControllerTest {
 <div class="listingblock">
 <div class="title">bookrecommendation/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">-1 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::eureka[]</span>
+<span class="key">eureka</span>:
+  <span class="key">client</span>:
+    <span class="key">registration</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
+<span class="comment">#end::eureka[]</span></code></pre>
 </div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Start the Micronaut microservice at a random port when running the tests.</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
 <p>Run the unit test:</p>
