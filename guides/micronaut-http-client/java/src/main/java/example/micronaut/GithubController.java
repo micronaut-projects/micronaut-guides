@@ -3,9 +3,8 @@ package example.micronaut;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-
+import org.reactivestreams.Publisher;
+import io.micronaut.core.async.annotation.SingleResult;
 import java.util.List;
 
 @Controller("/github") // <1>
@@ -21,12 +20,13 @@ public class GithubController {
     }
 
     @Get("/releases-lowlevel") // <3>
-    Maybe<List<GithubRelease>> releasesWithLowLevelClient() { // <4>
+    @SingleResult
+    Publisher<List<GithubRelease>> releasesWithLowLevelClient() { // <4>
         return githubLowLevelClient.fetchReleases();
     }
 
     @Get(uri = "/releases", produces = MediaType.APPLICATION_JSON_STREAM) // <5>
-    Flowable<GithubRelease> fetchReleases() { // <6>
+    Publisher<GithubRelease> fetchReleases() { // <6>
         return githubApiClient.fetchReleases();
     }
 }
