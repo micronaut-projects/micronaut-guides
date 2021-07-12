@@ -333,11 +333,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.RxHttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>
-<span class="keyword">import</span> <span class="include">io.reactivex.Flowable</span>
-<span class="keyword">import</span> <span class="include">io.reactivex.Maybe</span>
-
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.async.annotation.SingleResult</span>
 <span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
-
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.ACCEPT</span>
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.USER_AGENT</span>
 
@@ -358,12 +356,12 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
             .build()
     }
 
-    Maybe&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; fetchReleases() {
+    <span class="annotation">@SingleResult</span>
+    Publisher&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; fetchReleases() {
         HttpRequest&lt;?&gt; req = HttpRequest.GET(uri) <i class="conum" data-value="4"></i><b>(4)</b>
             .header(USER_AGENT, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut HTTP Client</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
             .header(ACCEPT, <span class="string"><span class="delimiter">&quot;</span><span class="content">application/vnd.github.v3+json, application/json</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="6"></i><b>(6)</b>
-        Flowable&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; flowable = httpClient.retrieve(req, Argument.listOf(GithubRelease)) <i class="conum" data-value="7"></i><b>(7)</b>
-        <span class="keyword">return</span> flowable.firstElement() <i class="conum" data-value="8"></i><b>(8)</b>
+        httpClient.retrieve(req, Argument.listOf(GithubRelease)) <i class="conum" data-value="7"></i><b>(7)</b>
     }
 }</code></pre>
 </div>
@@ -397,10 +395,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <tr>
 <td><i class="conum" data-value="7"></i><b>7</b></td>
 <td>Use <code>retrieve</code> to perform an HTTP request for the given request object and convert the full HTTP response&#8217;s body into the specified type. e.g. <code>List&lt;GithubRelease&gt;</code>.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="8"></i><b>8</b></td>
-<td>The <code>retrieve</code> method returns a Flowable which has a firstElement method that returns the first emitted item or nothing</td>
 </tr>
 </table>
 </div>
@@ -437,8 +431,7 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.reactivex.Flowable</span>
-
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.ACCEPT</span>
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.USER_AGENT</span>
 
@@ -448,7 +441,7 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <span class="type">interface</span> GithubApiClient {
 
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/repos/${github.organization}/${github.repo}/releases</span><span class="delimiter">'</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    Flowable&lt;GithubRelease&gt; fetchReleases() <i class="conum" data-value="5"></i><b>(5)</b>
+    Publisher&lt;GithubRelease&gt; fetchReleases() <i class="conum" data-value="5"></i><b>(5)</b>
 }</code></pre>
 </div>
 </div>
@@ -502,8 +495,8 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 <span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.reactivex.Flowable</span>
-<span class="keyword">import</span> <span class="include">io.reactivex.Maybe</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.async.annotation.SingleResult</span>
 
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/github</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
@@ -519,13 +512,14 @@ compose multiple HTTP client calls without blocking (which will limit the throug
     }
 
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/releases-lowlevel</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    Maybe&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; releasesWithLowLevelClient() { <i class="conum" data-value="4"></i><b>(4)</b>
-        <span class="keyword">return</span> githubLowLevelClient.fetchReleases()
+    <span class="annotation">@SingleResult</span>
+    Publisher&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; releasesWithLowLevelClient() { <i class="conum" data-value="4"></i><b>(4)</b>
+        githubLowLevelClient.fetchReleases()
     }
 
     <span class="annotation">@Get</span>(uri = <span class="string"><span class="delimiter">&quot;</span><span class="content">/releases</span><span class="delimiter">&quot;</span></span>, produces = MediaType.APPLICATION_JSON_STREAM) <i class="conum" data-value="5"></i><b>(5)</b>
-    Flowable&lt;GithubRelease&gt; fetchReleases() { <i class="conum" data-value="6"></i><b>(6)</b>
-        <span class="keyword">return</span> githubApiClient.fetchReleases()
+    Publisher&lt;GithubRelease&gt; fetchReleases() { <i class="conum" data-value="6"></i><b>(6)</b>
+        githubApiClient.fetchReleases()
     }
 }</code></pre>
 </div>
@@ -576,10 +570,10 @@ compose multiple HTTP client calls without blocking (which will limit the throug
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.RxStreamingHttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">io.reactivex.Flowable</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Shared</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-
+<span class="keyword">import</span> <span class="include">io.reactivex.Flowable</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 <span class="keyword">import</span> <span class="include">javax.inject.Inject</span>
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
@@ -616,8 +610,8 @@ compose multiple HTTP client calls without blocking (which will limit the throug
         <span class="key">when</span>:
         HttpRequest request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/github/releases-lowlevel</span><span class="delimiter">'</span></span>)
 
-        Flowable&lt;GithubRelease&gt; githubReleaseStream = client.jsonStream(request, GithubRelease) <i class="conum" data-value="7"></i><b>(7)</b>
-        <span class="predefined-type">Iterable</span>&lt;GithubRelease&gt; githubReleases = githubReleaseStream.blockingIterable()
+        Publisher&lt;GithubRelease&gt; githubReleaseStream = client.jsonStream(request, GithubRelease) <i class="conum" data-value="7"></i><b>(7)</b>
+        <span class="predefined-type">Iterable</span>&lt;GithubRelease&gt; githubReleases = Flowable.fromPublisher(githubReleaseStream).blockingIterable()
 
         <span class="key">then</span>:
         <span class="keyword">for</span> (<span class="predefined-type">String</span> name : expectedReleases) {
