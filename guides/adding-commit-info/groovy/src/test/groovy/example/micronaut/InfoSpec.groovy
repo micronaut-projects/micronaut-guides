@@ -2,7 +2,7 @@ package example.micronaut
 
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Shared
@@ -15,7 +15,7 @@ class InfoSpec extends Specification {
     @Shared
     @Client("/")
     @Inject
-    RxHttpClient client // <2>
+    HttpClient client // <2>
 
     void 'test git commit info appears in JSON'() {
         given:

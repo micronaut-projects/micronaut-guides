@@ -5,11 +5,12 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.uri.UriBuilder;
-import javax.inject.Singleton;
 import org.reactivestreams.Publisher;
 import io.micronaut.core.async.annotation.SingleResult;
+import javax.inject.Singleton;
 import java.net.URI;
 import java.util.List;
+
 import static io.micronaut.http.HttpHeaders.ACCEPT;
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
 

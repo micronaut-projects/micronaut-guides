@@ -3,7 +3,7 @@ package example.micronaut
 import groovy.transform.CompileStatic
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.uri.UriBuilder
 import org.reactivestreams.Publisher
@@ -16,10 +16,10 @@ import static io.micronaut.http.HttpHeaders.USER_AGENT
 @CompileStatic
 class GithubLowLevelClient {
 
-    private final RxHttpClient httpClient
+    private final HttpClient httpClient
     private final URI uri
 
-    GithubLowLevelClient(@Client(GithubConfiguration.GITHUB_API_URL) RxHttpClient httpClient,  // <2>
+    GithubLowLevelClient(@Client(GithubConfiguration.GITHUB_API_URL) HttpClient httpClient,  // <2>
                          GithubConfiguration configuration) {  // <3>
         this.httpClient = httpClient
         this.uri = UriBuilder.of("/repos")
