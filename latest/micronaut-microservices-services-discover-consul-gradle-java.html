@@ -678,7 +678,7 @@ select an available instance, and make a request.</p>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.RxHttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
@@ -695,11 +695,11 @@ select an available instance, and make a request.</p>
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    RxHttpClient rxHttpClient;
+    HttpClient httpClient;
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testBooksController() {
-        HttpResponse&lt;<span class="predefined-type">Boolean</span>&gt; rsp = rxHttpClient.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/1491950358</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>.class);
+        HttpResponse&lt;<span class="predefined-type">Boolean</span>&gt; rsp = httpClient.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/1491950358</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>.class);
         assertEquals(rsp.status(), HttpStatus.OK);
         assertTrue(rsp.body());
     }
@@ -707,7 +707,7 @@ select an available instance, and make a request.</p>
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testBooksControllerWithNonExistingIsbn() {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -&gt; {
-            rxHttpClient.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/XXXXX</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>.class);
+            httpClient.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/XXXXX</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>.class);
         });
 
         assertEquals(
