@@ -1,6 +1,6 @@
 package example.micronaut
 
-import edu.umd.cs.findbugs.annotations.NonNull
+import io.micronaut.core.annotation.NonNull
 import groovy.transform.EqualsAndHashCode
 import io.micronaut.core.annotation.Introspected
 import javax.validation.constraints.NotBlank

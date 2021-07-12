@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.Primary
 import io.micronaut.context.annotation.Requires
 import io.micronaut.core.annotation.NonNull
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 

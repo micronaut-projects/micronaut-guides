@@ -13,7 +13,7 @@ import io.micronaut.core.io.ResourceResolver
 import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Factory // <1>
 class GraphQLFactory {

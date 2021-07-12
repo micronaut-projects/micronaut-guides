@@ -4,9 +4,8 @@ import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.ReflectiveAccess
 import io.micronaut.oraclecloud.core.TenancyIdProvider
 import io.micronaut.oraclecloud.function.OciFunction
-
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @CompileStatic
 @Singleton

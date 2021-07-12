@@ -5,7 +5,7 @@ import io.micronaut.cache.annotation.CacheConfig
 import io.micronaut.cache.annotation.CacheInvalidate
 import io.micronaut.cache.annotation.CachePut
 import io.micronaut.cache.annotation.Cacheable
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import java.time.Month
 import java.util.concurrent.TimeUnit
 

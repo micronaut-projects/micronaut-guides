@@ -5,7 +5,7 @@ import com.oracle.bmc.auth.BasicAuthenticationDetailsProvider
 import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider
 import io.micronaut.context.annotation.Replaces
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @AuthCachingPolicy(cacheKeyId = false, cachePrivateKey = false) // <1>
 @Singleton

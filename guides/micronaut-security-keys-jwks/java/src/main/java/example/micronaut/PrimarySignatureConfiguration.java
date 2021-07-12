@@ -1,7 +1,7 @@
 package example.micronaut;
 
 import io.micronaut.runtime.context.scope.Refreshable;
-import javax.inject.Named;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 @Refreshable // <1>

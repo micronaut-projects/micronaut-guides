@@ -16,8 +16,8 @@ import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import org.reactivestreams.Publisher
 
-import javax.inject.Named
-import javax.inject.Singleton
+import jakarta.inject.Named
+import jakarta.inject.Singleton
 import java.util.concurrent.ExecutorService
 
 @Singleton

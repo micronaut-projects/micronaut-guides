@@ -5,7 +5,7 @@ import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.runtime.Micronaut
 import io.micronaut.runtime.server.event.ServerStartupEvent
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @CompileStatic
 @Singleton

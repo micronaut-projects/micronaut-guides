@@ -6,9 +6,8 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.reactivex.Flowable;
 import org.junit.jupiter.api.Test;
-
 import jakarta.inject.Inject;
-
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest
@@ -18,6 +17,7 @@ public class BookControllerTest {
     @Client("/")
     RxStreamingHttpClient client;
 
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     @Test
     public void testRetrieveBooks() {
         Flowable<BookRecommendation> books = client.jsonStream(HttpRequest.GET("/books"), BookRecommendation.class);

@@ -3,8 +3,7 @@ package example.micronaut
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.micronaut.scheduling.annotation.Scheduled
-
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import java.text.SimpleDateFormat
 
 @CompileStatic

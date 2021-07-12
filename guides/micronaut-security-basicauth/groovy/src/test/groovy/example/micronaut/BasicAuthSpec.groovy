@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
@@ -16,7 +16,7 @@ class BasicAuthSpec extends Specification {
 
     @Inject
     @Client("/")
-    RxHttpClient client // <2>
+    HttpClient client // <2>
 
     def "by default every endpoint is secured"() {
         when: 'Accessing a secured URL without authenticating'

@@ -11,7 +11,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
 import org.reactivestreams.Publisher
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton // <1>
 class AuthenticationProviderUserPassword : AuthenticationProvider { // <2>

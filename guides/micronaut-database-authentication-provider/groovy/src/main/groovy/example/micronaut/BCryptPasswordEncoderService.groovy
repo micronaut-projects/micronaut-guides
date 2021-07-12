@@ -1,8 +1,8 @@
 package example.micronaut
 
-import edu.umd.cs.findbugs.annotations.NonNull
+import io.micronaut.core.annotation.NonNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank
 
 @Singleton // <1>

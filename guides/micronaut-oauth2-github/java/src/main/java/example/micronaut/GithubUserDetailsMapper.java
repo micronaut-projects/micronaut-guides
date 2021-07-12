@@ -6,7 +6,7 @@ import io.micronaut.security.oauth2.endpoint.authorization.state.State;
 import org.reactivestreams.Publisher;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.security.authentication.AuthenticationResponse;
-import javax.inject.Named;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import java.util.Collections;
 import java.util.HashMap;

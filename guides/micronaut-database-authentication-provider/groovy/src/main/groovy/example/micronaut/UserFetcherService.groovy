@@ -1,9 +1,9 @@
 package example.micronaut
 
-import edu.umd.cs.findbugs.annotations.NonNull
+import io.micronaut.core.annotation.NonNull
 import groovy.transform.CompileStatic
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank
 
 @CompileStatic

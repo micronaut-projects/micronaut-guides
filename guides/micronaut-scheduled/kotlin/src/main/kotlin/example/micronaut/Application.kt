@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.runtime.Micronaut.build
 import io.micronaut.runtime.server.event.ServerStartupEvent
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 fun main(args: Array<String>) {
     build()

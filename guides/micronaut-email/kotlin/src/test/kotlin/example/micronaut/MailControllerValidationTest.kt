@@ -5,7 +5,7 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
@@ -24,7 +24,7 @@ class MailControllerValidationTest {
 
     @Inject
     @field:Client("/")
-    lateinit var client: RxHttpClient
+    lateinit var client: HttpClient
 
     @Test
     fun mailSendCannotBeInvokedWithoubSubject() {

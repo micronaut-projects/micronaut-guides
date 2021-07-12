@@ -4,7 +4,7 @@ import io.micronaut.scheduling.annotation.Scheduled
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.util.Date
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton // <1>
 class HelloWorldJob {

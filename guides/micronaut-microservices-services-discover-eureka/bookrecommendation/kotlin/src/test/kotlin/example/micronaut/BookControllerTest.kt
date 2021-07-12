@@ -7,6 +7,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 
 @MicronautTest
 class BookControllerTest {
@@ -14,6 +15,7 @@ class BookControllerTest {
     @field:Client("/")
     lateinit var client: RxStreamingHttpClient
 
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     @Test
     fun testRetrieveBooks() {
         val books = client.jsonStream(HttpRequest.GET<Any>("/books"), BookRecommendation::class.java)

@@ -5,7 +5,7 @@ import io.micronaut.core.annotation.AnnotationValue
 import io.micronaut.core.util.StringUtils
 import io.micronaut.validation.validator.constraints.ConstraintValidator
 import io.micronaut.validation.validator.constraints.ConstraintValidatorContext
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Factory
 class EmailConstraintsFactory {

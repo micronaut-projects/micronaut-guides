@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 import io.reactivex.Maybe
 import io.micronaut.retry.annotation.Fallback
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank
 
 @Requires(env = Environment.TEST) // <1>

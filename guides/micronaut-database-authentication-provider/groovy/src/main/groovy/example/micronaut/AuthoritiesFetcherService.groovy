@@ -1,6 +1,6 @@
 package example.micronaut
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton // <1>
 class AuthoritiesFetcherService implements AuthoritiesFetcher {

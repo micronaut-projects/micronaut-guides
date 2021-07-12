@@ -4,8 +4,7 @@ import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 import io.micronaut.retry.annotation.Fallback
 import io.reactivex.Flowable
-
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Requires(env = arrayOf(Environment.TEST))
 @Fallback

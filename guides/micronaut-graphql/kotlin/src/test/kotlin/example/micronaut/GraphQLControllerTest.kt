@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,7 +16,7 @@ class GraphQLControllerTest {
 
     @Inject
     @field:Client("/")
-    lateinit var client: RxHttpClient // <2>
+    lateinit var client: HttpClient // <2>
 
     @Test
     fun testGraphQLController() {

@@ -3,7 +3,7 @@ package example.micronaut;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.client.RxHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.security.authentication.UsernamePasswordCredentials;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
@@ -22,7 +22,7 @@ public class LoginIncludesRefreshTokenTest {
 
     @Inject
     @Client("/")
-    RxHttpClient client;
+    HttpClient client;
 
     @Test
     void uponSuccessfulAuthenticationUserGetsAccessTokenAndRefreshToken() throws ParseException {

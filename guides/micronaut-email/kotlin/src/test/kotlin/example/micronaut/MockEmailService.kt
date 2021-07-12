@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.context.annotation.Primary
 import io.micronaut.context.annotation.Requires
 import java.util.ArrayList
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 

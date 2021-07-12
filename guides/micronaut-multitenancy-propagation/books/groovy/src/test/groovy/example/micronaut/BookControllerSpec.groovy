@@ -3,7 +3,7 @@ package example.micronaut
 import grails.gorm.multitenancy.Tenants
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
@@ -14,7 +14,7 @@ class BookControllerSpec extends Specification {
 
     @Inject
     @Client("/")
-    RxHttpClient client
+    HttpClient client
 
     @Inject
     BookService bookService

@@ -2,7 +2,7 @@ package io.micronaut.guides.feature;
 
 import io.micronaut.starter.application.generator.GeneratorContext;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class OracleCloudSdkCore extends AbstractFeature {

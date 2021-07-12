@@ -1,8 +1,8 @@
 package example.micronaut;
 
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.exceptions.HttpStatusException;
 import io.micronaut.http.server.types.files.SystemFile;

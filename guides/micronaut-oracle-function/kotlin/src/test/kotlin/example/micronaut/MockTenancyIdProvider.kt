@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.context.annotation.Context
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.oraclecloud.core.TenancyIdProvider
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Context
 @Singleton

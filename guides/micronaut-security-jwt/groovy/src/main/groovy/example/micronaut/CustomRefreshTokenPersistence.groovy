@@ -9,8 +9,7 @@ import io.micronaut.security.token.refresh.RefreshTokenPersistence
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import org.reactivestreams.Publisher
-
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton // <1>
 class CustomRefreshTokenPersistence implements RefreshTokenPersistence {

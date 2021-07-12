@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
@@ -22,7 +22,7 @@ class BasicAuthTest {
 
     @Test
     fun verifyHttpBasicAuthWorks() {
-        val client : RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url) // <2>
+        val client : HttpClient = embeddedServer.applicationContext.createBean(HttpClient::class.java, embeddedServer.url) // <2>
 
         //when: 'Accessing a secured URL without authenticating'
         val e = Executable { client.toBlocking().exchange<Any, Any>(HttpRequest.GET<Any>("/").accept(MediaType.TEXT_PLAIN)) } // <3>
