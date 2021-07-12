@@ -2,43 +2,38 @@ package example.micronaut
 
 import io.micronaut.configuration.kafka.annotation.KafkaListener
 import io.micronaut.configuration.kafka.annotation.Topic
-import io.micronaut.context.ApplicationContext
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.runtime.server.EmbeddedServer
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import io.micronaut.test.support.TestPropertyProvider
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
-import spock.lang.AutoCleanup
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
+import javax.inject.Inject
 import java.util.concurrent.ConcurrentLinkedDeque
 
 import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
 
-class BookControllerSpec extends Specification {
+@MicronautTest
+class BookControllerSpec extends Specification implements TestPropertyProvider {
 
     private static final Collection<Book> received = new ConcurrentLinkedDeque<>();
     private static final PollingConditions conditions = new PollingConditions(timeout: 5)
 
-    @Shared
-    @AutoCleanup
-    static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse('confluentinc/cp-kafka:latest'))
+    static KafkaContainer kafka = new KafkaContainer(
+            DockerImageName.parse('confluentinc/cp-kafka:latest'))
 
-    @Shared @AutoCleanup EmbeddedServer embeddedServer
-    @Shared @AutoCleanup ApplicationContext context
-    @Shared @AutoCleanup HttpClient client
+    @Inject
+    AnalyticsListener analyticsListener
 
-    void setupSpec() {
-        kafka.start()
-        embeddedServer = ApplicationContext.run(EmbeddedServer,
-                ['kafka.bootstrap.servers': kafka.bootstrapServers])
-        context = embeddedServer.applicationContext
-        client = context.createBean(HttpClient, embeddedServer.URL)
-    }
+    @Inject
+    @Client('/')
+    HttpClient client
 
     void 'test message is published to Kafka when book found'() {
         when:
@@ -79,6 +74,12 @@ class BookControllerSpec extends Specification {
 
     void cleanup() {
         received.clear()
+    }
+
+    @Override
+    Map<String, String> getProperties() {
+        kafka.start()
+        ['kafka.bootstrap.servers': kafka.bootstrapServers]
     }
 
     @KafkaListener(offsetReset = EARLIEST)
