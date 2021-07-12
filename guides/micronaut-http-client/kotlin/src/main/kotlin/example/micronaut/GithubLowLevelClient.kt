@@ -7,8 +7,8 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.uri.UriBuilder
-import io.reactivex.Maybe
-import io.reactivex.Flowable
+import org.reactivestreams.Publisher
+import io.micronaut.core.async.annotation.SingleResult
 import java.net.URI
 import javax.inject.Singleton
 
@@ -21,11 +21,11 @@ class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) pri
         .path("releases")
         .build()
 
-    fun fetchReleases(): Maybe<List<GithubRelease>> {
+    @SingleResult
+    fun fetchReleases(): Publisher<List<GithubRelease>> {
         val req: HttpRequest<*> = HttpRequest.GET<Any>(uri) // <4>
             .header(USER_AGENT, "Micronaut HTTP Client") // <5>
             .header(ACCEPT, "application/vnd.github.v3+json, application/json") // <6>
-        val flowable = Flowable.fromPublisher(httpClient.retrieve(req, Argument.listOf(GithubRelease::class.java))) // <7>
-        return flowable.firstElement() // <8>
+        return httpClient.retrieve(req, Argument.listOf(GithubRelease::class.java)) // <7>
     }
 }

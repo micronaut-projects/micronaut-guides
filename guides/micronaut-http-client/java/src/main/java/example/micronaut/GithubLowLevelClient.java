@@ -5,9 +5,8 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.uri.UriBuilder;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-
+import org.reactivestreams.Publisher;
+import io.micronaut.core.async.annotation.SingleResult;
 import javax.inject.Singleton;
 import java.net.URI;
 import java.util.List;
@@ -31,11 +30,11 @@ public class GithubLowLevelClient {
                 .build();
     }
 
-    Maybe<List<GithubRelease>> fetchReleases() {
+    @SingleResult
+    Publisher<List<GithubRelease>> fetchReleases() {
         HttpRequest<?> req = HttpRequest.GET(uri) // <4>
                 .header(USER_AGENT, "Micronaut HTTP Client") // <5>
                 .header(ACCEPT, "application/vnd.github.v3+json, application/json"); // <6>
-        Flowable<List<GithubRelease>> flowable = Flowable.fromPublisher(httpClient.retrieve(req, Argument.listOf(GithubRelease.class))); // <7>
-        return flowable.firstElement(); // <8>
+        return httpClient.retrieve(req, Argument.listOf(GithubRelease.class)); // <7>
     }
 }
