@@ -19,35 +19,34 @@ import java.util.concurrent.ConcurrentLinkedDeque
 
 import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
 
-@MicronautTest
-class BookControllerSpec extends Specification implements TestPropertyProvider {
+@MicronautTest // <1> <2>
+class BookControllerSpec extends Specification implements TestPropertyProvider { // <3>
 
-    private static final Collection<Book> received = new ConcurrentLinkedDeque<>();
-    private static final PollingConditions conditions = new PollingConditions(timeout: 5)
+    private static final Collection<Book> received = new ConcurrentLinkedDeque<>()
 
     static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse('confluentinc/cp-kafka:latest'))
+            DockerImageName.parse('confluentinc/cp-kafka:latest')) // <4>
 
     @Inject
-    AnalyticsListener analyticsListener
+    AnalyticsListener analyticsListener // <5>
 
     @Inject
     @Client('/')
-    HttpClient client
+    HttpClient client // <6>
 
     void 'test message is published to Kafka when book found'() {
         when:
         String isbn = '1491950358'
-        Optional<Book> result = retrieveGet('/books/' + isbn)
+        Optional<Book> result = retrieveGet('/books/' + isbn) // <7>
 
         then:
         result != null
         result.present
         isbn == result.get().isbn
 
-        conditions.eventually {
+        new PollingConditions(timeout: 5).eventually { // <8>
             !received.isEmpty()
-            1 == received.size()
+            1 == received.size() // <9>
         }
 
         when:
@@ -66,7 +65,7 @@ class BookControllerSpec extends Specification implements TestPropertyProvider {
         thrown HttpClientResponseException
 
         when:
-        sleep 5000
+        sleep 5000 // <10>
 
         then:
         0 == received.size()
@@ -79,7 +78,7 @@ class BookControllerSpec extends Specification implements TestPropertyProvider {
     @Override
     Map<String, String> getProperties() {
         kafka.start()
-        ['kafka.bootstrap.servers': kafka.bootstrapServers]
+        ['kafka.bootstrap.servers': kafka.bootstrapServers] // <11>
     }
 
     @KafkaListener(offsetReset = EARLIEST)
@@ -87,7 +86,7 @@ class BookControllerSpec extends Specification implements TestPropertyProvider {
 
         @Topic('analytics')
         void updateAnalytics(Book book) {
-            received.add(book);
+            received << book
         }
     }
 

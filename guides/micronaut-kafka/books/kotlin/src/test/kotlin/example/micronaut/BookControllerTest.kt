@@ -28,36 +28,36 @@ import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
 
-@Testcontainers
+@Testcontainers // <1>
 @MicronautTest
-@TestInstance(PER_CLASS)
-class BookControllerTest : TestPropertyProvider {
+@TestInstance(PER_CLASS) // <2>
+class BookControllerTest : TestPropertyProvider { // <3>
 
     companion object {
         val received: MutableCollection<Book> = ConcurrentLinkedDeque()
     }
 
     @Container
-    val kafka = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
+    val kafka = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest")) // <4>
 
     @Inject
-    lateinit var analyticsListener: AnalyticsListener
+    lateinit var analyticsListener: AnalyticsListener // <5>
 
     @Inject
     @field:Client("/")
-    lateinit var client: HttpClient
+    lateinit var client: HttpClient // <6>
 
     @Test
     fun testMessageIsPublishedToKafkaWhenBookFound() {
         val isbn = "1491950358"
 
-        val result : Optional<Book> = retrieveGet("/books/" + isbn) as Optional<Book>
+        val result : Optional<Book> = retrieveGet("/books/" + isbn) as Optional<Book> // <7>
         assertNotNull(result)
         assertTrue(result.isPresent)
         assertEquals(isbn, result.get().isbn)
 
-        await().atMost(5, SECONDS).until { !received.isEmpty() }
-        assertEquals(1, received.size)
+        await().atMost(5, SECONDS).until { !received.isEmpty() } // <8>
+        assertEquals(1, received.size) // <9>
 
         val bookFromKafka = received.iterator().next()
         assertNotNull(bookFromKafka)
@@ -68,13 +68,13 @@ class BookControllerTest : TestPropertyProvider {
     fun testMessageIsNotPublishedToKafkaWhenBookNotFound() {
         assertThrows(HttpClientResponseException::class.java) { retrieveGet("/books/INVALID") }
 
-        Thread.sleep(5_000);
+        Thread.sleep(5_000); // <10>
         assertEquals(0, received.size);
     }
 
     override fun getProperties(): Map<String, String> {
         kafka.start()
-        return mapOf("kafka.bootstrap.servers" to kafka.bootstrapServers)
+        return mapOf("kafka.bootstrap.servers" to kafka.bootstrapServers) // <11>
     }
 
     @AfterEach

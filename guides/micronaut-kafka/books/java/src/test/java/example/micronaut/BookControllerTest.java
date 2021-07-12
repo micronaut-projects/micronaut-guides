@@ -34,35 +34,36 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-@Testcontainers
+@Testcontainers // <1>
 @MicronautTest
-@TestInstance(PER_CLASS)
-class BookControllerTest implements TestPropertyProvider {
+@TestInstance(PER_CLASS) // <2>
+class BookControllerTest implements TestPropertyProvider { // <3>
 
     private static final Collection<Book> received = new ConcurrentLinkedDeque<>();
 
     @Container
-    static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"));
+    static KafkaContainer kafka = new KafkaContainer(
+            DockerImageName.parse("confluentinc/cp-kafka:latest")); // <4>
 
     @Inject
-    AnalyticsListener analyticsListener;
+    AnalyticsListener analyticsListener; // <5>
 
     @Inject
     @Client("/")
-    HttpClient client;
+    HttpClient client; // <6>
 
     @Test
     void testMessageIsPublishedToKafkaWhenBookFound() {
         String isbn = "1491950358";
 
-        Optional<Book> result = retrieveGet("/books/" + isbn);
+        Optional<Book> result = retrieveGet("/books/" + isbn); // <7>
         assertNotNull(result);
         assertTrue(result.isPresent());
         assertEquals(isbn, result.get().getIsbn());
 
-        await().atMost(5, SECONDS).until(() -> !received.isEmpty());
+        await().atMost(5, SECONDS).until(() -> !received.isEmpty()); // <8>
 
-        assertEquals(1, received.size());
+        assertEquals(1, received.size()); // <9>
         Book bookFromKafka = received.iterator().next();
         assertNotNull(bookFromKafka);
         assertEquals(isbn, bookFromKafka.getIsbn());
@@ -74,7 +75,7 @@ class BookControllerTest implements TestPropertyProvider {
             retrieveGet("/books/INVALID");
         });
 
-        Thread.sleep(5_000);
+        Thread.sleep(5_000); // <10>
         assertEquals(0, received.size());
     }
 
@@ -82,7 +83,7 @@ class BookControllerTest implements TestPropertyProvider {
     @Override
     public Map<String, String> getProperties() {
         return Collections.singletonMap(
-                "kafka.bootstrap.servers", kafka.getBootstrapServers()
+                "kafka.bootstrap.servers", kafka.getBootstrapServers() // <11>
         );
     }
 

@@ -14,11 +14,14 @@ class AnalyticsFilter(private val analyticsClient: AnalyticsClient) // <3>
 
     override fun doFilter(request: HttpRequest<*>, // <4>
                           chain: ServerFilterChain): Publisher<MutableHttpResponse<*>> =
+        Flowable
+            .fromPublisher(chain.proceed(request)) // <5>
+            .flatMap { response: MutableHttpResponse<*> ->
+                Flowable.fromCallable {
+                    val book = response.getBody(Book::class.java) // <6>
+                    book.ifPresent { book: Book -> analyticsClient.updateAnalytics(book) } // <7>
 
-            Flowable.fromPublisher(chain.proceed(request)) // <5>
-                    .switchMap { response: MutableHttpResponse<*> ->
-                        val book = response.getBody(Book::class.java) // <6>
-                        book.ifPresent { b: Book -> analyticsClient.updateAnalytics(b) } // <7>
-                        Flowable.just(response)
-                    }
+                    response
+                }
+            }
 }

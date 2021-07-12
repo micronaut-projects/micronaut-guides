@@ -22,10 +22,11 @@ class AnalyticsFilter implements HttpServerFilter { // <2>
                                                ServerFilterChain chain) { // <4>
         return Flowable
                 .fromPublisher(chain.proceed(request)) // <5>
-                .flatMap(response -> {
+                .flatMap(response -> Flowable.fromCallable(() -> {
                     Optional<Book> book = response.getBody(Book) // <6>
                     book.ifPresent(analyticsClient::updateAnalytics) // <7>
-                    return Flowable.just(response)
-                })
+
+                    return response
+                }))
     }
 }
