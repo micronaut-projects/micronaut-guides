@@ -1,7 +1,7 @@
 package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,7 +13,7 @@ import javax.inject.Inject
 class HelloControllerTest {
     @Inject
     @field:Client("/")  // <2>
-    lateinit var client : RxHttpClient
+    lateinit var client : HttpClient
 
     @Test
     fun testHello() {

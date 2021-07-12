@@ -1,7 +1,7 @@
 package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
@@ -19,7 +19,7 @@ class OauthAccessTokenSpec extends Specification {
 
     @Inject
     @Client("/")
-    RxHttpClient client // <2>
+    HttpClient client // <2>
 
     @Shared
     @Inject
