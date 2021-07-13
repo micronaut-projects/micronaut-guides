@@ -16,11 +16,11 @@ class BookController {
 
     @Get // <3>
     List<Book> listAll() {
-        return bookService.listAll()
+        bookService.listAll()
     }
 
     @Get('/{isbn}') // <4>
     Optional<Book> findBook(String isbn) {
-        return bookService.findByIsbn(isbn)
+        bookService.findByIsbn(isbn)
     }
 }

@@ -10,11 +10,7 @@ class AnalyticsService {
 
     fun updateBookAnalytics(book: Book) { // <2>
         bookAnalytics.compute(book) { k, v ->
-            if (v == null) {
-                return@compute 1L
-            } else {
-                return@compute v + 1
-            }
+            if (v == null) return@compute 1L else return@compute v + 1
         }
     }
 

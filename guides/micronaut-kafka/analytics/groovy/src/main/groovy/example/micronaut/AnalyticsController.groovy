@@ -1,8 +1,10 @@
 package example.micronaut
 
+import groovy.transform.CompileStatic
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 
+@CompileStatic
 @Controller('/analytics')
 class AnalyticsController {
 
@@ -14,6 +16,6 @@ class AnalyticsController {
 
     @Get // <1>
     List<BookAnalytics> listAnalytics() {
-        return analyticsService.listAnalytics()
+        analyticsService.listAnalytics()
     }
 }

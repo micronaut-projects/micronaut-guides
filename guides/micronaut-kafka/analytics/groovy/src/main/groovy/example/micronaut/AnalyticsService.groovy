@@ -1,8 +1,11 @@
 package example.micronaut
 
+import groovy.transform.CompileStatic
+
 import javax.inject.Singleton
 import java.util.concurrent.ConcurrentHashMap
 
+@CompileStatic
 @Singleton
 class AnalyticsService {
 
@@ -10,15 +13,11 @@ class AnalyticsService {
 
     void updateBookAnalytics(Book book) { // <2>
         bookAnalytics.compute(book, (k, v) -> {
-            if (v == null) {
-                return 1L
-            } else {
-                return v + 1
-            }
+            v == null ? 1L : v + 1
         })
     }
 
     List<BookAnalytics> listAnalytics() { // <3>
-        return bookAnalytics.collect {e -> new BookAnalytics(e.key.isbn, e.value) }
+        bookAnalytics.collect { e -> new BookAnalytics(e.key.isbn, e.value) }
     }
 }

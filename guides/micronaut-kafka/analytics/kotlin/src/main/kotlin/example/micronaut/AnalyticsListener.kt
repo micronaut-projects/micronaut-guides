@@ -10,7 +10,5 @@ import io.micronaut.context.env.Environment
 class AnalyticsListener(private val analyticsService: AnalyticsService) { // <3>
 
     @Topic("analytics") // <4>
-    fun updateAnalytics(book: Book) {
-        analyticsService.updateBookAnalytics(book) // <5>
-    }
+    fun updateAnalytics(book: Book) = analyticsService.updateBookAnalytics(book) // <5>
 }

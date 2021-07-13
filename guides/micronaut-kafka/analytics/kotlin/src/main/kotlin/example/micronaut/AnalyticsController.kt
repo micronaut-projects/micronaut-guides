@@ -7,7 +7,5 @@ import io.micronaut.http.annotation.Get
 class AnalyticsController(private val analyticsService: AnalyticsService) {
 
     @Get
-    fun listAnalytics(): List<BookAnalytics> { // <1>
-        return analyticsService.listAnalytics()
-    }
+    fun listAnalytics(): List<BookAnalytics> = analyticsService.listAnalytics() // <1>
 }

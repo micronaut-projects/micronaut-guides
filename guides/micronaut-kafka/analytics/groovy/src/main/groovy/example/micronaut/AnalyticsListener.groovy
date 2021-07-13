@@ -1,10 +1,12 @@
 package example.micronaut
 
+import groovy.transform.CompileStatic
 import io.micronaut.configuration.kafka.annotation.KafkaListener
 import io.micronaut.configuration.kafka.annotation.Topic
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 
+@CompileStatic
 @Requires(notEnv = Environment.TEST) // <1>
 @KafkaListener // <2>
 class AnalyticsListener {

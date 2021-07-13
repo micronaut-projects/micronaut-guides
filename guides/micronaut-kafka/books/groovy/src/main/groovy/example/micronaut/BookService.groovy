@@ -19,10 +19,10 @@ class BookService {
     }
 
     List<Book> listAll() {
-        return bookStore
+        bookStore
     }
 
     Optional<Book> findByIsbn(String isbn) {
-        return Optional.ofNullable(bookStore.find { it.isbn == isbn })
+        Optional.ofNullable(bookStore.find { it.isbn == isbn })
     }
 }

@@ -31,10 +31,10 @@ class AnalyticsServiceSpec extends Specification {
     }
 
     private BookAnalytics findBookAnalytics(Book b, List<BookAnalytics> analytics) {
-        BookAnalytics bookAnalytics = analytics.find {it.bookIsbn == b.isbn }
+        BookAnalytics bookAnalytics = analytics.find { it.bookIsbn == b.isbn }
         if (!bookAnalytics) {
             throw new RuntimeException('Book not found')
         }
-        return bookAnalytics
+        bookAnalytics
     }
 }

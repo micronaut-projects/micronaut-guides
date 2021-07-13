@@ -91,6 +91,6 @@ class BookControllerSpec extends Specification implements TestPropertyProvider {
     }
 
     private Optional<Book> retrieveGet(String url) {
-        return client.toBlocking().retrieve(HttpRequest.GET(url), Argument.of(Optional, Book))
+        client.toBlocking().retrieve(HttpRequest.GET(url), Argument.of(Optional, Book))
     }
 }
