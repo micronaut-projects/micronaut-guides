@@ -1,17 +1,16 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 
 @Introspected
 public class BookAnalytics {
 
-    private String bookIsbn;
-    private Long count;
+    private final String bookIsbn;
+    private final long count;
 
-    public BookAnalytics() {
-    }
-
-    public BookAnalytics(String bookIsbn, Long count) {
+    @Creator
+    public BookAnalytics(String bookIsbn, long count) {
         this.bookIsbn = bookIsbn;
         this.count = count;
     }
@@ -20,15 +19,7 @@ public class BookAnalytics {
         return bookIsbn;
     }
 
-    public void setBookIsbn(String bookIsbn) {
-        this.bookIsbn = bookIsbn;
-    }
-
-    public Long getCount() {
+    public long getCount() {
         return count;
-    }
-
-    public void setCount(Long count) {
-        this.count = count;
     }
 }
