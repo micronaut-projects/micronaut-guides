@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.security.authentication.UserDetails;
 import io.micronaut.security.token.event.RefreshTokenGeneratedEvent;
 import io.micronaut.security.token.refresh.RefreshTokenPersistence;
@@ -22,8 +21,7 @@ class CustomRefreshTokenPersistence : RefreshTokenPersistence {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-    @EventListener // <3>
-    override fun persistToken(event: RefreshTokenGeneratedEvent?) {
+    override fun persistToken(event: RefreshTokenGeneratedEvent?) { // <3>
         if (event?.refreshToken != null &&
             event.userDetails != null &&
             event.userDetails.username != null) {

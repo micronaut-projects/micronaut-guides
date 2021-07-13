@@ -1,6 +1,5 @@
 package example.micronaut
 
-import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.security.authentication.UserDetails
 import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode
 import io.micronaut.security.errors.OauthErrorResponseException
@@ -20,8 +19,7 @@ class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
     }
 
     @Override
-    @EventListener // <3>
-    void persistToken(RefreshTokenGeneratedEvent event) {
+    void persistToken(RefreshTokenGeneratedEvent event) { // <3>
         if (event?.refreshToken && event?.userDetails?.username) {
             String payload = event.refreshToken
             refreshTokenRepository.save(event.userDetails.username, payload, Boolean.FALSE) // <4>
