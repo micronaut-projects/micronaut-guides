@@ -20,6 +20,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
+
 @CompileStatic
 class GuideProjectGenerator implements Closeable {
 
@@ -78,6 +80,7 @@ class GuideProjectGenerator implements Closeable {
                 skipGradleTests: config.skipGradleTests ?: false,
                 skipMavenTests: config.skipMavenTests ?: false,
                 minimumJavaVersion: config.minimumJavaVersion,
+                zipIncludes: config.zipIncludes ?: [],
                 apps: config.apps.collect { it -> new App(name: it.name,
                         features: it.features,
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
@@ -92,16 +95,13 @@ class GuideProjectGenerator implements Closeable {
     void generate(File guidesFolder,
                   File output,
                   String metadataConfigName,
-                  boolean merge = true,
-                  File asciidocDir = null) {
+                  File asciidocDir) {
 
         guidesFolder.eachDir { dir ->
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
             if (Utils.process(metadata)) {
-                generate(metadata, dir, output, merge)
-                if (asciidocDir != null) {
-                    GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
-                }
+                generate(metadata, dir, output)
+                GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
             }
         }
     }
@@ -110,7 +110,7 @@ class GuideProjectGenerator implements Closeable {
         "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language}"
     }
 
-    void generate(GuideMetadata metadata, File inputDir, File outputDir, boolean merge = true) {
+    void generate(GuideMetadata metadata, File inputDir, File outputDir) {
         String packageAndName = "${basePackage}.${appName}"
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
@@ -145,13 +145,11 @@ class GuideProjectGenerator implements Closeable {
                 File destination = destinationPath.toFile()
                 destination.mkdir()
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
-                if (merge) {
-                    Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
-                    if (!sourcePath.toFile().exists()) {
-                        throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
-                    }
-                    Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
+                Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
+                if (!sourcePath.toFile().exists()) {
+                    throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
                 }
+                Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
                 if (app.excludeSource) {
                     for (String mainSource : app.excludeSource) {
                         deleteFile(destination, GuideAsciidocGenerator.mainPath(appName, mainSource), guidesOption)
@@ -162,17 +160,34 @@ class GuideProjectGenerator implements Closeable {
                         deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
                     }
                 }
-
+                if (metadata.zipIncludes) {
+                    File destinationRoot = new File(outputDir.absolutePath, folder)
+                    for (String zipInclude : metadata.zipIncludes) {
+                        copyFile(inputDir, destinationRoot, zipInclude)
+                    }
+                }
             }
         }
     }
 
-    private deleteFile(File destination, String path, GuidesOption guidesOption) {
+    private void deleteFile(File destination, String path, GuidesOption guidesOption) {
         Paths.get(destination.absolutePath, path
                 .replace("@lang@", guidesOption.language.toString())
                 .replace("@languageextension@", guidesOption.language.extension))
                 .toFile()
                 .delete()
+    }
+
+    private void copyFile(File inputDir, File destinationRoot, String filePath) {
+        File sourceFile = new File(inputDir, filePath)
+        File destinationFile = new File(destinationRoot, filePath)
+
+        File destinationFileDir = destinationFile.getParentFile()
+        if (!destinationFileDir.exists()) {
+            Files.createDirectories destinationFileDir.toPath()
+        }
+
+        Files.copy sourceFile.toPath(), destinationFile.toPath(), REPLACE_EXISTING
     }
 
     static List<GuidesOption> guidesOptions(GuideMetadata guideMetadata) {

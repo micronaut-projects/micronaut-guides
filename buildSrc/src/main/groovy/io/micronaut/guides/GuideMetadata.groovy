@@ -26,6 +26,8 @@ class GuideMetadata {
 
     Integer minimumJavaVersion
 
+    List<String> zipIncludes
+
     List<App> apps
 
     static class App {

@@ -60,6 +60,9 @@ class GuideAsciidocGenerator {
                 } else if (shouldProcessLine(line, 'testResource:')) {
                     lines.addAll(testResourceIncludeLines(line))
 
+                } else if (shouldProcessLine(line, 'zipInclude:')) {
+                    lines.addAll(zipIncludeLines(line))
+
                 } else if (line == ':dependencies:') {
                     groupDependencies = !groupDependencies
                     if (!groupDependencies) {
@@ -163,6 +166,28 @@ class GuideAsciidocGenerator {
 
     private static List<String> testResourceIncludeLines(String line) {
         resourceIncludeLines(line, 'test', 'testResource:')
+    }
+
+    private static List<String> zipIncludeLines(String line) {
+        String fileName = extractName(line, 'zipInclude:')
+        List<String> tagNames = extractTags(line)
+
+        List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
+        String asciidoctorLang = resolveAsciidoctorLanguage(fileName)
+
+        List<String> lines = [
+                '[source,' + asciidoctorLang + ']',
+                '.' + fileName,
+                '----']
+        if (tags) {
+            for (String tag : tags) {
+                lines << "include::{sourceDir}/@sourceDir@/${fileName}[${tag}]\n".toString()
+            }
+        } else {
+            lines << "include::{sourceDir}/@sourceDir@/${fileName}[]".toString()
+        }
+        lines << '----'
+        lines
     }
 
     private static List<String> sourceIncludeLines(String line, TestFramework testFramework, String macro) {
