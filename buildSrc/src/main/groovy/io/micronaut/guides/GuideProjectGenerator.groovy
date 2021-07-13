@@ -126,12 +126,17 @@ class GuideProjectGenerator implements Closeable {
             }
 
             for (App app: metadata.apps) {
-                List<String> appFeatures = app.features
+                List<String> appFeatures = [] + app.features
 
                 if (guidesOption.language == Language.GROOVY ||
                         !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(javaVersion)) {
                     appFeatures.remove('graalvm')
                 }
+
+                if (testFramework == TestFramework.SPOCK) {
+                    appFeatures.remove('mockito')
+                }
+
                 // Normal guide use 'default' as name, multi project guides have different modules
                 String appName = app.name == DEFAULT_APP_NAME ? StringUtils.EMPTY_STRING : app.name
                 String folder = folderName(metadata.slug, guidesOption)

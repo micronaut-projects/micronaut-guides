@@ -26,9 +26,16 @@ include::{commondir}/common-annotationprocessors.adoc[]
 
 === Books microservice
 
-Create the `books` microservice:
+Create the `books` microservice using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
-`mn create-app example.micronaut.books`
+[source,bash]
+----
+mn create-app --features=rabbitmq,graalvm example.micronaut.books --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq` and `graalvm` features.
 
 The previous command creates a directory named `books` and a Micronaut application inside it with default package `example.micronaut`.
 
@@ -52,9 +59,16 @@ source:BookService[app=books]
 
 === Analytics microservice
 
-Create the `analytics` microservice:
+Create the `analytics` microservice using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
-`mn create-app example.micronaut.analytics`
+[source,bash]
+----
+mn create-app --features=rabbitmq,graalvm example.micronaut.analytics --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka` and `graalvm` features.
 
 To keep this guide simple there is no database persistence, and the books analytics is kept in memory in `AnalyticsService`:
 
@@ -63,6 +77,10 @@ source:AnalyticsService[app=analytics]
 <1> Keep the books analytics in memory.
 <2> Initialize and update the analytics for the book passed as parameter.
 <3> Return all the analytics.
+
+Create the `Book` POJO used by `AnalyticsService`:
+
+source:Book[app=analytics]
 
 The previous service responds a `List<BookAnalytics>`. Create the `BookAnalytics` POJO:
 
@@ -192,10 +210,6 @@ Alternatively you can https://www.rabbitmq.com/download.html[install and run a l
 
 === Books microservice
 
-Add `rabbitmq` dependency.
-
-dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
-
 By default Micronaut will connect to a RabbitMQ instance running on `localhost` so it is not necessary to add anything
 to `application.yml`. In case you want to change the configuration, add the following:
 
@@ -244,10 +258,6 @@ source:AnalyticsFilter[app=books]
 <7> If the book is found, use RabbitMQ client to send a message.
 
 === Analytics microservice
-
-Add `rabbitmq` dependency.
-
-dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
 
 ==== Create RabbitMQ exchange, queue and binding
 
