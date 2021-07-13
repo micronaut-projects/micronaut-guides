@@ -14,8 +14,8 @@ class AnalyticsController {
         this.analyticsService = analyticsService
     }
 
-    @Get('/') // <1>
+    @Get // <1>
     List<BookAnalytics> listAnalytics() {
-        return analyticsService.listAnalytics()
+        analyticsService.listAnalytics()
     }
 }
