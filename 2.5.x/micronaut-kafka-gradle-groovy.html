@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Kafka and Micronaut - Event driven applications</title>
+    <link rel="canonical" href="@canonical@"/>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut Framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-kafka.html">Kafka and Micronaut - Event driven applications</a> » <span class="breadcrumb_last" aria-current="page">gradle | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the application</a>
+<ul class="sectlevel2">
+<li><a href="#books-microservice">4.1. Books Microservice</a></li>
+<li><a href="#analytics-microservice">4.2. Analytics Microservice</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application">5. Running the application</a></li>
+<li><a href="#kafka-and-micronaut">6. Kafka and Micronaut</a>
+<ul class="sectlevel2">
+<li><a href="#install-kafka">6.1. Install Kafka</a></li>
+<li><a href="#books-microservice-2">6.2. Books Microservice</a></li>
+<li><a href="#analytics-microservice-2">6.3. Analytics Microservice</a></li>
+<li><a href="#running-the-application-2">6.4. Running the application</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">7. Next steps</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Kafka and Micronaut - Event driven applications</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Use Kafka to communicate between your Micronaut apps.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Burt Beckwith</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 2.5.8</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Groovy.</p>
+</div>
+<div class="paragraph">
+<p>In this guide, we will create two microservices that will use <a href="https://kafka.apache.org/">Kafka</a> to communicate with each other in an asynchronous and decoupled way.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+<li>
+<p><a href="https://www.docker.io/gettingstarted/#h_installation">Docker</a> and <a href="https://docs.docker.com/compose/install/">Docker Compose</a> installed if you will be running Kafka in Docker, and for running tests.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-kafka-gradle-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s describe the microservices you will build through the guide.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>books</code> - It returns a list of books. It uses a domain consisting of a book name and ISBN. It also publishes a message in Kafka every time a book is accessed.</p>
+</li>
+<li>
+<p><code>analytics</code> - It connects to Kafka to update the analytics for every book (a counter). It also exposes an endpoint to get the analytics.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="books-microservice">4.1. Books Microservice</h3>
+<div class="paragraph">
+<p>Create the <code>books</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,graalvm,testcontainers example.micronaut.books --build=gradle --lang=groovy</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>kafka</code>, <code>graalvm</code>, and <code>testcontainers</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>books</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="paragraph">
+<p>In addition to the dependencies added by the <code>testcontainers</code> feature, we also need a test dependency for Kafka in Testcontainers, along with one for the <a href="http://www.awaitility.org/">Awaitility</a> library:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.testcontainers:kafka</span><span class="delimiter">&quot;</span></span>)
+testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.awaitility:awaitility:4.1.0</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a <code>Book</code> POJO:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/Book.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.Canonical</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+
+<span class="annotation">@Canonical</span>
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">Book</span> {
+    <span class="predefined-type">String</span> isbn
+    <span class="predefined-type">String</span> name
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To keep this guide simple there is no database persistence - <code>BookService</code> keeps the list of books in memory:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/BookService.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="keyword">import</span> <span class="include">javax.annotation.PostConstruct</span>
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Singleton</span>
+<span class="type">class</span> <span class="class">BookService</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; bookStore = <span class="type">[]</span>
+
+    <span class="annotation">@PostConstruct</span>
+    <span class="type">void</span> init() {
+        bookStore &lt;&lt; <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">'</span><span class="content">1491950358</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Building Microservices</span><span class="delimiter">'</span></span>)
+        bookStore &lt;&lt; <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">'</span><span class="content">1680502395</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Release It!</span><span class="delimiter">'</span></span>)
+        bookStore &lt;&lt; <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">'</span><span class="content">0321601912</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Continuous Delivery</span><span class="delimiter">'</span></span>)
+    }
+
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; listAll() {
+        bookStore
+    }
+
+    Optional&lt;<span class="predefined-type">Book</span>&gt; findByIsbn(<span class="predefined-type">String</span> isbn) {
+        Optional.ofNullable(bookStore.find { <span class="local-variable">it</span>.isbn == isbn })
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a <code>BookController</code> class to handle incoming HTTP requests to the <code>books</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/BookController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/books</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">BookController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> BookService bookService
+
+    BookController(BookService bookService) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.bookService = bookService
+    }
+
+    <span class="annotation">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; listAll() {
+        bookService.listAll()
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/{isbn}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
+    Optional&lt;<span class="predefined-type">Book</span>&gt; findBook(<span class="predefined-type">String</span> isbn) {
+        bookService.findByIsbn(isbn)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation defines the class as a controller mapped to the root URI <code>/books</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject <code>BookService</code> using constructor injection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <code>@Get</code> annotation maps the <code>listAll</code> method to an HTTP GET request on <code>/books</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <code>@Get</code> annotation maps the <code>findBook</code> method to an HTTP GET request on <code>/books/{isbn}</code></td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="analytics-microservice">4.2. Analytics Microservice</h3>
+<div class="paragraph">
+<p>Create the <code>analytics</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/index.html#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,graalvm example.micronaut.analytics --build=gradle --lang=groovy</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>kafka</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>Create a <code>Book</code> POJO:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/groovy/example/micronaut/Book.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.Canonical</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+
+<span class="annotation">@Canonical</span>
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">Book</span> {
+    <span class="predefined-type">String</span> isbn
+    <span class="predefined-type">String</span> name
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This <code>Book</code> POJO is the same as the one in the <code>books</code> microservice. In a real application this would be in a shared library but to keep things simple we&#8217;ll just duplicate it.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a <code>BookAnalytics</code> POJO:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/groovy/example/micronaut/BookAnalytics.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.Canonical</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+
+<span class="annotation">@Canonical</span>
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">BookAnalytics</span> {
+    <span class="predefined-type">String</span> bookIsbn
+    <span class="type">long</span> count
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To keep this guide simple there is no database persistence - <code>AnalyticsService</code> keeps book analytics in memory:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/groovy/example/micronaut/AnalyticsService.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">java.util.concurrent.ConcurrentHashMap</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Singleton</span>
+<span class="type">class</span> <span class="class">AnalyticsService</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">Book</span>, <span class="predefined-type">Long</span>&gt; bookAnalytics = <span class="keyword">new</span> <span class="predefined-type">ConcurrentHashMap</span>&lt;&gt;() <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="type">void</span> updateBookAnalytics(<span class="predefined-type">Book</span> book) { <i class="conum" data-value="2"></i><b>(2)</b>
+        bookAnalytics.compute(book, (k, v) -&gt; {
+            v == <span class="predefined-constant">null</span> ? <span class="integer">1L</span> : v + <span class="integer">1</span>
+        })
+    }
+
+    <span class="predefined-type">List</span>&lt;BookAnalytics&gt; listAnalytics() { <i class="conum" data-value="3"></i><b>(3)</b>
+        bookAnalytics.collect { e -&gt; <span class="keyword">new</span> BookAnalytics(e.key.isbn, e.value) }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Keep the book analytics in memory</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Initialize and update the analytics for the book passed as parameter</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Return all the analytics</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Write a test for <code>AnalyticsService</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/test/groovy/example/micronaut/AnalyticsServiceSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="keyword">import</span> <span class="include">javax.inject.Inject</span>
+
+<span class="annotation">@MicronautTest</span>
+<span class="type">class</span> <span class="class">AnalyticsServiceSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@Inject</span>
+    AnalyticsService analyticsService
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test update book analytics and get analytics</span><span class="delimiter">'</span></span>() {
+        <span class="key">given</span>:
+        <span class="predefined-type">Book</span> b1 = <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">'</span><span class="content">1491950358</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Building Microservices</span><span class="delimiter">'</span></span>)
+        <span class="predefined-type">Book</span> b2 = <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">'</span><span class="content">1680502395</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Release It!</span><span class="delimiter">'</span></span>)
+
+        <span class="key">when</span>:
+        analyticsService.updateBookAnalytics b1
+        analyticsService.updateBookAnalytics b1
+        analyticsService.updateBookAnalytics b1
+        analyticsService.updateBookAnalytics b2
+
+        <span class="predefined-type">List</span>&lt;BookAnalytics&gt; analytics = analyticsService.listAnalytics()
+
+        <span class="key">then</span>:
+        <span class="integer">2</span> == analytics.size()
+        <span class="integer">3</span> == findBookAnalytics(b1, analytics).count
+        <span class="integer">1</span> == findBookAnalytics(b2, analytics).count
+    }
+
+    <span class="directive">private</span> BookAnalytics findBookAnalytics(<span class="predefined-type">Book</span> b, <span class="predefined-type">List</span>&lt;BookAnalytics&gt; analytics) {
+        BookAnalytics bookAnalytics = analytics.find { <span class="local-variable">it</span>.bookIsbn == b.isbn }
+        <span class="keyword">if</span> (!bookAnalytics) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="exception">RuntimeException</span>(<span class="string"><span class="delimiter">'</span><span class="content">Book not found</span><span class="delimiter">'</span></span>)
+        }
+        bookAnalytics
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a Controller to expose the analytics:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/groovy/example/micronaut/AnalyticsController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/analytics</span><span class="delimiter">'</span></span>)
+<span class="type">class</span> <span class="class">AnalyticsController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> AnalyticsService analyticsService
+
+    AnalyticsController(AnalyticsService analyticsService) {
+        <span class="local-variable">this</span>.analyticsService = analyticsService
+    }
+
+    <span class="annotation">@Get</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="predefined-type">List</span>&lt;BookAnalytics&gt; listAnalytics() {
+        analyticsService.listAnalytics()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Just expose the analytics</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The application doesn&#8217;t expose the method <code>updateBookAnalytics</code> created in <code>AnalyticsService</code>. This method will be invoked when reading messages from Kafka.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">analytics $ ./gradlew test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Modify the <code>Application</code> class to use <code>dev</code> as a default environment:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Micronaut supports the concept of one or many default environments. A default environment is one that is only applied if no other environments are explicitly specified or deduced.</p>
+</div>
+</blockquote>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/groovy/example/micronaut/Application.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="type">class</span> <span class="class">Application</span> {
+
+    <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
+        Micronaut.build(args)
+                .mainClass(Application)
+                .defaultEnvironments(DEVELOPMENT)
+                .start()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>src/main/resources/application-dev.yml</code>. Micronaut applies this configuration file only for the <code>dev</code> environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/resources/application-dev.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">server</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">8081 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Start the <code>analytics</code> microservice on port 8081</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">5. Running the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Start the <code>books</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">books $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Start the <code>analytics</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">analytics $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use <code>curl</code> to test the application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8080/books
+[{&quot;isbn&quot;:&quot;1491950358&quot;,&quot;name&quot;:&quot;Building Microservices&quot;},{&quot;isbn&quot;:&quot;1680502395&quot;,&quot;name&quot;:&quot;Release It!&quot;},{&quot;isbn&quot;:&quot;0321601912&quot;,&quot;name&quot;:&quot;Continuous Delivery&quot;}]
+
+$ curl http://localhost:8080/books/1491950358
+{&quot;isbn&quot;:&quot;1491950358&quot;,&quot;name&quot;:&quot;Building Microservices&quot;}
+
+$ curl http://localhost:8081/analytics
+[]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that getting the analytics returns an empty list because the applications are not communicating with each other (yet).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kafka-and-micronaut">6. Kafka and Micronaut</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="install-kafka">6.1. Install Kafka</h3>
+<div class="paragraph">
+<p>A fast way to start using Kafka is <a href="https://hub.docker.com/r/confluentinc/cp-kafka/">via Docker</a>. Create this <code>docker-compose.yml</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="title">docker/docker-compose.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">version</span>: <span class="string"><span class="content">'2'</span></span>
+<span class="key">services</span>:
+  <span class="key">zookeeper</span>:
+    <span class="key">image</span>: <span class="string"><span class="content">confluentinc/cp-zookeeper</span></span>
+    <span class="key">ports</span>:
+      - <span class="string"><span class="content">2181:2181 </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">environment</span>:
+      <span class="key">ZOOKEEPER_CLIENT_PORT</span>: <span class="string"><span class="content">2181</span></span>
+      <span class="key">ZOOKEEPER_TICK_TIME</span>: <span class="string"><span class="content">2000</span></span>
+  <span class="key">kafka</span>:
+    <span class="key">image</span>: <span class="string"><span class="content">confluentinc/cp-kafka</span></span>
+    <span class="key">depends_on</span>:
+      - <span class="string"><span class="content">zookeeper</span></span>
+    <span class="key">ports</span>:
+      - <span class="string"><span class="content">9092:9092 </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="key">environment</span>:
+      <span class="key">KAFKA_ZOOKEEPER_CONNECT</span>: <span class="string"><span class="content">zookeeper:2181</span></span>
+      <span class="key">KAFKA_ADVERTISED_LISTENERS</span>: <span class="string"><span class="content">PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092</span></span>
+      <span class="key">KAFKA_LISTENER_SECURITY_PROTOCOL_MAP</span>: <span class="string"><span class="content">PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT</span></span>
+      <span class="key">KAFKA_INTER_BROKER_LISTENER_NAME</span>: <span class="string"><span class="content">PLAINTEXT</span></span>
+      <span class="key">KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR</span>: <span class="string"><span class="content">1</span></span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Zookeeper uses port 2181 by default, but change the value if needed</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Kafka uses port 9092 by default, but change the value if needed</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Start Zookeeper and Kafka (use CTRL-C to stop both):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ docker-compose up</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively you can <a href="https://kafka.apache.org/quickstart">install and run a local Kafka instance</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="books-microservice-2">6.2. Books Microservice</h3>
+<div class="paragraph">
+<p>The generated code includes configuration to connect to a Kafka broker running on <code>localhost:9092</code>. In case you want to change the configuration, update the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">kafka</span>:
+  <span class="key">bootstrap</span>:
+    <span class="key">servers</span>: <span class="string"><span class="content">localhost:9092</span></span></code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-kafka-client-producer">6.2.1. Create Kafka client (producer)</h4>
+<div class="paragraph">
+<p>Let&#8217;s create an interface to send messages to Kafka. Micronaut will implement the interface at compilation time:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/AnalyticsClient.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.KafkaClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.Topic</span>
+
+<span class="annotation">@KafkaClient</span>
+<span class="type">interface</span> AnalyticsClient {
+
+    <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">'</span><span class="content">analytics</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="type">void</span> updateAnalytics(<span class="predefined-type">Book</span> book) <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the topic name</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Send the <code>Book</code> POJO. Micronaut will automatically convert it to JSON before sending it</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-tests">6.2.2. Create Tests</h4>
+<div class="paragraph">
+<p>We could use mocks to test the message sending logic between <code>BookController</code>, <code>AnalyticsFilter</code>, and <code>AnalyticsClient</code>, but it&#8217;s more realistic to use a running Kafka broker. To avoid the burden of having to install Kafka locally (and to make the tests more CI-friendly) we&#8217;ll use <a href="https://www.testcontainers.org/">Testcontainers</a> to run Kafka inside a Docker container.</p>
+</div>
+<div class="paragraph">
+<p>Write a test for <code>BookController</code> to verify the interaction with <code>AnalyticsService</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/test/groovy/example/micronaut/BookControllerSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.KafkaListener</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.Topic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.support.TestPropertyProvider</span>
+<span class="keyword">import</span> <span class="include">org.testcontainers.containers.KafkaContainer</span>
+<span class="keyword">import</span> <span class="include">org.testcontainers.utility.DockerImageName</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="keyword">import</span> <span class="include">spock.util.concurrent.PollingConditions</span>
+
+<span class="keyword">import</span> <span class="include">javax.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">java.util.concurrent.ConcurrentLinkedDeque</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST</span>
+
+<span class="annotation">@MicronautTest</span>  <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">BookControllerSpec</span> <span class="directive">extends</span> Specification <span class="directive">implements</span> TestPropertyProvider { <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Collection</span>&lt;<span class="predefined-type">Book</span>&gt; received = <span class="keyword">new</span> ConcurrentLinkedDeque&lt;&gt;()
+
+    <span class="directive">static</span> KafkaContainer kafka = <span class="keyword">new</span> KafkaContainer(
+            DockerImageName.parse(<span class="string"><span class="delimiter">'</span><span class="content">confluentinc/cp-kafka:latest</span><span class="delimiter">'</span></span>)) <i class="conum" data-value="4"></i><b>(4)</b>
+
+    <span class="annotation">@Inject</span>
+    AnalyticsListener analyticsListener <i class="conum" data-value="5"></i><b>(5)</b>
+
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
+    HttpClient client <i class="conum" data-value="6"></i><b>(6)</b>
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test message is published to Kafka when book found</span><span class="delimiter">'</span></span>() {
+        <span class="key">when</span>:
+        <span class="predefined-type">String</span> isbn = <span class="string"><span class="delimiter">'</span><span class="content">1491950358</span><span class="delimiter">'</span></span>
+        Optional&lt;<span class="predefined-type">Book</span>&gt; result = retrieveGet(<span class="string"><span class="delimiter">'</span><span class="content">/books/</span><span class="delimiter">'</span></span> + isbn) <i class="conum" data-value="7"></i><b>(7)</b>
+
+        <span class="key">then</span>:
+        result != <span class="predefined-constant">null</span>
+        result.present
+        isbn == result.get().isbn
+
+        <span class="keyword">new</span> PollingConditions(<span class="key">timeout</span>: <span class="integer">5</span>).eventually { <i class="conum" data-value="8"></i><b>(8)</b>
+            !received.isEmpty()
+            <span class="integer">1</span> == received.size() <i class="conum" data-value="9"></i><b>(9)</b>
+        }
+
+        <span class="key">when</span>:
+        <span class="predefined-type">Book</span> bookFromKafka = received[<span class="integer">0</span>]
+
+        <span class="key">then</span>:
+        bookFromKafka
+        isbn == bookFromKafka.isbn
+    }
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test message is not published to Kafka when book not found</span><span class="delimiter">'</span></span>() {
+        <span class="key">when</span>:
+        retrieveGet <span class="string"><span class="delimiter">'</span><span class="content">/books/INVALID</span><span class="delimiter">'</span></span>
+
+        <span class="key">then</span>:
+        thrown HttpClientResponseException
+
+        <span class="key">when</span>:
+        sleep <span class="integer">5000</span> <i class="conum" data-value="10"></i><b>(10)</b>
+
+        <span class="key">then</span>:
+        <span class="integer">0</span> == received.size()
+    }
+
+    <span class="type">void</span> cleanup() {
+        received.clear()
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() {
+        kafka.start()
+        [<span class="string"><span class="delimiter">'</span><span class="content">kafka.bootstrap.servers</span><span class="delimiter">'</span></span>: kafka.bootstrapServers] <i class="conum" data-value="11"></i><b>(11)</b>
+    }
+
+    <span class="annotation">@KafkaListener</span>(offsetReset = EARLIEST)
+    <span class="directive">static</span> <span class="type">class</span> <span class="class">AnalyticsListener</span> {
+
+        <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">'</span><span class="content">analytics</span><span class="delimiter">'</span></span>)
+        <span class="type">void</span> updateAnalytics(<span class="predefined-type">Book</span> book) {
+            received &lt;&lt; book
+        }
+    }
+
+    <span class="directive">private</span> Optional&lt;<span class="predefined-type">Book</span>&gt; retrieveGet(<span class="predefined-type">String</span> url) {
+        client.toBlocking().retrieve(HttpRequest.GET(url), Argument.of(Optional, <span class="predefined-type">Book</span>))
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use the <code>@Testcontainers</code> annotation to configure automatic container management (not necessary in Spock tests)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Classes that implement <code>TestPropertyProvider</code> must use this annotation to create a single class instance for all tests (not necessary in Spock tests)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Implementing <code>TestPropertyProvider</code> allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The Testcontainer instance for Kafka</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Dependency injection for the <code>AnalyticsListener</code> class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the <code>analytics</code> microservice</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Dependency injection for an HTTP client that Micronaut will implement at compile to make calls to <code>BookController</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Use the <code>HttpClient</code> to retrieve a <code>Book</code>, which will trigger sending a message with Kafka</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Verify that the message was received and has the correct data</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>Wait a few seconds to make sure no message is sent</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="send-analytics-information-automatically">6.2.3. Send Analytics information automatically</h4>
+<div class="paragraph">
+<p>Sending a message to Kafka is as simple as injecting <code>AnalyticsClient</code> and calling the <code>updateAnalytics</code> method. The goal is to do it automatically every time a book is returned, i.e., every time there is a call to <code><a href="http://localhost:8080/books/{isbn}" class="bare">http://localhost:8080/books/{isbn}</a></code>.
+To achieve this we will create an <a href="https://docs.micronaut.io/latest/guide/index.html#filters">Http Server Filter</a>.
+Create the <code>AnalyticsFilter</code> class:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/groovy/example/micronaut/AnalyticsFilter.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.MutableHttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Filter</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.filter.HttpServerFilter</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.filter.ServerFilterChain</span>
+<span class="keyword">import</span> <span class="include">io.reactivex.Flowable</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+
+<span class="annotation">@Filter</span>(<span class="string"><span class="delimiter">'</span><span class="content">/books/?*</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">AnalyticsFilter</span> <span class="directive">implements</span> HttpServerFilter { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="directive">private</span> <span class="directive">final</span> AnalyticsClient analyticsClient
+
+    AnalyticsFilter(AnalyticsClient analyticsClient) { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.analyticsClient = analyticsClient
+    }
+
+    <span class="annotation">@Override</span>
+    Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request,
+                                               ServerFilterChain chain) { <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="keyword">return</span> Flowable
+                .fromPublisher(chain.proceed(request)) <i class="conum" data-value="5"></i><b>(5)</b>
+                .flatMap(response -&gt; Flowable.fromCallable(() -&gt; {
+                    Optional&lt;<span class="predefined-type">Book</span>&gt; book = response.getBody(<span class="predefined-type">Book</span>) <i class="conum" data-value="6"></i><b>(6)</b>
+                    book.ifPresent(<span class="key">analyticsClient</span>::updateAnalytics) <i class="conum" data-value="7"></i><b>(7)</b>
+
+                    <span class="keyword">return</span> response
+                }))
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@Filter</code> and define the Ant-style matcher pattern to intercept all calls to the desired URIs</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The class must implement <code>HttpServerFilter</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Dependency injection for the Kafka <code>AnalyticsClient</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Implement the <code>doFilter</code> method</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Execute the request; this will invoke the controller action</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Get the response from the controller and return the body as a <code>Book</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>If the book is found, use the Kafka client to send a message</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="analytics-microservice-2">6.3. Analytics Microservice</h3>
+<div class="sect3">
+<h4 id="create-kafka-consumer">6.3.1. Create Kafka consumer</h4>
+<div class="paragraph">
+<p>Create a new class to act as a consumer of the messages sent to Kafka by the <code>books</code> microservice. Micronaut will implement logic to invoke the consumer at compile time. Create the <code>AnalyticsListener</code> class:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/groovy/example/micronaut/AnalyticsListener.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.KafkaListener</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.Topic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Requires</span>(notEnv = Environment.TEST) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@KafkaListener</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">AnalyticsListener</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> AnalyticsService analyticsService <i class="conum" data-value="3"></i><b>(3)</b>
+
+    AnalyticsListener(AnalyticsService analyticsService) { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.analyticsService = analyticsService
+    }
+
+    <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">'</span><span class="content">analytics</span><span class="delimiter">'</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="type">void</span> updateAnalytics(<span class="predefined-type">Book</span> book) {
+        analyticsService.updateBookAnalytics(book) <i class="conum" data-value="5"></i><b>(5)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Do not load this bean for the test environment - this lets us run the tests without having Kafka running</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@KafkaListener</code> to indicate that this bean will consume messages from Kafka</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Constructor injection for <code>AnalyticsService</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Annotate the method with <code>@Topic</code> and specify the topic name to use</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Call <code>AnalyticsService</code> to update the analytics for the book</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-the-application-2">6.4. Running the application</h3>
+<div class="paragraph">
+<p>Start the <code>books</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">books $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Execute a <code>curl</code> request to get one book:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8080/books/1491950358
+{&quot;isbn&quot;:&quot;1491950358&quot;,&quot;name&quot;:&quot;Building Microservices&quot;}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Start the <code>analytics</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">analytics $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The application will consume and process the message automatically after startup.</p>
+</div>
+<div class="paragraph">
+<p>Now, use <code>curl</code> to see the analytics:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8081/analytics
+[{&quot;bookIsbn&quot;:&quot;1491950358&quot;,&quot;count&quot;:1}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Update the <code>curl</code> command to the <code>books</code> microservice to retrieve other books and repeat the invocations, then re-run the <code>curl</code> command to the <code>analytics</code> microservice to see that the counts increase.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">7. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-kafka/latest/guide/">Kafka support</a> in Micronaut.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="https://micronaut.io/wp-content/uploads/2021/03/Micronaut_byobjectcomputing_w.svg" alt=""/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li id="menu-item-2885" class="show-on-blog menu-item menu-item-type-custom menu-item-object-custom menu-item-2885">
+                                <a target="_blank" rel="noopener" href="https://micronaut.io/feed/rss/">
+                                    <i class="fas fa-rss">
+                                        <span class="sr-only">RSS</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2886" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2886">
+                                <a target="_blank" rel="noopener" href="https://twitter.com/micronautfw">
+                                    <i class="fab fa-twitter">
+                                        <span class="sr-only">Twitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2887" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2887">
+                                <a href="mailto:info@micronaut.io">
+                                    <i class="fas fa-envelope">
+                                        <span class="sr-only">Mail</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2888" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2888">
+                                <a target="_blank" rel="noopener" href="https://gitter.im/micronautfw/">
+                                    <i class="fab fa-gitter">
+                                        <span class="sr-only">Gitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2889" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2889">
+                                <a target="_blank" rel="noopener" href="https://github.com/micronaut-projects/">
+                                    <i class="fab fa-github">
+                                        <span class="sr-only">GitHub</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2890" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2890">
+                                <a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLI74De5M9T72YshO4Sc90wtGr286nM8Yu">
+                                    <i class="fab fa-youtube">
+                                        <span class="sr-only">YouTube</span>
+                                    </i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 Object Computing, Inc. All rights reserved</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
