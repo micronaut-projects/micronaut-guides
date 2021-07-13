@@ -1,5 +1,6 @@
 package io.micronaut.guides
 
+import com.fizzed.rocker.Rocker
 import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
@@ -85,6 +86,8 @@ class GuideAsciidocGenerator {
                     if (languages.any { it == guidesOption.language.toString() }) {
                         excludeLineForLanguage = true
                     }
+                } else if (shouldProcessLine(line, 'rocker:')) {
+                    lines.addAll(includeRocker(line))
                 } else {
                     lines << line
                 }
@@ -270,6 +273,12 @@ class GuideAsciidocGenerator {
         lines
     }
 
+    private static List<String> includeRocker(String line) {
+        String name = extractName(line, 'rocker:')
+        String rendered = Rocker.template("io/micronaut/guides/feature/template/${name}.rocker.raw").render()
+        return rendered.split("\\r?\\n|\\r") as List
+    }
+
     private static String extractAppName(String line) {
         extractFromParametersLine(line, 'app')
     }
@@ -320,12 +329,9 @@ class GuideAsciidocGenerator {
     }
 
     private static Map<String, Coordinate> getCoordinates() {
-        ApplicationContext context = ApplicationContext.run()
-        PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
-        Map<String, Coordinate> coordinates = pomDependencyVersionResolver.getCoordinates()
-
-        context.close()
-
-        return coordinates
+        try (ApplicationContext context = ApplicationContext.run()) {
+            PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
+            return pomDependencyVersionResolver.getCoordinates()
+        }
     }
 }
