@@ -9,6 +9,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @MicronautTest(startApplication = false)
 public class PrimarySignatureConfigurationTest {
@@ -25,16 +27,14 @@ public class PrimarySignatureConfigurationTest {
 
     @Test
     void primarySignatureConfigurationIsAnnotatedNamedGenerator() {
-        assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class)
-                .getAnnotationNameByStereotype(Named.class)
-                .isPresent());
-        Optional<String> nameOptional = applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class)
-                .getAnnotationValuesByType(Named.class)
-                .stream()
-                .filter(annValue -> annValue.getValue(String.class).isPresent())
-                .map(annValue -> annValue.getValue(String.class).get())
-                .findFirst();
-        assertTrue(nameOptional.isPresent());
-        assertEquals("generator", nameOptional.get());
+        String annotationName = "javax.inject.Named";
+        assertNotNull(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class).getAnnotationMetadata()
+                .getAnnotation(annotationName));
+        assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class).getAnnotationMetadata()
+                .getAnnotation(annotationName)
+                .getValue(String.class).isPresent());
+        assertEquals("generator", applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class).getAnnotationMetadata()
+                .getAnnotation(annotationName)
+                .getValue(String.class).get());
     }
 }
