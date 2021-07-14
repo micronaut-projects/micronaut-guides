@@ -24,13 +24,12 @@ public class AnalyticsFilter implements HttpServerFilter { // <2>
                                                       ServerFilterChain chain) { // <4>
         return Flowable
                 .fromPublisher(chain.proceed(request)) // <5>
-                .flatMap(response ->
-                    Flowable.fromCallable(() -> {
-                        Optional<Book> book = response.getBody(Book.class); // <6>
-                        book.ifPresent(analyticsClient::updateAnalytics); // <7>
-
-                        return response;
-                    })
-                );
+                .flatMap(response -> {
+                    Book book = response.getBody(Book.class).orElse(null); // <6>
+                    if (book == null) {
+                        return Flowable.just(response);
+                    }
+                    return analyticsClient.updateAnalytics(book).map(b -> response).toFlowable(); // <7>
+                });
     }
 }
