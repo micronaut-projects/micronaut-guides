@@ -787,12 +787,13 @@ $ curl http://localhost:8081/analytics
 
 <span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.KafkaClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.Topic</span>
+<span class="keyword">import</span> <span class="include">io.reactivex.Single</span>
 
 <span class="annotation">@KafkaClient</span>
 <span class="type">interface</span> AnalyticsClient {
 
     <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">'</span><span class="content">analytics</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="type">void</span> updateAnalytics(<span class="predefined-type">Book</span> book) <i class="conum" data-value="2"></i><b>(2)</b>
+    Single&lt;<span class="predefined-type">Book</span>&gt; updateAnalytics(<span class="predefined-type">Book</span> book) <i class="conum" data-value="2"></i><b>(2)</b>
 }</code></pre>
 </div>
 </div>
@@ -1001,12 +1002,15 @@ Create the <code>AnalyticsFilter</code> class:</p>
                                                ServerFilterChain chain) { <i class="conum" data-value="4"></i><b>(4)</b>
         <span class="keyword">return</span> Flowable
                 .fromPublisher(chain.proceed(request)) <i class="conum" data-value="5"></i><b>(5)</b>
-                .flatMap(response -&gt; Flowable.fromCallable(() -&gt; {
-                    Optional&lt;<span class="predefined-type">Book</span>&gt; book = response.getBody(<span class="predefined-type">Book</span>) <i class="conum" data-value="6"></i><b>(6)</b>
-                    book.ifPresent(<span class="key">analyticsClient</span>::updateAnalytics) <i class="conum" data-value="7"></i><b>(7)</b>
-
-                    <span class="keyword">return</span> response
-                }))
+                .flatMap(response -&gt; {
+                    <span class="predefined-type">Book</span> book = response.getBody(<span class="predefined-type">Book</span>).orElse(<span class="predefined-constant">null</span>) <i class="conum" data-value="6"></i><b>(6)</b>
+                    <span class="keyword">if</span> (book) {
+                        analyticsClient.updateAnalytics(book).map(b -&gt; response).toFlowable() <i class="conum" data-value="7"></i><b>(7)</b>
+                    }
+                    <span class="keyword">else</span> {
+                        Flowable.just response
+                    }
+                })
     }
 }</code></pre>
 </div>
