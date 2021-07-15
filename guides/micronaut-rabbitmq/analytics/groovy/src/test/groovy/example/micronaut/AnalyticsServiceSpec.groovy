@@ -35,6 +35,6 @@ class AnalyticsServiceSpec extends Specification {
         if (!bookAnalytics) {
             throw new RuntimeException('Book not found')
         }
-        return bookAnalytics
+        bookAnalytics
     }
 }
