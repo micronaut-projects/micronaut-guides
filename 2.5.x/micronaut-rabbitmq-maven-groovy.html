@@ -419,16 +419,12 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
     <span class="type">void</span> updateBookAnalytics(<span class="predefined-type">Book</span> book) { <i class="conum" data-value="2"></i><b>(2)</b>
         bookAnalytics.compute(book, (k, v) -&gt; {
-            <span class="keyword">if</span> (v == <span class="predefined-constant">null</span>) {
-                <span class="keyword">return</span> <span class="integer">1L</span>
-            } <span class="keyword">else</span> {
-                <span class="keyword">return</span> v + <span class="integer">1</span>
-            }
+            v == <span class="predefined-constant">null</span> ? <span class="integer">1L</span> : v + <span class="integer">1</span>
         })
     }
 
     <span class="predefined-type">List</span>&lt;BookAnalytics&gt; listAnalytics() { <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="keyword">return</span> bookAnalytics.collect { e -&gt; <span class="keyword">new</span> BookAnalytics(e.key.isbn, e.value) }
+        bookAnalytics.collect { e -&gt; <span class="keyword">new</span> BookAnalytics(e.key.isbn, e.value) }
     }
 }</code></pre>
 </div>
@@ -534,7 +530,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="keyword">if</span> (!bookAnalytics) {
             <span class="keyword">throw</span> <span class="keyword">new</span> <span class="exception">RuntimeException</span>(<span class="string"><span class="delimiter">'</span><span class="content">Book not found</span><span class="delimiter">'</span></span>)
         }
-        <span class="keyword">return</span> bookAnalytics
+        bookAnalytics
     }
 }</code></pre>
 </div>
@@ -574,9 +570,9 @@ creating an application with the CLI. For more information take a look <a href="
         <span class="local-variable">this</span>.analyticsService = analyticsService
     }
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="annotation">@Get</span> <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="predefined-type">List</span>&lt;BookAnalytics&gt; listAnalytics() {
-        <span class="keyword">return</span> analyticsService.listAnalytics()
+        analyticsService.listAnalytics()
     }
 }</code></pre>
 </div>
@@ -613,10 +609,42 @@ when reading messages from RabbitMQ.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Finally edit <code>application.yml</code> to run the application on a different port that <code>books</code> microservice.</p>
+<p>Modify the <code>Application</code> class to use <code>dev</code> as a default environment:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Micronaut supports the concept of one or many default environments. A default environment is one that is only applied if no other environments are explicitly specified or deduced.</p>
+</div>
+</blockquote>
 </div>
 <div class="listingblock">
-<div class="title">analytics/src/main/resources/application.yml</div>
+<div class="title">analytics/src/main/groovy/example/micronaut/Application.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="type">class</span> <span class="class">Application</span> {
+
+    <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
+        Micronaut.build(args)
+                .mainClass(Application)
+                .defaultEnvironments(DEVELOPMENT)
+                .start()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>src/main/resources/application-dev.yml</code>. Micronaut applies this configuration file only for the <code>dev</code> environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/resources/application-dev.yml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
   <span class="key">server</span>:
@@ -627,7 +655,7 @@ when reading messages from RabbitMQ.</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Start the Micronaut microservice on port 8081.</td>
+<td>Start the <code>analytics</code> microservice on port 8081.</td>
 </tr>
 </table>
 </div>

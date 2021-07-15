@@ -408,11 +408,7 @@ class AnalyticsService {
 
     fun updateBookAnalytics(book: Book) { <i class="conum" data-value="2"></i><b>(2)</b>
         bookAnalytics.compute(book) { k, v -&gt;
-            if (v == null) {
-                return@compute 1L
-            } else {
-                return@compute v + 1
-            }
+            if (v == null) return@compute 1L else return@compute v + 1
         }
     }
 
@@ -573,10 +569,37 @@ when reading messages from RabbitMQ.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Finally edit <code>application.yml</code> to run the application on a different port that <code>books</code> microservice.</p>
+<p>Modify the <code>Application</code> class to use <code>dev</code> as a default environment:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Micronaut supports the concept of one or many default environments. A default environment is one that is only applied if no other environments are explicitly specified or deduced.</p>
+</div>
+</blockquote>
 </div>
 <div class="listingblock">
-<div class="title">analytics/src/main/resources/application.yml</div>
+<div class="title">analytics/src/main/kotlin/example/micronaut/Application.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.env.Environment.DEVELOPMENT
+import io.micronaut.runtime.Micronaut.build
+
+fun main(args: Array&lt;String&gt;) {
+    build()
+            .args(*args)
+            .packages(&quot;example.micronaut&quot;)
+            .defaultEnvironments(DEVELOPMENT)
+            .start()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>src/main/resources/application-dev.yml</code>. Micronaut applies this configuration file only for the <code>dev</code> environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/resources/application-dev.yml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
   <span class="key">server</span>:
@@ -587,7 +610,7 @@ when reading messages from RabbitMQ.</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Start the Micronaut microservice on port 8081.</td>
+<td>Start the <code>analytics</code> microservice on port 8081.</td>
 </tr>
 </table>
 </div>
