@@ -1,9 +1,7 @@
 package example.micronaut
 
-import io.micronaut.http.HttpMethod
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.MediaType
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
@@ -17,6 +15,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import javax.inject.Inject
+
+import static io.micronaut.http.HttpMethod.POST
+import static io.micronaut.http.MediaType.APPLICATION_JSON_TYPE
 
 @MicronautTest
 class LoginControllerSpec extends Specification {
@@ -34,8 +35,8 @@ class LoginControllerSpec extends Specification {
 
     void 'attempt to access /login without supplying credentials server responds BAD REQUEST'() {
         when:
-        HttpRequest request = HttpRequest.create(HttpMethod.POST, '/login')
-            .accept(MediaType.APPLICATION_JSON_TYPE)
+        HttpRequest request = HttpRequest.create(POST, '/login')
+            .accept(APPLICATION_JSON_TYPE)
         client.toBlocking().exchange(request)
 
         then:
@@ -48,26 +49,26 @@ class LoginControllerSpec extends Specification {
         userGormService.count() > 0
 
         when:
-        HttpRequest request = HttpRequest.create(HttpMethod.POST, '/login')
-            .accept(MediaType.APPLICATION_JSON_TYPE)
+        HttpRequest request = HttpRequest.create(POST, '/login')
+            .accept(APPLICATION_JSON_TYPE)
             .body(new UsernamePasswordCredentials('sherlock', 'elementary'))
         HttpResponse<AccessRefreshToken> rsp = client.toBlocking().exchange(request, AccessRefreshToken)
 
         then:
         noExceptionThrown()
         rsp.status.code == 200
-        rsp.body.isPresent()
+        rsp.body.present
         rsp.body.get().accessToken
 
         when:
         String accessToken = rsp.body.get().accessToken
-        Authentication authentication = Flowable.fromPublisher(tokenValidator.validateToken(accessToken)).blockingFirst()
+        Authentication authentication = Flowable.fromPublisher(tokenValidator.validateToken(accessToken, request)).blockingFirst()
 
         then:
-        authentication.getAttributes()
-        authentication.getAttributes().containsKey('roles')
-        authentication.getAttributes().containsKey('iss')
-        authentication.getAttributes().containsKey('exp')
-        authentication.getAttributes().containsKey('iat')
+        authentication.attributes
+        authentication.attributes.containsKey('roles')
+        authentication.attributes.containsKey('iss')
+        authentication.attributes.containsKey('exp')
+        authentication.attributes.containsKey('iat')
     }
 }
