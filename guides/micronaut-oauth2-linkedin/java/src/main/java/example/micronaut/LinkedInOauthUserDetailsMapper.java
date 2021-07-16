@@ -11,7 +11,7 @@ import io.micronaut.security.authentication.UserDetails;
 import io.micronaut.security.oauth2.endpoint.authorization.state.State;
 import io.micronaut.security.oauth2.endpoint.token.response.OauthUserDetailsMapper;
 import io.micronaut.security.oauth2.endpoint.token.response.TokenResponse;
-import io.reactivex.Flowable;
+import reactor.core.publisher.Mono;
 import org.reactivestreams.Publisher;
 
 import jakarta.inject.Named;
@@ -32,7 +32,7 @@ public class LinkedInOauthUserDetailsMapper implements OauthUserDetailsMapper {
     @Override
     public Publisher<AuthenticationResponse> createAuthenticationResponse(TokenResponse tokenResponse,
                                                                           @Nullable State state) {
-        return linkedInApiClient.me(HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + " " + tokenResponse.getAccessToken())
+        return Mono.from(linkedInApiClient.me(HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + " " + tokenResponse.getAccessToken()))
                 .map(linkedMe -> {
                     Map<String, Object> attributes = CollectionUtils.mapOf("firstName", linkedMe.getLocalizedFirstName(),
                             "lastName", linkedMe.getLocalizedLastName());

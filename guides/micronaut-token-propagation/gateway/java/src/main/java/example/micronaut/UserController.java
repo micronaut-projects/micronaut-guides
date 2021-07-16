@@ -6,7 +6,8 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Single;
+import org.reactivestreams.Publisher;
+import io.micronaut.core.async.annotation.SingleResult;
 
 @Controller("/user")
 public class UserController {
@@ -20,7 +21,8 @@ public class UserController {
     @Secured(SecurityRule.IS_AUTHENTICATED)
     @Produces(MediaType.TEXT_PLAIN)
     @Get
-    Single<String> index() {
+    @SingleResult
+    Publisher<String> index() {
         return usernameFetcher.findUsername();
     }
 }

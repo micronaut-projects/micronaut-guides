@@ -2,7 +2,8 @@ package example.micronaut;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.reactivex.Flowable;
+import reactor.core.publisher.Flux;
+import org.reactivestreams.Publisher;
 
 @Controller("/books") // <1>
 public class BookController {
@@ -16,10 +17,10 @@ public class BookController {
     }
 
     @Get("/") // <3>
-    public Flowable<BookRecommendation> index() {
-        return catalogueClient.findAll(null)
+    public Publisher<BookRecommendation> index() {
+        return Flux.from(catalogueClient.findAll(null))
                 .flatMap(Flowable::fromIterable)
-                .flatMapMaybe(book -> inventoryClient.stock(book.getIsbn())
+                .flatMap(b -> Flux.from(bookInventoryOperations.stock(b.getIsbn()))
                         .filter(Boolean::booleanValue)
                         .map(response -> book))
                 .map(book -> new BookRecommendation(book.getName()));

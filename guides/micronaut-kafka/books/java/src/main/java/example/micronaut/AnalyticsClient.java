@@ -2,11 +2,13 @@ package example.micronaut;
 
 import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
-import io.reactivex.Single;
+import org.reactivestreams.Publisher;
+import io.micronaut.core.async.annotation.SingleResult;
 
 @KafkaClient
 public interface AnalyticsClient {
 
     @Topic("analytics") // <1>
-    Single<Book> updateAnalytics(Book book); // <2>
+    @SingleResult
+    Publisher<Book> updateAnalytics(Book book); // <2>
 }

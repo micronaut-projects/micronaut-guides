@@ -3,8 +3,8 @@ package example.micronaut;
 import io.micronaut.rabbitmq.annotation.Binding;
 import io.micronaut.rabbitmq.annotation.RabbitClient;
 import io.micronaut.rabbitmq.annotation.RabbitProperty;
-import io.reactivex.Flowable;
-
+import reactor.core.publisher.Flux;
+import org.reactivestreams.Publisher;
 import java.util.List;
 
 @RabbitClient("micronaut") // <1>
@@ -12,6 +12,6 @@ import java.util.List;
 public interface CatalogueClient {
 
     @Binding("books.catalogue") // <3>
-    Flowable<List<Book>> findAll(byte[] data); // <4>
+    Publisher<List<Book>> findAll(byte[] data); // <4>
 
 }
