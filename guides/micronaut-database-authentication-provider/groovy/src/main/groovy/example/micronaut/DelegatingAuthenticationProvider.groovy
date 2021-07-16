@@ -5,7 +5,6 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.security.authentication.AuthenticationException
 import io.micronaut.security.authentication.AuthenticationFailed
-import io.micronaut.security.authentication.AuthenticationFailureReason
 import io.micronaut.security.authentication.AuthenticationProvider
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
@@ -20,13 +19,20 @@ import jakarta.inject.Named
 import jakarta.inject.Singleton
 import java.util.concurrent.ExecutorService
 
+import static io.micronaut.security.authentication.AuthenticationFailureReason.ACCOUNT_EXPIRED
+import static io.micronaut.security.authentication.AuthenticationFailureReason.ACCOUNT_LOCKED
+import static io.micronaut.security.authentication.AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH
+import static io.micronaut.security.authentication.AuthenticationFailureReason.PASSWORD_EXPIRED
+import static io.micronaut.security.authentication.AuthenticationFailureReason.USER_DISABLED
+import static io.micronaut.security.authentication.AuthenticationFailureReason.USER_NOT_FOUND
+
 @Singleton
 class DelegatingAuthenticationProvider implements AuthenticationProvider {
 
-    protected final UserFetcher userFetcher
-    protected final PasswordEncoder passwordEncoder
-    protected final AuthoritiesFetcher authoritiesFetcher
-    protected final Scheduler scheduler
+    private final UserFetcher userFetcher
+    private final PasswordEncoder passwordEncoder
+    private final AuthoritiesFetcher authoritiesFetcher
+    private final Scheduler scheduler
 
     DelegatingAuthenticationProvider(UserFetcher userFetcher,
                                      PasswordEncoder passwordEncoder,
@@ -43,48 +49,49 @@ class DelegatingAuthenticationProvider implements AuthenticationProvider {
                                                    AuthenticationRequest<?, ?> authenticationRequest) {
         Flowable.create({ emitter ->
             UserState user = fetchUserState(authenticationRequest)
-            Optional<AuthenticationFailed> authenticationFailed = validate(user, authenticationRequest)
-            if (authenticationFailed.isPresent()) {
-                emitter.onError(new AuthenticationException(authenticationFailed.get()))
+            AuthenticationFailed authenticationFailed = validate(user, authenticationRequest)
+            if (authenticationFailed) {
+                emitter.onError(new AuthenticationException(authenticationFailed))
             } else {
-                emitter.onNext(createSuccessfulAuthenticationResponse(authenticationRequest, user))
+                emitter.onNext(createSuccessfulAuthenticationResponse(user))
             }
             emitter.onComplete()
         }, BackpressureStrategy.ERROR)
                 .subscribeOn(scheduler) // <2>
     }
 
-    protected Optional<AuthenticationFailed> validate(UserState user, AuthenticationRequest authenticationRequest) {
+    private AuthenticationFailed validate(UserState user, AuthenticationRequest authenticationRequest) {
 
         AuthenticationFailed authenticationFailed = null
-        if (user == null) {
-            authenticationFailed = new AuthenticationFailed(AuthenticationFailureReason.USER_NOT_FOUND)
+        if (!user) {
+            authenticationFailed = new AuthenticationFailed(USER_NOT_FOUND)
 
-        } else if (!user.isEnabled()) {
-            authenticationFailed = new AuthenticationFailed(AuthenticationFailureReason.USER_DISABLED)
+        } else if (!user.enabled) {
+            authenticationFailed = new AuthenticationFailed(USER_DISABLED)
 
-        } else if (user.isAccountExpired()) {
-            authenticationFailed = new AuthenticationFailed(AuthenticationFailureReason.ACCOUNT_EXPIRED)
+        } else if (user.accountExpired) {
+            authenticationFailed = new AuthenticationFailed(ACCOUNT_EXPIRED)
 
-        } else if (user.isAccountLocked()) {
-            authenticationFailed = new AuthenticationFailed(AuthenticationFailureReason.ACCOUNT_LOCKED)
+        } else if (user.accountLocked) {
+            authenticationFailed = new AuthenticationFailed(ACCOUNT_LOCKED)
 
-        } else if (user.isPasswordExpired()) {
-            authenticationFailed = new AuthenticationFailed(AuthenticationFailureReason.PASSWORD_EXPIRED)
+        } else if (user.passwordExpired) {
+            authenticationFailed = new AuthenticationFailed(PASSWORD_EXPIRED)
 
-        } else if (!passwordEncoder.matches(authenticationRequest.getSecret().toString(), user.getPassword())) {
-            authenticationFailed = new AuthenticationFailed(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
+        } else if (!passwordEncoder.matches(authenticationRequest.secret.toString(), user.password)) {
+            authenticationFailed = new AuthenticationFailed(CREDENTIALS_DO_NOT_MATCH)
         }
-        Optional.ofNullable(authenticationFailed)
+
+        authenticationFailed
     }
 
-    protected UserState fetchUserState(AuthenticationRequest authenticationRequest) {
-        final String username = authenticationRequest.getIdentity().toString()
+    private UserState fetchUserState(AuthenticationRequest authRequest) {
+        final String username = authRequest.identity.toString()
         userFetcher.findByUsername(username)
     }
 
-    protected AuthenticationResponse createSuccessfulAuthenticationResponse(AuthenticationRequest authenticationRequest, UserState user) {
-        List<String> authorities = authoritiesFetcher.findAuthoritiesByUsername(user.getUsername())
-        new UserDetails(user.getUsername(), authorities)
+    private AuthenticationResponse createSuccessfulAuthenticationResponse(UserState user) {
+        List<String> authorities = authoritiesFetcher.findAuthoritiesByUsername(user.username)
+        new UserDetails(user.username, authorities)
     }
 }

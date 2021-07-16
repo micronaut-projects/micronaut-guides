@@ -1,0 +1,366 @@
+include::{commondir}/common-header.adoc[]
+
+In this guide, we will create two microservices that will use https://kafka.apache.org/[Kafka] to communicate with each other in an asynchronous and decoupled way.
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+* JDK 1.8 or greater installed with `JAVA_HOME` configured appropriately
+* https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker, and for running tests.
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the application
+
+Let's describe the microservices you will build through the guide.
+
+* `books` - It returns a list of books. It uses a domain consisting of a book name and ISBN. It also publishes a message in Kafka every time a book is accessed.
+
+* `analytics` - It connects to Kafka to update the analytics for every book (a counter). It also exposes an endpoint to get the analytics.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+=== Books Microservice
+
+Create the `books` microservice using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
+
+[source,bash]
+----
+mn create-app --features=kafka,graalvm,testcontainers example.micronaut.books --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, and `testcontainers` features.
+
+The previous command creates a directory named `books` and a Micronaut application inside it with default package `example.micronaut`.
+
+In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for Kafka in Testcontainers, along with one for the http://www.awaitility.org/[Awaitility] library:
+
+:dependencies:
+dependency:kafka[groupId=org.testcontainers,scope=test]
+dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
+:dependencies:
+
+Create a `Book` POJO:
+
+source:Book[app=books]
+
+To keep this guide simple there is no database persistence - `BookService` keeps the list of books in memory:
+
+source:BookService[app=books]
+
+Create a `BookController` class to handle incoming HTTP requests to the `books` microservice:
+
+source:BookController[app=books]
+
+<1> The @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation defines the class as a controller mapped to the root URI `/books`
+<2> Inject `BookService` using constructor injection
+<3> The `@Get` annotation maps the `listAll` method to an HTTP GET request on `/books`
+<4> The `@Get` annotation maps the `findBook` method to an HTTP GET request on `/books/{isbn}`
+
+=== Analytics Microservice
+
+Create the `analytics` microservice using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
+
+[source,bash]
+----
+mn create-app --features=kafka,graalvm example.micronaut.analytics --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka` and `graalvm` features.
+
+Create a `Book` POJO:
+
+source:Book[app=analytics]
+
+NOTE: This `Book` POJO is the same as the one in the `books` microservice. In a real application this would be in a shared library but to keep things simple we'll just duplicate it.
+
+Create a `BookAnalytics` POJO:
+
+source:BookAnalytics[app=analytics]
+
+To keep this guide simple there is no database persistence - `AnalyticsService` keeps book analytics in memory:
+
+source:AnalyticsService[app=analytics]
+
+<1> Keep the book analytics in memory
+<2> Initialize and update the analytics for the book passed as parameter
+<3> Return all the analytics
+
+Write a test for `AnalyticsService`:
+
+test:AnalyticsServiceTest[app=analytics]
+
+Create a Controller to expose the analytics:
+
+source:AnalyticsController[app=analytics]
+
+<1> Just expose the analytics
+
+[NOTE]
+====
+The application doesn't expose the method `updateBookAnalytics` created in `AnalyticsService`. This method will be invoked when reading messages from Kafka.
+====
+
+To run the tests:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+analytics $ ./gradlew test
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+analytics $ ./mvnw test
+----
+
+:exclude-for-build:
+
+include::{commondir}/common-default-dev-environment-application.adoc[]
+
+source:Application[app=analytics]
+
+include::{commondir}/common-default-dev-environment-application-dev-yaml.adoc[]
+
+resource:application-dev.yml[app=analytics]
+
+<1> Start the `analytics` microservice on port 8081
+
+== Running the application
+
+Start the `books` microservice:
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+books $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
+----
+
+Start the `analytics` microservice:
+
+[source,bash]
+----
+analytics $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+books $ ./mvnw mn:run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
+----
+
+Start the `analytics` microservice:
+
+[source,bash]
+----
+analytics $ ./mvnw mn:run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
+----
+
+:exclude-for-build:
+
+You can use `curl` to test the application:
+
+[source, bash]
+----
+$ curl http://localhost:8080/books
+[{"isbn":"1491950358","name":"Building Microservices"},{"isbn":"1680502395","name":"Release It!"},{"isbn":"0321601912","name":"Continuous Delivery"}]
+
+$ curl http://localhost:8080/books/1491950358
+{"isbn":"1491950358","name":"Building Microservices"}
+
+$ curl http://localhost:8081/analytics
+[]
+----
+
+Note that getting the analytics returns an empty list because the applications are not communicating with each other (yet).
+
+== Kafka and Micronaut
+
+=== Install Kafka
+
+A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker]. Create this `docker-compose.yml` file:
+
+zipInclude:docker/docker-compose.yml[]
+
+<1> Zookeeper uses port 2181 by default, but change the value if needed
+<2> Kafka uses port 9092 by default, but change the value if needed
+
+Start Zookeeper and Kafka (use CTRL-C to stop both):
+
+[source,bash]
+----
+$ docker-compose up
+----
+
+Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance].
+
+=== Books Microservice
+
+The generated code includes configuration to connect to a Kafka broker running on `localhost:9092`. In case you want to change the configuration, update the following:
+
+resource:application.yml[app=books,tag=kafka]
+
+==== Create Kafka client (producer)
+
+Let's create an interface to send messages to Kafka. Micronaut will implement the interface at compilation time:
+
+source:AnalyticsClient[app=books]
+
+<1> Set the topic name
+<2> Send the `Book` POJO. Micronaut will automatically convert it to JSON before sending it
+
+==== Create Tests
+
+We could use mocks to test the message sending logic between `BookController`, `AnalyticsFilter`, and `AnalyticsClient`, but it's more realistic to use a running Kafka broker. To avoid the burden of having to install Kafka locally (and to make the tests more CI-friendly) we'll use https://www.testcontainers.org/[Testcontainers] to run Kafka inside a Docker container.
+
+Write a test for `BookController` to verify the interaction with `AnalyticsService`:
+
+test:BookControllerTest[app=books]
+
+<1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
+<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+<3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
+<4> The Testcontainer instance for Kafka
+<5> Dependency injection for the `AnalyticsListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `analytics` microservice
+<6> Dependency injection for an HTTP client that Micronaut will implement at compile to make calls to `BookController`
+<7> Use the `HttpClient` to retrieve a `Book`, which will trigger sending a message with Kafka
+<8> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<9> Verify that the message was received and has the correct data
+<10> Wait a few seconds to make sure no message is sent
+<11> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
+
+==== Send Analytics information automatically
+
+Sending a message to Kafka is as simple as injecting `AnalyticsClient` and calling the `updateAnalytics` method. The goal is to do it automatically every time a book is returned, i.e., every time there is a call to `http://localhost:8080/books/{isbn}`.
+To achieve this we will create an https://docs.micronaut.io/latest/guide/index.html#filters[Http Server Filter].
+Create the `AnalyticsFilter` class:
+
+source:AnalyticsFilter[app=books]
+
+<1> Annotate the class with `@Filter` and define the Ant-style matcher pattern to intercept all calls to the desired URIs
+<2> The class must implement `HttpServerFilter`
+<3> Dependency injection for the Kafka `AnalyticsClient`
+<4> Implement the `doFilter` method
+<5> Execute the request; this will invoke the controller action
+<6> Get the response from the controller and return the body as a `Book`
+<7> If the book is found, use the Kafka client to send a message
+
+=== Analytics Microservice
+
+==== Create Kafka consumer
+
+Create a new class to act as a consumer of the messages sent to Kafka by the `books` microservice. Micronaut will implement logic to invoke the consumer at compile time. Create the `AnalyticsListener` class:
+
+source:AnalyticsListener[app=analytics]
+
+<1> Do not load this bean for the test environment - this lets us run the tests without having Kafka running
+<2> Annotate the class with `@KafkaListener` to indicate that this bean will consume messages from Kafka
+<3> Constructor injection for `AnalyticsService`
+<4> Annotate the method with `@Topic` and specify the topic name to use
+<5> Call `AnalyticsService` to update the analytics for the book
+
+=== Running the application
+
+Start the `books` microservice:
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+books $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+books $ ./mvnw mn:run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
+----
+
+:exclude-for-build:
+
+Execute a `curl` request to get one book:
+
+[source, bash]
+----
+$ curl http://localhost:8080/books/1491950358
+{"isbn":"1491950358","name":"Building Microservices"}
+----
+
+Start the `analytics` microservice:
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+analytics $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+analytics $ ./mvnw mn:run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
+----
+
+:exclude-for-build:
+
+The application will consume and process the message automatically after startup.
+
+Now, use `curl` to see the analytics:
+
+[source, bash]
+----
+$ curl http://localhost:8081/analytics
+[{"bookIsbn":"1491950358","count":1}]
+----
+
+Update the `curl` command to the `books` microservice to retrieve other books and repeat the invocations, then re-run the `curl` command to the `analytics` microservice to see that the counts increase.
+
+include::{commondir}/common-graal-with-plugins-multi.adoc[]
+
+:exclude-for-languages:groovy
+
+Start the native images for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
+
+:exclude-for-languages:
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut.

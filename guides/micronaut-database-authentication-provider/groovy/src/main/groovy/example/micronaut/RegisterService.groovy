@@ -2,7 +2,6 @@ package example.micronaut
 
 import example.micronaut.domain.Role
 import example.micronaut.domain.User
-import example.micronaut.domain.UserRole
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 
@@ -14,10 +13,10 @@ import javax.validation.constraints.NotBlank
 @Singleton
 class RegisterService {
 
-    protected final RoleGormService roleGormService
-    protected final UserGormService userGormService
-    protected final UserRoleGormService userRoleGormService
-    protected final PasswordEncoder passwordEncoder
+    private final RoleGormService roleGormService
+    private final UserGormService userGormService
+    private final UserRoleGormService userRoleGormService
+    private final PasswordEncoder passwordEncoder
 
     RegisterService(RoleGormService roleGormService,
                     UserGormService userGormService,
@@ -30,7 +29,8 @@ class RegisterService {
     }
 
     @Transactional
-    void register(@Email String email, @NotBlank String username, @NotBlank String rawPassword, List<String> authorities) {
+    void register(@Email String email, @NotBlank String username,
+                  @NotBlank String rawPassword, List<String> authorities) {
 
         User user = userGormService.findByUsername(username)
         if (!user) {
@@ -39,16 +39,9 @@ class RegisterService {
         }
 
         if (user && authorities) {
-
             for (String authority : authorities) {
-                Role role = roleGormService.find(authority)
-                if (!role) {
-                    role = roleGormService.save(authority)
-                }
-                UserRole userRole = userRoleGormService.find(user, role)
-                if (!userRole) {
-                    userRoleGormService.save(user, role)
-                }
+                Role role = roleGormService.find(authority) ?: roleGormService.save(authority)
+                userRoleGormService.find(user, role) ?: userRoleGormService.save(user, role)
             }
         }
     }

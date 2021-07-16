@@ -1,5 +1,6 @@
 package io.micronaut.guides
 
+import com.fizzed.rocker.Rocker
 import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
@@ -59,6 +60,9 @@ class GuideAsciidocGenerator {
                 } else if (shouldProcessLine(line, 'testResource:')) {
                     lines.addAll(testResourceIncludeLines(line))
 
+                } else if (shouldProcessLine(line, 'zipInclude:')) {
+                    lines.addAll(zipIncludeLines(line))
+
                 } else if (line == ':dependencies:') {
                     groupDependencies = !groupDependencies
                     if (!groupDependencies) {
@@ -85,6 +89,8 @@ class GuideAsciidocGenerator {
                     if (languages.any { it == guidesOption.language.toString() }) {
                         excludeLineForLanguage = true
                     }
+                } else if (shouldProcessLine(line, 'rocker:')) {
+                    lines.addAll(includeRocker(line))
                 } else {
                     lines << line
                 }
@@ -160,6 +166,28 @@ class GuideAsciidocGenerator {
 
     private static List<String> testResourceIncludeLines(String line) {
         resourceIncludeLines(line, 'test', 'testResource:')
+    }
+
+    private static List<String> zipIncludeLines(String line) {
+        String fileName = extractName(line, 'zipInclude:')
+        List<String> tagNames = extractTags(line)
+
+        List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
+        String asciidoctorLang = resolveAsciidoctorLanguage(fileName)
+
+        List<String> lines = [
+                '[source,' + asciidoctorLang + ']',
+                '.' + fileName,
+                '----']
+        if (tags) {
+            for (String tag : tags) {
+                lines << "include::{sourceDir}/@sourceDir@/${fileName}[${tag}]\n".toString()
+            }
+        } else {
+            lines << "include::{sourceDir}/@sourceDir@/${fileName}[]".toString()
+        }
+        lines << '----'
+        lines
     }
 
     private static List<String> sourceIncludeLines(String line, TestFramework testFramework, String macro) {
@@ -270,6 +298,12 @@ class GuideAsciidocGenerator {
         lines
     }
 
+    private static List<String> includeRocker(String line) {
+        String name = extractName(line, 'rocker:')
+        String rendered = Rocker.template("io/micronaut/guides/feature/template/${name}.rocker.raw").render()
+        return rendered.split("\\r?\\n|\\r") as List
+    }
+
     private static String extractAppName(String line) {
         extractFromParametersLine(line, 'app')
     }
@@ -320,12 +354,9 @@ class GuideAsciidocGenerator {
     }
 
     private static Map<String, Coordinate> getCoordinates() {
-        ApplicationContext context = ApplicationContext.run()
-        PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
-        Map<String, Coordinate> coordinates = pomDependencyVersionResolver.getCoordinates()
-
-        context.close()
-
-        return coordinates
+        try (ApplicationContext context = ApplicationContext.run()) {
+            PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
+            return pomDependencyVersionResolver.getCoordinates()
+        }
     }
 }

@@ -13,11 +13,7 @@ public class AnalyticsService {
 
     public void updateBookAnalytics(Book book) { // <2>
         bookAnalytics.compute(book, (b, v) -> {
-            if (v == null) {
-                return 1L;
-            } else {
-                return v + 1;
-            }
+            return v == null ? 1L : v + 1;
         });
     }
 
