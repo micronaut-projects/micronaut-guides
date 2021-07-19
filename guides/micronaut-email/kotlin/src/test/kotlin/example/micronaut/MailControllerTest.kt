@@ -5,7 +5,7 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -22,7 +22,7 @@ internal class MailControllerTest {
 
     @Inject
     @field:Client("/")
-    lateinit var client: RxHttpClient // <4>
+    lateinit var client: HttpClient // <4>
 
     @Test
     fun mailsendInteractsOnceEmailService() {

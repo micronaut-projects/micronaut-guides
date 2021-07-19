@@ -1,14 +1,6 @@
-= @guideTitle@
+include::{commondir}/common-header.adoc[]
 
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-== Getting Started
-
-In this guide, you will create a Micronaut application which uses multiple authentication providers; an LDAP and a database authentication provider.
+The application uses multiple authentication providers; an LDAP and a database authentication provider.
 
 image:diagram-ldap-authentication.provider.svg[]
 
@@ -16,30 +8,34 @@ include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+== Writing the Application
 
-Add `security-jwt` dependency:
+include::{commondir}/common-cli-or-launch.adoc[]
 
-:dependencies:
+[source,bash]
+----
+mn create-app --features=security-jwt,security-ldap example.micronaut.micronautguide --build=@build@ --lang=@lang@
+----
 
-dependency:micronaut-security-annotations[groupId=io.micronaut.security,scope=annotationProcessor]
-dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+include::{commondir}/common-build-lang-arguments.adoc[]
 
-:dependencies:
+If you use Micronaut Launch, select Micronaut Application as application type and add the `security-jwt` and `security-ldap` features.
 
-Modify `application.yml` to enable security:
+include::{commondir}/common-default-package.adoc[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+The generated `application.yml` includes configuration settings that enable security:
 
 resource:application.yml[tag=security]
 
 <1> Set `micronaut.security.authentication` as `bearer`
 <2> You can create a SecretSignatureConfiguration named `generator` via configuration as illustrated above. The generator signature is used to sign the issued JWT claims.
-<3> Change this by your own secret and keep it safe (do not store this in your VCS)
+<3> Change this to your own secret and keep it safe (do not store this in your VCS)
 
 === Security LDAP
 
-Micronaut supports authentication with LDAP out of the box. To get started, add the `security-ldap` dependency to your application.
-
-dependency:micronaut-security-ldap[groupId=io.micronaut.security]
+Micronaut supports authentication with LDAP out of the box.
 
 We will use an https://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/[Online LDAP test server] for this guide.
 
@@ -47,8 +43,8 @@ Create several configuration properties matching those of the test LDAP Server.
 
 resource:application.yml[tag=ldap]
 
-<1> The LDAP authentication in Micronaut supports configuration of one or more LDAP servers to authenticate with. You need to name each one. In this tutorial, we use `default`.
-<2> Each server has it's own settings and can be enabled or disabled.
+<1> LDAP authentication in Micronaut supports configuration of one or more LDAP servers to authenticate with. You need to name each one. In this tutorial, we use `default`.
+<2> Each server has its own settings and can be enabled or disabled.
 <3> Sets the manager DN
 <4> Sets the manager password.
 <5> Sets the base DN to search.
@@ -59,7 +55,7 @@ resource:application.yml[tag=ldap]
 
 include::{commondir}/common-gorm.adoc[]
 
-Add a GORM dependency to the project:
+Add GORM dependencies to the project:
 
 :dependencies:
 
@@ -80,7 +76,7 @@ include::{commondir}/common-quotedomainclass.adoc[]
 
 ===== User
 
-Create a interface `UserState` to model the user state.
+Create a `UserState` interface to model the user state.
 
 source:UserState[]
 
@@ -88,7 +84,7 @@ Create `User` domain class to store users within our application.
 
 source:domain/User[]
 
-<1> GORM entities should be annotated with `grails.persistence.Entity`.
+<1> GORM entities should be annotated with `grails.gorm.annotation.Entity`.
 <2> Use of `GormEntity` to aid IDE support.
 
 ===== Role
@@ -97,7 +93,7 @@ Create `Role` domain class to store authorities within our application.
 
 source:domain/Role[]
 
-<1> GORM entities should be annotated with `grails.persistence.Entity`.
+<1> GORM entities should be annotated with `grails.gorm.annotation.Entity`.
 <2> Use of `GormEntity` to aid IDE support.
 
 ===== UserRole
@@ -106,7 +102,7 @@ Create a `UserRole` which stores a many-to-many relationship between `User` and 
 
 source:domain/UserRole[]
 
-<1> GORM entities should be annotated with `grails.persistence.Entity`.
+<1> GORM entities should be annotated with `grails.gorm.annotation.Entity`.
 <2> Use of `GormEntity` to aid IDE support.
 
 ==== Data Services
@@ -117,66 +113,18 @@ Create various GORM Data services:
 
 source:UserGormService[]
 
-<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Services] which is registered as a `Singleton`.
+<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Service] which is registered as a `Singleton`.
 
 source:RoleGormService[]
 
-<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Services] which is registered as a `Singleton`.
+<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Service] which is registered as a `Singleton`.
 
 source:UserRoleGormService[]
 
-<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Services] which is registered as a `Singleton`.
-<2> GORM allows Statically-compiled JPA-QL Queries
+<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Service] which is registered as a `Singleton`.
+<2> GORM allows statically-compiled JPA-QL Queries
 
-=== Register Service
-
-We will register a user when the application starts up.
-
-source:Application[]
-
-<1> Implements `ServerStartupEvent` which enables to execute a method when the application starts.
-<2> `RegisterService` is injected via constructor injection.
-<3> Register a new user when the application starts.
-
-Create `RegisterService`
-
-source:RegisterService[]
-
-=== Delegating Authentication Provider
-
-We will set up a http://docs.micronaut.io/snapshot/api/io/micronaut/security/authentication/AuthenticationProvider.html[AuthenticationProvider] a described in the next diagramm.
-
-image::delegating_authentication_provider.svg[]
-
-Next, we create interfaces and implementations for each of the pieces of the previous diagram.
-
-==== User Fetcher
-
-Create an interface to retrieve a `UserState` given a username.
-
-source:UserFetcher[]
-
-Provide an implementation:
-
-source:UserFetcherService[]
-
-<1> Use `javax.inject.Singleton` to designate a class a a singleton.
-<2> `UserGormService` is injected via constructor injection.
-
-==== Authorities Fetcher
-
-Create an interface to retrieve roles given a username.
-
-source:AuthoritiesFetcher[]
-
-Provide an implementation:
-
-source:AuthoritiesFetcherService[]
-
-<1> Use `javax.inject.Singleton` to designate a class a a singleton.
-<2> `UserRoleGormService` is injected via constructor injection.
-
-==== Password Encoder
+=== Password Encoder
 
 Create an interface to handle password encoding:
 
@@ -192,7 +140,57 @@ Then, write the implementation:
 
 source:BCryptPasswordEncoderService[]
 
-<1> Use `javax.inject.Singleton` to designate a class a a singleton.
+<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+
+=== Register Service
+
+We will register a user when the application starts up.
+
+Create `RegisterService`
+
+source:RegisterService[]
+
+Update the `Application` class to be an event listener, and use `RegisterService` to create a user:
+
+source:Application[]
+
+<1> Implements `ServerStartupEvent` which enables executing a method when the application starts.
+<2> `RegisterService` is injected via constructor injection.
+<3> Register a new user when the application starts.
+
+=== Delegating Authentication Provider
+
+We will set up a http://docs.micronaut.io/snapshot/api/io/micronaut/security/authentication/AuthenticationProvider.html[AuthenticationProvider] a described in the next diagram.
+
+image::delegating_authentication_provider.svg[]
+
+Next, we create interfaces and implementations for each of the pieces of the previous diagram.
+
+==== User Fetcher
+
+Create an interface to retrieve a `UserState` given a username.
+
+source:UserFetcher[]
+
+Provide an implementation:
+
+source:UserFetcherService[]
+
+<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+<2> `UserGormService` is injected via constructor injection.
+
+==== Authorities Fetcher
+
+Create an interface to retrieve roles given a username.
+
+source:AuthoritiesFetcher[]
+
+Provide an implementation:
+
+source:AuthoritiesFetcherService[]
+
+<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+<2> `UserRoleGormService` is injected via constructor injection.
 
 ==== Authentication Provider
 
@@ -211,9 +209,9 @@ Create a test to verify an LDAP user can log in.
 
 test:LoginLdapTest[]
 
-<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
-<2> Inject the `HttpClient` bean in the application context.
-<3> Inject to `TokenValidator` bean.
+<1> Annotate the class with `@MicronautTest` to let Micronaut start the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/].
+<2> Inject the `HttpClient` bean.
+<3> Inject the `TokenValidator` bean.
 <4> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
 <5> If you attempt to access a secured endpoint without authentication, 401 is returned
 <6> Use the `tokenValidator` bean previously injected.

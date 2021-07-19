@@ -2,7 +2,7 @@ package example.micronaut;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.context.annotation.DefaultImplementation;
 import io.micronaut.http.server.types.files.SystemFile;
 

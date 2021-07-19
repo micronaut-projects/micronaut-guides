@@ -4,7 +4,7 @@ import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
@@ -16,7 +16,7 @@ class GraphQLControllerSpec extends Specification {
 
     @Inject
     @Client("/")
-    RxHttpClient client
+    HttpClient client
 
     void 'test graphQL controller'() {
         given:

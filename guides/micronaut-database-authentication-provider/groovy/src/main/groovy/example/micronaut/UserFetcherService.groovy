@@ -1,6 +1,6 @@
 package example.micronaut
 
-import edu.umd.cs.findbugs.annotations.NonNull
+import io.micronaut.core.annotation.NonNull
 import groovy.transform.CompileStatic
 
 import javax.inject.Singleton
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank
 @Singleton // <1>
 class UserFetcherService implements UserFetcher {
 
-    protected final UserGormService userGormService
+    private final UserGormService userGormService
 
     UserFetcherService(UserGormService userGormService) { // <2>
         this.userGormService = userGormService

@@ -26,15 +26,7 @@ To create a new guide create a new asciidoc file under `src/guides` with the fol
  
 
 ```asciidoc
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 include::{commondir}/common-requirements.adoc[]
 

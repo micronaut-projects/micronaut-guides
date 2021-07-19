@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.stream.StreamSupport
 import javax.inject.Inject
+import io.reactivex.Flowable
 
 @MicronautTest // <1>
 class GithubControllerTest {
@@ -45,7 +46,7 @@ class GithubControllerTest {
         //when:
         val request: HttpRequest<Any> = HttpRequest.GET("/github/releases-lowlevel")
         val githubReleaseStream = client.jsonStream(request, GithubRelease::class.java) // <7>
-        val githubReleases = githubReleaseStream.blockingIterable()
+        val githubReleases = Flowable.fromPublisher(githubReleaseStream).blockingIterable()
 
         //then:
         for (name in expectedReleases) {

@@ -35,6 +35,7 @@ task cleanAsciidoctorFolder {
         }
     }
 }
+
 task copyImagesToDist(type: Copy) {
     group 'guides'
     description 'Copies images from src/docs/images to build/dist/images folder'
@@ -48,10 +49,18 @@ task copyImagesToDist(type: Copy) {
 
 task copyStylesheetsToDist(type: Copy) {
     group 'guides'
-    description 'Copies css files from assets/stylesheets to build/dist folder'
+    description 'Copies CSS files from assets/stylesheets to build/dist folder'
     from 'assets/stylesheets'
     into "${project.buildDir}/dist"
     include '*.css'
+}
+
+task copyJavaScriptToDist(type: Copy) {
+    group 'guides'
+    description 'Copies JS files from assets/js to build/dist folder'
+    from 'assets/js'
+    into "${project.buildDir}/dist"
+    include '*.js'
 }
 
 task copyHtmlToDist(type: Copy) {
@@ -64,8 +73,9 @@ task copyHtmlToDist(type: Copy) {
 
 task createDist {
     description 'Creates build/dist folder with static assets'
-    dependsOn('copyImagesToDist')
-    dependsOn('copyStylesheetsToDist')
+    dependsOn 'copyImagesToDist',
+              'copyStylesheetsToDist',
+              'copyJavaScriptToDist'
 }
 
 clean.dependsOn('cleanAsciidoctorFolder')
@@ -84,7 +94,7 @@ task generateSampleProjects {
     }
     doLast {
         GuideProjectGenerator generator = new GuideProjectGenerator()
-        generator.generate(file(guides), file(output), metadataConfigName, true, new File(projectDir, "src/docs/asciidoc"))
+        generator.generate(file(guides), file(output), metadataConfigName, new File(projectDir, "src/docs/asciidoc"))
         generator.close()
     }
     finalizedBy(
