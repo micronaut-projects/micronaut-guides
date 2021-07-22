@@ -507,9 +507,60 @@ Once you've verified that the microservices work with the configured cloud resou
 
 Follow the steps in https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[this guide] for each service.
 
+=== Instance Principal authentication
+
+The current configuration in `application-oraclecloud.yml` works when running locally using OCI resources (ATP database and Cloud Streams) but won't work when deploying the application because it doesn't make sense to install the Oracle Cloud CLI in Compute instances. Instead, we'll use https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#instance-principals[Instance Principal authentication].
+
+To use this we need to update the config, and create a dynamic group and add policy statements granting permissions.
+
+==== Dynamic Group
+
+Create a Dynamic Group by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Dynamic Groups":
+
+image::oraclecloudstream/dynamicgroup1.png[]
+
+Click "Create Dynamic Group":
+
+image::oraclecloudstream/dynamicgroup2.png[]
+
+Then enter a name and description for the group, e.g. "mn-streaming-guide-dg", and a matching rule, i.e. the logic that will be used to determine group membership. We'll make the rule fairly broad - enter `ALL {instance.compartment.id = 'ocid1.compartment.oc1..aaaaaxxxxx'}` replacing `ocid1.compartment.oc1..aaaaaxxxxx` with the compartment OCID where you're creating your Compute instances, and click "Create":
+
+image::oraclecloudstream/dynamicgroup3.png[]
+
+See the https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm[Dynamic Group docs] for more information.
+
+==== Dynamic Group Policy Statements
+
+Edit the policy you created earlier and add three new policies; one to grant access to Autonomous Database, one to allow sending stream messages, and one to allow receiving stream messages:
+
+image::oraclecloudstream/policy4.png[]
+
+==== Configuration
+
+Edit `application-oraclecloud.yml` in the `chess-listener` microservice and replace
+
+[source, yaml]
+----
+oci:
+  config:
+    profile: DEFAULT
+----
+
+with
+
+[source, yaml]
+----
+oci:
+  config:
+    instance-principal:
+      enabled: true
+----
+
 include::{commondir}/common-graal-with-plugins-multi.adoc[]
 
 :exclude-for-languages:groovy
+
+NOTE: Native image building will fail if the H2 driver is in the classpath, so comment out that dependency in your build script before building. No other changes are needed since there are no compile dependencies on the library, so you can keep the H2 versions of the repository interfaces for use in dev mode.
 
 === Deployable Native Images
 
@@ -517,7 +568,7 @@ The native images you built probably won't be deployable to OCI even if you buil
 
 :exclude-for-build:maven
 
-To generate deployable native images for each application using Gradle run:
+To generate deployable native images for each application using Gradle, run:
 
 [source, bash]
 ----
@@ -528,7 +579,7 @@ $ ./gradlew dockerBuildNative
 
 :exclude-for-build:gradle
 
-To generate deployable native images for each application using Maven run:
+To generate deployable native images for each application using Maven, run:
 
 [source, bash]
 ----
@@ -546,9 +597,24 @@ You'll need the Docker image ids, so run:
 $ docker image ls
 ----
 
+The output should look like this:
+
+[source, bash]
+----
+REPOSITORY                   TAG             IMAGE ID       CREATED          SIZE
+chess-listener               latest          0e262e1754a7   32 seconds ago   246MB
+chess-game                   latest          43f567f2fed6   39 minutes ago   86.1MB
+confluentinc/cp-kafka        latest          ca0dbcd0244c   2 weeks ago      771MB
+confluentinc/cp-zookeeper    latest          04999d93068f   2 weeks ago      771MB
+ghcr.io/graalvm/graalvm-ce   java11-21.1.0   9762c6e631f0   2 months ago     1.29GB
+ghcr.io/graalvm/graalvm-ce   java8-21.1.0    aef3649e379d   2 months ago     1.12GB
+frolvlad/alpine-glibc        alpine-3.12     39c4d33bd807   2 months ago     17.9MB
+portainer/portainer          latest          cd645f5a4769   13 months ago    79.1MB
+----
+
 The ids should be at the top since they're the most recent.
 
-Then run this for each image, replacing `image_id` with the Docker image id, e.g. `f59d22bcad03`:
+Then run this for each image, replacing `image_id` with the Docker image id, e.g. `0e262e1754a7` and `43f567f2fed6`:
 
 [source, bash]
 ----
