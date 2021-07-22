@@ -1,0 +1,15 @@
+package example.micronaut.chess.repository
+
+import io.micronaut.context.annotation.Primary
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.env.Environment.ORACLE_CLOUD
+import io.micronaut.data.jdbc.annotation.JdbcRepository
+import io.micronaut.data.model.query.builder.sql.Dialect.ORACLE
+
+/**
+ * Oracle `GameState` entity repository.
+ */
+@Primary
+@JdbcRepository(dialect = ORACLE)
+@Requires(env = [ORACLE_CLOUD])
+interface OracleGameStateRepository : GameStateRepository
