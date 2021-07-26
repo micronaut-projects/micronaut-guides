@@ -11,7 +11,7 @@ class BooksController(private val bookCatalogueOperations: BookCatalogueOperatio
 
     @Get // <3>
     fun index(): Publisher<BookRecommendation> {
-        return bookCatalogueOperations.findAll()
+        return Flux.from(bookCatalogueOperations.findAll())
                 .flatMap { b ->
                     Flux.from(bookInventoryOperations.stock(b.isbn))
                             .filter { hasStock -> hasStock }
