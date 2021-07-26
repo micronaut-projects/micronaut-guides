@@ -13,7 +13,7 @@ import org.reactivestreams.Publisher
 class BookCatalogueClientStub implements BookCatalogueOperations {
 
     @Override
-    Flux<Book> findAll() {
+    Publisher<Book> findAll() {
         Book buildingMicroservices = new Book("1491950358", "Building Microservices")
         Book releaseIt = new Book("1680502395", "Release It!")
         Flux.just(buildingMicroservices, releaseIt)
