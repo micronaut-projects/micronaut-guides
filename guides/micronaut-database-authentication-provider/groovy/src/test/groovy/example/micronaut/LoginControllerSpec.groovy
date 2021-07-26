@@ -62,7 +62,7 @@ class LoginControllerSpec extends Specification {
 
         when:
         String accessToken = rsp.body.get().accessToken
-        Authentication authentication = Flux.from(tokenValidator.validateToken(accessToken, request)).blockingFirst()
+        Authentication authentication = Flux.from(tokenValidator.validateToken(accessToken, request)).blockFirst()
 
         then:
         authentication.attributes

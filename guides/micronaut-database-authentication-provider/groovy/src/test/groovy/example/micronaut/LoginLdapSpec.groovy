@@ -77,9 +77,9 @@ class LoginLdapSpec extends Specification {
         Publisher authentication = tokenValidator.validateToken(accessToken, request) // <6>
 
         then:
-        Flux.from(authentication).blockingFirst()
+        Flux.from(authentication).blockFirst()
 
         and: 'access token contains an expiration date'
-        Flux.from(authentication).blockingFirst().attributes.get(JwtClaims.EXPIRATION_TIME)
+        Flux.from(authentication).blockFirst().attributes.get(JwtClaims.EXPIRATION_TIME)
     }
 }
