@@ -5,8 +5,8 @@ import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode
 import io.micronaut.security.errors.OauthErrorResponseException
 import io.micronaut.security.token.event.RefreshTokenGeneratedEvent
 import io.micronaut.security.token.refresh.RefreshTokenPersistence
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
+import reactor.core.publisher.FluxSink
+import reactor.core.publisher.Flux
 import org.reactivestreams.Publisher
 import jakarta.inject.Singleton
 
@@ -28,19 +28,19 @@ class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
 
     @Override
     Publisher<UserDetails> getUserDetails(String refreshToken) {
-        Flowable.create(emitter -> {
+        Flux.create(emitter -> {
             Optional<RefreshTokenEntity> tokenOpt = refreshTokenRepository.findByRefreshToken(refreshToken)
             if (tokenOpt.isPresent()) {
                 RefreshTokenEntity token = tokenOpt.get()
                 if (token.getRevoked()) {
-                    emitter.onError(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)) // <5>
+                    emitter.error(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)) // <5>
                 } else {
-                    emitter.onNext(new UserDetails(token.username, [])) // <6>
-                    emitter.onComplete()
+                    emitter.next(new UserDetails(token.username, [])) // <6>
+                    emitter.complete()
                 }
             } else {
-                emitter.onError(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)) // <7>
+                emitter.error(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)) // <7>
             }
-        }, BackpressureStrategy.ERROR) as Publisher<UserDetails>
+        }, FluxSink.OverflowStrategy.ERROR) as Publisher<UserDetails>
     }
 }

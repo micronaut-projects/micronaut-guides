@@ -7,7 +7,7 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.StreamingHttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.reactivex.Flowable;
+import reactor.core.publisher.Flux;
 import org.reactivestreams.Publisher;
 import org.junit.jupiter.api.Test;
 import jakarta.inject.Inject;
@@ -55,7 +55,7 @@ class GithubControllerTest {
         HttpRequest<Object> request = HttpRequest.GET("/github/releases-lowlevel");
 
         Publisher<GithubRelease> githubReleaseStream = client.jsonStream(request, GithubRelease.class); // <7>
-        Iterable<GithubRelease> githubReleases = Flowable.fromPublisher(githubReleaseStream).blockingIterable();
+        Iterable<GithubRelease> githubReleases = Flux.from(githubReleaseStream).toIterable();
 
         //then:
         for (String name : expectedReleases) {

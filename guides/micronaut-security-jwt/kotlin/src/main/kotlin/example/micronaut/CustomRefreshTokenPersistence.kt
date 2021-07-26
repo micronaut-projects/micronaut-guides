@@ -5,9 +5,8 @@ import io.micronaut.security.token.event.RefreshTokenGeneratedEvent;
 import io.micronaut.security.token.refresh.RefreshTokenPersistence;
 import io.micronaut.security.errors.OauthErrorResponseException;
 import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter
+import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Flux;
 import org.reactivestreams.Publisher;
 
 import jakarta.inject.Singleton;
@@ -31,19 +30,19 @@ class CustomRefreshTokenPersistence : RefreshTokenPersistence {
     }
 
     override fun getUserDetails(refreshToken: String) : Publisher<UserDetails> {
-        return Flowable.create({ emitter: FlowableEmitter<UserDetails> ->
+        return Flux.create({ emitter: FluxSink<UserDetails> ->
             val tokenOpt = refreshTokenRepository.findByRefreshToken(refreshToken);
             if (tokenOpt.isPresent) {
                 val token = tokenOpt.get();
                 if (token.revoked) {
-                    emitter.onError(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)); // <5>
+                    emitter.error(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)); // <5>
                 } else {
-                    emitter.onNext(UserDetails(token.username, listOf())); // <6>
-                    emitter.onComplete();
+                    emitter.next(UserDetails(token.username, listOf())); // <6>
+                    emitter.complete();
                 }
             } else {
-                emitter.onError(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)); // <7>
+                emitter.error(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)); // <7>
             }
-        }, BackpressureStrategy.ERROR);
+        }, FluxSink.OverflowStrategy.ERROR);
     }
 }

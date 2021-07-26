@@ -2,10 +2,12 @@ package example.micronaut
 
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
-import io.reactivex.Maybe
+import org.reactivestreams.Publisher
+import io.micronaut.core.async.annotation.SingleResult
 import io.micronaut.retry.annotation.Fallback
 import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank
+import reactor.core.publisher.Mono
 
 @Requires(env = Environment.TEST) // <1>
 @Fallback
@@ -13,13 +15,14 @@ import javax.validation.constraints.NotBlank
 class BookInventoryClientStub implements BookInventoryOperations {
 
     @Override
-    Maybe<Boolean> stock(@NotBlank String isbn) {
+    @SingleResult
+    Publisher<Boolean> stock(@NotBlank String isbn) {
         if (isbn == "1491950358") {
-            return Maybe.just(Boolean.TRUE) // <2>
+            return Mono.just(Boolean.TRUE) // <2>
 
         } else if (isbn == "1680502395") {
-            return Maybe.just(Boolean.FALSE) // <3>
+            return Mono.just(Boolean.FALSE) // <3>
         }
-        Maybe.empty() // <4>
+        Mono.empty() // <4>
     }
 }

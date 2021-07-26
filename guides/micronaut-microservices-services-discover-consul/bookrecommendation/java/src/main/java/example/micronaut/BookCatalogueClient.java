@@ -4,7 +4,8 @@ package example.micronaut;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.retry.annotation.Recoverable;
-import io.reactivex.Flowable;
+import reactor.core.publisher.Flux;
+import org.reactivestreams.Publisher;
 //end::packageandimports[]
 
 /*
@@ -21,6 +22,6 @@ import io.reactivex.Flowable;
 interface BookCatalogueClient extends BookCatalogueOperations {
 
     @Get("/books")
-    Flowable<Book> findAll();
+    Publisher<Book> findAll();
 }
 //end::clazz[]

@@ -1,7 +1,8 @@
 package example.micronaut
 
-import io.reactivex.Flowable
+import reactor.core.publisher.Flux
+import org.reactivestreams.Publisher
 
 interface BookCatalogueOperations {
-    Flowable<Book> findAll()
+    Publisher<Book> findAll()
 }

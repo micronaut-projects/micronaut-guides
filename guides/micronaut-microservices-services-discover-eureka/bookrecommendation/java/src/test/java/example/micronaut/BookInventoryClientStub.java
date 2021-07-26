@@ -4,10 +4,11 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.retry.annotation.Fallback;
-import io.reactivex.Maybe;
-
+import org.reactivestreams.Publisher;
+import io.micronaut.core.async.annotation.SingleResult;
 import jakarta.inject.Singleton;
 import javax.validation.constraints.NotBlank;
+import reactor.core.publisher.Mono;
 
 @Requires(env = Environment.TEST) // <1>
 @Fallback
@@ -15,13 +16,14 @@ import javax.validation.constraints.NotBlank;
 public class BookInventoryClientStub implements BookInventoryOperations {
 
     @Override
-    public Maybe<Boolean> stock(@NonNull @NotBlank String isbn) {
+    @SingleResult
+    public Publisher<Boolean> stock(@NonNull @NotBlank String isbn) {
         if (isbn.equals("1491950358")) {
-            return Maybe.just(Boolean.TRUE); // <2>
+            return Mono.just(Boolean.TRUE); // <2>
 
         } else if (isbn.equals("1680502395")) {
-            return Maybe.just(Boolean.FALSE); // <3>
+            return Mono.just(Boolean.FALSE); // <3>
         }
-        return Maybe.empty(); // <4>
+        return Mono.empty(); // <4>
     }
 }

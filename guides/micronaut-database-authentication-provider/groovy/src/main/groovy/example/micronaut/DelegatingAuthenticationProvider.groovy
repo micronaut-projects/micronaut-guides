@@ -9,12 +9,11 @@ import io.micronaut.security.authentication.AuthenticationProvider
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
 import io.micronaut.security.authentication.UserDetails
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
+import reactor.core.publisher.FluxSink
+import reactor.core.publisher.Flux
+import reactor.core.scheduler.Scheduler
+import reactor.core.scheduler.Schedulers
 import org.reactivestreams.Publisher
-
 import jakarta.inject.Named
 import jakarta.inject.Singleton
 import java.util.concurrent.ExecutorService
@@ -41,22 +40,22 @@ class DelegatingAuthenticationProvider implements AuthenticationProvider {
         this.userFetcher = userFetcher
         this.passwordEncoder = passwordEncoder
         this.authoritiesFetcher = authoritiesFetcher
-        this.scheduler = Schedulers.from(executorService)
+        this.scheduler = Schedulers.fromExecutorService(executorService)
     }
 
     @Override
     Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<?> httpRequest,
                                                    AuthenticationRequest<?, ?> authenticationRequest) {
-        Flowable.create({ emitter ->
+        Flux.create({ emitter ->
             UserState user = fetchUserState(authenticationRequest)
             AuthenticationFailed authenticationFailed = validate(user, authenticationRequest)
             if (authenticationFailed) {
-                emitter.onError(new AuthenticationException(authenticationFailed))
+                emitter.error(new AuthenticationException(authenticationFailed))
             } else {
-                emitter.onNext(createSuccessfulAuthenticationResponse(user))
+                emitter.next(createSuccessfulAuthenticationResponse(user))
+                emitter.complete()
             }
-            emitter.onComplete()
-        }, BackpressureStrategy.ERROR)
+        }, FluxSink.OverflowStrategy.ERROR)
                 .subscribeOn(scheduler) // <2>
     }
 

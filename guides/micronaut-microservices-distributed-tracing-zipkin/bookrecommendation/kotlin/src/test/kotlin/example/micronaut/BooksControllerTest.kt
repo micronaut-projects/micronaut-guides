@@ -1,7 +1,7 @@
 package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.RxStreamingHttpClient
+import io.micronaut.http.client.StreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 class BooksControllerTest {
     @Inject
     @field:Client("/")
-    lateinit var client: RxStreamingHttpClient
+    lateinit var client: StreamingHttpClient
 
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     @Test

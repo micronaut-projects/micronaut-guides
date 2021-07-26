@@ -4,7 +4,6 @@ import groovy.transform.CompileStatic
 import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.runtime.Micronaut
 import io.micronaut.runtime.server.event.ServerStartupEvent
-
 import jakarta.inject.Singleton
 
 @CompileStatic
@@ -23,6 +22,6 @@ class Application implements ApplicationEventListener<ServerStartupEvent> { // <
     }
 
     static void main(String[] args) {
-        Micronaut.run Application
+        Micronaut.run Application, args
     }
 }

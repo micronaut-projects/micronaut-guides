@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxStreamingHttpClient
+import io.micronaut.http.client.StreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.stream.StreamSupport
 import jakarta.inject.Inject
-import io.reactivex.Flowable
+import reactor.core.publisher.Flux
 
 @MicronautTest // <1>
 class GithubControllerTest {
 
     @Inject
     @field:Client("/")
-    lateinit var client: RxStreamingHttpClient // <2>
+    lateinit var client: StreamingHttpClient // <2>
 
     @Test
     fun verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {
@@ -46,7 +46,7 @@ class GithubControllerTest {
         //when:
         val request: HttpRequest<Any> = HttpRequest.GET("/github/releases-lowlevel")
         val githubReleaseStream = client.jsonStream(request, GithubRelease::class.java) // <7>
-        val githubReleases = Flowable.fromPublisher(githubReleaseStream).blockingIterable()
+        val githubReleases = Flux.from(githubReleaseStream).toIterable()
 
         //then:
         for (name in expectedReleases) {

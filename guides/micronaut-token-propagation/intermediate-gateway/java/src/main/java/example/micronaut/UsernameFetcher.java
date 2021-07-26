@@ -1,8 +1,10 @@
 package example.micronaut;
 
 import io.micronaut.http.annotation.Header;
-import io.reactivex.Single;
+import org.reactivestreams.Publisher;
+import io.micronaut.core.async.annotation.SingleResult;
 
 public interface UsernameFetcher {
-    Single<String> findUsername(@Header("Authorization") String authorization);
+    @SingleResult
+    Publisher<String> findUsername(@Header("Authorization") String authorization);
 }

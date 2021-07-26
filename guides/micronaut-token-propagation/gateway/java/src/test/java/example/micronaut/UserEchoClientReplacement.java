@@ -2,8 +2,9 @@ package example.micronaut;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
-import io.reactivex.Single;
-
+import org.reactivestreams.Publisher;
+import io.micronaut.core.async.annotation.SingleResult;
+import reactor.core.publisher.Mono;
 import jakarta.inject.Singleton;
 
 @Requires(env = Environment.TEST)
@@ -11,7 +12,8 @@ import jakarta.inject.Singleton;
 public class UserEchoClientReplacement implements UsernameFetcher {
 
     @Override
-    public Single<String> findUsername() {
-        return Single.just("sherlock");
+    @SingleResult
+    public Publisher<String> findUsername() {
+        return Mono.just("sherlock");
     }
 }
