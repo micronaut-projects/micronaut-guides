@@ -17,7 +17,7 @@ class Application implements ApplicationEventListener<ServerStartupEvent> {  // 
     }
 
     static void main(String[] args) {
-        Micronaut.run(Application.class)
+        Micronaut.run(Application, args)
     }
 
     @Override
