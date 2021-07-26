@@ -15,5 +15,6 @@ interface DadJokeClient {
     fun tellMeAJoke(): Publisher<DadJoke>
 
     @Get("/search?term={searchTerm}")
-    fun searchDadJokes(@QueryValue searchTerm: String): Single<DadJokePagedResults>
+    @SingleResult
+    fun searchDadJokes(@QueryValue searchTerm: String): Publisher<DadJokePagedResults>
 }

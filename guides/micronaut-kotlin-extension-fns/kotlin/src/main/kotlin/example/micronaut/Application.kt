@@ -1,6 +1,6 @@
 package example.micronaut
 
-import io.micronaut.runtime.startApplication // <1>
+import io.micronaut.kotlin.runtime.startApplication // <1>
 
 object ApplicationKt { // <2>
 	@JvmStatic
