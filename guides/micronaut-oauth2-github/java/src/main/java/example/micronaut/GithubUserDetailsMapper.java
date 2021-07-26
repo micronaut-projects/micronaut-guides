@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import reactor.core.publisher.Mono;
 
 @Named("github") // <1>
 @Singleton
@@ -27,7 +28,7 @@ public class GithubUserDetailsMapper implements OauthUserDetailsMapper {
 
     @Override
     public Publisher<AuthenticationResponse> createAuthenticationResponse(TokenResponse tokenResponse, @Nullable State state) {
-        return apiClient.getUser(TOKEN_PREFIX + tokenResponse.getAccessToken()) // <2>
+        return Mono.from(apiClient.getUser(TOKEN_PREFIX + tokenResponse.getAccessToken())) // <2>
                 .map(user -> new UserDetails(user.getLogin(),
                         Collections.singletonList(ROLE_GITHUB),
                         Collections.singletonMap(OauthUserDetailsMapper.ACCESS_TOKEN_KEY, tokenResponse.getAccessToken()))); // <3>
