@@ -19,8 +19,8 @@ public class BookController {
     @Get("/") // <3>
     public Publisher<BookRecommendation> index() {
         return Flux.from(catalogueClient.findAll(null))
-                .flatMap(Flowable::fromIterable)
-                .flatMap(b -> Flux.from(bookInventoryOperations.stock(b.getIsbn()))
+                .flatMap(Flux::fromIterable)
+                .flatMap(book -> Flux.from(inventoryClient.stock(book.getIsbn()))
                         .filter(Boolean::booleanValue)
                         .map(response -> book))
                 .map(book -> new BookRecommendation(book.getName()));
