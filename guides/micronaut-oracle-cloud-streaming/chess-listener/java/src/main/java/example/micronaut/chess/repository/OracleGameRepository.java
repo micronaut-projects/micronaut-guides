@@ -5,6 +5,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 
 import static io.micronaut.context.env.Environment.ORACLE_CLOUD;
+import static io.micronaut.context.env.Environment.TEST;
 import static io.micronaut.data.model.query.builder.sql.Dialect.ORACLE;
 
 /**
@@ -12,6 +13,6 @@ import static io.micronaut.data.model.query.builder.sql.Dialect.ORACLE;
  */
 @Primary
 @JdbcRepository(dialect = ORACLE) // <1>
-@Requires(env = ORACLE_CLOUD) // <2>
+@Requires(env = {ORACLE_CLOUD, TEST}) // <2>
 public interface OracleGameRepository extends GameRepository {
 }

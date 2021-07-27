@@ -4,12 +4,10 @@ import example.micronaut.chess.dto.GameDTO;
 import example.micronaut.chess.dto.GameStateDTO;
 import io.micronaut.configuration.kafka.annotation.KafkaListener;
 import io.micronaut.configuration.kafka.annotation.Topic;
-import io.micronaut.context.annotation.Requires;
 
-import static io.micronaut.context.env.Environment.TEST;
+import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST;
 
-@Requires(notEnv = TEST)
-@KafkaListener // <1>
+@KafkaListener(offsetReset = EARLIEST) // <1>
 class ChessListener {
 
     private final GameService gameService;

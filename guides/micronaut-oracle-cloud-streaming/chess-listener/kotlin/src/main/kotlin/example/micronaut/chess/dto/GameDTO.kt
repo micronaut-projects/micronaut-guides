@@ -41,6 +41,6 @@ class GameDTO
      * @param draw `true` if the game ended in a draw
      * @param winner `null` if the game ended in a draw, "b", or "w" to indicate the winner
      */
-    constructor(id: String, draw: Boolean, winner: String) :
+    constructor(id: String, draw: Boolean, winner: String?) :
             this(id, null, null, draw, winner)
 }

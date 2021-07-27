@@ -11,13 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 /**
  * Service to encapsulate business logic.
  */
 @Singleton
 @Transactional
-class GameService {
+public class GameService {
 
     private final Logger log = LoggerFactory.getLogger(GameService.class.getName());
 
@@ -39,7 +40,7 @@ class GameService {
     public Game newGame(GameDTO gameDTO) {
         log.debug("New game {}, black: {}, white: {}",
                 gameDTO.getId(), gameDTO.getBlackName(), gameDTO.getWhiteName());
-        Game game = new Game(gameDTO.getId(),
+        Game game = new Game(UUID.fromString(gameDTO.getId()),
                 gameDTO.getBlackName(), gameDTO.getWhiteName());
         return gameRepository.save(game);
     }
@@ -51,7 +52,8 @@ class GameService {
      */
     public void newGameState(GameStateDTO gameStateDTO) {
         Game game = findGame(gameStateDTO.getGameId());
-        GameState gameState = new GameState(game,
+        GameState gameState = new GameState(
+                UUID.fromString(gameStateDTO.getId()), game,
                 gameStateDTO.getPlayer(), gameStateDTO.getMove(),
                 gameStateDTO.getFen(), gameStateDTO.getPgn());
         gameStateRepository.save(gameState);
@@ -83,7 +85,7 @@ class GameService {
     }
 
     private Game findGame(String gameId) {
-        return gameRepository.findById(gameId).orElseThrow(() ->
+        return gameRepository.findById(UUID.fromString(gameId)).orElseThrow(() ->
                 new IllegalArgumentException("Game with id '" + gameId + "' not found"));
     }
 }

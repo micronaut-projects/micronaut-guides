@@ -20,8 +20,9 @@ class GameDTO
      * @param draw `true` if the game ended in a draw
      * @param winner `null` if a new game or the game ended in a draw, "b", or "w" to indicate the winner
      */
-    @Creator constructor(val id: String, val blackName: String?, val whiteName: String?,
-                         val draw: Boolean, val winner: String?) {
+    @Creator
+    constructor(val id: String, val blackName: String?, val whiteName: String?,
+                val draw: Boolean, val winner: String?) {
 
     /**
      * Constructor for a new game.

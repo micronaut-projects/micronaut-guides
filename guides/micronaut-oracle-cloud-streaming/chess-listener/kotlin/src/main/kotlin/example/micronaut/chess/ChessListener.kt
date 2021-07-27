@@ -3,12 +3,10 @@ package example.micronaut.chess
 import example.micronaut.chess.dto.GameDTO
 import example.micronaut.chess.dto.GameStateDTO
 import io.micronaut.configuration.kafka.annotation.KafkaListener
+import io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
 import io.micronaut.configuration.kafka.annotation.Topic
-import io.micronaut.context.annotation.Requires
-import io.micronaut.context.env.Environment.TEST
 
-@Requires(notEnv = [TEST])
-@KafkaListener // <1>
+@KafkaListener(offsetReset = EARLIEST) // <1>
 class ChessListener(private val gameService: GameService) { // <2>
 
     @Topic("chessGame") // <3>

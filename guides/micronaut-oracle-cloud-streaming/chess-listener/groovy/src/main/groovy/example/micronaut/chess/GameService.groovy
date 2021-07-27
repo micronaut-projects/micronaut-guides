@@ -41,7 +41,7 @@ class GameService {
     Game newGame(GameDTO gameDTO) {
         log.debug('New game {}, black: {}, white: {}',
                 gameDTO.id, gameDTO.blackName, gameDTO.whiteName)
-        Game game = new Game(gameDTO.id, gameDTO.blackName, gameDTO.whiteName)
+        Game game = new Game(UUID.fromString(gameDTO.id), gameDTO.blackName, gameDTO.whiteName)
         gameRepository.save game
     }
 
@@ -52,7 +52,8 @@ class GameService {
      */
     void newGameState(GameStateDTO gameStateDTO) {
         Game game = findGame(gameStateDTO.gameId)
-        GameState gameState = new GameState(game,
+        GameState gameState = new GameState(
+                UUID.fromString(gameStateDTO.id), game,
                 gameStateDTO.player, gameStateDTO.move,
                 gameStateDTO.fen, gameStateDTO.pgn)
         gameStateRepository.save gameState
@@ -84,7 +85,7 @@ class GameService {
     }
 
     private Game findGame(String gameId) {
-        gameRepository.findById(gameId).orElseThrow(() ->
+        gameRepository.findById(UUID.fromString(gameId)).orElseThrow(() ->
                 new IllegalArgumentException("Game with id '" + gameId + "' not found"))
     }
 }

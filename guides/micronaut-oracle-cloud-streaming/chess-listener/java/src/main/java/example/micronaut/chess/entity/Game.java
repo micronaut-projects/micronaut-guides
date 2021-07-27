@@ -4,13 +4,11 @@ import example.micronaut.chess.dto.GameDTO;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.annotation.DateCreated;
 import io.micronaut.data.annotation.DateUpdated;
-import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 
-import java.util.Date;
-
-import static io.micronaut.data.annotation.GeneratedValue.Type.IDENTITY;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Represents a chess game.
@@ -19,30 +17,30 @@ import static io.micronaut.data.annotation.GeneratedValue.Type.IDENTITY;
 public class Game {
 
     @Id
-    private final String id;
+    private final UUID id;
 
     private final String blackName;
 
     private final String whiteName;
 
     @DateCreated
-    private Date dateCreated;
+    private LocalDateTime dateCreated;
 
     @DateUpdated
-    private Date dateUpdated;
+    private LocalDateTime dateUpdated;
 
     private boolean draw;
 
     @Nullable
     private String winner;
 
-    public Game(String id, String blackName, String whiteName) {
+    public Game(UUID id, String blackName, String whiteName) {
         this.id = id;
         this.blackName = blackName;
         this.whiteName = whiteName;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -54,19 +52,19 @@ public class Game {
         return whiteName;
     }
 
-    public Date getDateCreated() {
+    public LocalDateTime getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Date dateCreated) {
+    public void setDateCreated(LocalDateTime dateCreated) {
         this.dateCreated = dateCreated;
     }
 
-    public Date getDateUpdated() {
+    public LocalDateTime getDateUpdated() {
         return dateUpdated;
     }
 
-    public void setDateUpdated(Date dateUpdated) {
+    public void setDateUpdated(LocalDateTime dateUpdated) {
         this.dateUpdated = dateUpdated;
     }
 
@@ -87,6 +85,6 @@ public class Game {
     }
 
     public GameDTO toDto() {
-        return new GameDTO(id, blackName, whiteName, draw, winner);
+        return new GameDTO(id.toString(), blackName, whiteName, draw, winner);
     }
 }

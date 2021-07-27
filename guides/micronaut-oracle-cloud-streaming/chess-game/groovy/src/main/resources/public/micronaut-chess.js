@@ -1,15 +1,15 @@
 function updateStatus(n, started) {
 
-    const game = GAMES[n];
+    if (started) {
+        onMove(n);
+    }
 
+    const game = GAMES[n];
     if (game.in_checkmate()) {
         onCheckmate(n);
     }
     else if (game.in_draw()) {
         onDraw(n);
-    }
-    else if (started) {
-        onMove(n);
     }
 }
 

@@ -19,7 +19,7 @@ To complete this guide, you will need the following:
 * JDK 11 or greater installed with `JAVA_HOME` configured appropriately
 * An Oracle Cloud account (create a free trial account at https://signup.oraclecloud.com[signup.oraclecloud.com])
 * https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
-* https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker
+* https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker, and for running tests.
 
 include::{commondir}/common-completesolution.adoc[]
 
@@ -35,20 +35,27 @@ The microservices are:
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
-=== Game Microservice
+=== chess-game Microservice
 
 Create the `chess-game` microservice using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
 [source,bash]
 ----
-mn create-app --features=kafka,graalvm example.micronaut.chess-game --build=@build@ --lang=@lang@
+mn create-app --features=kafka,graalvm,testcontainers example.micronaut.chess-game --build=@build@ --lang=@lang@
 ----
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka` and `graalvm` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, and `testcontainers` features.
 
 The previous command creates a directory named `chess-game` and a Micronaut application inside it with default package `example.micronaut`.
+
+In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for Kafka in Testcontainers, along with one for the http://www.awaitility.org/[Awaitility] library:
+
+:dependencies:
+dependency:kafka[groupId=org.testcontainers,scope=test]
+dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
+:dependencies:
 
 ==== DTOs
 
@@ -135,14 +142,22 @@ Create the `chess-listener` microservice using the https://docs.micronaut.io/lat
 
 [source,bash]
 ----
-mn create-app --features=kafka,graalvm,data-jdbc,flyway example.micronaut.chess-listener --build=@build@ --lang=@lang@
+mn create-app --features=kafka,graalvm,data-jdbc,flyway,testcontainers example.micronaut.chess-listener --build=@build@ --lang=@lang@
 ----
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `data-jdbc`, and `flyway` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `data-jdbc`, `flyway`, and `testcontainers` features.
 
 The previous command creates a directory named `chess-listener` and a Micronaut application inside it with default package `example.micronaut`.
+
+In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for Kafka and Oracle in Testcontainers, along with one for the http://www.awaitility.org/[Awaitility] library:
+
+:dependencies:
+dependency:kafka[groupId=org.testcontainers,scope=test]
+dependency:oracle-xe[groupId=org.testcontainers,scope=test]
+dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
+:dependencies:
 
 ==== Flyway
 
@@ -181,7 +196,9 @@ Create a "base" `GameStateRepository` interface to have access to methods for `G
 
 source:chess/repository/GameStateRepository[app=chess-listener]
 
-and a `H2GameStateRepository` interface that extends `GameStateRepository`:
+<1> Override the `findById` method from `CrudRepository` to add a `@Join` annotation. This will configure the SQL query to load `Game` data when retrieving a `GameState` to resolve the `game` property.
+
+Also create a `H2GameStateRepository` interface that extends `GameStateRepository`:
 
 source:chess/repository/H2GameStateRepository[app=chess-listener]
 
@@ -500,6 +517,55 @@ or if you use Windows:
 ----
 
 :exclude-for-build:
+
+== Writing Tests
+
+We'll run Kafka inside a Docker container using https://www.testcontainers.org/[Testcontainers] for both application tests, and also run Oracle database inside a Docker container for testing persistence in the `chess-listener` tests.
+
+=== chess-game tests
+
+Create a test in the `chess-game` microservice to verify that Kafka message processing works:
+
+test:GameReporterTest[app=chess-game]
+
+<1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
+<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+<3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
+<4> The Testcontainer instance for Kafka
+<5> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
+<6> Dependency injection for an HTTP client that Micronaut will implement at compile to make calls to `GameController`
+<7> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<8> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
+<9> Use a Map to hold form parameter names and values
+<10> Use the `HttpClient` to send a POST request that indicates a game has started, which will trigger sending a message with Kafka
+<11> Use the `HttpClient` to send a POST request that indicates a game move occurred, which will trigger sending a message with Kafka
+<12> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
+
+=== chess-listener tests
+
+Create a test in the `chess-listener` microservice to verify that Kafka message processing and database persistence works:
+
+test:GameServiceTest[app=chess-listener]
+
+<1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
+<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+<3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
+<4> The Testcontainer instance for Kafka
+<5> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice
+<6> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<7> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
+
+Create `testcontainers.properties` in `src/test/resources` with this content:
+
+testResource:testcontainers.properties[app=chess-listener]
+
+Create `application-test.yml` file in `src/test/resources` with this content:
+
+testResource:application-test.yml[app=chess-listener]
+
+=== Running the tests
+
+include::{commondir}/common-testApp-noheader.adoc[]
 
 == Deploy to OCI
 

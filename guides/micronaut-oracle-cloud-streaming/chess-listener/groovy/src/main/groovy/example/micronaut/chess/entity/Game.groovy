@@ -8,6 +8,8 @@ import io.micronaut.data.annotation.DateUpdated
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
 
+import java.time.LocalDateTime
+
 /**
  * Represents a chess game.
  */
@@ -16,30 +18,30 @@ import io.micronaut.data.annotation.MappedEntity
 class Game {
 
     @Id
-    final String id
+    final UUID id
 
     final String blackName
 
     final String whiteName
 
     @DateCreated
-    Date dateCreated
+    LocalDateTime dateCreated
 
     @DateUpdated
-    Date dateUpdated
+    LocalDateTime dateUpdated
 
     boolean draw
 
     @Nullable
     String winner
 
-    Game(String id, String blackName, String whiteName) {
+    Game(UUID id, String blackName, String whiteName) {
         this.id = id
         this.blackName = blackName
         this.whiteName = whiteName
     }
 
     GameDTO toDto() {
-        new GameDTO(id, blackName, whiteName, draw, winner)
+        new GameDTO(id.toString(), blackName, whiteName, draw, winner)
     }
 }

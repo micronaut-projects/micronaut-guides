@@ -6,27 +6,31 @@ import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
-import java.util.Date
+import java.time.LocalDateTime
+import java.util.UUID
 
 /**
  * Represents a chess game.
  */
 @MappedEntity("GAME")
 class Game(
-    @field:Id val id: String,
+
+    @field:Id val id: UUID,
+
     val blackName: String,
+
     val whiteName: String) {
 
     @DateCreated
-    var dateCreated: Date? = null
+    var dateCreated: LocalDateTime? = null
 
     @DateUpdated
-    var dateUpdated: Date? = null
+    var dateUpdated: LocalDateTime? = null
 
     var draw = false
 
     @Nullable
     var winner: String? = null
 
-    fun toDto() = GameDTO(id, blackName, whiteName, draw, winner)
+    fun toDto() = GameDTO(id.toString(), blackName, whiteName, draw, winner)
 }

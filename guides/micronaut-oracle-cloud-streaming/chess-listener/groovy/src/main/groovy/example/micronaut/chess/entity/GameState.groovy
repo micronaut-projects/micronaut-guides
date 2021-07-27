@@ -2,11 +2,12 @@ package example.micronaut.chess.entity
 
 import example.micronaut.chess.dto.GameStateDTO
 import groovy.transform.CompileStatic
-import io.micronaut.data.annotation.AutoPopulated
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
 import io.micronaut.data.annotation.Relation
+
+import java.time.LocalDateTime
 
 import static io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE
 
@@ -18,14 +19,13 @@ import static io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE
 class GameState {
 
     @Id
-    @AutoPopulated(updateable = false)
-    UUID id
+    final UUID id
 
     @Relation(MANY_TO_ONE)
     final Game game
 
     @DateCreated
-    Date dateCreated
+    LocalDateTime dateCreated
 
     final String player
 
@@ -36,14 +36,16 @@ class GameState {
     final String move
 
     /**
+     * @param id the id
      * @param game the game
      * @param player b or w
      * @param move the current move
      * @param fen https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
      * @param pgn https://en.wikipedia.org/wiki/Portable_Game_Notation
      */
-    GameState(Game game, String player, String move,
-              String fen, String pgn) {
+    GameState(UUID id, Game game, String player,
+              String move, String fen, String pgn) {
+        this.id = id;
         this.game = game
         this.player = player
         this.move = move
@@ -52,6 +54,6 @@ class GameState {
     }
 
     GameStateDTO toDto() {
-        new GameStateDTO(id.toString(), game.getId(), player, move, fen, pgn)
+        new GameStateDTO(id.toString(), game.getId().toString(), player, move, fen, pgn)
     }
 }

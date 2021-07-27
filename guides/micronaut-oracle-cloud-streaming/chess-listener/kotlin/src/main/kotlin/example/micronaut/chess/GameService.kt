@@ -7,6 +7,7 @@ import example.micronaut.chess.entity.GameState
 import example.micronaut.chess.repository.GameRepository
 import example.micronaut.chess.repository.GameStateRepository
 import org.slf4j.LoggerFactory
+import java.util.UUID
 import javax.inject.Singleton
 import javax.transaction.Transactional
 
@@ -29,7 +30,7 @@ open class GameService(private val gameRepository: GameRepository,
     open fun newGame(gameDTO: GameDTO): Game {
         log.debug("New game {}, black: {}, white: {}",
                 gameDTO.id, gameDTO.blackName, gameDTO.whiteName)
-        val game = Game(gameDTO.id, gameDTO.blackName!!, gameDTO.whiteName!!)
+        val game = Game(UUID.fromString(gameDTO.id), gameDTO.blackName!!, gameDTO.whiteName!!)
         return gameRepository.save(game)
     }
 
@@ -40,7 +41,8 @@ open class GameService(private val gameRepository: GameRepository,
      */
     open fun newGameState(gameStateDTO: GameStateDTO) {
         val game = findGame(gameStateDTO.gameId)
-        val gameState = GameState(game,
+        val gameState = GameState(
+                UUID.fromString(gameStateDTO.id), game,
                 gameStateDTO.player, gameStateDTO.move,
                 gameStateDTO.fen, gameStateDTO.pgn)
         gameStateRepository.save(gameState)
@@ -71,6 +73,6 @@ open class GameService(private val gameRepository: GameRepository,
     }
 
     private fun findGame(gameId: String) =
-            gameRepository.findById(gameId)
+            gameRepository.findById(UUID.fromString(gameId))
                     .orElseThrow { IllegalArgumentException("Game with id '$gameId' not found") }
 }

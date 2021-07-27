@@ -8,5 +8,5 @@ import io.micronaut.data.repository.CrudRepository
  * <code>Game</code> entity repository.
  */
 @Repository
-interface GameRepository extends CrudRepository<Game, String> {
+interface GameRepository extends CrudRepository<Game, UUID> {
 }
