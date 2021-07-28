@@ -5,20 +5,23 @@ import example.micronaut.chess.dto.GameStateDTO;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Status;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-import io.reactivex.Single;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static io.micronaut.http.HttpStatus.CREATED;
+import static io.micronaut.http.HttpStatus.NO_CONTENT;
 import static io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static io.micronaut.http.MediaType.TEXT_PLAIN;
 
 /**
  * Endpoints called by the front end using Ajax.
  */
-@Controller("/game")
-@ExecuteOn(TaskExecutors.IO) // <1>
+@Controller("/game") // <1>
+@ExecuteOn(TaskExecutors.IO) // <2>
 class GameController {
 
     private final GameReporter gameReporter;
@@ -34,10 +37,14 @@ class GameController {
      * @param w white's name
      * @return the id of the game
      */
-    @Post(value = "/start", consumes = APPLICATION_FORM_URLENCODED, produces = TEXT_PLAIN) // <2>
-    Single<String> start(String b, String w) { // <3>
-        GameDTO game = new GameDTO(UUID.randomUUID().toString(), b, w); // <4>
-        return gameReporter.game(game.getId(), game).map(gameDTO -> game.getId()); // <5>
+    @Post(value = "/start", // <3>
+          consumes = APPLICATION_FORM_URLENCODED, // <4>
+          produces = TEXT_PLAIN) // <5>
+    @Status(CREATED) // <6>
+    Mono<String> start(String b, // <7>
+                       String w) {
+        GameDTO game = new GameDTO(UUID.randomUUID().toString(), b, w); // <8>
+        return gameReporter.game(game.getId(), game).map(gameDTO -> game.getId()); // <9>
     }
 
     /**
@@ -49,11 +56,17 @@ class GameController {
      * @param fen the current FEN string
      * @param pgn the current PGN string
      */
-    @Post(value = "/move/{gameId}", consumes = APPLICATION_FORM_URLENCODED) // <6>
-    void move(@PathVariable String gameId, String player, String move, String fen, String pgn) {
+    @Post(value = "/move/{gameId}", // <10>
+          consumes = APPLICATION_FORM_URLENCODED) // <11>
+    @Status(CREATED) // <12>
+    void move(@PathVariable String gameId,
+              String player,
+              String move,
+              String fen,
+              String pgn) {
         GameStateDTO gameState = new GameStateDTO(UUID.randomUUID().toString(),
                 gameId, player, move, fen, pgn);
-        gameReporter.gameState(gameId, gameState).subscribe(); // <7>
+        gameReporter.gameState(gameId, gameState).subscribe(); // <13>
     }
 
     /**
@@ -62,10 +75,12 @@ class GameController {
      * @param gameId the <code>Game</code> id
      * @param player b or w
      */
-    @Post("/checkmate/{gameId}/{player}") // <8>
-    void checkmate(@PathVariable String gameId, @PathVariable String player) {
+    @Post("/checkmate/{gameId}/{player}") // <14>
+    @Status(NO_CONTENT) // <15>
+    void checkmate(@PathVariable String gameId,
+                   @PathVariable String player) {
         GameDTO game = new GameDTO(gameId, false, player);
-        gameReporter.game(gameId, game).subscribe(); // <9>
+        gameReporter.game(gameId, game).subscribe(); // <16>
     }
 
     /**
@@ -73,9 +88,10 @@ class GameController {
      *
      * @param gameId the <code>Game</code> id
      */
-    @Post("/draw/{gameId}") // <10>
+    @Post("/draw/{gameId}") // <17>
+    @Status(NO_CONTENT) // <18>
     void draw(@PathVariable String gameId) {
         GameDTO game = new GameDTO(gameId, true, null);
-        gameReporter.game(gameId, game).subscribe(); // <11>
+        gameReporter.game(gameId, game).subscribe(); // <19>
     }
 }

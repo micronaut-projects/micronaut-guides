@@ -1,12 +1,15 @@
 package example.micronaut.chess.entity;
 
 import example.micronaut.chess.dto.GameDTO;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.annotation.DateCreated;
 import io.micronaut.data.annotation.DateUpdated;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -17,10 +20,13 @@ import java.util.UUID;
 public class Game {
 
     @Id
+    @NotNull
     private final UUID id;
 
+    @Size(max = 255)
     private final String blackName;
 
+    @Size(max = 255)
     private final String whiteName;
 
     @DateCreated
@@ -32,9 +38,12 @@ public class Game {
     private boolean draw;
 
     @Nullable
+    @Size(max = 1)
     private String winner;
 
-    public Game(UUID id, String blackName, String whiteName) {
+    public Game(@NonNull UUID id,
+                @NonNull String blackName,
+                @NonNull String whiteName) {
         this.id = id;
         this.blackName = blackName;
         this.whiteName = whiteName;

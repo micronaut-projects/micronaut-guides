@@ -8,6 +8,7 @@ import io.micronaut.data.annotation.Relation
 import io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE
 import java.time.LocalDateTime
 import java.util.UUID
+import javax.validation.constraints.Size
 
 /**
  * Represents the state of a chess game after a move.
@@ -15,14 +16,19 @@ import java.util.UUID
 @MappedEntity("GAME_STATE")
 class GameState(
 
-    @field:Id val id: UUID,
+    @field:Id
+    val id: UUID,
 
-    @field:Relation(MANY_TO_ONE) val game: Game,
+    @field:Relation(MANY_TO_ONE)
+    val game: Game,
 
+    @field:Size(max = 1)
     val player: String,
 
+    @field:Size(max = 10)
     val move: String,
 
+    @field:Size(max = 100)
     val fen: String,
 
     val pgn: String) {

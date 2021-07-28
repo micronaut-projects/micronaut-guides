@@ -5,7 +5,8 @@ import example.micronaut.chess.dto.GameStateDTO;
 import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.KafkaKey;
 import io.micronaut.configuration.kafka.annotation.Topic;
-import io.reactivex.Single;
+import io.micronaut.core.annotation.NonNull;
+import reactor.core.publisher.Mono;
 
 @KafkaClient // <1>
 public interface GameReporter {
@@ -18,7 +19,9 @@ public interface GameReporter {
      * @return a reactive Single to trigger non-blocking send
      */
     @Topic("chessGame") // <2>
-    Single<GameDTO> game(@KafkaKey String gameId, GameDTO game); // <3> <4>
+    @NonNull
+    Mono<GameDTO> game(@NonNull @KafkaKey String gameId, // <3> <4>
+                       @NonNull GameDTO game);
 
     /**
      * Send a game move.
@@ -28,5 +31,7 @@ public interface GameReporter {
      * @return a reactive Single to trigger non-blocking send
      */
     @Topic("chessGameState") // <2>
-    Single<GameStateDTO> gameState(@KafkaKey String gameId, GameStateDTO gameState); // <3> <4>
+    @NonNull
+    Mono<GameStateDTO> gameState(@NonNull @KafkaKey String gameId, // <3> <4>
+                                 @NonNull GameStateDTO gameState);
 }

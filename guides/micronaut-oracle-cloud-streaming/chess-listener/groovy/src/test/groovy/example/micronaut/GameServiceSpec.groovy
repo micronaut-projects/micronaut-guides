@@ -11,9 +11,9 @@ import io.micronaut.configuration.kafka.annotation.KafkaKey
 import io.micronaut.configuration.kafka.annotation.Topic
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
-import io.reactivex.Single
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
+import reactor.core.publisher.Mono
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
@@ -241,10 +241,10 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
     static interface GameReporter {
 
         @Topic('chessGame')
-        Single<GameDTO> game(@KafkaKey String gameId, GameDTO game)
+        Mono<GameDTO> game(@KafkaKey String gameId, GameDTO game)
 
         @Topic('chessGameState')
-        Single<GameStateDTO> gameState(@KafkaKey String gameId, GameStateDTO gameState)
+        Mono<GameStateDTO> gameState(@KafkaKey String gameId, GameStateDTO gameState)
     }
 
     private UUID makeMove(String gameId, String player, String move,

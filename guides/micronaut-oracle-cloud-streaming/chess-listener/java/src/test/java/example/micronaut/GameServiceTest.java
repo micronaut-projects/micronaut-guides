@@ -12,7 +12,6 @@ import io.micronaut.configuration.kafka.annotation.Topic;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
-import io.reactivex.Single;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -20,6 +19,7 @@ import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import reactor.core.publisher.Mono;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -243,10 +243,10 @@ class GameServiceTest implements TestPropertyProvider { // <3>
     interface GameReporter {
 
         @Topic("chessGame")
-        Single<GameDTO> game(@KafkaKey String gameId, GameDTO game);
+        Mono<GameDTO> game(@KafkaKey String gameId, GameDTO game);
 
         @Topic("chessGameState")
-        Single<GameStateDTO> gameState(@KafkaKey String gameId, GameStateDTO gameState);
+        Mono<GameStateDTO> gameState(@KafkaKey String gameId, GameStateDTO gameState);
     }
 
     private UUID makeMove(String gameId, String player, String move,

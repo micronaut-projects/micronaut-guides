@@ -1,14 +1,16 @@
 package example.micronaut.chess.dto
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import io.micronaut.core.annotation.Creator
 import io.micronaut.core.annotation.Introspected
+import javax.validation.constraints.Size
 
 /**
  * DTO for `Game` entity.
  */
-@Introspected
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "_className")
+@Introspected // <1>
+@JsonTypeInfo(use = NAME, property = "_className") // <2>
 class GameDTO
 
     /**
@@ -20,9 +22,12 @@ class GameDTO
      * @param draw `true` if the game ended in a draw
      * @param winner `null` if a new game or the game ended in a draw, "b", or "w" to indicate the winner
      */
-    @Creator
-    constructor(val id: String, val blackName: String?, val whiteName: String?,
-                val draw: Boolean, val winner: String?) {
+    @Creator // <3>
+    constructor(@field:Size(max = 36) val id: String,
+                @field:Size(max = 255) val blackName: String?,
+                @field:Size(max = 255) val whiteName: String?,
+                val draw: Boolean,
+                @field:Size(max = 1) val winner: String?) {
 
     /**
      * Constructor for a new game.

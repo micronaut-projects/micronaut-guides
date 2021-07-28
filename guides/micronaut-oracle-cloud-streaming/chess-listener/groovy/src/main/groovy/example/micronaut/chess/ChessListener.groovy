@@ -22,11 +22,9 @@ class ChessListener {
     void onGame(GameDTO gameDTO) {
         if (gameDTO.draw) {
             gameService.draw gameDTO // <4>
-        }
-        else if (gameDTO.winner) {
+        } else if (gameDTO.winner) {
             gameService.checkmate gameDTO // <5>
-        }
-        else {
+        } else {
             gameService.newGame gameDTO // <6>
         }
     }

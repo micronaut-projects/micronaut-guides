@@ -8,6 +8,7 @@ import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
 import java.time.LocalDateTime
 import java.util.UUID
+import javax.validation.constraints.Size
 
 /**
  * Represents a chess game.
@@ -15,10 +16,13 @@ import java.util.UUID
 @MappedEntity("GAME")
 class Game(
 
-    @field:Id val id: UUID,
+    @field:Id
+    val id: UUID,
 
+    @field:Size(max = 255)
     val blackName: String,
 
+    @field:Size(max = 255)
     val whiteName: String) {
 
     @DateCreated
@@ -30,7 +34,7 @@ class Game(
     var draw = false
 
     @Nullable
-    var winner: String? = null
+    @field:Size(max = 1) var winner: String? = null
 
     fun toDto() = GameDTO(id.toString(), blackName, whiteName, draw, winner)
 }

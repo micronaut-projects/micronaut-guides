@@ -3,11 +3,16 @@ package example.micronaut.chess.dto
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import io.micronaut.core.annotation.Introspected
+import javax.validation.constraints.Size
 
 /**
  * DTO for `GameState` entity.
  */
-@Introspected
-@JsonTypeInfo(use = NAME, property = "_className")
-data class GameStateDTO(val id: String, val gameId: String, val player: String,
-                        val move: String, val fen: String, val pgn: String)
+@Introspected // <1>
+@JsonTypeInfo(use = NAME, property = "_className") // <2>
+data class GameStateDTO(@field:Size(max = 36) val id: String,
+                        @field:Size(max = 36) val gameId: String,
+                        @field:Size(max = 1) val player: String,
+                        @field:Size(max = 100) val move: String,
+                        val fen: String,
+                        @field:Size(max = 10) val pgn: String)

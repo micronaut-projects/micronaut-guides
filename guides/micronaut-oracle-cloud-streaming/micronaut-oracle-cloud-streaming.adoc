@@ -41,12 +41,12 @@ Create the `chess-game` microservice using the https://docs.micronaut.io/latest/
 
 [source,bash]
 ----
-mn create-app --features=kafka,graalvm,testcontainers example.micronaut.chess-game --build=@build@ --lang=@lang@
+mn create-app --features=kafka,graalvm,reactor,testcontainers example.micronaut.chess-game --build=@build@ --lang=@lang@
 ----
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, and `testcontainers` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `reactor`, and `testcontainers` features.
 
 The previous command creates a directory named `chess-game` and a Micronaut application inside it with default package `example.micronaut`.
 
@@ -63,9 +63,16 @@ Create a `GameDTO` data transfer object to represent game data:
 
 source:chess/dto/GameDTO[app=chess-game]
 
+<1> Annotate with `@Introspected` to generate metadata at compilation time and avoid reflection
+<2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
+<3> Annotate with `@Creator` to indicate the constructor to use when deserializing from JSON
+
 Create a `GameStateDTO` data transfer object to represent game move data:
 
 source:chess/dto/GameStateDTO[app=chess-game]
+
+<1> Annotate with `@Introspected` to generate metadata at compilation time and avoid reflection
+<2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
 
 ==== GameReporter
 
@@ -84,17 +91,25 @@ Create a `GameController` class to contain Ajax endpoints for the front end:
 
 source:chess/GameController[app=chess-game]
 
-<1> Execute controller actions on the I/O executor to avoid blocking the Event loop
-<2> The method accepts HTTP POST requests to indicate a new game has started
-<3> Returning a reactive type to configure a reactive response
-<4> Assign the game's primary key as a UUID
-<5> Use the `GameReporter` to send a Kafka message with new game data
-<6> The method accepts HTTP POST requests to indicate a move has occurred
-<7> Use the `GameReporter` to send a Kafka message with game move data
-<8> The method accepts HTTP POST requests to indicate the game ended with a checkmate
-<9> Use the `GameReporter` to send a Kafka message that the game ended in a checkmate
-<10> The method accepts HTTP POST requests to indicate the game ended with a draw
-<11> Use the `GameReporter` to send a Kafka message that the game ended in a draw
+<1> Use the `@Controller` annotation to make the class a controller, and specify the root URI as `"/game"`
+<2> Execute controller actions on the I/O executor to avoid blocking the Event loop
+<3> The method accepts HTTP POST requests to indicate a new game has started
+<4> The method accepts encoded form data (the two players' names)
+<5> The response will be plain text and contain the ID of the persisted `Game`
+<6> Send a `"Created"` (201) status to indicate a `Game` was persisted
+<7> Return a reactive type to configure a reactive response
+<8> Assign the game's primary key as a UUID
+<9> Use the `GameReporter` to send a Kafka message with new game data
+<10> The method accepts HTTP POST requests to indicate a move has occurred
+<11> The method accepts encoded form data (the move information)
+<12> Send a `"Created"` (201) status to indicate a `GameState` was persisted
+<13> Use the `GameReporter` to send a Kafka message with game move data
+<14> The method accepts HTTP POST requests to indicate the game ended with a checkmate
+<15> Send a `"No Content"` (204) status to indicate success and no response body
+<16> Use the `GameReporter` to send a Kafka message that the game ended in a checkmate
+<17> The method accepts HTTP POST requests to indicate the game ended with a draw
+<18> Send a `"No Content"` (204) status to indicate success and no response body
+<19> Use the `GameReporter` to send a Kafka message that the game ended in a draw
 
 ==== Development environment
 
@@ -142,12 +157,12 @@ Create the `chess-listener` microservice using the https://docs.micronaut.io/lat
 
 [source,bash]
 ----
-mn create-app --features=kafka,graalvm,data-jdbc,flyway,testcontainers example.micronaut.chess-listener --build=@build@ --lang=@lang@
+mn create-app --features=kafka,graalvm,data-jdbc,flyway,reactor,testcontainers example.micronaut.chess-listener --build=@build@ --lang=@lang@
 ----
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `data-jdbc`, `flyway`, and `testcontainers` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `data-jdbc`, `flyway`, `reactor`, and `testcontainers` features.
 
 The previous command creates a directory named `chess-listener` and a Micronaut application inside it with default package `example.micronaut`.
 
@@ -477,6 +492,8 @@ resource:application-oraclecloud.yml[app=chess-game]
 
 <1> Use the "FQDN" URL value you saved earlier here
 <2> Use the value `config: org.apache.kafka.common.security.plain.PlainLoginModule required username="<tenancy-name>/<username>/<stream-pool-ocid>" password="<auth-token>";`, replacing `<tenancy-name>` with the name of your tenancy, `<username>` with the username created above, `<stream-pool-ocid>` with the OCID of the stream pool you saved earlier, and `<auth-token>` with the auth token value you saved earlier.
+<3> Limit request size to 1MB
+<4> Limit request size to 1MB per partition
 
 == Local testing with cloud resources
 

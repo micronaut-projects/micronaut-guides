@@ -11,7 +11,6 @@ import io.micronaut.configuration.kafka.annotation.Topic
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
-import io.reactivex.Single
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -25,6 +24,7 @@ import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
+import reactor.core.publisher.Mono
 import java.util.UUID
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
@@ -219,10 +219,10 @@ class GameServiceTest : TestPropertyProvider { // <3>
     @KafkaClient
     interface GameReporter {
         @Topic("chessGame")
-        fun game(@KafkaKey gameId: String, game: GameDTO): Single<GameDTO>
+        fun game(@KafkaKey gameId: String, game: GameDTO): Mono<GameDTO>
 
         @Topic("chessGameState")
-        fun gameState(@KafkaKey gameId: String, gameState: GameStateDTO): Single<GameStateDTO>
+        fun gameState(@KafkaKey gameId: String, gameState: GameStateDTO): Mono<GameStateDTO>
     }
 
     private fun makeMove(gameId: String, player: String, move: String,
