@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.util.StringUtils
+import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
@@ -12,6 +13,8 @@ import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Map.Entry
+
+import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 
 @CompileStatic
 class GuideAsciidocGenerator {
@@ -91,6 +94,8 @@ class GuideAsciidocGenerator {
                     }
                 } else if (shouldProcessLine(line, 'rocker:')) {
                     lines.addAll(includeRocker(line))
+                } else if (shouldProcessLine(line, 'diffLink:')) {
+                    lines << buildDiffLink(line, guidesOption, metadata)
                 } else {
                     lines << line
                 }
@@ -303,6 +308,42 @@ class GuideAsciidocGenerator {
         String name = extractName(line, 'rocker:')
         String rendered = Rocker.template("io/micronaut/guides/feature/template/${name}.rocker.raw").render()
         return rendered.split("\\r?\\n|\\r") as List
+    }
+
+    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
+
+        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
+        App app = metadata.apps.find { it.name == appName }
+
+        String features = extractFromParametersLine(line, 'features')
+        List<String> featureNames
+        if (features) {
+            featureNames = features.tokenize('|')
+        }
+        else {
+            featureNames = app.features
+        }
+
+        String featureExcludes = extractFromParametersLine(line, 'featureExcludes')
+        List<String> excludedFeatureNames
+        if (featureExcludes) {
+            excludedFeatureNames = featureExcludes.tokenize('|')
+        }
+        else {
+            excludedFeatureNames = []
+        }
+        featureNames.removeAll excludedFeatureNames
+
+        String url = 'https://micronaut.io/launch?' +
+                featureNames.collect {'features=' + it }.join('&') +
+                '&lang=' + guidesOption.language.name() +
+                '&build=' + guidesOption.buildTool.name() +
+                '&test=' + guidesOption.testFramework.name() +
+                '&name=' + (appName == DEFAULT_APP_NAME ? 'micronautguide' : appName) +
+                '&type=' + app.applicationType.name() +
+                '&package=example.micronaut' +
+                '&activity=diff'
+        url + '[view the dependency and configuration changes from the specified features, window="_blank"]'
     }
 
     private static String extractAppName(String line) {
