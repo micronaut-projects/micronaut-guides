@@ -19,7 +19,6 @@ import spock.util.concurrent.PollingConditions
 
 import javax.inject.Inject
 
-@spock.lang.Ignore // TODO fix and remove
 @MicronautTest // <1> <2>
 class GameServiceSpec extends Specification implements TestPropertyProvider { // <3>
 
