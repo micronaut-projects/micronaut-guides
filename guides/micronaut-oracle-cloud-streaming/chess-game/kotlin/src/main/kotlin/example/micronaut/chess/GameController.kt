@@ -12,7 +12,7 @@ import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Status
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
-import io.reactivex.Single
+import reactor.core.publisher.Mono
 import java.util.UUID
 
 /**
@@ -34,7 +34,7 @@ class GameController(private val gameReporter: GameReporter) {
           produces = [TEXT_PLAIN]) // <5>
     @Status(CREATED) // <6>
     fun start(b: String,
-              w: String): Single<String> { // <7>
+              w: String): Mono<String> { // <7>
         val game = GameDTO(UUID.randomUUID().toString(), b, w) // <8>
         return gameReporter.game(game.id, game).map { game.id } // <9>
     }

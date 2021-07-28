@@ -4,6 +4,7 @@ import example.micronaut.chess.dto.GameStateDTO;
 import io.micronaut.data.annotation.DateCreated;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.data.annotation.Relation;
 
 import javax.validation.constraints.NotNull;
