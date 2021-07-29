@@ -334,7 +334,7 @@ class GuideAsciidocGenerator {
         }
         featureNames.removeAll excludedFeatureNames
 
-        String url = 'https://micronaut.io/launch?' +
+        String link = 'https://micronaut.io/launch?' +
                 featureNames.collect {'features=' + it }.join('&') +
                 '&lang=' + guidesOption.language.name() +
                 '&build=' + guidesOption.buildTool.name() +
@@ -342,8 +342,11 @@ class GuideAsciidocGenerator {
                 '&name=' + (appName == DEFAULT_APP_NAME ? 'micronautguide' : appName) +
                 '&type=' + app.applicationType.name() +
                 '&package=example.micronaut' +
-                '&activity=diff'
-        url + '[view the dependency and configuration changes from the specified features, window="_blank"]'
+                '&activity=diff' +
+                '[view the dependency and configuration changes from the specified features, window="_blank"]'
+
+        "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can " +
+        link + " and apply those changes to your application."
     }
 
     private static String extractAppName(String line) {
