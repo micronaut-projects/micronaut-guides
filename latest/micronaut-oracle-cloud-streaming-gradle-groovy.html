@@ -287,6 +287,15 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <div class="sect3">
 <h4 id="dtos">4.1.1. DTOs</h4>
 <div class="paragraph">
+<p>Create an enum for the chess players:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/chess/dto/Player.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> micronaut-oracle-cloud-streaming-gradle-groovy.adoc - <span class="key">include</span>::build/code/micronaut-oracle-cloud-streaming-gradle-groovy/src/main/groovy/example/micronaut/chess/dto/Player.groovy<span class="type">[]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>Create a <code>GameDTO</code> data transfer object to represent game data:</p>
 </div>
 <div class="listingblock">
@@ -328,14 +337,14 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 
     <span class="annotation">@Size</span>(max = <span class="integer">1</span>)
     <span class="annotation">@Nullable</span>
-    <span class="directive">final</span> <span class="predefined-type">String</span> winner
+    <span class="directive">final</span> Player winner
 
     <span class="annotation">@Creator</span> <i class="conum" data-value="3"></i><b>(3)</b>
     GameDTO(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> id,
             <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> blackName,
             <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> whiteName,
             <span class="type">boolean</span> draw,
-            <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> winner) {
+            <span class="annotation">@Nullable</span> Player winner) {
         <span class="local-variable">this</span>.id = id
         <span class="local-variable">this</span>.blackName = blackName
         <span class="local-variable">this</span>.whiteName = whiteName
@@ -351,7 +360,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 
     GameDTO(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> id,
             <span class="type">boolean</span> draw,
-            <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> winner) {
+            <span class="annotation">@Nullable</span> Player winner) {
         <span class="local-variable">this</span>(id, <span class="predefined-constant">null</span>, <span class="predefined-constant">null</span>, draw, winner)
     }
 }</code></pre>
@@ -409,7 +418,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
     <span class="annotation">@Size</span>(max = <span class="integer">1</span>)
     <span class="annotation">@NotNull</span>
     <span class="annotation">@NonNull</span>
-    <span class="directive">final</span> <span class="predefined-type">String</span> player
+    <span class="directive">final</span> Player player
 
     <span class="annotation">@Size</span>(max = <span class="integer">100</span>)
     <span class="annotation">@NotNull</span>
@@ -427,7 +436,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 
     GameStateDTO(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> id,
                  <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> gameId,
-                 <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> player,
+                 <span class="annotation">@NonNull</span> Player player,
                  <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> move,
                  <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> fen,
                  <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> pgn) {
@@ -518,6 +527,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.chess
 
+<span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.Player</span>
 <span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.GameDTO</span>
 <span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.GameStateDTO</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
@@ -559,7 +569,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
           consumes = APPLICATION_FORM_URLENCODED) <i class="conum" data-value="11"></i><b>(11)</b>
     <span class="annotation">@Status</span>(CREATED) <i class="conum" data-value="12"></i><b>(12)</b>
     <span class="type">void</span> move(<span class="annotation">@PathVariable</span> <span class="predefined-type">String</span> gameId,
-              <span class="predefined-type">String</span> player,
+              Player player,
               <span class="predefined-type">String</span> move,
               <span class="predefined-type">String</span> fen,
               <span class="predefined-type">String</span> pgn) {
@@ -571,7 +581,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
     <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">'</span><span class="content">/checkmate/{gameId}/{player}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="14"></i><b>(14)</b>
     <span class="annotation">@Status</span>(NO_CONTENT) <i class="conum" data-value="15"></i><b>(15)</b>
     <span class="type">void</span> checkmate(<span class="annotation">@PathVariable</span> <span class="predefined-type">String</span> gameId,
-                   <span class="annotation">@PathVariable</span> <span class="predefined-type">String</span> player) {
+                   <span class="annotation">@PathVariable</span> Player player) {
         GameDTO game = <span class="keyword">new</span> GameDTO(gameId, <span class="predefined-constant">false</span>, player)
         gameReporter.game(gameId, game).subscribe() <i class="conum" data-value="16"></i><b>(16)</b>
     }
@@ -1023,7 +1033,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <div class="sect3">
 <h4 id="dtos-2">4.2.2. DTOs</h4>
 <div class="paragraph">
-<p>The same <code>GameDTO</code> and <code>GameStateDTO</code> data transfer objects as above in the <code>chess-game</code> microservice. In a real application these would be in a shared library but to keep things simple we&#8217;ll just duplicate them.</p>
+<p>The same data transfer objects (<code>GameDTO</code> and <code>GameStateDTO</code>&#8230;&#8203;) as above in the <code>chess-game</code> microservice. In a real application these would be in a shared library but to keep things simple we&#8217;ll just duplicate them.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1036,6 +1046,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.chess.entity
 
+<span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.Player</span>
 <span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.GameDTO</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
@@ -1078,7 +1089,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 
     <span class="annotation">@Nullable</span>
     <span class="annotation">@Size</span>(max = <span class="integer">1</span>)
-    <span class="predefined-type">String</span> winner
+    Player winner
 
     Game(<span class="annotation">@NonNull</span> <span class="predefined-type">UUID</span> id,
          <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> blackName,
@@ -1112,7 +1123,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Size</span>
-
+<span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.Player</span>
 <span class="keyword">import</span> <span class="include">java.time.LocalDateTime</span>
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE</span>
@@ -1137,7 +1148,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
     <span class="annotation">@Size</span>(max = <span class="integer">1</span>)
     <span class="annotation">@NotBlank</span>
     <span class="annotation">@NonNull</span>
-    <span class="directive">final</span> <span class="predefined-type">String</span> player
+    <span class="directive">final</span> Player player
 
     <span class="annotation">@Size</span>(max = <span class="integer">100</span>)
     <span class="annotation">@NotBlank</span>
@@ -1163,7 +1174,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
      */</span>
     GameState(<span class="annotation">@NonNull</span> <span class="predefined-type">UUID</span> id,
               <span class="annotation">@NonNull</span> Game game,
-              <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> player,
+              <span class="annotation">@NonNull</span> Player player,
               <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> move,
               <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> fen,
               <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> pgn) {
@@ -2149,6 +2160,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
+<span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.Player</span>
 <span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.GameDTO</span>
 <span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.GameStateDTO</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.KafkaListener</span>
@@ -2218,10 +2230,10 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">make moves</span><span class="delimiter">'</span></span>
         receivedGames.clear()
 
-        makeMove(gameId, <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span>)
-        makeMove(gameId, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6</span><span class="delimiter">'</span></span>)
-        makeMove(gameId, <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">g4</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6 2. g4</span><span class="delimiter">'</span></span>)
-        makeMove(gameId, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Qh4#</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6 2. g4 Qh4#</span><span class="delimiter">'</span></span>)
+        makeMove(gameId, Player.WHITE, <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span>)
+        makeMove(gameId, Player.BLACK, <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6</span><span class="delimiter">'</span></span>)
+        makeMove(gameId, Player.WHITE, <span class="string"><span class="delimiter">'</span><span class="content">g4</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6 2. g4</span><span class="delimiter">'</span></span>)
+        makeMove(gameId, Player.BLACK, <span class="string"><span class="delimiter">'</span><span class="content">Qh4#</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6 2. g4 Qh4#</span><span class="delimiter">'</span></span>)
 
         <span class="key">then</span>:
         pollingConditions.eventually {
@@ -2235,23 +2247,23 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         <span class="predefined-type">List</span>&lt;GameStateDTO&gt; moves = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;(receivedMoves)
 
         <span class="key">then</span>:
-        <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span> == moves[<span class="integer">0</span>].player
+        Player.WHITE == moves[<span class="integer">0</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span> == moves[<span class="integer">0</span>].move
 
-        <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span> == moves[<span class="integer">1</span>].player
+        Player.BLACK == moves[<span class="integer">1</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span> == moves[<span class="integer">1</span>].move
 
-        <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span> == moves[<span class="integer">2</span>].player
+        Player.WHITE == moves[<span class="integer">2</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">g4</span><span class="delimiter">'</span></span> == moves[<span class="integer">2</span>].move
 
-        <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span> == moves[<span class="integer">3</span>].player
+        Player.BLACK == moves[<span class="integer">3</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">Qh4#</span><span class="delimiter">'</span></span> == moves[<span class="integer">3</span>].move
 
         <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">end game</span><span class="delimiter">'</span></span>
 
         receivedMoves.clear()
 
-        endGame(gameId, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>)
+        endGame(gameId, Player.BLACK)
 
         <span class="key">then</span>:
         pollingConditions.eventually {
@@ -2269,7 +2281,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         !game.blackName
         !game.whiteName
         !game.draw
-        <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span> == game.winner
+        Player.BLACK == game.winner
     }
 
     <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test game ending in draw</span><span class="delimiter">'</span></span>() {
@@ -2303,8 +2315,9 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">make moves</span><span class="delimiter">'</span></span>
         receivedGames.clear()
 
-        makeMove(gameId, <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span>)
-        makeMove(gameId, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6</span><span class="delimiter">'</span></span>)
+        makeMove(gameId, Player.WHITE, <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span>)
+        makeMove(gameId, Player.BLACK, <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span> +
+                <span class="string"><span class="delimiter">'</span><span class="content">Player</span><span class="delimiter">'</span></span>)
 
         <span class="key">then</span>:
         pollingConditions.eventually {
@@ -2319,7 +2332,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         endGame(gameId, <span class="predefined-constant">null</span>)
 
         <span class="key">then</span>:
-        pollingConditions.eventually {
+        <span class="keyword">new</span> PollingConditions().eventually {
             !receivedGames.empty
         }
 
@@ -2335,7 +2348,9 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         !game.whiteName
         game.draw
         !game.winner
+        Player
     }
+
 
     <span class="annotation">@Override</span>
     <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() {
@@ -2371,7 +2386,9 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
                 Argument.of(Optional, <span class="predefined-type">String</span>)) <i class="conum" data-value="10"></i><b>(10)</b>
     }
 
-    <span class="directive">private</span> <span class="type">void</span> makeMove(<span class="predefined-type">String</span> gameId, <span class="predefined-type">String</span> player, <span class="predefined-type">String</span> move,
+    <span class="directive">private</span> <span class="type">void</span> makeMove(<span class="predefined-type">String</span> gameId,
+                          Player player,
+                          <span class="predefined-type">String</span> move,
                           <span class="predefined-type">String</span> fen, <span class="predefined-type">String</span> pgn) {
         <span class="predefined-type">Map</span> body = [<span class="key">player</span>: player, <span class="key">move</span>: move, <span class="key">fen</span>: fen, <span class="key">pgn</span>: pgn]
 
@@ -2380,10 +2397,10 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         client.toBlocking().exchange(request) <i class="conum" data-value="11"></i><b>(11)</b>
     }
 
-    <span class="directive">private</span> <span class="type">void</span> endGame(<span class="predefined-type">String</span> gameId, <span class="predefined-type">String</span> winner) {
+    <span class="directive">private</span> <span class="type">void</span> endGame(<span class="predefined-type">String</span> gameId, Player winner) {
         UriBuilder uriBuilder = UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/game</span><span class="delimiter">&quot;</span></span>).path(winner == <span class="predefined-constant">null</span> ? <span class="string"><span class="delimiter">&quot;</span><span class="content">draw</span><span class="delimiter">&quot;</span></span> : <span class="string"><span class="delimiter">&quot;</span><span class="content">checkmate</span><span class="delimiter">&quot;</span></span>).path(gameId)
         <span class="keyword">if</span> (winner != <span class="predefined-constant">null</span>) {
-            uriBuilder = uriBuilder.path(winner)
+            uriBuilder = uriBuilder.path(winner.toString())
         }
         <span class="predefined-type">URI</span> uri = uriBuilder.build()
         HttpRequest&lt;<span class="predefined-type">Object</span>&gt; request = HttpRequest.POST(uri, <span class="predefined-constant">null</span>)
@@ -2455,6 +2472,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
+<span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.Player</span>
 <span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.GameDTO</span>
 <span class="keyword">import</span> <span class="include">example.micronaut.chess.dto.GameStateDTO</span>
 <span class="keyword">import</span> <span class="include">example.micronaut.chess.entity.Game</span>
@@ -2527,16 +2545,16 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 
         <span class="predefined-type">List</span>&lt;<span class="predefined-type">UUID</span>&gt; gameStateIds = <span class="type">[]</span>
 
-        <span class="predefined-type">UUID</span> gameStateId = makeMove(gameIdString, <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span>)
+        <span class="predefined-type">UUID</span> gameStateId = makeMove(gameIdString, Player.WHITE, <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span>)
         gameStateIds &lt;&lt; gameStateId
 
-        gameStateId = makeMove(gameIdString, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6</span><span class="delimiter">'</span></span>)
+        gameStateId = makeMove(gameIdString, Player.BLACK, <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6</span><span class="delimiter">'</span></span>)
         gameStateIds &lt;&lt; gameStateId
 
-        gameStateId = makeMove(gameIdString, <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">g4</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6 2. g4</span><span class="delimiter">'</span></span>)
+        gameStateId = makeMove(gameIdString, Player.WHITE, <span class="string"><span class="delimiter">'</span><span class="content">g4</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6 2. g4</span><span class="delimiter">'</span></span>)
         gameStateIds &lt;&lt; gameStateId
 
-        gameStateId = makeMove(gameIdString, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Qh4#</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6 2. g4 Qh4#</span><span class="delimiter">'</span></span>)
+        gameStateId = makeMove(gameIdString, Player.BLACK, <span class="string"><span class="delimiter">'</span><span class="content">Qh4#</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6 2. g4 Qh4#</span><span class="delimiter">'</span></span>)
         gameStateIds &lt;&lt; gameStateId
 
         <span class="key">then</span>:
@@ -2551,21 +2569,21 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         <span class="predefined-type">List</span>&lt;GameState&gt; moves = gameStateIds.collect { <span class="predefined-type">UUID</span> id -&gt; gameStateRepository.findById(id).orElse(<span class="predefined-constant">null</span>) }
 
         <span class="key">then</span>:
-        <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span> == moves[<span class="integer">0</span>].player
+        Player.WHITE == moves[<span class="integer">0</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span> == moves[<span class="integer">0</span>].move
 
-        <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span> == moves[<span class="integer">1</span>].player
+        Player.BLACK == moves[<span class="integer">1</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span> == moves[<span class="integer">1</span>].move
 
-        <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span> == moves[<span class="integer">2</span>].player
+        Player.WHITE == moves[<span class="integer">2</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">g4</span><span class="delimiter">'</span></span> == moves[<span class="integer">2</span>].move
 
-        <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span> == moves[<span class="integer">3</span>].player
+        Player.BLACK == moves[<span class="integer">3</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">Qh4#</span><span class="delimiter">'</span></span> == moves[<span class="integer">3</span>].move
 
         <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">end game</span><span class="delimiter">'</span></span>
 
-        gameDto = <span class="keyword">new</span> GameDTO(gameIdString, <span class="predefined-constant">false</span>, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>)
+        gameDto = <span class="keyword">new</span> GameDTO(gameIdString, <span class="predefined-constant">false</span>, Player.BLACK)
         gameReporter.game(gameIdString, gameDto).subscribe()
 
         <span class="key">then</span>:
@@ -2587,7 +2605,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         blackName == game.blackName
         whiteName == game.whiteName
         !game.draw
-        <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span> == game.winner
+        Player.BLACK == game.winner
     }
 
     <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test game ending in draw</span><span class="delimiter">'</span></span>() {
@@ -2626,10 +2644,10 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 
         <span class="predefined-type">List</span>&lt;<span class="predefined-type">UUID</span>&gt; gameStateIds = <span class="type">[]</span>
 
-        <span class="predefined-type">UUID</span> gameStateId = makeMove(gameIdString, <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span>)
+        <span class="predefined-type">UUID</span> gameStateId = makeMove(gameIdString, Player.WHITE, <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3</span><span class="delimiter">'</span></span>)
         gameStateIds &lt;&lt; gameStateId
 
-        gameStateId = makeMove(gameIdString, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6</span><span class="delimiter">'</span></span>)
+        gameStateId = makeMove(gameIdString, Player.BLACK, <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1. f3 e6</span><span class="delimiter">'</span></span>)
         gameStateIds &lt;&lt; gameStateId
 
         <span class="key">then</span>:
@@ -2648,10 +2666,10 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         }
 
         <span class="key">then</span>:
-        <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span> == moves[<span class="integer">0</span>].player
+        Player.WHITE == moves[<span class="integer">0</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">f3</span><span class="delimiter">'</span></span> == moves[<span class="integer">0</span>].move
 
-        <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span> == moves[<span class="integer">1</span>].player
+        Player.BLACK == moves[<span class="integer">1</span>].player
         <span class="string"><span class="delimiter">'</span><span class="content">e6</span><span class="delimiter">'</span></span> == moves[<span class="integer">1</span>].move
 
         <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">end game</span><span class="delimiter">'</span></span>
@@ -2702,8 +2720,11 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         Mono&lt;GameStateDTO&gt; gameState(<span class="annotation">@KafkaKey</span> <span class="predefined-type">String</span> gameId, GameStateDTO gameState)
     }
 
-    <span class="directive">private</span> <span class="predefined-type">UUID</span> makeMove(<span class="predefined-type">String</span> gameId, <span class="predefined-type">String</span> player, <span class="predefined-type">String</span> move,
-                          <span class="predefined-type">String</span> fen, <span class="predefined-type">String</span> pgn) {
+    <span class="directive">private</span> <span class="predefined-type">UUID</span> makeMove(<span class="predefined-type">String</span> gameId,
+                          Player player,
+                          <span class="predefined-type">String</span> move,
+                          <span class="predefined-type">String</span> fen,
+                          <span class="predefined-type">String</span> pgn) {
         <span class="predefined-type">UUID</span> gameStateId = <span class="predefined-type">UUID</span>.randomUUID()
         gameReporter.gameState(gameId, <span class="keyword">new</span> GameStateDTO(gameStateId.toString(),
                 gameId, player, move, fen, pgn)).subscribe()
