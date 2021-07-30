@@ -12,7 +12,7 @@ class ChessListener {
 
     private final GameService gameService;
 
-    ChessListener(GameService gameService) { // <2>
+    public ChessListener(GameService gameService) { // <2>
         this.gameService = gameService;
     }
 
