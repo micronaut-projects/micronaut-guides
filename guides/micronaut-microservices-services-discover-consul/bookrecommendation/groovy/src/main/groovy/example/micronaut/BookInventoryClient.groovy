@@ -4,7 +4,7 @@ package example.micronaut
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import org.reactivestreams.Publisher
-import io.micronaut.core.async.annotation.SingleResult
+import reactor.core.publisher.Mono
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Consumes
 import javax.validation.constraints.NotBlank
@@ -26,7 +26,6 @@ interface BookInventoryClient extends BookInventoryOperations {
 
     @Get("/books/stock/{isbn}")
     @Consumes(MediaType.TEXT_PLAIN)
-    @SingleResult
-    Publisher<Boolean> stock(@NotBlank String isbn)
+    Mono<Boolean> stock(@NotBlank String isbn)
 }
 //end::clazz[]

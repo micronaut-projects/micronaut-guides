@@ -8,7 +8,7 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import org.reactivestreams.Publisher;
-import io.micronaut.core.async.annotation.SingleResult;
+import reactor.core.publisher.Mono;
 
 @Controller("/user") // <1>
 public class UserController {
@@ -22,8 +22,7 @@ public class UserController {
     @Secured(SecurityRule.IS_AUTHENTICATED)  // <3>
     @Produces(MediaType.TEXT_PLAIN) // <4>
     @Get // <5>
-    @SingleResult
-    Publisher<String> index(@Header("Authorization") String authorization) {  // <6>
+    Mono<String> index(@Header("Authorization") String authorization) {  // <6>
         return usernameFetcher.findUsername(authorization);
     }
 }

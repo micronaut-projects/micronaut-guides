@@ -4,7 +4,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import org.reactivestreams.Publisher;
-import io.micronaut.core.async.annotation.SingleResult;
+import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Controller("/github") // <1>
@@ -20,8 +20,7 @@ public class GithubController {
     }
 
     @Get("/releases-lowlevel") // <3>
-    @SingleResult
-    Publisher<List<GithubRelease>> releasesWithLowLevelClient() { // <4>
+    Mono<List<GithubRelease>> releasesWithLowLevelClient() { // <4>
         return githubLowLevelClient.fetchReleases();
     }
 

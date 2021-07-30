@@ -8,7 +8,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.client.annotation.Client;
 import org.reactivestreams.Publisher;
-import io.micronaut.core.async.annotation.SingleResult;
+import reactor.core.publisher.Mono;
 
 @Client(id = "userecho") // <1>
 @Requires(notEnv = Environment.TEST) // <2>
@@ -17,6 +17,5 @@ public interface UserEchoClient extends UsernameFetcher {
     @Override
     @Consumes(MediaType.TEXT_PLAIN)
     @Get("/user") // <3>
-    @SingleResult
-    Publisher<String> findUsername(@Header("Authorization") String authorization); // <4>
+    Mono<String> findUsername(@Header("Authorization") String authorization); // <4>
 }

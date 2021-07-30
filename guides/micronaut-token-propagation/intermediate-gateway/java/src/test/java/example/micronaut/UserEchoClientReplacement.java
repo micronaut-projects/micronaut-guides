@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
 import io.micronaut.http.annotation.Header;
 import org.reactivestreams.Publisher;
-import io.micronaut.core.async.annotation.SingleResult;
+import reactor.core.publisher.Mono;
 import jakarta.inject.Singleton;
 import reactor.core.publisher.Mono;
 
@@ -13,8 +13,7 @@ import reactor.core.publisher.Mono;
 public class UserEchoClientReplacement implements UsernameFetcher {
 
     @Override
-    @SingleResult
-    public Publisher<String> findUsername(@Header("Authorization") String authorization) {
+    public Mono<String> findUsername(@Header("Authorization") String authorization) {
         return Mono.just("sherlock");
     }
 }

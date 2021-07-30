@@ -1,7 +1,7 @@
 //tag::fileHead[]
 package example.micronaut
 
-import io.micronaut.core.async.annotation.SingleResult
+import reactor.core.publisher.Mono
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import jakarta.inject.Inject
@@ -20,16 +20,14 @@ class DadJokeController {
 
     //tag::standardGet[]
     @Get("/joke")
-    @SingleResult
-    fun getAJoke(): Publisher<String> {
+    fun getAJoke(): Mono<String> {
         return Mono.from(dadJokeClient.tellMeAJoke()).map(DadJoke::joke)
     }
 //end::standardGet[]
 
     //tag::usingExt[]
     @Get("/dogJokes")
-    @SingleResult
-    fun getDogJokes(): Publisher<List<DadJoke>> {
+    fun getDogJokes(): Mono<List<DadJoke>> {
         return dadJokeClient.getDogJokes() // <1>
     }
 //end::usingExt[]
@@ -38,8 +36,7 @@ class DadJokeController {
 //end::end[]
 
 //tag::clientExt[]
-@SingleResult
-fun DadJokeClient.getDogJokes(): Publisher<List<DadJoke>> { // <1>
+fun DadJokeClient.getDogJokes(): Mono<List<DadJoke>> { // <1>
     return Mono.from(this.searchDadJokes("dog")).map(DadJokePagedResults::results)
 }
 //end::clientExt[]

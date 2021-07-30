@@ -5,16 +5,14 @@ import io.micronaut.http.annotation.Header
 import io.micronaut.http.annotation.QueryValue
 import io.micronaut.http.client.annotation.Client
 import org.reactivestreams.Publisher
-import io.micronaut.core.async.annotation.SingleResult
+import reactor.core.publisher.Mono
 
 @Client("https://icanhazdadjoke.com/")
 @Header(name = "Accept", value = "application/json")
 interface DadJokeClient {
     @Get
-    @SingleResult
-    fun tellMeAJoke(): Publisher<DadJoke>
+    fun tellMeAJoke(): Mono<DadJoke>
 
     @Get("/search?term={searchTerm}")
-    @SingleResult
-    fun searchDadJokes(@QueryValue searchTerm: String): Publisher<DadJokePagedResults>
+    fun searchDadJokes(@QueryValue searchTerm: String): Mono<DadJokePagedResults>
 }

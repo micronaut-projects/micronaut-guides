@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
 import org.reactivestreams.Publisher
-import io.micronaut.core.async.annotation.SingleResult
+import reactor.core.publisher.Mono
 import javax.validation.constraints.NotBlank
 
 //end::packageandimports[]
@@ -20,7 +20,6 @@ interface BookInventoryClient : BookInventoryOperations {
 
     @Consumes(MediaType.TEXT_PLAIN)
     @Get("/books/stock/{isbn}")
-    @SingleResult
-    override fun stock(@NotBlank isbn: String): Publisher<Boolean>
+    override fun stock(@NotBlank isbn: String): Mono<Boolean>
 }
 //end::clazz[]

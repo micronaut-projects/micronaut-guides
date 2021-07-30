@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 import io.micronaut.retry.annotation.Fallback
 import org.reactivestreams.Publisher
-import io.micronaut.core.async.annotation.SingleResult
+import reactor.core.publisher.Mono
 import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank
 import reactor.core.publisher.Mono
@@ -15,8 +15,7 @@ import reactor.core.publisher.Mono
 class BookInventoryClientStub implements BookInventoryOperations {
 
     @Override
-    @SingleResult
-    Publisher<Boolean> stock(@NotBlank String isbn) {
+    Mono<Boolean> stock(@NotBlank String isbn) {
         if (isbn == "1491950358") {
             return Mono.just(Boolean.TRUE)
 

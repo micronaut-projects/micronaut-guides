@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.retry.annotation.Recoverable;
 import org.reactivestreams.Publisher;
-import io.micronaut.core.async.annotation.SingleResult;
+import reactor.core.publisher.Mono;
 import javax.validation.constraints.NotBlank;
 
 @Client("http://localhost:8082")
@@ -16,6 +16,5 @@ public interface BookInventoryClient extends BookInventoryOperations {
 
     @Consumes(MediaType.TEXT_PLAIN)
     @Get("/books/stock/{isbn}")
-    @SingleResult
-    Publisher<Boolean> stock(@NotBlank String isbn);
+    Mono<Boolean> stock(@NotBlank String isbn);
 }

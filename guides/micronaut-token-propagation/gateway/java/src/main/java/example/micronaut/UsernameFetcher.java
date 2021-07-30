@@ -1,9 +1,8 @@
 package example.micronaut;
 
 import org.reactivestreams.Publisher;
-import io.micronaut.core.async.annotation.SingleResult;
+import reactor.core.publisher.Mono;
 
 public interface UsernameFetcher {
-    @SingleResult
-    Publisher<String> findUsername();
+    Mono<String> findUsername();
 }

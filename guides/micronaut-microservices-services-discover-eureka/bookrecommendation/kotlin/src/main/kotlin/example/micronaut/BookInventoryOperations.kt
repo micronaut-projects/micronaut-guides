@@ -1,10 +1,9 @@
 package example.micronaut
 
 import org.reactivestreams.Publisher
-import io.micronaut.core.async.annotation.SingleResult
+import reactor.core.publisher.Mono
 import javax.validation.constraints.NotBlank
 
 interface BookInventoryOperations {
-    @SingleResult
-    fun stock(@NotBlank isbn: String): Publisher<Boolean>
+    fun stock(@NotBlank isbn: String): Mono<Boolean>
 }
