@@ -22,11 +22,11 @@ import static io.micronaut.http.MediaType.TEXT_PLAIN;
  */
 @Controller("/game") // <1>
 @ExecuteOn(TaskExecutors.IO) // <2>
-class GameController {
+public class GameController {
 
     private final GameReporter gameReporter;
 
-    GameController(GameReporter gameReporter) {
+    public GameController(GameReporter gameReporter) {
         this.gameReporter = gameReporter;
     }
 
@@ -41,8 +41,8 @@ class GameController {
           consumes = APPLICATION_FORM_URLENCODED, // <4>
           produces = TEXT_PLAIN) // <5>
     @Status(CREATED) // <6>
-    Mono<String> start(String b, // <7>
-                       String w) {
+    public Mono<String> start(String b, // <7>
+                              String w) {
         GameDTO game = new GameDTO(UUID.randomUUID().toString(), b, w); // <8>
         return gameReporter.game(game.getId(), game).map(gameDTO -> game.getId()); // <9>
     }
@@ -59,7 +59,7 @@ class GameController {
     @Post(value = "/move/{gameId}", // <10>
           consumes = APPLICATION_FORM_URLENCODED) // <11>
     @Status(CREATED) // <12>
-    void move(@PathVariable String gameId,
+    public void move(@PathVariable String gameId,
               String player,
               String move,
               String fen,
@@ -77,7 +77,7 @@ class GameController {
      */
     @Post("/checkmate/{gameId}/{player}") // <14>
     @Status(NO_CONTENT) // <15>
-    void checkmate(@PathVariable String gameId,
+    public void checkmate(@PathVariable String gameId,
                    @PathVariable String player) {
         GameDTO game = new GameDTO(gameId, false, player);
         gameReporter.game(gameId, game).subscribe(); // <16>
@@ -90,7 +90,7 @@ class GameController {
      */
     @Post("/draw/{gameId}") // <17>
     @Status(NO_CONTENT) // <18>
-    void draw(@PathVariable String gameId) {
+    public void draw(@PathVariable String gameId) {
         GameDTO game = new GameDTO(gameId, true, null);
         gameReporter.game(gameId, game).subscribe(); // <19>
     }
