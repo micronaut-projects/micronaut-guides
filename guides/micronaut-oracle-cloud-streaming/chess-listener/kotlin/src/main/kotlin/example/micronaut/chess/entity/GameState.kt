@@ -10,9 +10,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.validation.constraints.Size
 
-/**
- * Represents the state of a chess game after a move.
- */
 @MappedEntity("GAME_STATE")
 class GameState(
 

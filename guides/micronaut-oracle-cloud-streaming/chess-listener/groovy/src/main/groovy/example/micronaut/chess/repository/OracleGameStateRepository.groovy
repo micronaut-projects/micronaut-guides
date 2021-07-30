@@ -8,9 +8,6 @@ import static io.micronaut.context.env.Environment.ORACLE_CLOUD
 import static io.micronaut.context.env.Environment.TEST
 import static io.micronaut.data.model.query.builder.sql.Dialect.ORACLE
 
-/**
- * Oracle <code>GameState</code> entity repository.
- */
 @Primary
 @JdbcRepository(dialect = ORACLE)
 @Requires(env = [ORACLE_CLOUD, TEST])

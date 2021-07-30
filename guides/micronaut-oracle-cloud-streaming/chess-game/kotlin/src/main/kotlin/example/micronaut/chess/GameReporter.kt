@@ -11,25 +11,11 @@ import reactor.core.publisher.Mono
 @KafkaClient // <1>
 interface GameReporter {
 
-    /**
-     * Send a game indicating the start or finish (checkmate or draw).
-     *
-     * @param gameId the game id
-     * @param game the game DTO
-     * @return a reactive Single to trigger non-blocking send
-     */
     @Topic("chessGame") // <2>
     @NonNull
     fun game(@NonNull @KafkaKey gameId: String, // <4>
              @NonNull game: GameDTO): Mono<GameDTO> // <3>
 
-    /**
-     * Send a game move.
-     *
-     * @param gameId the game id
-     * @param gameState the current state
-     * @return a reactive Single to trigger non-blocking send
-     */
     @Topic("chessGameState") // <2>
     @NonNull
     fun gameState(@NonNull @KafkaKey gameId: String, // <4>

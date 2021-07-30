@@ -9,9 +9,6 @@ import java.util.Optional
 import java.util.UUID
 import javax.validation.constraints.NotNull
 
-/**
- * `GameState` entity repository.
- */
 interface GameStateRepository : CrudRepository<GameState, UUID> {
 
     @NonNull

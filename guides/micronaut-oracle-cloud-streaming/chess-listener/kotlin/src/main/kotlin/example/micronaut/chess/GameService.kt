@@ -11,9 +11,6 @@ import java.util.UUID
 import javax.inject.Singleton
 import javax.transaction.Transactional
 
-/**
- * Service to encapsulate business logic.
- */
 @Singleton
 @Transactional
 open class GameService(private val gameRepository: GameRepository,
@@ -21,12 +18,6 @@ open class GameService(private val gameRepository: GameRepository,
 
     private val log = LoggerFactory.getLogger(GameService::class.java.name)
 
-    /**
-     * Create a new `Game` and persist it.
-     *
-     * @param gameDTO the `Game` data
-     * @return the game
-     */
     open fun newGame(gameDTO: GameDTO): Game {
         log.debug("New game {}, black: {}, white: {}",
                 gameDTO.id, gameDTO.blackName, gameDTO.whiteName)
@@ -34,11 +25,6 @@ open class GameService(private val gameRepository: GameRepository,
         return gameRepository.save(game)
     }
 
-    /**
-     * Persist a game move as a `GameState`.
-     *
-     * @param gameStateDTO the `GameState` data
-     */
     open fun newGameState(gameStateDTO: GameStateDTO) {
         val game = findGame(gameStateDTO.gameId)
         val gameState = GameState(
@@ -48,11 +34,6 @@ open class GameService(private val gameRepository: GameRepository,
         gameStateRepository.save(gameState)
     }
 
-    /**
-     * Record that a game ended in checkmate.
-     *
-     * @param gameDTO the `Game` data
-     */
     open fun checkmate(gameDTO: GameDTO) {
         log.debug("Game {} ended with winner: {}", gameDTO.id, gameDTO.winner)
         val game = findGame(gameDTO.id)
@@ -60,11 +41,6 @@ open class GameService(private val gameRepository: GameRepository,
         gameRepository.update(game)
     }
 
-    /**
-     * Record that a game ended in a draw.
-     *
-     * @param gameDTO the `Game` data
-     */
     open fun draw(gameDTO: GameDTO) {
         log.debug("Game {} ended in a draw", gameDTO.id)
         val game = findGame(gameDTO.id)

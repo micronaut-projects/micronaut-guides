@@ -13,9 +13,6 @@ import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 import javax.transaction.Transactional
 
-/**
- * Service to encapsulate business logic.
- */
 @Singleton
 @Transactional
 @CompileStatic
