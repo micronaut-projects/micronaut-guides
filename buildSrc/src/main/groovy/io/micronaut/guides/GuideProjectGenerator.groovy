@@ -148,7 +148,7 @@ class GuideProjectGenerator implements Closeable {
 
                 Path srcPath = Paths.get(inputDir.absolutePath, appName, "src")
                 if (srcPath.toFile().exists()) {
-                    Files.walkFileTree(srcPath, new CopyFileVisitor(destinationPath))
+                    Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destination.path, 'src')))
                 }
                 Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
                 if (!sourcePath.toFile().exists()) {
