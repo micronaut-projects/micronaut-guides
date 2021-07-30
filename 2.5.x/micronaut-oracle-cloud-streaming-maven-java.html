@@ -328,9 +328,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME</span>;
 
-<span class="comment">/**
- * DTO for &lt;code&gt;Game&lt;/code&gt; entity.
- */</span>
 <span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@JsonTypeInfo</span>(use = NAME, property = <span class="string"><span class="delimiter">&quot;</span><span class="content">_className</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GameDTO</span> {
@@ -350,15 +347,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@Size</span>(max = <span class="integer">1</span>)
     <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> winner;
 
-    <span class="comment">/**
-     * Full constructor.
-     *
-     * @param id the game id
-     * @param blackName the black player name
-     * @param whiteName the white player name
-     * @param draw &lt;code&gt;true&lt;/code&gt; if the game ended in a draw
-     * @param winner &lt;code&gt;null&lt;/code&gt; if a new game or the game ended in a draw, &quot;b&quot;, or &quot;w&quot; to indicate the winner
-     */</span>
     <span class="annotation">@Creator</span> <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="directive">public</span> GameDTO(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> id,
                    <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> blackName,
@@ -372,26 +360,12 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="local-variable">this</span>.winner = winner;
     }
 
-    <span class="comment">/**
-     * Constructor for a new game.
-     *
-     * @param id the game id
-     * @param blackName the black player name
-     * @param whiteName the white player name
-     */</span>
     <span class="directive">public</span> GameDTO(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> id,
                    <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> blackName,
                    <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> whiteName) {
         <span class="local-variable">this</span>(id, blackName, whiteName, <span class="predefined-constant">false</span>, <span class="predefined-constant">null</span>);
     }
 
-    <span class="comment">/**
-     * Constructor for declaring a draw or winner.
-     *
-     * @param id the game id
-     * @param draw &lt;code&gt;true&lt;/code&gt; if the game ended in a draw
-     * @param winner &lt;code&gt;null&lt;/code&gt; if the game ended in a draw, &quot;b&quot;, or &quot;w&quot; to indicate the winner
-     */</span>
     <span class="directive">public</span> GameDTO(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> id,
                    <span class="type">boolean</span> draw,
                    <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> winner) {
@@ -567,25 +541,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="annotation">@KafkaClient</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">GameReporter</span> {
 
-    <span class="comment">/**
-     * Send a game indicating the start or finish (checkmate or draw).
-     *
-     * @param gameId the game id
-     * @param game the game DTO
-     * @return a reactive Single to trigger non-blocking send
-     */</span>
     <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">chessGame</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="annotation">@NonNull</span>
     Mono&lt;GameDTO&gt; game(<span class="annotation">@NonNull</span> <span class="annotation">@KafkaKey</span> <span class="predefined-type">String</span> gameId,  <i class="conum" data-value="3"></i><b>(3)</b> <i class="conum" data-value="4"></i><b>(4)</b>
                        <span class="annotation">@NonNull</span> GameDTO game);
 
-    <span class="comment">/**
-     * Send a game move.
-     *
-     * @param gameId the game id
-     * @param gameState the current state
-     * @return a reactive Single to trigger non-blocking send
-     */</span>
     <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">chessGameState</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="annotation">@NonNull</span>
     Mono&lt;GameStateDTO&gt; gameState(<span class="annotation">@NonNull</span> <span class="annotation">@KafkaKey</span> <span class="predefined-type">String</span> gameId,  <i class="conum" data-value="3"></i><b>(3)</b> <i class="conum" data-value="4"></i><b>(4)</b>
@@ -641,9 +601,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
 
-<span class="comment">/**
- * Endpoints called by the front end using Ajax.
- */</span>
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/game</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@ExecuteOn</span>(TaskExecutors.IO) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="type">class</span> <span class="class">GameController</span> {
@@ -654,13 +611,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="local-variable">this</span>.gameReporter = gameReporter;
     }
 
-    <span class="comment">/**
-     * Start a new game.
-     *
-     * @param b black's name
-     * @param w white's name
-     * @return the id of the game
-     */</span>
     <span class="annotation">@Post</span>(value = <span class="string"><span class="delimiter">&quot;</span><span class="content">/start</span><span class="delimiter">&quot;</span></span>, <i class="conum" data-value="3"></i><b>(3)</b>
           consumes = APPLICATION_FORM_URLENCODED, <i class="conum" data-value="4"></i><b>(4)</b>
           produces = TEXT_PLAIN) <i class="conum" data-value="5"></i><b>(5)</b>
@@ -671,15 +621,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="keyword">return</span> gameReporter.game(game.getId(), game).map(gameDTO -&gt; game.getId()); <i class="conum" data-value="9"></i><b>(9)</b>
     }
 
-    <span class="comment">/**
-     * Record a move.
-     *
-     * @param gameId the &lt;code&gt;Game&lt;/code&gt; id
-     * @param player b or w
-     * @param move the current move
-     * @param fen the current FEN string
-     * @param pgn the current PGN string
-     */</span>
     <span class="annotation">@Post</span>(value = <span class="string"><span class="delimiter">&quot;</span><span class="content">/move/{gameId}</span><span class="delimiter">&quot;</span></span>, <i class="conum" data-value="10"></i><b>(10)</b>
           consumes = APPLICATION_FORM_URLENCODED) <i class="conum" data-value="11"></i><b>(11)</b>
     <span class="annotation">@Status</span>(CREATED) <i class="conum" data-value="12"></i><b>(12)</b>
@@ -693,12 +634,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         gameReporter.gameState(gameId, gameState).subscribe(); <i class="conum" data-value="13"></i><b>(13)</b>
     }
 
-    <span class="comment">/**
-     * Record a checkmate.
-     *
-     * @param gameId the &lt;code&gt;Game&lt;/code&gt; id
-     * @param player b or w
-     */</span>
     <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/checkmate/{gameId}/{player}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="14"></i><b>(14)</b>
     <span class="annotation">@Status</span>(NO_CONTENT) <i class="conum" data-value="15"></i><b>(15)</b>
     <span class="type">void</span> checkmate(<span class="annotation">@PathVariable</span> <span class="predefined-type">String</span> gameId,
@@ -707,11 +642,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         gameReporter.game(gameId, game).subscribe(); <i class="conum" data-value="16"></i><b>(16)</b>
     }
 
-    <span class="comment">/**
-     * Record a draw.
-     *
-     * @param gameId the &lt;code&gt;Game&lt;/code&gt; id
-     */</span>
     <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/draw/{gameId}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="17"></i><b>(17)</b>
     <span class="annotation">@Status</span>(NO_CONTENT) <i class="conum" data-value="18"></i><b>(18)</b>
     <span class="type">void</span> draw(<span class="annotation">@PathVariable</span> <span class="predefined-type">String</span> gameId) {
@@ -1196,9 +1126,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">java.time.LocalDateTime</span>;
 <span class="keyword">import</span> <span class="include">java.util.UUID</span>;
 
-<span class="comment">/**
- * Represents a chess game.
- */</span>
 <span class="annotation">@MappedEntity</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">GAME</span><span class="delimiter">&quot;</span></span>)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Game</span> {
 
@@ -1304,9 +1231,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE</span>;
 
-<span class="comment">/**
- * Represents the state of a chess game after a move.
- */</span>
 <span class="annotation">@MappedEntity</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">GAME_STATE</span><span class="delimiter">&quot;</span></span>)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GameState</span> {
 
@@ -1325,10 +1249,12 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@NotNull</span>
     <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> player;
 
+    <span class="comment">// https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation</span>
     <span class="annotation">@Size</span>(max = <span class="integer">100</span>)
     <span class="annotation">@NotNull</span>
     <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> fen;
 
+    <span class="comment">// https://en.wikipedia.org/wiki/Portable_Game_Notation</span>
     <span class="annotation">@NotNull</span>
     <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> pgn;
 
@@ -1336,14 +1262,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@NotNull</span>
     <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> move;
 
-    <span class="comment">/**
-     * @param id the ID
-     * @param game the game
-     * @param player b or w
-     * @param move the current move
-     * @param fen https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-     * @param pgn https://en.wikipedia.org/wiki/Portable_Game_Notation
-     */</span>
     <span class="directive">public</span> GameState(<span class="annotation">@NonNull</span> <span class="predefined-type">UUID</span> id,
                      <span class="annotation">@NonNull</span> Game game,
                      <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> player,
@@ -1412,9 +1330,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">java.util.UUID</span>;
 
-<span class="comment">/**
- * &lt;code&gt;Game&lt;/code&gt; entity repository.
- */</span>
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">GameRepository</span> <span class="directive">extends</span> CrudRepository&lt;Game, <span class="predefined-type">UUID</span>&gt; {
 }</code></pre>
 </div>
@@ -1434,9 +1349,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect.H2</span>;
 
-<span class="comment">/**
- * H2 (local dev) &lt;code&gt;Game&lt;/code&gt; entity repository.
- */</span>
 <span class="annotation">@Primary</span>
 <span class="annotation">@JdbcRepository</span>(dialect = H2) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Requires</span>(env = DEVELOPMENT) <i class="conum" data-value="2"></i><b>(2)</b>
@@ -1475,9 +1387,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.annotation.Join.Type.FETCH</span>;
 
-<span class="comment">/**
- * &lt;code&gt;GameState&lt;/code&gt; entity repository.
- */</span>
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">GameStateRepository</span> <span class="directive">extends</span> CrudRepository&lt;GameState, <span class="predefined-type">UUID</span>&gt; {
 
     <span class="annotation">@Override</span>
@@ -1510,9 +1419,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect.H2</span>;
 
-<span class="comment">/**
- * H2 (local dev) &lt;code&gt;GameState&lt;/code&gt; entity repository.
- */</span>
 <span class="annotation">@Primary</span>
 <span class="annotation">@JdbcRepository</span>(dialect = H2)
 <span class="annotation">@Requires</span>(env = DEVELOPMENT)
@@ -1544,9 +1450,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">javax.transaction.Transactional</span>;
 <span class="keyword">import</span> <span class="include">java.util.UUID</span>;
 
-<span class="comment">/**
- * Service to encapsulate business logic.
- */</span>
 <span class="annotation">@Singleton</span>
 <span class="annotation">@Transactional</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GameService</span> {
@@ -1562,12 +1465,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="local-variable">this</span>.gameStateRepository = gameStateRepository;
     }
 
-    <span class="comment">/**
-     * Create a new &lt;code&gt;Game&lt;/code&gt; and persist it.
-     *
-     * @param gameDTO the &lt;code&gt;Game&lt;/code&gt; data
-     * @return the game
-     */</span>
     <span class="directive">public</span> Game newGame(GameDTO gameDTO) {
         log.debug(<span class="string"><span class="delimiter">&quot;</span><span class="content">New game {}, black: {}, white: {}</span><span class="delimiter">&quot;</span></span>,
                 gameDTO.getId(), gameDTO.getBlackName(), gameDTO.getWhiteName());
@@ -1576,11 +1473,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="keyword">return</span> gameRepository.save(game);
     }
 
-    <span class="comment">/**
-     * Persist a game move as a &lt;code&gt;GameState&lt;/code&gt;.
-     *
-     * @param gameStateDTO the &lt;code&gt;GameState&lt;/code&gt; data
-     */</span>
     <span class="directive">public</span> <span class="type">void</span> newGameState(GameStateDTO gameStateDTO) {
         Game game = findGame(gameStateDTO.getGameId());
         GameState gameState = <span class="keyword">new</span> GameState(
@@ -1590,11 +1482,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         gameStateRepository.save(gameState);
     }
 
-    <span class="comment">/**
-     * Record that a game ended in checkmate.
-     *
-     * @param gameDTO the &lt;code&gt;Game&lt;/code&gt; data
-     */</span>
     <span class="directive">public</span> <span class="type">void</span> checkmate(GameDTO gameDTO) {
         log.debug(<span class="string"><span class="delimiter">&quot;</span><span class="content">Game {} ended with winner: {}</span><span class="delimiter">&quot;</span></span>,
                 gameDTO.getId(), gameDTO.getWinner());
@@ -1603,11 +1490,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         gameRepository.update(game);
     }
 
-    <span class="comment">/**
-     * Record that a game ended in a draw.
-     *
-     * @param gameDTO the &lt;code&gt;Game&lt;/code&gt; data
-     */</span>
     <span class="directive">public</span> <span class="type">void</span> draw(GameDTO gameDTO) {
         log.debug(<span class="string"><span class="delimiter">&quot;</span><span class="content">Game {} ended in a draw</span><span class="delimiter">&quot;</span></span>, gameDTO.getId());
         Game game = findGame(gameDTO.getId());
@@ -2047,9 +1929,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect.ORACLE</span>;
 
-<span class="comment">/**
- * Oracle &lt;code&gt;Game&lt;/code&gt; entity repository.
- */</span>
 <span class="annotation">@Primary</span>
 <span class="annotation">@JdbcRepository</span>(dialect = ORACLE) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Requires</span>(env = {ORACLE_CLOUD, TEST}) <i class="conum" data-value="2"></i><b>(2)</b>
@@ -2085,9 +1964,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect.ORACLE</span>;
 
-<span class="comment">/**
- * Oracle &lt;code&gt;GameState&lt;/code&gt; entity repository.
- */</span>
 <span class="annotation">@Primary</span>
 <span class="annotation">@JdbcRepository</span>(dialect = ORACLE)
 <span class="annotation">@Requires</span>(env = {ORACLE_CLOUD, TEST})
