@@ -314,22 +314,10 @@ import io.micronaut.core.annotation.Creator
 import io.micronaut.core.annotation.Introspected
 import javax.validation.constraints.Size
 
-/**
- * DTO for `Game` entity.
- */
 @Introspected <i class="conum" data-value="1"></i><b>(1)</b>
 @JsonTypeInfo(use = NAME, property = &quot;_className&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
 class GameDTO
 
-    /**
-     * Full constructor.
-     *
-     * @param id the game id
-     * @param blackName the black player name
-     * @param whiteName the white player name
-     * @param draw `true` if the game ended in a draw
-     * @param winner `null` if a new game or the game ended in a draw, &quot;b&quot;, or &quot;w&quot; to indicate the winner
-     */
     @Creator <i class="conum" data-value="3"></i><b>(3)</b>
     constructor(@field:Size(max = 36) val id: String,
                 @field:Size(max = 255) val blackName: String?,
@@ -337,23 +325,9 @@ class GameDTO
                 val draw: Boolean,
                 @field:Size(max = 1) val winner: String?) {
 
-    /**
-     * Constructor for a new game.
-     *
-     * @param id the game id
-     * @param blackName the black player name
-     * @param whiteName the white player name
-     */
     constructor(id: String, blackName: String, whiteName: String) :
             this(id, blackName, whiteName, false, null)
 
-    /**
-     * Constructor for declaring a draw or winner.
-     *
-     * @param id the game id
-     * @param draw `true` if the game ended in a draw
-     * @param winner `null` if the game ended in a draw, &quot;b&quot;, or &quot;w&quot; to indicate the winner
-     */
     constructor(id: String, draw: Boolean, winner: String?) :
             this(id, null, null, draw, winner)
 }</code></pre>
@@ -388,9 +362,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import io.micronaut.core.annotation.Introspected
 import javax.validation.constraints.Size
 
-/**
- * DTO for `GameState` entity.
- */
 @Introspected <i class="conum" data-value="1"></i><b>(1)</b>
 @JsonTypeInfo(use = NAME, property = &quot;_className&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
 data class GameStateDTO(@field:Size(max = 36) val id: String,
@@ -435,25 +406,11 @@ import reactor.core.publisher.Mono
 @KafkaClient <i class="conum" data-value="1"></i><b>(1)</b>
 interface GameReporter {
 
-    /**
-     * Send a game indicating the start or finish (checkmate or draw).
-     *
-     * @param gameId the game id
-     * @param game the game DTO
-     * @return a reactive Single to trigger non-blocking send
-     */
     @Topic(&quot;chessGame&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
     @NonNull
     fun game(@NonNull @KafkaKey gameId: String, <i class="conum" data-value="4"></i><b>(4)</b>
              @NonNull game: GameDTO): Mono&lt;GameDTO&gt; <i class="conum" data-value="3"></i><b>(3)</b>
 
-    /**
-     * Send a game move.
-     *
-     * @param gameId the game id
-     * @param gameState the current state
-     * @return a reactive Single to trigger non-blocking send
-     */
     @Topic(&quot;chessGameState&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
     @NonNull
     fun gameState(@NonNull @KafkaKey gameId: String, <i class="conum" data-value="4"></i><b>(4)</b>
@@ -507,20 +464,10 @@ import io.micronaut.scheduling.annotation.ExecuteOn
 import reactor.core.publisher.Mono
 import java.util.UUID
 
-/**
- * Endpoints called by the front end using Ajax.
- */
 @Controller(&quot;/game&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
 @ExecuteOn(TaskExecutors.IO) <i class="conum" data-value="2"></i><b>(2)</b>
 class GameController(private val gameReporter: GameReporter) {
 
-    /**
-     * Start a new game.
-     *
-     * @param b black's name
-     * @param w white's name
-     * @return the id of the game
-     */
     @Post(value = &quot;/start&quot;, <i class="conum" data-value="3"></i><b>(3)</b>
           consumes = [APPLICATION_FORM_URLENCODED], <i class="conum" data-value="4"></i><b>(4)</b>
           produces = [TEXT_PLAIN]) <i class="conum" data-value="5"></i><b>(5)</b>
@@ -531,15 +478,6 @@ class GameController(private val gameReporter: GameReporter) {
         return gameReporter.game(game.id, game).map { game.id } <i class="conum" data-value="9"></i><b>(9)</b>
     }
 
-    /**
-     * Record a move.
-     *
-     * @param gameId the `Game` id
-     * @param player b or w
-     * @param move the current move
-     * @param fen the current FEN string
-     * @param pgn the current PGN string
-     */
     @Post(value = &quot;/move/{gameId}&quot;, <i class="conum" data-value="10"></i><b>(10)</b>
           consumes = [APPLICATION_FORM_URLENCODED]) <i class="conum" data-value="11"></i><b>(11)</b>
     @Status(CREATED) <i class="conum" data-value="12"></i><b>(12)</b>
@@ -553,12 +491,6 @@ class GameController(private val gameReporter: GameReporter) {
         gameReporter.gameState(gameId, gameState).subscribe() <i class="conum" data-value="13"></i><b>(13)</b>
     }
 
-    /**
-     * Record a checkmate.
-     *
-     * @param gameId the `Game` id
-     * @param player b or w
-     */
     @Post(&quot;/checkmate/{gameId}/{player}&quot;) <i class="conum" data-value="14"></i><b>(14)</b>
     @Status(NO_CONTENT) <i class="conum" data-value="15"></i><b>(15)</b>
     fun checkmate(@PathVariable gameId: String,
@@ -567,11 +499,6 @@ class GameController(private val gameReporter: GameReporter) {
         gameReporter.game(gameId, game).subscribe() <i class="conum" data-value="16"></i><b>(16)</b>
     }
 
-    /**
-     * Record a draw.
-     *
-     * @param gameId the `Game` id
-     */
     @Post(&quot;/draw/{gameId}&quot;) <i class="conum" data-value="17"></i><b>(17)</b>
     @Status(NO_CONTENT) <i class="conum" data-value="18"></i><b>(18)</b>
     fun draw(@PathVariable gameId: String) {
@@ -1037,9 +964,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.validation.constraints.Size
 
-/**
- * Represents a chess game.
- */
 @MappedEntity(&quot;GAME&quot;)
 class Game(
 
@@ -1085,9 +1009,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.validation.constraints.Size
 
-/**
- * Represents the state of a chess game after a move.
- */
 @MappedEntity(&quot;GAME_STATE&quot;)
 class GameState(
 
@@ -1130,9 +1051,6 @@ import example.micronaut.chess.entity.Game
 import io.micronaut.data.repository.CrudRepository
 import java.util.UUID
 
-/**
- * `Game` entity repository.
- */
 interface GameRepository : CrudRepository&lt;Game, UUID&gt;</code></pre>
 </div>
 </div>
@@ -1150,9 +1068,6 @@ import io.micronaut.context.env.Environment.DEVELOPMENT
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect.H2
 
-/**
- * H2 (local dev) `Game` entity repository.
- */
 @Primary
 @JdbcRepository(dialect = H2) <i class="conum" data-value="1"></i><b>(1)</b>
 @Requires(env = [DEVELOPMENT]) <i class="conum" data-value="2"></i><b>(2)</b>
@@ -1188,9 +1103,6 @@ import java.util.Optional
 import java.util.UUID
 import javax.validation.constraints.NotNull
 
-/**
- * `GameState` entity repository.
- */
 interface GameStateRepository : CrudRepository&lt;GameState, UUID&gt; {
 
     @NonNull
@@ -1221,9 +1133,6 @@ import io.micronaut.context.env.Environment.DEVELOPMENT
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect.H2
 
-/**
- * H2 (local dev) `GameState` entity repository.
- */
 @Primary
 @JdbcRepository(dialect = H2)
 @Requires(env = [DEVELOPMENT])
@@ -1252,9 +1161,6 @@ import java.util.UUID
 import javax.inject.Singleton
 import javax.transaction.Transactional
 
-/**
- * Service to encapsulate business logic.
- */
 @Singleton
 @Transactional
 open class GameService(private val gameRepository: GameRepository,
@@ -1262,12 +1168,6 @@ open class GameService(private val gameRepository: GameRepository,
 
     private val log = LoggerFactory.getLogger(GameService::class.java.name)
 
-    /**
-     * Create a new `Game` and persist it.
-     *
-     * @param gameDTO the `Game` data
-     * @return the game
-     */
     open fun newGame(gameDTO: GameDTO): Game {
         log.debug(&quot;New game {}, black: {}, white: {}&quot;,
                 gameDTO.id, gameDTO.blackName, gameDTO.whiteName)
@@ -1275,11 +1175,6 @@ open class GameService(private val gameRepository: GameRepository,
         return gameRepository.save(game)
     }
 
-    /**
-     * Persist a game move as a `GameState`.
-     *
-     * @param gameStateDTO the `GameState` data
-     */
     open fun newGameState(gameStateDTO: GameStateDTO) {
         val game = findGame(gameStateDTO.gameId)
         val gameState = GameState(
@@ -1289,11 +1184,6 @@ open class GameService(private val gameRepository: GameRepository,
         gameStateRepository.save(gameState)
     }
 
-    /**
-     * Record that a game ended in checkmate.
-     *
-     * @param gameDTO the `Game` data
-     */
     open fun checkmate(gameDTO: GameDTO) {
         log.debug(&quot;Game {} ended with winner: {}&quot;, gameDTO.id, gameDTO.winner)
         val game = findGame(gameDTO.id)
@@ -1301,11 +1191,6 @@ open class GameService(private val gameRepository: GameRepository,
         gameRepository.update(game)
     }
 
-    /**
-     * Record that a game ended in a draw.
-     *
-     * @param gameDTO the `Game` data
-     */
     open fun draw(gameDTO: GameDTO) {
         log.debug(&quot;Game {} ended in a draw&quot;, gameDTO.id)
         val game = findGame(gameDTO.id)
@@ -1717,9 +1602,6 @@ import io.micronaut.context.env.Environment.TEST
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect.ORACLE
 
-/**
- * Oracle `Game` entity repository.
- */
 @Primary
 @JdbcRepository(dialect = ORACLE) <i class="conum" data-value="1"></i><b>(1)</b>
 @Requires(env = [ORACLE_CLOUD, TEST]) <i class="conum" data-value="2"></i><b>(2)</b>
@@ -1753,9 +1635,6 @@ import io.micronaut.context.env.Environment.TEST
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect.ORACLE
 
-/**
- * Oracle `GameState` entity repository.
- */
 @Primary
 @JdbcRepository(dialect = ORACLE)
 @Requires(env = [ORACLE_CLOUD, TEST])
