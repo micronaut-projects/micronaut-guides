@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedDeque;
-
+import java.net.URI;
+import io.micronaut.http.uri.UriBuilder;
 import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST;
 import static io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED_TYPE;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -238,9 +239,11 @@ class GameReporterTest implements TestPropertyProvider { // <3>
     }
 
     private void endGame(String gameId, String winner) {
-        String uri = winner == null
-                ? "/game/draw/" + gameId
-                : "/game/checkmate/" + gameId + '/' + winner;
+        UriBuilder uriBuilder = UriBuilder.of("/game").path(winner == null ? "draw" : "checkmate").path(gameId);
+        if (winner != null) {
+            uriBuilder = uriBuilder.path(winner);
+        }
+        URI uri = uriBuilder.build();
         HttpRequest<?> request = HttpRequest.POST(uri, null);
         client.toBlocking().exchange(request); // <12>
     }
