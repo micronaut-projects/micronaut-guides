@@ -1,5 +1,6 @@
 package example.micronaut
 
+import example.micronaut.chess.dto.Player
 import example.micronaut.chess.dto.GameDTO
 import example.micronaut.chess.dto.GameStateDTO
 import io.micronaut.configuration.kafka.annotation.KafkaListener
@@ -69,10 +70,10 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         when: 'make moves'
         receivedGames.clear()
 
-        makeMove(gameId, 'w', 'f3', 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1', '1. f3')
-        makeMove(gameId, 'b', 'e6', 'rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2', '1. f3 e6')
-        makeMove(gameId, 'w', 'g4', 'rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2', '1. f3 e6 2. g4')
-        makeMove(gameId, 'b', 'Qh4#', 'rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3', '1. f3 e6 2. g4 Qh4#')
+        makeMove(gameId, Player.WHITE, 'f3', 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1', '1. f3')
+        makeMove(gameId, Player.BLACK, 'e6', 'rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2', '1. f3 e6')
+        makeMove(gameId, Player.WHITE, 'g4', 'rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2', '1. f3 e6 2. g4')
+        makeMove(gameId, Player.BLACK, 'Qh4#', 'rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3', '1. f3 e6 2. g4 Qh4#')
 
         then:
         pollingConditions.eventually {
@@ -86,23 +87,23 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         List<GameStateDTO> moves = new ArrayList<>(receivedMoves)
 
         then:
-        'w' == moves[0].player
+        Player.WHITE == moves[0].player
         'f3' == moves[0].move
 
-        'b' == moves[1].player
+        Player.BLACK == moves[1].player
         'e6' == moves[1].move
 
-        'w' == moves[2].player
+        Player.WHITE == moves[2].player
         'g4' == moves[2].move
 
-        'b' == moves[3].player
+        Player.BLACK == moves[3].player
         'Qh4#' == moves[3].move
 
         when: 'end game'
 
         receivedMoves.clear()
 
-        endGame(gameId, 'b')
+        endGame(gameId, Player.BLACK)
 
         then:
         pollingConditions.eventually {
@@ -120,7 +121,7 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         !game.blackName
         !game.whiteName
         !game.draw
-        'b' == game.winner
+        Player.BLACK == game.winner
     }
 
     void 'test game ending in draw'() {
@@ -154,8 +155,9 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         when: 'make moves'
         receivedGames.clear()
 
-        makeMove(gameId, 'w', 'f3', 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1', '1. f3')
-        makeMove(gameId, 'b', 'e6', 'rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2', '1. f3 e6')
+        makeMove(gameId, Player.WHITE, 'f3', 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1', '1. f3')
+        makeMove(gameId, Player.BLACK, 'e6', 'rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2', '1. f3' +
+                'Player')
 
         then:
         pollingConditions.eventually {
@@ -170,7 +172,7 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         endGame(gameId, null)
 
         then:
-        pollingConditions.eventually {
+        new PollingConditions().eventually {
             !receivedGames.empty
         }
 
@@ -186,7 +188,9 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         !game.whiteName
         game.draw
         !game.winner
+        Player
     }
+
 
     @Override
     Map<String, String> getProperties() {
@@ -222,7 +226,9 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
                 Argument.of(Optional, String)) // <10>
     }
 
-    private void makeMove(String gameId, String player, String move,
+    private void makeMove(String gameId,
+                          Player player,
+                          String move,
                           String fen, String pgn) {
         Map body = [player: player, move: move, fen: fen, pgn: pgn]
 
@@ -231,10 +237,10 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         client.toBlocking().exchange(request) // <11>
     }
 
-    private void endGame(String gameId, String winner) {
+    private void endGame(String gameId, Player winner) {
         UriBuilder uriBuilder = UriBuilder.of("/game").path(winner == null ? "draw" : "checkmate").path(gameId)
         if (winner != null) {
-            uriBuilder = uriBuilder.path(winner)
+            uriBuilder = uriBuilder.path(winner.toString())
         }
         URI uri = uriBuilder.build()
         HttpRequest<Object> request = HttpRequest.POST(uri, null)

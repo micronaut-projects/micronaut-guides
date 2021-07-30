@@ -1,5 +1,6 @@
 package example.micronaut.chess.entity
 
+import example.micronaut.chess.dto.Player
 import example.micronaut.chess.dto.GameDTO
 import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.NonNull
@@ -42,7 +43,7 @@ class Game {
 
     @Nullable
     @Size(max = 1)
-    String winner
+    Player winner
 
     Game(@NonNull UUID id,
          @NonNull String blackName,

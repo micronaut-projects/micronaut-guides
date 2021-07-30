@@ -26,7 +26,7 @@ public class GameStateDTO {
 
     @Size(max = 1)
     @NotNull
-    private final String player;
+    private final Player player;
 
     @Size(max = 100)
     @NotNull
@@ -41,7 +41,7 @@ public class GameStateDTO {
 
     public GameStateDTO(@NonNull String id,
                         @NonNull String gameId,
-                        @NonNull String player,
+                        @NonNull Player player,
                         @NonNull String move,
                         @NonNull String fen,
                         @NonNull String pgn) {
@@ -64,7 +64,7 @@ public class GameStateDTO {
     }
 
     @NonNull
-    public String getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 

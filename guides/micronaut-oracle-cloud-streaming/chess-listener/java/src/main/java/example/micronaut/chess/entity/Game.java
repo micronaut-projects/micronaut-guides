@@ -1,5 +1,6 @@
 package example.micronaut.chess.entity;
 
+import example.micronaut.chess.dto.Player;
 import example.micronaut.chess.dto.GameDTO;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
@@ -39,7 +40,7 @@ public class Game {
 
     @Nullable
     @Size(max = 1)
-    private String winner;
+    private Player winner;
 
     public Game(@NonNull UUID id,
                 @NonNull String blackName,
@@ -88,11 +89,11 @@ public class Game {
         this.draw = draw;
     }
 
-    public String getWinner() {
+    public Player getWinner() {
         return winner;
     }
 
-    public void setWinner(String winner) {
+    public void setWinner(Player winner) {
         this.winner = winner;
     }
 

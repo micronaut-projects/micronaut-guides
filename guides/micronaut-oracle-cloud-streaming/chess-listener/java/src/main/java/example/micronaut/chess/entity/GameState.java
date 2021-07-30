@@ -1,5 +1,6 @@
 package example.micronaut.chess.entity;
 
+import example.micronaut.chess.dto.Player;
 import example.micronaut.chess.dto.GameStateDTO;
 import io.micronaut.data.annotation.DateCreated;
 import io.micronaut.data.annotation.Id;
@@ -33,7 +34,7 @@ public class GameState {
     @Size(max = 1)
     @NotNull
     @NonNull
-    private final String player;
+    private final Player player;
 
     // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
     @Size(max = 100)
@@ -53,7 +54,7 @@ public class GameState {
 
     public GameState(@NonNull UUID id,
                      @NonNull Game game,
-                     @NonNull String player,
+                     @NonNull Player player,
                      @NonNull String move,
                      @NonNull String fen,
                      @NonNull String pgn) {
@@ -84,7 +85,7 @@ public class GameState {
     }
 
     @NonNull
-    public String getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
