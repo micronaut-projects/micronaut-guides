@@ -5,8 +5,5 @@ import io.micronaut.data.repository.CrudRepository;
 
 import java.util.UUID;
 
-/**
- * <code>Game</code> entity repository.
- */
 public interface GameRepository extends CrudRepository<Game, UUID> {
 }

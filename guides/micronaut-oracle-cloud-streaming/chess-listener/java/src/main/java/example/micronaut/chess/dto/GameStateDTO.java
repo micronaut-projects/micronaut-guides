@@ -9,9 +9,6 @@ import javax.validation.constraints.Size;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
-/**
- * DTO for <code>GameState</code> entity.
- */
 @Introspected // <1>
 @JsonTypeInfo(use = NAME, property = "_className") // <2>
 public class GameStateDTO {
