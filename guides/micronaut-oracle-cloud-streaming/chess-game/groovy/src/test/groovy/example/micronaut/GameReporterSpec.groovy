@@ -14,10 +14,9 @@ import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
-
+import io.micronaut.http.uri.UriBuilder
 import javax.inject.Inject
 import java.util.concurrent.ConcurrentLinkedDeque
-
 import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
 import static io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED_TYPE
 
@@ -233,9 +232,11 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
     }
 
     private void endGame(String gameId, String winner) {
-        String uri = winner == null
-                ? '/game/draw/' + gameId
-                : '/game/checkmate/' + gameId + '/' + winner
+        UriBuilder uriBuilder = UriBuilder.of("/game").path(winner == null ? "draw" : "checkmate").path(gameId)
+        if (winner != null) {
+            uriBuilder = uriBuilder.path(winner)
+        }
+        URI uri = uriBuilder.build()
         HttpRequest<Object> request = HttpRequest.POST(uri, null)
         client.toBlocking().exchange(request) // <12>
     }
