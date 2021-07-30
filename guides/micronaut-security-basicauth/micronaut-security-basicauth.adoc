@@ -12,7 +12,7 @@ include::{commondir}/common-create-app.adoc[]
 
 === Security Dependency
 
-Add Micronaut's security dependency to your build file.
+Add Micronaut's security dependency to your build:
 
 dependency:micronaut-security[groupId:io.micronaut.security]
 
@@ -32,8 +32,8 @@ Create a file named `HomeController` which resolves the base URL `/`:
 source:HomeController[]
 
 <1> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
-<2> Annotate with `io.micronaut.http.annotation.Controller` to designate a class as a Micronaut controller.
-<3> You can specify the HTTP verb that a controller's action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<2> Annotate with `io.micronaut.http.annotation.Controller` to designate the class as a Micronaut controller.
+<3> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
 <4> If a user is authenticated, Micronaut will bind the user object to an argument of type `java.security.Principal` (if present).
 
 === WWW-Authenticate
@@ -44,7 +44,7 @@ source:DefaultAuthorizationExceptionHandlerReplacement[]
 
 The previous code adds the https://datatracker.ietf.org/doc/html/rfc7235#section-4.1[WWW-Authenticate] header to indicate the authentication scheme.
 
-<1> To register a Singleton in Micronaut's application context annotate your class with `javax.inject.Singleton`.
+<1> To register a Singleton in Micronaut's application context, annotate your class with `javax.inject.Singleton`.
 <2> Specify that `DefaultAuthorizationExceptionHandlerReplacement` replaces the bean `DefaultAuthorizationExceptionHandler`
 
 === Tests
@@ -58,7 +58,7 @@ test:BasicAuthTest[]
 <3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
 <4> If you attempt to access a secured endpoint without authentication, 401 is returned
 <5> By using `basicAuth` method, you populate the `Authorization` header with user-id:password pairs, encoded using Base64.
-<6> Micronaut's `HttpClient` simplifies parsing HTTP response payload to Java objects. In this example, we parse the response to `String`.
+<6> Micronaut's `HttpClient` simplifies parsing the HTTP response payload to Java objects. In this example, we parse the response to `String`.
 <7> Use `.body()` to retrieve the parsed payload.
 
 === Use Micronaut's HTTP Client and Basic Auth
@@ -69,7 +69,7 @@ First create a `@Client` with a method `home` which accepts an `Authorization` H
 
 test:AppClient[]
 
-<1> The method consumes plain text, because of it Micronaut includes the HTTP Header `Accept: text/plain`.
+<1> The method consumes plain text, so Micronaut includes the HTTP Header `Accept: text/plain`.
 <2> The first character of the parameter name is capitalized and that value (`Authorization`) is used as the HTTP Header name. To change the parameter name, specify the `@Header` annotation value.
 
 Create a test which uses the previous `@Client`
@@ -84,12 +84,14 @@ include::{commondir}/common-testApp.adoc[]
 
 include::{commondir}/common-runapp.adoc[]
 
-To test the running application, issue a GET request to localhost:8080 with a basic authentication header in place.  One way to do this is with the popular curl command:
+To test the running application, issue a GET request to localhost:8080 with a Basic Authentication header. One way to do this is with curl:
+
+[source,bash]
 ----
 curl -v -u sherlock:password localhost:8080
 ----
 
-If you open the `localhost:8080` in your browser a login dialog pops up due to the `WWW-Authenticate` header.
+If you open `localhost:8080` in a browser, a login dialog pops up due to the `WWW-Authenticate` header.
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
