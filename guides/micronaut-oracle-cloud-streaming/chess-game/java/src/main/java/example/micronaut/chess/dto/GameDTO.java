@@ -20,9 +20,11 @@ public class GameDTO {
     private final String id;
 
     @Size(max = 255)
+    @Nullable
     private final String blackName;
 
     @Size(max = 255)
+    @Nullable
     private final String whiteName;
 
     private final boolean draw;

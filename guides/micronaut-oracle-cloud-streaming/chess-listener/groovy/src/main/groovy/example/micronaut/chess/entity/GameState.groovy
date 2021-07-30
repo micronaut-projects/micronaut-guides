@@ -8,6 +8,7 @@ import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
 import io.micronaut.data.annotation.Relation
 import javax.validation.constraints.NotNull
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Size
 
 import java.time.LocalDateTime
@@ -23,28 +24,34 @@ class GameState {
 
     @Id
     @NotNull
+    @NonNull
     final UUID id
 
     @Relation(MANY_TO_ONE)
     @NotNull
+    @NonNull
     final Game game
 
     @DateCreated
     LocalDateTime dateCreated
 
     @Size(max = 1)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String player
 
     @Size(max = 100)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String fen
 
-    @NotNull
+    @NotBlank
+    @NonNull
     final String pgn
 
     @Size(max = 10)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String move
 
     /**
@@ -69,6 +76,7 @@ class GameState {
         this.pgn = pgn
     }
 
+    @NonNull
     GameStateDTO toDto() {
         new GameStateDTO(id.toString(), game.getId().toString(), player, move, fen, pgn)
     }
