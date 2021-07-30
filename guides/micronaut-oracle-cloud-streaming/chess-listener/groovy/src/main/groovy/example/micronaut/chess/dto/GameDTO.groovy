@@ -6,8 +6,7 @@ import io.micronaut.core.annotation.Creator
 import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
-
-import javax.validation.constraints.NotNull
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Size
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
@@ -18,18 +17,22 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 class GameDTO {
 
     @Size(max = 36)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String id
 
     @Size(max = 255)
+    @Nullable
     final String blackName
 
     @Size(max = 255)
+    @Nullable
     final String whiteName
 
     final boolean draw
 
     @Size(max = 1)
+    @Nullable
     final String winner
 
     /**

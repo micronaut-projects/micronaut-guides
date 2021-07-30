@@ -9,7 +9,7 @@ import example.micronaut.chess.repository.GameStateRepository
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
+import io.micronaut.core.annotation.NonNull
 import javax.inject.Singleton
 import javax.transaction.Transactional
 
@@ -81,6 +81,7 @@ class GameService {
         gameRepository.update game
     }
 
+    @NonNull
     private Game findGame(String gameId) {
         gameRepository.findById(UUID.fromString(gameId)).orElseThrow(() ->
                 new IllegalArgumentException("Game with id '" + gameId + "' not found"))
