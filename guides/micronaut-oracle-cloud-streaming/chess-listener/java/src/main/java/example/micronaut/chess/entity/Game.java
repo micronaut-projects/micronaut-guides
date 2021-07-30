@@ -13,9 +13,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Represents a chess game.
- */
 @MappedEntity("GAME")
 public class Game {
 

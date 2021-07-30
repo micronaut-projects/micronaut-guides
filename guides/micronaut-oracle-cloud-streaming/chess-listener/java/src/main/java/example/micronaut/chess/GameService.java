@@ -13,9 +13,6 @@ import javax.inject.Singleton;
 import javax.transaction.Transactional;
 import java.util.UUID;
 
-/**
- * Service to encapsulate business logic.
- */
 @Singleton
 @Transactional
 public class GameService {
@@ -31,12 +28,6 @@ public class GameService {
         this.gameStateRepository = gameStateRepository;
     }
 
-    /**
-     * Create a new <code>Game</code> and persist it.
-     *
-     * @param gameDTO the <code>Game</code> data
-     * @return the game
-     */
     public Game newGame(GameDTO gameDTO) {
         log.debug("New game {}, black: {}, white: {}",
                 gameDTO.getId(), gameDTO.getBlackName(), gameDTO.getWhiteName());
@@ -45,11 +36,6 @@ public class GameService {
         return gameRepository.save(game);
     }
 
-    /**
-     * Persist a game move as a <code>GameState</code>.
-     *
-     * @param gameStateDTO the <code>GameState</code> data
-     */
     public void newGameState(GameStateDTO gameStateDTO) {
         Game game = findGame(gameStateDTO.getGameId());
         GameState gameState = new GameState(
@@ -59,11 +45,6 @@ public class GameService {
         gameStateRepository.save(gameState);
     }
 
-    /**
-     * Record that a game ended in checkmate.
-     *
-     * @param gameDTO the <code>Game</code> data
-     */
     public void checkmate(GameDTO gameDTO) {
         log.debug("Game {} ended with winner: {}",
                 gameDTO.getId(), gameDTO.getWinner());
@@ -72,11 +53,6 @@ public class GameService {
         gameRepository.update(game);
     }
 
-    /**
-     * Record that a game ended in a draw.
-     *
-     * @param gameDTO the <code>Game</code> data
-     */
     public void draw(GameDTO gameDTO) {
         log.debug("Game {} ended in a draw", gameDTO.getId());
         Game game = findGame(gameDTO.getId());

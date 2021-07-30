@@ -14,9 +14,6 @@ import java.util.UUID;
 
 import static io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE;
 
-/**
- * Represents the state of a chess game after a move.
- */
 @MappedEntity("GAME_STATE")
 public class GameState {
 
@@ -35,10 +32,12 @@ public class GameState {
     @NotNull
     private final String player;
 
+    // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
     @Size(max = 100)
     @NotNull
     private final String fen;
 
+    // https://en.wikipedia.org/wiki/Portable_Game_Notation
     @NotNull
     private final String pgn;
 
@@ -46,14 +45,6 @@ public class GameState {
     @NotNull
     private final String move;
 
-    /**
-     * @param id the ID
-     * @param game the game
-     * @param player b or w
-     * @param move the current move
-     * @param fen https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-     * @param pgn https://en.wikipedia.org/wiki/Portable_Game_Notation
-     */
     public GameState(@NonNull UUID id,
                      @NonNull Game game,
                      @NonNull String player,

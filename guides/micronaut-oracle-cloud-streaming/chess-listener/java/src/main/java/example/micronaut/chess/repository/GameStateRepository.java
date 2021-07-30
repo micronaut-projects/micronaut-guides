@@ -11,9 +11,6 @@ import java.util.UUID;
 
 import static io.micronaut.data.annotation.Join.Type.FETCH;
 
-/**
- * <code>GameState</code> entity repository.
- */
 public interface GameStateRepository extends CrudRepository<GameState, UUID> {
 
     @Override

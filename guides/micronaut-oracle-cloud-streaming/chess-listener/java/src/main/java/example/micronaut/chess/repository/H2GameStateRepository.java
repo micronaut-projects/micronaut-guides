@@ -7,9 +7,6 @@ import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import static io.micronaut.context.env.Environment.DEVELOPMENT;
 import static io.micronaut.data.model.query.builder.sql.Dialect.H2;
 
-/**
- * H2 (local dev) <code>GameState</code> entity repository.
- */
 @Primary
 @JdbcRepository(dialect = H2)
 @Requires(env = DEVELOPMENT)
