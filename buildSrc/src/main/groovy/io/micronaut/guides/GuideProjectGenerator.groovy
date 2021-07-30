@@ -146,9 +146,10 @@ class GuideProjectGenerator implements Closeable {
                 destination.mkdir()
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
 
-                Path srcPath = Paths.get(inputDir.absolutePath, appName, "src")
+                final String srcFolder = 'src'
+                Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
                 if (srcPath.toFile().exists()) {
-                    Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destination.path, 'src')))
+                    Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destination.path, srcFolder)))
                 }
                 Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
                 if (!sourcePath.toFile().exists()) {
