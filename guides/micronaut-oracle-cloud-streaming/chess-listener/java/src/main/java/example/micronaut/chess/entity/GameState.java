@@ -20,10 +20,12 @@ public class GameState {
 
     @Id
     @NotNull
+    @NonNull
     private final UUID id;
 
     @Relation(MANY_TO_ONE)
     @NotNull
+    @NonNull
     private final Game game;
 
     @DateCreated
@@ -31,19 +33,23 @@ public class GameState {
 
     @Size(max = 1)
     @NotNull
+    @NonNull
     private final Player player;
 
     // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
     @Size(max = 100)
     @NotNull
+    @NonNull
     private final String fen;
 
     // https://en.wikipedia.org/wiki/Portable_Game_Notation
     @NotNull
+    @NonNull
     private final String pgn;
 
     @Size(max = 10)
     @NotNull
+    @NonNull
     private final String move;
 
     public GameState(@NonNull UUID id,
@@ -60,10 +66,12 @@ public class GameState {
         this.pgn = pgn;
     }
 
+    @NonNull
     public UUID getId() {
         return id;
     }
 
+    @NonNull
     public Game getGame() {
         return game;
     }
@@ -76,22 +84,27 @@ public class GameState {
         this.dateCreated = dateCreated;
     }
 
+    @NonNull
     public Player getPlayer() {
         return player;
     }
 
+    @NonNull
     public String getFen() {
         return fen;
     }
 
+    @NonNull
     public String getPgn() {
         return pgn;
     }
 
+    @NonNull
     public String getMove() {
         return move;
     }
 
+    @NonNull
     public GameStateDTO toDto() {
         return new GameStateDTO(id.toString(), game.getId().toString(), player, move, fen, pgn);
     }

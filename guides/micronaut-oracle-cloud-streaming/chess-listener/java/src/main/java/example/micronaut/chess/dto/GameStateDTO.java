@@ -15,25 +15,31 @@ public class GameStateDTO {
 
     @Size(max = 36)
     @NotNull
+    @NonNull
     private final String id;
 
     @Size(max = 36)
     @NotNull
+    @NonNull
     private final String gameId;
 
     @Size(max = 1)
     @NotNull
+    @NonNull
     private final Player player;
 
     @Size(max = 100)
     @NotNull
+    @NonNull
     private final String fen;
 
     @NotNull
+    @NonNull
     private final String pgn;
 
     @Size(max = 10)
     @NotNull
+    @NonNull
     private final String move;
 
     public GameStateDTO(@NonNull String id,

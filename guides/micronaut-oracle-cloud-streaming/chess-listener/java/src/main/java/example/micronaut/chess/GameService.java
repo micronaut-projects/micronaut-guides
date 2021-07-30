@@ -8,7 +8,7 @@ import example.micronaut.chess.repository.GameRepository;
 import example.micronaut.chess.repository.GameStateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import io.micronaut.core.annotation.NonNull;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 import java.util.UUID;
@@ -60,6 +60,7 @@ public class GameService {
         gameRepository.update(game);
     }
 
+    @NonNull
     private Game findGame(String gameId) {
         return gameRepository.findById(UUID.fromString(gameId)).orElseThrow(() ->
                 new IllegalArgumentException("Game with id '" + gameId + "' not found"));

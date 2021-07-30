@@ -5,6 +5,7 @@ import example.micronaut.chess.dto.GameDTO
 import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
+import javax.validation.constraints.NotBlank
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated
 import io.micronaut.data.annotation.Id
@@ -23,9 +24,13 @@ class Game {
     final UUID id
 
     @Size(max = 255)
+    @NotBlank
+    @NonNull
     final String blackName
 
     @Size(max = 255)
+    @NotBlank
+    @NonNull
     final String whiteName
 
     @DateCreated

@@ -19,17 +19,21 @@ class GameDTO {
 
     @Size(max = 36)
     @NotNull
+    @NonNull
     final String id
 
     @Size(max = 255)
+    @Nullable
     final String blackName
 
     @Size(max = 255)
+    @Nullable
     final String whiteName
 
     final boolean draw
 
     @Size(max = 1)
+    @Nullable
     final Player winner
 
     @Creator // <3>

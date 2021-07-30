@@ -19,12 +19,15 @@ public class Game {
 
     @Id
     @NotNull
+    @NonNull
     private final UUID id;
 
     @Size(max = 255)
+    @NonNull
     private final String blackName;
 
     @Size(max = 255)
+    @NonNull
     private final String whiteName;
 
     @DateCreated
@@ -47,14 +50,17 @@ public class Game {
         this.whiteName = whiteName;
     }
 
+    @NonNull
     public UUID getId() {
         return id;
     }
 
+    @NonNull
     public String getBlackName() {
         return blackName;
     }
 
+    @NonNull
     public String getWhiteName() {
         return whiteName;
     }
@@ -91,6 +97,7 @@ public class Game {
         this.winner = winner;
     }
 
+    @NonNull
     public GameDTO toDto() {
         return new GameDTO(id.toString(), blackName, whiteName, draw, winner);
     }
