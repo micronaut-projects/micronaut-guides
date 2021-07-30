@@ -2139,10 +2139,9 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <span class="keyword">import</span> <span class="include">org.testcontainers.utility.DockerImageName</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 <span class="keyword">import</span> <span class="include">spock.util.concurrent.PollingConditions</span>
-
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>
 <span class="keyword">import</span> <span class="include">javax.inject.Inject</span>
 <span class="keyword">import</span> <span class="include">java.util.concurrent.ConcurrentLinkedDeque</span>
-
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST</span>
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED_TYPE</span>
 
@@ -2358,9 +2357,11 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
     }
 
     <span class="directive">private</span> <span class="type">void</span> endGame(<span class="predefined-type">String</span> gameId, <span class="predefined-type">String</span> winner) {
-        <span class="predefined-type">String</span> uri = winner == <span class="predefined-constant">null</span>
-                ? <span class="string"><span class="delimiter">'</span><span class="content">/game/draw/</span><span class="delimiter">'</span></span> + gameId
-                : <span class="string"><span class="delimiter">'</span><span class="content">/game/checkmate/</span><span class="delimiter">'</span></span> + gameId + <span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span> + winner
+        UriBuilder uriBuilder = UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/game</span><span class="delimiter">&quot;</span></span>).path(winner == <span class="predefined-constant">null</span> ? <span class="string"><span class="delimiter">&quot;</span><span class="content">draw</span><span class="delimiter">&quot;</span></span> : <span class="string"><span class="delimiter">&quot;</span><span class="content">checkmate</span><span class="delimiter">&quot;</span></span>).path(gameId)
+        <span class="keyword">if</span> (winner != <span class="predefined-constant">null</span>) {
+            uriBuilder = uriBuilder.path(winner)
+        }
+        <span class="predefined-type">URI</span> uri = uriBuilder.build()
         HttpRequest&lt;<span class="predefined-type">Object</span>&gt; request = HttpRequest.POST(uri, <span class="predefined-constant">null</span>)
         client.toBlocking().exchange(request) <i class="conum" data-value="12"></i><b>(12)</b>
     }
