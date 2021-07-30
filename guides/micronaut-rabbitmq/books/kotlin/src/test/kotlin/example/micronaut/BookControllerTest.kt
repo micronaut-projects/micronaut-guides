@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.internal.verification.VerificationModeFactory.times
 import java.util.Optional
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest
 class BookControllerTest {

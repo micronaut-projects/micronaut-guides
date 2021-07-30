@@ -1,0 +1,717 @@
+= @guideTitle@
+
+@guideIntro@
+
+Authors: @authors@
+
+Micronaut Version: @micronaut@
+
+== Getting Started
+
+In this guide, we will create two Micronaut microservices written in @language@ that will use https://docs.oracle.com/en-us/iaas/Content/Streaming/Concepts/streamingoverview.htm[Oracle Cloud Streaming] to communicate with each other in an asynchronous and decoupled way.
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+* JDK 11 or greater installed with `JAVA_HOME` configured appropriately
+* An Oracle Cloud account (create a free trial account at https://signup.oraclecloud.com[signup.oraclecloud.com])
+* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
+* https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker, and for running tests.
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the application
+
+The microservices will use Oracle Cloud Streaming and the Kafka API to send and receive messages. The messages will represent events occurring chess game play, including game start and end, and each move.
+
+The microservices are:
+
+* `chess-game` - Has a simple JavaScript and Ajax UI that renders a variable number of chess games that will be auto-played to generate many events
+
+* `chess-listener` - Receives the chess event messages and persists them to a database
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+=== chess-game Microservice
+
+Create the `chess-game` microservice using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
+
+[source,bash]
+----
+mn create-app --features=kafka,graalvm,reactor,testcontainers example.micronaut.chess-game --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `reactor`, and `testcontainers` features.
+
+The previous command creates a directory named `chess-game` and a Micronaut application inside it with default package `example.micronaut`.
+
+In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for https://www.testcontainers.org/modules/kafka/[Kafka in Testcontainers], along with one for the http://www.awaitility.org/[Awaitility] library:
+
+:dependencies:
+dependency:kafka[groupId=org.testcontainers,scope=test]
+dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
+:dependencies:
+
+==== DTOs
+
+Create a `GameDTO` data transfer object to represent game data:
+
+source:chess/dto/GameDTO[app=chess-game]
+
+<1> Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+<2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
+<3> Annotate with `@Creator` to indicate the constructor to use when deserializing from JSON
+
+Create a `GameStateDTO` data transfer object to represent game move data:
+
+source:chess/dto/GameStateDTO[app=chess-game]
+
+<1> Annotate with `@Introspected` to generate metadata at compilation time and avoid reflection
+<2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
+
+==== GameReporter
+
+Create a `GameReporter` Kafka client to send chess-related messages:
+
+source:chess/GameReporter[app=chess-game]
+
+<1> Annotate the class with `@KafkaClient` to declare it as a Kafka message producer; Micronaut will generate the sending code at compile time
+<2> Annotate the method with `@Topic` and specify the topic name
+<3> By returning a reactive type, Micronaut will use non-blocking code to send the message
+<4> Use the `Game` primary key as the Kafka partition key
+
+==== GameController
+
+Create a `GameController` class to contain Ajax endpoints for the front end:
+
+source:chess/GameController[app=chess-game]
+
+<1> Use the `@Controller` annotation to make the class a controller, and specify the root URI as `"/game"`
+<2> Execute controller actions on the I/O executor to avoid blocking the Event loop
+<3> The method accepts HTTP POST requests to indicate a new game has started
+<4> The method accepts encoded form data (the two players' names)
+<5> The response will be plain text and contain the ID of the persisted `Game`
+<6> Send a `"Created"` (201) status to indicate a `Game` was persisted
+<7> Return a reactive type to configure a reactive response
+<8> Assign the game's primary key as a UUID
+<9> Use the `GameReporter` to send a Kafka message with new game data
+<10> The method accepts HTTP POST requests to indicate a move has occurred
+<11> The method accepts encoded form data (the move information)
+<12> Send a `"Created"` (201) status to indicate a `GameState` was persisted
+<13> Use the `GameReporter` to send a Kafka message with game move data
+<14> The method accepts HTTP POST requests to indicate the game ended with a checkmate
+<15> Send a `"No Content"` (204) status to indicate success and no response body
+<16> Use the `GameReporter` to send a Kafka message that the game ended in a checkmate
+<17> The method accepts HTTP POST requests to indicate the game ended with a draw
+<18> Send a `"No Content"` (204) status to indicate success and no response body
+<19> Use the `GameReporter` to send a Kafka message that the game ended in a draw
+
+==== Development environment
+
+include::{commondir}/common-default-dev-environment-application.adoc[]
+
+source:Application[app=chess-game]
+
+Delete the `kafka.bootstrap.servers` config option from `application.yml` and move it to `application-dev.yml`.
+
+include::{commondir}/common-default-dev-environment-application-dev-yaml.adoc[]
+
+resource:application-dev.yml[app=chess-game]
+
+<1> Use local Kafka in the development environment
+
+==== UI Resources
+
+Update `application.yml` to add static resource configuration:
+
+resource:application.yml[app=chess-game,tag=router]
+
+<1> Configure Micronaut to look for static resources in `src/main/resources/public`
+
+Create `index.html` with the simple chess game UI:
+
+resource:public/index.html[app=chess-game]
+
+The HTML page includes the https://chessboardjs.com/[chessboard.js] JavaScript library to create a chess board and the https://github.com/jhlywa/chess.js[chess.js] JavaScript library for chess game logic.
+
+Create `micronaut-chess.js` used by `index.html` with the JavaScript code:
+
+resource:public/micronaut-chess.js[app=chess-game]
+
+Copy these chess piece images to `src/main/resources/public/img/chesspieces/wikipedia` (the path must be correct because it is hard-coded in `chessboard.js`):
+
+image:oraclecloudstream/bB.png[] image:oraclecloudstream/bK.png[] image:oraclecloudstream/bN.png[] image:oraclecloudstream/bP.png[] image:oraclecloudstream/bQ.png[] image:oraclecloudstream/bR.png[]
+
+image:oraclecloudstream/wB.png[] image:oraclecloudstream/wK.png[] image:oraclecloudstream/wN.png[] image:oraclecloudstream/wP.png[] image:oraclecloudstream/wQ.png[] image:oraclecloudstream/wR.png[]
+
+Right-click each image and save to your local file system, or extract the completed example zip file linked above and get them from there.
+
+=== chess-listener Microservice
+
+Create the `chess-listener` microservice using the https://docs.micronaut.io/latest/guide/index.html#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
+
+[source,bash]
+----
+mn create-app --features=kafka,graalvm,data-jdbc,flyway,reactor,testcontainers example.micronaut.chess-listener --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `data-jdbc`, `flyway`, `reactor`, and `testcontainers` features.
+
+The previous command creates a directory named `chess-listener` and a Micronaut application inside it with default package `example.micronaut`.
+
+In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for Kafka and Oracle in Testcontainers, along with one for the http://www.awaitility.org/[Awaitility] library:
+
+:dependencies:
+dependency:kafka[groupId=org.testcontainers,scope=test]
+dependency:oracle-xe[groupId=org.testcontainers,scope=test]
+dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
+:dependencies:
+
+==== Flyway
+
+Enable Flyway database migrations for all environments by adding this configuration to `application.yml`:
+
+resource:application.yml[app=chess-listener,tag=flyway]
+
+==== DTOs
+
+The same `GameDTO` and `GameStateDTO` data transfer objects as above in the `chess-game` microservice. In a real application these would be in a shared library but to keep things simple we'll just duplicate them.
+
+==== Entity Classes
+
+Create a `Game` entity to represent persistent game data:
+
+source:chess/entity/Game[app=chess-listener]
+
+Create a `GameState` entity to represent persistent game move data:
+
+source:chess/entity/GameState[app=chess-listener]
+
+==== Repositories
+
+Create a "base" `GameRepository` interface to have access to methods for `Game` entity persistence:
+
+source:chess/repository/GameRepository[app=chess-listener]
+
+and a `H2GameRepository` interface that extends `GameRepository` and specifies the `H2` dialect to use an in-memory H2 database in the development environment (we'll also be creating an Oracle repository):
+
+source:chess/repository/H2GameRepository[app=chess-listener]
+
+<1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `H2` dialect. Micronaut will generate persistence logic at compile time and use H2-specific SQL.
+<2> Restrict the bean to only be available in the development environment
+
+Create a "base" `GameStateRepository` interface to have access to methods for `GameState` entity persistence:
+
+source:chess/repository/GameStateRepository[app=chess-listener]
+
+<1> Override the `findById` method from `CrudRepository` to add a `@Join` annotation. This will configure the SQL query to load `Game` data when retrieving a `GameState` to resolve the `game` property.
+
+Also create a `H2GameStateRepository` interface that extends `GameStateRepository`:
+
+source:chess/repository/H2GameStateRepository[app=chess-listener]
+
+==== GameService
+
+Create `GameService` to coordinate transactional persistence using `GameRepository` and `GameStateRepository`:
+
+source:chess/GameService[app=chess-listener]
+
+==== ChessListener
+
+Create `ChessListener` Kafka listener to receive messages sent from the `chess-game` microservice:
+
+source:chess/ChessListener[app=chess-listener]
+
+<1> Annotate the class with `@KafkaListener` to declare it as a Kafka message listener; Micronaut will generate the receiving code at compile time
+<2> Dependency injection for `GameService`
+<3> Annotate the method with `@Topic` and specify the topic name
+<4> Use `GameService` to record that the game ended in a draw
+<5> Use `GameService` to record that the game ended in checkmate
+<6> Use `GameService` to record that a new game has started
+<7> Use `GameService` to record that a new game move occurred
+
+==== Development environment
+
+include::{commondir}/common-default-dev-environment-application.adoc[]
+
+source:Application[app=chess-listener]
+
+include::{commondir}/common-default-dev-environment-application-dev-yaml.adoc[]
+
+resource:application-dev.yml[app=chess-listener]
+
+<1> Run this microservice on port 8081; `chess-game` will run on the default port 8080
+<2> Use an in-memory H2 database. Delete the `datasources` block so it's only in `application-dev.yml`
+<3> Use local Kafka. Delete the `kafka.bootstrap.servers` property so it's only in `application-dev.yml`
+<4> Configure Flyway to look for migration scripts in `src/main/resources/db/migration/h2`
+
+==== H2 Flyway Migration Script
+
+Create a database migration script to create the database tables:
+
+resource:db/migration/h2/V1__create-schema.sql[app=chess-listener]
+
+== Kafka
+
+We'll use Oracle Cloud Streaming in the "real" application, but for local development we can use a local Kafka instance.
+
+=== Install Kafka
+
+A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker]. Create this `docker-compose.yml` file:
+
+zipInclude:docker/docker-compose.yml[]
+
+<1> Zookeeper uses port 2181 by default, but change the value if needed
+<2> Kafka uses port 9092 by default, but change the value if needed
+
+Start Zookeeper and Kafka (use CTRL-C to stop both):
+
+[source,bash]
+----
+$ docker-compose up
+----
+
+Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance].
+
+== Running the application
+
+Start the `chess-game` microservice:
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+chess-game $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
+----
+
+Start the `chess-listener` microservice:
+
+[source,bash]
+----
+chess-listener $ ./gradlew run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+chess-game $ ./mvnw mn:run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
+----
+
+Start the `chess-listener` microservice:
+
+[source,bash]
+----
+chess-listener $ ./mvnw mn:run
+
+16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
+----
+
+:exclude-for-build:
+
+Test the app functionality by opening \http://localhost:8080/ in a browser. The UI lets you choose one or more chess games that will auto-play with the specified delay between plays. Events (game start and end, player moves) are sent to the server via Ajax and then sent to the `chess-listener` microservice for processing, analysis, etc.
+
+You can, for example, start a single game with a moderately large delay between plays:
+
+image::oraclecloudstream/ui1.png[]
+
+A single board is displayed:
+
+image::oraclecloudstream/ui2.png[]
+
+Or you can start multiple games with a short delay (or any combination you want):
+
+image::oraclecloudstream/ui3.png[]
+
+Multiple simultaneous boards are displayed:
+
+image::oraclecloudstream/ui4.png[]
+
+== Moving to Oracle Cloud
+
+=== Oracle Autonomous Database (ATP)
+
+Update the `chess-listener` microservice to support Oracle in addition to the in-memory H2 database.
+
+Use the https://guides.micronaut.io/latest/micronaut-oracle-autonomous-db.html[Oracle Autonomous Database guide] to provision an Oracle database at OCI.
+
+==== Dependencies
+
+Add the required dependencies to the `chess-listener` microservice to support using ATP:
+
+:dependencies:
+dependency:ojdbc-bom[groupId=com.oracle.database.jdbc,version=@ojdbc-bomVersion@,pom=true]
+dependency:micronaut-oraclecloud-atp[groupId=io.micronaut.oraclecloud]
+:dependencies:
+
+==== Configuration
+
+Create `src/main/resources/application-oraclecloud.yml`. Micronaut applies this configuration file only for the `oraclecloud` environment.
+
+resource:application-oraclecloud.yml[app=chess-listener,tag=atp]
+
+<1> Set the value of the `ocid` property with the database OCID unique identifier you saved when creating the database
+<2> Set the `walletPassword` property with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
+<3> Set the `password` property with the `micronautdemo` schema user password you created
+<4> Change the profile name if you're not using the default, and optionally add a value for the path to the config file if necessary as described in the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth[Authentication section] of the Micronaut Oracle Cloud docs
+<5> Configure Flyway to look for migration scripts in `src/main/resources/db/migration/oracle`
+
+==== Repositories
+
+Create the `OracleGameRepository` interface that extends `GameRepository` and specifies the `ORACLE` dialect in the `oraclecloud` environment:
+
+source:chess/repository/OracleGameRepository[app=chess-listener]
+
+<1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `ORACLE` dialect. Micronaut will generate persistence logic at compile time and use Oracle-specific SQL.
+<2> Restrict the bean to only be available in the `oraclecloud` environment
+
+Create the `OracleGameStateRepository` interface that extends `GameStateRepository`:
+
+source:chess/repository/OracleGameStateRepository[app=chess-listener]
+
+==== Flyway
+
+Create a database migration script to create the Oracle database tables:
+
+resource:db/migration/oracle/V1__create-schema.sql[app=chess-listener]
+
+=== Oracle Cloud Streaming
+
+Up to now we've been using a local Kafka, but let's configure the equivalent infrastructure in OCI. This will involve minimal application changes thanks to the ability to send and receive Cloud Streaming messages using Kafka APIs, and https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut's support for Kafka].
+
+==== Stream Pool and Streams
+
+Login to your Oracle Cloud tenancy, and from the Oracle Cloud Menu select "Analytics & AI" and then "Streaming":
+
+image::oraclecloudstream/create.stream.1.png[]
+
+Choose the compartment to create the streams in, then click "Create Stream Pool":
+
+image::oraclecloudstream/create.stream.2.png[]
+
+Enter a name for the pool, e.g. "mn-guide-pool" and click "Create":
+
+image::oraclecloudstream/create.stream.3.png[]
+
+Click the "Copy" link in the `OCID` row and save the value for later. Also save the "FQDN" URL. Click "Create Stream":
+
+image::oraclecloudstream/create.stream.4.png[]
+
+Create two streams within the pool you created with the Topic names used in the microservices. First create "chessGame":
+
+image::oraclecloudstream/create.stream.5.png[]
+
+and then create "chessGameState":
+
+image::oraclecloudstream/create.stream.6.png[]
+
+==== User and Group
+
+Create a group for the streams by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Groups":
+
+image::oraclecloudstream/user1.png[]
+
+Click "Create Group":
+
+image::oraclecloudstream/user2.png[]
+
+Choose a name and a description, e.g. "mn-guide-streaming-group", and click "Create":
+
+image::oraclecloudstream/user3.png[]
+
+Create a user by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Users":
+
+image::oraclecloudstream/user4.png[]
+
+Click "Create User":
+
+image::oraclecloudstream/user5.png[]
+
+Choose a name and a description, e.g. "mn-guide-streaming-user", and click "Create":
+
+image::oraclecloudstream/user6.png[]
+
+Scroll down and click "Add User to Group":
+
+image::oraclecloudstream/user7.png[]
+
+Select the group you created and click "Add":
+
+image::oraclecloudstream/user8.png[]
+
+You'll need an auth token to use as the password in the Micronaut Kafka configuration. Click "Auth Tokens" and then "Generate Token":
+
+image::oraclecloudstream/user9.png[]
+
+Enter a name for the token, e.g. "mn-guide-streaming", and click "Generate Token":
+
+image::oraclecloudstream/user10.png[]
+
+Copy the token to the clipboard and save it for later:
+
+image::oraclecloudstream/user11.png[]
+
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm[Groups and Users docs] for more information.
+
+==== Policy
+
+Create a policy to grant various Streams access to the user and group you created.
+
+Open the Oracle Cloud Menu and click "Identity & Security", and then "Policies":
+
+image::oraclecloudstream/policy1.png[]
+
+Select the compartment where you created the streams from the drop-down and click "Create Policy":
+
+image::oraclecloudstream/policy2.png[]
+
+Choose a name and description, e.g. "mn-guide-streaming-policy", and click "Show Manual Editor". Copy the following and paste it into the "Policy Builder" field, replacing "micronaut-guides" with the name of the compartment you're using, and click "Create":
+
+image::oraclecloudstream/policy3.png[]
+
+==== Application configuration
+
+Create `src/main/resources/application-oraclecloud.yml` in the `chess-game` microservice. Add the following there, and also add it to the `application-oraclecloud.yml` you already created in the `chess-listener` microservice:
+
+resource:application-oraclecloud.yml[app=chess-game]
+
+<1> Use the "FQDN" URL value you saved earlier here
+<2> Use the value `config: org.apache.kafka.common.security.plain.PlainLoginModule required username="<tenancy-name>/<username>/<stream-pool-ocid>" password="<auth-token>";`, replacing `<tenancy-name>` with the name of your tenancy, `<username>` with the username created above, `<stream-pool-ocid>` with the OCID of the stream pool you saved earlier, and `<auth-token>` with the auth token value you saved earlier.
+<3> Limit request size to 1MB
+<4> Limit request size to 1MB per partition
+
+== Local testing with cloud resources
+
+You can now start both microservices in the `oraclecloud` environment to use Cloud Streaming and the ATP database you created:
+
+:exclude-for-build:maven
+
+To run each application use:
+
+[source, bash]
+----
+$ MICRONAUT_ENVIRONMENTS=oraclecloud ./gradlew run
+----
+
+or if you use Windows:
+
+[source, bash]
+----
+> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run each application use:
+
+[source, bash]
+----
+$ MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run
+----
+
+or if you use Windows:
+
+[source, bash]
+----
+> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
+----
+
+:exclude-for-build:
+
+== Writing Tests
+
+We'll run Kafka inside a Docker container using https://www.testcontainers.org/[Testcontainers] for both application tests, and also run Oracle database inside a Docker container for testing persistence in the `chess-listener` tests.
+
+=== chess-game tests
+
+Create a test in the `chess-game` microservice to verify that Kafka message processing works:
+
+test:GameReporterTest[app=chess-game]
+
+<1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
+<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+<3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
+<4> The Testcontainer instance for Kafka
+<5> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
+<6> Dependency injection for an HTTP client that Micronaut will implement at compile to make calls to `GameController`
+<7> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<8> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
+<9> Use a Map to hold form parameter names and values
+<10> Use the `HttpClient` to send a POST request that indicates a game has started, which will trigger sending a message with Kafka
+<11> Use the `HttpClient` to send a POST request that indicates a game move occurred, which will trigger sending a message with Kafka
+<12> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
+
+=== chess-listener tests
+
+Create a test in the `chess-listener` microservice to verify that Kafka message processing and database persistence works:
+
+test:GameServiceTest[app=chess-listener]
+
+<1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
+<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+<3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
+<4> The Testcontainer instance for Kafka
+<5> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice
+<6> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<7> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
+
+Create `testcontainers.properties` in `src/test/resources` with this content:
+
+testResource:testcontainers.properties[app=chess-listener]
+
+Create `application-test.yml` file in `src/test/resources` with this content:
+
+testResource:application-test.yml[app=chess-listener]
+
+=== Running the tests
+
+include::{commondir}/common-testApp-noheader.adoc[]
+
+== Deploy to OCI
+
+Once you've verified that the microservices work with the configured cloud resources, you can deploy the microservices to Compute instances and run everything in Oracle Cloud.
+
+Follow the steps in https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[this guide] for each service.
+
+=== Instance Principal authentication
+
+The current configuration in `application-oraclecloud.yml` works when running locally using OCI resources (ATP database and Cloud Streams) but won't work when deploying the application because it doesn't make sense to install the Oracle Cloud CLI in Compute instances. Instead, we'll use https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#instance-principals[Instance Principal authentication].
+
+To use this we need to update the config, and create a dynamic group and add policy statements granting permissions.
+
+==== Dynamic Group
+
+Create a Dynamic Group by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Dynamic Groups":
+
+image::oraclecloudstream/dynamicgroup1.png[]
+
+Click "Create Dynamic Group":
+
+image::oraclecloudstream/dynamicgroup2.png[]
+
+Then enter a name and description for the group, e.g. "mn-streaming-guide-dg", and a matching rule, i.e. the logic that will be used to determine group membership. We'll make the rule fairly broad - enter `ALL {instance.compartment.id = 'ocid1.compartment.oc1..aaaaaxxxxx'}` replacing `ocid1.compartment.oc1..aaaaaxxxxx` with the compartment OCID where you're creating your Compute instances, and click "Create":
+
+image::oraclecloudstream/dynamicgroup3.png[]
+
+See the https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm[Dynamic Group docs] for more information.
+
+==== Dynamic Group Policy Statements
+
+Edit the policy you created earlier and add three new policies; one to grant access to Autonomous Database, one to allow sending stream messages, and one to allow receiving stream messages:
+
+image::oraclecloudstream/policy4.png[]
+
+==== Configuration
+
+Edit `application-oraclecloud.yml` in the `chess-listener` microservice and replace
+
+[source, yaml]
+----
+oci:
+  config:
+    profile: DEFAULT
+----
+
+with
+
+[source, yaml]
+----
+oci:
+  config:
+    instance-principal:
+      enabled: true
+----
+
+include::{commondir}/common-graal-with-plugins-multi.adoc[]
+
+:exclude-for-languages:groovy
+
+NOTE: Native image building will fail if the H2 driver is in the classpath, so comment out that dependency in your build script before building. No other changes are needed since there are no compile dependencies on the library, so you can keep the H2 versions of the repository interfaces for use in dev mode.
+
+=== Deployable Native Images
+
+The native images you built probably won't be deployable to OCI even if you build on the same Linux distro your Compute instances use. To create deployable native images, change the build process a bit.
+
+:exclude-for-build:maven
+
+To generate deployable native images for each application using Gradle, run:
+
+[source, bash]
+----
+$ ./gradlew dockerBuildNative
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To generate deployable native images for each application using Maven, run:
+
+[source, bash]
+----
+$ ./mvnw package -Dpackaging=docker-native
+----
+
+:exclude-for-build:
+
+Then you just need to extract the native image applications from the Docker images you built.
+
+You'll need the Docker image ids, so run:
+
+[source, bash]
+----
+$ docker image ls
+----
+
+The output should look like this:
+
+[source, bash]
+----
+REPOSITORY                   TAG             IMAGE ID       CREATED          SIZE
+chess-listener               latest          0e262e1754a7   32 seconds ago   246MB
+chess-game                   latest          43f567f2fed6   39 minutes ago   86.1MB
+confluentinc/cp-kafka        latest          ca0dbcd0244c   2 weeks ago      771MB
+confluentinc/cp-zookeeper    latest          04999d93068f   2 weeks ago      771MB
+ghcr.io/graalvm/graalvm-ce   java11-21.1.0   9762c6e631f0   2 months ago     1.29GB
+ghcr.io/graalvm/graalvm-ce   java8-21.1.0    aef3649e379d   2 months ago     1.12GB
+frolvlad/alpine-glibc        alpine-3.12     39c4d33bd807   2 months ago     17.9MB
+portainer/portainer          latest          cd645f5a4769   13 months ago    79.1MB
+----
+
+The ids should be at the top since they're the most recent.
+
+Then run this for each image, replacing `image_id` with the Docker image id, e.g. `0e262e1754a7` and `43f567f2fed6`:
+
+[source, bash]
+----
+$ docker create --name container_temp <image_id>
+$ docker cp container_temp:/app/application .
+$ docker rm container_temp
+----
+
+Now you can scp each native image to a Compute instance with no Java installed and see the startup time and resource usage reduction you expect when running applications as native images.
+
+:exclude-for-languages:
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut.
+
+Also see https://guides.micronaut.io/latest/micronaut-kafka.html[this guide on Micronaut + Kafka].

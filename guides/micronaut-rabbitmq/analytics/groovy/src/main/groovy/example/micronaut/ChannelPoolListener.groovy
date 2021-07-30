@@ -5,7 +5,7 @@ import com.rabbitmq.client.Channel
 import groovy.transform.CompileStatic
 import io.micronaut.rabbitmq.connect.ChannelInitializer
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @CompileStatic
 @Singleton

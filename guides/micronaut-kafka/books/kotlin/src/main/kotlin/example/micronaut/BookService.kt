@@ -2,7 +2,7 @@ package example.micronaut
 
 import java.util.Optional
 import javax.annotation.PostConstruct
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class BookService {

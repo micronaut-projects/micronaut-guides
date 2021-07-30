@@ -2,7 +2,7 @@ package example.micronaut
 
 import groovy.transform.CompileStatic
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import java.util.concurrent.ConcurrentHashMap
 
 @CompileStatic

@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.util.StringUtils
+import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
@@ -12,6 +13,8 @@ import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Map.Entry
+
+import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 
 @CompileStatic
 class GuideAsciidocGenerator {
@@ -91,11 +94,15 @@ class GuideAsciidocGenerator {
                     }
                 } else if (shouldProcessLine(line, 'rocker:')) {
                     lines.addAll(includeRocker(line))
+                } else if (shouldProcessLine(line, 'diffLink:')) {
+                    lines << buildDiffLink(line, guidesOption, metadata)
                 } else {
                     lines << line
                 }
             }
+
             File versionFile = Paths.get(destinationFolder.absolutePath, "../../../version.txt").toFile()
+
             String text = lines.join('\n')
             text = text.replace("{githubSlug}", metadata.slug)
             text = text.replace("@language@", StringUtils.capitalize(guidesOption.language.toString()))
@@ -108,7 +115,6 @@ class GuideAsciidocGenerator {
             text = text.replace("@authors@", metadata.authors.join(', '))
             text = text.replace("@languageextension@", guidesOption.language.extension)
             text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
-
             text = text.replace("@sourceDir@", projectName)
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
@@ -304,6 +310,45 @@ class GuideAsciidocGenerator {
         return rendered.split("\\r?\\n|\\r") as List
     }
 
+    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
+
+        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
+        App app = metadata.apps.find { it.name == appName }
+
+        String features = extractFromParametersLine(line, 'features')
+        List<String> featureNames
+        if (features) {
+            featureNames = features.tokenize('|')
+        }
+        else {
+            featureNames = app.features
+        }
+
+        String featureExcludes = extractFromParametersLine(line, 'featureExcludes')
+        List<String> excludedFeatureNames
+        if (featureExcludes) {
+            excludedFeatureNames = featureExcludes.tokenize('|')
+        }
+        else {
+            excludedFeatureNames = []
+        }
+        featureNames.removeAll excludedFeatureNames
+
+        String link = 'https://micronaut.io/launch?' +
+                featureNames.collect {'features=' + it }.join('&') +
+                '&lang=' + guidesOption.language.name() +
+                '&build=' + guidesOption.buildTool.name() +
+                '&test=' + guidesOption.testFramework.name() +
+                '&name=' + (appName == DEFAULT_APP_NAME ? 'micronautguide' : appName) +
+                '&type=' + app.applicationType.name() +
+                '&package=example.micronaut' +
+                '&activity=diff' +
+                '[view the dependency and configuration changes from the specified features, window="_blank"]'
+
+        "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can " +
+        link + " and apply those changes to your application."
+    }
+
     private static String extractAppName(String line) {
         extractFromParametersLine(line, 'app')
     }
@@ -312,10 +357,10 @@ class GuideAsciidocGenerator {
         extractFromParametersLine(line, 'tag')
     }
 
-    private static List<String> extractTags(String line, String tagSeparator = '|') {
+    private static List<String> extractTags(String line) {
         String attributeValue = extractFromParametersLine(line, 'tags')
         if (attributeValue) {
-            return attributeValue.tokenize(tagSeparator)
+            return attributeValue.tokenize('|')
         }
 
         [extractTagName(line)].findAll { it }

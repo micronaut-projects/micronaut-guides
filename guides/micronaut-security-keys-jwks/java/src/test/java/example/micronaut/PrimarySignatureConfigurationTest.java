@@ -27,7 +27,7 @@ public class PrimarySignatureConfigurationTest {
 
     @Test
     void primarySignatureConfigurationIsAnnotatedNamedGenerator() {
-        String annotationName = "javax.inject.Named";
+        String annotationName = "jakarta.inject.Named";
         assertNotNull(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class).getAnnotationMetadata()
                 .getAnnotation(annotationName));
         assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class).getAnnotationMetadata()

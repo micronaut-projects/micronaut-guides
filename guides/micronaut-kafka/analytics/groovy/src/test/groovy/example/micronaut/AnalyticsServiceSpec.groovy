@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest
 class AnalyticsServiceSpec extends Specification {

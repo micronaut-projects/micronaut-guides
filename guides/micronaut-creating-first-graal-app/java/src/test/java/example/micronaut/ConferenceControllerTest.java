@@ -11,15 +11,15 @@ import jakarta.inject.Inject;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @MicronautTest
-public class ConferenceControllerTest {
+class ConferenceControllerTest {
 
     @Inject
     @Client("/")
     HttpClient client;
 
     @Test
-    public void testHello() throws Exception {
-        HttpRequest request = HttpRequest.GET("/conferences/random");
+    void testHello() {
+        HttpRequest<?> request = HttpRequest.GET("/conferences/random");
         String body = client.toBlocking().retrieve(request);
         assertNotNull(body);
     }
