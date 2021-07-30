@@ -14,9 +14,6 @@ import java.time.LocalDateTime
 
 import static io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE
 
-/**
- * Represents the state of a chess game after a move.
- */
 @MappedEntity('GAME_STATE')
 @CompileStatic
 class GameState {

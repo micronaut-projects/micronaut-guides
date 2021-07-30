@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import io.micronaut.core.annotation.Introspected
 import javax.validation.constraints.Size
 
-/**
- * DTO for `GameState` entity.
- */
 @Introspected // <1>
 @JsonTypeInfo(use = NAME, property = "_className") // <2>
 data class GameStateDTO(@field:Size(max = 36) val id: String,

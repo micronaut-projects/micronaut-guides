@@ -7,9 +7,6 @@ import io.micronaut.context.env.Environment.TEST
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect.ORACLE
 
-/**
- * Oracle `Game` entity repository.
- */
 @Primary
 @JdbcRepository(dialect = ORACLE) // <1>
 @Requires(env = [ORACLE_CLOUD, TEST]) // <2>
