@@ -1,5 +1,6 @@
 package example.micronaut
 
+import example.micronaut.chess.dto.Player
 import example.micronaut.chess.dto.GameDTO
 import example.micronaut.chess.dto.GameStateDTO
 import example.micronaut.chess.entity.Game
@@ -72,16 +73,16 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
 
         List<UUID> gameStateIds = []
 
-        UUID gameStateId = makeMove(gameIdString, 'w', 'f3', 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1', '1. f3')
+        UUID gameStateId = makeMove(gameIdString, Player.WHITE, 'f3', 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1', '1. f3')
         gameStateIds << gameStateId
 
-        gameStateId = makeMove(gameIdString, 'b', 'e6', 'rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2', '1. f3 e6')
+        gameStateId = makeMove(gameIdString, Player.BLACK, 'e6', 'rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2', '1. f3 e6')
         gameStateIds << gameStateId
 
-        gameStateId = makeMove(gameIdString, 'w', 'g4', 'rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2', '1. f3 e6 2. g4')
+        gameStateId = makeMove(gameIdString, Player.WHITE, 'g4', 'rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2', '1. f3 e6 2. g4')
         gameStateIds << gameStateId
 
-        gameStateId = makeMove(gameIdString, 'b', 'Qh4#', 'rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3', '1. f3 e6 2. g4 Qh4#')
+        gameStateId = makeMove(gameIdString, Player.BLACK, 'Qh4#', 'rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3', '1. f3 e6 2. g4 Qh4#')
         gameStateIds << gameStateId
 
         then:
@@ -96,21 +97,21 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
         List<GameState> moves = gameStateIds.collect { UUID id -> gameStateRepository.findById(id).orElse(null) }
 
         then:
-        'w' == moves[0].player
+        Player.WHITE == moves[0].player
         'f3' == moves[0].move
 
-        'b' == moves[1].player
+        Player.BLACK == moves[1].player
         'e6' == moves[1].move
 
-        'w' == moves[2].player
+        Player.WHITE == moves[2].player
         'g4' == moves[2].move
 
-        'b' == moves[3].player
+        Player.BLACK == moves[3].player
         'Qh4#' == moves[3].move
 
         when: 'end game'
 
-        gameDto = new GameDTO(gameIdString, false, 'b')
+        gameDto = new GameDTO(gameIdString, false, Player.BLACK)
         gameReporter.game(gameIdString, gameDto).subscribe()
 
         then:
@@ -132,7 +133,7 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
         blackName == game.blackName
         whiteName == game.whiteName
         !game.draw
-        'b' == game.winner
+        Player.BLACK == game.winner
     }
 
     void 'test game ending in draw'() {
@@ -171,10 +172,10 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
 
         List<UUID> gameStateIds = []
 
-        UUID gameStateId = makeMove(gameIdString, 'w', 'f3', 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1', '1. f3')
+        UUID gameStateId = makeMove(gameIdString, Player.WHITE, 'f3', 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1', '1. f3')
         gameStateIds << gameStateId
 
-        gameStateId = makeMove(gameIdString, 'b', 'e6', 'rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2', '1. f3 e6')
+        gameStateId = makeMove(gameIdString, Player.BLACK, 'e6', 'rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2', '1. f3 e6')
         gameStateIds << gameStateId
 
         then:
@@ -193,10 +194,10 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
         }
 
         then:
-        'w' == moves[0].player
+        Player.WHITE == moves[0].player
         'f3' == moves[0].move
 
-        'b' == moves[1].player
+        Player.BLACK == moves[1].player
         'e6' == moves[1].move
 
         when: 'end game'
@@ -247,8 +248,11 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
         Mono<GameStateDTO> gameState(@KafkaKey String gameId, GameStateDTO gameState)
     }
 
-    private UUID makeMove(String gameId, String player, String move,
-                          String fen, String pgn) {
+    private UUID makeMove(String gameId,
+                          Player player,
+                          String move,
+                          String fen,
+                          String pgn) {
         UUID gameStateId = UUID.randomUUID()
         gameReporter.gameState(gameId, new GameStateDTO(gameStateId.toString(),
                 gameId, player, move, fen, pgn)).subscribe()

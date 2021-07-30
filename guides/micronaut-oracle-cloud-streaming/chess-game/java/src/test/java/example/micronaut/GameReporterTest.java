@@ -1,5 +1,6 @@
 package example.micronaut;
 
+import example.micronaut.chess.dto.Player;
 import example.micronaut.chess.dto.GameDTO;
 import example.micronaut.chess.dto.GameStateDTO;
 import io.micronaut.configuration.kafka.annotation.KafkaListener;
@@ -86,10 +87,10 @@ class GameReporterTest implements TestPropertyProvider { // <3>
         // make moves
         receivedGames.clear();
 
-        makeMove(gameId, "w", "f3", "rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1", "1. f3");
-        makeMove(gameId, "b", "e6", "rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2", "1. f3 e6");
-        makeMove(gameId, "w", "g4", "rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2", "1. f3 e6 2. g4");
-        makeMove(gameId, "b", "Qh4#", "rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3", "1. f3 e6 2. g4 Qh4#");
+        makeMove(gameId, Player.WHITE, "f3", "rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1", "1. f3");
+        makeMove(gameId, Player.BLACK, "e6", "rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2", "1. f3 e6");
+        makeMove(gameId, Player.WHITE, "g4", "rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2", "1. f3 e6 2. g4");
+        makeMove(gameId, Player.BLACK, "Qh4#", "rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3", "1. f3 e6 2. g4 Qh4#");
 
         await().atMost(5, SECONDS).until(() -> receivedMoves.size() > 3);
 
@@ -98,23 +99,23 @@ class GameReporterTest implements TestPropertyProvider { // <3>
 
         List<GameStateDTO> moves = new ArrayList<>(receivedMoves);
 
-        assertEquals("w", moves.get(0).getPlayer());
+        assertEquals(Player.WHITE, moves.get(0).getPlayer());
         assertEquals("f3", moves.get(0).getMove());
 
-        assertEquals("b", moves.get(1).getPlayer());
+        assertEquals(Player.BLACK, moves.get(1).getPlayer());
         assertEquals("e6", moves.get(1).getMove());
 
-        assertEquals("w", moves.get(2).getPlayer());
+        assertEquals(Player.WHITE, moves.get(2).getPlayer());
         assertEquals("g4", moves.get(2).getMove());
 
-        assertEquals("b", moves.get(3).getPlayer());
+        assertEquals(Player.BLACK, moves.get(3).getPlayer());
         assertEquals("Qh4#", moves.get(3).getMove());
 
         // end game
 
         receivedMoves.clear();
 
-        endGame(gameId, "b");
+        endGame(gameId, Player.BLACK);
 
         await().atMost(5, SECONDS).until(() -> !receivedGames.isEmpty());
 
@@ -127,7 +128,7 @@ class GameReporterTest implements TestPropertyProvider { // <3>
         assertNull(game.getBlackName());
         assertNull(game.getWhiteName());
         assertFalse(game.isDraw());
-        assertEquals("b", game.getWinner());
+        assertEquals(Player.BLACK, game.getWinner());
     }
 
     @Test
@@ -158,8 +159,8 @@ class GameReporterTest implements TestPropertyProvider { // <3>
         // make moves
         receivedGames.clear();
 
-        makeMove(gameId, "w", "f3", "rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1", "1. f3");
-        makeMove(gameId, "b", "e6", "rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2", "1. f3 e6");
+        makeMove(gameId, Player.WHITE, "f3", "rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1", "1. f3");
+        makeMove(gameId, Player.BLACK, "e6", "rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2", "1. f3 e6");
 
         await().atMost(5, SECONDS).until(() -> receivedMoves.size() > 1);
 
@@ -216,8 +217,8 @@ class GameReporterTest implements TestPropertyProvider { // <3>
 
     private Optional<String> startGame(String blackName, String whiteName) {
         Map<String, String> body = new HashMap<>(); // <9>
-        body.put("b", blackName);
-        body.put("w", whiteName);
+        body.put(Player.BLACK.toString(), blackName);
+        body.put(Player.WHITE.toString(), whiteName);
 
         HttpRequest<?> request = HttpRequest.POST("/game/start", body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE);
@@ -225,10 +226,10 @@ class GameReporterTest implements TestPropertyProvider { // <3>
                 Argument.of(Optional.class, String.class)); // <10>
     }
 
-    private void makeMove(String gameId, String player, String move,
+    private void makeMove(String gameId, Player player, String move,
                           String fen, String pgn) {
         Map<String, String> body = new HashMap<>();
-        body.put("player", player);
+        body.put("player", player.toString());
         body.put("move", move);
         body.put("fen", fen);
         body.put("pgn", pgn);
@@ -238,10 +239,10 @@ class GameReporterTest implements TestPropertyProvider { // <3>
         client.toBlocking().exchange(request); // <11>
     }
 
-    private void endGame(String gameId, String winner) {
+    private void endGame(String gameId, Player winner) {
         UriBuilder uriBuilder = UriBuilder.of("/game").path(winner == null ? "draw" : "checkmate").path(gameId);
         if (winner != null) {
-            uriBuilder = uriBuilder.path(winner);
+            uriBuilder = uriBuilder.path(winner.toString());
         }
         URI uri = uriBuilder.build();
         HttpRequest<?> request = HttpRequest.POST(uri, null);

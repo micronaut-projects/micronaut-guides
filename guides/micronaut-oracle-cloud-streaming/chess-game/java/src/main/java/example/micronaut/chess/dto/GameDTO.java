@@ -28,14 +28,14 @@ public class GameDTO {
     private final boolean draw;
 
     @Size(max = 1)
-    private final String winner;
+    private final Player winner;
 
     @Creator // <3>
     public GameDTO(@NonNull String id,
                    @Nullable String blackName,
                    @Nullable String whiteName,
                    boolean draw,
-                   @Nullable String winner) {
+                   @Nullable Player winner) {
         this.id = id;
         this.blackName = blackName;
         this.whiteName = whiteName;
@@ -51,7 +51,7 @@ public class GameDTO {
 
     public GameDTO(@NonNull String id,
                    boolean draw,
-                   @Nullable String winner) {
+                   @Nullable Player winner) {
         this(id, null, null, draw, winner);
     }
 
@@ -75,7 +75,7 @@ public class GameDTO {
     }
 
     @Nullable
-    public String getWinner() {
+    public Player getWinner() {
         return winner;
     }
 }

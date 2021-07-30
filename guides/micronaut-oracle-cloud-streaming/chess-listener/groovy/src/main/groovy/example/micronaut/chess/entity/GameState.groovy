@@ -9,7 +9,7 @@ import io.micronaut.data.annotation.MappedEntity
 import io.micronaut.data.annotation.Relation
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
-
+import example.micronaut.chess.dto.Player
 import java.time.LocalDateTime
 
 import static io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE
@@ -31,7 +31,7 @@ class GameState {
 
     @Size(max = 1)
     @NotNull
-    final String player
+    final Player player
 
     @Size(max = 100)
     @NotNull
@@ -54,7 +54,7 @@ class GameState {
      */
     GameState(@NonNull UUID id,
               @NonNull Game game,
-              @NonNull String player,
+              @NonNull Player player,
               @NonNull String move,
               @NonNull String fen,
               @NonNull String pgn) {
