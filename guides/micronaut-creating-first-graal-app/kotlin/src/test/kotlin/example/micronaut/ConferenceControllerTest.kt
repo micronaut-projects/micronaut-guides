@@ -6,7 +6,7 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import jakarta.inject.Singleton
+import jakarta.inject.Inject
 
 @MicronautTest
 class ConferenceControllerTest {

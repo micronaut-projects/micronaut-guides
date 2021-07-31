@@ -3,7 +3,6 @@ package example.micronaut
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 import org.reactivestreams.Publisher
-import reactor.core.publisher.Mono
 import io.micronaut.retry.annotation.Fallback
 import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank

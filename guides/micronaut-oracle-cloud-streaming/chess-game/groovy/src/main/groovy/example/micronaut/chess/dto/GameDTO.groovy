@@ -19,25 +19,29 @@ class GameDTO {
 
     @Size(max = 36)
     @NotNull
+    @NonNull
     final String id
 
     @Size(max = 255)
+    @Nullable
     final String blackName
 
     @Size(max = 255)
+    @Nullable
     final String whiteName
 
     final boolean draw
 
     @Size(max = 1)
-    final String winner
+    @Nullable
+    final Player winner
 
     @Creator // <3>
     GameDTO(@NonNull String id,
             @Nullable String blackName,
             @Nullable String whiteName,
             boolean draw,
-            @Nullable String winner) {
+            @Nullable Player winner) {
         this.id = id
         this.blackName = blackName
         this.whiteName = whiteName
@@ -53,7 +57,7 @@ class GameDTO {
 
     GameDTO(@NonNull String id,
             boolean draw,
-            @Nullable String winner) {
+            @Nullable Player winner) {
         this(id, null, null, draw, winner)
     }
 }

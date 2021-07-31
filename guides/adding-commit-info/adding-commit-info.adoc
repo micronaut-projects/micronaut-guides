@@ -29,9 +29,7 @@ include::{commondir}/common-create-app.adoc[]
 == Initialize Git Repository
 
 The project aims to demonstrate how to provide Git commit information to the
-`/info` endpoint and in order for that to work the project needs to be in a Git
-repository.  After creating the project, initialize a Git repository from the root
-of the newly created project:
+`/info` endpoint and in order for that to work the project needs to be in a Git repository.  After creating the project, initialize a Git repository from the root of the newly created project:
 
 [source,bash]
 ----
@@ -57,13 +55,24 @@ Enable the info endpoint:
 
 resource:application.yml[tag=endpoints]
 
+:exclude-for-build:maven
+
 == Gradle Git Properties Plugin
 
-If a `git.properties` file is available on the classpath, the http://docs.micronaut.io/latest/api/io/micronaut/management/endpoint/info/source/GitInfoSource.html[GitInfoSource]
-will expose the values in that file under the `git` key. Generating of a `git.properties` file will need to be configured
-as part of your build; for example, you may choose to use the https://plugins.gradle.org/plugin/com.gorylenko.gradle-git-properties[Gradle Git Properties] plugin. The plugin provides a task named `generateGitProperties` responsible for the `git.properties` file generation. It is automatically invoked upon the execution of the `classes` task. You can find the generated file in the directory `build/resources/main`.
+:exclude-for-build:
+:exclude-for-build:gradle
 
-Modify `build.gradle` file to add the Gradle plugin:
+== Maven Git Commit Id Plugin
+
+:exclude-for-build:
+
+If a `git.properties` file is available on the classpath, the http://docs.micronaut.io/latest/api/io/micronaut/management/endpoint/info/source/GitInfoSource.html[GitInfoSource] will expose the values in that file under the `git` key. Generation of a `git.properties` file will need to be configured as part of your build.
+
+:exclude-for-build:maven
+
+For example, you may choose to use the https://plugins.gradle.org/plugin/com.gorylenko.gradle-git-properties[Gradle Git Properties] plugin. The plugin provides a task named `generateGitProperties` responsible for the `git.properties` file generation. It is automatically invoked upon the execution of the `classes` task. You can find the generated file in the directory `build/resources/main`.
+
+Modify `build.gradle` file to add the plugin:
 
 [source,groovy]
 .build.gradle
@@ -72,6 +81,29 @@ plugins {
   id "com.gorylenko.gradle-git-properties" version "@gradle-git-propertiesVersion@"
 }
 ----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+For example, you may choose to use the https://github.com/git-commit-id/git-commit-id-maven-plugin[Maven Git Commit Id Plugin] plugin. The plugin provides a goal named `git-commit-id:revision` responsible for the `git.properties` file generation. It is automatically invoked upon the execution of the `classes` goal. You can find the generated file in the directory `target/classes`.
+
+Modify `pom.xml` file to add the plugin:
+
+[source,xml]
+.pom.xml
+----
+<properties>
+   ...
+   <gitCommitIdPlugin.version>@git-commit-id-pluginVersion@</gitCommitIdPlugin.version>
+</properties>
+
+...
+
+rocker:gitCommitIdPlugin[]
+----
+
+:exclude-for-build:
 
 == Test
 
@@ -104,7 +136,7 @@ Create a JUnit test to verify the behaviour:
 
 test:InfoTest[]
 
-<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<1> Annotate the class with `@MicronautTest` to let Micronaut start the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
 <2> Inject the `HttpClient` bean in the application context.
 <3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
 <4> Use `.body()` to retrieve the parsed payload.
@@ -133,7 +165,7 @@ You can execute the `info` endpoint exposed by the native image:
 
 [source, bash]
 ----
- curl localhost:8080/info
+curl localhost:8080/info
 
 {"git":{"dirty":"true","total":{"commit":{"count":"45"}},"build":{"host":"Sergios-iMac-Pro.local","time":"2019-12-09T09:35:30+0100","user":{"name":"Sergio del Amo","email":"sergio.delamo@softamo.com"},"version":"0.1"},"commit":{"time":"2019-12-09T09:30:41+0100","id":"af3cff433d247fd4c2d8c54ae200108e98adfb2a","message":{"short":"add help section","full":"add help section\n"},"user":{"name":"Sergio del Amo","email":"sergio.delamo@softamo.com"}},"remote":{"origin":{"url":"git@github.com:micronaut-guides/adding-commit-info.git"}},"branch":"master"}}%
 ----

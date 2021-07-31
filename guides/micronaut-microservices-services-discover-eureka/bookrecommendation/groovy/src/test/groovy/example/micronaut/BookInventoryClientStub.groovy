@@ -7,7 +7,6 @@ import reactor.core.publisher.Mono
 import io.micronaut.retry.annotation.Fallback
 import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank
-import reactor.core.publisher.Mono
 
 @Requires(env = Environment.TEST) // <1>
 @Fallback

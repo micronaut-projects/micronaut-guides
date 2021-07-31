@@ -8,8 +8,9 @@ import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
 import io.micronaut.data.annotation.Relation
 import javax.validation.constraints.NotNull
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Size
-
+import example.micronaut.chess.dto.Player
 import java.time.LocalDateTime
 
 import static io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE
@@ -20,28 +21,34 @@ class GameState {
 
     @Id
     @NotNull
+    @NonNull
     final UUID id
 
     @Relation(MANY_TO_ONE)
     @NotNull
+    @NonNull
     final Game game
 
     @DateCreated
     LocalDateTime dateCreated
 
     @Size(max = 1)
-    @NotNull
-    final String player
+    @NotBlank
+    @NonNull
+    final Player player
 
     @Size(max = 100)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String fen
 
-    @NotNull
+    @NotBlank
+    @NonNull
     final String pgn
 
     @Size(max = 10)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String move
 
     /**
@@ -54,7 +61,7 @@ class GameState {
      */
     GameState(@NonNull UUID id,
               @NonNull Game game,
-              @NonNull String player,
+              @NonNull Player player,
               @NonNull String move,
               @NonNull String fen,
               @NonNull String pgn) {
@@ -66,6 +73,7 @@ class GameState {
         this.pgn = pgn
     }
 
+    @NonNull
     GameStateDTO toDto() {
         new GameStateDTO(id.toString(), game.getId().toString(), player, move, fen, pgn)
     }

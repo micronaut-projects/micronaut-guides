@@ -1,5 +1,6 @@
 package example.micronaut.chess
 
+import example.micronaut.chess.dto.Player
 import example.micronaut.chess.dto.GameDTO
 import example.micronaut.chess.dto.GameStateDTO
 import groovy.transform.CompileStatic
@@ -41,7 +42,7 @@ class GameController {
           consumes = APPLICATION_FORM_URLENCODED) // <11>
     @Status(CREATED) // <12>
     void move(@PathVariable String gameId,
-              String player,
+              Player player,
               String move,
               String fen,
               String pgn) {
@@ -53,7 +54,7 @@ class GameController {
     @Post('/checkmate/{gameId}/{player}') // <14>
     @Status(NO_CONTENT) // <15>
     void checkmate(@PathVariable String gameId,
-                   @PathVariable String player) {
+                   @PathVariable Player player) {
         GameDTO game = new GameDTO(gameId, false, player)
         gameReporter.game(gameId, game).subscribe() // <16>
     }

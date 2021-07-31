@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.NonNull
-
-import javax.validation.constraints.NotNull
+import io.micronaut.core.annotation.Nullable
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Size
 import javax.validation.constraints.Size
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
@@ -16,31 +17,37 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 class GameStateDTO {
 
     @Size(max = 36)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String id
 
     @Size(max = 36)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String gameId
 
     @Size(max = 1)
-    @NotNull
-    final String player
+    @NotBlank  
+    @NonNull  
+    final Player player
 
     @Size(max = 100)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String fen
 
-    @NotNull
+    @NotBlank
+    @NonNull
     final String pgn
 
     @Size(max = 10)
-    @NotNull
+    @NotBlank
+    @NonNull
     final String move
 
     GameStateDTO(@NonNull String id,
                  @NonNull String gameId,
-                 @NonNull String player,
+                 @NonNull Player player,
                  @NonNull String move,
                  @NonNull String fen,
                  @NonNull String pgn) {

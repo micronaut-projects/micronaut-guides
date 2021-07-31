@@ -7,7 +7,6 @@ import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank
-import reactor.core.publisher.Mono
 
 @Requires(env = Environment.TEST)
 @Fallback
