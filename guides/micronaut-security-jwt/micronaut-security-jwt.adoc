@@ -8,7 +8,7 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-Micronaut ships with security capabilities based on https://jwt.io/[Json Web Token (JWT)]. JWT is an https://tools.ietf.org/html/rfc7519[IETF standard] which defines a secure way to encapsulate arbitrary data that can be sent over unsecure URLs.
+The Micronaut framework ships with security capabilities based on https://jwt.io/[Json Web Token (JWT)]. JWT is an https://tools.ietf.org/html/rfc7519[IETF standard] which defines a secure way to encapsulate arbitrary data that can be sent over unsecure URLs.
 
 In this guide you will create a Micronaut application and secure it with JWT.
 
@@ -37,7 +37,7 @@ include::{commondir}/common-annotationprocessors.adoc[]
 
 === Security Dependency
 
-Add Micronaut's `security-jwt` dependency.
+Add the Micronaut `security-jwt` dependency:
 
 :dependencies:
 
@@ -61,8 +61,8 @@ To keep this guide simple, create a naive `AuthenticationProvider` to simulate u
 
 source:AuthenticationProviderUserPassword[]
 
-<1> To register a Singleton in Micronaut's application context, annotate your class with `javax.inject.Singleton`
-<2> A Micronaut's Authentication Provider implements the interface `io.micronaut.security.authentication.AuthenticationProvider`
+<1> To register a Singleton in the application context, annotate your class with `javax.inject.Singleton`
+<2> A Micronaut Authentication Provider implements the interface `io.micronaut.security.authentication.AuthenticationProvider`
 
 === Controller
 
@@ -73,7 +73,7 @@ source:HomeController[]
 <1> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
 <2> Annotate with `io.micronaut.http.annotation.Controller` to designate the class as a Micronaut controller.
 <3> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
-<4> If a user is authenticated, Micronaut will bind the user object to an argument of type `java.security.Principal` (if present).
+<4> If a user is authenticated, the Micronaut framework will bind the user object to an argument of type `java.security.Principal` (if present).
 
 == Tests
 
@@ -81,17 +81,17 @@ Create a test to verify a user is able to login and access a secured endpoint.
 
 test:JwtAuthenticationTest[]
 
-<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+<1> Annotate the class with `@MicronautTest` to let the Micronaut framework start the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
 <2> Inject the `HttpClient` bean in the application context.
 <3> When you include the security dependencies, security is considered enabled and every endpoint is secured by default.
 <4> To login, do a POST request to `/login` with your credentials as a JSON payload in the body of the request.
-<5> Micronaut makes it easy to bind JSON responses into Java objects.
-<6> Micronaut supports https://tools.ietf.org/html/rfc6750[RFC 6750 Bearer Token] specification out-of-the-box. We supply the JWT token in the `Authorization` HTTP Header.
+<5> The Framework makes it easy to bind JSON responses into Java objects.
+<6> The Framework supports https://tools.ietf.org/html/rfc6750[RFC 6750 Bearer Token] specification out-of-the-box. We supply the JWT token in the `Authorization` HTTP Header.
 <7> Use `.body()` to retrieve the parsed payload.
 
-=== Use Micronaut's HTTP Client and JWT
+=== Use the Micronaut HTTP Client and JWT
 
-To access a secured endpoint, you can also use Micronaut's HTTP Client and supply the JWT token in the Authorization header.
+To access a secured endpoint, you can also use a Micronaut HTTP Client and supply the JWT token in the Authorization header.
 
 First create a `@Client` with a method `home` which accepts an `Authorization` HTTP Header.
 
@@ -185,7 +185,7 @@ https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/
 
 source:CustomRefreshTokenPersistence[]
 
-<1> To register a Singleton in Micronaut's application context, annotate your class with `javax.inject.Singleton`
+<1> To register a Singleton in the application context, annotate your class with `javax.inject.Singleton`
 <2> Constructor injection of `RefreshTokenRepository`.
 <3> When a new refresh token is issued, the application emits an event of type https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/event/RefreshTokenGeneratedEvent.html[RefreshTokenGeneratedEvent]. We listen for it and save the token in the database.
 <4> The event contains both the refresh token and the user details associated to the token.
