@@ -198,7 +198,7 @@ $ curl http://localhost:8081/analytics
 
 Note that getting the analytics returns an empty list because the applications are not communicating with each other (yet).
 
-== Kafka and Micronaut
+== Kafka and Micronaut Framework
 
 === Install Kafka
 
@@ -226,12 +226,12 @@ resource:application.yml[app=books,tag=kafka]
 
 ==== Create Kafka client (producer)
 
-Let's create an interface to send messages to Kafka. Micronaut will implement the interface at compilation time:
+Let's create an interface to send messages to Kafka. The Micronaut framework will implement the interface at compilation time:
 
 source:AnalyticsClient[app=books]
 
 <1> Set the topic name
-<2> Send the `Book` POJO. Micronaut will automatically convert it to JSON before sending it
+<2> Send the `Book` POJO. The Framework will automatically convert it to JSON before sending it
 
 ==== Create Tests
 
@@ -246,7 +246,7 @@ test:BookControllerTest[app=books]
 <3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainer instance for Kafka
 <5> Dependency injection for the `AnalyticsListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `analytics` microservice
-<6> Dependency injection for an HTTP client that Micronaut will implement at compile to make calls to `BookController`
+<6> Dependency injection for an HTTP client that the Micronaut framework will implement at compile to make calls to `BookController`
 <7> Use the `HttpClient` to retrieve a `Book`, which will trigger sending a message with Kafka
 <8> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
 <9> Verify that the message was received and has the correct data
@@ -273,7 +273,7 @@ source:AnalyticsFilter[app=books]
 
 ==== Create Kafka consumer
 
-Create a new class to act as a consumer of the messages sent to Kafka by the `books` microservice. Micronaut will implement logic to invoke the consumer at compile time. Create the `AnalyticsListener` class:
+Create a new class to act as a consumer of the messages sent to Kafka by the `books` microservice. The Micronaut framework will implement logic to invoke the consumer at compile time. Create the `AnalyticsListener` class:
 
 source:AnalyticsListener[app=analytics]
 
@@ -363,4 +363,4 @@ Start the native images for the two microservices and run the same `curl` reques
 
 == Next steps
 
-Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut.
+Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut framework.

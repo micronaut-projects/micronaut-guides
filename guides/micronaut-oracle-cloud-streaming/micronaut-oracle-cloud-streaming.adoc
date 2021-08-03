@@ -88,9 +88,9 @@ Create a `GameReporter` Kafka client to send chess-related messages:
 
 source:chess/GameReporter[app=chess-game]
 
-<1> Annotate the class with `@KafkaClient` to declare it as a Kafka message producer; Micronaut will generate the sending code at compile time
+<1> Annotate the class with `@KafkaClient` to declare it as a Kafka message producer; the Micronaut framework will generate the sending code at compile time
 <2> Annotate the method with `@Topic` and specify the topic name
-<3> By returning a reactive type, Micronaut will use non-blocking code to send the message
+<3> By returning a reactive type, the Micronaut framework will use non-blocking code to send the message
 <4> Use the `Game` primary key as the Kafka partition key
 
 ==== GameController
@@ -139,7 +139,7 @@ Update `application.yml` to add static resource configuration:
 
 resource:application.yml[app=chess-game,tag=router]
 
-<1> Configure Micronaut to look for static resources in `src/main/resources/public`
+<1> Configure the Framework to look for static resources in `src/main/resources/public`
 
 Create `index.html` with the simple chess game UI:
 
@@ -212,7 +212,7 @@ and a `H2GameRepository` interface that extends `GameRepository` and specifies t
 
 source:chess/repository/H2GameRepository[app=chess-listener]
 
-<1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `H2` dialect. Micronaut will generate persistence logic at compile time and use H2-specific SQL.
+<1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `H2` dialect. The Micronaut framework will generate persistence logic at compile time and use H2-specific SQL.
 <2> Restrict the bean to only be available in the development environment
 
 Create a "base" `GameStateRepository` interface to have access to methods for `GameState` entity persistence:
@@ -237,7 +237,7 @@ Create `ChessListener` Kafka listener to receive messages sent from the `chess-g
 
 source:chess/ChessListener[app=chess-listener]
 
-<1> Annotate the class with `@KafkaListener` to declare it as a Kafka message listener; Micronaut will generate the receiving code at compile time
+<1> Annotate the class with `@KafkaListener` to declare it as a Kafka message listener; The Micronaut framework will generate the receiving code at compile time
 <2> Dependency injection for `GameService`
 <3> Annotate the method with `@Topic` and specify the topic name
 <4> Use `GameService` to record that the game ended in a draw
@@ -369,7 +369,7 @@ dependency:micronaut-oraclecloud-atp[groupId=io.micronaut.oraclecloud]
 
 ==== Configuration
 
-Create `src/main/resources/application-oraclecloud.yml`. Micronaut applies this configuration file only for the `oraclecloud` environment.
+Create `src/main/resources/application-oraclecloud.yml`. The Micronaut framework applies this configuration file only for the `oraclecloud` environment.
 
 resource:application-oraclecloud.yml[app=chess-listener,tag=atp]
 
@@ -385,7 +385,7 @@ Create the `OracleGameRepository` interface that extends `GameRepository` and sp
 
 source:chess/repository/OracleGameRepository[app=chess-listener]
 
-<1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `ORACLE` dialect. Micronaut will generate persistence logic at compile time and use Oracle-specific SQL.
+<1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `ORACLE` dialect. The Micronaut framework will generate persistence logic at compile time and use Oracle-specific SQL.
 <2> Restrict the bean to only be available in the `oraclecloud` environment
 
 Create the `OracleGameStateRepository` interface that extends `GameStateRepository`:
@@ -400,7 +400,7 @@ resource:db/migration/oracle/V1__create-schema.sql[app=chess-listener]
 
 === Oracle Cloud Streaming
 
-Up to now we've been using a local Kafka, but let's configure the equivalent infrastructure in OCI. This will involve minimal application changes thanks to the ability to send and receive Cloud Streaming messages using Kafka APIs, and https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut's support for Kafka].
+Up to now we've been using a local Kafka, but let's configure the equivalent infrastructure in OCI. This will involve minimal application changes thanks to the ability to send and receive Cloud Streaming messages using Kafka APIs, and https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut Framework support for Kafka].
 
 ==== Stream Pool and Streams
 
@@ -555,10 +555,10 @@ test:GameReporterTest[app=chess-game]
 
 <1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
 <2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
-<3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
+<3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainer instance for Kafka
 <5> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
-<6> Dependency injection for an HTTP client that Micronaut will implement at compile to make calls to `GameController`
+<6> Dependency injection for an HTTP client that the Micronaut framework will implement at compile to make calls to `GameController`
 <7> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
 <8> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
 <9> Use a Map to hold form parameter names and values
@@ -574,7 +574,7 @@ test:GameServiceTest[app=chess-listener]
 
 <1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
 <2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
-<3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
+<3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainer instance for Kafka
 <5> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice
 <6> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
@@ -720,6 +720,6 @@ Now you can scp each native image to a Compute instance with no Java installed a
 
 == Next steps
 
-Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut.
+Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut framework.
 
-Also see https://guides.micronaut.io/latest/micronaut-kafka.html[this guide on Micronaut + Kafka].
+Also see https://guides.micronaut.io/latest/micronaut-kafka.html[this guide on Micronaut Framework + Kafka].

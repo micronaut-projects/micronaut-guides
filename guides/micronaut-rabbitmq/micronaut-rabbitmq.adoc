@@ -196,7 +196,7 @@ $ curl http://localhost:8081/analytics
 
 Please note that getting the analytics returns an empty list because the applications are not communicating to each other (yet).
 
-== RabbitMQ and Micronaut
+== RabbitMQ and Micronaut Framework
 
 === Install RabbitMQ via Docker
 
@@ -214,7 +214,7 @@ Alternatively you can https://www.rabbitmq.com/download.html[install and run a l
 
 === Books microservice
 
-By default Micronaut will connect to a RabbitMQ instance running on `localhost` so it is not necessary to add anything
+By default a Micronaut application will connect to a RabbitMQ instance running on `localhost` so it is not necessary to add anything
 to `application.yml`. In case you want to change the configuration, add the following:
 
 resource:application.yml[app=books,tag=rabbitmq]
@@ -225,24 +225,23 @@ Before being able to send and receive messages using RabbitMQ it is necessary to
 One option is create them directly in the RabbitMQ Admin UI available on `http://localhost:15672`.Use `guest` for both
 username and password.
 
-Another option is create them programatically with Micronaut.Create the class `ChannelPoolListener`:
+Another option is create them programatically. Create the class `ChannelPoolListener`:
 
 source:ChannelPoolListener[app=books]
 
-<1> Define an exchange named `micronaut`.From the producer point of view everything is sent to the exchange with the
-appropriate routing key
-<2> Define a queue named `analytics`.The consumer will listen for messages in that queue.
+<1> Define an exchange named `micronaut`. From the producer point of view everything is sent to the exchange with the appropriate routing key
+<2> Define a queue named `analytics`. The consumer will listen for messages in that queue.
 <3> Define a binding between the exchange and the queue using the routing key `analytics`.
 
 ==== Create RabbitMQ client (producer)
 
-Let's create an interface to send messages to RabbitMQ. Micronaut will implement the interface at compilation time:
+Let's create an interface to send messages to RabbitMQ. The Micronaut framework will implement the interface at compilation time:
 
 source:AnalyticsClient[app=books]
 
 <1> Set the exchange used to send the messages.
 <2> Set the routing key.
-<3> Send the `Book` POJO. Micronaut will automatically convert it to JSON before sending it.
+<3> Send the `Book` POJO. The Micronaut framework will automatically convert it to JSON before sending it.
 
 ==== Send Analytics information automatically
 
@@ -275,7 +274,7 @@ share it among all the microservices.
 
 ==== Create RabbitMQ consumer
 
-Create a new class to act as a consumer of the messages sent to RabbitMQ by the Books Microservice. Micronaut will
+Create a new class to act as a consumer of the messages sent to RabbitMQ by the Books Microservice. The Micronaut framework will
 implement the consumer at compile time. Create `AnalyticsListener`:
 
 source:AnalyticsListener[app=analytics]
@@ -376,5 +375,5 @@ Start the native images for the two microservices and run the same `curl` reques
 
 == Next steps
 
-Read more about https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/[RabbitMQ support] inside Micronaut.
+Read more about https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/[RabbitMQ support] in the Micronaut framework.
 

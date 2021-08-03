@@ -8,11 +8,11 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-Please, read about https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support] to learn more about different Lambda runtime, Triggers and Handlers and how to integrate with a Micronaut application.
+Please read about https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support] to learn more about different Lambda runtime, Triggers, and Handlers, and how to integrate with a Micronaut application.
 
 The biggest problem with Java applications and Lambda is how to mitigate Cold startups. Executing GraalVM Native images of a Micronaut function in a Lambda Custom runtime is a solution to this problem.
 
-In this guide, we will deploy a Micronaut Application as a GraalVM Native image to a AWS Lambda custom runtime. If your Lambda integrates with https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html[API Gateway via a Lambda Proxy], a Micronaut function of type `Application` with the `aws-lambda` feature is a good fit. Specially, when you have multiple endpoints which you wish to delegate to a single Lambda.
+In this guide, we will deploy a Micronaut Application as a GraalVM Native image to an AWS Lambda custom runtime. If your Lambda integrates with https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html[API Gateway via a Lambda Proxy], a Micronaut function of type `Application` with the `aws-lambda` feature is a good fit, especially when you have multiple endpoints which you wish to delegate to a single Lambda.
 
 In this guide, we will create a Micronaut application written in @language@.
 
@@ -31,7 +31,7 @@ mn create-app example.micronaut.complete --features aws-lambda,graalvm
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use https://launch.micronaut.io[Micronaut Launch], add `aws-lambda`, `graalvm` features.
+If you use https://launch.micronaut.io[Micronaut Launch], add `aws-lambda` and `graalvm` features.
 
 include::{commondir}/common-default-package.adoc[]
 
@@ -41,11 +41,11 @@ The generated application contains a `BookController`. It responds to POST reque
 
 source:BookController[]
 
-* The class is defined as a controller with the `@Controller` annotation mapped to the path /
+* The class is defined as a controller with the `@Controller` annotation mapped to the path `/`
 * The `@Post` annotation maps HTTP requests to `/` to the `save` method.
-* Add the `@Valid` annotation to any method parameter's object which requires validation.
+* Add the `@Valid` annotation to any method parameter that requires validation.
 
-The controller's method parameter is a `Book` object:
+The controller method parameter is a `Book` object:
 
 source:Book[]
 
@@ -63,7 +63,7 @@ test:BookControllerTest[]
 
 * When you instantiate the Handler, the application context starts.
 * Remember to close your application context when you end your test. You can use your handler to obtain it.
-* You don't invoke the controller directly. Instead, your handler receives a AWS Proxy Request event which it is routed transparently to your controller.
+* You don't invoke the controller directly. Instead, your handler receives an AWS Proxy Request event which it is routed transparently to your controller.
 
 include::{commondir}/common-testApp.adoc[]
 
@@ -75,9 +75,9 @@ image::create-function-bootstrap.png[]
 
 === Upload Code
 
-Micronaut's eases the deployment of your functions as a https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html[Custom AWS Lambda runtime].
+The Micronaut framework eases the deployment of your functions as a https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html[Custom AWS Lambda runtime].
 
-The main API you will interact with is https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/runtime/AbstractMicronautLambdaRuntime.html[AbstractMicronautLambdaRuntime]. An abstract class which you can extend to create your custom runtime `mainClass`. That class includes the necessary code to perform the https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html#runtimes-custom-build[Processing Tasks] described in the Custom Runtime documentation.
+The main API you will interact with is https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/runtime/AbstractMicronautLambdaRuntime.html[AbstractMicronautLambdaRuntime]. This is an abstract class which you can subclass to create your custom runtime `mainClass`. That class includes the code to perform the https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html#runtimes-custom-build[Processing Tasks] described in the Custom Runtime documentation.
 
 include::{commondir}/common-build-native-lambda.adoc[]
 

@@ -15,7 +15,7 @@ class RegisterUseCase(private val emailUseCase: EmailUseCase, // <1>
 
     fun register(email: String) {
         LOG.info("saving {} at {}", email, SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(Date()))
-        scheduleFollowupEmail(email, "Welcome to Micronaut")
+        scheduleFollowupEmail(email, "Welcome to Micronaut Framework")
     }
 
     private fun scheduleFollowupEmail(email: String, message: String) {
