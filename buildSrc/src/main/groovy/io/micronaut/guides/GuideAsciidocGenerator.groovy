@@ -9,6 +9,7 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
+import org.gradle.api.GradleException
 
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -18,6 +19,10 @@ import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 
 @CompileStatic
 class GuideAsciidocGenerator {
+
+
+    public static final String INCLUDE_COMMONDIR = 'include::{commondir}/'
+    public static final String CALLOUT = 'callout:'
 
     static void generate(GuideMetadata metadata, File inputDir, File destinationFolder) {
         Path asciidocPath = Paths.get(inputDir.absolutePath, metadata.asciidoctor)
@@ -133,21 +138,61 @@ class GuideAsciidocGenerator {
         List<String> rawLines = []
 
         for (String rawLine : lines) {
-            if (rawLine.startsWith('include::{commondir}/') && rawLine.endsWith('[]')) {
-                String commonFileName = rawLine.substring(rawLine.indexOf('include::{commondir}/') + 'include::{commondir}/'.length(), rawLine.indexOf('[]'))
-
-                File commonFile = Paths.get(destinationFolder.absolutePath, "../common/$commonFileName").toFile()
-                assert commonFile.exists()
-
-                rawLines.add("// Start: ${commonFileName}".toString())
-                rawLines.addAll(expandAllCommonIncludes(commonFile.readLines(), destinationFolder))
-                rawLines.add("// End: ${commonFileName}".toString())
+            if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
+                String commonFileName = parseFileName(rawLine, CALLOUT)
+                        .map(str -> 'callout-' + str)
+                        .orElseThrow(() -> new GradleException("could not parse filename from callout for line" + rawLine))
+                Optional<Integer> number = parseNumber(rawLine)
+                List<String> newLines = commonLines(destinationFolder, commonFileName)
+                String line = "${number.map(num -> '<' + num + '>').orElse('*')} ${newLines.first()}".toString()
+                for (int i = 0; i < 10; i++) {
+                    String value = extractFromParametersLine(rawLine, "arg" + i)
+                    if (value) {
+                        line = line.replace("{" + i + "}", value)
+                    }
+                }
+                rawLines.add(line)
+            } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
+                String commonFileName = parseFileName(rawLine, INCLUDE_COMMONDIR)
+                        .orElseThrow(() -> new GradleException("could not parse filename from commondir line" + rawLine))
+                rawLines.addAll(commonLines(destinationFolder, commonFileName))
             } else {
                 rawLines << rawLine
             }
         }
-
         return rawLines
+    }
+
+    static Optional<String> parseFileName(String line, String preffix, String suffix = '.adoc') {
+        if (line.contains(preffix) && line.contains('[')) {
+            String name = line.substring(line.indexOf(preffix) + preffix.length(), line.indexOf('['))
+            if (!name.endsWith(suffix)) {
+                name += suffix
+            }
+            return Optional.of(name)
+        }
+        Optional.empty()
+    }
+
+    static Optional<Integer> parseNumber(String rawLine) {
+        if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
+            String number = extractFromParametersLine(rawLine, 'number')
+            try {
+                if (number) {
+                    return Optional.of(Integer.valueOf(number))
+                }
+                return Optional.of(Integer.valueOf(rawLine.substring(rawLine.indexOf('[') + '['.length(), rawLine.indexOf(']'))))
+            } catch(NumberFormatException e) {
+
+            }
+        }
+        Optional.empty()
+    }
+
+    static List<String> commonLines(File destinationFolder, String commonFileName) {
+        File commonFile = Paths.get(destinationFolder.absolutePath, "../common/$commonFileName").toFile()
+        assert commonFile.exists()
+        return expandAllCommonIncludes(commonFile.readLines(), destinationFolder)
     }
 
     private static boolean shouldProcessLine(String line, String macro) {

@@ -86,8 +86,8 @@ Create `User` domain class to store users within our application.
 
 source:domain/User[]
 
-<1> GORM entities should be annotated with `grails.gorm.annotation.Entity`.
-<2> Use of `GormEntity` to aid IDE support.
+callout:gorm-entity[1]
+callout:gorm-entity-ide[1]
 
 ===== Role
 
@@ -95,8 +95,8 @@ Create `Role` domain class to store authorities within our application.
 
 source:domain/Role[]
 
-<1> GORM entities should be annotated with `grails.gorm.annotation.Entity`.
-<2> Use of `GormEntity` to aid IDE support.
+callout:gorm-entity[1]
+callout:gorm-entity-ide[2]
 
 ===== UserRole
 
@@ -104,8 +104,8 @@ Create a `UserRole` which stores a many-to-many relationship between `User` and 
 
 source:domain/UserRole[]
 
-<1> GORM entities should be annotated with `grails.gorm.annotation.Entity`.
-<2> Use of `GormEntity` to aid IDE support.
+callout:gorm-entity[1]
+callout:gorm-entity-ide[2]
 
 ==== Data Services
 
@@ -115,15 +115,15 @@ Create various GORM Data services:
 
 source:UserGormService[]
 
-<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Service] which is registered as a `Singleton`.
+callout:gorm-service[1]
 
 source:RoleGormService[]
 
-<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Service] which is registered as a `Singleton`.
+callout:gorm-service[1]
 
 source:UserRoleGormService[]
 
-<1> Annotate with `@Service` to designate a http://gorm.grails.org/latest/hibernate/manual/index.html#dataServices[GORM Data Service] which is registered as a `Singleton`.
+callout:gorm-service[1]
 <2> GORM allows statically-compiled JPA-QL Queries
 
 === Password Encoder
@@ -142,7 +142,7 @@ Then, write the implementation:
 
 source:BCryptPasswordEncoderService[]
 
-<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+callout:singleton[1]
 
 === Register Service
 
@@ -156,8 +156,8 @@ Update the `Application` class to be an event listener, and use `RegisterService
 
 source:Application[]
 
-<1> Implements `ServerStartupEvent` which enables executing a method when the application starts.
-<2> `RegisterService` is injected via constructor injection.
+callout:server-startup-event[1]
+callout:constructor-di[number=0,arg0=RegisterService]
 <3> Register a new user when the application starts.
 
 === Delegating Authentication Provider
@@ -178,7 +178,7 @@ Provide an implementation:
 
 source:UserFetcherService[]
 
-<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+callout:singleton[1]
 <2> `UserGormService` is injected via constructor injection.
 
 ==== Authorities Fetcher
@@ -191,7 +191,7 @@ Provide an implementation:
 
 source:AuthoritiesFetcherService[]
 
-<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+callout:singleton[1]
 <2> `UserRoleGormService` is injected via constructor injection.
 
 ==== Authentication Provider
@@ -201,7 +201,7 @@ Create an authentication provider which uses the interfaces you wrote in the pre
 source:DelegatingAuthenticationProvider[]
 
 <1> The configured I/O executor service is injected
-<2> RxJava's subscribeOn method schedules the operation on the I/O thread pool
+<2> `subscribeOn` method schedules the operation on the I/O thread pool
 
 IMPORTANT: It is critical that any blocking I/O operations (such as fetching the user from the database in the previous code sample) are offloaded to a separate thread pool that does not block the Event loop.
 
@@ -211,10 +211,10 @@ Create a test to verify an LDAP user can log in.
 
 test:LoginLdapTest[]
 
-<1> Annotate the class with `@MicronautTest` to let the Micronaut framework start the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/].
-<2> Inject the `HttpClient` bean.
+callout:micronaut-test[1]
+callout:http-client[2]
 <3> Inject the `TokenValidator` bean.
-<4> Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.
+callout:http-request[4]
 <5> If you attempt to access a secured endpoint without authentication, 401 is returned
 <6> Use the `tokenValidator` bean previously injected.
 

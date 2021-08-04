@@ -54,10 +54,10 @@ Create `GithubLowLevelClient`:
 
 source:GithubLowLevelClient[]
 
-<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+callout:singleton[1]
 <2> Inject `HttpClient` via constructor injection.
 <3> Inject the previously defined configuration parameters.
-<4> Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.
+callout:http-request[4]
 <5> GitHub API requires to set the `User-Agent` header.
 <6> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
 <7> Use `retrieve` to perform an HTTP request for the given request object and convert the full HTTP response's body into the specified type. e.g. `List<GithubRelease>`.
@@ -91,7 +91,7 @@ Create a Controller. It uses both (low-level and declarative clients). It showca
 
 source:GithubController[]
 
-<1> The class is defined as a controller with the @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/github`.
+callout:controller[number=1,arg0=/github]
 <2> Inject beans via constructor injection.
 <3> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the index method to all requests that use an HTTP GET
 <4> The `releasesWithLowLevelClient` returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.
@@ -104,12 +104,12 @@ Create a test to verify that both clients work as expected, and the controller e
 
 test:GithubControllerTest[]
 
-<1> Annotate the class with `@MicronautTest` to let the Micronaut framework start the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
-<2> Inject the `RxStreamingHttpClient` bean in the application context.
+callout:micronaut-test[1]
+<2> Inject the `StreamingHttpClient` bean in the application context.
 <3> Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 <4> The Micronaut framework makes it easy to parse JSON into Java objects.
 <5> Use `status` to check the HTTP status code.
-<6> Use `.body()` to retrieve the parsed payload.
+callout:body-method[6]
 <7> Use the `jsonStream` method, which returns a `Publisher`, to consume the endpoint which generates a JSON Stream.
 
 include::{commondir}/common-testApp.adoc[]
