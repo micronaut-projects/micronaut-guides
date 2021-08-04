@@ -14,6 +14,6 @@ public enum Player {
 
     @JsonValue
     public String toString() {
-        return this.color;
+        return color;
     }
 }
