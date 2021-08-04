@@ -3,8 +3,8 @@ package example.micronaut.chess.dto
 import com.fasterxml.jackson.annotation.JsonValue
 
 enum Player {
-    WHITE("w"),
-    BLACK("b");
+    WHITE('w'),
+    BLACK('b');
 
     private final String color
 
@@ -14,6 +14,6 @@ enum Player {
 
     @JsonValue
     String toString() {
-        this.color
+        color
     }
 }
