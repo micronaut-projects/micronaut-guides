@@ -25,6 +25,6 @@ class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) pri
         val req: HttpRequest<*> = HttpRequest.GET<Any>(uri) // <4>
             .header(USER_AGENT, "Micronaut HTTP Client") // <5>
             .header(ACCEPT, "application/vnd.github.v3+json, application/json") // <6>
-        return httpClient.retrieve(req, Argument.listOf(GithubRelease::class.java)) // <7>
+        return Mono.from(httpClient.retrieve(req, Argument.listOf(GithubRelease::class.java))) // <7>
     }
 }

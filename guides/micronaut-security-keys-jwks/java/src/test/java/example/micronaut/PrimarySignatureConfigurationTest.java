@@ -2,14 +2,12 @@ package example.micronaut;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.core.annotation.AnnotationUtil;
 import io.micronaut.runtime.context.scope.Refreshable;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @MicronautTest(startApplication = false)
@@ -27,14 +25,13 @@ public class PrimarySignatureConfigurationTest {
 
     @Test
     void primarySignatureConfigurationIsAnnotatedNamedGenerator() {
-        String annotationName = "jakarta.inject.Named";
         assertNotNull(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class).getAnnotationMetadata()
-                .getAnnotation(annotationName));
+                .getAnnotation(AnnotationUtil.NAMED));
         assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class).getAnnotationMetadata()
-                .getAnnotation(annotationName)
+                .getAnnotation(AnnotationUtil.NAMED)
                 .getValue(String.class).isPresent());
         assertEquals("generator", applicationContext.getBeanDefinition(PrimarySignatureConfiguration.class).getAnnotationMetadata()
-                .getAnnotation(annotationName)
+                .getAnnotation(AnnotationUtil.NAMED)
                 .getValue(String.class).get());
     }
 }
