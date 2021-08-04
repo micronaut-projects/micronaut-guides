@@ -27,7 +27,7 @@ public class RegisterUseCase {
 
     public void register(String email) {
         LOG.info("saving {} at {}", email, new SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(new Date()));
-        scheduleFollowupEmail(email, "Welcome to Micronaut");
+        scheduleFollowupEmail(email, "Welcome to Micronaut Framework");
     }
 
     private void scheduleFollowupEmail(String email, String message) {
