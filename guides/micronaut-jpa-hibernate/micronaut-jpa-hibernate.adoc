@@ -59,7 +59,7 @@ Create a `ApplicationConfigurationProperties` class:
 
 source:ApplicationConfigurationProperties[]
 
-<1> @ConfigurationProperties` annotation takes a configuration prefix.
+callout:configuration-properties[1]
 
 You can override `max` if you add to your `src/main/resources/application.yml`:
 
@@ -81,7 +81,7 @@ The implementation:
 
 source:GenreRepositoryImpl[]
 
-<1> Use `javax.inject.Singleton` to designate a class as a singleton.
+callout:singleton[1]
 <2> Inject easily an `EntityManager`.
 <3> All database access needs to be wrapped inside a transaction. As the method
 only reads data from the database, annotate it with `@ReadOnly`.
@@ -95,7 +95,7 @@ Create two classes to encapsulate Save and Update operations:
 
 source:GenreSaveCommand[]
 
-<1> Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+callout:introspected[1]
 
 source:GenreUpdateCommand[]
 
@@ -109,8 +109,8 @@ Create `GenreController`, a controller which exposes a resource with the common 
 
 source:GenreController[]
 
-<1> It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.
-<2> The class is defined as a controller with the `@Controller` annotation mapped to the path `/genres`.
+callout:executes-on[1]
+callout:controller[number=2,arg0=/genres]
 <3> Constructor injection.
 <4> Maps a `GET` request to `/genres/{id}` which attempts to show a genre. This illustrates the use of a URL path variable.
 <5> Returning `null` when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
@@ -128,9 +128,9 @@ Create a test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 
-<1> Annotate the class with `@MicronautTest` to let the Micronaut framework start the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
-<2> Inject the `HttpClient` bean in the application context.
-<3> Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-request[3]
 <4> If you care just about the object in the response use `retrieve`.
 <5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 

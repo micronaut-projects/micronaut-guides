@@ -93,17 +93,17 @@ Create a class to encapsulate the Update operations:
 
 source:GenreUpdateCommand[]
 
-<1> Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+callout:introspected[1]
 
 Create `GenreController`, a controller which exposes a resource with the common CRUD operations:
 
 source:GenreController[]
 
-<1> It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.
-<2> The class is defined as a controller with the `@Controller` annotation mapped to the path `/genres`.
-<3> Constructor injection.
+callout:executes-on[1]
+callout:controller[number=2,arg0=/genres]
+callout:constructor-di[number=3,arg0=GenreRepository]
 <4> Maps a `GET` request to `/genres/{id}` which attempts to show a genre. This illustrates the use of a URL path variable.
-<5> Returning `an empty optional when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
+<5> Returning an empty optional when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
 <6> Maps a `PUT` request to `/genres` which attempts to update a genre.
 <7> Add `@Valid` to any method parameter which requires validation. Use a POJO supplied as a JSON payload in the request to populate command.
 <8> It is easy to add custom headers to the response.
@@ -119,11 +119,11 @@ Create a test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 
-<1> Annotate the class with `@MicronautTest` to let the Micronaut framework start the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
-<2> Inject the `HttpClient` bean in the application context.
-<3> Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-request[3]
 <4> If you care just about the object in the response use `retrieve`.
-<5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
+<5> Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
 include::{commondir}/common-testApp.adoc[]
 
