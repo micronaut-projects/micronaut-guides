@@ -155,7 +155,9 @@ class GuideAsciidocGenerator {
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
                 String commonFileName = parseFileName(rawLine, INCLUDE_COMMONDIR)
                         .orElseThrow(() -> new GradleException("could not parse filename from commondir line" + rawLine))
+                rawLines.add("// Start: ${commonFileName}".toString())
                 rawLines.addAll(commonLines(destinationFolder, commonFileName))
+                rawLines.add("// End: ${commonFileName}".toString())
             } else {
                 rawLines << rawLine
             }
