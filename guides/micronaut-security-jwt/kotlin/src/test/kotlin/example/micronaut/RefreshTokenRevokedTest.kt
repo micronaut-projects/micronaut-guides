@@ -11,7 +11,9 @@ import io.micronaut.security.authentication.UserDetails
 import io.micronaut.security.token.generator.RefreshTokenGenerator
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Optional
 
@@ -26,30 +28,30 @@ internal class RefreshTokenRevokedTest {
         val user = UserDetails("sherlock", emptyList())
         val refreshToken = refreshTokenGenerator.createKey(user)
         val refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
-        Assertions.assertTrue(refreshTokenOptional.isPresent)
+        assertTrue(refreshTokenOptional.isPresent)
 
         val oldTokenCount = refreshTokenRepository.count()
         val signedRefreshToken = refreshTokenOptional.get()
         refreshTokenRepository.save(user.username, refreshToken, true) // <1>
-        Assertions.assertEquals(oldTokenCount + 1, refreshTokenRepository.count())
+        assertEquals(oldTokenCount + 1, refreshTokenRepository.count())
 
         val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
         val errorArgument = Argument.of(Map::class.java)
-        val e = Assertions.assertThrows(HttpClientResponseException::class.java) {
+        val e = assertThrows(HttpClientResponseException::class.java) {
             client.toBlocking().exchange(
                 HttpRequest.POST("/oauth/access_token", TokenRefreshRequest(signedRefreshToken)),
                 bodyArgument,
                 errorArgument
             )
         }
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(HttpStatus.BAD_REQUEST, e.status)
 
         val mapOptional: Optional<Map<*, *>> = e.response.getBody(Map::class.java)
-        Assertions.assertTrue(mapOptional.isPresent)
+        assertTrue(mapOptional.isPresent)
 
         val m = mapOptional.get()
-        Assertions.assertEquals("invalid_grant", m["error"])
-        Assertions.assertEquals("refresh token revoked", m["error_description"])
+        assertEquals("invalid_grant", m["error"])
+        assertEquals("refresh token revoked", m["error_description"])
         refreshTokenRepository.deleteAll()
     }
 }

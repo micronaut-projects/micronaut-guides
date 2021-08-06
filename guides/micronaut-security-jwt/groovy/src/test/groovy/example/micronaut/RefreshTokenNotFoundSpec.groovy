@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.authentication.UserDetails
@@ -20,7 +20,7 @@ class RefreshTokenNotFoundSpec extends Specification {
 
     @Inject
     @Client("/")
-    RxHttpClient client
+    HttpClient client
 
     @Inject
     RefreshTokenGenerator refreshTokenGenerator

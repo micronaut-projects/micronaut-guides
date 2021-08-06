@@ -1,16 +1,8 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 Nowadays it is pretty usual to have some kind of cron or scheduled task that needs to run every midnight, every hour, a few times a week,...
 
-In this guide you will learn how to use Micronaut native capabilities to schedule periodic tasks inside a Micronaut microservice.
+In this guide you will learn how to use Micronaut framework capabilities to schedule periodic tasks inside a Micronaut microservice.
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -18,10 +10,9 @@ include::{commondir}/common-completesolution.adoc[]
 
 include::{commondir}/common-create-app.adoc[]
 
-
 === Set log level INFO for package demo
 
-During this guide, we are going to use several log statements to show Job execution.
+During this guide, we will use several log statements to show Job execution.
 
 Add at the end of `logback.xml` the next statement:
 
@@ -29,18 +20,16 @@ resource:logback.xml[tag=logger,indent=0]
 
 The above line configures a logger for package `example.micronaut` with log level INFO.
 
-
 === Creating a Job
 
 Create a file and add the following:
 
 source:HelloWorldJob[]
 
-<1> To register a Singleton in Micronaut's application context annotate your class with `javax.inject.Singleton`
+callout:singleton[1]
 <2> Inject a Logger.
 <3> Create trigger every 10 seconds
 <4> Create another trigger every 45 seconds with an initial delay of 5 seconds (5000 millis)
-
 
 :exclude-for-build:maven
 
@@ -69,17 +58,15 @@ After a few seconds you will see the following output:
 ----
 
 <1> First execution of 10 seconds job just after the application starts
-<2> The 45 seconds job just starts 5 seconds after the app starts
+<2> The 45 seconds job just starts 5 seconds after the application starts
 <3> Second execution of 10 seconds job just 10 seconds after the first execution
 <4> Second execution of 45 seconds job just 45 seconds after the first execution
 
-
 === Business logic in dedicated Use Cases
-
 
 Although the previous example is valid, usually you don't want to put your business logic in a Job. A better approach is
 to create an additional bean which the `Job` invokes. This approach decouples your business logic from the scheduling logic.
-Moreover, it facilitates testing and maintenance. Let’s see an example:
+Moreover, it facilitates testing and maintenance. Let's see an example:
 
 Create the following use case:
 
@@ -89,29 +76,27 @@ And then the job:
 
 source:DailyEmailJob[]
 
-<1> To register a Singleton in Micronaut's application context annotate your class with `javax.inject.Singleton`
+callout:singleton[1]
 <2> Constructor injection.
 <3> Trigger the job once a day at 04:30 AM
 <4> Call the injected use case
 
-
 === Scheduling a Job Manually
 
-Imagine the following scenario. You want to send every user an email 2 hours after they registered into your app.
-You want to ask him about his experiences during this first interaction with your application.
+Consider the following scenario. You want to send every user an email two hours after they registered into your application. You want to ask them about their experiences during this first interaction with your application.
 
-For this guide, we are going to schedule a Job to trigger after one minute.
+For this guide, we will schedule a Job to trigger after one minute.
 
-To test it out, we are going to call twice a new use case named `RegisterUseCase` when the app starts.
+To test it, we will call a new use case named `RegisterUseCase` twice when the application starts.
 
 Modify `Application.@languageextension@`:
 
 source:Application[]
 
-<1> Annotate the class with `@Singleton` to register it in the application context.
+callout:singleton[1]
 <2> Listen to the event `ServerStartupEvent`
 <3> Constructor injection of `RegisterUseCase`
-<4> `onApplicationEvent` is invoked when the app starts.
+<4> `onApplicationEvent` is invoked when the application starts.
 
 As you see in the previous example, subscribing to an event is as easy as implementing `ApplicationEventListener`.
 
@@ -135,15 +120,13 @@ If you execute the above code you will see the Job being executed one minute aft
 INFO  example.micronaut.RegisterUseCase - saving harry@micronaut.example at 15/5/2018 06:25:14
 INFO  example.micronaut.RegisterUseCase - saving ron@micronaut.example at 15/5/2018 06:25:34
 INFO  example.micronaut.EmailUseCase - Sending email to harry@micronaut.example : Welcome to Micronaut at 15/5/2018 06:26:14
-INFO  example.micronaut.EmailUseCase - Sending email to ron@micronaut.example : Welcome to Micronaut at 15/5/2018 06:26:34
+INFO  example.micronaut.EmailUseCase - Sending email to ron@micronaut.example : Welcome to Micronaut Framework at 15/5/2018 06:26:34
 ----
-
 
 == Summary
 
 During this guide, we learned how to configure Jobs using the `@Scheduled` annotation using fixedDelay, initialDelay,
 and cron as well as manually configuring jobs with a `TaskScheduler` and tasks.
-
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
@@ -160,7 +143,6 @@ $ 10:16:30.807 [pool-2-thread-4] INFO  example.micronaut.HelloWorldJob - Simple 
 ----
 
 :exclude-for-languages:
-
 
 include::{commondir}/common-next.adoc[]
 

@@ -1,12 +1,4 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -16,7 +8,7 @@ include::{commondir}/common-create-app.adoc[]
 
 === Views
 
-Although Micronaut is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
+Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
 
 To use https://www.thymeleaf.org/[Thymeleaf] Java template engine to render views within a Micronaut application add the following dependency on your classpath.
 
@@ -32,7 +24,7 @@ You will also need to create OAuth 2.0 credentials for the project since Google 
 
 image::google-2.png[]
 
-The Google Console will prompt for some information about your application such as the product name, a home page and a logo. On the next page, select *Web Application* type, and enter the redirect URL where the Micronaut app we will build next will wait for the callback.
+The Google Console will prompt for some information about your application such as the product name, a home page, and a logo. On the next page, select *Web Application* type, and enter the redirect URL where the Micronaut application we will build next will wait for the callback.
 
 image::google-4.png[]
 
@@ -40,23 +32,23 @@ You will then receive a client ID and secret.
 
 image::google-3.png[]
 
-To use OAuth 2.0 integration in your Micronaut App, add the next dependency:
+To use OAuth 2.0 integration in your Micronaut application, add the following dependency:
 
 dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
 
-Add also JWT https://docs.micronaut.io/latest/guide/index.html#jwt[Micronaut’s JWT support] dependencies:
+Also add https://docs.micronaut.io/latest/guide/index.html#jwt[Micronaut JWT support] dependencies:
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
-Add the following Oauth2 Configuration:
+Add the following OAuth2 Configuration:
 
 resource:application.yml[tag=oauth2]
 
-<1> Set `micronaut.security.authentication` as `idtoken`. The idtoken provided by Google when the OAuth 2.0 Authorization code flow ends will be saved in a cookie. The id token is a signed JWT. For every request, Micronaut extracts the JWT from the Cookie and validates the JWT signature with the remote Json Web Key Set exposed by Google. JWKS is exposed by Google via the `jws-uri` entry of https://accounts.google.com/.well-known/openid-configuration
+<1> Set `micronaut.security.authentication` as `idtoken`. The idtoken provided by Google when the OAuth 2.0 Authorization code flow ends will be saved in a cookie. The id token is a signed JWT. For every request, the Micronaut framework extracts the JWT from the Cookie and validates the JWT signature with the remote Json Web Key Set exposed by Google. JWKS is exposed by Google via the `jws-uri` entry of https://accounts.google.com/.well-known/openid-configuration
 <2> You can choose any name. The name you select, will be used in your routes. E.g. If you set `google` the login route for this OAuth 2.0 client is `/oauth/login/google`
 <3> Client Secret. See previous screenshot.
 <4> Client ID. See previous screenshot.
-<5> `issuer` url. It allows micronaut to discover the configuration of the OpenID Connect server.
+<5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
 <6> Accept GET request to the `/logout` endpoint.
 
 The previous configuration uses several placeholders. You will need to setup `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
@@ -75,14 +67,14 @@ image::diagramm.png[]
 
 === Home
 
-Create a controller to handle the requests to `/`. You are going to display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we are going to use a Thymeleaf template.
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
 
 source:HomeController[]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/`.
+callout:controller[number=1,arg0=/]
 <2> Annotate with `io.micronaut.security.Secured` to configure secured access. The `SecurityRule.IS_ANONYMOUS` expression will allow access without authentication.
-<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template would you like to render the response against.
-<4> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the `index` method to GET `/` requests.
+<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
 
 Create a thymeleaf template:
 
@@ -90,13 +82,11 @@ resource:views/home.html[]
 
 Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
 
-- The https://docs.micronaut.io/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor] injects into the model a `security` map with the authenticated user. See https://micronaut-projects.github.io/micronaut-views/latest/guide/index.html#views-security[User in a view] documentation.
-
+- The @api@/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor] injects into the model a `security` map with the authenticated user. See https://micronaut-projects.github.io/micronaut-views/latest/guide/index.html#views-security[User in a view] documentation.
 
 include::{commondir}/common-runapp.adoc[]
 
 image::googlevideo.gif[]
-
 
 === Custom ID token claims validation
 
@@ -116,7 +106,7 @@ Backed by a `@ConfigurationProperties` annotated class:
 
 source:ApplicationConfigurationProperties[]
 
-and then implement a `OpenIdClaimsValidator` bean. Micronaut validates the id token against every bean of type `OpenIdClaimsValidator`. If the id token `hd` claim does not match the value configured, it is considered invalid.
+and then implement a `OpenIdClaimsValidator` bean. The Micronaut framework validates the id token against every bean of type `OpenIdClaimsValidator`. If the id token `hd` claim does not match the value configured, it is considered invalid.
 
 source:HostedDomainClaimValidator[]
 
@@ -128,7 +118,7 @@ app:
   hosted-domain: 'objectcomputing.com'
 ----
 
-if you start the app, you will only be able to sign in with a Google Account within OCI organization.
+if you start the application, you will only be able to sign in with a Google Account within the OCI organization.
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 

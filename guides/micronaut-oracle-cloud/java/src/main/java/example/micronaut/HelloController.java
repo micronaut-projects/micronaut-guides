@@ -9,6 +9,6 @@ public class HelloController {
 
     @Get(produces = MediaType.TEXT_PLAIN)
     public String index() {
-        return "Micronaut on Oracle Cloud";
+        return "Micronaut Framework on Oracle Cloud";
     }
 }

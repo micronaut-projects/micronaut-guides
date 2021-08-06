@@ -7,10 +7,10 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.RxStreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import io.reactivex.Flowable
 import spock.lang.Shared
 import spock.lang.Specification
-
+import io.reactivex.Flowable
+import org.reactivestreams.Publisher
 import javax.inject.Inject
 
 @MicronautTest // <1>
@@ -47,8 +47,8 @@ class GithubControllerSpec extends Specification {
         when:
         HttpRequest request = HttpRequest.GET('/github/releases-lowlevel')
 
-        Flowable<GithubRelease> githubReleaseStream = client.jsonStream(request, GithubRelease) // <7>
-        Iterable<GithubRelease> githubReleases = githubReleaseStream.blockingIterable()
+        Publisher<GithubRelease> githubReleaseStream = client.jsonStream(request, GithubRelease) // <7>
+        Iterable<GithubRelease> githubReleases = Flowable.fromPublisher(githubReleaseStream).blockingIterable()
 
         then:
         for (String name : expectedReleases) {

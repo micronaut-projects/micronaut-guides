@@ -1,13 +1,16 @@
 package example.micronaut
 
+import groovy.transform.CompileStatic
+
 import javax.inject.Singleton
 
+@CompileStatic
 @Singleton // <1>
 class AuthoritiesFetcherService implements AuthoritiesFetcher {
 
-    protected final UserRoleGormService userRoleGormService
+    private final UserRoleGormService userRoleGormService
 
-    AuthoritiesFetcherService(UserRoleGormService userRoleGormService) {  // <2>
+    AuthoritiesFetcherService(UserRoleGormService userRoleGormService) { // <2>
         this.userRoleGormService = userRoleGormService
     }
 

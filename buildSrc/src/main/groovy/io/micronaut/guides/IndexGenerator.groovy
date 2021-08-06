@@ -14,7 +14,7 @@ class IndexGenerator {
 
     private static final String LATEST_GUIDES_URL = "https://guides.micronaut.io/latest/"
 
-    static String generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
+    static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
 
         String templateText = template.text
@@ -35,7 +35,8 @@ class IndexGenerator {
         }
     }
 
-    static void save(String templateText, String filename, File buildDir, List<GuideMetadata> metadatas, String title = 'Micronaut Guides') {
+    private static void save(String templateText, String filename, File buildDir,
+                             List<GuideMetadata> metadatas, String title = 'Micronaut Guides') {
         String text = indexText(templateText, metadatas, title)
         Path path = Paths.get(buildDir.absolutePath, filename)
         File output = path.toFile()
@@ -43,7 +44,7 @@ class IndexGenerator {
         output.text = text
     }
 
-    static String indexText(String templateText, List<GuideMetadata> metadatas, String title) {
+    private static String indexText(String templateText, List<GuideMetadata> metadatas, String title) {
         boolean singleGuide = metadatas.size() == 1
 
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
@@ -71,11 +72,11 @@ class IndexGenerator {
         text
     }
 
-    static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
+    private static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
         String index = ''
         int count = 0
-        List<GuideMetadata> filteredMetadatas = System.getProperty('micronaut.guide') ?
-                metadatas.findAll { it.slug == System.getProperty('micronaut.guide') } :
+        List<GuideMetadata> filteredMetadatas = Utils.singleGuide() ?
+                metadatas.findAll { it.slug == Utils.singleGuide() } :
                 metadatas
         if (!filteredMetadatas) {
             return index
@@ -119,13 +120,13 @@ class IndexGenerator {
         index
     }
 
-    static String guideLink(String baseURL, GuideMetadata metadata, GuidesOption guidesOption, String title = null) {
+    private static String guideLink(String baseURL, GuideMetadata metadata,
+                                    GuidesOption guidesOption, String title = null) {
         String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
         "<a href='${baseURL}${folder}.html'>${title ? title : (guidesOption.buildTool.toString() + ' - ' + guidesOption.language)}</a>"
     }
 
-    static String table(String baseURL, GuideMetadata metadata) {
-        String readCopy = 'Read'
+    private static String table(String baseURL, GuideMetadata metadata) {
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         String kotlinImg = '<img src="./images/kotlin.svg" width="60" alt="Kotlin"/>'
         String groovyImg = '<img src="./images/groovy.svg" width="60" alt="Groovy"/>'
@@ -139,9 +140,9 @@ class IndexGenerator {
 <tr>
 <th></th>
 """
-            tableHtml += "<th>${javaImg}</th>"
-            tableHtml += "<th>${kotlinImg}</th>"
-            tableHtml += "<th>${groovyImg}</th>"
+        tableHtml += "<th>${javaImg}</th>"
+        tableHtml += "<th>${kotlinImg}</th>"
+        tableHtml += "<th>${groovyImg}</th>"
         tableHtml += """\
 </tr>
 </thead>
@@ -181,7 +182,8 @@ class IndexGenerator {
         tableHtml
     }
 
-    static String cell(String baseURL, GuideMetadata metadata, BuildTool buildTool, Language language, List<GuidesOption> guidesOptionList) {
+    private static String cell(String baseURL, GuideMetadata metadata, BuildTool buildTool,
+                               Language language, List<GuidesOption> guidesOptionList) {
         String tableHtml = "<td>"
         GuidesOption guidesOption = guidesOptionList.find {GuidesOption option -> option.buildTool == buildTool&& option.language == language }
         if (guidesOption) {
@@ -193,7 +195,7 @@ class IndexGenerator {
         tableHtml
     }
 
-    static String imageForCategory(Category cat) {
+    private static String imageForCategory(Category cat) {
         switch (cat) {
             case Category.GCP:
                 return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
@@ -234,7 +236,7 @@ class IndexGenerator {
 
     }
 
-    static String category(Category cat) {
+    private static String category(Category cat) {
         String html = "<div class='category'>"
         html += '<div class="inner">'
         html += '<img width="100" style="margin-bottom: 30px" src="' + imageForCategory(cat) + '"/>'

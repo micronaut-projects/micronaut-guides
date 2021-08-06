@@ -8,19 +8,17 @@ Micronaut Version: @micronaut@
 
 == Getting Started
 
-In this guide, we are going to create a Micronaut app written in @language@ to consume the GitHub API with the Micronaut HTTP Client.
+In this guide, we will create a Micronaut application written in @language@ to consume the GitHub API with the Micronaut HTTP Client.
 
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-
 include::{commondir}/common-create-app.adoc[]
-
 
 === GitHub API
 
-In this guide, you are going to consume the https://docs.github.com/en/rest[GitHub API] from a Micronaut application.
+In this guide, you will consume the https://docs.github.com/en/rest[GitHub API] from a Micronaut application.
 
 In particular, we consume the https://docs.github.com/en/rest/reference/repos#list-releases[List releases] endpoint.
 
@@ -40,10 +38,9 @@ To encapsulate type-safe configuration retrieval, we use a https://docs.micronau
 
 source:GithubConfiguration[]
 
-In this guide, you are going to fetch https://github.com/micronaut-projects/micronaut-core/releases[Micronaut Core releases].
+In this guide, you will fetch https://github.com/micronaut-projects/micronaut-core/releases[Micronaut Core releases].
 
 To consume the GitHub API, you will use Micronaut HTTP Client.
-
 
 === Low Level Client
 
@@ -57,14 +54,13 @@ Create `GithubLowLevelClient`:
 
 source:GithubLowLevelClient[]
 
-<1> Use `javax.inject.Singleton` to designate a class as a singleton.
-<2> Inject `RxClient` via constructor injection.
+callout:singleton[1]
+<2> Inject `HttpClient` via constructor injection.
 <3> Inject the previously defined configuration parameters.
-<4> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+callout:http-request[4]
 <5> GitHub API requires to set the `User-Agent` header.
 <6> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
 <7> Use `retrieve` to perform an HTTP request for the given request object and convert the full HTTP response's body into the specified type. e.g. `List<GithubRelease>`.
-<8> The `retrieve` method returns a Flowable which has a firstElement method that returns the first emitted item or nothing
 
 NOTE: Instead of `retrieve` we could have used `jsonStream`. You can use `jsonStream()` to stream arrays of type `application/json` or
 JSON streams of type `application/x-json-stream`. If we use `retrieve`, such as in the previous code listing, the operation will not block.
@@ -72,11 +68,9 @@ However, it will not return until all the data has been received from the server
 However, if you are interested in just the first element of the array, `jsonStream` provides a better alternative since it starts streaming data from the server without needing the whole response.
 For example, `jsonStream().firstElement()` will only parse the first item in a JSON array. Hence it is more efficient.
 
-
-
 === Declarative Client
 
-It is time to take a look at Micronaut's support for declarative clients via the Client annotation.
+It is time to take a look at support for declarative clients via the Client annotation.
 
 Create `GithubApiClient` which clearly illustrates how a declarative Micronaut HTTP Client, which is generated at compile-time, simplifies our code.
 
@@ -86,52 +80,43 @@ source:GithubApiClient[]
 <2> GitHub API requires to set the `User-Agent` header.
 <3> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
 <4> You can use configuration parameter interpolation when you define the path of the GET endpoint.
-<5> You can return reactive types, such as an RxJava `Flowable`.
-
-
+<5> You can return any reactive type of any implementation (RxJava, Reactor...), but it's better to use the Reactive Streams public interfaces like `Publisher`.
 
 === Controller
 
-Create a Controller. It uses both (low-level and declarative clients). It showcases several Micronaut's capabilities.
+Create a Controller. It uses both (low-level and declarative clients). It showcases several Micronaut framework capabilities.
 
-* Micronaut supports any framework that implements Reactive Streams, including RxJava, and Reactor. Thus, you can easily and efficiently
-compose multiple HTTP client calls without blocking (which will limit the throughput and scalability of your application).
-* Micronaut enables you to consume/produce https://docs.micronaut.io/latest/guide/index.html#clientStreaming[JSON Streams].
-
+* The Micronaut framework supports any framework that implements Reactive Streams, including RxJava, and Reactor. Thus, you can easily and efficiently compose multiple HTTP client calls without blocking (which will limit the throughput and scalability of your application).
+* The Framework enables you to consume/produce https://docs.micronaut.io/latest/guide/index.html#clientStreaming[JSON Streams].
 
 source:GithubController[]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/github`.
+callout:controller[number=1,arg0=/github]
 <2> Inject beans via constructor injection.
-<3> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the index method to all requests that use an HTTP GET
+<3> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the index method to all requests that use an HTTP GET
 <4> The `releasesWithLowLevelClient` returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.
 <5> In order to do JSON streaming you can declare a controller method that returns a `application/x-json-stream` of JSON objects.
-<6> You can return reactive types, such as an RxJava `Flowable`.
-
+<6> You can return any reactive type of any implementation (RxJava, Reactor...), but it's better to use the Reactive Streams public interfaces like `Publisher`.
 
 === Tests
 
-Create a test which verifies both clients work as expected and the controller echoes the output of the GitHub API in a Reactive way.
+Create a test to verify that both clients work as expected, and the controller echoes the output of the GitHub API in a Reactive way.
 
 test:GithubControllerTest[]
 
-<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
-<2> Inject the `RxStreamingHttpClient` bean in the application context.
+callout:micronaut-test[1]
+<2> Inject the `StreamingHttpClient` bean in the application context.
 <3> Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
-<4> Micronaut makes it easy to parse JSON into Java objects.
+<4> The Micronaut framework makes it easy to parse JSON into Java objects.
 <5> Use `status` to check the HTTP status code.
-<6> Use `.body()` to retrieve the parsed payload.
-<7> Use the `jsonStream` method, which returns a `Flowable`, to consume the endpoint which generates a JSON Stream.
-
+callout:body-method[6]
+<7> Use the `jsonStream` method, which returns a `Publisher`, to consume the endpoint which generates a JSON Stream.
 
 include::{commondir}/common-testApp.adoc[]
 
-
 == HTTP Client Filter
 
-Often, you need to include the same HTTP headers or URL parameters in a set of requests against a third-party API or when
-calling another Microservice. To simplify this, Micronaut includes the ability to define `HttpClientFilter` classes that
-are applied to all matching HTTP clients.
+Often, you need to include the same HTTP headers or URL parameters in a set of requests against a third-party API or when calling another Microservice. To simplify this, the Micronaut framework includes the ability to define `HttpClientFilter` classes that are applied to all matching HTTP clients.
 
 For a real world example, let us provide GitHub Authentication via an `HttpClientFilter`. Follow the steps in
 https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token[to create you own Personal Token].
@@ -143,7 +128,7 @@ Create a Filter:
 source:GithubFilter[]
 
 <1> Supply the pattern you want to match to the `@Filter` annotation.
-<2> Micronaut will not load the Bean unless configuration properties are set.
+<2> The Micronaut framework will not load the bean unless configuration properties are set.
 <3> Constructor injection of the configuration parameters.
 <4> Enhance every request sent to GitHub API providing Basic Authentication.
 
@@ -160,7 +145,7 @@ github:
   token: xxxxxxxxxxxx
 ----
 
-Add to `src/main/resources/logback.xml`, a logger to see Micronaut's HTTP client output.
+Add a logger to `src/main/resources/logback.xml` to see the HTTP client output.
 
 [source, xml]
 ----
@@ -178,9 +163,7 @@ If you run again the tests, you will see the that the Filter is invoked and HTTP
 13:09:56.664 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - host: api.github.com
 -----
 
-
 include::{commondir}/common-graal-with-plugins.adoc[]
-
 
 == Next steps
 
