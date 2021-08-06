@@ -7,7 +7,7 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.runtime.server.EmbeddedServer
-import io.micronaut.security.authentication.UserDetails
+import io.micronaut.security.authentication.Authentication
 import io.micronaut.security.token.generator.RefreshTokenGenerator
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
@@ -25,7 +25,7 @@ internal class RefreshTokenRevokedTest {
 
     @Test
     fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
-        val user = UserDetails("sherlock", emptyList())
+        val user = Authentication.build("sherlock")
         val refreshToken = refreshTokenGenerator.createKey(user)
         val refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
         assertTrue(refreshTokenOptional.isPresent)

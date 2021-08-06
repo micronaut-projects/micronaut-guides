@@ -7,7 +7,7 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.runtime.server.EmbeddedServer;
-import io.micronaut.security.authentication.UserDetails;
+import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.generator.RefreshTokenGenerator;
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
@@ -33,7 +33,7 @@ class RefreshTokenRevokedTest {
 
     @Test
     void accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
-        UserDetails user = new UserDetails("sherlock", Collections.emptyList());
+        Authentication user = Authentication.build("sherlock");
 
         String refreshToken = refreshTokenGenerator.createKey(user);
         Optional<String> refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken);

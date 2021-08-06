@@ -7,7 +7,6 @@ import io.micronaut.security.authentication.AuthenticationFailed;
 import io.micronaut.security.authentication.AuthenticationProvider;
 import io.micronaut.security.authentication.AuthenticationRequest;
 import io.micronaut.security.authentication.AuthenticationResponse;
-import io.micronaut.security.authentication.UserDetails;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Flux;
 import org.reactivestreams.Publisher;
@@ -23,10 +22,10 @@ public class AuthenticationProviderUserPassword implements AuthenticationProvide
         return Flux.create(emitter -> {
             if ( authenticationRequest.getIdentity().equals("sherlock") &&
                     authenticationRequest.getSecret().equals("password") ) {
-                emitter.next(new UserDetails((String) authenticationRequest.getIdentity(), new ArrayList<>()));
+                emitter.next(AuthenticationResponse.success((String) authenticationRequest.getIdentity()));
                 emitter.complete();
             } else {
-                emitter.error(new AuthenticationException(new AuthenticationFailed()));
+                emitter.error(AuthenticationResposne.exception());
             }
         }, FluxSink.OverflowStrategy.ERROR);
     }

@@ -5,7 +5,6 @@ import io.micronaut.security.authentication.AuthenticationProvider
 import io.micronaut.security.authentication.AuthenticationResponse
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationFailed
-import io.micronaut.security.authentication.UserDetails
 import io.micronaut.security.authentication.AuthenticationException
 import reactor.core.publisher.FluxSink
 import reactor.core.publisher.Flux
@@ -17,10 +16,10 @@ class AuthenticationProviderUserPassword : AuthenticationProvider { // <2>
     override fun authenticate(httpRequest: HttpRequest<*>?, authenticationRequest: AuthenticationRequest<*, *>): Publisher<AuthenticationResponse> {
         return Flux.create({ emitter: FluxSink<AuthenticationResponse> ->
             if (authenticationRequest.identity == "sherlock" && authenticationRequest.secret == "password") {
-                emitter.next(UserDetails(authenticationRequest.identity as String, ArrayList()))
+                emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
                 emitter.complete()
             } else {
-                emitter.error(AuthenticationException(AuthenticationFailed()))
+                emitter.error(AuthenticationResponse.exception())
             }
         }, FluxSink.OverflowStrategy.ERROR)
     }
