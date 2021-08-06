@@ -7,12 +7,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.stream.Stream;
 
-class SecretsManagerRotationStepSpec extends Specification {
+class SecretsManagerRotationStepTest {
 
     @ParameterizedTest(name = "for {0} string inferred SecretsManagerRotationStep should be {1}")
     @MethodSource("stepProvider")
     void shouldCalculateToPayValueForInvoice(String str, SecretsManagerRotationStep step) {
-        assertTrue(SecretsManagerRotationStep.of(str).isPresent())
+        assertTrue(SecretsManagerRotationStep.of(str).isPresent());
         assertEquals(SecretsManagerRotationStep.of(str).get(), step);
     }
 

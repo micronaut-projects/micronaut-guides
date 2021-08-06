@@ -23,6 +23,9 @@ public class Handler
 
     private static final Logger LOG = LoggerFactory.getLogger(Handler.class);
 
+    private static final String JWK_PRIMARY = "jwk.primary";
+    private static final String JWK_SECONDARY = "jwk.secondary";
+
     @Inject
     public JsonWebKeyGenerator jsonWebKeyGenerator; // <3>
 
@@ -44,26 +47,33 @@ public class Handler
             if (step == SecretsManagerRotationStep.FINISH_SECRET) {
                 currentPrimary(input.getSecretId())
                         .flatMap(this::generateSecretString)
-                        .ifPresent(secretString -> secretsManagerClient.putSecretValue(PutSecretValueRequest.builder()
-                                .clientRequestToken(input.getClientRequestToken())
-                                .secretId(input.getSecretId())
-                                .secretString(secretString)
-                                .build()));
+                        .ifPresent(secretString -> updateSecretString(input, secretString));
             }
         });
         return null;
     }
 
     @NonNull
-    private Optional<String> generateSecretString(@NonNull String currentPrimary) {
+    private Optional<String> currentPrimary(@NonNull String secretId) {  // <6>
+        return keyValueFetcher.keyValuesByPrefix(secretId)
+                .filter(m -> m.containsKey(JWK_PRIMARY))
+                .map(m -> m.get(JWK_PRIMARY))
+                .filter(Objects::nonNull)
+                .map(Object::toString);
+    }
+
+
+
+    @NonNull
+    private Optional<String> generateSecretString(@NonNull String currentPrimary) {  // <7>
         Optional<String> jsonJwkOptional = jsonWebKeyGenerator.generateJsonWebKey(null);
         if (!jsonJwkOptional.isPresent()) {
             return Optional.empty();
         }
         String jsonJwk = jsonJwkOptional.get();
         Map<String, String> newJwk = new HashMap<>();
-        newJwk.put("jwk.primary", jsonJwk);
-        newJwk.put("jwk.secondary", currentPrimary);
+        newJwk.put(JWK_PRIMARY, jsonJwk);
+        newJwk.put(JWK_SECONDARY, currentPrimary);
         try {
             return Optional.of(objectMapper.writeValueAsString(newJwk));
         } catch (JsonProcessingException e) {
@@ -74,12 +84,12 @@ public class Handler
         return Optional.empty();
     }
 
-    @NonNull
-    private Optional<String> currentPrimary(@NonNull String secretId) {
-        return keyValueFetcher.keyValuesByPrefix(secretId)
-                .filter(m -> m.containsKey("jwk.primary"))
-                .map(m -> m.get("jwk.primary"))
-                .filter(Objects::nonNull)
-                .map(Object::toString);
+    private void updateSecretString(@NonNull SecretsManagerRotationEvent input,
+                                    @NonNull String secretString) {  // <8>
+        secretsManagerClient.putSecretValue(PutSecretValueRequest.builder()
+                .clientRequestToken(input.getClientRequestToken())
+                .secretId(input.getSecretId())
+                .secretString(secretString)
+                .build());
     }
 }
