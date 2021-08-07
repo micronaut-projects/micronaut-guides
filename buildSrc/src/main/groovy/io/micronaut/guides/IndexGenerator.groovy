@@ -275,7 +275,7 @@ class IndexGenerator {
     @CompileDynamic
     private static List<String> generateTags(GuideMetadata guide) {
         [
-            guide.tags +
+            guide.tags ?: [] +
             guide.languages*.toString() +
             guide.buildTools*.toString() +
             guide.apps.collect { it.features }.flatten().unique()
