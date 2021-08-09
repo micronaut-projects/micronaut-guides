@@ -27,7 +27,7 @@ public class Handler
     private static final String JWK_SECONDARY = "jwk.secondary";
 
     @Inject
-    public JsonWebKeyGenerator jsonWebKeyGenerator; // <3>
+    public JsonWebKeyGenerator jsonWebKeyGenerator; // <2>
 
     @Inject
     public ObjectMapper objectMapper; // <3>
