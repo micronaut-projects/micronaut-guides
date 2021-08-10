@@ -40,9 +40,7 @@ public class Handler
 
     @Override
     public Void execute(SecretsManagerRotationEvent input) {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("step {} secretId: {}", input.getStep(), input.getSecretId());
-        }
+        LOG.info("step {} secretId: {}", input.getStep(), input.getSecretId());
         SecretsManagerRotationStep.of(input.getStep()).ifPresent(step -> {
             if (step == SecretsManagerRotationStep.FINISH_SECRET) {
                 currentPrimary(input.getSecretId())
