@@ -6,25 +6,11 @@ import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
 import io.micronaut.starter.feature.Feature;
 import javax.inject.Singleton;
+import static io.micronaut.starter.build.dependencies.Scope.TEST;
 
 @Singleton
-public class JunitParams implements Feature {
-
-    @NonNull
-    @Override
-    public String getName() {
-        return "junit-params";
-    }
-
-    @Override
-    public boolean supports(ApplicationType applicationType) {
-        return true;
-    }
-
-    @Override
-    public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(Dependency.builder()
-                .lookupArtifactId("junit-jupiter-params")
-                .test());
+public class JunitParams extends AbstractFeature {
+    public JunitParams() {
+        super("junit-params", "junit-jupiter-params", TEST);
     }
 }
