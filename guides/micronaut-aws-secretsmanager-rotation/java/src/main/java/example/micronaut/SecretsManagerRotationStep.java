@@ -4,7 +4,7 @@ import io.micronaut.core.annotation.NonNull;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 public enum SecretsManagerRotationStep {
 
@@ -16,7 +16,7 @@ public enum SecretsManagerRotationStep {
     private static final Map<String, SecretsManagerRotationStep> ENUM_MAP;
 
     static {
-        Map<String, SecretsManagerRotationStep> map = new ConcurrentHashMap<>();
+        Map<String, SecretsManagerRotationStep> map = new HashMap<>();
         for (SecretsManagerRotationStep instance : SecretsManagerRotationStep.values()) {
             map.put(instance.toString(), instance);
         }
