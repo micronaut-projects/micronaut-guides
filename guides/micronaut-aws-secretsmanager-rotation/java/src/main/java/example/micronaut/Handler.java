@@ -75,9 +75,7 @@ public class Handler
         try {
             return Optional.of(objectMapper.writeValueAsString(newJwk));
         } catch (JsonProcessingException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("JsonProcessingException", e);
-            }
+            LOG.warn("JsonProcessingException", e);
         }
         return Optional.empty();
     }
