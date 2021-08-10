@@ -32,9 +32,8 @@ public class Handler
     @Override
     public Void execute(S3EventNotification input) {
         for (S3EventNotification.S3EventNotificationRecord record : input.getRecords()) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("event name: {}" , record.getEventName());
-            }
+
+            LOG.info("event name: {}" , record.getEventName());
             if (record.getEventName().contains(OBJECT_CREATED)) { // <4>
                 S3EventNotification.S3Entity s3Entity = record.getS3();
                 String bucket = s3Entity.getBucket().getName();

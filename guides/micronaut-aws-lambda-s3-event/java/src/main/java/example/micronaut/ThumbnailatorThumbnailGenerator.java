@@ -34,9 +34,7 @@ public class ThumbnailatorThumbnailGenerator implements ThumbnailGenerator {
             return Optional.of(byteArrayOutputStream.toByteArray());
 
         } catch (IOException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("IOException thrown while generating the thumbnail");
-            }
+            LOG.warn("IOException thrown while generating the thumbnail");
         }
         return Optional.empty();
     }
