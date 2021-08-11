@@ -87,13 +87,15 @@ class SendGridEmailService implements EmailService {
             request.setBody(mail.build());
 
             Response response = sg.api(request);
-            LOG.info("Status Code: {}", String.valueOf(response.getStatusCode()));
-            LOG.info("Body: {}", response.getBody());
-            LOG.info("Headers {}", response.getHeaders()
-                    .keySet()
-                    .stream()
-                    .map(key -> key.toString() + "=" + response.getHeaders().get(key))
-                    .collect(Collectors.joining(", ", "{", "}")));
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Status Code: {}", String.valueOf(response.getStatusCode()));
+                LOG.info("Body: {}", response.getBody());
+                LOG.info("Headers {}", response.getHeaders()
+                        .keySet()
+                        .stream()
+                        .map(key -> key.toString() + "=" + response.getHeaders().get(key))
+                        .collect(Collectors.joining(", ", "{", "}")));
+            }
         } catch (IOException ex) {
             LOG.error(ex.getMessage());
         }

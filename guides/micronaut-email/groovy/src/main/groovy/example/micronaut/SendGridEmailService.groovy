@@ -89,9 +89,11 @@ class SendGridEmailService implements EmailService {
 
             Response response = sg.api(request)
 
-            LOG.info("Status Code: {}", String.valueOf(response.getStatusCode()))
-            LOG.info("Body: {}", response.getBody())
-            LOG.info("Headers {}", "{${response.headers.collect { k, v -> "$k=$v" }.join(", ")}}".toString())
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Status Code: {}", String.valueOf(response.getStatusCode()))
+                LOG.info("Body: {}", response.getBody())
+                LOG.info("Headers {}", "{${response.headers.collect { k, v -> "$k=$v" }.join(", ")}}".toString())
+            }
         } catch (IOException ex) {
             LOG.error(ex.getMessage())
         }

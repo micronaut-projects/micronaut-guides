@@ -70,13 +70,15 @@ class SendGridEmailService(@Value("\${SENDGRID_APIKEY:none}") apiKeyEnv: String,
             request.endpoint = "mail/send"
             request.body = mail.build()
             val response = sg.api(request)
-            LOG.info("Status Code: {}", response.statusCode)
-            LOG.info("Body: {}", response.body)
-            LOG.info("Headers {}", response.headers
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Status Code: {}", response.statusCode)
+                LOG.info("Body: {}", response.body)
+                LOG.info("Headers {}", response.headers
                     .keySet()
                     .stream()
                     .map { key -> key.toString() + "=" + response.headers.get(key) }
                     .collect(Collectors.joining(", ", "{", "}")))
+            }
         } catch (ex: IOException) {
             LOG.error(ex.message)
         }
