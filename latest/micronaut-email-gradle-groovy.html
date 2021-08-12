@@ -423,9 +423,7 @@ for businesses of all sizes that use email to keep in contact with their custome
                 .message(Message.builder().subject(Content.builder().data(email.subject).build())
                         .body(Body.builder().text(Content.builder().data(email.textBody).build()).build()).build()).build() <span class="keyword">as</span> SendEmailRequest
         SendEmailResponse response =ses.sendEmail(sendEmailRequest)
-        <span class="keyword">if</span> (LOG.isInfoEnabled()) {
-            LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Sent email with id: {}</span><span class="delimiter">&quot;</span></span>, response.messageId())
-        }
+        LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Sent email with id: {}</span><span class="delimiter">&quot;</span></span>, response.messageId())
     }
 }</code></pre>
 </div>
@@ -680,7 +678,7 @@ system properties (<code>sendgrid.apikey</code>, <code>sendgrid.fromemail</code>
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 <span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>
 <span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>
-
+<span class="keyword">import</span> <span class="include">java.util.stream.Collectors</span>
 <span class="keyword">import</span> <span class="include">javax.inject.Singleton</span>
 <span class="keyword">import</span> <span class="include">javax.validation.Valid</span>
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
@@ -755,20 +753,14 @@ system properties (<code>sendgrid.apikey</code>, <code>sendgrid.fromemail</code>
             request.setBody(mail.build())
 
             Response response = sg.api(request)
+
             <span class="keyword">if</span> (LOG.isInfoEnabled()) {
                 LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Status Code: {}</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">String</span>.valueOf(response.getStatusCode()))
                 LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Body: {}</span><span class="delimiter">&quot;</span></span>, response.getBody())
-                <span class="keyword">for</span> ( <span class="predefined-type">String</span> k : response.getHeaders().keySet()) {
-                    <span class="predefined-type">String</span> v = response.getHeaders().get(k)
-                    LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Response Header {} =&gt; {}</span><span class="delimiter">&quot;</span></span>, k, v)
-                }
+                LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Headers {}</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="inline"><span class="inline-delimiter">${</span>response.headers.collect { k, v -&gt; <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">$</span>k</span><span class="content">=</span><span class="inline"><span class="inline-delimiter">$</span>v</span><span class="delimiter">&quot;</span></span> }.join(<span class="string"><span class="delimiter">&quot;</span><span class="content">, </span><span class="delimiter">&quot;</span></span>)<span class="inline-delimiter">}</span></span><span class="content">}</span><span class="delimiter">&quot;</span></span>.toString())
             }
-
-
         } <span class="keyword">catch</span> (<span class="exception">IOException</span> ex) {
-            <span class="keyword">if</span> (LOG.isErrorEnabled()) {
-                LOG.error(ex.getMessage())
-            }
+            LOG.error(ex.getMessage())
         }
     }
 }</code></pre>
