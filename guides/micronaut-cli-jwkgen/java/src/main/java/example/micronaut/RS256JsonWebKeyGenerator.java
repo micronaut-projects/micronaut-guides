@@ -29,9 +29,7 @@ public class RS256JsonWebKeyGenerator implements JsonWebKeyGenerator {
                     .toJSONString());
 
         } catch (JOSEException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("unable to generate RS256 key",  e);
-            }
+            LOG.warn("unable to generate RS256 key",  e);
         }
         return Optional.empty();
     }

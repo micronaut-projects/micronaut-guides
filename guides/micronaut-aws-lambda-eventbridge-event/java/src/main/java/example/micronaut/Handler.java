@@ -13,9 +13,7 @@ public class Handler extends MicronautRequestHandler<Map<String, Object>, Void> 
 
     @Override
     public Void execute(Map<String, Object> input) {
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("{}", input);
-        }
+        LOG.trace("{}", input);
         return null;
     }
 

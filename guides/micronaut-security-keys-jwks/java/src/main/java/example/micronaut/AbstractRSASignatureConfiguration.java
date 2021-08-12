@@ -70,16 +70,12 @@ public abstract class AbstractRSASignatureConfiguration
         try {
             JWK jwk = JWK.parse(jsonJwk);
             if (!(jwk instanceof RSAKey)) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("JWK is not an RSAKey");
-                }
+                LOG.warn("JWK is not an RSAKey");
                 return Optional.empty();
             }
             return Optional.of((RSAKey) jwk);
         } catch (ParseException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Could not parse JWK JSON string {}", jsonJwk);
-            }
+            LOG.warn("Could not parse JWK JSON string {}", jsonJwk);
         }
         return Optional.empty();
     }

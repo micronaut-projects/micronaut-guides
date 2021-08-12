@@ -44,9 +44,7 @@ public class BookExcelServiceImpl implements BookExcelService {
             });
             return new SystemFile(file).attach(HEADER_EXCEL_FILENAME);
         } catch (IOException e) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error("File not found exception raised when generating excel file");
-            }
+            LOG.error("File not found exception raised when generating excel file");
         }
         throw new HttpStatusException(HttpStatus.SERVICE_UNAVAILABLE, "error generating excel file");
     }

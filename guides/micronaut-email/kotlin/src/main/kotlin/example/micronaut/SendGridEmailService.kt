@@ -13,6 +13,7 @@ import javax.inject.Singleton
 import java.io.IOException
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
+import java.util.stream.Collectors
 
 @Singleton // <1>
 @Requires(condition = SendGridEmailCondition::class) // <2>
@@ -69,18 +70,17 @@ class SendGridEmailService(@Value("\${SENDGRID_APIKEY:none}") apiKeyEnv: String,
             request.endpoint = "mail/send"
             request.body = mail.build()
             val response = sg.api(request)
-            if (LOG.isInfoEnabled) {
+            if (LOG.isInfoEnabled()) {
                 LOG.info("Status Code: {}", response.statusCode)
                 LOG.info("Body: {}", response.body)
-                for (k in response.headers.keys) {
-                    val v = response.headers[k]
-                    LOG.info("Response Header {} => {}", k, v)
-                }
+                LOG.info("Headers {}", response.headers
+                    .keySet()
+                    .stream()
+                    .map { key -> key.toString() + "=" + response.headers.get(key) }
+                    .collect(Collectors.joining(", ", "{", "}")))
             }
         } catch (ex: IOException) {
-            if (LOG.isErrorEnabled) {
-                LOG.error(ex.message)
-            }
+            LOG.error(ex.message)
         }
     }
 
