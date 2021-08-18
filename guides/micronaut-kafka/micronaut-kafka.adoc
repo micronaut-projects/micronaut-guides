@@ -1,6 +1,6 @@
 include::{commondir}/common-header.adoc[]
 
-In this guide, we will create two microservices that will use https://kafka.apache.org/[Kafka] to communicate with each other in an asynchronous and decoupled way.
+In this guide, we will create two microservices that will use https://kafka.apache.org/[Kafka^] to communicate with each other in an asynchronous and decoupled way.
 
 == What you will need
 
@@ -9,7 +9,7 @@ To complete this guide, you will need the following:
 * Some time on your hands
 * A decent text editor or IDE
 * JDK 1.8 or greater installed with `JAVA_HOME` configured appropriately
-* https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker, and for running tests.
+* https://www.docker.io/gettingstarted/#h_installation[Docker^] and https://docs.docker.com/compose/install/[Docker Compose^] installed if you will be running Kafka in Docker, and for running tests.
 
 include::{commondir}/common-completesolution.adoc[]
 
@@ -25,7 +25,7 @@ include::{commondir}/common-annotationprocessors.adoc[]
 
 === Books Microservice
 
-Create the `books` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
+Create the `books` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^] or with https://launch.micronaut.io[Micronaut Launch^].
 
 [source,bash]
 ----
@@ -38,7 +38,7 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 
 The previous command creates a directory named `books` and a Micronaut application inside it with default package `example.micronaut`.
 
-In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for https://www.testcontainers.org/modules/kafka/[Kafka in Testcontainers], along with one for the http://www.awaitility.org/[Awaitility] library:
+In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for https://www.testcontainers.org/modules/kafka/[Kafka in Testcontainers^], along with one for the http://www.awaitility.org/[Awaitility^] library:
 
 :dependencies:
 dependency:kafka[groupId=org.testcontainers,scope=test]
@@ -57,14 +57,14 @@ Create a `BookController` class to handle incoming HTTP requests to the `books` 
 
 source:BookController[app=books]
 
-<1> The @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation defines the class as a controller mapped to the root URI `/books`
+<1> The @api@/io/micronaut/http/annotation/Controller.html[@Controller^] annotation defines the class as a controller mapped to the root URI `/books`
 callout:constructor-di[number=2,arg0=BookService]
 callout:get[number=3,arg0=listAll,arg1=/books]
 callout:get[number=4,arg0=findBook,arg1=/books/{isbn}]
 
 === Analytics Microservice
 
-Create the `analytics` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
+Create the `analytics` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^] or with https://launch.micronaut.io[Micronaut Launch^].
 
 [source,bash]
 ----
@@ -202,7 +202,7 @@ Note that getting the analytics returns an empty list because the applications a
 
 === Install Kafka
 
-A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker]. Create this `docker-compose.yml` file:
+A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker^]. Create this `docker-compose.yml` file:
 
 zipInclude:docker/docker-compose.yml[]
 
@@ -216,7 +216,7 @@ Start Zookeeper and Kafka (use CTRL-C to stop both):
 $ docker-compose up
 ----
 
-Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance].
+Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance^].
 
 === Books Microservice
 
@@ -235,7 +235,7 @@ source:AnalyticsClient[app=books]
 
 ==== Create Tests
 
-We could use mocks to test the message sending logic between `BookController`, `AnalyticsFilter`, and `AnalyticsClient`, but it's more realistic to use a running Kafka broker. To avoid the burden of having to install Kafka locally (and to make the tests more CI-friendly) we'll use https://www.testcontainers.org/[Testcontainers] to run Kafka inside a Docker container.
+We could use mocks to test the message sending logic between `BookController`, `AnalyticsFilter`, and `AnalyticsClient`, but it's more realistic to use a running Kafka broker. To avoid the burden of having to install Kafka locally (and to make the tests more CI-friendly) we'll use https://www.testcontainers.org/[Testcontainers^] to run Kafka inside a Docker container.
 
 Write a test for `BookController` to verify the interaction with `AnalyticsService`:
 
@@ -255,8 +255,8 @@ test:BookControllerTest[app=books]
 
 ==== Send Analytics information automatically
 
-Sending a message to Kafka is as simple as injecting `AnalyticsClient` and calling the `updateAnalytics` method. The goal is to do it automatically every time a book is returned, i.e., every time there is a call to `http://localhost:8080/books/{isbn}`.
-To achieve this we will create an https://docs.micronaut.io/latest/guide/#filters[Http Server Filter].
+Sending a message to Kafka is as simple as injecting `AnalyticsClient` and calling the `updateAnalytics` method. The goal is to do it automatically every time a book is returned, i.e., every time there is a call to `\http://localhost:8080/books/{isbn}`.
+To achieve this we will create an https://docs.micronaut.io/latest/guide/#filters[Http Server Filter^].
 Create the `AnalyticsFilter` class:
 
 source:AnalyticsFilter[app=books]
@@ -363,4 +363,4 @@ Start the native images for the two microservices and run the same `curl` reques
 
 == Next steps
 
-Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut framework.
+Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support^] in Micronaut framework.

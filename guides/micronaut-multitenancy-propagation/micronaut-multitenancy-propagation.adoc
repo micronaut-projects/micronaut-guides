@@ -7,7 +7,7 @@ In this guide, we will create two microservices and configure them to use multit
 Let's describe the microservices you will build through the guide.
 
 * `gateway` - A microservice which resolves a Tenant ID with a Cookie and propagates the Tenant ID to outgoing requests via HTTP Header.
-* `books` - A microservice which uses https://gorm.grails.org[GORM] to provide data access layer with multitenacy support.
+* `books` - A microservice which uses https://gorm.grails.org[GORM^] to provide data access layer with multitenacy support.
 
 The next diagram illustrates the flow:
 
@@ -19,7 +19,7 @@ include::{commondir}/common-completesolution.adoc[]
 
 == Writing the App
 
-We will be using Groovy for this guide in order to demonstrate the use of multitenancy with https://gorm.grails.org[GORM], the powerful Groovy-based data access toolkit from the Grails framework.
+We will be using Groovy for this guide in order to demonstrate the use of multitenancy with https://gorm.grails.org[GORM^], the powerful Groovy-based data access toolkit from the Grails framework.
 
 == Gateway
 
@@ -30,7 +30,7 @@ Create the microservice:
 mn create-app example.micronaut.gateway --test=spock --lang=groovy
 ----
 
-In the previous command, we generate a Micronaut application and tell the CLI to use https://spockframework.org[Spock] as the test framework.
+In the previous command, we generate a Micronaut application and tell the CLI to use https://spockframework.org[Spock^] as the test framework.
 
 === Multitenancy Configuration
 
@@ -45,8 +45,8 @@ resource:application.yml[app=gateway,tag=multitenancy]
 <1> Enable tenant propagation.
 <2> Propagate the resolved tenant ID only in requests going to a particular set of services.
 In our example, we define a regex to match the service id `books`.
-<3> In the gateway we use the https://docs.micronaut.io/latest/api/io/micronaut/multitenancy/tenantresolver/CookieTenantResolver.html[CookieTenantResolver] which resolves the current tenant from an HTTP cookie.
-<4> We propagate the tenant with a https://docs.micronaut.io/latest/api/io/micronaut/multitenancy/writer/HttpHeaderTenantWriter.html[HttpHeaderTenantWriter] which writes the current tenant to a HTTP Header.
+<3> In the gateway we use the https://docs.micronaut.io/latest/api/io/micronaut/multitenancy/tenantresolver/CookieTenantResolver.html[CookieTenantResolver^] which resolves the current tenant from an HTTP cookie.
+<4> We propagate the tenant with a https://docs.micronaut.io/latest/api/io/micronaut/multitenancy/writer/HttpHeaderTenantWriter.html[HttpHeaderTenantWriter^] which writes the current tenant to a HTTP Header.
 
 === Http Filter & Cookie Redirect
 
@@ -67,7 +67,7 @@ Create an interface to encapsulate the communication with the `books` microservi
 source:Book[app=gateway]
 source:BookFetcher[app=gateway]
 
-Create a https://docs.micronaut.io/latest/guide/#clientAnnotation[declarative HTTP client]:
+Create a https://docs.micronaut.io/latest/guide/#clientAnnotation[declarative HTTP client^]:
 
 source:BookClient[app=gateway]
 
@@ -89,7 +89,7 @@ The `views` module provides support for view rendering on the server side and do
 
 dependency:micronaut-views-handlebars[groupId=io.micronaut.views]
 
-The previous dependency includes https://micronaut-projects.github.io/micronaut-views/latest/api/[HandlebarsViewsRenderer] which uses the https://jknack.github.io/handlebars.java/[Handlebars.java] project.
+The previous dependency includes https://micronaut-projects.github.io/micronaut-views/latest/api/[HandlebarsViewsRenderer^] which uses the https://jknack.github.io/handlebars.java/[Handlebars.java^] project.
 
 Create a view which we will use in the `HomeController`.
 
@@ -131,7 +131,7 @@ Provide a `BookFetcher` bean replacement for the Test environment.
 
 test:MockBookFetcher[app=gateway]
 
-Create a test to verify the flow using https://gebish.org[Geb].
+Create a test to verify the flow using https://gebish.org[Geb^].
 
 Add dependencies for Geb:
 
@@ -142,7 +142,7 @@ dependency:htmlunit-driver[groupId=org.seleniumhq.selenium,scope=testImplementat
 
 :dependencies:
 
-Add a https://gebish.org/manual/current/#configuration[Geb configuration script]:
+Add a https://gebish.org/manual/current/#configuration[Geb configuration script^]:
 
 testResource:GebConfig.groovy[app=gateway]
 
@@ -169,7 +169,7 @@ mn create-app example.micronaut.books --lang=groovy
 
 === GORM
 
-https://gorm.grails.org[GORM] is a powerful Groovy-based data access toolkit for the JVM. To use it in a Micronaut application, add the following dependencies:
+https://gorm.grails.org[GORM^] is a powerful Groovy-based data access toolkit for the JVM. To use it in a Micronaut application, add the following dependencies:
 
 :dependencies:
 
@@ -178,13 +178,13 @@ dependency:micronaut-multitenancy-gorm[groupId=io.micronaut.groovy]
 
 :dependencies:
 
-Configure multiple data sources as described in the https://gorm.grails.org/latest/hibernate/manual/#multipleDataSources[GORM Multiple Data Sources] documentation.
+Configure multiple data sources as described in the https://gorm.grails.org/latest/hibernate/manual/#multipleDataSources[GORM Multiple Data Sources^] documentation.
 
 resource:application.yml[app=books,tag=datasources]
 
 === Domain
 
-GORM supports several https://gorm.grails.org/latest/hibernate/manual/#_multi_tenancy_modes[tenancy modes].
+GORM supports several https://gorm.grails.org/latest/hibernate/manual/#_multi_tenancy_modes[tenancy modes^].
 In this guide we use `DATABASE` where a separate database with a separate connection pool stores each tenant's data.
 
 Add the following configuration to `application.yml`
@@ -205,7 +205,7 @@ callout:gorm-entity-ide[2]
 
 === Data Service
 
-https://gorm.grails.org/latest/hibernate/manual/#dataServices[GORM Data Services] take the work out of implemented service layer logic by adding the ability to automatically implement abstract classes or interfaces using GORM logic.
+https://gorm.grails.org/latest/hibernate/manual/#dataServices[GORM Data Services^] take the work out of implemented service layer logic by adding the ability to automatically implement abstract classes or interfaces using GORM logic.
 
 source:BookService[app=books]
 
@@ -262,12 +262,12 @@ gateway $ ./gradlew run
 18:28:35.723 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 707ms. Server Running: http://localhost:8080
 ----
 
-You can visit `http://localhost:8080` and change tenant and see the book list change:
+You can visit `http://localhost:8080[http://localhost:8080^]` and change tenant and see the book list change:
 
 image:multitenancy.gif[]
 
 == Next Steps
 
-Read more about https://docs.micronaut.io/latest/guide/#multitenancy[Multitenancy] support in Micronaut framework and https://gorm.grails.org/latest/hibernate/manual/#multiTenancy[GORM Multitenancy support].
+Read more about https://docs.micronaut.io/latest/guide/#multitenancy[Multitenancy^] support in Micronaut framework and https://gorm.grails.org/latest/hibernate/manual/#multiTenancy[GORM Multitenancy support^].
 
 include::{commondir}/common-helpWithMicronaut.adoc[]
