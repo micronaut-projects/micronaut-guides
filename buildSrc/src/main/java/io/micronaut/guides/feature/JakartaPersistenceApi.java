@@ -1,6 +1,6 @@
 package io.micronaut.guides.feature;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import static io.micronaut.starter.build.dependencies.Scope.COMPILE_ONLY;
 

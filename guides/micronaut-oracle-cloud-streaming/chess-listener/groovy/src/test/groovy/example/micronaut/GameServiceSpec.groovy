@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest // <1> <2>
 class GameServiceSpec extends Specification implements TestPropertyProvider { // <3>

@@ -4,8 +4,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.NonNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder as SpringSecurityPasswordEncoder
-
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.validation.constraints.NotBlank
 
 @CompileStatic

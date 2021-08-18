@@ -5,7 +5,7 @@ import example.micronaut.repository.ThingRepository
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.event.StartupEvent
 import io.micronaut.runtime.event.annotation.EventListener
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.transaction.Transactional
 
 @Singleton

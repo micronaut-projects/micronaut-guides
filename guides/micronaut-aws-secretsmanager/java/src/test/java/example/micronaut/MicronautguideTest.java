@@ -4,7 +4,7 @@ import io.micronaut.runtime.EmbeddedApplication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @MicronautTest
 class MicronautguideTest {

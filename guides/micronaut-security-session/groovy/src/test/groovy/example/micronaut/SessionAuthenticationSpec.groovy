@@ -3,7 +3,7 @@ package example.micronaut
 import geb.spock.GebSpec
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 //tag::clazz[]
 @MicronautTest // <1>

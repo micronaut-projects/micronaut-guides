@@ -9,7 +9,7 @@ import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest
 class LoginIncludesRefreshTokenSpec extends Specification {

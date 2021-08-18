@@ -8,7 +8,7 @@ import example.micronaut.chess.repository.GameRepository
 import example.micronaut.chess.repository.GameStateRepository
 import org.slf4j.LoggerFactory
 import java.util.UUID
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.transaction.Transactional
 
 @Singleton

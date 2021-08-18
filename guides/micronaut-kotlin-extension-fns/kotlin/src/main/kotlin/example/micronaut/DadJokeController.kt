@@ -3,7 +3,10 @@ package example.micronaut
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import javax.inject.Inject
+import jakarta.inject.Inject
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Mono
+
 //end::fileHead[]
 
 //tag::start[]
@@ -14,16 +17,16 @@ class DadJokeController {
     lateinit var dadJokeClient: DadJokeClient
 //end::start[]
 
-//tag::standardGet[]
+    //tag::standardGet[]
     @Get("/joke")
-    fun getAJoke(): String {
-        return dadJokeClient.tellMeAJoke().blockingGet().joke
+    fun getAJoke(): Mono<String> {
+        return Mono.from(dadJokeClient.tellMeAJoke()).map(DadJoke::joke)
     }
 //end::standardGet[]
 
-//tag::usingExt[]
+    //tag::usingExt[]
     @Get("/dogJokes")
-    fun getDogJokes(): List<DadJoke> {
+    fun getDogJokes(): Mono<List<DadJoke>> {
         return dadJokeClient.getDogJokes() // <1>
     }
 //end::usingExt[]
@@ -32,7 +35,7 @@ class DadJokeController {
 //end::end[]
 
 //tag::clientExt[]
-fun DadJokeClient.getDogJokes(): List<DadJoke> { // <1>
-    return this.searchDadJokes("dog").blockingGet().results
+fun DadJokeClient.getDogJokes(): Mono<List<DadJoke>> { // <1>
+    return Mono.from(this.searchDadJokes("dog")).map(DadJokePagedResults::results)
 }
 //end::clientExt[]

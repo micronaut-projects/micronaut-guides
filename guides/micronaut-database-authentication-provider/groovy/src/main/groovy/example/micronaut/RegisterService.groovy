@@ -5,7 +5,7 @@ import example.micronaut.domain.User
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 

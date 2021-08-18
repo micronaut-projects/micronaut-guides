@@ -93,6 +93,9 @@ task generateSampleProjects {
         guides = "${projectDir}/guides"
     }
     doLast {
+	if (!file(buildDir).exists()) {
+	   file(buildDir).mkdir()
+	}
         GuideProjectGenerator generator = new GuideProjectGenerator()
         generator.generate(file(guides), file(output), metadataConfigName, new File(projectDir, "src/docs/asciidoc"))
         generator.close()
@@ -104,7 +107,6 @@ task generateSampleProjects {
             'themeGuides'
     )
 }
-
 task generateTestScript {
     group 'guides'
     description 'Generates a test.sh to runs every guide test at build/code'

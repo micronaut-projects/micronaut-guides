@@ -8,7 +8,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.oauth2.configuration.OauthClientConfiguration;
 import io.micronaut.security.rules.SecurityRule;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 @Controller
 public class ClientIdController {

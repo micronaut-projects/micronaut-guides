@@ -16,7 +16,7 @@ import org.testcontainers.utility.DockerImageName
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 import io.micronaut.http.uri.UriBuilder
-import javax.inject.Inject
+import jakarta.inject.Inject
 import java.util.concurrent.ConcurrentLinkedDeque
 import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
 import static io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED_TYPE

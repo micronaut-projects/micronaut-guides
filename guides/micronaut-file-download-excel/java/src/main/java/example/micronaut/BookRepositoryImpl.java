@@ -1,6 +1,6 @@
 package example.micronaut;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import io.micronaut.core.annotation.NonNull;
 import java.util.List;
 import java.util.Arrays;

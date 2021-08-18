@@ -9,9 +9,7 @@ import com.oracle.bmc.core.requests.InstanceActionRequest;
 import com.oracle.bmc.core.responses.GetInstanceResponse;
 import com.oracle.bmc.core.responses.InstanceActionResponse;
 import io.micronaut.context.annotation.Replaces;
-
-import javax.inject.Singleton;
-
+import jakarta.inject.Singleton;
 import static com.oracle.bmc.core.model.Instance.LifecycleState.Starting;
 import static com.oracle.bmc.core.model.Instance.LifecycleState.Stopping;
 

@@ -1,10 +1,10 @@
 package example.micronaut
-import io.micronaut.context.createBean
-import io.micronaut.context.run
+import io.micronaut.kotlin.context.createBean
+import io.micronaut.kotlin.context.run
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
-import io.micronaut.http.retrieveList
-import io.micronaut.http.retrieveObject
+import io.micronaut.kotlin.http.retrieveList
+import io.micronaut.kotlin.http.retrieveObject
 import io.micronaut.runtime.server.EmbeddedServer
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test

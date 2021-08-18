@@ -5,7 +5,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
-import io.micronaut.security.oauth2.endpoint.token.response.OauthUserDetailsMapper;
+import io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ public class ReposController {
 
     private String authorizationValue(Authentication authentication) {
         String authorization = null;
-        Object claim = authentication.getAttributes().get(OauthUserDetailsMapper.ACCESS_TOKEN_KEY);  // <6>
+        Object claim = authentication.getAttributes().get(OauthAuthenticationMapper.ACCESS_TOKEN_KEY);  // <6>
         if (claim instanceof String) {
             authorization = HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + ' ' + claim;
         }

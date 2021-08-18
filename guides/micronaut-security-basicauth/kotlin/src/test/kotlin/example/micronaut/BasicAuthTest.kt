@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest // <1>
 class BasicAuthTest {

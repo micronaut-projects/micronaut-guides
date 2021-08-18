@@ -12,7 +12,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest(rollback = false) // <1>
 class OauthAccessTokenSpec extends Specification {

@@ -1,16 +1,14 @@
 package example.micronaut
 
-import io.micronaut.runtime.event.annotation.EventListener
-import io.micronaut.security.authentication.UserDetails
 import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode
 import io.micronaut.security.errors.OauthErrorResponseException
 import io.micronaut.security.token.event.RefreshTokenGeneratedEvent
 import io.micronaut.security.token.refresh.RefreshTokenPersistence
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
+import reactor.core.publisher.FluxSink
+import reactor.core.publisher.Flux
 import org.reactivestreams.Publisher
-
-import javax.inject.Singleton
+import jakarta.inject.Singleton
+import io.micronaut.security.authentication.Authentication
 
 @Singleton // <1>
 class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
@@ -21,29 +19,28 @@ class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
     }
 
     @Override
-    @EventListener // <3>
-    void persistToken(RefreshTokenGeneratedEvent event) {
-        if (event?.refreshToken && event?.userDetails?.username) {
+    void persistToken(RefreshTokenGeneratedEvent event) { // <3>
+        if (event?.refreshToken && event?.authentication?.name) {
             String payload = event.refreshToken
-            refreshTokenRepository.save(event.userDetails.username, payload, Boolean.FALSE) // <4>
+            refreshTokenRepository.save(event.authentication.name, payload, Boolean.FALSE) // <4>
         }
     }
 
     @Override
-    Publisher<UserDetails> getUserDetails(String refreshToken) {
-        Flowable.create(emitter -> {
+    Publisher<Authentication> getAuthentication(String refreshToken) {
+        Flux.create(emitter -> {
             Optional<RefreshTokenEntity> tokenOpt = refreshTokenRepository.findByRefreshToken(refreshToken)
             if (tokenOpt.isPresent()) {
                 RefreshTokenEntity token = tokenOpt.get()
                 if (token.getRevoked()) {
-                    emitter.onError(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)) // <5>
+                    emitter.error(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)) // <5>
                 } else {
-                    emitter.onNext(new UserDetails(token.username, [])) // <6>
-                    emitter.onComplete()
+                    emitter.next(Authentication.build(token.username)) // <6>
+                    emitter.complete()
                 }
             } else {
-                emitter.onError(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)) // <7>
+                emitter.error(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)) // <7>
             }
-        }, BackpressureStrategy.ERROR) as Publisher<UserDetails>
+        }, FluxSink.OverflowStrategy.ERROR) as Publisher<Authentication>
     }
 }

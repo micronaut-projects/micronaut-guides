@@ -2,7 +2,7 @@ package example.micronaut;
 
 import io.micronaut.scheduling.annotation.Scheduled;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton // <1>
 public class DailyEmailJob {

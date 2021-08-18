@@ -3,7 +3,7 @@ package example.micronaut
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
 import java.util.function.Predicate
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class GraphQLDataFetchers(private val dbRepository: DbRepository) { // <1>

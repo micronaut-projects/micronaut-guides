@@ -1,8 +1,7 @@
 package example.micronaut
 
+import jakarta.inject.Singleton
 import groovy.transform.CompileStatic
-
-import javax.inject.Singleton
 
 @CompileStatic
 @Singleton // <1>

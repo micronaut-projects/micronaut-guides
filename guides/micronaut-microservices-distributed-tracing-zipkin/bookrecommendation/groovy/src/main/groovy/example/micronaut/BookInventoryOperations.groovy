@@ -1,8 +1,9 @@
 package example.micronaut
 
-import io.reactivex.Maybe
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Mono
 import javax.validation.constraints.NotBlank
 
 interface BookInventoryOperations {
-    Maybe<Boolean> stock(@NotBlank String isbn)
+    Mono<Boolean> stock(@NotBlank String isbn)
 }

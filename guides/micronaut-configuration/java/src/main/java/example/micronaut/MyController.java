@@ -4,7 +4,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 @Controller("/my")
 public class MyController {

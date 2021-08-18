@@ -1,17 +1,15 @@
 package example.micronaut;
 
-import io.micronaut.runtime.event.annotation.EventListener;
-import io.micronaut.security.authentication.UserDetails;
+import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.event.RefreshTokenGeneratedEvent;
 import io.micronaut.security.token.refresh.RefreshTokenPersistence;
 import io.micronaut.security.errors.OauthErrorResponseException;
 import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter
+import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Flux;
 import org.reactivestreams.Publisher;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton // <1>
 class CustomRefreshTokenPersistence : RefreshTokenPersistence {
@@ -22,30 +20,29 @@ class CustomRefreshTokenPersistence : RefreshTokenPersistence {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-    @EventListener // <3>
-    override fun persistToken(event: RefreshTokenGeneratedEvent?) {
+    override fun persistToken(event: RefreshTokenGeneratedEvent?) { // <3>
         if (event?.refreshToken != null &&
-            event.userDetails != null &&
-            event.userDetails.username != null) {
+            event.authentication != null &&
+            event.authentication.name != null) {
             val payload = event.refreshToken;
-            refreshTokenRepository.save(event.userDetails.username, payload, false); // <4>
+            refreshTokenRepository.save(event.authentication.name, payload, false); // <4>
         }
     }
 
-    override fun getUserDetails(refreshToken: String) : Publisher<UserDetails> {
-        return Flowable.create({ emitter: FlowableEmitter<UserDetails> ->
+    override fun getAuthentication(refreshToken: String) : Publisher<Authentication> {
+        return Flux.create({ emitter: FluxSink<Authentication> ->
             val tokenOpt = refreshTokenRepository.findByRefreshToken(refreshToken);
             if (tokenOpt.isPresent) {
                 val token = tokenOpt.get();
                 if (token.revoked) {
-                    emitter.onError(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)); // <5>
+                    emitter.error(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)); // <5>
                 } else {
-                    emitter.onNext(UserDetails(token.username, listOf())); // <6>
-                    emitter.onComplete();
+                    emitter.next(Authentication.build(token.username)); // <6>
+                    emitter.complete();
                 }
             } else {
-                emitter.onError(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)); // <7>
+                emitter.error(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)); // <7>
             }
-        }, BackpressureStrategy.ERROR);
+        }, FluxSink.OverflowStrategy.ERROR);
     }
 }

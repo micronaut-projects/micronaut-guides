@@ -7,8 +7,8 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.uri.UriBuilder
 import org.reactivestreams.Publisher
-import io.micronaut.core.async.annotation.SingleResult
-import javax.inject.Singleton
+import reactor.core.publisher.Mono
+import jakarta.inject.Singleton
 import static io.micronaut.http.HttpHeaders.ACCEPT
 import static io.micronaut.http.HttpHeaders.USER_AGENT
 
@@ -29,11 +29,10 @@ class GithubLowLevelClient {
             .build()
     }
 
-    @SingleResult
-    Publisher<List<GithubRelease>> fetchReleases() {
+    Mono<List<GithubRelease>> fetchReleases() {
         HttpRequest<?> req = HttpRequest.GET(uri) // <4>
             .header(USER_AGENT, "Micronaut HTTP Client") // <5>
             .header(ACCEPT, "application/vnd.github.v3+json, application/json") // <6>
-        httpClient.retrieve(req, Argument.listOf(GithubRelease)) // <7>
+        Mono.from(httpClient.retrieve(req, Argument.listOf(GithubRelease))) // <7>
     }
 }

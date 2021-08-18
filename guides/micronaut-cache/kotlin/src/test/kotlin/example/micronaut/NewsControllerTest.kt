@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import java.time.Month
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest
 class NewsControllerTest {

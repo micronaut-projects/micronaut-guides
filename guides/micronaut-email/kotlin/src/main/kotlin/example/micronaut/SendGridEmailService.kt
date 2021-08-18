@@ -9,7 +9,7 @@ import com.sendgrid.helpers.mail.objects.Personalization
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.annotation.Value
 import org.slf4j.LoggerFactory
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import java.io.IOException
 import javax.validation.Valid
 import javax.validation.constraints.NotNull

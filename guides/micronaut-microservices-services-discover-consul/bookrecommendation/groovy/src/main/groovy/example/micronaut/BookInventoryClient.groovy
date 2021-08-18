@@ -3,7 +3,8 @@ package example.micronaut
 
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
-import io.reactivex.Maybe
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Mono
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Consumes
 import javax.validation.constraints.NotBlank
@@ -25,6 +26,6 @@ interface BookInventoryClient extends BookInventoryOperations {
 
     @Get("/books/stock/{isbn}")
     @Consumes(MediaType.TEXT_PLAIN)
-    Maybe<Boolean> stock(@NotBlank String isbn)
+    Mono<Boolean> stock(@NotBlank String isbn)
 }
 //end::clazz[]

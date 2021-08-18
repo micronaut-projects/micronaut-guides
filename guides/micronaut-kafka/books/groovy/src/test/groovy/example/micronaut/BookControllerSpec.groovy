@@ -13,8 +13,7 @@ import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
-
-import javax.inject.Inject
+import jakarta.inject.Inject
 import java.util.concurrent.ConcurrentLinkedDeque
 
 import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST

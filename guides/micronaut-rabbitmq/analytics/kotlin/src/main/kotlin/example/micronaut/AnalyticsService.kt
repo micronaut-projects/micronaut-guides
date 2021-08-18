@@ -1,7 +1,7 @@
 package example.micronaut
 
 import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class AnalyticsService {

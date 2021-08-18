@@ -5,7 +5,7 @@ import example.micronaut.repository.ThingRepository
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 import java.util.stream.Collectors
 
 @MicronautTest

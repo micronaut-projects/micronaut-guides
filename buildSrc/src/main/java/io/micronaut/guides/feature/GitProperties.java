@@ -11,7 +11,7 @@ import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.template.RockerWritable;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class GitProperties implements Feature {

@@ -10,12 +10,12 @@ import io.micronaut.security.token.jwt.generator.claims.JwtClaims
 import io.micronaut.security.token.jwt.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.validator.JwtTokenValidator
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import io.reactivex.Flowable
+import reactor.core.publisher.Flux
 import org.reactivestreams.Publisher
 import spock.lang.Shared
 import spock.lang.Specification
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 import static io.micronaut.http.HttpMethod.POST
 import static io.micronaut.http.MediaType.APPLICATION_JSON_TYPE
@@ -77,9 +77,9 @@ class LoginLdapSpec extends Specification {
         Publisher authentication = tokenValidator.validateToken(accessToken, request) // <6>
 
         then:
-        Flowable.fromPublisher(authentication).blockingFirst()
+        Flux.from(authentication).blockFirst()
 
         and: 'access token contains an expiration date'
-        Flowable.fromPublisher(authentication).blockingFirst().attributes.get(JwtClaims.EXPIRATION_TIME)
+        Flux.from(authentication).blockFirst().attributes.get(JwtClaims.EXPIRATION_TIME)
     }
 }

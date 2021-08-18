@@ -7,13 +7,13 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.runtime.server.EmbeddedServer
-import io.micronaut.security.authentication.UserDetails
 import io.micronaut.security.token.generator.RefreshTokenGenerator
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
+import io.micronaut.security.authentication.Authentication
 
 class RefreshTokenRevokedSpec extends Specification {
 
@@ -32,7 +32,7 @@ class RefreshTokenRevokedSpec extends Specification {
 
     void 'Accessing a secured URL without authenticating returns unauthorized'() {
         given:
-        UserDetails user = new UserDetails("sherlock", [])
+        Authentication user = Authentication.build("sherlock")
         when:
         String refreshToken = refreshTokenGenerator.createKey(user)
         Optional<String> refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
@@ -42,7 +42,7 @@ class RefreshTokenRevokedSpec extends Specification {
 
         when:
         String signedRefreshToken = refreshTokenOptional.get()
-        refreshTokenRepository.save(user.username, refreshToken, Boolean.TRUE) // <1>
+        refreshTokenRepository.save(user.name, refreshToken, Boolean.TRUE) // <1>
 
         then:
         refreshTokenRepository.count() == old(refreshTokenRepository.count()) + 1

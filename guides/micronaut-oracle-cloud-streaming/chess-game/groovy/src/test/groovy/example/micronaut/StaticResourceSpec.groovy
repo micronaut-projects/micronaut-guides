@@ -5,7 +5,7 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import spock.lang.Specification
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest
 class StaticResourceTest extends Specification {

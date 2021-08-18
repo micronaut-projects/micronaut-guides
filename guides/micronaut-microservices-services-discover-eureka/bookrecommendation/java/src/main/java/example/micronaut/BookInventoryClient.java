@@ -6,7 +6,8 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.client.annotation.Client;
-import io.reactivex.Maybe;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 import io.micronaut.retry.annotation.Recoverable;
 import javax.validation.constraints.NotBlank;
 //end::packageandimports[]
@@ -26,6 +27,6 @@ interface BookInventoryClient extends BookInventoryOperations {
 
     @Consumes(MediaType.TEXT_PLAIN)
     @Get("/books/stock/{isbn}")
-    Maybe<Boolean> stock(@NonNull @NotBlank String isbn);
+    Mono<Boolean> stock(@NonNull @NotBlank String isbn);
 }
 //end::clazz[]

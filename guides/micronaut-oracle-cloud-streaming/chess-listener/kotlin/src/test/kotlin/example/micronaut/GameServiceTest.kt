@@ -27,7 +27,7 @@ import org.testcontainers.utility.DockerImageName
 import reactor.core.publisher.Mono
 import java.util.UUID
 import java.util.concurrent.TimeUnit.SECONDS
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @Testcontainers // <1>
 @MicronautTest

@@ -1,17 +1,16 @@
 package io.micronaut.guides.feature;
 
+import io.micronaut.context.BeanProvider;
 import io.micronaut.starter.feature.FeatureContext;
 import io.micronaut.starter.feature.aws.AwsV2Sdk;
-
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class S3 extends AbstractFeature {
 
-    private final Provider<AwsV2Sdk> awsV2Sdk;
+    private final BeanProvider<AwsV2Sdk> awsV2Sdk;
 
-    public S3(Provider<AwsV2Sdk> awsV2Sdk) {
+    public S3(BeanProvider<AwsV2Sdk> awsV2Sdk) {
         super("s3");
         this.awsV2Sdk = awsV2Sdk;
     }

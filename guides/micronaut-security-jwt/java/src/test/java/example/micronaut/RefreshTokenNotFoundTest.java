@@ -6,14 +6,13 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
-import io.micronaut.security.authentication.UserDetails;
 import io.micronaut.security.token.generator.RefreshTokenGenerator;
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
-
-import javax.inject.Inject;
+import io.micronaut.security.authentication.Authentication;
+import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +33,7 @@ class RefreshTokenNotFoundTest {
 
     @Test
     void accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
-        UserDetails user = new UserDetails("sherlock", Collections.emptyList());
+        Authentication user = Authentication.build("sherlock");
 
         String refreshToken = refreshTokenGenerator.createKey(user);
         Optional<String> refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken);

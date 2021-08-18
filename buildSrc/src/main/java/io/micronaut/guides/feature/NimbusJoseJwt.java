@@ -1,6 +1,6 @@
 package io.micronaut.guides.feature;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class NimbusJoseJwt extends AbstractFeature {

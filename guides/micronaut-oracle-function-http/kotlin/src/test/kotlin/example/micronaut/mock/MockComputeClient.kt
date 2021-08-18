@@ -8,7 +8,7 @@ import com.oracle.bmc.core.requests.InstanceActionRequest
 import com.oracle.bmc.core.responses.GetInstanceResponse
 import com.oracle.bmc.core.responses.InstanceActionResponse
 import io.micronaut.context.annotation.Replaces
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 @Replaces(ComputeClient::class) // <1>

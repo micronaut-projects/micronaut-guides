@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.Timeout
 import java.time.Month
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @TestMethodOrder(OrderAnnotation::class) // <1>
 @MicronautTest(startApplication = false)  // <2>

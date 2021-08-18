@@ -1,7 +1,7 @@
 package example.micronaut
 
 import io.micronaut.core.annotation.NonNull
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton // <1>
 class BookRepositoryImpl implements BookRepository {

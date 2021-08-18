@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.text.ParseException
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest
 class LoginIncludesRefreshTokenTest {

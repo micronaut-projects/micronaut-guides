@@ -2,7 +2,7 @@ package example.micronaut
 
 import graphql.schema.DataFetcher
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class GraphQLDataFetchers {

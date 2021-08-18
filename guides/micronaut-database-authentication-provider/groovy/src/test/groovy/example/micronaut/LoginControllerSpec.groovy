@@ -10,11 +10,11 @@ import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.validator.JwtTokenValidator
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import io.reactivex.Flowable
+import reactor.core.publisher.Flux
 import spock.lang.Shared
 import spock.lang.Specification
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 import static io.micronaut.http.HttpMethod.POST
 import static io.micronaut.http.MediaType.APPLICATION_JSON_TYPE
@@ -62,7 +62,7 @@ class LoginControllerSpec extends Specification {
 
         when:
         String accessToken = rsp.body.get().accessToken
-        Authentication authentication = Flowable.fromPublisher(tokenValidator.validateToken(accessToken, request)).blockingFirst()
+        Authentication authentication = Flux.from(tokenValidator.validateToken(accessToken, request)).blockFirst()
 
         then:
         authentication.attributes

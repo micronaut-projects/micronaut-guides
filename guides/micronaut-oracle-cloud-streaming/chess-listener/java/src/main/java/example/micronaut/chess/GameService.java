@@ -9,7 +9,7 @@ import example.micronaut.chess.repository.GameStateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.micronaut.core.annotation.NonNull;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.transaction.Transactional;
 import java.util.UUID;
 

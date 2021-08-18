@@ -8,8 +8,8 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
+import jakarta.inject.Inject
 import spock.lang.IgnoreIf
-import javax.inject.Inject
 
 @MicronautTest
 class BookControllerSpec extends Specification {
