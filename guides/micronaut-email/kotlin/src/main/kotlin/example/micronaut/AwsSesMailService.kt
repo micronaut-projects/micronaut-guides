@@ -39,9 +39,7 @@ class AwsSesMailService(
             )
             .build()
         val response: SendEmailResponse = ses.sendEmail(sendEmailRequest)
-        if (LOG.isInfoEnabled) {
-            LOG.info("Sent email with id: {}", response.messageId())
-        }
+        LOG.info("Sent email with id: {}", response.messageId())
     }
 
     companion object {

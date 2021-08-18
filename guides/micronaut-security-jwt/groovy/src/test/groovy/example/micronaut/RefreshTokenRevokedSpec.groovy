@@ -42,7 +42,7 @@ class RefreshTokenRevokedSpec extends Specification {
 
         when:
         String signedRefreshToken = refreshTokenOptional.get()
-        refreshTokenRepository.save(user.username, refreshToken, Boolean.TRUE) // <1>
+        refreshTokenRepository.save(user.name, refreshToken, Boolean.TRUE) // <1>
 
         then:
         refreshTokenRepository.count() == old(refreshTokenRepository.count()) + 1

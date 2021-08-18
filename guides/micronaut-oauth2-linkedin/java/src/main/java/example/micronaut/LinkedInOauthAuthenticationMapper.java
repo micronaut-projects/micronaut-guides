@@ -4,6 +4,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.HttpHeaderValues;
+import io.micronaut.security.authentication.AuthenticationResponse;
 import io.micronaut.security.authentication.AuthenticationFailed;
 import io.micronaut.security.authentication.AuthenticationFailureReason;
 import io.micronaut.security.authentication.AuthenticationResponse;
@@ -36,7 +37,7 @@ public class LinkedInOauthAuthenticationMapper implements OauthAuthenticationMap
                     Map<String, Object> attributes = CollectionUtils.mapOf("firstName", linkedMe.getLocalizedFirstName(),
                             "lastName", linkedMe.getLocalizedLastName());
                     String username = linkedMe.getId();
-                    return AuthenticationResponse.build(username, Collections.emptyList(), attributes);
+                    return AuthenticationResponse.success(username, Collections.emptyList(), attributes);
                 });
     }
 }

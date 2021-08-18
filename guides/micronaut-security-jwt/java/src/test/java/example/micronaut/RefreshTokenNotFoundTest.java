@@ -11,7 +11,7 @@ import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
-
+import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.Map;

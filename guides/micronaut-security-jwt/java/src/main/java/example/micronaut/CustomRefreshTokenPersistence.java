@@ -7,7 +7,7 @@ import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Flux;
 import org.reactivestreams.Publisher;
-
+import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Optional;

@@ -22,10 +22,10 @@ class CustomRefreshTokenPersistence : RefreshTokenPersistence {
 
     override fun persistToken(event: RefreshTokenGeneratedEvent?) { // <3>
         if (event?.refreshToken != null &&
-            event.userDetails != null &&
-            event.userDetails.username != null) {
+            event.authentication != null &&
+            event.authentication.name != null) {
             val payload = event.refreshToken;
-            refreshTokenRepository.save(event.userDetails.username, payload, false); // <4>
+            refreshTokenRepository.save(event.authentication.name, payload, false); // <4>
         }
     }
 

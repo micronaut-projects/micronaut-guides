@@ -25,7 +25,7 @@ public class AuthenticationProviderUserPassword implements AuthenticationProvide
                 emitter.next(AuthenticationResponse.success((String) authenticationRequest.getIdentity()));
                 emitter.complete();
             } else {
-                emitter.error(AuthenticationResposne.exception());
+                emitter.error(AuthenticationResponse.exception());
             }
         }, FluxSink.OverflowStrategy.ERROR);
     }

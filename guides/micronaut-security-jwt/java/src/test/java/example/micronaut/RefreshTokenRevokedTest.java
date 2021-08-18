@@ -41,7 +41,7 @@ class RefreshTokenRevokedTest {
 
         long oldTokenCount = refreshTokenRepository.count();
         String signedRefreshToken = refreshTokenOptional.get();
-        refreshTokenRepository.save(user.getUsername(), refreshToken, Boolean.TRUE); // <1>
+        refreshTokenRepository.save(user.getName(), refreshToken, Boolean.TRUE); // <1>
         assertEquals(oldTokenCount + 1, refreshTokenRepository.count());
 
         Argument<BearerAccessRefreshToken> bodyArgument = Argument.of(BearerAccessRefreshToken.class);

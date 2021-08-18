@@ -20,9 +20,9 @@ class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
 
     @Override
     void persistToken(RefreshTokenGeneratedEvent event) { // <3>
-        if (event?.refreshToken && event?.userDetails?.username) {
+        if (event?.refreshToken && event?.authentication?.name) {
             String payload = event.refreshToken
-            refreshTokenRepository.save(event.userDetails.username, payload, Boolean.FALSE) // <4>
+            refreshTokenRepository.save(event.authentication.name, payload, Boolean.FALSE) // <4>
         }
     }
 

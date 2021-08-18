@@ -32,7 +32,7 @@ internal class RefreshTokenRevokedTest {
 
         val oldTokenCount = refreshTokenRepository.count()
         val signedRefreshToken = refreshTokenOptional.get()
-        refreshTokenRepository.save(user.username, refreshToken, true) // <1>
+        refreshTokenRepository.save(user.name, refreshToken, true) // <1>
         assertEquals(oldTokenCount + 1, refreshTokenRepository.count())
 
         val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)

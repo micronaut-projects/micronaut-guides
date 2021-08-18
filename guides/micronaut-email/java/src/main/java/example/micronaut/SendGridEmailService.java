@@ -12,7 +12,7 @@ import io.micronaut.context.annotation.Value;
 import io.micronaut.core.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.util.stream.Collectors;
 import jakarta.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -90,17 +90,14 @@ class SendGridEmailService implements EmailService {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Status Code: {}", String.valueOf(response.getStatusCode()));
                 LOG.info("Body: {}", response.getBody());
-                for ( String k : response.getHeaders().keySet()) {
-                    String v = response.getHeaders().get(k);
-                    LOG.info("Response Header {} => {}", k, v);
-                }
+                LOG.info("Headers {}", response.getHeaders()
+                        .keySet()
+                        .stream()
+                        .map(key -> key.toString() + "=" + response.getHeaders().get(key))
+                        .collect(Collectors.joining(", ", "{", "}")));
             }
-
-
         } catch (IOException ex) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error(ex.getMessage());
-            }
+            LOG.error(ex.getMessage());
         }
     }
 }

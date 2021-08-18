@@ -101,27 +101,12 @@ task generateSampleProjects {
         generator.close()
     }
     finalizedBy(
-            'replaceWithJakarta',
             'generateTestScript',
             'generateGuidesIndex',
             'generateGuidesJsonMetadata',
             'themeGuides'
     )
 }
-import static groovy.io.FileType.FILES
-task replaceWithJakarta {
-    doLast {
-        String token = 'import javax.inject'
-        String value = 'import jakarta.inject'
-	List<String> suffixes = ['.groovy','.kt','.java']
-        file(generateSampleProjects.output).eachFileRecurse(FILES) { f ->
-            if(suffixes.any { suf -> f.name.endsWith(suf) }) {
-                ant.replace(file: f, token: token, value: value)
-            }
-        }
-    }
-}
-
 task generateTestScript {
     group 'guides'
     description 'Generates a test.sh to runs every guide test at build/code'

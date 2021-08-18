@@ -27,7 +27,7 @@ public class NotFoundController {
                 .accept()
                 .stream()
                 .anyMatch(mediaType -> mediaType.getName().contains(MediaType.TEXT_HTML))) { // <4>
-            return HttpResponse.ok(viewsRenderer.render("notFound", Collections.emptyMap()))
+            return HttpResponse.ok(viewsRenderer.render("notFound", Collections.emptyMap(), request))
                     .contentType(MediaType.TEXT_HTML);
         }
 

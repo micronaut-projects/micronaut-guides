@@ -48,8 +48,6 @@ public class AwsSesMailService implements EmailService {
                         .body(Body.builder().text(Content.builder().data(email.getTextBody()).build()).build()).build())
                 .build();
         SendEmailResponse response =ses.sendEmail(sendEmailRequest);
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Sent email with id: {}", response.messageId());
-        }
+        LOG.info("Sent email with id: {}", response.messageId());
     }
 }
