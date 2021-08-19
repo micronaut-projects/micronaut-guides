@@ -11,8 +11,12 @@ import java.nio.file.Paths
 
 @CompileStatic
 class IndexGenerator {
-
-    private static final String LATEST_GUIDES_URL = "https://guides.micronaut.io/latest/"
+    private static final String DEFAULT_CARD = "micronauttwittercard.png";
+    private static final String GUIDES_URL = "https://guides.micronaut.io"
+    private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
+    public static final String TWITTER_MICRONAUT = "@micronautfw"
+    public static final String DEFAULT_TITLE = "Micronaut Guides"
+    public static final String DEFAULT_INTRO = "Step by Step tutorials to learn the Micronaut Framework"
 
     static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
@@ -35,16 +39,22 @@ class IndexGenerator {
         }
     }
 
-    private static void save(String templateText, String filename, File buildDir,
-                             List<GuideMetadata> metadatas, String title = 'Micronaut Guides') {
-        String text = indexText(templateText, metadatas, title)
+    private static void save(String templateText,
+                             String filename,
+                             File buildDir,
+                             List<GuideMetadata> metadatas,
+                             String title = 'Micronaut Guides') {
+        String text = indexText(buildDir, templateText, metadatas, title)
         Path path = Paths.get(buildDir.absolutePath, filename)
         File output = path.toFile()
         output.createNewFile()
         output.text = text
     }
 
-    private static String indexText(String templateText, List<GuideMetadata> metadatas, String title) {
+    private static String indexText(File buildDir,
+                                    String templateText,
+                                    List<GuideMetadata> metadatas,
+                                    String title) {
         boolean singleGuide = metadatas.size() == 1
 
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
@@ -66,10 +76,28 @@ class IndexGenerator {
             text = text.replace("@breadcrumb@", breadcrumb)
         }
         text = text.replace("@title@", title)
+        String twittercard = ''
+        if (singleGuide) {
+            twittercard = twitterCardHtml(Paths.get(buildDir.absolutePath, "/dist").toFile(), metadatas.get(0))
+        }
+        text = text.replace("@twittercard@", twittercard)
         text = text.replace("@bodyclass@", 'guideindex')
         text = text.replace("@toccontent@", '')
         text = text.replace("@content@", index)
         text
+    }
+
+    static String twitterCardHtml(File distDir, GuideMetadata guideMetadata) {
+        String rootUrl = System.getenv("CI") ? GUIDES_URL : ""
+        String filename = (Paths.get(distDir.absolutePath, "/images/cards/" + guideMetadata.slug + ".png").toFile().exists()) ?
+                guideMetadata.slug + ".png" : DEFAULT_CARD
+"""\
+<meta name='twitter:card' content='summary_large_image'/>
+<meta name='twitter:image' content='${rootUrl}/images/cards/${filename}'>
+<meta name="twitter:creator" content="${TWITTER_MICRONAUT}">
+<meta name="twitter:site" content="${TWITTER_MICRONAUT}">
+<meta name='twitter:title' content='${guideMetadata.title ?: DEFAULT_TITLE}'/>
+<meta name='twitter:description' content='${guideMetadata.intro ?: DEFAULT_INTRO}'/>"""
     }
 
     private static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
