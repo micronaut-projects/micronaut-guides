@@ -2,6 +2,7 @@ name: Java CI for Micronaut SNAPSHOT
 on:
   schedule:
     - cron: '0 5 * * 1-5'
+  workflow_dispatch:
 jobs:
   patch-snapshot:
     runs-on: ubuntu-latest
@@ -24,7 +25,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-      - name: Use next snapshot version
+      - name: Use next snapshot patch version
         run: ./increment_version.sh -p
       - name: Build with Gradle
         run: ./gradlew build
@@ -36,7 +37,7 @@ jobs:
         with:
           name: test-reports-${{ matrix.java }}
           path: /home/runner/work/micronaut-guides/micronaut-guides/build/code/
-  major-snapshot:
+  minor-snapshot:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -58,6 +59,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
+      - name: Use next snapshot patch version
+        run: ./increment_version.sh -m
       - name: Build with Gradle
         run: ./gradlew build
       - name: Execute tests
