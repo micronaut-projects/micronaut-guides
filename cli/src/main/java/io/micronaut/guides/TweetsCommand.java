@@ -27,7 +27,7 @@ import java.util.List;
 
 @Command(name = "guidetweets", description = "generates a list of tweets", mixinStandardHelpOptions = true)
 public class TweetsCommand implements Runnable {
-    private static final String HASHTAG = " #";
+    private static final String HASHTAG = "#";
 
     @Inject
     GuidesClient guidesClient;
