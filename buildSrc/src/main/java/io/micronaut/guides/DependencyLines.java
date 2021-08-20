@@ -29,7 +29,6 @@ public class DependencyLines {
             case "annotationProcessor":
                 return "compile";
             case "testCompile":
-            case "testRuntime":
             case "testRuntimeOnly":
             case "testImplementation":
                 return "test";
