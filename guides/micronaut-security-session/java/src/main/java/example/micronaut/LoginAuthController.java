@@ -9,7 +9,6 @@ import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 @Secured(SecurityRule.IS_ANONYMOUS) // <1>
@@ -20,7 +19,7 @@ public class LoginAuthController {
     @Get("/auth") // <3>
     @View("auth") // <4>
     public Map<String, Object> auth() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Produces(MediaType.TEXT_HTML)

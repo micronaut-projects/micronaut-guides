@@ -15,10 +15,7 @@ class HomePage extends Page {
     }
 
     String username() {
-        if ( usernameElement.empty ) {
-            return null
-        }
-        usernameElement.text()
+        usernameElement.empty ? null : usernameElement.text()
     }
 
     void login() {
