@@ -1,20 +1,33 @@
-include::{commondir}/common-header.adoc[]
+include::{commondir}/common-header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will create a Micronaut application written in @language@ and secure it with HTTP Basic Auth.
 
 https://tools.ietf.org/html/rfc7617[RFC7617^] defines the "Basic" Hypertext Transfer Protocol (HTTP) authentication scheme, which transmits credentials as user-id/password pairs, encoded using Base64.
-
-In this guide you will create a Micronaut application and secure it with HTTP Basic Auth.
 
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+== Writing the Application
 
-=== Security Dependency
+include::{commondir}/common-cli-or-launch.adoc[]
 
-Add the Micronaut security dependency to your build:
+[source,bash]
+----
+mn create-app --features=security,reactor,graalvm example.micronaut.micronautguide --build=@build@ --lang=@lang@
+----
 
-dependency:micronaut-security[groupId:io.micronaut.security]
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select "Micronaut Application" as application type and add the `security`, `reactor`, and `graalvm` features.
+
+include::{commondir}/common-default-package.adoc[]
+
+diffLink:[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
 
 === Authentication Provider
 
@@ -27,7 +40,7 @@ callout:singleton[1]
 
 === Controllers
 
-Create a file named `HomeController` which resolves the base URL `/`:
+Create `HomeController` which resolves the base URL `/`:
 
 source:HomeController[]
 
@@ -38,7 +51,7 @@ source:HomeController[]
 
 === WWW-Authenticate
 
-https://docs.micronaut.io/latest/guide/#replaces[Replace^] the default https://docs.micronaut.io/latest/guide/#exceptionHandler[Exception Handler^] for `AuthorizationExceptionHandler`; the exception raised when a request is not authorized.
+https://docs.micronaut.io/latest/guide/#replaces[Replace^] the default https://docs.micronaut.io/latest/guide/#exceptionHandler[Exception Handler^] for `AuthorizationExceptionHandler`, the exception raised when a request is not authorized.
 
 source:DefaultAuthorizationExceptionHandlerReplacement[]
 
@@ -91,7 +104,7 @@ To test the running application, issue a GET request to localhost:8080 with a Ba
 curl -v -u sherlock:password localhost:8080
 ----
 
-If you open `localhost:8080` in a browser, a login dialog pops up due to the `WWW-Authenticate` header.
+If you open http://localhost:8080[http://localhost:8080^] in a browser, a login dialog pops up due to the `WWW-Authenticate` header.
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
