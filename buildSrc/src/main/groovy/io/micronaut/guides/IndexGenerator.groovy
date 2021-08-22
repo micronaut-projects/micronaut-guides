@@ -89,15 +89,15 @@ class IndexGenerator {
 
     static String twitterCardHtml(File distDir, GuideMetadata guideMetadata) {
         String rootUrl = System.getenv("CI") ? GUIDES_URL : ""
-        String filename = (Paths.get(distDir.absolutePath, "/images/cards/" + guideMetadata.slug + ".png").toFile().exists()) ?
+        String filename = new File(distDir.absolutePath, "/images/cards/" + guideMetadata.slug + ".png").exists() ?
                 guideMetadata.slug + ".png" : DEFAULT_CARD
 """\
-<meta name='twitter:card' content='summary_large_image'/>
-<meta name='twitter:image' content='${rootUrl}/images/cards/${filename}'/>
-<meta name="twitter:creator" content="${TWITTER_MICRONAUT}"/>
-<meta name="twitter:site" content="${TWITTER_MICRONAUT}"/>
-<meta name='twitter:title' content='${guideMetadata.title ?: DEFAULT_TITLE}'/>
-<meta name='twitter:description' content='${guideMetadata.intro ?: DEFAULT_INTRO}'/>"""
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="${rootUrl}/images/cards/${filename}"/>
+    <meta name="twitter:creator" content="${TWITTER_MICRONAUT}"/>
+    <meta name="twitter:site" content="${TWITTER_MICRONAUT}"/>
+    <meta name="twitter:title" content="${guideMetadata.title?.replaceAll('"', "&quot;") ?: DEFAULT_TITLE}"/>
+    <meta name="twitter:description" content="${guideMetadata.intro?.replaceAll('"', "&quot;") ?: DEFAULT_INTRO}"/>"""
     }
 
     private static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
