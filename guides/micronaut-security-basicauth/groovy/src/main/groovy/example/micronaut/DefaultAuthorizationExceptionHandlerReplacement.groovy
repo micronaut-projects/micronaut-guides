@@ -20,10 +20,9 @@ class DefaultAuthorizationExceptionHandlerReplacement extends DefaultAuthorizati
     protected MutableHttpResponse<?> httpResponseWithStatus(HttpRequest request,
                                                             AuthorizationException e) {
         if (e.isForbidden()) {
-            HttpResponse.status(FORBIDDEN)
-        } else {
-            HttpResponse.status(UNAUTHORIZED)
-                    .header(WWW_AUTHENTICATE, 'Basic realm="Micronaut Guide"')
+            return HttpResponse.status(FORBIDDEN)
         }
+        HttpResponse.status(UNAUTHORIZED)
+                .header(WWW_AUTHENTICATE, 'Basic realm="Micronaut Guide"')
     }
 }
