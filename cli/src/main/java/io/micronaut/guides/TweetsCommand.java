@@ -38,14 +38,13 @@ public class TweetsCommand implements Runnable {
     @Option(names = {"-p", "--prefix"}, description = "Tweet prefix", defaultValue =  "📖 Micronaut Guide:")
     String prefix;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         PicocliRunner.run(TweetsCommand.class, args);
     }
 
     public void run() {
         List<Guide> guides = Mono.from(guidesClient.fetchGuides()).block();
         composeTweets(guides).forEach(System.out::println);
-
     }
 
     private List<String> composeTweets(List<Guide> guides) {

@@ -20,9 +20,8 @@ import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 @CompileStatic
 class GuideAsciidocGenerator {
 
-
-    public static final String INCLUDE_COMMONDIR = 'include::{commondir}/'
-    public static final String CALLOUT = 'callout:'
+    private static final String INCLUDE_COMMONDIR = 'include::{commondir}/'
+    private static final String CALLOUT = 'callout:'
 
     static void generate(GuideMetadata metadata, File inputDir, File destinationFolder) {
         Path asciidocPath = Paths.get(inputDir.absolutePath, metadata.asciidoctor)
