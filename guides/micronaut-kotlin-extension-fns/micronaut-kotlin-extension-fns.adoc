@@ -10,8 +10,7 @@ Before we get started writing the application, let's touch briefly on what exten
 
 === What Are Extension Functions?
 
-The https://kotlinlang.org/docs/extensions.html[kotlin documentation^] explains that extension functions are
-"an ability to extend a class with new functionality without having to inherit from the class or use design patterns such as Decorator."
+The https://kotlinlang.org/docs/extensions.html[Kotlin documentation^] explains that extension functions are "an ability to extend a class with new functionality without having to inherit from the class or use design patterns such as Decorator."
 
 They're useful for writing new functions for classes in a third-party library or quickly creating new methods for common use cases of a class you otherwise can't edit directly.
 
@@ -34,14 +33,14 @@ Then use it like it was a regular method of `MutableList`
 ----
 val languages = mutableListOf('java', 'groovy', 'kotlin')
 
-languages.swap(0,2) // Will swap 'java' and 'kotlin' so kotlin comes first
+languages.swap(0, 2) // Will swap 'java' and 'kotlin' so kotlin comes first
 ----
 
-=== Using Extension Functions in an App
+=== Using Extension Functions in an Application
 
 To show off the extension functions available for use in Micronaut applications (and how to write your own), we'll build a simple application that
 
-- Consumes https://icanhazdadjoke.com/api[this fun dad joke API^] (I love a good dad joke) with an http client
+- Consumes https://icanhazdadjoke.com/api[this fun dad joke API^] (I love a good dad joke) with an HTTP client
 - Schedules the joke to "be sent" to someone [we won't actually be integrating a message sender for simplicity]
 - Writes our own extension function for the client (as if it was provided by a third party)
 - Puts everything together in a controller
@@ -70,7 +69,7 @@ include::{commondir}/common-annotationprocessors.adoc[]
 
 We're using the https://micronaut-projects.github.io/micronaut-kotlin/latest/guide/#extensionFunctions[Micronaut Kotlin extension function library^] which aids Kotlin developers in writing more idiomatic code in Micronaut.
 
-You can see the https://micronaut-projects.github.io/micronaut-kotlin/latest/api/[dokka docs for the full list of functions here^]
+You can see the https://micronaut-projects.github.io/micronaut-kotlin/latest/api/[dokka docs for the full list of functions here^].
 
 Big credit is due to https://github.com/ideaplugins[Alejandro Gomez^] for allowing for the use of his initial collection of extension functions!
 
@@ -83,14 +82,13 @@ Right away let's modify the generated `Application.kt` to use the `startApplicat
 source:Application[]
 
 <1> Here we import the extension function
-<2> Since the extension function takes a type argument, we'll define our Application as a kotlin `object`, which is an easy shortcut for a singleton or place to put a static method like `main`.
+<2> Since the extension function takes a type argument, we'll define our Application as a Kotlin `object`, which is an easy shortcut for a singleton or place to put a static method like `main`.
 We're naming it `ApplicationKt` simply because this guide's build file is auto-generated, and we want to match the mainClass name it generates. `Application` alone would be a preferable name outside the context of this guide.
 <3> `startApplication<ApplicationKt>` here does the work of `.build().mainClass(ApplicationKt::class.java).start()`. Convenient!
 
 === DadJokeClient
 
-Next we'll build out our functionality. We'll start by modelling the response types for the plain `GET` request for the Dad Joke API (that just return a random joke),
-as well as the paged results that are returned from the `/search` endpoint.
+Next we'll build out our functionality. We'll start by modelling the response types for the plain `GET` request for the Dad Joke API (that just return a random joke), as well as the paged results that are returned from the `/search` endpoint.
 
 source:DadJoke[]
 
@@ -102,12 +100,10 @@ Then, we can create a standard Micronaut HTTP client for the DadJoke API endpoin
 
 source:DadJokeClient[]
 
-Note that while *we* are creating this client for the purposes of this guide, often times something like this may come from
-a third party library. Perhaps you're getting it from a public dependency you don't have permission to edit, or from
-another team within your company that has different priorities from your own team.
+Note that while *we* are creating this client for the purposes of this guide, often something like this comes from a third-party library.
+Perhaps you're getting it from a public dependency you don't have permission to edit, or from another team within your company that has different priorities from your own team.
 
-It could also be that you simply have a specific use case for the client involving specific setup for your application
-that doesn't belong in the client proper.
+It could also be that you simply have a specific use case for the client involving specific setup for your application that doesn't belong in the client.
 
 Let's see how we can extend this client to suit our own use case.
 
@@ -117,7 +113,7 @@ We'll create a controller to utilize the client's standard `GET` for a random jo
 
 source:DadJokeController[tags=fileHead|start|standardGet|end]
 
-Now, say we have a particular way we want to use a client frequently (like attaching common headers, or filling in some parameters by default.
+Now, say we have a particular way we want to use a client frequently, for example attaching common headers or filling in some parameters by default.
 
 Let's explore how we can extend the client for our benefit. We'll define a method for the client to specifically look for jokes about dogs.
 
