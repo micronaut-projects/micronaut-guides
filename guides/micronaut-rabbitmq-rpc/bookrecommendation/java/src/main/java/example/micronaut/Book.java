@@ -1,17 +1,17 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 
 import java.util.Objects;
 
 @Introspected
 public class Book {
-    private String isbn;
-    private String name;
 
-    public Book() {
-    }
+    private final String isbn;
+    private final String name;
 
+    @Creator
     public Book(String isbn, String name) {
         this.isbn = isbn;
         this.name = name;
@@ -21,16 +21,8 @@ public class Book {
         return isbn;
     }
 
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

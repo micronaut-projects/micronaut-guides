@@ -1,26 +1,22 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 
 import java.util.Objects;
 
 @Introspected
 public class BookRecommendation {
-    private String name;
 
-    public BookRecommendation() {
-    }
+    private final String name;
 
+    @Creator
     public BookRecommendation(String name) {
         this.name = name;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
