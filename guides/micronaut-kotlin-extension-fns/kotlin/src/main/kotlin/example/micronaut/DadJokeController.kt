@@ -4,9 +4,7 @@ package example.micronaut
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import jakarta.inject.Inject
-import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
-
 //end::fileHead[]
 
 //tag::start[]
