@@ -1,17 +1,16 @@
 package example.micronaut;
-import io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper;
-import io.micronaut.security.oauth2.endpoint.token.response.TokenResponse;
-import io.micronaut.security.oauth2.endpoint.authorization.state.State;
-import org.reactivestreams.Publisher;
+
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.security.authentication.AuthenticationResponse;
+import io.micronaut.security.oauth2.endpoint.authorization.state.State;
+import io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper;
+import io.micronaut.security.oauth2.endpoint.token.response.TokenResponse;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
 
 @Named("github") // <1>
 @Singleton

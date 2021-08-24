@@ -4,15 +4,30 @@ include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+== Writing the Application
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app --features=security-oauth2,security-jwt,views-thymeleaf,reactor,graalvm example.micronaut.micronautguide --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `security-oauth2`, `security-jwt`, `views-thymeleaf`, `reactor`, and `graalvm` features.
+
+include::{commondir}/common-default-package.adoc[]
+
+diffLink:[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
 
 === Views
 
 Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
 
-To use https://www.thymeleaf.org/[Thymeleaf^] Java template engine within a Micronaut Application add the following dependency on your classpath.
-
-dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+We'll use the https://www.thymeleaf.org/[Thymeleaf^] Java template engine to render views.
 
 === Home
 
@@ -25,11 +40,11 @@ callout:controller[number=1,arg0=/]
 <3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View^] annotation to specify which template to use to render the response.
 <4> The @api@/io/micronaut/http/annotation/Get.html[@Get^] annotation maps the `index` method to GET `/` requests.
 
-Create a thymeleaf template:
+Create a Thymeleaf template:
 
 resource:views/home.html[]
 
-Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the Thymeleaf template.
 
 - The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor^]
 injects into the model a `security` map with the authenticated user.  See
@@ -46,14 +61,6 @@ image::github-2.png[]
 image::github-3.png[]
 
 === OAuth 2.0 Configuration
-
-To use OAuth 2.0 integration, add the following dependency:
-
-dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
-
-Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support^] dependencies:
-
-dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
 Add the following OAuth2 Configuration:
 
@@ -136,7 +143,7 @@ source:ReposController[]
 <5> Consume the GitHub API.
 <6> Use the previously obtained access token to get access against the GitHub API.
 
-Create a thymeleaf template:
+Create a Thymeleaf template:
 
 resource:views/repos.html[]
 
