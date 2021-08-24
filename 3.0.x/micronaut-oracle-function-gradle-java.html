@@ -138,11 +138,12 @@
 <li><a href="#policies">6.6. Policies</a></li>
 </ul>
 </li>
-<li><a href="#enable-tracing-and-logs">7. Enable Tracing and Logs</a></li>
-<li><a href="#creating-the-function">8. Creating the function</a></li>
+<li><a href="#creating-the-function">7. Creating the function</a></li>
+<li><a href="#enable-tracing-and-logs">8. Enable Tracing and Logs</a></li>
 <li><a href="#invoking-the-function">9. Invoking the function</a></li>
-<li><a href="#next-steps">10. Next steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">11. Help with the Micronaut Framework</a></li>
+<li><a href="#deploying-as-a-native-image">10. Deploying as a Native Image</a></li>
+<li><a href="#next-steps">11. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">12. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -226,7 +227,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app --features=oracle-function example.micronaut.micronautguide --build=gradle --lang=java</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app --features=graalvm,oracle-function example.micronaut.micronautguide --build=gradle --lang=java --jdk=11</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -242,10 +243,22 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
-<p>If you use <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>, select serverless function as application type and add the <code>oracle-function</code> feature.</p>
+<p>If you use <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>, select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the <code>graalvm</code> and <code>oracle-function</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=graalvm&amp;features=oracle-function&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=FUNCTION&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
@@ -435,6 +448,7 @@ $ open build/reports/tests/test/index.html</code></pre>
 <p>Edit <code>build.gradle</code> and replace <code>REGION</code>, <code>TENANCY</code>, and <code>REPO</code> with appropriate values:</p>
 </div>
 <div class="listingblock">
+<div class="title">build.gradle</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dockerBuild {
     images = [<span class="string"><span class="delimiter">&quot;</span><span class="content">[REGION].ocir.io/[TENANCY]/[REPO]/</span><span class="inline"><span class="inline-delimiter">$</span>project</span><span class="content">.name:</span><span class="inline"><span class="inline-delimiter">$</span>project</span><span class="content">.version</span><span class="delimiter">&quot;</span></span>]
@@ -454,6 +468,7 @@ $ open build/reports/tests/test/index.html</code></pre>
 <p>The final value should look something like this:</p>
 </div>
 <div class="listingblock">
+<div class="title">build.gradle</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dockerBuild {
     images = [<span class="string"><span class="delimiter">&quot;</span><span class="content">iad.ocir.io/my-tenancy/mn-functions/</span><span class="inline"><span class="inline-delimiter">$</span>project</span><span class="content">.name:</span><span class="inline"><span class="inline-delimiter">$</span>project</span><span class="content">.version</span><span class="delimiter">&quot;</span></span>]
@@ -593,7 +608,74 @@ Allow service faas to use apm-domains in compartment &lt;compartment-name&gt;</c
 </div>
 </div>
 <div class="sect1">
-<h2 id="enable-tracing-and-logs">7. Enable Tracing and Logs</h2>
+<h2 id="creating-the-function">7. Creating the function</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First we&#8217;ll need to build the function as a Docker image and push it to the OCIR repository.</p>
+</div>
+<div class="paragraph">
+<p>Run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew dockerPush</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you&#8217;ve pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.</p>
+</div>
+<div class="paragraph">
+<p>Open the Oracle Cloud Menu and click "Developer Services", and then "Applications" under "Functions":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function1.png" alt="function1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create Application":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function2.png" alt="function2">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name for the application, e.g. "mn-guide-function-app", and select the VCN created earlier. Select the private subnet, and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function3.png" alt="function3">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Functions" (under "Resources") in the lower left, and then click "Create Function":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function4.png" alt="function4">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name for the function, e.g. "mn-guide-function", select the repository where you pushed the Docker image, and select the uploaded image. Select 512MB memory and click "Create":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function5.png" alt="function5">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the function link in the list, and click the "Copy" link in the OCID row; you&#8217;ll need the OCID of the function to invoke the function:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function6.png" alt="function6">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enable-tracing-and-logs">8. Enable Tracing and Logs</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Open the Oracle Cloud Menu and click "Observability &amp; Management", and then "Administration" under "Application Performance&#8230;&#8203;":</p>
@@ -665,73 +747,6 @@ Allow service faas to use apm-domains in compartment &lt;compartment-name&gt;</c
 </div>
 </div>
 <div class="sect1">
-<h2 id="creating-the-function">8. Creating the function</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>First we&#8217;ll need to build the function as a Docker image and push it to the OCIR repository.</p>
-</div>
-<div class="paragraph">
-<p>Run:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew dockerPush</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Once you&#8217;ve pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.</p>
-</div>
-<div class="paragraph">
-<p>Open the Oracle Cloud Menu and click "Developer Services", and then "Applications" under "Functions":</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/oraclefn/function1.png" alt="function1">
-</div>
-</div>
-<div class="paragraph">
-<p>Click "Create Application":</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/oraclefn/function2.png" alt="function2">
-</div>
-</div>
-<div class="paragraph">
-<p>Choose a name for the application, e.g. "mn-guide-function-app", and select the VCN created earlier. Select the private subnet, and click "Create":</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/oraclefn/function3.png" alt="function3">
-</div>
-</div>
-<div class="paragraph">
-<p>Click the application link in the list, and then click "Create Function":</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/oraclefn/function4.png" alt="function4">
-</div>
-</div>
-<div class="paragraph">
-<p>Choose a name for the function, e.g. "mn-guide-function", select the repository where you pushed the Docker image, and select the uploaded image. Select 512MB memory and click "Create":</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/oraclefn/function5.png" alt="function5">
-</div>
-</div>
-<div class="paragraph">
-<p>Click the function link in the list, and click the "Copy" link in the OCID row; you&#8217;ll need the OCID of the function to invoke the function:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/oraclefn/function6.png" alt="function6">
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="invoking-the-function">9. Invoking the function</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -756,7 +771,71 @@ Allow service faas to use apm-domains in compartment &lt;compartment-name&gt;</c
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">10. Next steps</h2>
+<h2 id="deploying-as-a-native-image">10. Deploying as a Native Image</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Deploying the function as a native image is similar to the earlier deployment above.</p>
+</div>
+<div class="paragraph">
+<p>First you need to update your build script with the location to deploy the native image Docker container.</p>
+</div>
+<div class="paragraph">
+<p>Edit <code>build.gradle</code> like before, but set the <code>images</code> property in the <code>dockerBuildNative</code> block this time, replacing <code>REGION</code>, <code>TENANCY</code>, and <code>REPO</code> as before:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">dockerBuildNative {
+    images = [<span class="string"><span class="delimiter">&quot;</span><span class="content">[REGION].ocir.io/[TENANCY]/[REPO]/</span><span class="inline"><span class="inline-delimiter">$</span>project</span><span class="content">.name-native:</span><span class="inline"><span class="inline-delimiter">$</span>project</span><span class="content">.version</span><span class="delimiter">&quot;</span></span>]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Since it&#8217;s unlikely that you&#8217;ll be deploying both jar-based containers and native image-based containers, you can use the same repo:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">dockerBuildNative {
+    images = [<span class="string"><span class="delimiter">&quot;</span><span class="content">[REGION].ocir.io/[TENANCY]/[REPO]/</span><span class="inline"><span class="inline-delimiter">$</span>project</span><span class="content">.name:</span><span class="inline"><span class="inline-delimiter">$</span>project</span><span class="content">.version</span><span class="delimiter">&quot;</span></span>]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, update the version.</p>
+</div>
+<div class="paragraph">
+<p>Edit <code>build.gradle</code> and increment the version to <code>0.2</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">version = <span class="string"><span class="delimiter">&quot;</span><span class="content">0.2</span><span class="delimiter">&quot;</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew dockerPushNative</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you&#8217;ve pushed the Docker container, edit the function in the console to use the new container, and to reduce the memory to 128MB:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/function7.png" alt="function7">
+</div>
+</div>
+<div class="paragraph">
+<p>Use the same OCI command as before to invoke the function. No changes are needed because the function OCID doesn&#8217;t change when deploying new containers.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">11. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Explore more features with <a href="https://micronaut.io/guides/" target="_blank" rel="noopener">Micronaut Guides</a>.</p>
@@ -770,7 +849,7 @@ Allow service faas to use apm-domains in compartment &lt;compartment-name&gt;</c
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">11. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">12. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a href="https://objectcomputing.com" target="_blank" rel="noopener">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
