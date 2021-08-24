@@ -5,12 +5,14 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
-import io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper.ACCESS_TOKEN_KEY;
 
 @Controller("/repos") // <1>
 public class ReposController {
@@ -18,6 +20,7 @@ public class ReposController {
     public static final String CREATED = "created";
     public static final String DESC = "desc";
     public static final String REPOS = "repos";
+
     private final GithubApiClient githubApiClient;
 
     public ReposController(GithubApiClient githubApiClient) {
@@ -35,11 +38,10 @@ public class ReposController {
     }
 
     private String authorizationValue(Authentication authentication) {
-        String authorization = null;
-        Object claim = authentication.getAttributes().get(OauthAuthenticationMapper.ACCESS_TOKEN_KEY);  // <6>
+        Object claim = authentication.getAttributes().get(ACCESS_TOKEN_KEY);  // <6>
         if (claim instanceof String) {
-            authorization = HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + ' ' + claim;
+            return HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + ' ' + claim;
         }
-        return authorization;
+        return null;
     }
 }
