@@ -19,14 +19,16 @@ include::{commondir}/common-cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-function-app --features=oracle-function example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
+mn create-function-app --features=graalvm,oracle-function example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
 ----
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use https://launch.micronaut.io[Micronaut Launch], select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the `oracle-function` feature.
+If you use https://launch.micronaut.io[Micronaut Launch^], select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the `graalvm` and `oracle-function` features.
 
 include::{commondir}/common-default-package.adoc[]
+
+diffLink:[]
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
@@ -111,6 +113,7 @@ Update your build script with the location to deploy the Docker container.
 Edit `build.gradle` and replace `REGION`, `TENANCY`, and `REPO` with appropriate values:
 
 [source, groovy]
+.build.gradle
 ----
 dockerBuild {
     images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name:$project.version"]
@@ -126,6 +129,7 @@ For `REPO`, use the name of the repository to use, e.g. `mn-functions` (or `my-u
 The final value should look something like this:
 
 [source, groovy]
+.build.gradle
 ----
 dockerBuild {
     images = ["iad.ocir.io/my-tenancy/mn-functions/$project.name:$project.version"]
@@ -139,6 +143,7 @@ dockerBuild {
 Edit `pom.xml` and add these three properties in the `<properties>` section, replacing `REGION`, `TENANCY`, and `REPO` with appropriate values:
 
 [source, xml]
+.pom.xml
 ----
 <exec.mainClass>example.micronaut.Function</exec.mainClass>
 
@@ -156,6 +161,7 @@ For `REPO`, use the name of the repository to use, e.g. `mn-functions` (or `my-u
 The final properties should look something like this:
 
 [source, xml]
+.pom.xml
 ----
 <exec.mainClass>example.micronaut.Function</exec.mainClass>
 
@@ -285,7 +291,7 @@ Choose a name for the application, e.g. "mn-guide-function-app", and select the 
 
 image::oraclefn/function3.png[]
 
-Click the application link in the list, and then click "Create Function":
+Click "Functions" (under "Resources") in the lower left, and then click "Create Function":
 
 image::oraclefn/function4.png[]
 
@@ -350,6 +356,100 @@ Your tenancy is: ocid1.tenancy.oc1..aaaaaaaaud4g4e5ovjawn5cij7ke................
 ----
 
 The first invocation ("cold start") will take a while as the infrastructure is configured, probably 10-20 seconds or more but subsequent invocations should return in 1-2 seconds.
+
+== Deploying as a Native Image
+
+Deploying the function as a native image is similar to the earlier deployment above.
+
+First you need to update your build script with the location to deploy the native image Docker container.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` like before, but set the `images` property in the `dockerBuildNative` block this time, replacing `REGION`, `TENANCY`, and `REPO` as before:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuildNative {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name-native:$project.version"]
+}
+----
+
+Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuildNative {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name:$project.version"]
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo. If you wish to separate the native image containers, edit `pom.xml` and update the `jib.docker.image` property, appending "-native" to the value:
+
+[source, xml]
+.pom.xml
+----
+<jib.docker.image>[REGION].ocir.io/[TENANCY]/[REPO]/${project.artifactId}-native</jib.docker.image>
+----
+
+:exclude-for-build:
+
+Next, update the version.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` and increment the version to `0.2`:
+
+[source, groovy]
+.build.gradle
+----
+version = "0.2"
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Edit `pom.xml` and increment the version to `0.2`:
+
+[source, xml]
+.pom.xml
+----
+<version>0.2</version>
+----
+
+:exclude-for-build:
+
+Then run:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerPushNative
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw deploy -Dpackaging=docker-native
+----
+
+:exclude-for-build:
+
+Once you've pushed the Docker container, edit the function in the console to use the new container, and to reduce the memory to 128MB:
+
+image::oraclefn/function7.png[]
+
+Use the same OCI command as before to invoke the function. No changes are needed because the function OCID doesn't change when deploying new containers.
 
 include::{commondir}/common-next.adoc[]
 
