@@ -1,5 +1,6 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 
@@ -10,16 +11,17 @@ public class LinkedInMe {
 
     @NonNull
     @NotBlank
-    private String id;
+    private final String id;
 
     @NonNull
     @NotBlank
-    private String localizedFirstName;
+    private final String localizedFirstName;
 
     @NonNull
     @NotBlank
-    private String localizedLastName;
+    private final String localizedLastName;
 
+    @Creator
     public LinkedInMe(@NonNull String id,
                       @NonNull String localizedFirstName,
                       @NonNull String localizedLastName) {
@@ -33,25 +35,13 @@ public class LinkedInMe {
         return id;
     }
 
-    public void setId(@NonNull String id) {
-        this.id = id;
-    }
-
     @NonNull
     public String getLocalizedFirstName() {
         return localizedFirstName;
     }
 
-    public void setLocalizedFirstName(@NonNull String localizedFirstName) {
-        this.localizedFirstName = localizedFirstName;
-    }
-
     @NonNull
     public String getLocalizedLastName() {
         return localizedLastName;
-    }
-
-    public void setLocalizedLastName(@NonNull String localizedLastName) {
-        this.localizedLastName = localizedLastName;
     }
 }
