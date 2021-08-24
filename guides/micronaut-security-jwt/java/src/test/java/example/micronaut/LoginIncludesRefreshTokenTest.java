@@ -8,9 +8,9 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.security.authentication.UsernamePasswordCredentials;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import jakarta.inject.Inject;
 import java.text.ParseException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +27,7 @@ public class LoginIncludesRefreshTokenTest {
     @Test
     void uponSuccessfulAuthenticationUserGetsAccessTokenAndRefreshToken() throws ParseException {
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials("sherlock", "password");
-        HttpRequest request = HttpRequest.POST("/login", creds);
+        HttpRequest<?> request = HttpRequest.POST("/login", creds);
         BearerAccessRefreshToken rsp = client.toBlocking().retrieve(request, BearerAccessRefreshToken.class);
 
         assertEquals("sherlock", rsp.getUsername());

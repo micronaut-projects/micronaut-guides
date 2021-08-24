@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank
 
 @MappedEntity // <1>
 data class RefreshTokenEntity(
+
     @field:Id // <2>
     @GeneratedValue // <3>
     var id: Long? = null,
@@ -23,7 +24,7 @@ data class RefreshTokenEntity(
     var revoked: Boolean,
 
     @DateCreated // <4>
-    var dateCreated: Instant? = null,
+    var dateCreated: Instant? = null
     //end::clazzwithoutsettersandgetters[]
 //tag::endclass[]
 )

@@ -1,6 +1,6 @@
 package example.micronaut
 
-import io.micronaut.http.MediaType
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Consumes
 import io.micronaut.http.annotation.Get
@@ -16,7 +16,7 @@ interface AppClient {
     @Post("/login")
     fun login(@Body credentials: UsernamePasswordCredentials): BearerAccessRefreshToken
 
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Get("/")
+    @Consumes(TEXT_PLAIN)
+    @Get
     fun home(@Header("authorization") authorization: String): String
 }

@@ -13,6 +13,7 @@ import java.time.Instant;
 
 @MappedEntity // <1>
 public class RefreshTokenEntity {
+
     @Id // <2>
     @GeneratedValue // <3>
     @NonNull

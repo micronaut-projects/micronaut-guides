@@ -2,17 +2,18 @@ package example.micronaut
 
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.security.authentication.Authentication
 import io.micronaut.security.token.generator.RefreshTokenGenerator
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import spock.lang.Specification
-import io.micronaut.security.authentication.Authentication
 import jakarta.inject.Inject
+import spock.lang.Specification
+
+import static io.micronaut.http.HttpStatus.BAD_REQUEST
 
 @MicronautTest
 class RefreshTokenNotFoundSpec extends Specification {
@@ -27,6 +28,7 @@ class RefreshTokenNotFoundSpec extends Specification {
     void 'Accessing a secured URL without authenticating returns unauthorized'() {
         given:
         Authentication user = Authentication.build("sherlock")
+
         when:
         String refreshToken = refreshTokenGenerator.createKey(user)
         Optional<String> refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
@@ -43,7 +45,7 @@ class RefreshTokenNotFoundSpec extends Specification {
 
         then:
         HttpClientResponseException e = thrown()
-        e.status == HttpStatus.BAD_REQUEST
+        e.status == BAD_REQUEST
 
         when:
         Optional<Map> mapOptional = e.response.getBody(Map)

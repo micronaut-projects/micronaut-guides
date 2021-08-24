@@ -3,7 +3,7 @@ package example.micronaut
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
+import io.micronaut.http.HttpStatus.BAD_REQUEST
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.runtime.server.EmbeddedServer
@@ -18,10 +18,11 @@ import org.junit.jupiter.api.Test
 import java.util.Optional
 
 internal class RefreshTokenRevokedTest {
-    var embeddedServer = ApplicationContext.run(EmbeddedServer::class.java, emptyMap())
-    var client = embeddedServer.applicationContext.createBean(HttpClient::class.java, embeddedServer.url)
-    var refreshTokenGenerator = embeddedServer.applicationContext.getBean(RefreshTokenGenerator::class.java)
-    var refreshTokenRepository = embeddedServer.applicationContext.getBean(RefreshTokenRepository::class.java)
+
+    val embeddedServer = ApplicationContext.run(EmbeddedServer::class.java, emptyMap())
+    val client = embeddedServer.applicationContext.createBean(HttpClient::class.java, embeddedServer.url)
+    val refreshTokenGenerator = embeddedServer.applicationContext.getBean(RefreshTokenGenerator::class.java)
+    val refreshTokenRepository = embeddedServer.applicationContext.getBean(RefreshTokenRepository::class.java)
 
     @Test
     fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
@@ -41,10 +42,9 @@ internal class RefreshTokenRevokedTest {
             client.toBlocking().exchange(
                 HttpRequest.POST("/oauth/access_token", TokenRefreshRequest(signedRefreshToken)),
                 bodyArgument,
-                errorArgument
-            )
+                errorArgument)
         }
-        assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(BAD_REQUEST, e.status)
 
         val mapOptional: Optional<Map<*, *>> = e.response.getBody(Map::class.java)
         assertTrue(mapOptional.isPresent)
@@ -52,6 +52,7 @@ internal class RefreshTokenRevokedTest {
         val m = mapOptional.get()
         assertEquals("invalid_grant", m["error"])
         assertEquals("refresh token revoked", m["error_description"])
+
         refreshTokenRepository.deleteAll()
     }
 }
