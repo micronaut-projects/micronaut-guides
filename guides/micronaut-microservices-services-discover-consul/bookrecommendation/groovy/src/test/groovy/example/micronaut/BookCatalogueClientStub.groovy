@@ -1,13 +1,14 @@
 package example.micronaut
 
 import io.micronaut.context.annotation.Requires
-import io.micronaut.context.env.Environment
-import reactor.core.publisher.Flux
 import io.micronaut.retry.annotation.Fallback
 import jakarta.inject.Singleton
 import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
 
-@Requires(env = Environment.TEST)
+import static io.micronaut.context.env.Environment.TEST
+
+@Requires(env = TEST)
 @Fallback
 @Singleton
 class BookCatalogueClientStub implements BookCatalogueOperations {

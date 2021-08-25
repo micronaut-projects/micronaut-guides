@@ -1,16 +1,12 @@
 package example.micronaut
 
-import io.micronaut.context.env.Environment
-import io.micronaut.runtime.Micronaut
+import io.micronaut.context.env.Environment.DEVELOPMENT
+import io.micronaut.runtime.Micronaut.build
 
-class Application {
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            Micronaut.build(*args)
-                    .mainClass(Application::class.java)
-                    .defaultEnvironments(Environment.DEVELOPMENT)
-                    .start()
-        }
-    }
+fun main(args: Array<String>) {
+    build()
+        .args(*args)
+        .packages("example.micronaut")
+        .defaultEnvironments(DEVELOPMENT)
+        .start()
 }
