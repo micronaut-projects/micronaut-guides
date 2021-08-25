@@ -3,19 +3,17 @@ package example.micronaut
 import geb.spock.GebSpec
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-
 import jakarta.inject.Inject
 
-//tag::clazz[]
 @MicronautTest // <1>
 class AuthenticationSpec extends GebSpec {
 
     @Inject
     EmbeddedServer embeddedServer // <2>
 
-    def "verify session based authentication works"() {
+    void "verify session based authentication works"() {
         given:
-        browser.baseUrl = "http://localhost:${embeddedServer.port}"
+        browser.baseUrl = "http://localhost:$embeddedServer.port"
 
         when:
         to HomePage
@@ -70,4 +68,3 @@ class AuthenticationSpec extends GebSpec {
         homePage.username() == null
     }
 }
-//end::clazz[]
