@@ -5,8 +5,8 @@ import io.micronaut.runtime.Micronaut.build
 
 fun main(args: Array<String>) {
     build()
-            .args(*args)
-            .packages("example.micronaut")
-            .defaultEnvironments(DEVELOPMENT)
-            .start()
+        .args(*args)
+        .packages("example.micronaut")
+        .defaultEnvironments(DEVELOPMENT)
+        .start()
 }
