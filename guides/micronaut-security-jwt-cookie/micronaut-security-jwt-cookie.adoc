@@ -14,24 +14,22 @@ include::{commondir}/common-completesolution.adoc[]
 
 == Writing the Application
 
-Create an application using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^].
+include::{commondir}/common-cli-or-launch.adoc[]
 
-`mn create-app example.micronaut.micronautguide --test=spock --lang=@lang@`
+[source,bash]
+----
+mn create-app --features=security-jwt,views-velocity,reactor,graalvm example.micronaut.micronautguide --build=@build@ --lang=@lang@ --test=spock
+----
 
-The previous command creates a Micronaut application with the default package `example.micronaut` in a directory named `micronautguide`.
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `security-jwt`, `views-velocity`, `reactor`, and `graalvm` features.
+
+include::{commondir}/common-default-package.adoc[]
+
+diffLink:[featureExcludes=geb]
 
 include::{commondir}/common-annotationprocessors.adoc[]
-
-=== Security Dependency
-
-Add a dependency for Micronaut JWT security:
-
-:dependencies:
-
-dependency:micronaut-security-annotations[groupId=io.micronaut.security,scope=annotationProcessor]
-dependency:micronaut-security-jwt[groupId=io.micronaut.security]
-
-:dependencies:
 
 === Configuration
 
@@ -57,14 +55,10 @@ callout:singleton[1]
 
 By default, Micronaut controllers produce JSON. Usually, you consume those endpoints with a mobile phone application, or a JavaScript front end (Angular, React, Vue.js, etc.). However, to keep this guide simple we will produce HTML in our controllers.
 
-In order to do that, we use https://velocity.apache.org/[Apache Velocity^].
+In order to do that, we use https://velocity.apache.org/[Apache Velocity^] and the Micronaut https://docs.micronaut.io/latest/guide/#views[Server Side View Rendering Module^].
 ____
 Velocity is a Java-based template engine. It permits anyone to use a simple yet powerful template language to reference objects defined in Java code.
 ____
-
-Add a dependency for the Micronaut https://docs.micronaut.io/latest/guide/#views[Server Side View Rendering Module^] and for Velocity:
-
-dependency:micronaut-views-velocity[groupId=io.micronaut.views]
 
 Create two Velocity templates in `src/main/resources/views`:
 
@@ -74,7 +68,7 @@ resource:views/auth.vm[]
 
 === Controllers
 
-Create a file named `HomeController` which resolves the base URL `/`:
+Create `HomeController` which resolves the base URL `/`:
 
 source:HomeController[]
 
@@ -108,7 +102,7 @@ rawTest:LoginPage[]
 
 Create tests to verify the user authentication flow.
 
-rawTest:AuthenticationSpec[tag=clazz]
+rawTest:AuthenticationSpec[]
 
 callout:micronaut-test[1]
 <2> Inject the `EmbeddedServer` bean.
