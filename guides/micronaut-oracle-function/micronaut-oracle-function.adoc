@@ -257,7 +257,7 @@ See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscrea
 
 First we'll need to build the function as a Docker image and push it to the OCIR repository.
 
-Run:
+From the demo project directory, run:
 
 :exclude-for-build:maven
 
@@ -341,7 +341,9 @@ See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsexpo
 
 == Invoking the function
 
-We'll use the OCI command line to invoke the function. Run the following, replacing `<OCID>` with the OCID of the function you copied above:
+We'll use the OCI command line to invoke the function. If you haven't already, install the https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI^] and run `oci setup config`.
+
+Run the following, replacing `<OCID>` with the OCID of the function you copied above:
 
 [source, bash]
 ----
@@ -357,7 +359,21 @@ Your tenancy is: ocid1.tenancy.oc1..aaaaaaaaud4g4e5ovjawn5cij7ke................
 
 The first invocation ("cold start") will take a while as the infrastructure is configured, probably 10-20 seconds or more but subsequent invocations should return in 1-2 seconds.
 
+:exclude-for-languages:groovy
+
 == Deploying as a Native Image
+
+=== Install GraalVM
+
+We will use https://www.graalvm.org/[GraalVM^], the polyglot embeddable virtual machine, to generate a Native image of our function.
+
+Compiling native images ahead-of-time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications and functions.
+
+NOTE: Only Java and Kotlin projects support using GraalVM's `native-image` tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+
+include::{commondir}/common-install-graalvm-sdkman.adoc[]
+
+=== Building and deploying the native image
 
 Deploying the function as a native image is similar to the earlier deployment above.
 
@@ -425,7 +441,7 @@ Edit `pom.xml` and increment the version to `0.2`:
 
 :exclude-for-build:
 
-Then run:
+Then from the demo project directory, run:
 
 :exclude-for-build:maven
 
@@ -450,6 +466,8 @@ Once you've pushed the Docker container, edit the function in the console to use
 image::oraclefn/function7.png[]
 
 Use the same OCI command as before to invoke the function. No changes are needed because the function OCID doesn't change when deploying new containers.
+
+:exclude-for-languages:
 
 include::{commondir}/common-next.adoc[]
 
