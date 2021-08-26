@@ -435,6 +435,25 @@ $ open build/reports/tests/test/index.html</code></pre>
 </div>
 </div>
 <div class="paragraph">
+<p>You will need a password to login as this user, so click the "Create/Reset Password" button:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user12.png" alt="user12">
+</div>
+</div>
+<div class="paragraph">
+<p>and then click the "Create/Reset Password" button in the dialog:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oraclefn/user13.png" alt="user13">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the "Copy" link and save the generated password for later.</p>
+</div>
+<div class="paragraph">
 <p>See the <a href="https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm" target="_blank" rel="noopener">Groups and Users docs</a> for more information.</p>
 </div>
 </div>
@@ -883,6 +902,29 @@ Our recommended approach is to use GraalVM JDK11 even if you still use Java 8 fo
 <div class="title">build.gradle</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">version = <span class="string"><span class="delimiter">&quot;</span><span class="content">0.2</span><span class="delimiter">&quot;</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Depending on the Micronaut version you&#8217;re using, you might also need to update some properties in your build script to update the Docker configuration.</p>
+</div>
+<div class="paragraph">
+<p>In your <code>build.gradle</code>, if the <code>nativeImage</code> block includes <code>--static</code> in the <code>args</code> list, replace it with <code>-H:+StaticExecutableWithDynamicLibC</code>. Also change the base image to <code>frolvlad/alpine-glibc:alpine-3.12</code> in the <code>dockerfileNative</code> block:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">nativeImage {
+    args(<span class="string"><span class="delimiter">&quot;</span><span class="content">-H:+StaticExecutableWithDynamicLibC</span><span class="delimiter">&quot;</span></span>,
+         <span class="string"><span class="delimiter">&quot;</span><span class="content">-Dfn.handler=example.micronaut.Function::handleRequest</span><span class="delimiter">&quot;</span></span>,
+         <span class="string"><span class="delimiter">&quot;</span><span class="content">--initialize-at-build-time=example.micronaut</span><span class="delimiter">&quot;</span></span>)
+}
+
+dockerfileNative {
+    args(<span class="string"><span class="delimiter">&quot;</span><span class="content">-XX:MaximumHeapSizePercent=80</span><span class="delimiter">&quot;</span></span>)
+    buildStrategy.set(ORACLE_FUNCTION)
+    defaultCommand.set(<span class="string"><span class="delimiter">&quot;</span><span class="content">example.micronaut.Function::handleRequest</span><span class="delimiter">&quot;</span></span>)
+    baseImage(<span class="string"><span class="delimiter">'</span><span class="content">frolvlad/alpine-glibc:alpine-3.12</span><span class="delimiter">'</span></span>)
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
