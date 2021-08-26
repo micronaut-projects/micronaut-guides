@@ -441,6 +441,57 @@ Edit `pom.xml` and increment the version to `0.2`:
 
 :exclude-for-build:
 
+Depending on the Micronaut version you're using, you might also need to update some properties in your build script to update the Docker configuration.
+
+:exclude-for-build:maven
+
+In your `build.gradle`, if the `nativeImage` block includes `--static` in the `args` list, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in the `dockerfileNative` block:
+
+[source, groovy]
+.build.gradle
+----
+nativeImage {
+    args("-H:+StaticExecutableWithDynamicLibC",
+         "-Dfn.handler=example.micronaut.Function::handleRequest",
+         "--initialize-at-build-time=example.micronaut")
+}
+
+dockerfileNative {
+    args("-XX:MaximumHeapSizePercent=80")
+    buildStrategy.set(ORACLE_FUNCTION)
+    defaultCommand.set("example.micronaut.Function::handleRequest")
+    baseImage('frolvlad/alpine-glibc:alpine-3.12')
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+In your `pom.xml`, if the `nativeImageBuildArgs` block in the configuration section of the `micronaut-maven-plugin` plugin includes an `arg` with value `--static`, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in a new `baseImageRun` element:
+
+[source, xml]
+.pom.xml
+----
+<plugin>
+  <groupId>io.micronaut.build</groupId>
+  <artifactId>micronaut-maven-plugin</artifactId>
+  <configuration>
+    <baseImageRun>frolvlad/alpine-glibc:alpine-3.12</baseImageRun>
+    <nativeImageBuildArgs>
+      <arg>-H:+StaticExecutableWithDynamicLibC</arg>
+      <arg>-Dfn.handler=${exec.mainClass}::handleRequest</arg>
+      <arg>--initialize-at-build-time=com.example</arg>
+    </nativeImageBuildArgs>
+    <appArguments>
+      <arg>${exec.mainClass}::handleRequest</arg>
+    </appArguments>
+  </configuration>
+</plugin>
+----
+
+:exclude-for-build:
+
 Then from the demo project directory, run:
 
 :exclude-for-build:maven
