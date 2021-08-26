@@ -1,5 +1,6 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 
@@ -10,10 +11,9 @@ public class BookRecommendation {
 
     @NonNull
     @NotBlank
-    private String name;
+    private final String name;
 
-    public BookRecommendation() {}
-
+    @Creator
     public BookRecommendation(@NonNull @NotBlank String name) {
         this.name = name;
     }
@@ -21,10 +21,6 @@ public class BookRecommendation {
     @NonNull
     public String getName() {
         return name;
-    }
-
-    public void setName(@NonNull String name) {
-        this.name = name;
     }
 
     @Override

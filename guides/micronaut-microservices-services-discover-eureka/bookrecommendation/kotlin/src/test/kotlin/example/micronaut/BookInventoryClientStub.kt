@@ -1,24 +1,23 @@
 package example.micronaut
 
 import io.micronaut.context.annotation.Requires
-import io.micronaut.context.env.Environment
+import io.micronaut.context.env.Environment.TEST
 import io.micronaut.retry.annotation.Fallback
-import org.reactivestreams.Publisher
 import jakarta.inject.Singleton
-import javax.validation.constraints.NotBlank
 import reactor.core.publisher.Mono
+import javax.validation.constraints.NotBlank
 
-@Requires(env = arrayOf(Environment.TEST)) // <1>
+@Requires(env = [TEST]) // <1>
 @Fallback
 @Singleton
 open class BookInventoryClientStub : BookInventoryOperations {
 
     override fun stock(@NotBlank isbn: String): Mono<Boolean> {
         if (isbn == "1491950358") {
-            return Mono.just(java.lang.Boolean.TRUE) // <2>
-
-        } else if (isbn == "1680502395") {
-            return Mono.just(java.lang.Boolean.FALSE) // <3>
+            return Mono.just(true) // <2>
+        }
+        if (isbn == "1680502395") {
+            return Mono.just(false) // <3>
         }
         return Mono.empty() // <4>
     }

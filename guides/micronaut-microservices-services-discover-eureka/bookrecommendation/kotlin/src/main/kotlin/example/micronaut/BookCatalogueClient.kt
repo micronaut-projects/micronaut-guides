@@ -5,18 +5,18 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
 import org.reactivestreams.Publisher
-
 //end::packageandimports[]
+
 /*
 //tag::harcoded[]
 @Client("http://localhost:8081") // <1>
 @Recoverable(api = BookCatalogueOperations::class)
 //end::harcoded[]
 */
-//tag::eureka[]
+//tag::consul[]
 @Client(id = "bookcatalogue") // <1>
 @Recoverable(api = BookCatalogueOperations::class)
-//end::eureka[]
+//end::consul[]
 //tag::clazz[]
 interface BookCatalogueClient : BookCatalogueOperations {
 

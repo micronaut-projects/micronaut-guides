@@ -13,10 +13,10 @@ import org.reactivestreams.Publisher;
 @Recoverable(api = BookCatalogueOperations.class)
 //end::harcoded[]
 */
-//tag::eureka[]
+//tag::consul[]
 @Client(id = "bookcatalogue") // <1>
 @Recoverable(api = BookCatalogueOperations.class)
-//end::eureka[]
+//end::consul[]
 //tag::clazz[]
 interface BookCatalogueClient extends BookCatalogueOperations {
 
