@@ -98,6 +98,16 @@ Copy the token to the clipboard and save it for later:
 
 image::oraclefn/user11.png[]
 
+You will need a password to login as this user, so click the "Create/Reset Password" button:
+
+image::oraclefn/user12.png[]
+
+and then click the "Create/Reset Password" button in the dialog:
+
+image::oraclefn/user13.png[]
+
+Click the "Copy" link and save the generated password for later.
+
 See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm[Groups and Users docs^] for more information.
 
 === Oracle Cloud Infrastructure Registry (OCIR) repository
@@ -437,6 +447,57 @@ Edit `pom.xml` and increment the version to `0.2`:
 .pom.xml
 ----
 <version>0.2</version>
+----
+
+:exclude-for-build:
+
+Depending on the Micronaut version you're using, you might also need to update some properties in your build script to update the Docker configuration.
+
+:exclude-for-build:maven
+
+In your `build.gradle`, if the `nativeImage` block includes `--static` in the `args` list, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in the `dockerfileNative` block:
+
+[source, groovy]
+.build.gradle
+----
+nativeImage {
+    args("-H:+StaticExecutableWithDynamicLibC",
+         "-Dfn.handler=example.micronaut.Function::handleRequest",
+         "--initialize-at-build-time=example.micronaut")
+}
+
+dockerfileNative {
+    args("-XX:MaximumHeapSizePercent=80")
+    buildStrategy.set(ORACLE_FUNCTION)
+    defaultCommand.set("example.micronaut.Function::handleRequest")
+    baseImage('frolvlad/alpine-glibc:alpine-3.12')
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+In your `pom.xml`, if the `nativeImageBuildArgs` block in the configuration section of the `micronaut-maven-plugin` plugin includes an `arg` with value `--static`, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in a new `baseImageRun` element:
+
+[source, xml]
+.pom.xml
+----
+<plugin>
+  <groupId>io.micronaut.build</groupId>
+  <artifactId>micronaut-maven-plugin</artifactId>
+  <configuration>
+    <baseImageRun>frolvlad/alpine-glibc:alpine-3.12</baseImageRun>
+    <nativeImageBuildArgs>
+      <arg>-H:+StaticExecutableWithDynamicLibC</arg>
+      <arg>-Dfn.handler=${exec.mainClass}::handleRequest</arg>
+      <arg>--initialize-at-build-time=com.example</arg>
+    </nativeImageBuildArgs>
+    <appArguments>
+      <arg>${exec.mainClass}::handleRequest</arg>
+    </appArguments>
+  </configuration>
+</plugin>
 ----
 
 :exclude-for-build:
