@@ -72,25 +72,16 @@ include::{commondir}/common-cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-app example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11 --features=oracle,data-jdbc,oracle-cloud-sdk,flyway,testcontainers
+mn create-app --features=oracle,oracle-cloud-atp,data-jdbc,oracle-cloud-sdk,flyway,testcontainers example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
 ----
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
 include::{commondir}/common-default-package.adoc[]
 
+diffLink:[]
+
 include::{commondir}/common-annotationprocessors.adoc[]
-
-=== Dependencies
-
-Oracle Cloud Autonomous Database connection information and credentials are stored in the https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm[Oracle Wallet^]. In addition to the dependencies added by the features specified when creating the application, we need a few more for Autonomous Database connectivity and automatic wallet configuration:
-
-:dependencies:
-dependency:ojdbc-bom[groupId=com.oracle.database.jdbc,version=@ojdbc-bomVersion@,pom=true]
-dependency:micronaut-oraclecloud-atp[groupId=io.micronaut.oraclecloud]
-:dependencies:
-
-See the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud integration documentation^] for more details and options for working with Oracle Cloud in Micronaut applications.
 
 === Entity class
 
@@ -134,6 +125,8 @@ Replace the generated `application.yml` with this:
 resource:application.yml[]
 
 <1> This is optional, but it's a good idea to configure the IO pool size when using `@ExecuteOn(TaskExecutors.IO)` in controllers
+
+Oracle Cloud Autonomous Database connection information and credentials are stored in the https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm[Oracle Wallet^]. See the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud integration documentation^] for more details and options for working with Oracle Cloud in Micronaut applications.
 
 Create an `application-oraclecloud.yml` file in `src/main/resources` with this content:
 
@@ -284,6 +277,111 @@ connection: keep-alive
 
 {"message":"Page Not Found","_links":{"self":{"href":"/things/Ralph","templated":false}}}
 ----
+
+== Using Oracle Cloud Vault
+
+In the previous sections, we included the admin and user passwords in cleartext inside `application-oraclecloud.yml`, which is not a best practice. However, it's possible to externalize those (and other properties that shouldn't be in cleartext and/or in source control) with https://docs.oracle.com/en-us/iaas/Content/KeyManagement
+/Concepts/keyoverview.htm[Oracle Cloud Vault].
+
+=== Creating the vault
+
+From the Oracle Cloud Menu select "Identity & Security" and then "Vault":
+
+image::oracleautodb/vault1.png[]
+
+Click "Create Vault":
+
+image::oracleautodb/vault2.png[]
+
+Then enter a name for the vault, e.g. "mn-guide-vault" and click "Create Vault":
+
+image::oracleautodb/vault3.png[]
+
+Click the "Copy" link in the `OCID` row; this is the unique identifier for your vault and you'll need it later.
+
+image::oracleautodb/vault4.png[]
+
+Click "Master Encryption Keys" under "Resources", then click "Create Key":
+
+image::oracleautodb/vault5.png[]
+
+Choose a name for the key, e.g. "mn-guide-encryption-key", and change "Protection Mode" to "Software", then click "Create Key":
+
+image::oracleautodb/vault6.png[]
+
+Once the key has finished provisioning, click "Secrets" under "Resources", then click "Create Secret":
+
+image::oracleautodb/vault7.png[]
+
+This first secret will be for the admin/wallet password, so choose a name like "ATP_ADMIN_PASSWORD". Select the encryption key you created, and put the admin password value in the "Secret Contents" field, then click "Create Secret":
+
+image::oracleautodb/vault8.png[]
+
+Create another key for the user password, using a name like "ATP_USER_PASSWORD".
+
+=== Dependency
+
+Add a dependency for the `micronaut-oraclecloud-vault` library to add support for using Vault as a distributed configuration source:
+
+dependency:micronaut-oraclecloud-vault[groupId=io.micronaut.oraclecloud]
+
+=== Configuration changes
+
+Create `src/main/resources/bootstrap.yml` with the following content:
+
+[source, yaml]
+.src/main/resources/bootstrap.yml
+----
+micronaut:
+  application:
+    name: micronautguide
+  config-client:
+    enabled: true
+oci:
+  config:
+    profile: DEFAULT # <1>
+  vault:
+    config:
+      enabled: true
+    vaults:
+      - ocid: # <2>
+        compartment-ocid: # <3>
+----
+
+<1> Use the same profile name as above in `application-oraclecloud.yml`
+<2> Set the value of the `ocid` property with the vault OCID unique identifier you saved when creating the vault.
+<3> Set the value of the `compartment-ocid` property with the OCID unique identifier of the compartment where you created the secrets
+
+Delete the `micronaut.application.name` property from `application.yml` so it's only declared once:
+
+[source, yaml]
+.src/main/resources/application.yml
+----
+micronaut:
+  executors:
+    io:
+      type: fixed
+      nThreads: 75
+flyway:
+  datasources:
+    default:
+      enabled: true
+----
+
+Similarly, delete the `oci.config.profile` property from `application-oraclecloud.yml`, and replace the cleartext passwords with placeholders using the secret names you created:
+
+[source, yaml]
+.src/main/resources/application-oraclecloud.yml
+----
+datasources:
+  default:
+    ocid: ocid1.autonomousdatabase.oc1.iad.anuwcl...
+    walletPassword: ${ATP_ADMIN_PASSWORD}
+    username: micronautdemo
+    password: ${ATP_USER_PASSWORD}
+----
+
+Run the application again, and everything should work with the password placeholders replaced with the resolved secret values at startup.
 
 include::{commondir}/common-next.adoc[]
 
