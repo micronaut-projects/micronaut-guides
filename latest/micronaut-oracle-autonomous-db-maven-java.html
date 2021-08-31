@@ -129,19 +129,25 @@
 <li><a href="#provision-oracle-autonomous-database">4. Provision Oracle Autonomous Database</a></li>
 <li><a href="#writing-the-app">5. Writing the App</a>
 <ul class="sectlevel2">
-<li><a href="#dependencies">5.1. Dependencies</a></li>
-<li><a href="#entity-class">5.2. Entity class</a></li>
-<li><a href="#repository-class">5.3. Repository class</a></li>
-<li><a href="#data-populator-class">5.4. Data populator class</a></li>
-<li><a href="#controller-class">5.5. Controller class</a></li>
-<li><a href="#configuration">5.6. Configuration</a></li>
-<li><a href="#writing-tests">5.7. Writing Tests</a></li>
+<li><a href="#entity-class">5.1. Entity class</a></li>
+<li><a href="#repository-class">5.2. Repository class</a></li>
+<li><a href="#data-populator-class">5.3. Data populator class</a></li>
+<li><a href="#controller-class">5.4. Controller class</a></li>
+<li><a href="#configuration">5.5. Configuration</a></li>
+<li><a href="#writing-tests">5.6. Writing Tests</a></li>
 </ul>
 </li>
 <li><a href="#testing-the-application">6. Testing the Application</a></li>
 <li><a href="#running-the-application">7. Running the Application</a></li>
-<li><a href="#next-steps">8. Next steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
+<li><a href="#using-oracle-cloud-vault">8. Using Oracle Cloud Vault</a>
+<ul class="sectlevel2">
+<li><a href="#creating-the-vault">8.1. Creating the vault</a></li>
+<li><a href="#dependency">8.2. Dependency</a></li>
+<li><a href="#configuration-changes">8.3. Configuration changes</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">9. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">10. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -323,7 +329,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=maven --lang=java --jdk=11 --features=oracle,data-jdbc,oracle-cloud-sdk,flyway,testcontainers</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=oracle,oracle-cloud-atp,data-jdbc,oracle-cloud-sdk,flyway,testcontainers example.micronaut.micronautguide --build=maven --lang=java --jdk=11</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -341,6 +347,18 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=graalvm&amp;features=oracle&amp;features=data-jdbc&amp;features=oracle-cloud-sdk&amp;features=flyway&amp;features=oracle-cloud-atp&amp;features=testcontainers&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
 </div>
@@ -350,35 +368,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="dependencies">5.1. Dependencies</h3>
-<div class="paragraph">
-<p>Oracle Cloud Autonomous Database connection information and credentials are stored in the <a href="https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm" target="_blank" rel="noopener">Oracle Wallet</a>. In addition to the dependencies added by the features specified when creating the application, we need a few more for Autonomous Database connectivity and automatic wallet configuration:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="comment">&lt;!-- Add the following to your dependencyManagement element --&gt;</span>
-<span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>com.oracle.database.jdbc<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>ojdbc-bom<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>21.1.0.0<span class="tag">&lt;/version&gt;</span>
-    <span class="tag">&lt;type&gt;</span>pom<span class="tag">&lt;/type&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>import<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-
-<span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.oraclecloud<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-oraclecloud-atp<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>See the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/" target="_blank" rel="noopener">Micronaut Oracle Cloud integration documentation</a> for more details and options for working with Oracle Cloud in Micronaut applications.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="entity-class">5.2. Entity class</h3>
+<h3 id="entity-class">5.1. Entity class</h3>
 <div class="paragraph">
 <p>Create a <code>Thing</code> entity class to represent database data:</p>
 </div>
@@ -422,7 +412,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="repository-class">5.3. Repository class</h3>
+<h3 id="repository-class">5.2. Repository class</h3>
 <div class="paragraph">
 <p>Create a <code>ThingRepository</code> class to read and write <code>Thing</code> database data:</p>
 </div>
@@ -453,7 +443,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="data-populator-class">5.4. Data populator class</h3>
+<h3 id="data-populator-class">5.3. Data populator class</h3>
 <div class="paragraph">
 <p>Create a <code>DataPopulator</code> class to create some example database entries when the application starts:</p>
 </div>
@@ -467,8 +457,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.context.event.StartupEvent</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.event.annotation.EventListener</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
 <span class="keyword">import</span> <span class="include">javax.transaction.Transactional</span>;
 <span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
 
@@ -498,7 +488,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="controller-class">5.5. Controller class</h3>
+<h3 id="controller-class">5.4. Controller class</h3>
 <div class="paragraph">
 <p>Create a <code>ThingController</code> class to view persisted data:</p>
 </div>
@@ -542,7 +532,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="configuration">5.6. Configuration</h3>
+<h3 id="configuration">5.5. Configuration</h3>
 <div class="paragraph">
 <p>Create a new Flyway migration SQL script in <code>src/main/resources/db/migration/V1__create-schema.sql</code> and add the following:</p>
 </div>
@@ -589,6 +579,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
+<p>Oracle Cloud Autonomous Database connection information and credentials are stored in the <a href="https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm" target="_blank" rel="noopener">Oracle Wallet</a>. See the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/" target="_blank" rel="noopener">Micronaut Oracle Cloud integration documentation</a> for more details and options for working with Oracle Cloud in Micronaut applications.</p>
+</div>
+<div class="paragraph">
 <p>Create an <code>application-oraclecloud.yml</code> file in <code>src/main/resources</code> with this content:</p>
 </div>
 <div class="listingblock">
@@ -627,7 +620,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="writing-tests">5.7. Writing Tests</h3>
+<h3 id="writing-tests">5.6. Writing Tests</h3>
 <div class="paragraph">
 <p>Create a test to verify that database access works:</p>
 </div>
@@ -842,7 +835,177 @@ connection: keep-alive
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">8. Next steps</h2>
+<h2 id="using-oracle-cloud-vault">8. Using Oracle Cloud Vault</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the previous sections, we included the admin and user passwords in cleartext inside <code>application-oraclecloud.yml</code>, which is not a best practice. However, it&#8217;s possible to externalize those (and other properties that shouldn&#8217;t be in cleartext and/or in source control) with <a href="https://docs.oracle.com/en-us/iaas/Content/KeyManagement" class="bare">https://docs.oracle.com/en-us/iaas/Content/KeyManagement</a>
+/Concepts/keyoverview.htm[Oracle Cloud Vault].</p>
+</div>
+<div class="sect2">
+<h3 id="creating-the-vault">8.1. Creating the vault</h3>
+<div class="paragraph">
+<p>From the Oracle Cloud Menu select "Identity &amp; Security" and then "Vault":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/vault1.png" alt="vault1">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Create Vault":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/vault2.png" alt="vault2">
+</div>
+</div>
+<div class="paragraph">
+<p>Then enter a name for the vault, e.g. "mn-guide-vault" and click "Create Vault":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/vault3.png" alt="vault3">
+</div>
+</div>
+<div class="paragraph">
+<p>Click the "Copy" link in the <code>OCID</code> row; this is the unique identifier for your vault and you&#8217;ll need it later.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/vault4.png" alt="vault4">
+</div>
+</div>
+<div class="paragraph">
+<p>Click "Master Encryption Keys" under "Resources", then click "Create Key":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/vault5.png" alt="vault5">
+</div>
+</div>
+<div class="paragraph">
+<p>Choose a name for the key, e.g. "mn-guide-encryption-key", and change "Protection Mode" to "Software", then click "Create Key":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/vault6.png" alt="vault6">
+</div>
+</div>
+<div class="paragraph">
+<p>Once the key has finished provisioning, click "Secrets" under "Resources", then click "Create Secret":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/vault7.png" alt="vault7">
+</div>
+</div>
+<div class="paragraph">
+<p>This first secret will be for the admin/wallet password, so choose a name like "ATP_ADMIN_PASSWORD". Select the encryption key you created, and put the admin password value in the "Secret Contents" field, then click "Create Secret":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/oracleautodb/vault8.png" alt="vault8">
+</div>
+</div>
+<div class="paragraph">
+<p>Create another key for the user password, using a name like "ATP_USER_PASSWORD".</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dependency">8.2. Dependency</h3>
+<div class="paragraph">
+<p>Add a dependency for the <code>micronaut-oraclecloud-vault</code> library to add support for using Vault as a distributed configuration source:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut.oraclecloud<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-oraclecloud-vault<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration-changes">8.3. Configuration changes</h3>
+<div class="paragraph">
+<p>Create <code>src/main/resources/bootstrap.yml</code> with the following content:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/bootstrap.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">application</span>:
+    <span class="key">name</span>: <span class="string"><span class="content">micronautguide</span></span>
+  <span class="key">config-client</span>:
+    <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+<span class="key">oci</span>:
+  <span class="key">config</span>:
+    <span class="key">profile</span>: <span class="string"><span class="content">DEFAULT </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+  <span class="key">vault</span>:
+    <span class="key">config</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+    <span class="key">vaults</span>:
+      - <span class="string"><span class="content">ocid: </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="key">compartment-ocid</span>: <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use the same profile name as above in <code>application-oraclecloud.yml</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the value of the <code>ocid</code> property with the vault OCID unique identifier you saved when creating the vault.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set the value of the <code>compartment-ocid</code> property with the OCID unique identifier of the compartment where you created the secrets</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Delete the <code>micronaut.application.name</code> property from <code>application.yml</code> so it&#8217;s only declared once:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">executors</span>:
+    <span class="key">io</span>:
+      <span class="key">type</span>: <span class="string"><span class="content">fixed</span></span>
+      <span class="key">nThreads</span>: <span class="string"><span class="content">75</span></span>
+<span class="key">flyway</span>:
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Similarly, delete the <code>oci.config.profile</code> property from <code>application-oraclecloud.yml</code>, and replace the cleartext passwords with placeholders using the secret names you created:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application-oraclecloud.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+  <span class="key">default</span>:
+    <span class="key">ocid</span>: <span class="string"><span class="content">ocid1.autonomousdatabase.oc1.iad.anuwcl...</span></span>
+    <span class="key">walletPassword</span>: <span class="string"><span class="content">${ATP_ADMIN_PASSWORD}</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">micronautdemo</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">${ATP_USER_PASSWORD}</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run the application again, and everything should work with the password placeholders replaced with the resolved secret values at startup.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">9. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Explore more features with <a href="https://micronaut.io/guides/" target="_blank" rel="noopener">Micronaut Guides</a>.</p>
@@ -856,7 +1019,7 @@ connection: keep-alive
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">10. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a href="https://objectcomputing.com" target="_blank" rel="noopener">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
