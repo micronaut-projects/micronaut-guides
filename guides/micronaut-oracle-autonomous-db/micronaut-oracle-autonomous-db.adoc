@@ -326,7 +326,7 @@ dependency:micronaut-oraclecloud-vault[groupId=io.micronaut.oraclecloud]
 
 === Configuration changes
 
-Create `src/main/resources/bootstrap.yml` with the following content:
+Create `src/main/resources/bootstrap.yml` with just the `micronaut.application.name` property:
 
 [source, yaml]
 .src/main/resources/bootstrap.yml
@@ -334,6 +334,30 @@ Create `src/main/resources/bootstrap.yml` with the following content:
 micronaut:
   application:
     name: micronautguide
+----
+
+and delete the `micronaut.application.name` property from `application.yml` so it's only declared once:
+
+[source, yaml]
+.src/main/resources/application.yml
+----
+micronaut:
+  executors:
+    io:
+      type: fixed
+      nThreads: 75
+flyway:
+  datasources:
+    default:
+      enabled: true
+----
+
+Then create `src/main/resources/bootstrap-oraclecloud.yml` with the following content:
+
+[source, yaml]
+.src/main/resources/bootstrap-oraclecloud.yml
+----
+micronaut:
   config-client:
     enabled: true
 oci:
@@ -351,23 +375,7 @@ oci:
 <2> Set the value of the `ocid` property with the vault OCID unique identifier you saved when creating the vault.
 <3> Set the value of the `compartment-ocid` property with the OCID unique identifier of the compartment where you created the secrets
 
-Delete the `micronaut.application.name` property from `application.yml` so it's only declared once:
-
-[source, yaml]
-.src/main/resources/application.yml
-----
-micronaut:
-  executors:
-    io:
-      type: fixed
-      nThreads: 75
-flyway:
-  datasources:
-    default:
-      enabled: true
-----
-
-Similarly, delete the `oci.config.profile` property from `application-oraclecloud.yml`, and replace the cleartext passwords with placeholders using the secret names you created:
+Delete the `oci.config.profile` property from `application-oraclecloud.yml`, and replace the cleartext passwords with placeholders using the secret names you created:
 
 [source, yaml]
 .src/main/resources/application-oraclecloud.yml
