@@ -16,7 +16,7 @@
     <link href="guide.css" rel="stylesheet" />
     <script src="guide.js"></script>
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:image" content="https://guides.micronaut.io/images/cards/micronaut-rabbitmq-rpc.png"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-rabbitmq-rpc.png"/>
     <meta name="twitter:creator" content="@micronautfw"/>
     <meta name="twitter:site" content="@micronautfw"/>
     <meta name="twitter:title" content="RabbitMQ RPC and Micronaut Framework"/>
@@ -171,10 +171,7 @@
 <h2 id="getting-started">1. Getting Started</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this guide, we will create a Micronaut application written in Java.</p>
-</div>
-<div class="paragraph">
-<p>In this guide, we will create three microservices and communicate each other with <a href="https://www.rabbitmq.com/" target="_blank" rel="noopener">RabbitMQ</a> using the request-response pattern with <a href="https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc" target="_blank" rel="noopener">RPC</a>
+<p>In this guide, we will create three microservices that will communicate with each other with <a href="https://www.rabbitmq.com/" target="_blank" rel="noopener">RabbitMQ</a> using the request-response pattern with <a href="https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc" target="_blank" rel="noopener">RPC</a>
 <em>(Remote Procedure Call)</em>.</p>
 </div>
 <div class="quoteblock">
@@ -254,29 +251,45 @@ Message Queuing Telemetry Transport (MQTT), and other protocols.</p>
 <div class="sect2">
 <h3 id="catalogue-microservice">4.1. Catalogue microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookcatalogue</code> microservice:</p>
-</div>
-<div class="paragraph">
-<p><code>mn create-app example.micronaut.bookcatalogue</code></p>
-</div>
-<div class="paragraph">
-<p>The previous command creates a directory named <code>bookcatalogue, and a Micronaut application inside it with default package `example.micronaut</code>.</p>
-</div>
-<div class="paragraph">
-<p>Add <code>rabbitmq</code> dependency. As we only want to use RabbitMQ to receive requests we can remove Micronaut HTTP client and Server.</p>
+<p>Create the <code>bookcatalogue</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
-<div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.rabbitmq<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-rabbitmq<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,graalvm example.micronaut.bookcatalogue --build=maven --lang=java</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>By default a Micronaut application will connect to a RabbitMQ instance running on <code>localhost</code> so it is not necessary to add anything to <code>application.yml</code>. In case you want to change the configuration, add the following:</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>rabbitmq</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookcatalogue</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=rabbitmq&amp;features=graalvm&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookcatalogue&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>By default, a Micronaut application will connect to a RabbitMQ instance running on <code>localhost</code>, so it is not necessary to add anything to <code>application.yml</code>. In case you want to change the configuration, add the following:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/resources/application.yml</div>
@@ -286,11 +299,11 @@ Message Queuing Telemetry Transport (MQTT), and other protocols.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="create-rabbitmq-exchange-queue-and-binding">4.1.1. Create RabbitMQ exchange, queue and binding</h4>
+<h4 id="create-rabbitmq-exchange-queue-and-binding">4.1.1. Create RabbitMQ exchange, queue, and binding</h4>
 <div class="paragraph">
 <p>Before being able to send and receive messages using RabbitMQ it is necessary to define the exchange, queue and binding.
-One option is create them directly in the RabbitMQ Admin UI available on <code><a href="http://localhost:15672" target="_blank" rel="noopener">http://localhost:15672</a></code>. Use <code>guest</code> for both
-username and password.</p>
+One option is create them directly in the RabbitMQ Admin UI available on <code><a href="http://localhost:15672" target="_blank" rel="noopener">http://localhost:15672</a></code>.
+Use <code>guest</code> for both username and password.</p>
 </div>
 <div class="paragraph">
 <p>Another option is create them programmatically. Create the class <code>ChannelPoolListener.java</code>:</p>
@@ -303,8 +316,8 @@ username and password.</p>
 <span class="keyword">import</span> <span class="include">com.rabbitmq.client.BuiltinExchangeType</span>;
 <span class="keyword">import</span> <span class="include">com.rabbitmq.client.Channel</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.rabbitmq.connect.ChannelInitializer</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
 <span class="keyword">import</span> <span class="include">java.io.IOException</span>;
 
 <span class="annotation">@Singleton</span>
@@ -474,31 +487,50 @@ all the elements in the same file and share the file between all the projects.
 <div class="sect2">
 <h3 id="inventory-microservice">4.2. Inventory microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookinventory</code> microservice:</p>
+<p>Create the <code>bookinventory</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,graalvm example.micronaut.bookinventory --build=maven --lang=java</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p><code>mn create-app example.micronaut.bookinventory</code></p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>rabbitmq</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookinventory</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=rabbitmq&amp;features=graalvm&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookinventory&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>The previous command creates a directory named <code>bookinventory</code>, and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
 </div>
-<div class="paragraph">
-<p>Add <code>rabbitmq</code> dependency. As we only want to use RabbitMQ to receive requests we can remove Micronaut HTTP client and Server.</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.rabbitmq<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-rabbitmq<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
 <div class="sect3">
 <h4 id="create-rabbitmq-exchange-queue-and-binding-2">4.2.1. Create RabbitMQ exchange, queue and binding</h4>
 <div class="paragraph">
-<p>As we did in <code>Catalogue</code> Microservice, create the class <code>ChannelPoolListener.java</code> in <code>bookinventory/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java</code>
+<p>As we did in the <code>Catalogue</code> Microservice, create the class <code>ChannelPoolListener.java</code> in <code>bookinventory/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java</code>
 with the same content as before.</p>
 </div>
 </div>
@@ -611,31 +643,47 @@ with the same content as before.</p>
 <div class="sect2">
 <h3 id="recommendation-microservice">4.3. Recommendation microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookrecommendation</code> microservice:</p>
-</div>
-<div class="paragraph">
-<p><code>mn create-app example.micronaut.bookrecommendation</code></p>
-</div>
-<div class="paragraph">
-<p>The previous command creates a directory named <code>bookrecommendation</code>, and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
-</div>
-<div class="paragraph">
-<p>Add <code>rabbitmq</code> dependency. In this microservice we will use Micronaut HTTP Server to receive REST request, so it is not necessary to remove any dependency.</p>
+<p>Create the <code>bookrecommendation</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
-<div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.rabbitmq<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-rabbitmq<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,reactor,graalvm example.micronaut.bookrecommendation --build=maven --lang=java</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>rabbitmq</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookrecommendation</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=rabbitmq&amp;features=graalvm&amp;features=reactor&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookrecommendation&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="sect3">
 <h4 id="create-rabbitmq-exchange-queue-and-binding-3">4.3.1. Create RabbitMQ exchange, queue and binding</h4>
 <div class="paragraph">
-<p>As we did in <code>Catalogue</code> Microservice, create the class <code>ChannelPoolListener.java</code> in <code>bookrecommendation/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java</code>
+<p>As we did in the <code>Catalogue</code> Microservice, create the class <code>ChannelPoolListener.java</code> in <code>bookrecommendation/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java</code>
 with the same content as before.</p>
 </div>
 </div>
@@ -653,8 +701,8 @@ Create <code>CatalogueClient.java</code>:</p>
 <span class="keyword">import</span> <span class="include">io.micronaut.rabbitmq.annotation.Binding</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.rabbitmq.annotation.RabbitClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.rabbitmq.annotation.RabbitProperty</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
 <span class="annotation">@RabbitClient</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">micronaut</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
@@ -663,7 +711,6 @@ Create <code>CatalogueClient.java</code>:</p>
 
     <span class="annotation">@Binding</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">books.catalogue</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
     Publisher&lt;<span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt;&gt; findAll(<span class="type">byte</span><span class="type">[]</span> data); <i class="conum" data-value="4"></i><b>(4)</b>
-
 }</code></pre>
 </div>
 </div>
@@ -703,7 +750,6 @@ used in the consumer.</td>
 <span class="keyword">import</span> <span class="include">io.micronaut.rabbitmq.annotation.Binding</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.rabbitmq.annotation.RabbitClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.rabbitmq.annotation.RabbitProperty</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
 <span class="annotation">@RabbitClient</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">micronaut</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
@@ -712,7 +758,6 @@ used in the consumer.</td>
 
     <span class="annotation">@Binding</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">books.inventory</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
     Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="predefined-type">String</span> isbn); <i class="conum" data-value="4"></i><b>(4)</b>
-
 }</code></pre>
 </div>
 </div>
@@ -750,8 +795,8 @@ type to wrap the result.</td>
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">BookController</span> {
@@ -773,7 +818,6 @@ type to wrap the result.</td>
                         .map(response -&gt; book))
                 .map(book -&gt; <span class="keyword">new</span> BookRecommendation(book.getName()));
     }
-
 }</code></pre>
 </div>
 </div>
