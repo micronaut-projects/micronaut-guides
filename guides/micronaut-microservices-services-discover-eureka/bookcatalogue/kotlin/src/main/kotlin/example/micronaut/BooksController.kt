@@ -7,10 +7,8 @@ import io.micronaut.http.annotation.Get
 class BooksController {
 
     @Get // <2>
-    fun index(): List<Book> {
-        val buildingMicroservices = Book("1491950358", "Building Microservices")
-        val releaseIt = Book("1680502395", "Release It!")
-        val cidelivery = Book("0321601912", "Continuous Delivery:")
-        return listOf(buildingMicroservices, releaseIt, cidelivery)
-    }
+    fun index(): List<Book> = listOf(
+            Book("1491950358", "Building Microservices"),
+            Book("1680502395", "Release It!"),
+            Book("0321601912", "Continuous Delivery:"))
 }

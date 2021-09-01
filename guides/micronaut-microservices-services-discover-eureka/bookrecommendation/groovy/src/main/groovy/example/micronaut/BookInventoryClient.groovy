@@ -19,10 +19,10 @@ import static io.micronaut.http.MediaType.TEXT_PLAIN
 @Recoverable(api = BookInventoryOperations)
 //end::harcoded[]
 */
-//tag::consul[]
+//tag::eureka[]
 @Client(id = "bookinventory") // <1>
 @Recoverable(api = BookInventoryOperations)
-//end::consul[]
+//end::eureka[]
 //tag::clazz[]
 interface BookInventoryClient extends BookInventoryOperations {
 

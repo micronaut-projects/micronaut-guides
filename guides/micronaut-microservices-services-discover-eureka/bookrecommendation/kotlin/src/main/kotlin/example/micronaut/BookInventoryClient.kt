@@ -16,10 +16,10 @@ import javax.validation.constraints.NotBlank
 @Recoverable(api = BookInventoryOperations::class)
 //end::harcoded[]
 */
-//tag::consul[]
+//tag::eureka[]
 @Client(id = "bookinventory") // <1>
 @Recoverable(api = BookInventoryOperations::class)
-//end::consul[]
+//end::eureka[]
 //tag::clazz[]
 interface BookInventoryClient : BookInventoryOperations {
 
