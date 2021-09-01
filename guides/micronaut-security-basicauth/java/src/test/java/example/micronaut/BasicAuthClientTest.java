@@ -1,9 +1,9 @@
 package example.micronaut;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import jakarta.inject.Inject;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,8 +17,7 @@ public class BasicAuthClientTest {
     @Test
     void verifyBasicAuthWorks() {
         String credsEncoded = Base64.getEncoder().encodeToString("sherlock:password".getBytes());
-        String rsp = appClient.home("Basic " +credsEncoded); // <3>
-        assertEquals(rsp, "sherlock");
+        String rsp = appClient.home("Basic " + credsEncoded); // <3>
+        assertEquals("sherlock", rsp);
     }
-
 }
