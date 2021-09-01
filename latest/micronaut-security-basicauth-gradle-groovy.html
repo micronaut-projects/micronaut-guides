@@ -128,12 +128,11 @@
 <li><a href="#solution">3. Solution</a></li>
 <li><a href="#writing-the-application">4. Writing the Application</a>
 <ul class="sectlevel2">
-<li><a href="#security-dependency">4.1. Security Dependency</a></li>
-<li><a href="#authentication-provider">4.2. Authentication Provider</a></li>
-<li><a href="#controllers">4.3. Controllers</a></li>
-<li><a href="#www-authenticate">4.4. WWW-Authenticate</a></li>
-<li><a href="#tests">4.5. Tests</a></li>
-<li><a href="#use-the-micronaut-http-client-and-basic-auth">4.6. Use the Micronaut HTTP Client and Basic Auth</a></li>
+<li><a href="#authentication-provider">4.1. Authentication Provider</a></li>
+<li><a href="#controllers">4.2. Controllers</a></li>
+<li><a href="#www-authenticate">4.3. WWW-Authenticate</a></li>
+<li><a href="#tests">4.4. Tests</a></li>
+<li><a href="#use-the-micronaut-http-client-and-basic-auth">4.5. Use the Micronaut HTTP Client and Basic Auth</a></li>
 </ul>
 </li>
 <li><a href="#testing-the-application">5. Testing the Application</a></li>
@@ -166,13 +165,10 @@
 <h2 id="getting-started">1. Getting Started</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this guide, we will create a Micronaut application written in Groovy.</p>
+<p>In this guide, we will create a Micronaut application written in Groovy and secure it with HTTP Basic Auth.</p>
 </div>
 <div class="paragraph">
 <p><a href="https://tools.ietf.org/html/rfc7617" target="_blank" rel="noopener">RFC7617</a> defines the "Basic" Hypertext Transfer Protocol (HTTP) authentication scheme, which transmits credentials as user-id/password pairs, encoded using Base64.</p>
-</div>
-<div class="paragraph">
-<p>In this guide you will create a Micronaut application and secure it with HTTP Basic Auth.</p>
 </div>
 </div>
 </div>
@@ -220,7 +216,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=gradle --lang=groovy</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=security,reactor,graalvm example.micronaut.micronautguide --build=gradle --lang=groovy</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -236,22 +232,25 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
+<p>If you use Micronaut Launch, select "Micronaut Application" as application type and add the <code>security</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=graalvm&amp;features=security&amp;features=reactor&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect2">
-<h3 id="security-dependency">4.1. Security Dependency</h3>
-<div class="paragraph">
-<p>Add the Micronaut security dependency to your build:</p>
-</div>
-<div class="listingblock">
-<div class="title">build.gradle</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut:micronaut-security</span><span class="delimiter">&quot;</span></span>)</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="authentication-provider">4.2. Authentication Provider</h3>
+<h3 id="authentication-provider">4.1. Authentication Provider</h3>
 <div class="paragraph">
 <p>To keep this guide simple, create a naive <code>AuthenticationProvider</code> to simulate user&#8217;s authentication.</p>
 </div>
@@ -263,22 +262,21 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailed</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationProvider</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>
 
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span> <span class="directive">implements</span> AuthenticationProvider { <i class="conum" data-value="2"></i><b>(2)</b>
 
     <span class="annotation">@Override</span>
-    Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest, AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
+    Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest,
+                                                   AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
         Flux.create({ emitter -&gt;
             <span class="keyword">if</span> ( authenticationRequest.identity == <span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span> &amp;&amp; authenticationRequest.secret == <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span> ) {
                 emitter.next(AuthenticationResponse.success((<span class="predefined-type">String</span>) authenticationRequest.identity))
@@ -306,9 +304,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="controllers">4.3. Controllers</h3>
+<h3 id="controllers">4.2. Controllers</h3>
 <div class="paragraph">
-<p>Create a file named <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
+<p>Create <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/HomeController.groovy</div>
@@ -360,9 +358,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="www-authenticate">4.4. WWW-Authenticate</h3>
+<h3 id="www-authenticate">4.3. WWW-Authenticate</h3>
 <div class="paragraph">
-<p><a href="https://docs.micronaut.io/latest/guide/#replaces" target="_blank" rel="noopener">Replace</a> the default <a href="https://docs.micronaut.io/latest/guide/#exceptionHandler" target="_blank" rel="noopener">Exception Handler</a> for <code>AuthorizationExceptionHandler</code>; the exception raised when a request is not authorized.</p>
+<p><a href="https://docs.micronaut.io/latest/guide/#replaces" target="_blank" rel="noopener">Replace</a> the default <a href="https://docs.micronaut.io/latest/guide/#exceptionHandler" target="_blank" rel="noopener">Exception Handler</a> for <code>AuthorizationExceptionHandler</code>, the exception raised when a request is not authorized.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/DefaultAuthorizationExceptionHandlerReplacement.groovy</div>
@@ -372,23 +370,27 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.MutableHttpResponse</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthorizationException</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.DefaultAuthorizationExceptionHandler</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.WWW_AUTHENTICATE</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.FORBIDDEN</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNAUTHORIZED</span>
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Replaces</span>(DefaultAuthorizationExceptionHandler) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="type">class</span> <span class="class">DefaultAuthorizationExceptionHandlerReplacement</span> <span class="directive">extends</span> DefaultAuthorizationExceptionHandler {
 
     <span class="annotation">@Override</span>
-    <span class="directive">protected</span> MutableHttpResponse&lt;?&gt; httpResponseWithStatus(HttpRequest request, AuthorizationException exception) {
-        <span class="keyword">if</span> (exception.isForbidden()) {
-            <span class="keyword">return</span> HttpResponse.status(HttpStatus.FORBIDDEN)
+    <span class="directive">protected</span> MutableHttpResponse&lt;?&gt; httpResponseWithStatus(HttpRequest request,
+                                                            AuthorizationException e) {
+        <span class="keyword">if</span> (e.isForbidden()) {
+            <span class="keyword">return</span> HttpResponse.status(FORBIDDEN)
         }
-        HttpResponse.status(HttpStatus.UNAUTHORIZED)
-                .header(<span class="string"><span class="delimiter">'</span><span class="content">WWW-Authenticate</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Basic realm=&quot;Micronaut Guide&quot;</span><span class="delimiter">'</span></span>)
+        HttpResponse.status(UNAUTHORIZED)
+                .header(WWW_AUTHENTICATE, <span class="string"><span class="delimiter">'</span><span class="content">Basic realm=&quot;Micronaut Guide&quot;</span><span class="delimiter">'</span></span>)
     }
 }</code></pre>
 </div>
@@ -410,7 +412,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="tests">4.5. Tests</h3>
+<h3 id="tests">4.4. Tests</h3>
 <div class="paragraph">
 <p>Create a test to verify the user authentication flow via Basic Auth.</p>
 </div>
@@ -421,14 +423,16 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.OK</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNAUTHORIZED</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">BasicAuthSpec</span> <span class="directive">extends</span> Specification {
@@ -437,26 +441,25 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
     HttpClient client <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">by default every endpoint is secured</span><span class="delimiter">&quot;</span></span>() {
+    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">by default every endpoint is secured</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">Accessing a secured URL without authenticating</span><span class="delimiter">'</span></span>
-        client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)) <i class="conum" data-value="3"></i><b>(3)</b>
+        client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>).accept(TEXT_PLAIN)) <i class="conum" data-value="3"></i><b>(3)</b>
 
         <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">returns unauthorized</span><span class="delimiter">'</span></span>
         HttpClientResponseException e = thrown() <i class="conum" data-value="4"></i><b>(4)</b>
-        e.status == HttpStatus.UNAUTHORIZED
+        e.status == UNAUTHORIZED
         e.response.headers.contains(<span class="string"><span class="delimiter">&quot;</span><span class="content">WWW-Authenticate</span><span class="delimiter">&quot;</span></span>)
-        e.response.headers.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">WWW-Authenticate</span><span class="delimiter">&quot;</span></span>) ==  <span class="string"><span class="delimiter">'</span><span class="content">Basic realm=\&quot;Micronaut Guide&quot;</span><span class="delimiter">'</span></span>
-
+        e.response.headers.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">WWW-Authenticate</span><span class="delimiter">&quot;</span></span>) == <span class="string"><span class="delimiter">'</span><span class="content">Basic realm=&quot;Micronaut Guide&quot;</span><span class="delimiter">'</span></span>
     }
 
-    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Verify HTTP Basic Auth works</span><span class="delimiter">&quot;</span></span>() {
+    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Verify HTTP Basic Auth works</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">A secured URL is accessed with Basic Auth</span><span class="delimiter">'</span></span>
         HttpRequest request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
                 .basicAuth(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
         HttpResponse&lt;<span class="predefined-type">String</span>&gt; rsp = client.toBlocking().exchange(request, <span class="predefined-type">String</span>) <i class="conum" data-value="6"></i><b>(6)</b>
 
         <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">the endpoint can be accessed</span><span class="delimiter">'</span></span>
-        rsp.status == HttpStatus.OK
+        rsp.status == OK
         rsp.body() == <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span> <i class="conum" data-value="7"></i><b>(7)</b>
     }
 }</code></pre>
@@ -496,7 +499,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="use-the-micronaut-http-client-and-basic-auth">4.6. Use the Micronaut HTTP Client and Basic Auth</h3>
+<h3 id="use-the-micronaut-http-client-and-basic-auth">4.5. Use the Micronaut HTTP Client and Basic Auth</h3>
 <div class="paragraph">
 <p>If you want to access a secured endpoint, you can also use a Micronaut HTTP Client and supply the Basic Auth as the Authorization header value.</p>
 </div>
@@ -509,18 +512,19 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
+
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
 <span class="type">interface</span> AppClient {
 
-    <span class="annotation">@Consumes</span>(MediaType.TEXT_PLAIN) <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
+    <span class="annotation">@Consumes</span>(TEXT_PLAIN) <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="annotation">@Get</span>
     <span class="predefined-type">String</span> home(<span class="annotation">@Header</span> <span class="predefined-type">String</span> authorization) <i class="conum" data-value="2"></i><b>(2)</b>
 }</code></pre>
 </div>
@@ -546,9 +550,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">BasicAuthClientSpec</span> <span class="directive">extends</span> Specification {
@@ -556,10 +559,10 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@Inject</span>
     AppClient appClient <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Verify HTTP Basic Auth works</span><span class="delimiter">&quot;</span></span>() {
+    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Verify HTTP Basic Auth works</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">when</span>:
-        <span class="predefined-type">String</span> credsEncoded = <span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock:password</span><span class="delimiter">&quot;</span></span>.bytes.encodeBase64().toString()
-        <span class="predefined-type">String</span> rsp = appClient.home(<span class="string"><span class="delimiter">&quot;</span><span class="content">Basic </span><span class="inline"><span class="inline-delimiter">${</span>credsEncoded<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="predefined-type">String</span> credsEncoded = <span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock:password</span><span class="delimiter">&quot;</span></span>.bytes.encodeBase64()
+        <span class="predefined-type">String</span> rsp = appClient.home(<span class="string"><span class="delimiter">&quot;</span><span class="content">Basic </span><span class="inline"><span class="inline-delimiter">$</span>credsEncoded</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
 
         <span class="key">then</span>:
         rsp == <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>
@@ -615,7 +618,7 @@ $ open build/reports/tests/test/index.html</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If you open <code>localhost:8080</code> in a browser, a login dialog pops up due to the <code>WWW-Authenticate</code> header.</p>
+<p>If you open <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a> in a browser, a login dialog pops up due to the <code>WWW-Authenticate</code> header.</p>
 </div>
 </div>
 </div>

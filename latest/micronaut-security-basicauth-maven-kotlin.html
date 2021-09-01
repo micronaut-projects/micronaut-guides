@@ -128,12 +128,11 @@
 <li><a href="#solution">3. Solution</a></li>
 <li><a href="#writing-the-application">4. Writing the Application</a>
 <ul class="sectlevel2">
-<li><a href="#security-dependency">4.1. Security Dependency</a></li>
-<li><a href="#authentication-provider">4.2. Authentication Provider</a></li>
-<li><a href="#controllers">4.3. Controllers</a></li>
-<li><a href="#www-authenticate">4.4. WWW-Authenticate</a></li>
-<li><a href="#tests">4.5. Tests</a></li>
-<li><a href="#use-the-micronaut-http-client-and-basic-auth">4.6. Use the Micronaut HTTP Client and Basic Auth</a></li>
+<li><a href="#authentication-provider">4.1. Authentication Provider</a></li>
+<li><a href="#controllers">4.2. Controllers</a></li>
+<li><a href="#www-authenticate">4.3. WWW-Authenticate</a></li>
+<li><a href="#tests">4.4. Tests</a></li>
+<li><a href="#use-the-micronaut-http-client-and-basic-auth">4.5. Use the Micronaut HTTP Client and Basic Auth</a></li>
 </ul>
 </li>
 <li><a href="#testing-the-application">5. Testing the Application</a></li>
@@ -171,13 +170,10 @@
 <h2 id="getting-started">1. Getting Started</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this guide, we will create a Micronaut application written in Kotlin.</p>
+<p>In this guide, we will create a Micronaut application written in Kotlin and secure it with HTTP Basic Auth.</p>
 </div>
 <div class="paragraph">
 <p><a href="https://tools.ietf.org/html/rfc7617" target="_blank" rel="noopener">RFC7617</a> defines the "Basic" Hypertext Transfer Protocol (HTTP) authentication scheme, which transmits credentials as user-id/password pairs, encoded using Base64.</p>
-</div>
-<div class="paragraph">
-<p>In this guide you will create a Micronaut application and secure it with HTTP Basic Auth.</p>
 </div>
 </div>
 </div>
@@ -225,7 +221,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=maven --lang=kotlin</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=security,reactor,graalvm example.micronaut.micronautguide --build=maven --lang=kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -241,7 +237,22 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
+<p>If you use Micronaut Launch, select "Micronaut Application" as application type and add the <code>security</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=graalvm&amp;features=security&amp;features=reactor&amp;lang=KOTLIN&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
@@ -252,23 +263,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="security-dependency">4.1. Security Dependency</h3>
-<div class="paragraph">
-<p>Add the Micronaut security dependency to your build:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="authentication-provider">4.2. Authentication Provider</h3>
+<h3 id="authentication-provider">4.1. Authentication Provider</h3>
 <div class="paragraph">
 <p>To keep this guide simple, create a naive <code>AuthenticationProvider</code> to simulate user&#8217;s authentication.</p>
 </div>
@@ -279,18 +274,17 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 import io.micronaut.http.HttpRequest
 import io.micronaut.security.authentication.AuthenticationProvider
-import io.micronaut.security.authentication.AuthenticationResponse
 import io.micronaut.security.authentication.AuthenticationRequest
-import io.micronaut.security.authentication.AuthenticationFailed
-import io.micronaut.security.authentication.AuthenticationException
-import reactor.core.publisher.FluxSink
-import reactor.core.publisher.Flux
-import org.reactivestreams.Publisher
+import io.micronaut.security.authentication.AuthenticationResponse
 import jakarta.inject.Singleton
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
 class AuthenticationProviderUserPassword : AuthenticationProvider { <i class="conum" data-value="2"></i><b>(2)</b>
-    override fun authenticate(httpRequest: HttpRequest&lt;*&gt;?, authenticationRequest: AuthenticationRequest&lt;*, *&gt;): Publisher&lt;AuthenticationResponse&gt; {
+    override fun authenticate(httpRequest: HttpRequest&lt;*&gt;?,
+                              authenticationRequest: AuthenticationRequest&lt;*, *&gt;): Publisher&lt;AuthenticationResponse&gt; {
         return Flux.create({ emitter: FluxSink&lt;AuthenticationResponse&gt; -&gt;
             if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;) {
                 emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
@@ -317,9 +311,9 @@ class AuthenticationProviderUserPassword : AuthenticationProvider { <i class="co
 </div>
 </div>
 <div class="sect2">
-<h3 id="controllers">4.3. Controllers</h3>
+<h3 id="controllers">4.2. Controllers</h3>
 <div class="paragraph">
-<p>Create a file named <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
+<p>Create <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/HomeController.kt</div>
@@ -338,11 +332,9 @@ import java.security.Principal
 @Controller<i class="conum" data-value="2"></i><b>(2)</b>
 class HomeController {
 
-    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-    @Get <i class="conum" data-value="4"></i><b>(4)</b>
-    fun index(principal: Principal): String {  <i class="conum" data-value="5"></i><b>(5)</b>
-        return principal.name
-    }
+    @Produces(MediaType.TEXT_PLAIN)
+    @Get <i class="conum" data-value="3"></i><b>(3)</b>
+    fun index(principal: Principal): String = principal.name <i class="conum" data-value="4"></i><b>(4)</b>
 }</code></pre>
 </div>
 </div>
@@ -368,9 +360,9 @@ class HomeController {
 </div>
 </div>
 <div class="sect2">
-<h3 id="www-authenticate">4.4. WWW-Authenticate</h3>
+<h3 id="www-authenticate">4.3. WWW-Authenticate</h3>
 <div class="paragraph">
-<p><a href="https://docs.micronaut.io/latest/guide/#replaces" target="_blank" rel="noopener">Replace</a> the default <a href="https://docs.micronaut.io/latest/guide/#exceptionHandler" target="_blank" rel="noopener">Exception Handler</a> for <code>AuthorizationExceptionHandler</code>; the exception raised when a request is not authorized.</p>
+<p><a href="https://docs.micronaut.io/latest/guide/#replaces" target="_blank" rel="noopener">Replace</a> the default <a href="https://docs.micronaut.io/latest/guide/#exceptionHandler" target="_blank" rel="noopener">Exception Handler</a> for <code>AuthorizationExceptionHandler</code>, the exception raised when a request is not authorized.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/DefaultAuthorizationExceptionHandlerReplacement.kt</div>
@@ -378,26 +370,28 @@ class HomeController {
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.context.annotation.Replaces
+import io.micronaut.http.HttpHeaders.WWW_AUTHENTICATE
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus.FORBIDDEN
+import io.micronaut.http.HttpStatus.UNAUTHORIZED
+import io.micronaut.http.MutableHttpResponse
 import io.micronaut.security.authentication.AuthorizationException
 import io.micronaut.security.authentication.DefaultAuthorizationExceptionHandler
 import jakarta.inject.Singleton
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.MutableHttpResponse
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-@Replaces(DefaultAuthorizationExceptionHandler::class)  <i class="conum" data-value="2"></i><b>(2)</b>
+@Replaces(DefaultAuthorizationExceptionHandler::class) <i class="conum" data-value="2"></i><b>(2)</b>
 class DefaultAuthorizationExceptionHandlerReplacement : DefaultAuthorizationExceptionHandler() {
-    override fun httpResponseWithStatus(
-        request: HttpRequest&lt;*&gt;?,
-        exception: AuthorizationException?
-    ): MutableHttpResponse&lt;*&gt; {
-        return if (exception?.isForbidden == true) {
-            HttpResponse.status&lt;Any&gt;(HttpStatus.FORBIDDEN);
-        } else HttpResponse.status&lt;Any&gt;(HttpStatus.UNAUTHORIZED)
-            .header(&quot;WWW-Authenticate&quot;, &quot;Basic realm=\&quot;Micronaut Guide\&quot;&quot;);
-    }
+
+    override fun httpResponseWithStatus(request: HttpRequest&lt;*&gt;,
+                                        e: AuthorizationException): MutableHttpResponse&lt;*&gt; =
+            if (e.isForbidden == true) {
+                HttpResponse.status&lt;Any&gt;(FORBIDDEN);
+            } else {
+                HttpResponse.status&lt;Any&gt;(UNAUTHORIZED)
+                        .header(WWW_AUTHENTICATE, &quot;Basic realm=\&quot;Micronaut Guide\&quot;&quot;)
+            }
 }</code></pre>
 </div>
 </div>
@@ -418,7 +412,7 @@ class DefaultAuthorizationExceptionHandlerReplacement : DefaultAuthorizationExce
 </div>
 </div>
 <div class="sect2">
-<h3 id="tests">4.5. Tests</h3>
+<h3 id="tests">4.4. Tests</h3>
 <div class="paragraph">
 <p>Create a test to verify the user authentication flow via Basic Auth.</p>
 </div>
@@ -428,47 +422,47 @@ class DefaultAuthorizationExceptionHandlerReplacement : DefaultAuthorizationExce
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.MediaType
+import io.micronaut.http.HttpStatus.OK
+import io.micronaut.http.HttpStatus.UNAUTHORIZED
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
-import jakarta.inject.Inject
 
 @MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
 class BasicAuthTest {
 
     @Inject
-    lateinit var embeddedServer: EmbeddedServer
+    @field:Client(&quot;/&quot;)
+    lateinit var client: HttpClient <i class="conum" data-value="2"></i><b>(2)</b>
 
     @Test
     fun verifyHttpBasicAuthWorks() {
-        val client : HttpClient = embeddedServer.applicationContext.createBean(HttpClient::class.java, embeddedServer.url) <i class="conum" data-value="2"></i><b>(2)</b>
-
         //when: 'Accessing a secured URL without authenticating'
-        val e = Executable { client.toBlocking().exchange&lt;Any, Any&gt;(HttpRequest.GET&lt;Any&gt;(&quot;/&quot;).accept(MediaType.TEXT_PLAIN)) } <i class="conum" data-value="3"></i><b>(3)</b>
+        val e = Executable { client.toBlocking().exchange&lt;Any, Any&gt;(HttpRequest.GET&lt;Any&gt;(&quot;/&quot;).accept(TEXT_PLAIN)) } <i class="conum" data-value="3"></i><b>(3)</b>
 
         // then: 'returns unauthorized'
         val thrown = assertThrows(HttpClientResponseException::class.java, e) <i class="conum" data-value="4"></i><b>(4)</b>
-        assertEquals(thrown.status, HttpStatus.UNAUTHORIZED)
+        assertEquals(UNAUTHORIZED, thrown.status)
 
         assertTrue(thrown.response.headers.contains(&quot;WWW-Authenticate&quot;))
-        assertEquals(thrown.response.headers.get(&quot;WWW-Authenticate&quot;), &quot;Basic realm=\&quot;Micronaut Guide\&quot;&quot;)
+        assertEquals(&quot;Basic realm=\&quot;Micronaut Guide\&quot;&quot;, thrown.response.headers.get(&quot;WWW-Authenticate&quot;))
 
         //when: 'A secured URL is accessed with Basic Auth'
         val rsp = client.toBlocking().exchange(HttpRequest.GET&lt;Any&gt;(&quot;/&quot;)
-                .accept(MediaType.TEXT_PLAIN)
-                .basicAuth(&quot;sherlock&quot;, &quot;password&quot;),  <i class="conum" data-value="5"></i><b>(5)</b>
+                .accept(TEXT_PLAIN)
+                .basicAuth(&quot;sherlock&quot;, &quot;password&quot;), <i class="conum" data-value="5"></i><b>(5)</b>
                 String::class.java) <i class="conum" data-value="6"></i><b>(6)</b>
         //then: 'the endpoint can be accessed'
-        assertEquals(rsp.status, HttpStatus.OK)
-        assertEquals(rsp.body.get(), &quot;sherlock&quot;) <i class="conum" data-value="7"></i><b>(7)</b>
+        assertEquals(OK, rsp.status)
+        assertEquals(&quot;sherlock&quot;, rsp.body.get()) <i class="conum" data-value="7"></i><b>(7)</b>
     }
 }</code></pre>
 </div>
@@ -507,7 +501,7 @@ class BasicAuthTest {
 </div>
 </div>
 <div class="sect2">
-<h3 id="use-the-micronaut-http-client-and-basic-auth">4.6. Use the Micronaut HTTP Client and Basic Auth</h3>
+<h3 id="use-the-micronaut-http-client-and-basic-auth">4.5. Use the Micronaut HTTP Client and Basic Auth</h3>
 <div class="paragraph">
 <p>If you want to access a secured endpoint, you can also use a Micronaut HTTP Client and supply the Basic Auth as the Authorization header value.</p>
 </div>
@@ -519,7 +513,7 @@ class BasicAuthTest {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.http.MediaType
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Consumes
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Header
@@ -528,8 +522,8 @@ import io.micronaut.http.client.annotation.Client
 @Client(&quot;/&quot;)
 interface AppClient {
 
-    @Consumes(MediaType.TEXT_PLAIN) <i class="conum" data-value="1"></i><b>(1)</b>
-    @Get(&quot;/&quot;)
+    @Consumes(TEXT_PLAIN) <i class="conum" data-value="1"></i><b>(1)</b>
+    @Get
     fun home(@Header authorization: String): String <i class="conum" data-value="2"></i><b>(2)</b>
 }</code></pre>
 </div>
@@ -555,10 +549,10 @@ interface AppClient {
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.Base64
-import jakarta.inject.Inject
 
 @MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
 class BasicAuthClientTest {
@@ -570,7 +564,7 @@ class BasicAuthClientTest {
     fun verifyBasicAuthWorks() {
         val credsEncoded = Base64.getEncoder().encodeToString(&quot;sherlock:password&quot;.toByteArray())
         val rsp = appClient.home(&quot;Basic $credsEncoded&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
-        assertEquals(rsp, &quot;sherlock&quot;)
+        assertEquals(&quot;sherlock&quot;, rsp)
     }
 }</code></pre>
 </div>
@@ -622,7 +616,7 @@ class BasicAuthClientTest {
 </div>
 </div>
 <div class="paragraph">
-<p>If you open <code>localhost:8080</code> in a browser, a login dialog pops up due to the <code>WWW-Authenticate</code> header.</p>
+<p>If you open <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a> in a browser, a login dialog pops up due to the <code>WWW-Authenticate</code> header.</p>
 </div>
 </div>
 </div>
