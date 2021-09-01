@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 
 import java.util.Objects;
@@ -11,7 +10,6 @@ public class BookInventory {
     private final String isbn;
     private final Integer stock;
 
-    @Creator
     public BookInventory(String isbn, Integer stock) {
         this.isbn = isbn;
         this.stock = stock;
