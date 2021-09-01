@@ -1,12 +1,11 @@
 //tag::fileHead[]
 package example.micronaut
 
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import jakarta.inject.Inject
-import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
-
 //end::fileHead[]
 
 //tag::start[]
@@ -18,7 +17,7 @@ class DadJokeController {
 //end::start[]
 
     //tag::standardGet[]
-    @Get("/joke")
+    @Get(uri = "/joke", produces = [TEXT_PLAIN])
     fun getAJoke(): Mono<String> {
         return Mono.from(dadJokeClient.tellMeAJoke()).map(DadJoke::joke)
     }
