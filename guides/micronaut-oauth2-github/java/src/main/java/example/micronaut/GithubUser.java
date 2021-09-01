@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 
 @Introspected
@@ -10,7 +9,6 @@ public class GithubUser {
     private final String name;
     private final String email;
 
-    @Creator
     public GithubUser(String login, String name, String email) {
         this.login = login;
         this.name = name;
