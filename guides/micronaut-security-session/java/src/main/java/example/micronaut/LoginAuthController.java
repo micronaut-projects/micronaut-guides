@@ -1,9 +1,7 @@
 package example.micronaut;
 
-import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Produces;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
@@ -15,14 +13,12 @@ import java.util.Map;
 @Controller("/login")  // <2>
 public class LoginAuthController {
 
-    @Produces(MediaType.TEXT_HTML)
     @Get("/auth") // <3>
     @View("auth") // <4>
     public Map<String, Object> auth() {
         return Collections.emptyMap();
     }
 
-    @Produces(MediaType.TEXT_HTML)
     @Get("/authFailed") // <5>
     @View("auth") // <4>
     public Map<String, Object> authFailed() {
