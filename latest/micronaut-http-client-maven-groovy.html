@@ -217,7 +217,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=maven --lang=groovy</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=reactor,graalvm example.micronaut.micronautguide --build=maven --lang=groovy</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -231,6 +231,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>reactor</code> and <code>graalvm</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
@@ -339,9 +342,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.ACCEPT</span>
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.USER_AGENT</span>
 
@@ -355,9 +358,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     GithubLowLevelClient(<span class="annotation">@Client</span>(GithubConfiguration.GITHUB_API_URL) HttpClient httpClient,  <i class="conum" data-value="2"></i><b>(2)</b>
                          GithubConfiguration configuration) {  <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="local-variable">this</span>.httpClient = httpClient
-        <span class="local-variable">this</span>.uri = UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/repos</span><span class="delimiter">&quot;</span></span>)
-            .path(configuration.getOrganization())
-            .path(configuration.getRepo())
+        uri = UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/repos</span><span class="delimiter">&quot;</span></span>)
+            .path(configuration.organization)
+            .path(configuration.repo)
             .path(<span class="string"><span class="delimiter">&quot;</span><span class="content">releases</span><span class="delimiter">&quot;</span></span>)
             .build()
     }
@@ -437,6 +440,7 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.ACCEPT</span>
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.USER_AGENT</span>
 
@@ -573,11 +577,11 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.StreamingHttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Shared</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">GithubControllerSpec</span> <span class="directive">extends</span> Specification {
@@ -680,7 +684,7 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 </div>
 <div class="paragraph">
 <p>For a real world example, let us provide GitHub Authentication via an <code>HttpClientFilter</code>. Follow the steps in
-<a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token" target="_blank" rel="noopener">to create you own Personal Token</a>.
+<a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token" target="_blank" rel="noopener">to create your own Personal Token</a>.
 Then you can use those credentials to access the GitHub API
 <a href="https://docs.github.com/en/rest/overview/other-authentication-methods#via-oauth-and-personal-access-tokens" target="_blank" rel="noopener">using Basic Auth</a>.</p>
 </div>
