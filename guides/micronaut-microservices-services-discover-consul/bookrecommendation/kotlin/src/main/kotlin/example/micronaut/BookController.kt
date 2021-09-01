@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux
 @Controller("/books") // <1>
 class BookController(
         private val bookCatalogueOperations: BookCatalogueOperations,
-        private val bookInventoryOperations: BookInventoryOperations) {
+        private val bookInventoryOperations: BookInventoryOperations) { // <2>
 
     @Get // <3>
     fun index(): Publisher<BookRecommendation> =
