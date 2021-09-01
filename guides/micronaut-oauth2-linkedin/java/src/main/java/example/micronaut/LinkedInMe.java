@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 
@@ -21,7 +20,6 @@ public class LinkedInMe {
     @NotBlank
     private final String localizedLastName;
 
-    @Creator
     public LinkedInMe(@NonNull String id,
                       @NonNull String localizedFirstName,
                       @NonNull String localizedLastName) {

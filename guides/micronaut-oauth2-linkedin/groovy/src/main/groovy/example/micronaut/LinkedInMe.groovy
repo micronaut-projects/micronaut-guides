@@ -1,7 +1,6 @@
 package example.micronaut
 
 import groovy.transform.CompileStatic
-import io.micronaut.core.annotation.Creator
 import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.NonNull
 
@@ -23,7 +22,6 @@ class LinkedInMe {
     @NotBlank
     final String localizedLastName
 
-    @Creator
     LinkedInMe(@NonNull String id,
                @NonNull String localizedFirstName,
                @NonNull String localizedLastName) {
