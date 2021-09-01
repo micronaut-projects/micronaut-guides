@@ -2,8 +2,8 @@ package example.micronaut;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import reactor.core.publisher.Flux;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 @Controller("/books") // <1>
 public class BookController {
@@ -25,5 +25,4 @@ public class BookController {
                         .map(response -> book))
                 .map(book -> new BookRecommendation(book.getName()));
     }
-
 }
