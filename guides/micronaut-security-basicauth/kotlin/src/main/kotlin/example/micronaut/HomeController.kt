@@ -12,9 +12,7 @@ import java.security.Principal
 @Controller// <2>
 class HomeController {
 
-    @Produces(MediaType.TEXT_PLAIN) // <3>
-    @Get // <4>
-    fun index(principal: Principal): String {  // <5>
-        return principal.name
-    }
+    @Produces(MediaType.TEXT_PLAIN)
+    @Get // <3>
+    fun index(principal: Principal): String = principal.name // <4>
 }

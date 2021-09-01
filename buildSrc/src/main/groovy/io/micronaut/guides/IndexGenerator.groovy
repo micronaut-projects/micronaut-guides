@@ -93,7 +93,7 @@ class IndexGenerator {
                 guideMetadata.slug + ".png" : DEFAULT_CARD
 """\
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:image" content="${rootUrl}/images/cards/${filename}"/>
+    <meta name="twitter:image" content="${rootUrl}/latest/images/cards/${filename}"/>
     <meta name="twitter:creator" content="${TWITTER_MICRONAUT}"/>
     <meta name="twitter:site" content="${TWITTER_MICRONAUT}"/>
     <meta name="twitter:title" content="${guideMetadata.title?.replaceAll('"', "&quot;") ?: DEFAULT_TITLE}"/>

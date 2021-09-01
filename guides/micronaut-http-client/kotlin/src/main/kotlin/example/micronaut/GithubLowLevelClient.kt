@@ -7,10 +7,9 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.uri.UriBuilder
-import org.reactivestreams.Publisher
+import jakarta.inject.Singleton
 import reactor.core.publisher.Mono
 import java.net.URI
-import jakarta.inject.Singleton
 
 @Singleton // <1>
 class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) private val httpClient: HttpClient,  // <2>

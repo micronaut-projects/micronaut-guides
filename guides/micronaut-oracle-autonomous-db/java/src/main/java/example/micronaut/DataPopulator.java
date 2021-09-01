@@ -5,8 +5,8 @@ import example.micronaut.repository.ThingRepository;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
-
 import jakarta.inject.Singleton;
+
 import javax.transaction.Transactional;
 import java.util.Arrays;
 

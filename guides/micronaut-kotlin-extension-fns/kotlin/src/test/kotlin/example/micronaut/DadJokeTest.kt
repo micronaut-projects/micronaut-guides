@@ -1,8 +1,9 @@
 package example.micronaut
-import io.micronaut.kotlin.context.createBean
-import io.micronaut.kotlin.context.run
+
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
+import io.micronaut.kotlin.context.createBean
+import io.micronaut.kotlin.context.run
 import io.micronaut.kotlin.http.retrieveList
 import io.micronaut.kotlin.http.retrieveObject
 import io.micronaut.runtime.server.EmbeddedServer
@@ -28,5 +29,4 @@ class DadJokeTest {
         client.close()
         embeddedServer.close()
     }
-
 }

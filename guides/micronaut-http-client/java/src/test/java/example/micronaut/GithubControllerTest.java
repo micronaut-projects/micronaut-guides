@@ -7,10 +7,11 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.StreamingHttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import reactor.core.publisher.Flux;
-import org.reactivestreams.Publisher;
-import org.junit.jupiter.api.Test;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.StreamSupport;
