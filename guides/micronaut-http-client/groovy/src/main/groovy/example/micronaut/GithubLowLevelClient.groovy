@@ -6,9 +6,9 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.uri.UriBuilder
-import org.reactivestreams.Publisher
-import reactor.core.publisher.Mono
 import jakarta.inject.Singleton
+import reactor.core.publisher.Mono
+
 import static io.micronaut.http.HttpHeaders.ACCEPT
 import static io.micronaut.http.HttpHeaders.USER_AGENT
 
@@ -22,9 +22,9 @@ class GithubLowLevelClient {
     GithubLowLevelClient(@Client(GithubConfiguration.GITHUB_API_URL) HttpClient httpClient,  // <2>
                          GithubConfiguration configuration) {  // <3>
         this.httpClient = httpClient
-        this.uri = UriBuilder.of("/repos")
-            .path(configuration.getOrganization())
-            .path(configuration.getRepo())
+        uri = UriBuilder.of("/repos")
+            .path(configuration.organization)
+            .path(configuration.repo)
             .path("releases")
             .build()
     }

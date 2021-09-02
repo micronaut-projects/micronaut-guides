@@ -6,13 +6,13 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.StreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.util.stream.StreamSupport
-import jakarta.inject.Inject
 import reactor.core.publisher.Flux
+import java.util.stream.StreamSupport
 
 @MicronautTest // <1>
 class GithubControllerTest {

@@ -19,14 +19,16 @@ include::{commondir}/common-cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-function-app --features=oracle-function example.micronaut.micronautguide --build=@build@ --lang=@lang@
+mn create-function-app --features=graalvm,oracle-function example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
 ----
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use https://launch.micronaut.io[Micronaut Launch^], select serverless function as application type and add the `oracle-function` feature.
+If you use https://launch.micronaut.io[Micronaut Launch^], select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the `graalvm` and `oracle-function` features.
 
 include::{commondir}/common-default-package.adoc[]
+
+diffLink:[]
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
@@ -96,6 +98,16 @@ Copy the token to the clipboard and save it for later:
 
 image::oraclefn/user11.png[]
 
+You will need a password to login as this user, so click the "Create/Reset Password" button:
+
+image::oraclefn/user12.png[]
+
+and then click the "Create/Reset Password" button in the dialog:
+
+image::oraclefn/user13.png[]
+
+Click the "Copy" link and save the generated password for later.
+
 See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm[Groups and Users docs^] for more information.
 
 === Oracle Cloud Infrastructure Registry (OCIR) repository
@@ -111,6 +123,7 @@ Update your build script with the location to deploy the Docker container.
 Edit `build.gradle` and replace `REGION`, `TENANCY`, and `REPO` with appropriate values:
 
 [source, groovy]
+.build.gradle
 ----
 dockerBuild {
     images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name:$project.version"]
@@ -126,6 +139,7 @@ For `REPO`, use the name of the repository to use, e.g. `mn-functions` (or `my-u
 The final value should look something like this:
 
 [source, groovy]
+.build.gradle
 ----
 dockerBuild {
     images = ["iad.ocir.io/my-tenancy/mn-functions/$project.name:$project.version"]
@@ -139,6 +153,7 @@ dockerBuild {
 Edit `pom.xml` and add these three properties in the `<properties>` section, replacing `REGION`, `TENANCY`, and `REPO` with appropriate values:
 
 [source, xml]
+.pom.xml
 ----
 <exec.mainClass>example.micronaut.Function</exec.mainClass>
 
@@ -156,6 +171,7 @@ For `REPO`, use the name of the repository to use, e.g. `mn-functions` (or `my-u
 The final properties should look something like this:
 
 [source, xml]
+.pom.xml
 ----
 <exec.mainClass>example.micronaut.Function</exec.mainClass>
 
@@ -247,6 +263,56 @@ image::oraclefn/policy4.png[]
 
 See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingpolicies.htm[Policies^] docs for more information.
 
+== Creating the function
+
+First we'll need to build the function as a Docker image and push it to the OCIR repository.
+
+From the demo project directory, run:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerPush
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw deploy -Dpackaging=docker
+----
+
+:exclude-for-build:
+
+Once you've pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.
+
+Open the Oracle Cloud Menu and click "Developer Services", and then "Applications" under "Functions":
+
+image::oraclefn/function1.png[]
+
+Click "Create Application":
+
+image::oraclefn/function2.png[]
+
+Choose a name for the application, e.g. "mn-guide-function-app", and select the VCN created earlier. Select the private subnet, and click "Create":
+
+image::oraclefn/function3.png[]
+
+Click "Functions" (under "Resources") in the lower left, and then click "Create Function":
+
+image::oraclefn/function4.png[]
+
+Choose a name for the function, e.g. "mn-guide-function", select the repository where you pushed the Docker image, and select the uploaded image. Select 512MB memory and click "Create":
+
+image::oraclefn/function5.png[]
+
+Click the function link in the list, and click the "Copy" link in the OCID row; you'll need the OCID of the function to invoke the function:
+
+image::oraclefn/function6.png[]
+
 == Enable Tracing and Logs
 
 Open the Oracle Cloud Menu and click "Observability & Management", and then "Administration" under "Application Performance...":
@@ -283,59 +349,11 @@ image::oraclefn/logs8.png[]
 
 See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsexportingfunctionlogfiles.htm[Logging^] and https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionstracing.htm[Tracing^] docs for more information.
 
-== Creating the function
-
-First we'll need to build the function as a Docker image and push it to the OCIR repository.
-
-Run:
-
-:exclude-for-build:maven
-
-[source, bash]
-----
-./gradlew dockerPush
-----
-
-:exclude-for-build:
-
-:exclude-for-build:gradle
-
-[source, bash]
-----
-./mvnw deploy -Dpackaging=docker
-----
-
-:exclude-for-build:
-
-Once you've pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.
-
-Open the Oracle Cloud Menu and click "Developer Services", and then "Applications" under "Functions":
-
-image::oraclefn/function1.png[]
-
-Click "Create Application":
-
-image::oraclefn/function2.png[]
-
-Choose a name for the application, e.g. "mn-guide-function-app", and select the VCN created earlier. Select the private subnet, and click "Create":
-
-image::oraclefn/function3.png[]
-
-Click the application link in the list, and then click "Create Function":
-
-image::oraclefn/function4.png[]
-
-Choose a name for the function, e.g. "mn-guide-function", select the repository where you pushed the Docker image, and select the uploaded image. Select 512MB memory and click "Create":
-
-image::oraclefn/function5.png[]
-
-Click the function link in the list, and click the "Copy" link in the OCID row; you'll need the OCID of the function to invoke the function:
-
-image::oraclefn/function6.png[]
-
 == Invoking the function
 
-We'll use the OCI command line to invoke the function. Run the following, replacing `<OCID>` with the OCID of the function you copied above:
+We'll use the OCI command line to invoke the function. If you haven't already, install the https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI^] and run `oci setup config`.
+
+Run the following, replacing `<OCID>` with the OCID of the function you copied above:
 
 [source, bash]
 ----
@@ -350,6 +368,167 @@ Your tenancy is: ocid1.tenancy.oc1..aaaaaaaaud4g4e5ovjawn5cij7ke................
 ----
 
 The first invocation ("cold start") will take a while as the infrastructure is configured, probably 10-20 seconds or more but subsequent invocations should return in 1-2 seconds.
+
+:exclude-for-languages:groovy
+
+== Deploying as a Native Image
+
+=== Install GraalVM
+
+We will use https://www.graalvm.org/[GraalVM^], the polyglot embeddable virtual machine, to generate a Native image of our function.
+
+Compiling native images ahead-of-time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications and functions.
+
+NOTE: Only Java and Kotlin projects support using GraalVM's `native-image` tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+
+include::{commondir}/common-install-graalvm-sdkman.adoc[]
+
+=== Building and deploying the native image
+
+Deploying the function as a native image is similar to the earlier deployment above.
+
+First you need to update your build script with the location to deploy the native image Docker container.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` like before, but set the `images` property in the `dockerBuildNative` block this time, replacing `REGION`, `TENANCY`, and `REPO` as before:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuildNative {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name-native:$project.version"]
+}
+----
+
+Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuildNative {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name:$project.version"]
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo. If you wish to separate the native image containers, edit `pom.xml` and update the `jib.docker.image` property, appending "-native" to the value:
+
+[source, xml]
+.pom.xml
+----
+<jib.docker.image>[REGION].ocir.io/[TENANCY]/[REPO]/${project.artifactId}-native</jib.docker.image>
+----
+
+:exclude-for-build:
+
+Next, update the version.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` and increment the version to `0.2`:
+
+[source, groovy]
+.build.gradle
+----
+version = "0.2"
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Edit `pom.xml` and increment the version to `0.2`:
+
+[source, xml]
+.pom.xml
+----
+<version>0.2</version>
+----
+
+:exclude-for-build:
+
+Depending on the Micronaut version you're using, you might also need to update some properties in your build script to update the Docker configuration.
+
+:exclude-for-build:maven
+
+In your `build.gradle`, if the `nativeImage` block includes `--static` in the `args` list, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in the `dockerfileNative` block:
+
+[source, groovy]
+.build.gradle
+----
+nativeImage {
+    args("-H:+StaticExecutableWithDynamicLibC",
+         "-Dfn.handler=example.micronaut.Function::handleRequest",
+         "--initialize-at-build-time=example.micronaut")
+}
+
+dockerfileNative {
+    args("-XX:MaximumHeapSizePercent=80")
+    buildStrategy.set(ORACLE_FUNCTION)
+    defaultCommand.set("example.micronaut.Function::handleRequest")
+    baseImage('frolvlad/alpine-glibc:alpine-3.12')
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+In your `pom.xml`, if the `nativeImageBuildArgs` block in the configuration section of the `micronaut-maven-plugin` plugin includes an `arg` with value `--static`, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in a new `baseImageRun` element:
+
+[source, xml]
+.pom.xml
+----
+<plugin>
+  <groupId>io.micronaut.build</groupId>
+  <artifactId>micronaut-maven-plugin</artifactId>
+  <configuration>
+    <baseImageRun>frolvlad/alpine-glibc:alpine-3.12</baseImageRun>
+    <nativeImageBuildArgs>
+      <arg>-H:+StaticExecutableWithDynamicLibC</arg>
+      <arg>-Dfn.handler=${exec.mainClass}::handleRequest</arg>
+      <arg>--initialize-at-build-time=com.example</arg>
+    </nativeImageBuildArgs>
+    <appArguments>
+      <arg>${exec.mainClass}::handleRequest</arg>
+    </appArguments>
+  </configuration>
+</plugin>
+----
+
+:exclude-for-build:
+
+Then from the demo project directory, run:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerPushNative
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw deploy -Dpackaging=docker-native
+----
+
+:exclude-for-build:
+
+Once you've pushed the Docker container, edit the function in the console to use the new container, and to reduce the memory to 128MB:
+
+image::oraclefn/function7.png[]
+
+Use the same OCI command as before to invoke the function. No changes are needed because the function OCID doesn't change when deploying new containers.
+
+:exclude-for-languages:
 
 include::{commondir}/common-next.adoc[]
 

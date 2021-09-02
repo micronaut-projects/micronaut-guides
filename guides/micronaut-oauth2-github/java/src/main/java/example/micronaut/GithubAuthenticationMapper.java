@@ -18,6 +18,7 @@ public class GithubAuthenticationMapper implements OauthAuthenticationMapper {
 
     public static final String TOKEN_PREFIX = "token ";
     public static final String ROLE_GITHUB = "ROLE_GITHUB";
+
     private final GithubApiClient apiClient;
 
     public GithubAuthenticationMapper(GithubApiClient apiClient) {
@@ -25,10 +26,11 @@ public class GithubAuthenticationMapper implements OauthAuthenticationMapper {
     }
 
     @Override
-    public Publisher<AuthenticationResponse> createAuthenticationResponse(TokenResponse tokenResponse, @Nullable State state) {
+    public Publisher<AuthenticationResponse> createAuthenticationResponse(TokenResponse tokenResponse,
+                                                                          @Nullable State state) {
         return Mono.from(apiClient.getUser(TOKEN_PREFIX + tokenResponse.getAccessToken())) // <2>
                 .map(user -> AuthenticationResponse.success(user.getLogin(),
                         Collections.singletonList(ROLE_GITHUB),
-                        Collections.singletonMap(OauthAuthenticationMapper.ACCESS_TOKEN_KEY, tokenResponse.getAccessToken()))); // <3>
+                        Collections.singletonMap(ACCESS_TOKEN_KEY, tokenResponse.getAccessToken()))); // <3>
     }
 }

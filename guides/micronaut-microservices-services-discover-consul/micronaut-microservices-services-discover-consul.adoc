@@ -54,14 +54,20 @@ include::{commondir}/common-annotationprocessors.adoc[]
 
 === Catalogue Microservice
 
-Create the `bookcatalogue` microservice:
+Create the `bookcatalogue` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^] or with https://launch.micronaut.io[Micronaut Launch^].
 
 [source,bash]
 ----
-mn create-app example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
+mn create-app --features=discovery-consul,management,graalvm example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
 ----
 
-The previous command creates a directory named `bookcatalogue` and a Micronaut application inside it.
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-consul`, `management`, and `graalvm` features.
+
+The previous command creates a directory named `bookcatalogue` and a Micronaut application inside it with default package `example.micronaut`.
+
+diffLink:[app=bookcatalogue]
 
 Create a `BooksController` class to handle incoming HTTP requests into the `bookcatalogue` microservice:
 
@@ -87,7 +93,7 @@ Edit `application.yml`
 
 resource:application.yml[app=bookcatalogue,tag=mn]
 
-<1> Configure the application name. The application name will be use by the discovery service.
+<1> Configure the application name. The application name will be used by the discovery service.
 
 include::{commondir}/common-default-dev-environment-application.adoc[]
 
@@ -125,14 +131,20 @@ bookcatalogue $ ./mvnw test
 
 === Inventory Microservice
 
-Create the `bookinventory` microservice:
+Create the `bookinventory` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^] or with https://launch.micronaut.io[Micronaut Launch^].
 
 [source,bash]
 ----
-mn create-app example.micronaut.bookinventory --build=@build@ --lang=@lang@
+mn create-app --features=discovery-consul,management,graalvm example.micronaut.bookinventory --build=@build@ --lang=@lang@
 ----
 
-The previous command creates a directory named `bookinventory` and a Micronaut application inside it.
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-consul`, `management`, and `graalvm` features.
+
+The previous command creates a directory named `bookinventory` and a Micronaut application inside it with default package `example.micronaut`.
+
+diffLink:[app=bookinventory]
 
 Create a Controller:
 
@@ -192,14 +204,20 @@ bookinventory $ ./mvnw test
 
 === Recommendation Microservice
 
-Create the `bookrecommendation` microservice:
+Create the `bookrecommendation` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^] or with https://launch.micronaut.io[Micronaut Launch^].
 
 [source,bash]
 ----
-mn create-app example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
+mn create-app --features=discovery-consul,management,reactor,graalvm example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
 ----
 
-The previous command creates a directory named `bookrecommendation` and a Micronaut application inside it.
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-consul`, `management`, `reactor`, and `graalvm` features.
+
+The previous command creates a directory named `bookrecommendation` and a Micronaut application inside it with default package `example.micronaut`.
+
+diffLink:[app=bookrecommendation]
 
 Create an interface to map operations with `bookcatalogue`, and a Micronaut Declarative HTTP Client to consume it.
 
@@ -217,7 +235,7 @@ Create an interface to map operations with `bookinventory`, and a Micronaut Decl
 
 source:BookInventoryOperations[app=bookrecommendation]
 
-source:BookCatalogueClient[app=bookrecommendation,tags=packageandimports|harcoded|clazz]
+source:BookInventoryClient[app=bookrecommendation,tags=packageandimports|harcoded|clazz]
 
 callout:client[1]
 
@@ -385,45 +403,25 @@ image::kitematic-consul-2.png[]
 
 === Book Catalogue
 
-Modify your build file to add the `discovery-client` feature.
-
-dependency:micronaut-discovery-client[groupId=io.micronaut.discovery]
-
 Append to `bookcatalogue` service `application.yml` the following snippet:
 
 resource:application.yml[app=bookcatalogue,tag=consul]
 
 This configuration registers a Micronaut application with Consul with minimal configuration. Discover a more complete list of configuration options at https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/consul/ConsulConfiguration.html[ConsulConfiguration^].
 
-Disable consul registration in tests:
-
-testResource:application-test.yml[app=bookcatalogue,tag=consul]
-
 === Book Inventory
 
-Modify your build file to add the `discovery-client` feature.
-
-dependency:micronaut-discovery-client[groupId=io.micronaut.discovery]
-
-Also, modify the `application.yml` of the `bookinventory` application with the following snippet:
+Modify the `application.yml` of the `bookinventory` application with the following snippet:
 
 resource:application.yml[app=bookinventory,tag=consul]
 
-Disable consul registration in tests:
-
-testResource:application-test.yml[app=bookinventory,tag=consul]
-
 === Book Recommendation
 
-Modify your build file to add the `discovery-client` feature.
-
-dependency:micronaut-discovery-client[groupId=io.micronaut.discovery]
-
-Also, append to `bookrecommendation`.`application.yml` the following snippet:
+Append to `bookrecommendation`.`application.yml` the following snippet:
 
 resource:application.yml[app=bookrecommendation,tag=consul]
 
-Modify `BookInventoryClient` and `BookCatalogueClient` to use the service id instead of a harcoded ip.
+Modify `BookInventoryClient` and `BookCatalogueClient` to use the service id instead of a hardcoded URL.
 
 source:BookCatalogueClient[app=bookrecommendation,tags=packageandimports|consul|clazz]
 
@@ -432,10 +430,6 @@ source:BookCatalogueClient[app=bookrecommendation,tags=packageandimports|consul|
 source:BookInventoryClient[app=bookrecommendation,tags=packageandimports|consul|clazz]
 
 <1> Use the configuration value `micronaut.application.name` used in `bookinventory` as service `id`.
-
-Disable consul registration in tests:
-
-testResource:application-test.yml[app=bookrecommendation,tag=consul]
 
 === Running the App
 

@@ -1,31 +1,31 @@
 package example.micronaut
 
-import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.StreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import spock.lang.Specification
-import spock.lang.IgnoreIf
 import jakarta.inject.Inject
+import reactor.core.publisher.Flux
+import spock.lang.IgnoreIf
+import spock.lang.Specification
 
 @MicronautTest
 class BookControllerSpec extends Specification {
 
     @Inject
     @Client("/")
-    HttpClient client
+    StreamingHttpClient client
 
     @IgnoreIf({env['CI'] as boolean})
     void "retrieve books"() {
         when:
-        HttpResponse response = client.toBlocking().exchange(HttpRequest.GET("/books"), Argument.listOf(BookRecommendation))
+        List<BookRecommendation> books = Flux
+                .from(client.jsonStream(HttpRequest.GET("/books"), BookRecommendation))
+                .collectList()
+                .block()
 
         then:
-        response.status() == HttpStatus.OK
-        response.body().size() == 1
-        response.body().get(0).name == "Building Microservices"
+        books.size() == 1
+        books[0].name == "Building Microservices"
     }
 }

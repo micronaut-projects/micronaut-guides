@@ -17,7 +17,8 @@ public class BookInventoryService {
     private Optional<BookInventory> bookInventoryByIsbn(String isbn) {
         if (isbn.equals("1491950358")) {
             return Optional.of(new BookInventory(isbn, 4));
-        } else if (isbn.equals("1680502395")) {
+        }
+        if (isbn.equals("1680502395")) {
             return Optional.of(new BookInventory(isbn, 0));
         }
         return Optional.empty();

@@ -7,11 +7,11 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.StreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
 import spock.lang.Shared
 import spock.lang.Specification
-import reactor.core.publisher.Flux
-import org.reactivestreams.Publisher
-import jakarta.inject.Inject
 
 @MicronautTest // <1>
 class GithubControllerSpec extends Specification {
