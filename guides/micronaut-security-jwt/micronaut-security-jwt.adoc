@@ -4,7 +4,7 @@ include::{commondir}/common-header-top.adoc[]
 
 The Micronaut framework ships with security capabilities based on https://jwt.io/[Json Web Token (JWT)^]. JWT is an https://tools.ietf.org/html/rfc7519[IETF standard^] which defines a secure way to encapsulate arbitrary data that can be sent over unsecure URLs.
 
-In this guide you will create a Micronaut application and secure it with JWT.
+In this guide you will create a Micronaut application written in @language@ and secure it with JWT.
 
 The following sequence illustrates the authentication flow:
 
@@ -14,35 +14,28 @@ include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-== Writing the application
+== Writing the Application
 
-=== Create an Application with the Command Line Interface
-
-Create an application using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^].
+include::{commondir}/common-cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-app example.micronaut.micronautguide --build=@build@ --lang=@lang@
+mn create-app --features=security-jwt,data-jdbc,reactor,graalvm example.micronaut.micronautguide --build=@build@ --lang=@lang@
 ----
 
-The previous command creates a Micronaut application with the default package `example.micronaut` in a directory named `micronautguide`.
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `security-jwt`, `data-jdbc`, `reactor`, and `graalvm` features.
+
+include::{commondir}/common-default-package.adoc[]
+
+diffLink:[]
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
-=== Security Dependency
-
-Add the Micronaut `security-jwt` dependency:
-
-:dependencies:
-
-dependency:micronaut-security-annotations[groupId=io.micronaut.security,scope=annotationProcessor]
-dependency:micronaut-security-jwt[groupId=io.micronaut.security]
-
-:dependencies:
-
 === Configuration
 
-Add the following to `application.yml`:
+Note the following configuration in the generated `application.yml`:
 
 resource:application.yml[tag=security]
 
@@ -60,7 +53,7 @@ callout:singleton[1]
 
 === Controller
 
-Create a file named `HomeController` which resolves the base URL `/`:
+Create `HomeController` which resolves the base URL `/`:
 
 source:HomeController[]
 
@@ -124,7 +117,7 @@ test:LoginIncludesRefreshTokenTest[]
 
 === Save Refresh Token
 
-We may want to save a refresh token issued by the application. For example, to be revoked a user's refresh tokens. So that a particular user cannot obtain a new access token, and thus access the application's endpoints.
+We may want to save a refresh token issued by the application, for example, to revoke a user's refresh tokens, so that a particular user cannot obtain a new access token, and thus access the application's endpoints.
 
 Persist the refresh tokens with help of https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data^].
 
@@ -134,7 +127,7 @@ In particular, use Micronaut JDBC
 
 > Micronaut Data JDBC is an implementation that pre-computes native SQL queries (given a particular database dialect) and provides a repository implementation that is a simple data mapper between a JDBC ResultSet and an object.
 
-Add the following dependencies:
+The `data-jdbc` feature adds the following dependencies:
 
 :dependencies:
 

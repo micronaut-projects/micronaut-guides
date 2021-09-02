@@ -8,9 +8,8 @@ import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest;
 import io.micronaut.security.token.jwt.render.AccessRefreshToken;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Test;
-
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -31,7 +30,7 @@ class OauthAccessTokenTest {
         String username = "sherlock";
 
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(username, "password");
-        HttpRequest request = HttpRequest.POST("/login", creds);
+        HttpRequest<?> request = HttpRequest.POST("/login", creds);
 
         long oldTokenCount = refreshTokenRepository.count();
         BearerAccessRefreshToken rsp = client.toBlocking().retrieve(request, BearerAccessRefreshToken.class);

@@ -5,11 +5,11 @@ import com.nimbusds.jwt.SignedJWT
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
 
 @MicronautTest
 class DeclarativeHttpClientWithJwtTest {
@@ -27,7 +27,6 @@ class DeclarativeHttpClientWithJwtTest {
         assertTrue(JWTParser.parse(loginRsp.accessToken) is SignedJWT)
 
         val msg = appClient.home("Bearer ${loginRsp.accessToken}") // <3>
-
         assertEquals("sherlock", msg)
     }
 }

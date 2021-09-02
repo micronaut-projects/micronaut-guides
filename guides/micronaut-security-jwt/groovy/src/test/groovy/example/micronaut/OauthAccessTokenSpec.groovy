@@ -8,11 +8,10 @@ import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
-
-import jakarta.inject.Inject
 
 @MicronautTest(rollback = false) // <1>
 class OauthAccessTokenSpec extends Specification {
@@ -25,7 +24,7 @@ class OauthAccessTokenSpec extends Specification {
     @Inject
     RefreshTokenRepository refreshTokenRepository
 
-    def "Verify JWT access token refresh works"() {
+    void "Verify JWT access token refresh works"() {
         given:
         String username = 'sherlock'
 

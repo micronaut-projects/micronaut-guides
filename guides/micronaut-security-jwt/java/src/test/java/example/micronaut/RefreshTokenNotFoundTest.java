@@ -2,21 +2,21 @@ package example.micronaut;
 
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
+import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.generator.RefreshTokenGenerator;
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Test;
-import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
-import java.util.Collections;
+import org.junit.jupiter.api.Test;
+
 import java.util.Map;
 import java.util.Optional;
 
+import static io.micronaut.http.HttpStatus.BAD_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,12 +42,12 @@ class RefreshTokenNotFoundTest {
         String signedRefreshToken = refreshTokenOptional.get();  // <1>
         Argument<BearerAccessRefreshToken> bodyArgument = Argument.of(BearerAccessRefreshToken.class);
         Argument<Map> errorArgument = Argument.of(Map.class);
-        HttpRequest req = HttpRequest.POST("/oauth/access_token", new TokenRefreshRequest(signedRefreshToken));
+        HttpRequest<?> req = HttpRequest.POST("/oauth/access_token", new TokenRefreshRequest(signedRefreshToken));
 
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () -> {
             client.toBlocking().exchange(req, bodyArgument, errorArgument);
         });
-        assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
+        assertEquals(BAD_REQUEST, e.getStatus());
 
         Optional<Map> mapOptional = e.getResponse().getBody(Map.class);
         assertTrue(mapOptional.isPresent());

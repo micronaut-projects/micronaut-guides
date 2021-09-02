@@ -4,17 +4,18 @@ import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.MediaType
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
 import spock.lang.Specification
 
-import jakarta.inject.Inject
+import static io.micronaut.http.HttpStatus.OK
+import static io.micronaut.http.HttpStatus.UNAUTHORIZED
+import static io.micronaut.http.MediaType.TEXT_PLAIN
 
 @MicronautTest // <1>
 class JwtAuthenticationSpec extends Specification {
@@ -25,21 +26,21 @@ class JwtAuthenticationSpec extends Specification {
 
     void 'Accessing a secured URL without authenticating returns unauthorized'() {
         when:
-        client.toBlocking().exchange(HttpRequest.GET('/', )) // <3>
+        client.toBlocking().exchange(HttpRequest.GET('/').accept(TEXT_PLAIN))
 
         then:
         HttpClientResponseException e = thrown()
-        e.status == HttpStatus.UNAUTHORIZED
+        e.status == UNAUTHORIZED // <3>
     }
 
-    void "upon successful authentication, a Json Web token is issued to the user"() {
+    void "upon successful authentication, a JSON Web token is issued to the user"() {
         when: 'Login endpoint is called with valid credentials'
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials("sherlock", "password")
         HttpRequest request = HttpRequest.POST('/login', creds) // <4>
         HttpResponse<BearerAccessRefreshToken> rsp = client.toBlocking().exchange(request, BearerAccessRefreshToken) // <5>
 
         then: 'the endpoint can be accessed'
-        rsp.status == HttpStatus.OK
+        rsp.status == OK
 
         when:
         BearerAccessRefreshToken bearerAccessRefreshToken = rsp.body()
@@ -54,12 +55,12 @@ class JwtAuthenticationSpec extends Specification {
         when: 'passing the access token as in the Authorization HTTP Header with the prefix Bearer allows the user to access a secured endpoint'
         String accessToken = bearerAccessRefreshToken.accessToken
         HttpRequest requestWithAuthorization = HttpRequest.GET('/' )
-                .accept(MediaType.TEXT_PLAIN)
+                .accept(TEXT_PLAIN)
                 .bearerAuth(accessToken) // <6>
         HttpResponse<String> response = client.toBlocking().exchange(requestWithAuthorization, String)
 
         then:
-        response.status == HttpStatus.OK
+        response.status == OK
         response.body() == 'sherlock' // <7>
     }
 }

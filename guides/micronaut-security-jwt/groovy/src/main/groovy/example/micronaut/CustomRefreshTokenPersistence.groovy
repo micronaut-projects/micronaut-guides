@@ -1,20 +1,22 @@
 package example.micronaut
 
-import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode
+import io.micronaut.security.authentication.Authentication
 import io.micronaut.security.errors.OauthErrorResponseException
 import io.micronaut.security.token.event.RefreshTokenGeneratedEvent
 import io.micronaut.security.token.refresh.RefreshTokenPersistence
-import reactor.core.publisher.FluxSink
-import reactor.core.publisher.Flux
-import org.reactivestreams.Publisher
 import jakarta.inject.Singleton
-import io.micronaut.security.authentication.Authentication
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
+
+import static io.micronaut.security.errors.IssuingAnAccessTokenErrorCode.INVALID_GRANT
 
 @Singleton // <1>
 class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
+
     private final RefreshTokenRepository refreshTokenRepository
 
-    CustomRefreshTokenPersistence(RefreshTokenRepository refreshTokenRepository) {  // <2>
+    CustomRefreshTokenPersistence(RefreshTokenRepository refreshTokenRepository) { // <2>
         this.refreshTokenRepository = refreshTokenRepository
     }
 
@@ -22,7 +24,7 @@ class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
     void persistToken(RefreshTokenGeneratedEvent event) { // <3>
         if (event?.refreshToken && event?.authentication?.name) {
             String payload = event.refreshToken
-            refreshTokenRepository.save(event.authentication.name, payload, Boolean.FALSE) // <4>
+            refreshTokenRepository.save(event.authentication.name, payload, false) // <4>
         }
     }
 
@@ -33,14 +35,14 @@ class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
             if (tokenOpt.isPresent()) {
                 RefreshTokenEntity token = tokenOpt.get()
                 if (token.getRevoked()) {
-                    emitter.error(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token revoked", null)) // <5>
+                    emitter.error(new OauthErrorResponseException(INVALID_GRANT, "refresh token revoked", null)) // <5>
                 } else {
                     emitter.next(Authentication.build(token.username)) // <6>
                     emitter.complete()
                 }
             } else {
-                emitter.error(new OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, "refresh token not found", null)) // <7>
+                emitter.error(new OauthErrorResponseException(INVALID_GRANT, "refresh token not found", null)) // <7>
             }
-        }, FluxSink.OverflowStrategy.ERROR) as Publisher<Authentication>
+        }, FluxSink.OverflowStrategy.ERROR)
     }
 }
