@@ -10,9 +10,7 @@ public class BookRecommendation {
 
     @NonNull
     @NotBlank
-    private String name;
-
-    public BookRecommendation() {}
+    private final String name;
 
     public BookRecommendation(@NonNull @NotBlank String name) {
         this.name = name;
@@ -21,10 +19,6 @@ public class BookRecommendation {
     @NonNull
     public String getName() {
         return name;
-    }
-
-    public void setName(@NonNull String name) {
-        this.name = name;
     }
 
     @Override

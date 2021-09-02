@@ -1,14 +1,17 @@
 package example.micronaut
 
-import io.micronaut.context.env.Environment
+import groovy.transform.CompileStatic
 import io.micronaut.runtime.Micronaut
 
+import static io.micronaut.context.env.Environment.DEVELOPMENT
+
+@CompileStatic
 class Application {
 
     static void main(String[] args) {
         Micronaut.build(args)
                 .mainClass(Application)
-                .defaultEnvironments(Environment.DEVELOPMENT)
+                .defaultEnvironments(DEVELOPMENT)
                 .start()
     }
 }

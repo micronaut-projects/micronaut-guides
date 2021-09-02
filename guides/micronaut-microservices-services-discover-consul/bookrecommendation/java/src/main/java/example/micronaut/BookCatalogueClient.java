@@ -4,7 +4,6 @@ package example.micronaut;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.retry.annotation.Recoverable;
-import reactor.core.publisher.Flux;
 import org.reactivestreams.Publisher;
 //end::packageandimports[]
 
