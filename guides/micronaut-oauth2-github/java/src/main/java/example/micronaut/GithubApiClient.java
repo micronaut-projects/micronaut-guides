@@ -7,8 +7,8 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.client.annotation.Client;
-import reactor.core.publisher.Flux;
 import org.reactivestreams.Publisher;
+
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
@@ -28,4 +28,6 @@ public interface GithubApiClient {
             @Pattern(regexp = "asc|desc") @Nullable @QueryValue String direction, // <2>
             @Header(HttpHeaders.AUTHORIZATION) String authorization);
     //end::repos[]
+//tag::clazz[]
 }
+//end::clazz[]
