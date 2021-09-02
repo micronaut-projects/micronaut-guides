@@ -16,7 +16,7 @@ public class BookController {
         this.inventoryClient = inventoryClient;
     }
 
-    @Get("/") // <3>
+    @Get // <3>
     public Publisher<BookRecommendation> index() {
         return Flux.from(catalogueClient.findAll(null))
                 .flatMap(Flux::fromIterable)
