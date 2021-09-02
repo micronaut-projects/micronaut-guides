@@ -498,43 +498,31 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.databind.PropertyNamingStrategy</span>;
-<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.databind.annotation.JsonNaming</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 
 <span class="annotation">@Introspected</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GithubUser</span> {
 
-    <span class="directive">private</span> <span class="predefined-type">String</span> login;
-    <span class="directive">private</span> <span class="predefined-type">String</span> name;
-    <span class="directive">private</span> <span class="predefined-type">String</span> email;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> login;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> email;
 
-    <span class="directive">public</span> GithubUser() {
-
+    <span class="directive">public</span> GithubUser(<span class="predefined-type">String</span> login, <span class="predefined-type">String</span> name, <span class="predefined-type">String</span> email) {
+        <span class="local-variable">this</span>.login = login;
+        <span class="local-variable">this</span>.name = name;
+        <span class="local-variable">this</span>.email = email;
     }
 
     <span class="directive">public</span> <span class="predefined-type">String</span> getLogin() {
         <span class="keyword">return</span> login;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setLogin(<span class="predefined-type">String</span> login) {
-        <span class="local-variable">this</span>.login = login;
-    }
-
     <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
         <span class="keyword">return</span> name;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setName(<span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
-    }
-
     <span class="directive">public</span> <span class="predefined-type">String</span> getEmail() {
         <span class="keyword">return</span> email;
-    }
-
-    <span class="directive">public</span> <span class="type">void</span> setEmail(<span class="predefined-type">String</span> email) {
-        <span class="local-variable">this</span>.email = email;
     }
 }</code></pre>
 </div>
@@ -553,8 +541,8 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.QueryValue</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
@@ -565,7 +553,8 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
 
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/user</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
     Publisher&lt;GithubUser&gt; getUser( <i class="conum" data-value="4"></i><b>(4)</b>
-            <span class="annotation">@Header</span>(HttpHeaders.AUTHORIZATION) <span class="predefined-type">String</span> authorization); <i class="conum" data-value="5"></i><b>(5)</b></code></pre>
+            <span class="annotation">@Header</span>(HttpHeaders.AUTHORIZATION) <span class="predefined-type">String</span> authorization); <i class="conum" data-value="5"></i><b>(5)</b>
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -612,19 +601,18 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
 <div class="title">src/main/java/example/micronaut/GithubAuthenticationMapper.java</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.TokenResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.authorization.state.State</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.authorization.state.State</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.TokenResponse</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Named</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
-<span class="keyword">import</span> <span class="include">java.util.HashMap</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
+
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 
 <span class="annotation">@Named</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">github</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Singleton</span>
@@ -632,6 +620,7 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> TOKEN_PREFIX = <span class="string"><span class="delimiter">&quot;</span><span class="content">token </span><span class="delimiter">&quot;</span></span>;
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> ROLE_GITHUB = <span class="string"><span class="delimiter">&quot;</span><span class="content">ROLE_GITHUB</span><span class="delimiter">&quot;</span></span>;
+
     <span class="directive">private</span> <span class="directive">final</span> GithubApiClient apiClient;
 
     <span class="directive">public</span> GithubAuthenticationMapper(GithubApiClient apiClient) {
@@ -639,11 +628,12 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
     }
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; createAuthenticationResponse(TokenResponse tokenResponse, <span class="annotation">@Nullable</span> State state) {
+    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; createAuthenticationResponse(TokenResponse tokenResponse,
+                                                                          <span class="annotation">@Nullable</span> State state) {
         <span class="keyword">return</span> Mono.from(apiClient.getUser(TOKEN_PREFIX + tokenResponse.getAccessToken())) <i class="conum" data-value="2"></i><b>(2)</b>
                 .map(user -&gt; AuthenticationResponse.success(user.getLogin(),
                         <span class="predefined-type">Collections</span>.singletonList(ROLE_GITHUB),
-                        <span class="predefined-type">Collections</span>.singletonMap(OauthAuthenticationMapper.ACCESS_TOKEN_KEY, tokenResponse.getAccessToken()))); <i class="conum" data-value="3"></i><b>(3)</b>
+                        <span class="predefined-type">Collections</span>.singletonMap(ACCESS_TOKEN_KEY, tokenResponse.getAccessToken()))); <i class="conum" data-value="3"></i><b>(3)</b>
     }
 }</code></pre>
 </div>
@@ -683,18 +673,14 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
 <span class="annotation">@Introspected</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GithubRepo</span> {
 
-    <span class="directive">private</span> <span class="predefined-type">String</span> name;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
 
-    <span class="directive">public</span> GithubRepo() {
-
+    <span class="directive">public</span> GithubRepo(<span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name;
     }
 
     <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
         <span class="keyword">return</span> name;
-    }
-
-    <span class="directive">public</span> <span class="type">void</span> setName(<span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
     }
 }</code></pre>
 </div>
@@ -737,12 +723,14 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.Authentication</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.views.View</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.HashMap</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 <span class="keyword">import</span> <span class="include">java.util.Map</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper.ACCESS_TOKEN_KEY</span>;
 
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/repos</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">ReposController</span> {
@@ -750,6 +738,7 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> CREATED = <span class="string"><span class="delimiter">&quot;</span><span class="content">created</span><span class="delimiter">&quot;</span></span>;
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> DESC = <span class="string"><span class="delimiter">&quot;</span><span class="content">desc</span><span class="delimiter">&quot;</span></span>;
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> REPOS = <span class="string"><span class="delimiter">&quot;</span><span class="content">repos</span><span class="delimiter">&quot;</span></span>;
+
     <span class="directive">private</span> <span class="directive">final</span> GithubApiClient githubApiClient;
 
     <span class="directive">public</span> ReposController(GithubApiClient githubApiClient) {
@@ -767,12 +756,11 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
     }
 
     <span class="directive">private</span> <span class="predefined-type">String</span> authorizationValue(Authentication authentication) {
-        <span class="predefined-type">String</span> authorization = <span class="predefined-constant">null</span>;
-        <span class="predefined-type">Object</span> claim = authentication.getAttributes().get(OauthAuthenticationMapper.ACCESS_TOKEN_KEY);  <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="predefined-type">Object</span> claim = authentication.getAttributes().get(ACCESS_TOKEN_KEY);  <i class="conum" data-value="6"></i><b>(6)</b>
         <span class="keyword">if</span> (claim <span class="keyword">instanceof</span> <span class="predefined-type">String</span>) {
-            authorization = HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + <span class="string"><span class="delimiter">'</span><span class="content"> </span><span class="delimiter">'</span></span> + claim;
+            <span class="keyword">return</span> HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER + <span class="string"><span class="delimiter">'</span><span class="content"> </span><span class="delimiter">'</span></span> + claim;
         }
-        <span class="keyword">return</span> authorization;
+        <span class="keyword">return</span> <span class="predefined-constant">null</span>;
     }
 }</code></pre>
 </div>
