@@ -293,15 +293,42 @@ select an available instance, and make a request.</p>
 <div class="sect2">
 <h3 id="catalogue-microservice">4.1. Catalogue Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookcatalogue</code> microservice:</p>
+<p>Create the <code>bookcatalogue</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookcatalogue --build=maven --lang=groovy</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-consul,management,graalvm example.micronaut.bookcatalogue --build=maven --lang=groovy</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookcatalogue</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-consul</code>, <code>management</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookcatalogue</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-consul&amp;features=management&amp;features=graalvm&amp;lang=GROOVY&amp;build=MAVEN&amp;test=SPOCK&amp;name=bookcatalogue&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Create a <code>BooksController</code> class to handle incoming HTTP requests into the <code>bookcatalogue</code> microservice:</p>
@@ -319,12 +346,12 @@ select an available instance, and make a request.</p>
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">BooksController</span> {
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@Get</span> <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; index() {
         [
             <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>),
             <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Release It!</span><span class="delimiter">&quot;</span></span>),
-            <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">0321601912</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Continuous Delivery:</span><span class="delimiter">&quot;</span></span>),
+            <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">0321601912</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Continuous Delivery:</span><span class="delimiter">&quot;</span></span>)
         ]
     }
 }</code></pre>
@@ -352,14 +379,31 @@ select an available instance, and make a request.</p>
 
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.EqualsAndHashCode</span>
-<span class="keyword">import</span> <span class="include">groovy.transform.TupleConstructor</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Creator</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 
-<span class="annotation">@TupleConstructor</span>
-<span class="annotation">@EqualsAndHashCode</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
 <span class="annotation">@CompileStatic</span>
+<span class="annotation">@EqualsAndHashCode</span>
+<span class="annotation">@Introspected</span>
 <span class="type">class</span> <span class="class">Book</span> {
-    <span class="predefined-type">String</span> isbn
-    <span class="predefined-type">String</span> name
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">final</span> <span class="predefined-type">String</span> isbn
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">final</span> <span class="predefined-type">String</span> name
+
+    <span class="annotation">@Creator</span>
+    <span class="predefined-type">Book</span>(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,
+         <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.isbn = isbn
+        <span class="local-variable">this</span>.name = name
+    }
 }</code></pre>
 </div>
 </div>
@@ -376,9 +420,8 @@ select an available instance, and make a request.</p>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">BooksControllerSpec</span> <span class="directive">extends</span> Specification {
@@ -390,7 +433,7 @@ select an available instance, and make a request.</p>
     <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">it is possible to retrieve books</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">when</span>:
         HttpRequest request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="predefined-type">List</span> books = client.toBlocking().retrieve(request, Argument.listOf(<span class="predefined-type">Book</span>)) <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; books = client.toBlocking().retrieve(request, Argument.listOf(<span class="predefined-type">Book</span>)) <i class="conum" data-value="4"></i><b>(4)</b>
 
         <span class="key">then</span>:
         books.size() == <span class="integer">3</span>
@@ -435,7 +478,7 @@ select an available instance, and make a request.</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Configure the application name. The application name will be use by the discovery service.</td>
+<td>Configure the application name. The application name will be used by the discovery service.</td>
 </tr>
 </table>
 </div>
@@ -454,15 +497,18 @@ select an available instance, and make a request.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>
+
+<span class="annotation">@CompileStatic</span>
 <span class="type">class</span> <span class="class">Application</span> {
 
     <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
         Micronaut.build(args)
                 .mainClass(Application)
-                .defaultEnvironments(Environment.DEVELOPMENT)
+                .defaultEnvironments(DEVELOPMENT)
                 .start()
     }
 }</code></pre>
@@ -493,12 +539,10 @@ select an available instance, and make a request.</p>
 <div class="listingblock">
 <div class="title">bookcatalogue/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::consul[]</span>
-<span class="key">consul</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">consul</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::consul[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -513,15 +557,42 @@ select an available instance, and make a request.</p>
 <div class="sect2">
 <h3 id="inventory-microservice">4.2. Inventory Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookinventory</code> microservice:</p>
+<p>Create the <code>bookinventory</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookinventory --build=maven --lang=groovy</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-consul,management,graalvm example.micronaut.bookinventory --build=maven --lang=groovy</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookinventory</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-consul</code>, <code>management</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookinventory</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-consul&amp;features=management&amp;features=graalvm&amp;lang=GROOVY&amp;build=MAVEN&amp;test=SPOCK&amp;name=bookinventory&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Create a Controller:</p>
@@ -532,28 +603,29 @@ select an available instance, and make a request.</p>
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
+
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">BooksController</span> {
 
-    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@Produces</span>(TEXT_PLAIN) <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/stock/{isbn}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="predefined-type">Boolean</span> stock(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn) {
-        bookInventoryByIsbn(isbn).map { bi -&gt; bi.getStock() &gt; <span class="integer">0</span> }.orElse(<span class="predefined-constant">null</span>)
+        bookInventoryByIsbn(isbn).map(bi -&gt; bi.stock &gt; <span class="integer">0</span>).orElse(<span class="predefined-constant">null</span>)
     }
 
     <span class="directive">private</span> Optional&lt;BookInventory&gt; bookInventoryByIsbn(<span class="predefined-type">String</span> isbn) {
         <span class="keyword">if</span> (isbn == <span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>) {
             <span class="keyword">return</span> Optional.of(<span class="keyword">new</span> BookInventory(isbn, <span class="integer">4</span>))
-
-        } <span class="keyword">else</span> <span class="keyword">if</span> (isbn == <span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>) {
+        }
+        <span class="keyword">if</span> (isbn == <span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>) {
             <span class="keyword">return</span> Optional.of(<span class="keyword">new</span> BookInventory(isbn, <span class="integer">0</span>))
         }
         Optional.empty()
@@ -587,14 +659,27 @@ select an available instance, and make a request.</p>
 
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.EqualsAndHashCode</span>
-<span class="keyword">import</span> <span class="include">groovy.transform.TupleConstructor</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
 
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@TupleConstructor</span>
 <span class="annotation">@EqualsAndHashCode</span>
+<span class="annotation">@Introspected</span>
 <span class="type">class</span> <span class="class">BookInventory</span> {
-    <span class="predefined-type">String</span> isbn
-    <span class="predefined-type">Integer</span> stock
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">final</span> <span class="predefined-type">String</span> isbn
+
+    <span class="directive">final</span> <span class="type">int</span> stock
+
+    BookInventory(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,
+                  <span class="type">int</span> stock) {
+        <span class="local-variable">this</span>.isbn = isbn
+        <span class="local-variable">this</span>.stock = stock
+    }
 }</code></pre>
 </div>
 </div>
@@ -607,47 +692,41 @@ select an available instance, and make a request.</p>
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.NOT_FOUND</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.OK</span>
 
 <span class="annotation">@MicronautTest</span>
 <span class="type">class</span> <span class="class">BooksControllerSpec</span> <span class="directive">extends</span> Specification {
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client
+    HttpClient httpClient
 
     <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">for a book with inventory true is returned</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">when</span>:
-        <span class="predefined-type">Boolean</span> hasStock = client.toBlocking().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/1491950358</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>)
+        HttpResponse&lt;<span class="predefined-type">Boolean</span>&gt; rsp = httpClient.toBlocking().exchange(
+                HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/1491950358</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>)
 
         <span class="key">then</span>:
-        noExceptionThrown()
-        hasStock
-    }
-
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">for a book without inventory false is returned</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">Boolean</span> hasStock = client.toBlocking().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/1680502395</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>)
-
-        <span class="key">then</span>:
-        noExceptionThrown()
-        hasStock == <span class="predefined-type">Boolean</span>.FALSE
+        rsp.status() == OK
+        rsp.body()
     }
 
     <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">for an invalid ISBN 404 is returned</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">when</span>:
-        client.toBlocking().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/XXXXX</span><span class="delimiter">&quot;</span></span>))
+        httpClient.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/XXXXX</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>)
 
         <span class="key">then</span>:
-        <span class="keyword">def</span> e = thrown(HttpClientResponseException)
-        e.response.status == HttpStatus.NOT_FOUND
+        HttpClientResponseException e = thrown()
+        e.response.status == NOT_FOUND
     }
 }</code></pre>
 </div>
@@ -686,15 +765,18 @@ select an available instance, and make a request.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>
+
+<span class="annotation">@CompileStatic</span>
 <span class="type">class</span> <span class="class">Application</span> {
 
     <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
         Micronaut.build(args)
                 .mainClass(Application)
-                .defaultEnvironments(Environment.DEVELOPMENT)
+                .defaultEnvironments(DEVELOPMENT)
                 .start()
     }
 }</code></pre>
@@ -725,12 +807,10 @@ select an available instance, and make a request.</p>
 <div class="listingblock">
 <div class="title">bookinventory/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::consul[]</span>
-<span class="key">consul</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">consul</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::consul[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -745,15 +825,42 @@ select an available instance, and make a request.</p>
 <div class="sect2">
 <h3 id="recommendation-microservice">4.3. Recommendation Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookrecommendation</code> microservice:</p>
+<p>Create the <code>bookrecommendation</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookrecommendation --build=maven --lang=groovy</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-consul,management,reactor,graalvm example.micronaut.bookrecommendation --build=maven --lang=groovy</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookrecommendation</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-consul</code>, <code>management</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookrecommendation</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-consul&amp;features=management&amp;features=graalvm&amp;features=reactor&amp;lang=GROOVY&amp;build=MAVEN&amp;test=SPOCK&amp;name=bookrecommendation&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Create an interface to map operations with <code>bookcatalogue</code>, and a Micronaut Declarative HTTP Client to consume it.</p>
@@ -775,13 +882,13 @@ select an available instance, and make a request.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Recoverable</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 
 <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:8081</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Recoverable</span>(api = BookCatalogueOperations.class)
+<span class="annotation">@Recoverable</span>(api = BookCatalogueOperations)
 
 <span class="type">interface</span> BookCatalogueClient <span class="directive">extends</span> BookCatalogueOperations {
 
@@ -808,14 +915,29 @@ select an available instance, and make a request.</p>
 
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.EqualsAndHashCode</span>
-<span class="keyword">import</span> <span class="include">groovy.transform.TupleConstructor</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
 
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@TupleConstructor</span>
 <span class="annotation">@EqualsAndHashCode</span>
+<span class="annotation">@Introspected</span>
 <span class="type">class</span> <span class="class">Book</span> {
-    <span class="predefined-type">String</span> isbn
-    <span class="predefined-type">String</span> name
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">final</span> <span class="predefined-type">String</span> isbn
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">final</span> <span class="predefined-type">String</span> name
+
+    <span class="predefined-type">Book</span>(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,
+         <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.isbn = isbn
+        <span class="local-variable">this</span>.name = name
+    }
 }</code></pre>
 </div>
 </div>
@@ -827,32 +949,40 @@ select an available instance, and make a request.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
 
 <span class="type">interface</span> BookInventoryOperations {
-    Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn)
+    Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn)
 }</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">bookrecommendation/src/main/groovy/example/micronaut/BookCatalogueClient.groovy</div>
+<div class="title">bookrecommendation/src/main/groovy/example/micronaut/BookInventoryClient.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Recoverable</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
 
-<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:8081</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Recoverable</span>(api = BookCatalogueOperations.class)
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
 
-<span class="type">interface</span> BookCatalogueClient <span class="directive">extends</span> BookCatalogueOperations {
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>)
-    Publisher&lt;<span class="predefined-type">Book</span>&gt; findAll()
+<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:8082</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Recoverable</span>(api = BookInventoryOperations)
+
+<span class="type">interface</span> BookInventoryClient <span class="directive">extends</span> BookInventoryOperations {
+
+    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/{isbn}</span><span class="delimiter">&quot;</span></span>)
+    Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn)
 }</code></pre>
 </div>
 </div>
@@ -875,8 +1005,8 @@ select an available instance, and make a request.</p>
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
 
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
@@ -891,14 +1021,13 @@ select an available instance, and make a request.</p>
         <span class="local-variable">this</span>.bookInventoryOperations = bookInventoryOperations
     }
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
     Publisher&lt;BookRecommendation&gt; index() {
-        <span class="keyword">return</span> Flux.from(bookCatalogueOperations.findAll())
-            .flatMap { b -&gt;
-                Flux.from(bookInventoryOperations.stock(b.isbn))
-                    .filter { hasStock -&gt; hasStock == <span class="predefined-type">Boolean</span>.TRUE }
-                    .map { rsp -&gt; b }
-            }.map { book -&gt; <span class="keyword">new</span> BookRecommendation(book.name) }
+        Flux.from(bookCatalogueOperations.findAll())
+                .flatMap(b -&gt; Flux.from(bookInventoryOperations.stock(b.isbn))
+                        .filter(<span class="predefined-type">Boolean</span>::booleanValue)
+                        .map(rsp -&gt; b)
+                ).map(book -&gt; <span class="keyword">new</span> BookRecommendation(book.name))
     }
 }</code></pre>
 </div>
@@ -929,13 +1058,23 @@ select an available instance, and make a request.</p>
 
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.EqualsAndHashCode</span>
-<span class="keyword">import</span> <span class="include">groovy.transform.TupleConstructor</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 
-<span class="annotation">@TupleConstructor</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@EqualsAndHashCode</span>
+<span class="annotation">@Introspected</span>
 <span class="type">class</span> <span class="class">BookRecommendation</span> {
-    <span class="predefined-type">String</span> name
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">final</span> <span class="predefined-type">String</span> name
+
+    BookRecommendation(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name
+    }
 }</code></pre>
 </div>
 </div>
@@ -954,25 +1093,27 @@ select an available instance, and make a request.</p>
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Fallback</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
 
-<span class="annotation">@Requires</span>(env = Environment.TEST) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>
+
+<span class="annotation">@Requires</span>(env = TEST) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Fallback</span>
 <span class="annotation">@Singleton</span>
 <span class="type">class</span> <span class="class">BookInventoryClientStub</span> <span class="directive">implements</span> BookInventoryOperations {
 
     <span class="annotation">@Override</span>
-    Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn) {
+    Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn) {
         <span class="keyword">if</span> (isbn == <span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>) {
-            <span class="keyword">return</span> Mono.just(<span class="predefined-type">Boolean</span>.TRUE) <i class="conum" data-value="2"></i><b>(2)</b>
-
-        } <span class="keyword">else</span> <span class="keyword">if</span> (isbn == <span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>) {
-            <span class="keyword">return</span> Mono.just(<span class="predefined-type">Boolean</span>.FALSE) <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="keyword">return</span> Mono.just(<span class="predefined-constant">true</span>) <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+        <span class="keyword">if</span> (isbn == <span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>) {
+            <span class="keyword">return</span> Mono.just(<span class="predefined-constant">false</span>) <i class="conum" data-value="3"></i><b>(3)</b>
         }
         Mono.empty() <i class="conum" data-value="4"></i><b>(4)</b>
     }
@@ -1005,13 +1146,14 @@ select an available instance, and make a request.</p>
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Fallback</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
 
-<span class="annotation">@Requires</span>(env = Environment.TEST)
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>
+
+<span class="annotation">@Requires</span>(env = TEST)
 <span class="annotation">@Fallback</span>
 <span class="annotation">@Singleton</span>
 <span class="type">class</span> <span class="class">BookCatalogueClientStub</span> <span class="directive">implements</span> BookCatalogueOperations {
@@ -1033,33 +1175,33 @@ select an available instance, and make a request.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.StreamingHttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-<span class="keyword">import</span> <span class="include">spock.lang.IgnoreIf</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
+<span class="keyword">import</span> <span class="include">spock.lang.IgnoreIf</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 
 <span class="annotation">@MicronautTest</span>
 <span class="type">class</span> <span class="class">BookControllerSpec</span> <span class="directive">extends</span> Specification {
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client
+    StreamingHttpClient client
 
     <span class="annotation">@IgnoreIf</span>({env[<span class="string"><span class="delimiter">'</span><span class="content">CI</span><span class="delimiter">'</span></span>] <span class="keyword">as</span> <span class="type">boolean</span>})
     <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">retrieve books</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">when</span>:
-        HttpResponse response = client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>), Argument.listOf(BookRecommendation))
+        <span class="predefined-type">List</span>&lt;BookRecommendation&gt; books = Flux
+                .from(client.jsonStream(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>), BookRecommendation))
+                .collectList()
+                .block()
 
         <span class="key">then</span>:
-        response.status() == HttpStatus.OK
-        response.body().size() == <span class="integer">1</span>
-        response.body().get(<span class="integer">0</span>).name == <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>
+        books.size() == <span class="integer">1</span>
+        books[<span class="integer">0</span>].name == <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>
     }
 }</code></pre>
 </div>
@@ -1098,15 +1240,18 @@ select an available instance, and make a request.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>
+
+<span class="annotation">@CompileStatic</span>
 <span class="type">class</span> <span class="class">Application</span> {
 
     <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
         Micronaut.build(args)
                 .mainClass(Application)
-                .defaultEnvironments(Environment.DEVELOPMENT)
+                .defaultEnvironments(DEVELOPMENT)
                 .start()
     }
 }</code></pre>
@@ -1137,12 +1282,10 @@ select an available instance, and make a request.</p>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::consul[]</span>
-<span class="key">consul</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">consul</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::consul[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1240,19 +1383,6 @@ select an available instance, and make a request.</p>
 <div class="sect2">
 <h3 id="book-catalogue">5.2. Book Catalogue</h3>
 <div class="paragraph">
-<p>Modify your build file to add the <code>discovery-client</code> feature.</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.discovery<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-discovery-client<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
 <p>Append to <code>bookcatalogue</code> service <code>application.yml</code> the following snippet:</p>
 </div>
 <div class="listingblock">
@@ -1268,36 +1398,11 @@ select an available instance, and make a request.</p>
 <div class="paragraph">
 <p>This configuration registers a Micronaut application with Consul with minimal configuration. Discover a more complete list of configuration options at <a href="https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/consul/ConsulConfiguration.html" target="_blank" rel="noopener">ConsulConfiguration</a>.</p>
 </div>
-<div class="paragraph">
-<p>Disable consul registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookcatalogue/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">consul</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="book-inventory">5.3. Book Inventory</h3>
 <div class="paragraph">
-<p>Modify your build file to add the <code>discovery-client</code> feature.</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.discovery<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-discovery-client<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Also, modify the <code>application.yml</code> of the <code>bookinventory</code> application with the following snippet:</p>
+<p>Modify the <code>application.yml</code> of the <code>bookinventory</code> application with the following snippet:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookinventory/src/main/resources/application.yml</div>
@@ -1309,36 +1414,11 @@ select an available instance, and make a request.</p>
     <span class="key">defaultZone</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}</span><span class="delimiter">&quot;</span></span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Disable consul registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookinventory/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">consul</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="book-recommendation">5.4. Book Recommendation</h3>
 <div class="paragraph">
-<p>Modify your build file to add the <code>discovery-client</code> feature.</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.discovery<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-discovery-client<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Also, append to <code>bookrecommendation</code>.<code>application.yml</code> the following snippet:</p>
+<p>Append to <code>bookrecommendation</code>.<code>application.yml</code> the following snippet:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/resources/application.yml</div>
@@ -1351,20 +1431,20 @@ select an available instance, and make a request.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Modify <code>BookInventoryClient</code> and <code>BookCatalogueClient</code> to use the service id instead of a harcoded ip.</p>
+<p>Modify <code>BookInventoryClient</code> and <code>BookCatalogueClient</code> to use the service id instead of a hardcoded URL.</p>
 </div>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/groovy/example/micronaut/BookCatalogueClient.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Recoverable</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 
 <span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">&quot;</span><span class="content">bookcatalogue</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Recoverable</span>(api = BookCatalogueOperations.class)
+<span class="annotation">@Recoverable</span>(api = BookCatalogueOperations)
 
 <span class="type">interface</span> BookCatalogueClient <span class="directive">extends</span> BookCatalogueOperations {
 
@@ -1386,23 +1466,25 @@ select an available instance, and make a request.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Recoverable</span>
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Recoverable</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
 
 <span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">&quot;</span><span class="content">bookinventory</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Recoverable</span>(api = BookInventoryOperations.class)
+<span class="annotation">@Recoverable</span>(api = BookInventoryOperations)
 
 <span class="type">interface</span> BookInventoryClient <span class="directive">extends</span> BookInventoryOperations {
 
+    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/{isbn}</span><span class="delimiter">&quot;</span></span>)
-    <span class="annotation">@Consumes</span>(MediaType.TEXT_PLAIN)
-    Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn)
+    Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn)
 }</code></pre>
 </div>
 </div>
@@ -1413,18 +1495,6 @@ select an available instance, and make a request.</p>
 <td>Use the configuration value <code>micronaut.application.name</code> used in <code>bookinventory</code> as service <code>id</code>.</td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>Disable consul registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookrecommendation/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">consul</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
 </div>
 </div>
 <div class="sect2">
