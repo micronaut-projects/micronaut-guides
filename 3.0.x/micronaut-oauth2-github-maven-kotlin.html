@@ -218,7 +218,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=maven --lang=kotlin</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=security-oauth2,security-jwt,views-thymeleaf,reactor,graalvm example.micronaut.micronautguide --build=maven --lang=kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -234,7 +234,22 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>security-oauth2</code>, <code>security-jwt</code>, <code>views-thymeleaf</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=graalvm&amp;features=views-thymeleaf&amp;features=security-oauth2&amp;features=security-jwt&amp;features=reactor&amp;lang=KOTLIN&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
@@ -250,17 +265,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.</p>
 </div>
 <div class="paragraph">
-<p>To use <a href="https://www.thymeleaf.org/" target="_blank" rel="noopener">Thymeleaf</a> Java template engine within a Micronaut Application add the following dependency on your classpath.</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.views<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-views-thymeleaf<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
+<p>We&#8217;ll use the <a href="https://www.thymeleaf.org/" target="_blank" rel="noopener">Thymeleaf</a> Java template engine to render views.</p>
 </div>
 </div>
 <div class="sect2">
@@ -310,7 +315,7 @@ class HomeController {
 </table>
 </div>
 <div class="paragraph">
-<p>Create a thymeleaf template:</p>
+<p>Create a Thymeleaf template:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/views/home.html</div>
@@ -338,7 +343,7 @@ class HomeController {
 </div>
 </div>
 <div class="paragraph">
-<p>Also, note that we return an empty model in the controller. However, we are accessing <code>security</code> in the thymeleaf template.</p>
+<p>Also, note that we return an empty model in the controller. However, we are accessing <code>security</code> in the Thymeleaf template.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -374,32 +379,6 @@ injects into the model a <code>security</code> map with the authenticated user. 
 <div class="sect2">
 <h3 id="oauth-2-0-configuration">4.4. OAuth 2.0 Configuration</h3>
 <div class="paragraph">
-<p>To use OAuth 2.0 integration, add the following dependency:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-oauth2<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Also add <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt" target="_blank" rel="noopener">Micronaut JWT support</a> dependencies:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-jwt<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
 <p>Add the following OAuth2 Configuration:</p>
 </div>
 <div class="listingblock">
@@ -427,7 +406,7 @@ injects into the model a <code>security</code> map with the authenticated user. 
             <span class="key">url</span>: <span class="string"><span class="content">'https://github.com/login/oauth/authorize' </span></span><i class="conum" data-value="8"></i><b>(8)</b>
           <span class="key">token</span>:
             <span class="key">url</span>: <span class="string"><span class="content">'https://github.com/login/oauth/access_token' </span></span><i class="conum" data-value="9"></i><b>(9)</b>
-            <span class="key">auth-method</span>: <span class="string"><span class="content">client-secret-post</span></span>
+            <span class="key">auth-method</span>: <span class="string"><span class="content">CLIENT_SECRET_POST</span></span>
     <span class="key">endpoints</span>:
       <span class="key">logout</span>:
         <span class="key">get-allowed</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="10"></i><b>(10)</b></code></pre>
@@ -749,7 +728,7 @@ class ReposController(private val githubApiClient: GithubApiClient) {
 </table>
 </div>
 <div class="paragraph">
-<p>Create a thymeleaf template:</p>
+<p>Create a Thymeleaf template:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/views/repos.html</div>
