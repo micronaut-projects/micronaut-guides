@@ -126,7 +126,7 @@
 <li><a href="#getting-started">1. Getting started</a></li>
 <li><a href="#what-you-will-need">2. What you will need</a></li>
 <li><a href="#solution">3. Solution</a></li>
-<li><a href="#writing-the-app">4. Writing the App</a>
+<li><a href="#writing-the-application">4. Writing the Application</a>
 <ul class="sectlevel2">
 <li><a href="#catalogue-microservice">4.1. Catalogue Microservice</a></li>
 <li><a href="#inventory-microservice">4.2. Inventory Microservice</a></li>
@@ -140,7 +140,7 @@
 <li><a href="#book-catalogue">5.2. Book Catalogue</a></li>
 <li><a href="#book-inventory">5.3. Book Inventory</a></li>
 <li><a href="#book-recommendation">5.4. Book Recommendation</a></li>
-<li><a href="#running-the-app">5.5. Running the App</a></li>
+<li><a href="#running-the-application-2">5.5. Running the Application</a></li>
 </ul>
 </li>
 <li><a href="#generate-a-micronaut-application-native-image-with-graalvm">6. Generate a Micronaut Application Native Image with GraalVM</a>
@@ -217,7 +217,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="writing-the-app">4. Writing the App</h2>
+<h2 id="writing-the-application">4. Writing the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Let&#8217;s describe the microservices:</p>
@@ -231,7 +231,7 @@
 <p><code>bookinventory</code> - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and ISBN.</p>
 </li>
 <li>
-<p><code>bookrecommendation</code> - It consumes previous services and exposes and endpoint which recommends book names which are in stock.</p>
+<p><code>bookrecommendation</code> - It consumes previous services and exposes an endpoint which recommends book names which are in stock.</p>
 </li>
 </ul>
 </div>
@@ -276,15 +276,45 @@
 <div class="sect2">
 <h3 id="catalogue-microservice">4.1. Catalogue Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookcatalogue</code> microservice:</p>
+<p>Create the <code>bookcatalogue</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookcatalogue --build=maven --lang=java</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-eureka,graalvm example.micronaut.bookcatalogue --build=maven --lang=java</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookcatalogue</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-eureka</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookcatalogue</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-eureka&amp;features=graalvm&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookcatalogue&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a <code>BooksController</code> class to handle incoming HTTP requests into the <code>bookcatalogue</code> microservice:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/java/example/micronaut/BooksController.java</div>
@@ -302,10 +332,11 @@
 
     <span class="annotation">@Get</span> <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="directive">public</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; index() {
-        <span class="predefined-type">Book</span> buildingMicroservices = <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>);
-        <span class="predefined-type">Book</span> releaseIt = <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Release It!</span><span class="delimiter">&quot;</span></span>);
-        <span class="predefined-type">Book</span> cidelivery = <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">0321601912</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Continuous Delivery:</span><span class="delimiter">&quot;</span></span>);
-        <span class="keyword">return</span> <span class="predefined-type">Arrays</span>.asList(buildingMicroservices, releaseIt, cidelivery);
+        <span class="keyword">return</span> <span class="predefined-type">Arrays</span>.asList(
+                <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>),
+                <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Release It!</span><span class="delimiter">&quot;</span></span>),
+                <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">0321601912</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Continuous Delivery:</span><span class="delimiter">&quot;</span></span>)
+        );
     }
 }</code></pre>
 </div>
@@ -323,7 +354,7 @@
 </table>
 </div>
 <div class="paragraph">
-<p>The previous controller responds a <code>Publisher&lt;Book&gt;</code>. Create the <code>Book</code> POJO:</p>
+<p>The previous controller responds a <code>List&lt;Book&gt;</code>. Create the <code>Book</code> POJO:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/java/example/micronaut/Book.java</div>
@@ -334,21 +365,21 @@
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+<span class="keyword">import</span> <span class="include">java.util.Objects</span>;
 
 <span class="annotation">@Introspected</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Book</span> {
 
     <span class="annotation">@NonNull</span>
     <span class="annotation">@NotBlank</span>
-    <span class="directive">private</span> <span class="predefined-type">String</span> isbn;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> isbn;
+
     <span class="annotation">@NonNull</span>
     <span class="annotation">@NotBlank</span>
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
 
-    <span class="directive">private</span> <span class="predefined-type">String</span> name;
-
-    <span class="directive">public</span> <span class="predefined-type">Book</span>() {}
-
-    <span class="directive">public</span> <span class="predefined-type">Book</span>(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+    <span class="directive">public</span> <span class="predefined-type">Book</span>(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,
+                <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>.isbn = isbn;
         <span class="local-variable">this</span>.name = name;
     }
@@ -358,17 +389,9 @@
         <span class="keyword">return</span> isbn;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setIsbn(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> isbn) {
-        <span class="local-variable">this</span>.isbn = isbn;
-    }
-
     <span class="annotation">@NonNull</span>
     <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
         <span class="keyword">return</span> name;
-    }
-
-    <span class="directive">public</span> <span class="type">void</span> setName(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
     }
 
     <span class="annotation">@Override</span>
@@ -377,16 +400,12 @@
         <span class="keyword">if</span> (o == <span class="predefined-constant">null</span> || getClass() != o.getClass()) <span class="keyword">return</span> <span class="predefined-constant">false</span>;
 
         <span class="predefined-type">Book</span> book = (<span class="predefined-type">Book</span>) o;
-
-        <span class="keyword">if</span> (!isbn.equals(book.isbn)) <span class="keyword">return</span> <span class="predefined-constant">false</span>;
-        <span class="keyword">return</span> name.equals(book.name);
+        <span class="keyword">return</span> Objects.equals(isbn, book.isbn) &amp;&amp; Objects.equals(name, book.name);
     }
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> <span class="type">int</span> hashCode() {
-        <span class="type">int</span> result = isbn.hashCode();
-        result = <span class="integer">31</span> * result + name.hashCode();
-        <span class="keyword">return</span> result;
+        <span class="keyword">return</span> Objects.hash(isbn, name);
     }
 }</code></pre>
 </div>
@@ -404,9 +423,9 @@
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
@@ -421,8 +440,9 @@
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testRetrieveBooks() {
-        HttpRequest request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="predefined-type">List</span> books = client.toBlocking().retrieve(request, Argument.listOf(<span class="predefined-type">Book</span>.class)); <i class="conum" data-value="4"></i><b>(4)</b>
+        HttpRequest&lt;?&gt; request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; books = client.toBlocking().retrieve(request, Argument.listOf(<span class="predefined-type">Book</span>.class)); <i class="conum" data-value="4"></i><b>(4)</b>
+
         assertEquals(<span class="integer">3</span>, books.size());
         assertTrue(books.contains(<span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>)));
         assertTrue(books.contains(<span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Release It!</span><span class="delimiter">&quot;</span></span>)));
@@ -484,15 +504,16 @@
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>;
 
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Application</span> {
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
         Micronaut.build(args)
                 .mainClass(Application.class)
-                .defaultEnvironments(Environment.DEVELOPMENT)
+                .defaultEnvironments(DEVELOPMENT)
                 .start();
     }
 }</code></pre>
@@ -523,12 +544,10 @@
 <div class="listingblock">
 <div class="title">bookcatalogue/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::eureka[]</span>
-<span class="key">eureka</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::eureka[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -543,15 +562,42 @@
 <div class="sect2">
 <h3 id="inventory-microservice">4.2. Inventory Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookinventory</code> microservice:</p>
+<p>Create the <code>bookinventory</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookinventory --build=maven --lang=java</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-eureka,graalvm example.micronaut.bookinventory --build=maven --lang=java</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookinventory</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-eureka</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookinventory</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-eureka&amp;features=graalvm&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookinventory&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Create a Controller:</p>
@@ -561,7 +607,6 @@
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>;
@@ -569,10 +614,12 @@
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
+
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">BooksController</span> {
 
-    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@Produces</span>(TEXT_PLAIN) <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/stock/{isbn}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="directive">public</span> <span class="predefined-type">Boolean</span> stock(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn) { <i class="conum" data-value="1"></i><b>(1)</b>
         <span class="keyword">return</span> bookInventoryByIsbn(isbn).map(bi -&gt; bi.getStock() &gt; <span class="integer">0</span>).orElse(<span class="predefined-constant">null</span>);
@@ -581,8 +628,8 @@
     <span class="directive">private</span> Optional&lt;BookInventory&gt; bookInventoryByIsbn(<span class="predefined-type">String</span> isbn) {
         <span class="keyword">if</span> (isbn.equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>)) {
             <span class="keyword">return</span> Optional.of(<span class="keyword">new</span> BookInventory(isbn, <span class="integer">4</span>));
-
-        } <span class="keyword">else</span> <span class="keyword">if</span> (isbn.equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>)) {
+        }
+        <span class="keyword">if</span> (isbn.equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>)) {
             <span class="keyword">return</span> Optional.of(<span class="keyword">new</span> BookInventory(isbn, <span class="integer">0</span>));
         }
         <span class="keyword">return</span> Optional.empty();
@@ -618,7 +665,6 @@
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.util.Objects</span>;
 
 <span class="annotation">@Introspected</span>
@@ -626,15 +672,12 @@
 
     <span class="annotation">@NonNull</span>
     <span class="annotation">@NotBlank</span>
-    <span class="directive">private</span> <span class="predefined-type">String</span> isbn;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> isbn;
 
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotNull</span>
-    <span class="directive">private</span> <span class="predefined-type">Integer</span> stock;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="type">int</span> stock;
 
-    <span class="directive">public</span> BookInventory() {}
-
-    <span class="directive">public</span> BookInventory(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn, <span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Integer</span> stock) {
+    <span class="directive">public</span> BookInventory(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,
+                         <span class="type">int</span> stock) {
         <span class="local-variable">this</span>.isbn = isbn;
         <span class="local-variable">this</span>.stock = stock;
     }
@@ -644,17 +687,8 @@
         <span class="keyword">return</span> isbn;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setIsbn(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> isbn) {
-        <span class="local-variable">this</span>.isbn = isbn;
-    }
-
-    <span class="annotation">@NonNull</span>
-    <span class="directive">public</span> <span class="predefined-type">Integer</span> getStock() {
+    <span class="directive">public</span> <span class="type">int</span> getStock() {
         <span class="keyword">return</span> stock;
-    }
-
-    <span class="directive">public</span> <span class="type">void</span> setStock(<span class="annotation">@NonNull</span> <span class="predefined-type">Integer</span> stock) {
-        <span class="local-variable">this</span>.stock = stock;
     }
 
     <span class="annotation">@Override</span>
@@ -663,16 +697,12 @@
         <span class="keyword">if</span> (o == <span class="predefined-constant">null</span> || getClass() != o.getClass()) <span class="keyword">return</span> <span class="predefined-constant">false</span>;
 
         BookInventory that = (BookInventory) o;
-
-        <span class="keyword">if</span> (!isbn.equals(that.isbn)) <span class="keyword">return</span> <span class="predefined-constant">false</span>;
-        <span class="keyword">return</span> stock.equals(that.stock);
+        <span class="keyword">return</span> stock == that.stock &amp;&amp; Objects.equals(isbn, that.isbn);
     }
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> <span class="type">int</span> hashCode() {
-        <span class="type">int</span> result = isbn.hashCode();
-        result = <span class="integer">31</span> * result + stock.hashCode();
-        <span class="keyword">return</span> result;
+        <span class="keyword">return</span> Objects.hash(isbn, stock);
     }
 }</code></pre>
 </div>
@@ -687,15 +717,15 @@
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.NOT_FOUND</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.OK</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
@@ -709,8 +739,9 @@
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testBooksController() {
-        HttpResponse&lt;<span class="predefined-type">Boolean</span>&gt; rsp = httpClient.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/1491950358</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>.class);
-        assertEquals(rsp.status(), HttpStatus.OK);
+        HttpResponse&lt;<span class="predefined-type">Boolean</span>&gt; rsp = httpClient.toBlocking().exchange(
+                HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/1491950358</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>.class);
+        assertEquals(OK, rsp.status());
         assertTrue(rsp.body());
     }
 
@@ -720,11 +751,7 @@
             httpClient.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/XXXXX</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Boolean</span>.class);
         });
 
-        assertEquals(
-                HttpStatus.NOT_FOUND,
-                thrown.getResponse().getStatus()
-        );
-
+        assertEquals(NOT_FOUND, thrown.getResponse().getStatus());
     }
 }</code></pre>
 </div>
@@ -765,10 +792,15 @@
 
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>;
+
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Application</span> {
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
-        Micronaut.run(Application.class, args);
+        Micronaut.build(args)
+                .mainClass(Application.class)
+                .defaultEnvironments(DEVELOPMENT)
+                .start();
     }
 }</code></pre>
 </div>
@@ -798,17 +830,10 @@
 <div class="listingblock">
 <div class="title">bookinventory/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::port[]</span>
-<span class="key">micronaut</span>:
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">-1</span></span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="comment">#end::port[]</span>
-<span class="comment">#tag::eureka[]</span>
-<span class="key">eureka</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::eureka[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -823,15 +848,42 @@
 <div class="sect2">
 <h3 id="recommendation-microservice">4.3. Recommendation Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookrecommendation</code> microservice:</p>
+<p>Create the <code>bookrecommendation</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookrecommendation --build=maven --lang=java</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-eureka,reactor,graalvm example.micronaut.bookrecommendation --build=maven --lang=java</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookrecommendation</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-eureka</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookrecommendation</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-eureka&amp;features=graalvm&amp;features=reactor&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookrecommendation&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Create an interface to map operations with <code>bookcatalogue</code>, and a Micronaut Declarative HTTP Client to consume it.</p>
@@ -895,15 +947,14 @@
 
     <span class="annotation">@NonNull</span>
     <span class="annotation">@NotBlank</span>
-    <span class="directive">private</span> <span class="predefined-type">String</span> isbn;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> isbn;
 
     <span class="annotation">@NonNull</span>
     <span class="annotation">@NotBlank</span>
-    <span class="directive">private</span> <span class="predefined-type">String</span> name;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
 
-    <span class="directive">public</span> <span class="predefined-type">Book</span>() {}
-
-    <span class="directive">public</span> <span class="predefined-type">Book</span>(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+    <span class="directive">public</span> <span class="predefined-type">Book</span>(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,
+                <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>.isbn = isbn;
         <span class="local-variable">this</span>.name = name;
     }
@@ -913,17 +964,9 @@
         <span class="keyword">return</span> isbn;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setIsbn(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> isbn) {
-        <span class="local-variable">this</span>.isbn = isbn;
-    }
-
     <span class="annotation">@NonNull</span>
     <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
         <span class="keyword">return</span> name;
-    }
-
-    <span class="directive">public</span> <span class="type">void</span> setName(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
     }
 
     <span class="annotation">@Override</span>
@@ -932,16 +975,12 @@
         <span class="keyword">if</span> (o == <span class="predefined-constant">null</span> || getClass() != o.getClass()) <span class="keyword">return</span> <span class="predefined-constant">false</span>;
 
         <span class="predefined-type">Book</span> book = (<span class="predefined-type">Book</span>) o;
-
-        <span class="keyword">if</span> (!isbn.equals(book.isbn)) <span class="keyword">return</span> <span class="predefined-constant">false</span>;
-        <span class="keyword">return</span> name.equals(book.name);
+        <span class="keyword">return</span> Objects.equals(isbn, book.isbn) &amp;&amp; Objects.equals(name, book.name);
     }
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> <span class="type">int</span> hashCode() {
-        <span class="type">int</span> result = isbn.hashCode();
-        result = <span class="integer">31</span> * result + name.hashCode();
-        <span class="keyword">return</span> result;
+        <span class="keyword">return</span> Objects.hash(isbn, name);
     }
 }</code></pre>
 </div>
@@ -955,8 +994,8 @@
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">BookInventoryOperations</span> {
@@ -965,22 +1004,29 @@
 </div>
 </div>
 <div class="listingblock">
-<div class="title">bookrecommendation/src/main/java/example/micronaut/BookCatalogueClient.java</div>
+<div class="title">bookrecommendation/src/main/java/example/micronaut/BookInventoryClient.java</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Recoverable</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
-<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:8081</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Recoverable</span>(api = BookCatalogueOperations.class)
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 
-<span class="type">interface</span> <span class="class">BookCatalogueClient</span> <span class="directive">extends</span> BookCatalogueOperations {
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>)
-    Publisher&lt;<span class="predefined-type">Book</span>&gt; findAll();
+<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:8082</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Recoverable</span>(api = BookInventoryOperations.class)
+
+<span class="type">interface</span> <span class="class">BookInventoryClient</span> <span class="directive">extends</span> BookInventoryOperations {
+
+    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/{isbn}</span><span class="delimiter">&quot;</span></span>)
+    Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn);
 }</code></pre>
 </div>
 </div>
@@ -1002,8 +1048,8 @@
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">BookController</span> {
@@ -1062,9 +1108,7 @@
 
     <span class="annotation">@NonNull</span>
     <span class="annotation">@NotBlank</span>
-    <span class="directive">private</span> <span class="predefined-type">String</span> name;
-
-    <span class="directive">public</span> BookRecommendation() {}
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
 
     <span class="directive">public</span> BookRecommendation(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>.name = name;
@@ -1073,10 +1117,6 @@
     <span class="annotation">@NonNull</span>
     <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
         <span class="keyword">return</span> name;
-    }
-
-    <span class="directive">public</span> <span class="type">void</span> setName(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
     }
 
     <span class="annotation">@Override</span>
@@ -1111,15 +1151,16 @@
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Fallback</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
-<span class="annotation">@Requires</span>(env = Environment.TEST) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>;
+
+<span class="annotation">@Requires</span>(env = TEST) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Fallback</span>
 <span class="annotation">@Singleton</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">BookInventoryClientStub</span> <span class="directive">implements</span> BookInventoryOperations {
@@ -1127,10 +1168,10 @@
     <span class="annotation">@Override</span>
     <span class="directive">public</span> Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn) {
         <span class="keyword">if</span> (isbn.equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>)) {
-            <span class="keyword">return</span> Mono.just(<span class="predefined-type">Boolean</span>.TRUE); <i class="conum" data-value="2"></i><b>(2)</b>
-
-        } <span class="keyword">else</span> <span class="keyword">if</span> (isbn.equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>)) {
-            <span class="keyword">return</span> Mono.just(<span class="predefined-type">Boolean</span>.FALSE); <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="keyword">return</span> Mono.just(<span class="predefined-constant">true</span>); <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+        <span class="keyword">if</span> (isbn.equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>)) {
+            <span class="keyword">return</span> Mono.just(<span class="predefined-constant">false</span>); <i class="conum" data-value="3"></i><b>(3)</b>
         }
         <span class="keyword">return</span> Mono.empty(); <i class="conum" data-value="4"></i><b>(4)</b>
     }
@@ -1163,13 +1204,14 @@
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Fallback</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 
-<span class="annotation">@Requires</span>(env = Environment.TEST)
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>;
+
+<span class="annotation">@Requires</span>(env = TEST)
 <span class="annotation">@Fallback</span>
 <span class="annotation">@Singleton</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">BookCatalogueClientStub</span> <span class="directive">implements</span> BookCatalogueOperations {
@@ -1195,12 +1237,14 @@
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.StreamingHttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 
 <span class="annotation">@MicronautTest</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">BookControllerTest</span> {
@@ -1212,9 +1256,12 @@
     <span class="annotation">@DisabledIfEnvironmentVariable</span>(named = <span class="string"><span class="delimiter">&quot;</span><span class="content">CI</span><span class="delimiter">&quot;</span></span>, matches = <span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span>)
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testRetrieveBooks() {
-        <span class="predefined-type">List</span>&lt;BookRecommendation&gt; books = Flux.from(client.jsonStream(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>), BookRecommendation.class)).collectList().block();
-        assertEquals(books.size(), <span class="integer">1</span>);
-        assertEquals(books.get(<span class="integer">0</span>).getName(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>);
+        <span class="predefined-type">List</span>&lt;BookRecommendation&gt; books = Flux
+                .from(client.jsonStream(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>), BookRecommendation.class))
+                .collectList()
+                .block();
+        assertEquals(<span class="integer">1</span>, books.size());
+        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>, books.get(<span class="integer">0</span>).getName());
     }
 }</code></pre>
 </div>
@@ -1253,15 +1300,16 @@
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.DEVELOPMENT</span>;
 
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Application</span> {
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
         Micronaut.build(args)
                 .mainClass(Application.class)
-                .defaultEnvironments(Environment.DEVELOPMENT)
+                .defaultEnvironments(DEVELOPMENT)
                 .start();
     }
 }</code></pre>
@@ -1292,12 +1340,10 @@
 <div class="listingblock">
 <div class="title">bookrecommendation/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::eureka[]</span>
-<span class="key">eureka</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::eureka[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1392,19 +1438,6 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
 <div class="sect2">
 <h3 id="book-catalogue">5.2. Book Catalogue</h3>
 <div class="paragraph">
-<p>Add <code>discovery-client</code> dependency.</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.discovery<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-discovery-client<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
 <p>Append to <code>bookcatalogue</code> service <code>application.yml</code> the following snippet:</p>
 </div>
 <div class="listingblock">
@@ -1420,36 +1453,11 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
 <div class="paragraph">
 <p>Previous configuration registers a Micronaut application with Eureka with minimal configuration. Discover a more complete list of configuration options at <a href="https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/eureka/EurekaConfiguration.html" target="_blank" rel="noopener">EurekaConfiguration</a>.</p>
 </div>
-<div class="paragraph">
-<p>Disable Eureka registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookcatalogue/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="book-inventory">5.3. Book Inventory</h3>
 <div class="paragraph">
-<p>Add <code>discovery-client</code> dependency.</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.discovery<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-discovery-client<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Also, append to <code>bookinventory</code>.<code>application.yml</code> the following snippet:</p>
+<p>Append to <code>bookinventory</code>.<code>application.yml</code> the following snippet:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookinventory/src/main/resources/application.yml</div>
@@ -1461,36 +1469,11 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
     <span class="key">defaultZone</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}</span><span class="delimiter">&quot;</span></span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Disable Eureka registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookinventory/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="book-recommendation">5.4. Book Recommendation</h3>
 <div class="paragraph">
-<p>Add <code>discovery-client</code> dependency.</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.discovery<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-discovery-client<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Also, append to <code>bookrecommendation</code>.<code>application.yml</code> the following snippet:</p>
+<p>Append to <code>bookrecommendation</code>.<code>application.yml</code> the following snippet:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/resources/application.yml</div>
@@ -1503,7 +1486,7 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Modify <code>BookInventoryClient</code> and <code>BookCatalogueClient</code> to use the service id instead of a harcoded ip.</p>
+<p>Modify <code>BookInventoryClient</code> and <code>BookCatalogueClient</code> to use the service id instead of a hardcoded URL.</p>
 </div>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/java/example/micronaut/BookCatalogueClient.java</div>
@@ -1539,21 +1522,22 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.retry.annotation.Recoverable</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
 
 <span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">&quot;</span><span class="content">bookinventory</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Recoverable</span>(api = BookInventoryOperations.class)
 
 <span class="type">interface</span> <span class="class">BookInventoryClient</span> <span class="directive">extends</span> BookInventoryOperations {
 
-    <span class="annotation">@Consumes</span>(MediaType.TEXT_PLAIN)
+    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/stock/{isbn}</span><span class="delimiter">&quot;</span></span>)
     Mono&lt;<span class="predefined-type">Boolean</span>&gt; stock(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn);
 }</code></pre>
@@ -1567,21 +1551,9 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
 </tr>
 </table>
 </div>
-<div class="paragraph">
-<p>Disable Eureka registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookrecommendation/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
-<h3 id="running-the-app">5.5. Running the App</h3>
+<h3 id="running-the-application-2">5.5. Running the Application</h3>
 <div class="paragraph">
 <p>Run <code>bookcatalogue</code> microservice:</p>
 </div>

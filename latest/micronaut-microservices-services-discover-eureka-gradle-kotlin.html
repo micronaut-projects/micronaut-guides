@@ -126,7 +126,7 @@
 <li><a href="#getting-started">1. Getting started</a></li>
 <li><a href="#what-you-will-need">2. What you will need</a></li>
 <li><a href="#solution">3. Solution</a></li>
-<li><a href="#writing-the-app">4. Writing the App</a>
+<li><a href="#writing-the-application">4. Writing the Application</a>
 <ul class="sectlevel2">
 <li><a href="#catalogue-microservice">4.1. Catalogue Microservice</a></li>
 <li><a href="#inventory-microservice">4.2. Inventory Microservice</a></li>
@@ -140,7 +140,7 @@
 <li><a href="#book-catalogue">5.2. Book Catalogue</a></li>
 <li><a href="#book-inventory">5.3. Book Inventory</a></li>
 <li><a href="#book-recommendation">5.4. Book Recommendation</a></li>
-<li><a href="#running-the-app">5.5. Running the App</a></li>
+<li><a href="#running-the-application-2">5.5. Running the Application</a></li>
 </ul>
 </li>
 <li><a href="#generate-a-micronaut-application-native-image-with-graalvm">6. Generate a Micronaut Application Native Image with GraalVM</a>
@@ -217,7 +217,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="writing-the-app">4. Writing the App</h2>
+<h2 id="writing-the-application">4. Writing the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Let&#8217;s describe the microservices:</p>
@@ -231,7 +231,7 @@
 <p><code>bookinventory</code> - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and ISBN.</p>
 </li>
 <li>
-<p><code>bookrecommendation</code> - It consumes previous services and exposes and endpoint which recommends book names which are in stock.</p>
+<p><code>bookrecommendation</code> - It consumes previous services and exposes an endpoint which recommends book names which are in stock.</p>
 </li>
 </ul>
 </div>
@@ -276,15 +276,45 @@
 <div class="sect2">
 <h3 id="catalogue-microservice">4.1. Catalogue Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookcatalogue</code> microservice:</p>
+<p>Create the <code>bookcatalogue</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookcatalogue --build=gradle --lang=kotlin</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-eureka,graalvm example.micronaut.bookcatalogue --build=gradle --lang=kotlin</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookcatalogue</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-eureka</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookcatalogue</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-eureka&amp;features=graalvm&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=bookcatalogue&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a <code>BooksController</code> class to handle incoming HTTP requests into the <code>bookcatalogue</code> microservice:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/kotlin/example/micronaut/BooksController.kt</div>
@@ -298,11 +328,10 @@ import io.micronaut.http.annotation.Get
 class BooksController {
 
     @Get <i class="conum" data-value="2"></i><b>(2)</b>
-    internal fun index(): List&lt;Book&gt; {
-        return listOf(Book(&quot;1491950358&quot;, &quot;Building Microservices&quot;),
-                Book(&quot;1680502395&quot;, &quot;Release It!&quot;),
-                Book(&quot;0321601912&quot;, &quot;Continuous Delivery:&quot;))
-    }
+    fun index(): List&lt;Book&gt; = listOf(
+            Book(&quot;1491950358&quot;, &quot;Building Microservices&quot;),
+            Book(&quot;1680502395&quot;, &quot;Release It!&quot;),
+            Book(&quot;0321601912&quot;, &quot;Continuous Delivery:&quot;))
 }</code></pre>
 </div>
 </div>
@@ -319,14 +348,19 @@ class BooksController {
 </table>
 </div>
 <div class="paragraph">
-<p>The previous controller responds a <code>Publisher&lt;Book&gt;</code>. Create the <code>Book</code> POJO:</p>
+<p>The previous controller responds a <code>List&lt;Book&gt;</code>. Create the <code>Book</code> POJO:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/kotlin/example/micronaut/Book.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-data class Book(var isbn: String, val name: String)</code></pre>
+import io.micronaut.core.annotation.Introspected
+import javax.validation.constraints.NotBlank
+
+@Introspected
+data class Book(@NotBlank val isbn: String,
+                @NotBlank val name: String)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -342,13 +376,14 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
 
 @MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
 class BooksControllerTest {
+
     @Inject
     @field:Client(&quot;/&quot;)
     lateinit var client: HttpClient <i class="conum" data-value="2"></i><b>(2)</b>
@@ -356,7 +391,8 @@ class BooksControllerTest {
     @Test
     fun testRetrieveBooks() {
         val request: HttpRequest&lt;*&gt; = HttpRequest.GET&lt;Any&gt;(&quot;/books&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
-        val books: List&lt;*&gt; = client.toBlocking().retrieve(request, Argument.listOf(Book::class.java)) <i class="conum" data-value="4"></i><b>(4)</b>
+        val books = client.toBlocking().retrieve(request, Argument.listOf(Book::class.java)) <i class="conum" data-value="4"></i><b>(4)</b>
+
         assertEquals(3, books.size)
         assertTrue(books.contains(Book(&quot;1491950358&quot;, &quot;Building Microservices&quot;)))
         assertTrue(books.contains(Book(&quot;1680502395&quot;, &quot;Release It!&quot;)))
@@ -418,19 +454,15 @@ class BooksControllerTest {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.context.env.Environment
-import io.micronaut.runtime.Micronaut
+import io.micronaut.context.env.Environment.DEVELOPMENT
+import io.micronaut.runtime.Micronaut.build
 
-class Application {
-    companion object {
-        @JvmStatic
-        fun main(args: Array&lt;String&gt;) {
-            Micronaut.build(*args)
-                    .mainClass(Application::class.java)
-                    .defaultEnvironments(Environment.DEVELOPMENT)
-                    .start()
-        }
-    }
+fun main(args: Array&lt;String&gt;) {
+    build()
+        .args(*args)
+        .packages(&quot;example.micronaut&quot;)
+        .defaultEnvironments(DEVELOPMENT)
+        .start()
 }</code></pre>
 </div>
 </div>
@@ -459,12 +491,10 @@ class Application {
 <div class="listingblock">
 <div class="title">bookcatalogue/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::eureka[]</span>
-<span class="key">eureka</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::eureka[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -479,15 +509,42 @@ class Application {
 <div class="sect2">
 <h3 id="inventory-microservice">4.2. Inventory Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookinventory</code> microservice:</p>
+<p>Create the <code>bookinventory</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookinventory --build=gradle --lang=kotlin</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-eureka,graalvm example.micronaut.bookinventory --build=gradle --lang=kotlin</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookinventory</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-eureka</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookinventory</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-eureka&amp;features=graalvm&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=bookinventory&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Create a Controller:</p>
@@ -497,7 +554,7 @@ class Application {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.http.MediaType
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
@@ -507,17 +564,16 @@ import javax.validation.constraints.NotBlank
 @Controller(&quot;/books&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
 open class BooksController {
 
-    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="2"></i><b>(2)</b>
+    @Produces(TEXT_PLAIN) <i class="conum" data-value="2"></i><b>(2)</b>
     @Get(&quot;/stock/{isbn}&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
-    open fun stock(@NotBlank isbn: String): Boolean? {
-        return bookInventoryByIsbn(isbn).map { (_, stock) -&gt; stock &gt; 0 }.orElse(null)
-    }
+    open fun stock(@NotBlank isbn: String): Boolean? =
+        bookInventoryByIsbn(isbn).map { (_, stock) -&gt; stock &gt; 0 }.orElse(null)
 
     private fun bookInventoryByIsbn(isbn: String): Optional&lt;BookInventory&gt; {
         if (isbn == &quot;1491950358&quot;) {
             return Optional.of(BookInventory(isbn, 4))
-
-        } else if (isbn == &quot;1680502395&quot;) {
+        }
+        if (isbn == &quot;1680502395&quot;) {
             return Optional.of(BookInventory(isbn, 0))
         }
         return Optional.empty()
@@ -549,7 +605,12 @@ open class BooksController {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-data class BookInventory(var isbn: String, val stock: Int)</code></pre>
+import io.micronaut.core.annotation.Introspected
+import javax.validation.constraints.NotBlank
+
+@Introspected
+data class BookInventory(@NotBlank val isbn: String,
+                         val stock: Int)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -561,37 +622,39 @@ data class BookInventory(var isbn: String, val stock: Int)</code></pre>
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
+import io.micronaut.http.HttpStatus.NOT_FOUND
+import io.micronaut.http.HttpStatus.OK
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
 
 @MicronautTest
 class BooksControllerTest {
+
     @Inject
     @field:Client(&quot;/&quot;)
     lateinit var httpClient: HttpClient
 
     @Test
     fun testBooksController() {
-        val rsp = httpClient.toBlocking().exchange(HttpRequest.GET&lt;Any&gt;(&quot;/books/stock/1491950358&quot;), Boolean::class.java)
-        assertEquals(rsp.status(), HttpStatus.OK)
-        assertTrue(rsp.body()!!)
+        val rsp = httpClient.toBlocking().exchange(
+                HttpRequest.GET&lt;Any&gt;(&quot;/books/stock/1491950358&quot;), Boolean::class.java)
+        assertEquals(OK, rsp.status())
+        assertTrue(rsp.body())
     }
 
     @Test
     fun testBooksControllerWithNonExistingIsbn() {
-        val thrown = assertThrows(HttpClientResponseException::class.java) { httpClient.toBlocking().exchange(HttpRequest.GET&lt;Any&gt;(&quot;/books/stock/XXXXX&quot;), Boolean::class.java) }
-        assertEquals(
-                HttpStatus.NOT_FOUND,
-                thrown.response.status
-        )
+        val thrown = assertThrows(HttpClientResponseException::class.java) {
+            httpClient.toBlocking().exchange(HttpRequest.GET&lt;Any&gt;(&quot;/books/stock/XXXXX&quot;), Boolean::class.java)
+        }
+        assertEquals(NOT_FOUND, thrown.response.status)
     }
 }</code></pre>
 </div>
@@ -630,19 +693,15 @@ class BooksControllerTest {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.context.env.Environment
-import io.micronaut.runtime.Micronaut
+import io.micronaut.context.env.Environment.DEVELOPMENT
+import io.micronaut.runtime.Micronaut.build
 
-class Application {
-    companion object {
-        @JvmStatic
-        fun main(args: Array&lt;String&gt;) {
-            Micronaut.build(*args)
-                    .mainClass(Application::class.java)
-                    .defaultEnvironments(Environment.DEVELOPMENT)
-                    .start()
-        }
-    }
+fun main(args: Array&lt;String&gt;) {
+    build()
+        .args(*args)
+        .packages(&quot;example.micronaut&quot;)
+        .defaultEnvironments(DEVELOPMENT)
+        .start()
 }</code></pre>
 </div>
 </div>
@@ -671,12 +730,10 @@ class Application {
 <div class="listingblock">
 <div class="title">bookinventory/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::eureka[]</span>
-<span class="key">eureka</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::eureka[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -691,15 +748,42 @@ class Application {
 <div class="sect2">
 <h3 id="recommendation-microservice">4.3. Recommendation Microservice</h3>
 <div class="paragraph">
-<p>Create the <code>bookrecommendation</code> microservice:</p>
+<p>Create the <code>bookrecommendation</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.bookrecommendation --build=gradle --lang=kotlin</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=discovery-eureka,reactor,graalvm example.micronaut.bookrecommendation --build=gradle --lang=kotlin</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>The previous command creates a directory named <code>bookrecommendation</code> and a Micronaut application inside it.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>discovery-eureka</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookrecommendation</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=discovery-eureka&amp;features=graalvm&amp;features=reactor&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=bookrecommendation&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Create an interface to map operations with <code>bookcatalogue</code>, and a Micronaut Declarative HTTP Client to consume it.</p>
@@ -725,7 +809,6 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
 import org.reactivestreams.Publisher
-
 
 @Client(&quot;http://localhost:8081&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
 @Recoverable(api = BookCatalogueOperations::class)
@@ -753,7 +836,12 @@ interface BookCatalogueClient : BookCatalogueOperations {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-data class Book(var isbn: String, val name: String)</code></pre>
+import io.micronaut.core.annotation.Introspected
+import javax.validation.constraints.NotBlank
+
+@Introspected
+data class Book(@NotBlank val isbn: String,
+                @NotBlank val name: String)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -764,7 +852,6 @@ data class Book(var isbn: String, val name: String)</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 import javax.validation.constraints.NotBlank
 
@@ -774,23 +861,26 @@ interface BookInventoryOperations {
 </div>
 </div>
 <div class="listingblock">
-<div class="title">bookrecommendation/src/main/kotlin/example/micronaut/BookCatalogueClient.kt</div>
+<div class="title">bookrecommendation/src/main/kotlin/example/micronaut/BookInventoryClient.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Consumes
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
-import org.reactivestreams.Publisher
+import reactor.core.publisher.Mono
+import javax.validation.constraints.NotBlank
 
+@Client(&quot;http://localhost:8082&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+@Recoverable(api = BookInventoryOperations::class)
 
-@Client(&quot;http://localhost:8081&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-@Recoverable(api = BookCatalogueOperations::class)
+interface BookInventoryClient : BookInventoryOperations {
 
-interface BookCatalogueClient : BookCatalogueOperations {
-
-    @Get(&quot;/books&quot;)
-    override fun findAll(): Publisher&lt;Book&gt;
+    @Consumes(TEXT_PLAIN)
+    @Get(&quot;/books/stock/{isbn}&quot;)
+    override fun stock(@NotBlank isbn: String): Mono&lt;Boolean&gt;
 }</code></pre>
 </div>
 </div>
@@ -812,22 +902,23 @@ interface BookCatalogueClient : BookCatalogueOperations {
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import reactor.core.publisher.Flux
 import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
 
 @Controller(&quot;/books&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-class BookController(private val bookCatalogueOperations: BookCatalogueOperations,
-                     private val bookInventoryOperations: BookInventoryOperations) { <i class="conum" data-value="2"></i><b>(2)</b>
+class BookController(
+        private val bookCatalogueOperations: BookCatalogueOperations,
+        private val bookInventoryOperations: BookInventoryOperations) {
 
     @Get <i class="conum" data-value="3"></i><b>(3)</b>
-    fun index(): Publisher&lt;BookRecommendation&gt; {
-        return Flux.from(bookCatalogueOperations.findAll())
+    fun index(): Publisher&lt;BookRecommendation&gt; =
+
+        Flux.from(bookCatalogueOperations.findAll())
                 .flatMap { b -&gt;
                     Flux.from(bookInventoryOperations.stock(b.isbn))
                             .filter { hasStock -&gt; hasStock }
-                            .map { _ -&gt; b }
+                            .map { b }
                 }.map { (_, name) -&gt; BookRecommendation(name) }
-    }
 }</code></pre>
 </div>
 </div>
@@ -855,7 +946,11 @@ class BookController(private val bookCatalogueOperations: BookCatalogueOperation
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-data class BookRecommendation(val name: String)</code></pre>
+import io.micronaut.core.annotation.Introspected
+import javax.validation.constraints.NotBlank
+
+@Introspected
+data class BookRecommendation(@NotBlank val name: String)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -873,24 +968,23 @@ data class BookRecommendation(val name: String)</code></pre>
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.context.annotation.Requires
-import io.micronaut.context.env.Environment
+import io.micronaut.context.env.Environment.TEST
 import io.micronaut.retry.annotation.Fallback
-import org.reactivestreams.Publisher
 import jakarta.inject.Singleton
-import javax.validation.constraints.NotBlank
 import reactor.core.publisher.Mono
+import javax.validation.constraints.NotBlank
 
-@Requires(env = arrayOf(Environment.TEST)) <i class="conum" data-value="1"></i><b>(1)</b>
+@Requires(env = [TEST]) <i class="conum" data-value="1"></i><b>(1)</b>
 @Fallback
 @Singleton
 open class BookInventoryClientStub : BookInventoryOperations {
 
     override fun stock(@NotBlank isbn: String): Mono&lt;Boolean&gt; {
         if (isbn == &quot;1491950358&quot;) {
-            return Mono.just(java.lang.Boolean.TRUE) <i class="conum" data-value="2"></i><b>(2)</b>
-
-        } else if (isbn == &quot;1680502395&quot;) {
-            return Mono.just(java.lang.Boolean.FALSE) <i class="conum" data-value="3"></i><b>(3)</b>
+            return Mono.just(true) <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+        if (isbn == &quot;1680502395&quot;) {
+            return Mono.just(false) <i class="conum" data-value="3"></i><b>(3)</b>
         }
         return Mono.empty() <i class="conum" data-value="4"></i><b>(4)</b>
     }
@@ -923,13 +1017,13 @@ open class BookInventoryClientStub : BookInventoryOperations {
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.context.annotation.Requires
-import io.micronaut.context.env.Environment
+import io.micronaut.context.env.Environment.TEST
 import io.micronaut.retry.annotation.Fallback
-import reactor.core.publisher.Flux
 import jakarta.inject.Singleton
 import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
 
-@Requires(env = arrayOf(Environment.TEST))
+@Requires(env = [TEST])
 @Fallback
 @Singleton
 class BookCatalogueClientStub : BookCatalogueOperations {
@@ -954,14 +1048,15 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.StreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import reactor.core.publisher.Flux
 
 @MicronautTest
 class BookControllerTest {
+
     @Inject
     @field:Client(&quot;/&quot;)
     lateinit var client: StreamingHttpClient
@@ -969,11 +1064,12 @@ class BookControllerTest {
     @DisabledIfEnvironmentVariable(named = &quot;CI&quot;, matches = &quot;true&quot;)
     @Test
     fun testRetrieveBooks() {
-        val books = Flux.from(client.jsonStream(HttpRequest.GET&lt;Any&gt;(&quot;/books&quot;), BookRecommendation::class.java))
+        val books = Flux
+                .from(client.jsonStream(HttpRequest.GET&lt;Any&gt;(&quot;/books&quot;), BookRecommendation::class.java))
                 .collectList()
                 .block()
-        assertEquals(books.size, 1)
-        assertEquals(books[0].name, &quot;Building Microservices&quot;)
+        assertEquals(1, books.size)
+        assertEquals(&quot;Building Microservices&quot;, books[0].name)
     }
 }</code></pre>
 </div>
@@ -1012,19 +1108,15 @@ class BookControllerTest {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.context.env.Environment
-import io.micronaut.runtime.Micronaut
+import io.micronaut.context.env.Environment.DEVELOPMENT
+import io.micronaut.runtime.Micronaut.build
 
-class Application {
-    companion object {
-        @JvmStatic
-        fun main(args: Array&lt;String&gt;) {
-            Micronaut.build(*args)
-                    .mainClass(Application::class.java)
-                    .defaultEnvironments(Environment.DEVELOPMENT)
-                    .start()
-        }
-    }
+fun main(args: Array&lt;String&gt;) {
+    build()
+        .args(*args)
+        .packages(&quot;example.micronaut&quot;)
+        .defaultEnvironments(DEVELOPMENT)
+        .start()
 }</code></pre>
 </div>
 </div>
@@ -1053,12 +1145,10 @@ class Application {
 <div class="listingblock">
 <div class="title">bookrecommendation/src/test/resources/application-test.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="comment">#tag::eureka[]</span>
-<span class="key">eureka</span>:
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
   <span class="key">client</span>:
     <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span>
-<span class="comment">#end::eureka[]</span></code></pre>
+      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1153,15 +1243,6 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
 <div class="sect2">
 <h3 id="book-catalogue">5.2. Book Catalogue</h3>
 <div class="paragraph">
-<p>Add <code>discovery-client</code> dependency.</p>
-</div>
-<div class="listingblock">
-<div class="title">build.gradle</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.discovery:micronaut-discovery-client</span><span class="delimiter">&quot;</span></span>)</code></pre>
-</div>
-</div>
-<div class="paragraph">
 <p>Append to <code>bookcatalogue</code> service <code>application.yml</code> the following snippet:</p>
 </div>
 <div class="listingblock">
@@ -1177,32 +1258,11 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
 <div class="paragraph">
 <p>Previous configuration registers a Micronaut application with Eureka with minimal configuration. Discover a more complete list of configuration options at <a href="https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/eureka/EurekaConfiguration.html" target="_blank" rel="noopener">EurekaConfiguration</a>.</p>
 </div>
-<div class="paragraph">
-<p>Disable Eureka registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookcatalogue/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="book-inventory">5.3. Book Inventory</h3>
 <div class="paragraph">
-<p>Add <code>discovery-client</code> dependency.</p>
-</div>
-<div class="listingblock">
-<div class="title">build.gradle</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.discovery:micronaut-discovery-client</span><span class="delimiter">&quot;</span></span>)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Also, append to <code>bookinventory</code>.<code>application.yml</code> the following snippet:</p>
+<p>Append to <code>bookinventory</code>.<code>application.yml</code> the following snippet:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookinventory/src/main/resources/application.yml</div>
@@ -1214,32 +1274,11 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
     <span class="key">defaultZone</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}</span><span class="delimiter">&quot;</span></span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Disable Eureka registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookinventory/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="book-recommendation">5.4. Book Recommendation</h3>
 <div class="paragraph">
-<p>Add <code>discovery-client</code> dependency.</p>
-</div>
-<div class="listingblock">
-<div class="title">build.gradle</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.discovery:micronaut-discovery-client</span><span class="delimiter">&quot;</span></span>)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Also, append to <code>bookrecommendation</code>.<code>application.yml</code> the following snippet:</p>
+<p>Append to <code>bookrecommendation</code>.<code>application.yml</code> the following snippet:</p>
 </div>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/resources/application.yml</div>
@@ -1252,7 +1291,7 @@ To bring up Eureka server using Spring-Cloud-Netflix:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Modify <code>BookInventoryClient</code> and <code>BookCatalogueClient</code> to use the service id instead of a harcoded ip.</p>
+<p>Modify <code>BookInventoryClient</code> and <code>BookCatalogueClient</code> to use the service id instead of a hardcoded URL.</p>
 </div>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/kotlin/example/micronaut/BookCatalogueClient.kt</div>
@@ -1263,7 +1302,6 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
 import org.reactivestreams.Publisher
-
 
 @Client(id = &quot;bookcatalogue&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
 @Recoverable(api = BookCatalogueOperations::class)
@@ -1288,22 +1326,20 @@ interface BookCatalogueClient : BookCatalogueOperations {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.http.MediaType
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Consumes
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
-import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 import javax.validation.constraints.NotBlank
-
 
 @Client(id = &quot;bookinventory&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
 @Recoverable(api = BookInventoryOperations::class)
 
 interface BookInventoryClient : BookInventoryOperations {
 
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(TEXT_PLAIN)
     @Get(&quot;/books/stock/{isbn}&quot;)
     override fun stock(@NotBlank isbn: String): Mono&lt;Boolean&gt;
 }</code></pre>
@@ -1317,21 +1353,9 @@ interface BookInventoryClient : BookInventoryOperations {
 </tr>
 </table>
 </div>
-<div class="paragraph">
-<p>Disable Eureka registration in tests:</p>
-</div>
-<div class="listingblock">
-<div class="title">bookrecommendation/src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">eureka</span>:
-  <span class="key">client</span>:
-    <span class="key">registration</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
-<h3 id="running-the-app">5.5. Running the App</h3>
+<h3 id="running-the-application-2">5.5. Running the Application</h3>
 <div class="paragraph">
 <p>Run <code>bookcatalogue</code> microservice:</p>
 </div>
