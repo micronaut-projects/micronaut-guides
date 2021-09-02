@@ -1,5 +1,6 @@
 package example.micronaut
 
+import io.micronaut.http.HttpHeaders.AUTHORIZATION
 import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Consumes
@@ -18,5 +19,5 @@ interface AppClient {
 
     @Consumes(TEXT_PLAIN)
     @Get
-    fun home(@Header("authorization") authorization: String): String
+    fun home(@Header(AUTHORIZATION) authorization: String): String
 }

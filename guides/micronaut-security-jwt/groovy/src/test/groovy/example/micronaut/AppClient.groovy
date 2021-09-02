@@ -10,6 +10,7 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 
+import static io.micronaut.http.HttpHeaders.AUTHORIZATION
 import static io.micronaut.http.MediaType.TEXT_PLAIN
 
 @CompileStatic
@@ -21,5 +22,5 @@ interface AppClient {
 
     @Consumes(TEXT_PLAIN)
     @Get
-    String home(@Header('authorization') String authorization)
+    String home(@Header(AUTHORIZATION) String authorization)
 }
