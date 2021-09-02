@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>RabbitMQ RPC and Micronaut Framework</title>
+    <link rel="canonical" href="@canonical@"/>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-rabbitmq-rpc.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="RabbitMQ RPC and Micronaut Framework"/>
+    <meta name="twitter:description" content="Use RabbitMQ RPC to use request-reply pattern in your Micronaut applications."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut Framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-rabbitmq-rpc.html">RabbitMQ RPC and Micronaut Framework</a> » <span class="breadcrumb_last" aria-current="page">maven | kotlin</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the application</a>
+<ul class="sectlevel2">
+<li><a href="#catalogue-microservice">4.1. Catalogue microservice</a></li>
+<li><a href="#inventory-microservice">4.2. Inventory microservice</a></li>
+<li><a href="#recommendation-microservice">4.3. Recommendation microservice</a></li>
+</ul>
+</li>
+<li><a href="#rabbitmq-and-micronaut-framework">5. RabbitMQ and Micronaut Framework</a>
+<ul class="sectlevel2">
+<li><a href="#install-rabbitmq-via-docker">5.1. Install RabbitMQ via Docker</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application">6. Running the application</a></li>
+<li><a href="#generate-a-micronaut-application-native-image-with-graalvm">7. Generate a Micronaut Application Native Image with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#native-image-generation">7.1. Native Image generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">8. Next steps</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>RabbitMQ RPC and Micronaut Framework</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Use RabbitMQ RPC to use request-reply pattern in your Micronaut applications.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Iván López</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.0.0</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create three microservices that will communicate with each other with <a href="https://www.rabbitmq.com/" target="_blank" rel="noopener">RabbitMQ</a> using the request-response pattern with <a href="https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc" target="_blank" rel="noopener">RPC</a>
+<em>(Remote Procedure Call)</em>.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>RabbitMQ is an open-source message-broker software that originally implemented the Advanced Message Queuing Protocol (AMQP)
+and has since been extended with a plug-in architecture to support Streaming Text Oriented Messaging Protocol (STOMP),
+Message Queuing Telemetry Transport (MQTT), and other protocols.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-rabbitmq-rpc-maven-kotlin.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s describe the microservices you will build through the guide.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>bookcatalogue</code> - It returns a list of books. It uses a domain consisting of a book name and ISBN.</p>
+</li>
+<li>
+<p><code>bookinventory</code> - It exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and ISBN.</p>
+</li>
+<li>
+<p><code>bookrecommendation</code> - It consumes previous services and exposes an endpoint which recommends book names which are in stock.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+<div class="sect2">
+<h3 id="catalogue-microservice">4.1. Catalogue microservice</h3>
+<div class="paragraph">
+<p>Create the <code>bookcatalogue</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,graalvm example.micronaut.bookcatalogue --build=maven --lang=kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>rabbitmq</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookcatalogue</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=rabbitmq&amp;features=graalvm&amp;lang=KOTLIN&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookcatalogue&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>By default, a Micronaut application will connect to a RabbitMQ instance running on <code>localhost</code>, so it is not necessary to add anything to <code>application.yml</code>. In case you want to change the configuration, add the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookcatalogue/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">rabbitmq</span>:
+  <span class="key">uri</span>: <span class="string"><span class="content">amqp://localhost:5672</span></span></code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-rabbitmq-exchange-queue-and-binding">4.1.1. Create RabbitMQ exchange, queue, and binding</h4>
+<div class="paragraph">
+<p>Before being able to send and receive messages using RabbitMQ it is necessary to define the exchange, queue and binding.
+One option is create them directly in the RabbitMQ Admin UI available on <code><a href="http://localhost:15672" target="_blank" rel="noopener">http://localhost:15672</a></code>.
+Use <code>guest</code> for both username and password.</p>
+</div>
+<div class="paragraph">
+<p>Another option is create them programmatically. Create the class <code>ChannelPoolListener.java</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookcatalogue/src/main/kotlin/example/micronaut/ChannelPoolListener.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import com.rabbitmq.client.BuiltinExchangeType
+import com.rabbitmq.client.Channel
+import io.micronaut.rabbitmq.connect.ChannelInitializer
+import jakarta.inject.Singleton
+import java.io.IOException
+
+@Singleton
+class ChannelPoolListener : ChannelInitializer() {
+
+    @Throws(IOException::class)
+    override fun initialize(channel: Channel) {
+        channel.exchangeDeclare(&quot;micronaut&quot;, BuiltinExchangeType.DIRECT, true) <i class="conum" data-value="1"></i><b>(1)</b>
+        channel.queueDeclare(&quot;inventory&quot;, true, false, false, null) <i class="conum" data-value="2"></i><b>(2)</b>
+        channel.queueBind(&quot;inventory&quot;, &quot;micronaut&quot;, &quot;books.inventory&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
+        channel.queueDeclare(&quot;catalogue&quot;, true, false, false, null) <i class="conum" data-value="4"></i><b>(4)</b>
+        channel.queueBind(&quot;catalogue&quot;, &quot;micronaut&quot;, &quot;books.catalogue&quot;) <i class="conum" data-value="5"></i><b>(5)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Define an exchange named <code>micronaut</code>. From the producer point of view everything is sent to the exchange with the
+appropriate routing key.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Define a queue named <code>inventory</code>. The consumer will listen for messages in that queue.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Define a binding between the exchange and the queue using the routing key <code>books.inventory</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Define a queue named <code>catalogue</code>. The consumer will listen for messages in that queue.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Define a binding between the exchange and the queue using the routing key <code>books.catalogue</code>.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In this Catalogue Microservice the only necessary element is the <code>catalogue</code> queue, but it is a good practice to define
+all the elements in the same file and share the file between all the projects.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-consumer">4.1.2. Create consumer</h4>
+<div class="paragraph">
+<p>Create a <code>BookCatalogueService</code> class to handle incoming RPC requests into the <code>bookcatalogue</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookcatalogue/src/main/kotlin/example/micronaut/BookCatalogueService.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.rabbitmq.annotation.Queue
+import io.micronaut.rabbitmq.annotation.RabbitListener
+
+@RabbitListener <i class="conum" data-value="1"></i><b>(1)</b>
+class BookCatalogueService {
+
+    @Queue(&quot;catalogue&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
+    fun listBooks(): List&lt;Book&gt; {
+        val buildingMicroservices = Book(&quot;1491950358&quot;, &quot;Building Microservices&quot;)
+        val releaseIt = Book(&quot;1680502395&quot;, &quot;Release It!&quot;)
+        val cidelivery = Book(&quot;0321601912&quot;, &quot;Continuous Delivery:&quot;)
+
+        return listOf(buildingMicroservices, releaseIt, cidelivery)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@RabbitListener</code> to indicate that this bean will consume messages from RabbitMQ.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the method with <code>@Queue</code>. This listener will listen to messages in <code>catalogue</code> queue.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous service responds a <code>List&lt;Book&gt;</code>. Create the <code>Book</code> POJO:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookcatalogue/src/main/kotlin/example/micronaut/Book.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.core.annotation.Introspected
+
+@Introspected
+data class Book(val isbn: String, val name: String)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="inventory-microservice">4.2. Inventory microservice</h3>
+<div class="paragraph">
+<p>Create the <code>bookinventory</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,graalvm example.micronaut.bookinventory --build=maven --lang=kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>rabbitmq</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookinventory</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=rabbitmq&amp;features=graalvm&amp;lang=KOTLIN&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookinventory&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookinventory</code>, and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="create-rabbitmq-exchange-queue-and-binding-2">4.2.1. Create RabbitMQ exchange, queue and binding</h4>
+<div class="paragraph">
+<p>Copy the <code>ChannelPoolListener</code> class you created in the <code>bookcatalogue</code> microservice to <code>bookinventory/src/main/kotlin/example/micronaut/bookcatalogue</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-consumer-2">4.2.2. Create consumer</h4>
+<div class="paragraph">
+<p>Create a <code>BookInventoryService</code> class to handle incoming RPC requests into the <code>bookinventory</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookinventory/src/main/kotlin/example/micronaut/BookInventoryService.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.rabbitmq.annotation.Queue
+import io.micronaut.rabbitmq.annotation.RabbitListener
+import java.util.Optional
+import javax.validation.constraints.NotBlank
+
+@RabbitListener <i class="conum" data-value="1"></i><b>(1)</b>
+class BookInventoryService {
+
+    @Queue(&quot;inventory&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
+    fun stock(isbn: @NotBlank String?): Boolean? =
+        bookInventoryByIsbn(isbn).map { (_, stock): BookInventory -&gt; stock &gt; 0 }.orElse(null)
+
+    private fun bookInventoryByIsbn(isbn: String?): Optional&lt;BookInventory&gt; =
+        if (isbn.equals(&quot;1491950358&quot;)) {
+            Optional.of(BookInventory(isbn!!, 4))
+        } else if (isbn.equals(&quot;1680502395&quot;)) {
+            Optional.of(BookInventory(isbn!!, 0))
+        } else {
+            Optional.empty&lt;Any&gt;() as Optional&lt;BookInventory&gt;
+        }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@RabbitListener</code> to indicate that this bean will consume messages from RabbitMQ.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the method with <code>@Queue</code>. This listener will listen to messages in <code>inventory</code> queue.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous service uses <code>BookInventory</code> POJO. Create it:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookinventory/src/main/kotlin/example/micronaut/BookInventory.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.core.annotation.Introspected
+
+@Introspected
+data class BookInventory(val isbn: String, val stock: Int)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="recommendation-microservice">4.3. Recommendation microservice</h3>
+<div class="paragraph">
+<p>Create the <code>bookrecommendation</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,reactor,graalvm example.micronaut.bookrecommendation --build=maven --lang=kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>rabbitmq</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>bookrecommendation</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=rabbitmq&amp;features=graalvm&amp;features=reactor&amp;lang=KOTLIN&amp;build=MAVEN&amp;test=JUNIT&amp;name=bookrecommendation&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="create-rabbitmq-exchange-queue-and-binding-3">4.3.1. Create RabbitMQ exchange, queue and binding</h4>
+<div class="paragraph">
+<p>Copy the <code>ChannelPoolListener</code> class you created in the <code>bookcatalogue</code> microservice to <code>bookrecommendation/src/main/java/example/micronaut/bookcatalogue</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-clients">4.3.2. Create clients</h4>
+<div class="paragraph">
+<p>Let&#8217;s create two interfaces to send messages to RabbitMQ. The Micronaut framework will implement the interfaces at compilation time.
+Create <code>CatalogueClient.java</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/main/kotlin/example/micronaut/CatalogueClient.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.rabbitmq.annotation.Binding
+import io.micronaut.rabbitmq.annotation.RabbitClient
+import io.micronaut.rabbitmq.annotation.RabbitProperty
+import org.reactivestreams.Publisher
+
+@RabbitClient(&quot;micronaut&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+@RabbitProperty(name = &quot;replyTo&quot;, value = &quot;amq.rabbitmq.reply-to&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
+interface CatalogueClient {
+
+    @Binding(&quot;books.catalogue&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
+    fun findAll(data: ByteArray?): Publisher&lt;List&lt;Book&gt;&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Send the messages to exchange <code>micronaut</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the <code>replyTo</code> property to <code>amq.rabbitmq.reply-to</code>. This is a special queue that always exists and does not need
+to be created. That it is why we did not create the queue in the <code>ChannelInitializer</code>. RabbitMQ uses that queue in a
+special way and setting the value of the property <code>replyTo</code> to that queue will enable this call as a RPC one. RabbitMQ
+will create a temporary queue for the callback.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set the routing key.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Define the method that will "mirror" the one in the consumer. Keep in mind that in the consumer it is not possible to
+return a reactive type, but on the client side it is. Also, it is necessary to send something, even if it&#8217;s not
+used in the consumer.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create <code>InventoryClient.java</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/main/kotlin/example/micronaut/InventoryClient.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.rabbitmq.annotation.Binding
+import io.micronaut.rabbitmq.annotation.RabbitClient
+import io.micronaut.rabbitmq.annotation.RabbitProperty
+import reactor.core.publisher.Mono
+
+@RabbitClient(&quot;micronaut&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+@RabbitProperty(name = &quot;replyTo&quot;, value = &quot;amq.rabbitmq.reply-to&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
+interface InventoryClient {
+
+    @Binding(&quot;books.inventory&quot;)<i class="conum" data-value="3"></i><b>(3)</b>
+    fun stock(isbn: String): Mono&lt;Boolean?&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Send the messages to exchange <code>micronaut</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the <code>replyTo</code> property to <code>amq.rabbitmq.reply-to</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set the routing key.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Define the method that will "mirror" the one in the consumer. As we did with <code>CatalogueClient</code> we use a reactive
+type to wrap the result.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-the-controller">4.3.3. Create the controller</h4>
+<div class="paragraph">
+<p>Create a Controller which injects both clients.</p>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/main/kotlin/example/micronaut/BookController.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
+
+@Controller(&quot;/books&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+class BookController(
+        private val catalogueClient: CatalogueClient, <i class="conum" data-value="2"></i><b>(2)</b>
+        private val inventoryClient: InventoryClient) {
+
+    @Get <i class="conum" data-value="3"></i><b>(3)</b>
+    fun index(): Publisher&lt;BookRecommendation&gt; =
+        Flux.from(catalogueClient.findAll(null))
+                .flatMap { Flux.fromIterable(it) }
+                .flatMap { book: Book -&gt;
+                    Flux.from(inventoryClient.stock(book.isbn))
+                            .filter { obj: Boolean? -&gt; obj == true }
+                            .map { book }
+                }
+                .map { (_, name): Book -&gt; BookRecommendation(name) }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html" target="_blank" rel="noopener">@Controller</a> annotation mapped to the path <code>/books</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Clients are injected via constructor injection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html" target="_blank" rel="noopener">@Get</a> annotation maps the <code>index</code> method to an HTTP GET request on <code>/books</code></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous controller returns a <code>Publisher&lt;BookRecommendation&gt;</code>. Create the <code>BookRecommendation</code> POJO:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/main/kotlin/example/micronaut/BookRecommendation.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.core.annotation.Introspected
+
+@Introspected
+class BookRecommendation(val name: String)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rabbitmq-and-micronaut-framework">5. RabbitMQ and Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="install-rabbitmq-via-docker">5.1. Install RabbitMQ via Docker</h3>
+<div class="paragraph">
+<p>The fastest way to start using <a href="https://hub.docker.com/_/rabbitmq/" target="_blank" rel="noopener">RabbitMQ is via Docker</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run --rm -it \
+        -p 5672:5672 \
+        -p 15672:15672 \
+        rabbitmq:3.8.12-management</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively you can <a href="https://www.rabbitmq.com/download.html" target="_blank" rel="noopener">install and run a local RabbitMQ instance</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">6. Running the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Configure <code>bookinventory</code> to run on port 8082:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookinventory/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">server</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">8082 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run <code>bookinventory</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">bookinventory $ ./mvnw mn:run
+
+13:30:22.426 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 742ms. Server Running: 1 active message listeners.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure <code>bookcatalogue</code> to run on port 8081:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookcatalogue/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">server</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">8081 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run <code>bookcatalogue</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">bookcatalogue $ ./mvnw mn:run
+
+13:31:19.887 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 949ms. Server Running: 1 active message listeners.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure <code>bookrecommendation</code> to run on port 8080:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">server</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">8080 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+8080 is the default port if you don&#8217;t specify <code>micronaut.server.port</code> property
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Run <code>bookrecommendation</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">bookcatalogue $ ./mvnw mn:run
+
+13:32:06.045 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 959ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can run a <code>curl</code> command to test the whole application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8080/books
+[{&quot;name&quot;:&quot;Building Microservices&quot;}]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-image-with-graalvm">7. Generate a Micronaut Application Native Image with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/" target="_blank" rel="noopener">GraalVM</a>, the polyglot embeddable virtual machine, to generate a Native image of our Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling native images ahead-of-time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="native-image-generation">7.1. Native Image generation</h3>
+<div class="paragraph">
+<p>The easiest way to install GraalVM is to use <a href="https://sdkman.io/" target="_blank" rel="noopener">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 8</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 21.2.0.r8-grl</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Java 11</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 21.2.0.r11-grl</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Java 16</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 21.2.0.r16-grl</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Our recommended approach is to use GraalVM JDK11 even if you still use Java 8 for your project.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You need to install the <code>native-image</code> component which is not installed by default.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ gu install native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate a native image using Maven run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ ./mvnw package -Dpackaging=native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native image is created in <code>target/application</code> and can be run with <code>./target/application</code>.</p>
+</div>
+<div class="paragraph">
+<p>Start the native images for the two microservices and run the same <code>curl</code> request as before to check that everything works with GraalVM.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc" target="_blank" rel="noopener">RabbitMQ RPC support</a> in the Micronaut framework.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="https://micronaut.io/wp-content/uploads/2021/03/Micronaut_byobjectcomputing_w.svg" alt=""/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li id="menu-item-2885" class="show-on-blog menu-item menu-item-type-custom menu-item-object-custom menu-item-2885">
+                                <a target="_blank" rel="noopener" href="https://micronaut.io/feed/rss/">
+                                    <i class="fas fa-rss">
+                                        <span class="sr-only">RSS</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2886" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2886">
+                                <a target="_blank" rel="noopener" href="https://twitter.com/micronautfw">
+                                    <i class="fab fa-twitter">
+                                        <span class="sr-only">Twitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2887" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2887">
+                                <a href="mailto:info@micronaut.io">
+                                    <i class="fas fa-envelope">
+                                        <span class="sr-only">Mail</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2888" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2888">
+                                <a target="_blank" rel="noopener" href="https://gitter.im/micronautfw/">
+                                    <i class="fab fa-gitter">
+                                        <span class="sr-only">Gitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2889" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2889">
+                                <a target="_blank" rel="noopener" href="https://github.com/micronaut-projects/">
+                                    <i class="fab fa-github">
+                                        <span class="sr-only">GitHub</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2890" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2890">
+                                <a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLI74De5M9T72YshO4Sc90wtGr286nM8Yu">
+                                    <i class="fab fa-youtube">
+                                        <span class="sr-only">YouTube</span>
+                                    </i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 Object Computing, Inc. All rights reserved</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
