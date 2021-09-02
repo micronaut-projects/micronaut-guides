@@ -6,7 +6,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Secured(SecurityRule.IS_ANONYMOUS) // <1>
@@ -16,12 +16,14 @@ public class LoginAuthController {
     @Get("/auth") // <3>
     @View("auth") // <4>
     public Map<String, Object> auth() {
-        return Collections.emptyMap();
+        return new HashMap<>();
     }
 
     @Get("/authFailed") // <5>
     @View("auth") // <4>
     public Map<String, Object> authFailed() {
-        return Collections.singletonMap("errors", true);
+        Map<String, Object> model = new HashMap<>();
+        model.put("errors", true);
+        return model;
     }
 }

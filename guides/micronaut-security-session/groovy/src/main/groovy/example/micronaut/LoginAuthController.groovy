@@ -15,7 +15,7 @@ class LoginAuthController {
     @Get("/auth") // <3>
     @View("auth") // <4>
     Map<String, Object> auth() {
-        Collections.emptyMap()
+        [:]
     }
 
     @Get("/authFailed") // <5>
