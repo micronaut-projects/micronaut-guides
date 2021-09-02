@@ -126,13 +126,11 @@
 <li><a href="#getting-started">1. Getting Started</a></li>
 <li><a href="#what-you-will-need">2. What you will need</a></li>
 <li><a href="#solution">3. Solution</a></li>
-<li><a href="#writing-the-application">4. Writing the application</a>
+<li><a href="#writing-the-application">4. Writing the Application</a>
 <ul class="sectlevel2">
-<li><a href="#create-an-application-with-the-command-line-interface">4.1. Create an Application with the Command Line Interface</a></li>
-<li><a href="#security-dependency">4.2. Security Dependency</a></li>
-<li><a href="#configuration">4.3. Configuration</a></li>
-<li><a href="#authentication-provider">4.4. Authentication Provider</a></li>
-<li><a href="#controller">4.5. Controller</a></li>
+<li><a href="#configuration">4.1. Configuration</a></li>
+<li><a href="#authentication-provider">4.2. Authentication Provider</a></li>
+<li><a href="#controller">4.3. Controller</a></li>
 </ul>
 </li>
 <li><a href="#tests">5. Tests</a>
@@ -185,7 +183,7 @@
 <p>The Micronaut framework ships with security capabilities based on <a href="https://jwt.io/" target="_blank" rel="noopener">Json Web Token (JWT)</a>. JWT is an <a href="https://tools.ietf.org/html/rfc7519" target="_blank" rel="noopener">IETF standard</a> which defines a secure way to encapsulate arbitrary data that can be sent over unsecure URLs.</p>
 </div>
 <div class="paragraph">
-<p>In this guide you will create a Micronaut application and secure it with JWT.</p>
+<p>In this guide you will create a Micronaut application written in Java and secure it with JWT.</p>
 </div>
 <div class="paragraph">
 <p>The following sequence illustrates the authentication flow:</p>
@@ -234,20 +232,45 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="writing-the-application">4. Writing the application</h2>
+<h2 id="writing-the-application">4. Writing the Application</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="create-an-application-with-the-command-line-interface">4.1. Create an Application with the Command Line Interface</h3>
 <div class="paragraph">
-<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a>.</p>
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=gradle --lang=java</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=security-jwt,data-jdbc,reactor,graalvm example.micronaut.micronautguide --build=gradle --lang=java</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>security-jwt</code>, <code>data-jdbc</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=security-jwt&amp;features=data-jdbc&amp;features=graalvm&amp;features=reactor&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
@@ -257,24 +280,10 @@
 <img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
 </div>
 </div>
-</div>
 <div class="sect2">
-<h3 id="security-dependency">4.2. Security Dependency</h3>
+<h3 id="configuration">4.1. Configuration</h3>
 <div class="paragraph">
-<p>Add the Micronaut <code>security-jwt</code> dependency:</p>
-</div>
-<div class="listingblock">
-<div class="title">build.gradle</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">annotationProcessor(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.security:micronaut-security-annotations</span><span class="delimiter">&quot;</span></span>)
-implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.security:micronaut-security-jwt</span><span class="delimiter">&quot;</span></span>)</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="configuration">4.3. Configuration</h3>
-<div class="paragraph">
-<p>Add the following to <code>application.yml</code>:</p>
+<p>Note the following configuration in the generated <code>application.yml</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
@@ -304,7 +313,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 </div>
 <div class="sect2">
-<h3 id="authentication-provider">4.4. Authentication Provider</h3>
+<h3 id="authentication-provider">4.2. Authentication Provider</h3>
 <div class="paragraph">
 <p>To keep this guide simple, create a naive <code>AuthenticationProvider</code> to simulate user&#8217;s authentication.</p>
 </div>
@@ -315,23 +324,20 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationException</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailed</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationProvider</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>;
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span> <span class="directive">implements</span> AuthenticationProvider { <i class="conum" data-value="2"></i><b>(2)</b>
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest, AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
+    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest,
+                                                          AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
         <span class="keyword">return</span> Flux.create(emitter -&gt; {
             <span class="keyword">if</span> (authenticationRequest.getIdentity().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>) &amp;&amp;
                     authenticationRequest.getSecret().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>)) {
@@ -359,9 +365,9 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 </div>
 <div class="sect2">
-<h3 id="controller">4.5. Controller</h3>
+<h3 id="controller">4.3. Controller</h3>
 <div class="paragraph">
-<p>Create a file named <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
+<p>Create <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/HomeController.java</div>
@@ -427,20 +433,20 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <span class="keyword">import</span> <span class="include">com.nimbusds.jwt.SignedJWT</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.function.Executable</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
 <span class="keyword">import</span> <span class="include">java.text.ParseException</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.OK</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNAUTHORIZED</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
@@ -456,18 +462,18 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
     <span class="annotation">@Test</span>
     <span class="type">void</span> accessingASecuredUrlWithoutAuthenticatingReturnsUnauthorized() {
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () -&gt; {
-            client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>).accept(MediaType.TEXT_PLAIN)); <i class="conum" data-value="3"></i><b>(3)</b>
+            client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>).accept(TEXT_PLAIN)); <i class="conum" data-value="3"></i><b>(3)</b>
         });
 
-        assertEquals(e.getStatus(), HttpStatus.UNAUTHORIZED); <i class="conum" data-value="3"></i><b>(3)</b>
+        assertEquals(UNAUTHORIZED, e.getStatus()); <i class="conum" data-value="3"></i><b>(3)</b>
     }
 
     <span class="annotation">@Test</span>
     <span class="type">void</span> uponSuccessfulAuthenticationAJsonWebTokenIsIssuedToTheUser() <span class="directive">throws</span> <span class="exception">ParseException</span> {
         UsernamePasswordCredentials creds = <span class="keyword">new</span> UsernamePasswordCredentials(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>);
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>, creds); <i class="conum" data-value="4"></i><b>(4)</b>
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>, creds); <i class="conum" data-value="4"></i><b>(4)</b>
         HttpResponse&lt;BearerAccessRefreshToken&gt; rsp = client.toBlocking().exchange(request, BearerAccessRefreshToken.class); <i class="conum" data-value="5"></i><b>(5)</b>
-        assertEquals(HttpStatus.OK, rsp.getStatus());
+        assertEquals(OK, rsp.getStatus());
 
         BearerAccessRefreshToken bearerAccessRefreshToken = rsp.body();
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, bearerAccessRefreshToken.getUsername());
@@ -475,12 +481,12 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         assertTrue(JWTParser.parse(bearerAccessRefreshToken.getAccessToken()) <span class="keyword">instanceof</span> SignedJWT);
 
         <span class="predefined-type">String</span> accessToken = bearerAccessRefreshToken.getAccessToken();
-        HttpRequest requestWithAuthorization = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-                .accept(MediaType.TEXT_PLAIN)
+        HttpRequest&lt;?&gt; requestWithAuthorization = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
+                .accept(TEXT_PLAIN)
                 .bearerAuth(accessToken); <i class="conum" data-value="6"></i><b>(6)</b>
         HttpResponse&lt;<span class="predefined-type">String</span>&gt; response = client.toBlocking().exchange(requestWithAuthorization, <span class="predefined-type">String</span>.class);
 
-        assertEquals(HttpStatus.OK, rsp.getStatus());
+        assertEquals(OK, rsp.getStatus());
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, response.body()); <i class="conum" data-value="7"></i><b>(7)</b>
     }
 }</code></pre>
@@ -531,7 +537,6 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
@@ -541,15 +546,18 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.AUTHORIZATION</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
+
 <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">AppClient</span> {
 
     <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>)
     BearerAccessRefreshToken login(<span class="annotation">@Body</span> UsernamePasswordCredentials credentials);
 
-    <span class="annotation">@Consumes</span>(MediaType.TEXT_PLAIN)
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    <span class="predefined-type">String</span> home(<span class="annotation">@Header</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">authorization</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> authorization);
+    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
+    <span class="annotation">@Get</span>
+    <span class="predefined-type">String</span> home(<span class="annotation">@Header</span>(AUTHORIZATION) <span class="predefined-type">String</span> authorization);
 }</code></pre>
 </div>
 </div>
@@ -566,9 +574,8 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
 <span class="keyword">import</span> <span class="include">java.text.ParseException</span>;
 
@@ -668,9 +675,9 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">java.text.ParseException</span>;
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
@@ -687,7 +694,7 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
     <span class="annotation">@Test</span>
     <span class="type">void</span> uponSuccessfulAuthenticationUserGetsAccessTokenAndRefreshToken() <span class="directive">throws</span> <span class="exception">ParseException</span> {
         UsernamePasswordCredentials creds = <span class="keyword">new</span> UsernamePasswordCredentials(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>);
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>, creds);
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>, creds);
         BearerAccessRefreshToken rsp = client.toBlocking().retrieve(request, BearerAccessRefreshToken.class);
 
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, rsp.getUsername());
@@ -710,7 +717,7 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 <div class="sect2">
 <h3 id="save-refresh-token">6.1. Save Refresh Token</h3>
 <div class="paragraph">
-<p>We may want to save a refresh token issued by the application. For example, to be revoked a user&#8217;s refresh tokens. So that a particular user cannot obtain a new access token, and thus access the application&#8217;s endpoints.</p>
+<p>We may want to save a refresh token issued by the application, for example, to revoke a user&#8217;s refresh tokens, so that a particular user cannot obtain a new access token, and thus access the application&#8217;s endpoints.</p>
 </div>
 <div class="paragraph">
 <p>Persist the refresh tokens with help of <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/" target="_blank" rel="noopener">Micronaut Data</a>.</p>
@@ -733,7 +740,7 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 </blockquote>
 </div>
 <div class="paragraph">
-<p>Add the following dependencies:</p>
+<p>The <code>data-jdbc</code> feature adds the following dependencies:</p>
 </div>
 <div class="listingblock">
 <div class="title">build.gradle</div>
@@ -784,6 +791,7 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 
 <span class="annotation">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">RefreshTokenEntity</span> {
+
     <span class="annotation">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="annotation">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="annotation">@NonNull</span>
@@ -844,7 +852,6 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.jdbc.annotation.JdbcRepository</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.repository.CrudRepository</span>;
 
 <span class="keyword">import</span> <span class="include">javax.transaction.Transactional</span>;
@@ -852,7 +859,9 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
-<span class="annotation">@JdbcRepository</span>(dialect = Dialect.H2) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect.H2</span>;
+
+<span class="annotation">@JdbcRepository</span>(dialect = H2) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">RefreshTokenRepository</span> <span class="directive">extends</span> CrudRepository&lt;RefreshTokenEntity, <span class="predefined-type">Long</span>&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
 
     <span class="annotation">@Transactional</span>
@@ -863,7 +872,7 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
     Optional&lt;RefreshTokenEntity&gt; findByRefreshToken(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> refreshToken); <i class="conum" data-value="4"></i><b>(4)</b>
 
     <span class="type">long</span> updateByUsername(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> username,
-                          <span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Boolean</span> revoked); <i class="conum" data-value="5"></i><b>(5)</b>
+                          <span class="type">boolean</span> revoked); <i class="conum" data-value="5"></i><b>(5)</b>
 }</code></pre>
 </div>
 </div>
@@ -907,23 +916,25 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.Authentication</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.errors.OauthErrorResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.event.RefreshTokenGeneratedEvent</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.refresh.RefreshTokenPersistence</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.errors.OauthErrorResponseException</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.errors.IssuingAnAccessTokenErrorCode</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.Authentication</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.errors.IssuingAnAccessTokenErrorCode.INVALID_GRANT</span>;
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">CustomRefreshTokenPersistence</span> <span class="directive">implements</span> RefreshTokenPersistence {
+
     <span class="directive">private</span> <span class="directive">final</span> RefreshTokenRepository refreshTokenRepository;
 
-    <span class="directive">public</span> CustomRefreshTokenPersistence(RefreshTokenRepository refreshTokenRepository) {  <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">public</span> CustomRefreshTokenPersistence(RefreshTokenRepository refreshTokenRepository) { <i class="conum" data-value="2"></i><b>(2)</b>
         <span class="local-variable">this</span>.refreshTokenRepository = refreshTokenRepository;
     }
 
@@ -934,7 +945,7 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
                 event.getAuthentication() != <span class="predefined-constant">null</span> &amp;&amp;
                 event.getAuthentication().getName() != <span class="predefined-constant">null</span>) {
             <span class="predefined-type">String</span> payload = event.getRefreshToken();
-            refreshTokenRepository.save(event.getAuthentication().getName(), payload, <span class="predefined-type">Boolean</span>.FALSE); <i class="conum" data-value="4"></i><b>(4)</b>
+            refreshTokenRepository.save(event.getAuthentication().getName(), payload, <span class="predefined-constant">false</span>); <i class="conum" data-value="4"></i><b>(4)</b>
         }
     }
 
@@ -945,16 +956,15 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
             <span class="keyword">if</span> (tokenOpt.isPresent()) {
                 RefreshTokenEntity token = tokenOpt.get();
                 <span class="keyword">if</span> (token.getRevoked()) {
-                    emitter.error(<span class="keyword">new</span> OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, <span class="string"><span class="delimiter">&quot;</span><span class="content">refresh token revoked</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">null</span>)); <i class="conum" data-value="5"></i><b>(5)</b>
+                    emitter.error(<span class="keyword">new</span> OauthErrorResponseException(INVALID_GRANT, <span class="string"><span class="delimiter">&quot;</span><span class="content">refresh token revoked</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">null</span>)); <i class="conum" data-value="5"></i><b>(5)</b>
                 } <span class="keyword">else</span> {
                     emitter.next(Authentication.build(token.getUsername())); <i class="conum" data-value="6"></i><b>(6)</b>
                     emitter.complete();
                 }
             } <span class="keyword">else</span> {
-                emitter.error(<span class="keyword">new</span> OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, <span class="string"><span class="delimiter">&quot;</span><span class="content">refresh token not found</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">null</span>)); <i class="conum" data-value="7"></i><b>(7)</b>
+                emitter.error(<span class="keyword">new</span> OauthErrorResponseException(INVALID_GRANT, <span class="string"><span class="delimiter">&quot;</span><span class="content">refresh token not found</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">null</span>)); <i class="conum" data-value="7"></i><b>(7)</b>
             }
         }, FluxSink.OverflowStrategy.ERROR);
-
     }
 }</code></pre>
 </div>
@@ -1017,19 +1027,19 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">java.util.Map</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.BAD_REQUEST</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
@@ -1051,10 +1061,11 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () -&gt; {
             client.toBlocking().exchange(
-                    HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(unsignedRefreshedToken)), bodyArgument, errorArgument
-            );
+                    HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(unsignedRefreshedToken)),
+                    bodyArgument,
+                    errorArgument);
         });
-        assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
+        assertEquals(BAD_REQUEST, e.getStatus());
 
         Optional&lt;<span class="predefined-type">Map</span>&gt; mapOptional = e.getResponse().getBody(<span class="predefined-type">Map</span>.class);
         assertTrue(mapOptional.isPresent());
@@ -1087,21 +1098,21 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.Authentication</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.generator.RefreshTokenGenerator</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.Authentication</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.Map</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.BAD_REQUEST</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
@@ -1127,12 +1138,12 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
         <span class="predefined-type">String</span> signedRefreshToken = refreshTokenOptional.get();  <i class="conum" data-value="1"></i><b>(1)</b>
         Argument&lt;BearerAccessRefreshToken&gt; bodyArgument = Argument.of(BearerAccessRefreshToken.class);
         Argument&lt;<span class="predefined-type">Map</span>&gt; errorArgument = Argument.of(<span class="predefined-type">Map</span>.class);
-        HttpRequest req = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(signedRefreshToken));
+        HttpRequest&lt;?&gt; req = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(signedRefreshToken));
 
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () -&gt; {
             client.toBlocking().exchange(req, bodyArgument, errorArgument);
         });
-        assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
+        assertEquals(BAD_REQUEST, e.getStatus());
 
         Optional&lt;<span class="predefined-type">Map</span>&gt; mapOptional = e.getResponse().getBody(<span class="predefined-type">Map</span>.class);
         assertTrue(mapOptional.isPresent());
@@ -1166,7 +1177,6 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 <span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>;
@@ -1180,6 +1190,7 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 <span class="keyword">import</span> <span class="include">java.util.Map</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.BAD_REQUEST</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
@@ -1187,11 +1198,8 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 <span class="type">class</span> <span class="class">RefreshTokenRevokedTest</span> {
 
     EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer.class, <span class="predefined-type">Collections</span>.emptyMap());
-
     HttpClient client = embeddedServer.getApplicationContext().createBean(HttpClient.class, embeddedServer.getURL());
-
     RefreshTokenGenerator refreshTokenGenerator = embeddedServer.getApplicationContext().getBean(RefreshTokenGenerator.class);
-
     RefreshTokenRepository refreshTokenRepository = embeddedServer.getApplicationContext().getBean(RefreshTokenRepository.class);
 
     <span class="annotation">@Test</span>
@@ -1204,17 +1212,18 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 
         <span class="type">long</span> oldTokenCount = refreshTokenRepository.count();
         <span class="predefined-type">String</span> signedRefreshToken = refreshTokenOptional.get();
-        refreshTokenRepository.save(user.getName(), refreshToken, <span class="predefined-type">Boolean</span>.TRUE); <i class="conum" data-value="1"></i><b>(1)</b>
+        refreshTokenRepository.save(user.getName(), refreshToken, <span class="predefined-constant">true</span>); <i class="conum" data-value="1"></i><b>(1)</b>
         assertEquals(oldTokenCount + <span class="integer">1</span>, refreshTokenRepository.count());
 
         Argument&lt;BearerAccessRefreshToken&gt; bodyArgument = Argument.of(BearerAccessRefreshToken.class);
         Argument&lt;<span class="predefined-type">Map</span>&gt; errorArgument = Argument.of(<span class="predefined-type">Map</span>.class);
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () -&gt; {
             client.toBlocking().exchange(
-                    HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(signedRefreshToken)), bodyArgument, errorArgument
-            );
+                    HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(signedRefreshToken)),
+                    bodyArgument,
+                    errorArgument);
         });
-        assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
+        assertEquals(BAD_REQUEST, e.getStatus());
 
         Optional&lt;<span class="predefined-type">Map</span>&gt; mapOptional = e.getResponse().getBody(<span class="predefined-type">Map</span>.class);
         assertTrue(mapOptional.isPresent());
@@ -1255,9 +1264,8 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.AccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotEquals</span>;
@@ -1278,7 +1286,7 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
         <span class="predefined-type">String</span> username = <span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>;
 
         UsernamePasswordCredentials creds = <span class="keyword">new</span> UsernamePasswordCredentials(username, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>);
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>, creds);
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>, creds);
 
         <span class="type">long</span> oldTokenCount = refreshTokenRepository.count();
         BearerAccessRefreshToken rsp = client.toBlocking().retrieve(request, BearerAccessRefreshToken.class);

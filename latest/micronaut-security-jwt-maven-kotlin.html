@@ -126,13 +126,11 @@
 <li><a href="#getting-started">1. Getting Started</a></li>
 <li><a href="#what-you-will-need">2. What you will need</a></li>
 <li><a href="#solution">3. Solution</a></li>
-<li><a href="#writing-the-application">4. Writing the application</a>
+<li><a href="#writing-the-application">4. Writing the Application</a>
 <ul class="sectlevel2">
-<li><a href="#create-an-application-with-the-command-line-interface">4.1. Create an Application with the Command Line Interface</a></li>
-<li><a href="#security-dependency">4.2. Security Dependency</a></li>
-<li><a href="#configuration">4.3. Configuration</a></li>
-<li><a href="#authentication-provider">4.4. Authentication Provider</a></li>
-<li><a href="#controller">4.5. Controller</a></li>
+<li><a href="#configuration">4.1. Configuration</a></li>
+<li><a href="#authentication-provider">4.2. Authentication Provider</a></li>
+<li><a href="#controller">4.3. Controller</a></li>
 </ul>
 </li>
 <li><a href="#tests">5. Tests</a>
@@ -185,7 +183,7 @@
 <p>The Micronaut framework ships with security capabilities based on <a href="https://jwt.io/" target="_blank" rel="noopener">Json Web Token (JWT)</a>. JWT is an <a href="https://tools.ietf.org/html/rfc7519" target="_blank" rel="noopener">IETF standard</a> which defines a secure way to encapsulate arbitrary data that can be sent over unsecure URLs.</p>
 </div>
 <div class="paragraph">
-<p>In this guide you will create a Micronaut application and secure it with JWT.</p>
+<p>In this guide you will create a Micronaut application written in Kotlin and secure it with JWT.</p>
 </div>
 <div class="paragraph">
 <p>The following sequence illustrates the authentication flow:</p>
@@ -234,20 +232,45 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="writing-the-application">4. Writing the application</h2>
+<h2 id="writing-the-application">4. Writing the Application</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="create-an-application-with-the-command-line-interface">4.1. Create an Application with the Command Line Interface</h3>
 <div class="paragraph">
-<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a>.</p>
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=maven --lang=kotlin</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=security-jwt,data-jdbc,reactor,graalvm example.micronaut.micronautguide --build=maven --lang=kotlin</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>security-jwt</code>, <code>data-jdbc</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=security-jwt&amp;features=data-jdbc&amp;features=graalvm&amp;features=reactor&amp;lang=KOTLIN&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
@@ -257,32 +280,10 @@
 <img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
 </div>
 </div>
-</div>
 <div class="sect2">
-<h3 id="security-dependency">4.2. Security Dependency</h3>
+<h3 id="configuration">4.1. Configuration</h3>
 <div class="paragraph">
-<p>Add the Micronaut <code>security-jwt</code> dependency:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="comment">&lt;!-- Add the following to your annotationProcessorPaths element --&gt;</span>
-<span class="tag">&lt;annotationProcessorPath&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-annotations<span class="tag">&lt;/artifactId&gt;</span>
-<span class="tag">&lt;/annotationProcessorPath&gt;</span>
-<span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-jwt<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="configuration">4.3. Configuration</h3>
-<div class="paragraph">
-<p>Add the following to <code>application.yml</code>:</p>
+<p>Note the following configuration in the generated <code>application.yml</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
@@ -312,7 +313,7 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="authentication-provider">4.4. Authentication Provider</h3>
+<h3 id="authentication-provider">4.2. Authentication Provider</h3>
 <div class="paragraph">
 <p>To keep this guide simple, create a naive <code>AuthenticationProvider</code> to simulate user&#8217;s authentication.</p>
 </div>
@@ -322,29 +323,25 @@
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.security.authentication.AuthenticationException
-import io.micronaut.security.authentication.AuthenticationFailed
 import io.micronaut.security.authentication.AuthenticationProvider
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
-import reactor.core.publisher.FluxSink
-import reactor.core.publisher.Flux
-import org.reactivestreams.Publisher
 import jakarta.inject.Singleton
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
 class AuthenticationProviderUserPassword : AuthenticationProvider { <i class="conum" data-value="2"></i><b>(2)</b>
 
-    override fun authenticate(
-        httpRequest: HttpRequest&lt;*&gt;?,
-        authenticationRequest: AuthenticationRequest&lt;*, *&gt;
-    ): Publisher&lt;AuthenticationResponse&gt; {
+    override fun authenticate(httpRequest: HttpRequest&lt;*&gt;?,
+                              authenticationRequest: AuthenticationRequest&lt;*, *&gt;): Publisher&lt;AuthenticationResponse&gt; {
         return Flux.create({ emitter: FluxSink&lt;AuthenticationResponse&gt; -&gt;
             if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;) {
                 emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
                 emitter.complete()
             } else {
-                emitter.error(AuthenticationException(AuthenticationFailed()))
+                emitter.error(AuthenticationResponse.exception())
             }
         }, FluxSink.OverflowStrategy.ERROR)
     }
@@ -365,31 +362,30 @@ class AuthenticationProviderUserPassword : AuthenticationProvider { <i class="co
 </div>
 </div>
 <div class="sect2">
-<h3 id="controller">4.5. Controller</h3>
+<h3 id="controller">4.3. Controller</h3>
 <div class="paragraph">
-<p>Create a file named <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
+<p>Create <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/HomeController.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.http.MediaType
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
 import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
 import java.security.Principal
 
-@Secured(&quot;isAuthenticated()&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-@Controller(&quot;/&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
+@Secured(SecurityRule.IS_AUTHENTICATED) <i class="conum" data-value="1"></i><b>(1)</b>
+@Controller <i class="conum" data-value="2"></i><b>(2)</b>
 class HomeController {
 
-    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-    @Get(&quot;/&quot;)  <i class="conum" data-value="4"></i><b>(4)</b>
-    fun index(principal: Principal): String {  <i class="conum" data-value="5"></i><b>(5)</b>
-        return principal.name
-    }
+    @Produces(TEXT_PLAIN)
+    @Get <i class="conum" data-value="3"></i><b>(3)</b>
+    fun index(principal: Principal): String = principal.name <i class="conum" data-value="4"></i><b>(4)</b>
 }</code></pre>
 </div>
 </div>
@@ -431,21 +427,21 @@ import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.MediaType
+import io.micronaut.http.HttpStatus.OK
+import io.micronaut.http.HttpStatus.UNAUTHORIZED
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.function.Executable
-import jakarta.inject.Inject
 
 @MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
 class JwtAuthenticationTest {
@@ -456,33 +452,33 @@ class JwtAuthenticationTest {
 
     @Test
     fun accessingASecuredUrlWithoutAuthenticatingReturnsUnauthorized() {
-        val e = Executable {
-            client.toBlocking().exchange&lt;Any, Any&gt;(HttpRequest.GET&lt;Any&gt;(&quot;/&quot;).accept(MediaType.TEXT_PLAIN)) <i class="conum" data-value="3"></i><b>(3)</b>
+        val e = assertThrows(HttpClientResponseException::class.java) {
+            client.toBlocking().exchange&lt;Any, Any&gt;(HttpRequest.GET&lt;Any&gt;(&quot;/&quot;).accept(TEXT_PLAIN)) <i class="conum" data-value="3"></i><b>(3)</b>
         }
-        val thrown = assertThrows(HttpClientResponseException::class.java, e)
-        assertEquals(thrown.status, HttpStatus.UNAUTHORIZED) <i class="conum" data-value="3"></i><b>(3)</b>
+        assertEquals(UNAUTHORIZED, e.status) <i class="conum" data-value="3"></i><b>(3)</b>
     }
 
     @Test
     fun uponSuccessfulAuthenticationAJsonWebTokenIsIssuedToTheUser() {
         val creds = UsernamePasswordCredentials(&quot;sherlock&quot;, &quot;password&quot;)
-        val request: HttpRequest&lt;Any&gt; = HttpRequest.POST(&quot;/login&quot;, creds) <i class="conum" data-value="4"></i><b>(4)</b>
+        val request: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/login&quot;, creds) <i class="conum" data-value="4"></i><b>(4)</b>
         val rsp: HttpResponse&lt;BearerAccessRefreshToken&gt; =
             client.toBlocking().exchange(request, BearerAccessRefreshToken::class.java) <i class="conum" data-value="5"></i><b>(5)</b>
-        assertEquals(HttpStatus.OK, rsp.status)
+        assertEquals(OK, rsp.status)
 
-        val bearerAccessRefreshToken: BearerAccessRefreshToken = rsp.body()!!
+        val bearerAccessRefreshToken: BearerAccessRefreshToken = rsp.body()
         assertEquals(&quot;sherlock&quot;, bearerAccessRefreshToken.username)
         assertNotNull(bearerAccessRefreshToken.accessToken)
         assertTrue(JWTParser.parse(bearerAccessRefreshToken.accessToken) is SignedJWT)
 
         val accessToken: String = bearerAccessRefreshToken.accessToken
         val requestWithAuthorization = HttpRequest.GET&lt;Any&gt;(&quot;/&quot;)
-            .accept(MediaType.TEXT_PLAIN)
+            .accept(TEXT_PLAIN)
             .bearerAuth(accessToken) <i class="conum" data-value="6"></i><b>(6)</b>
         val response: HttpResponse&lt;String&gt; = client.toBlocking().exchange(requestWithAuthorization, String::class.java)
-        assertEquals(HttpStatus.OK, rsp.status)
-        assertEquals(&quot;sherlock&quot;, response.body()!!) <i class="conum" data-value="7"></i><b>(7)</b>
+
+        assertEquals(OK, rsp.status)
+        assertEquals(&quot;sherlock&quot;, response.body()) <i class="conum" data-value="7"></i><b>(7)</b>
     }
 }</code></pre>
 </div>
@@ -532,7 +528,8 @@ class JwtAuthenticationTest {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.http.MediaType
+import io.micronaut.http.HttpHeaders.AUTHORIZATION
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Consumes
 import io.micronaut.http.annotation.Get
@@ -548,9 +545,9 @@ interface AppClient {
     @Post(&quot;/login&quot;)
     fun login(@Body credentials: UsernamePasswordCredentials): BearerAccessRefreshToken
 
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Get(&quot;/&quot;)
-    fun home(@Header(&quot;authorization&quot;) authorization: String): String
+    @Consumes(TEXT_PLAIN)
+    @Get
+    fun home(@Header(AUTHORIZATION) authorization: String): String
 }</code></pre>
 </div>
 </div>
@@ -567,11 +564,11 @@ import com.nimbusds.jwt.SignedJWT
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
 
 @MicronautTest
 class DeclarativeHttpClientWithJwtTest {
@@ -589,7 +586,6 @@ class DeclarativeHttpClientWithJwtTest {
         assertTrue(JWTParser.parse(loginRsp.accessToken) is SignedJWT)
 
         val msg = appClient.home(&quot;Bearer ${loginRsp.accessToken}&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
-
         assertEquals(&quot;sherlock&quot;, msg)
     }
 }</code></pre>
@@ -666,30 +662,29 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.text.ParseException
-import jakarta.inject.Inject
 
 @MicronautTest
 class LoginIncludesRefreshTokenTest {
 
     @Inject
     @field:Client(&quot;/&quot;)
-    var client: HttpClient? = null
+    lateinit var client: HttpClient
 
     @Test
-    @Throws(ParseException::class)
     fun uponSuccessfulAuthenticationUserGetsAccessTokenAndRefreshToken() {
         val creds = UsernamePasswordCredentials(&quot;sherlock&quot;, &quot;password&quot;)
-        val request: HttpRequest&lt;Any&gt; = HttpRequest.POST(&quot;/login&quot;, creds)
-        val rsp: BearerAccessRefreshToken =
-            client!!.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
+        val request: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/login&quot;, creds)
+        val rsp: BearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
+
         assertEquals(&quot;sherlock&quot;, rsp.username)
         assertNotNull(rsp.accessToken)
         assertNotNull(rsp.refreshToken) <i class="conum" data-value="1"></i><b>(1)</b>
+
         assertTrue(JWTParser.parse(rsp.accessToken) is SignedJWT)
     }
 }</code></pre>
@@ -706,7 +701,7 @@ class LoginIncludesRefreshTokenTest {
 <div class="sect2">
 <h3 id="save-refresh-token">6.1. Save Refresh Token</h3>
 <div class="paragraph">
-<p>We may want to save a refresh token issued by the application. For example, to be revoked a user&#8217;s refresh tokens. So that a particular user cannot obtain a new access token, and thus access the application&#8217;s endpoints.</p>
+<p>We may want to save a refresh token issued by the application, for example, to revoke a user&#8217;s refresh tokens, so that a particular user cannot obtain a new access token, and thus access the application&#8217;s endpoints.</p>
 </div>
 <div class="paragraph">
 <p>Persist the refresh tokens with help of <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/" target="_blank" rel="noopener">Micronaut Data</a>.</p>
@@ -729,7 +724,7 @@ class LoginIncludesRefreshTokenTest {
 </blockquote>
 </div>
 <div class="paragraph">
-<p>Add the following dependencies:</p>
+<p>The <code>data-jdbc</code> feature adds the following dependencies:</p>
 </div>
 <div class="listingblock">
 <div class="title">pom.xml</div>
@@ -793,6 +788,7 @@ import javax.validation.constraints.NotBlank
 
 @MappedEntity <i class="conum" data-value="1"></i><b>(1)</b>
 data class RefreshTokenEntity(
+
     @field:Id <i class="conum" data-value="2"></i><b>(2)</b>
     @GeneratedValue <i class="conum" data-value="3"></i><b>(3)</b>
     var id: Long? = null,
@@ -806,7 +802,7 @@ data class RefreshTokenEntity(
     var revoked: Boolean,
 
     @DateCreated <i class="conum" data-value="4"></i><b>(4)</b>
-    var dateCreated: Instant? = null,
+    var dateCreated: Instant? = null
 
 )</code></pre>
 </div>
@@ -840,25 +836,24 @@ data class RefreshTokenEntity(
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository
-import io.micronaut.data.model.query.builder.sql.Dialect
+import io.micronaut.data.model.query.builder.sql.Dialect.H2
 import io.micronaut.data.repository.CrudRepository
 import java.util.Optional
 import javax.transaction.Transactional
 import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
 
-@JdbcRepository(dialect = Dialect.H2) <i class="conum" data-value="1"></i><b>(1)</b>
-interface RefreshTokenRepository : CrudRepository&lt;RefreshTokenEntity?, Long?&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+@JdbcRepository(dialect = H2) <i class="conum" data-value="1"></i><b>(1)</b>
+interface RefreshTokenRepository : CrudRepository&lt;RefreshTokenEntity, Long&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
 
     @Transactional
-    fun save(username: @NotBlank String,
-             refreshToken: @NotBlank String,
-             revoked: @NotNull Boolean): RefreshTokenEntity? <i class="conum" data-value="3"></i><b>(3)</b>
+    fun save(@NotBlank username: String,
+             @NotBlank refreshToken: String,
+             revoked: Boolean): RefreshTokenEntity <i class="conum" data-value="3"></i><b>(3)</b>
 
-    fun findByRefreshToken(refreshToken: @NotBlank String): Optional&lt;RefreshTokenEntity&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+    fun findByRefreshToken(@NotBlank refreshToken: String): Optional&lt;RefreshTokenEntity&gt; <i class="conum" data-value="4"></i><b>(4)</b>
 
-    fun updateByUsername(username: @NotBlank String,
-                         revoked: @NotNull Boolean): Long <i class="conum" data-value="5"></i><b>(5)</b>
+    fun updateByUsername(@NotBlank username: String,
+                         revoked: Boolean): Long <i class="conum" data-value="5"></i><b>(5)</b>
 }</code></pre>
 </div>
 </div>
@@ -900,52 +895,44 @@ interface RefreshTokenRepository : CrudRepository&lt;RefreshTokenEntity?, Long?&
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/CustomRefreshTokenPersistence.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut;
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.security.authentication.Authentication;
-import io.micronaut.security.token.event.RefreshTokenGeneratedEvent;
-import io.micronaut.security.token.refresh.RefreshTokenPersistence;
-import io.micronaut.security.errors.OauthErrorResponseException;
-import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode;
-import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.Flux;
-import org.reactivestreams.Publisher;
-
-import jakarta.inject.Singleton;
+import io.micronaut.security.authentication.Authentication
+import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode.INVALID_GRANT
+import io.micronaut.security.errors.OauthErrorResponseException
+import io.micronaut.security.token.event.RefreshTokenGeneratedEvent
+import io.micronaut.security.token.refresh.RefreshTokenPersistence
+import jakarta.inject.Singleton
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class CustomRefreshTokenPersistence : RefreshTokenPersistence {
-
-    private var refreshTokenRepository: RefreshTokenRepository
-
-    constructor(refreshTokenRepository: RefreshTokenRepository) {  <i class="conum" data-value="2"></i><b>(2)</b>
-        this.refreshTokenRepository = refreshTokenRepository;
-    }
+class CustomRefreshTokenPersistence(private val refreshTokenRepository: RefreshTokenRepository) <i class="conum" data-value="2"></i><b>(2)</b>
+    : RefreshTokenPersistence {
 
     override fun persistToken(event: RefreshTokenGeneratedEvent?) { <i class="conum" data-value="3"></i><b>(3)</b>
-        if (event?.refreshToken != null &amp;&amp;
-            event.authentication != null &amp;&amp;
-            event.authentication.name != null) {
-            val payload = event.refreshToken;
-            refreshTokenRepository.save(event.authentication.name, payload, false); <i class="conum" data-value="4"></i><b>(4)</b>
+        if (event?.refreshToken != null &amp;&amp; event.authentication?.name != null) {
+            val payload = event.refreshToken
+            refreshTokenRepository.save(event.authentication.name, payload, false) <i class="conum" data-value="4"></i><b>(4)</b>
         }
     }
 
-    override fun getAuthentication(refreshToken: String) : Publisher&lt;Authentication&gt; {
+    override fun getAuthentication(refreshToken: String): Publisher&lt;Authentication&gt; {
         return Flux.create({ emitter: FluxSink&lt;Authentication&gt; -&gt;
-            val tokenOpt = refreshTokenRepository.findByRefreshToken(refreshToken);
+            val tokenOpt = refreshTokenRepository.findByRefreshToken(refreshToken)
             if (tokenOpt.isPresent) {
-                val token = tokenOpt.get();
-                if (token.revoked) {
-                    emitter.error(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, &quot;refresh token revoked&quot;, null)); <i class="conum" data-value="5"></i><b>(5)</b>
+                val (_, username, _, revoked) = tokenOpt.get()
+                if (revoked) {
+                    emitter.error(OauthErrorResponseException(INVALID_GRANT, &quot;refresh token revoked&quot;, null)) <i class="conum" data-value="5"></i><b>(5)</b>
                 } else {
-                    emitter.next(Authentication.build(token.username)); <i class="conum" data-value="6"></i><b>(6)</b>
-                    emitter.complete();
+                    emitter.next(Authentication.build(username)) <i class="conum" data-value="6"></i><b>(6)</b>
+                    emitter.complete()
                 }
             } else {
-                emitter.error(OauthErrorResponseException(IssuingAnAccessTokenErrorCode.INVALID_GRANT, &quot;refresh token not found&quot;, null)); <i class="conum" data-value="7"></i><b>(7)</b>
+                emitter.error(OauthErrorResponseException(INVALID_GRANT, &quot;refresh token not found&quot;, null)) <i class="conum" data-value="7"></i><b>(7)</b>
             }
-        }, FluxSink.OverflowStrategy.ERROR);
+        }, FluxSink.OverflowStrategy.ERROR)
     }
 }</code></pre>
 </div>
@@ -1008,26 +995,26 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
+import io.micronaut.http.HttpStatus.BAD_REQUEST
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Optional
-import jakarta.inject.Inject
 
 @MicronautTest
 internal class UnsignedRefreshTokenTest {
 
     @Inject
     @field:Client(&quot;/&quot;)
-    var client: HttpClient? = null
+    lateinit var client: HttpClient
 
     @Test
     fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
@@ -1035,13 +1022,12 @@ internal class UnsignedRefreshTokenTest {
         val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
         val errorArgument = Argument.of(Map::class.java)
         val e = assertThrows(HttpClientResponseException::class.java) {
-            client!!.toBlocking().exchange(
+            client.toBlocking().exchange(
                 HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(unsignedRefreshedToken)),
                 bodyArgument,
-                errorArgument
-            )
+                errorArgument)
         }
-        assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(BAD_REQUEST, e.status)
 
         val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
         assertTrue(mapOptional.isPresent)
@@ -1074,47 +1060,48 @@ internal class UnsignedRefreshTokenTest {
 
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
+import io.micronaut.http.HttpStatus.BAD_REQUEST
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.security.authentication.Authentication;
+import io.micronaut.security.authentication.Authentication
 import io.micronaut.security.token.generator.RefreshTokenGenerator
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Optional
-import jakarta.inject.Inject
 
 @MicronautTest
-internal class RefreshTokenNotFoundTest {
+class RefreshTokenNotFoundTest {
 
     @Inject
     @field:Client(&quot;/&quot;)
-    var client: HttpClient? = null
+    lateinit var client: HttpClient
 
     @Inject
-    var refreshTokenGenerator: RefreshTokenGenerator? = null
+    lateinit var refreshTokenGenerator: RefreshTokenGenerator
 
     @Test
     fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
+
         val user = Authentication.build(&quot;sherlock&quot;)
-        val refreshToken = refreshTokenGenerator!!.createKey(user)
-        val refreshTokenOptional = refreshTokenGenerator!!.generate(user, refreshToken)
+        val refreshToken = refreshTokenGenerator.createKey(user)
+        val refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
         assertTrue(refreshTokenOptional.isPresent)
 
         val signedRefreshToken = refreshTokenOptional.get() <i class="conum" data-value="1"></i><b>(1)</b>
         val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
         val errorArgument = Argument.of(MutableMap::class.java)
-        val req: HttpRequest&lt;Any&gt; = HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(signedRefreshToken))
+        val req: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(signedRefreshToken))
         val e = assertThrows(HttpClientResponseException::class.java) {
-            client!!.toBlocking().exchange(req, bodyArgument, errorArgument)
+            client.toBlocking().exchange(req, bodyArgument, errorArgument)
         }
-        assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(BAD_REQUEST, e.status)
 
         val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
         assertTrue(mapOptional.isPresent)
@@ -1148,7 +1135,7 @@ internal class RefreshTokenNotFoundTest {
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
+import io.micronaut.http.HttpStatus.BAD_REQUEST
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.runtime.server.EmbeddedServer
@@ -1163,10 +1150,11 @@ import org.junit.jupiter.api.Test
 import java.util.Optional
 
 internal class RefreshTokenRevokedTest {
-    var embeddedServer = ApplicationContext.run(EmbeddedServer::class.java, emptyMap())
-    var client = embeddedServer.applicationContext.createBean(HttpClient::class.java, embeddedServer.url)
-    var refreshTokenGenerator = embeddedServer.applicationContext.getBean(RefreshTokenGenerator::class.java)
-    var refreshTokenRepository = embeddedServer.applicationContext.getBean(RefreshTokenRepository::class.java)
+
+    val embeddedServer = ApplicationContext.run(EmbeddedServer::class.java, emptyMap())
+    val client = embeddedServer.applicationContext.createBean(HttpClient::class.java, embeddedServer.url)
+    val refreshTokenGenerator = embeddedServer.applicationContext.getBean(RefreshTokenGenerator::class.java)
+    val refreshTokenRepository = embeddedServer.applicationContext.getBean(RefreshTokenRepository::class.java)
 
     @Test
     fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
@@ -1186,10 +1174,9 @@ internal class RefreshTokenRevokedTest {
             client.toBlocking().exchange(
                 HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(signedRefreshToken)),
                 bodyArgument,
-                errorArgument
-            )
+                errorArgument)
         }
-        assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(BAD_REQUEST, e.status)
 
         val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
         assertTrue(mapOptional.isPresent)
@@ -1197,6 +1184,7 @@ internal class RefreshTokenRevokedTest {
         val m = mapOptional.get()
         assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
         assertEquals(&quot;refresh token revoked&quot;, m[&quot;error_description&quot;])
+
         refreshTokenRepository.deleteAll()
     }
 }</code></pre>
@@ -1229,47 +1217,45 @@ import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
 
 @MicronautTest(rollback = false)
 internal class OauthAccessTokenTest {
 
     @Inject
     @field:Client(&quot;/&quot;)
-    var client: HttpClient? = null
+    lateinit var client: HttpClient
 
     @Inject
-    var refreshTokenRepository: RefreshTokenRepository? = null
+    lateinit var refreshTokenRepository: RefreshTokenRepository
 
     @Test
-    @Throws(InterruptedException::class)
     fun verifyJWTAccessTokenRefreshWorks() {
         val username = &quot;sherlock&quot;
+
         val creds = UsernamePasswordCredentials(username, &quot;password&quot;)
-        val request: HttpRequest&lt;Any&gt; = HttpRequest.POST(&quot;/login&quot;, creds)
-        val oldTokenCount = refreshTokenRepository!!.count()
-        val rsp: BearerAccessRefreshToken =
-            client!!.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
+        val request: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/login&quot;, creds)
+
+        val oldTokenCount = refreshTokenRepository.count()
+        val rsp: BearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
         Thread.sleep(3000)
-        assertEquals(oldTokenCount + 1, refreshTokenRepository!!.count())
+        assertEquals(oldTokenCount + 1, refreshTokenRepository.count())
+
         assertNotNull(rsp.accessToken)
         assertNotNull(rsp.refreshToken)
 
         Thread.sleep(1000) // sleep for one second to give time for the issued at `iat` Claim to change
-        val refreshResponse = client!!.toBlocking().retrieve(
-            HttpRequest.POST(
-                &quot;/oauth/access_token&quot;,
-                TokenRefreshRequest(rsp.refreshToken)
-            ), AccessRefreshToken::class.java <i class="conum" data-value="1"></i><b>(1)</b>
-        )
+        val refreshResponse = client.toBlocking().retrieve(HttpRequest.POST(&quot;/oauth/access_token&quot;,
+                TokenRefreshRequest(rsp.refreshToken)), AccessRefreshToken::class.java) <i class="conum" data-value="1"></i><b>(1)</b>
 
         assertNotNull(refreshResponse.accessToken)
         assertNotEquals(rsp.accessToken, refreshResponse.accessToken) <i class="conum" data-value="2"></i><b>(2)</b>
-        refreshTokenRepository!!.deleteAll()
+
+        refreshTokenRepository.deleteAll()
     }
 }</code></pre>
 </div>
