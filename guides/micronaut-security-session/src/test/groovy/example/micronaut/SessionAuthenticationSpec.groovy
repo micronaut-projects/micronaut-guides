@@ -3,10 +3,8 @@ package example.micronaut
 import geb.spock.GebSpec
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-
 import jakarta.inject.Inject
 
-//tag::clazz[]
 @MicronautTest // <1>
 class SessionAuthenticationSpec extends GebSpec {
 
@@ -76,4 +74,3 @@ class SessionAuthenticationSpec extends GebSpec {
         homePage.username() == null
     }
 }
-//end::clazz[]

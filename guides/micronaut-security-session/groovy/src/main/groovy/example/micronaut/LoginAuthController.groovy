@@ -21,6 +21,6 @@ class LoginAuthController {
     @Get("/authFailed") // <5>
     @View("auth") // <4>
     Map<String, Object> authFailed() {
-        [errors: true] as Map<String, Object>
+        [errors: true] as Map
     }
 }
