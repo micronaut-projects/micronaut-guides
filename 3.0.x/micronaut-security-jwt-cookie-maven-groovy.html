@@ -128,12 +128,11 @@
 <li><a href="#solution">3. Solution</a></li>
 <li><a href="#writing-the-application">4. Writing the Application</a>
 <ul class="sectlevel2">
-<li><a href="#security-dependency">4.1. Security Dependency</a></li>
-<li><a href="#configuration">4.2. Configuration</a></li>
-<li><a href="#authentication-provider">4.3. Authentication Provider</a></li>
-<li><a href="#apache-velocity">4.4. Apache Velocity</a></li>
-<li><a href="#controllers">4.5. Controllers</a></li>
-<li><a href="#login-form">4.6. Login Form</a></li>
+<li><a href="#configuration">4.1. Configuration</a></li>
+<li><a href="#authentication-provider">4.2. Authentication Provider</a></li>
+<li><a href="#apache-velocity">4.3. Apache Velocity</a></li>
+<li><a href="#controllers">4.4. Controllers</a></li>
+<li><a href="#login-form">4.5. Login Form</a></li>
 </ul>
 </li>
 <li><a href="#tests">5. Tests</a></li>
@@ -219,37 +218,45 @@
 <h2 id="writing-the-application">4. Writing the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a>.</p>
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli" target="_blank" rel="noopener">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io" target="_blank" rel="noopener">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=security-jwt,views-velocity,reactor,graalvm example.micronaut.micronautguide --build=maven --lang=groovy --test=spock</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p><code>mn create-app example.micronaut.micronautguide --test=spock --lang=groovy</code></p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>security-jwt</code>, <code>views-velocity</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
-<div class="sect2">
-<h3 id="security-dependency">4.1. Security Dependency</h3>
-<div class="paragraph">
-<p>Add a dependency for Micronaut JWT security:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-annotations<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-jwt<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=security-jwt&amp;features=graalvm&amp;features=views-velocity&amp;features=reactor&amp;lang=GROOVY&amp;build=MAVEN&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
 </div>
 <div class="sect2">
-<h3 id="configuration">4.2. Configuration</h3>
+<h3 id="configuration">4.1. Configuration</h3>
 <div class="paragraph">
 <p>Add the following configuration:</p>
 </div>
@@ -291,7 +298,7 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="authentication-provider">4.3. Authentication Provider</h3>
+<h3 id="authentication-provider">4.2. Authentication Provider</h3>
 <div class="paragraph">
 <p>To keep this guide simple, create a naive <code>AuthenticationProvider</code> to simulate user&#8217;s authentication.</p>
 </div>
@@ -302,21 +309,20 @@
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailed</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationProvider</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span> <span class="directive">implements</span> AuthenticationProvider { <i class="conum" data-value="2"></i><b>(2)</b>
 
     <span class="annotation">@Override</span>
-    Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest, AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
+    Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest,
+                                                   AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
         Flux.create(emitter -&gt; {
             <span class="keyword">if</span> (authenticationRequest.identity == <span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span> &amp;&amp; authenticationRequest.secret == <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>) {
                 emitter.next(AuthenticationResponse.success((<span class="predefined-type">String</span>) authenticationRequest.identity))
@@ -324,7 +330,7 @@
             } <span class="keyword">else</span> {
                 emitter.error(AuthenticationResponse.exception())
             }
-        }, FluxSink.OverflowStrategy.ERROR) <span class="keyword">as</span> Publisher&lt;AuthenticationResponse&gt;
+        }, FluxSink.OverflowStrategy.ERROR)
     }
 }</code></pre>
 </div>
@@ -343,12 +349,12 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="apache-velocity">4.4. Apache Velocity</h3>
+<h3 id="apache-velocity">4.3. Apache Velocity</h3>
 <div class="paragraph">
 <p>By default, Micronaut controllers produce JSON. Usually, you consume those endpoints with a mobile phone application, or a JavaScript front end (Angular, React, Vue.js, etc.). However, to keep this guide simple we will produce HTML in our controllers.</p>
 </div>
 <div class="paragraph">
-<p>In order to do that, we use <a href="https://velocity.apache.org/" target="_blank" rel="noopener">Apache Velocity</a>.</p>
+<p>In order to do that, we use <a href="https://velocity.apache.org/" target="_blank" rel="noopener">Apache Velocity</a> and the Micronaut <a href="https://docs.micronaut.io/latest/guide/#views" target="_blank" rel="noopener">Server Side View Rendering Module</a>.</p>
 </div>
 <div class="quoteblock">
 <blockquote>
@@ -356,19 +362,6 @@
 <p>Velocity is a Java-based template engine. It permits anyone to use a simple yet powerful template language to reference objects defined in Java code.</p>
 </div>
 </blockquote>
-</div>
-<div class="paragraph">
-<p>Add a dependency for the Micronaut <a href="https://docs.micronaut.io/latest/guide/#views" target="_blank" rel="noopener">Server Side View Rendering Module</a> and for Velocity:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.views<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-views-velocity<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
 </div>
 <div class="paragraph">
 <p>Create two Velocity templates in <code>src/main/resources/views</code>:</p>
@@ -437,9 +430,9 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="controllers">4.5. Controllers</h3>
+<h3 id="controllers">4.4. Controllers</h3>
 <div class="paragraph">
-<p>Create a file named <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
+<p>Create <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/HomeController.groovy</div>
@@ -451,22 +444,22 @@
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.views.View</span>
 
 <span class="keyword">import</span> <span class="include">java.security.Principal</span>
 
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@Secured</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">isAnonymous()</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@Secured</span>(SecurityRule.IS_ANONYMOUS) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Controller</span> <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="type">class</span> <span class="class">HomeController</span> {
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="annotation">@View</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">home</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
     <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; index(<span class="annotation">@Nullable</span> <span class="predefined-type">Principal</span> principal) { <i class="conum" data-value="5"></i><b>(5)</b>
-        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; data = [:]
-        data[<span class="string"><span class="delimiter">&quot;</span><span class="content">loggedIn</span><span class="delimiter">&quot;</span></span>] = principal != <span class="predefined-constant">null</span>
+        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; data = [<span class="key">loggedIn</span>: principal != <span class="predefined-constant">null</span>] <span class="keyword">as</span> <span class="predefined-type">Map</span>
         <span class="keyword">if</span> (principal) {
-            data[<span class="string"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span>] = principal.name
+            data.username = principal.name
         }
         data
     }
@@ -499,7 +492,7 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="login-form">4.6. Login Form</h3>
+<h3 id="login-form">4.5. Login Form</h3>
 <div class="paragraph">
 <p>Next, create <code>LoginAuthController</code> which renders the login form.</p>
 </div>
@@ -512,10 +505,11 @@
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.views.View</span>
 
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@Secured</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">isAnonymous()</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Secured</span>(SecurityRule.IS_ANONYMOUS) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="type">class</span> <span class="class">LoginAuthController</span> {
 
@@ -528,7 +522,7 @@
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/authFailed</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
     <span class="annotation">@View</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">auth</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
     <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; authFailed() {
-        [<span class="key">errors</span>: <span class="predefined-constant">true</span>] <span class="keyword">as</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;
+        <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">'</span><span class="content">errors</span><span class="delimiter">'</span></span>, <span class="predefined-constant">true</span>) <span class="keyword">as</span> <span class="predefined-type">Map</span>
     }
 }</code></pre>
 </div>
@@ -672,15 +666,22 @@
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/AuthenticationSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">geb.spock.GebSpec</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">AuthenticationSpec</span> <span class="directive">extends</span> GebSpec {
 
     <span class="annotation">@Inject</span>
     EmbeddedServer embeddedServer <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">verify session based authentication works</span><span class="delimiter">&quot;</span></span>() {
+    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">verify session based authentication works</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">given</span>:
-        browser.baseUrl = <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:</span><span class="inline"><span class="inline-delimiter">${</span>embeddedServer.port<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
+        browser.baseUrl = <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:</span><span class="inline"><span class="inline-delimiter">$</span>embeddedServer</span><span class="content">.port</span><span class="delimiter">&quot;</span></span>
 
         <span class="key">when</span>:
         to HomePage
