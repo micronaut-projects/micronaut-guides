@@ -1,0 +1,123 @@
+include::{commondir}/common-header.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== OAuth 2.0
+
+To provide authentication, sign in to your https://auth0.com[Auth0] account.
+
+Create an Application
+
+image::auth0-create-application.png[]
+
+Fill the Application URIs:
+
+image::auth0-application-uris.png[]
+
+- Enter `http://localhost:8080/oauth/callback/auth0` as callback url.
+
+- Enter `http://localhost:8080/logout` as allowed logout url.
+
+- Enter `http://localhost:8080` as allowed web origins.
+
+Once you have an https domain (e.g. `https://myapp.org`) enter it as Application Login URI: `https://myapp.org/oauth/login/auth0`.
+
+You can obtain the application's domain, client id and secret in the Auth0 console. 
+
+image::auth0-clientid-clientsecret.png[]
+
+We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
+
+image::diagramm.png[]
+
+
+include::{commondir}/common-create-app.adoc[]
+
+=== Dependencies
+
+To use OAuth 2.0 integration, add the following dependency:
+
+dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
+
+Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwt[Micronaut JWT support] dependencies:
+
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+=== Configuration
+
+Add the following OAuth2 Configuration:
+
+resource:application.yml[tag=oauth2]
+
+callout:authentication-idtoken[number=1,arg0=Auth0]
+callout:oauth2-client-name[number=2,arg0=auth0]
+<3> Client ID. See previous screenshot.
+<4> Client Secret. See previous screenshot.
+<5> `issuer` URL. It allows the Micronaut framework to https://auth0.com/docs/configure/applications/configure-applications-with-oidc-discovery[discover the configuration of the OpenID Connect server]. Note: we will use the application's domain.
+<6> Accept GET request to the `/logout` endpoint.
+
+When you start the Micronaut applications, it fetches the Auth0 application's `openidconfiguration`:
+
+[source, bash]
+----
+https://{auth0domain}/.well-known/openid-configuration
+----
+
+The previous configuration uses several placeholders. You will need to setup `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` and `OAUTH_DOMAIN` environment variables.
+
+[soruce, bash]
+----
+export OAUTH_CLIENT_ID=XXXXXXXXXX
+export OAUTH_CLIENT_SECRET=YYYYYYYYYY
+export OAUTH_DOMAIN=micronautguides.eu.auth0.com
+----
+
+=== Views
+
+Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
+
+To use https://www.thymeleaf.org/[Thymeleaf] Java template engine to render views in a Micronaut application add the following dependency on your classpath.
+
+dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+
+=== Home Controller
+
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+
+source:HomeController[]
+
+callout:controller[number=1,arg0=/]
+callout:secured-anonymous[number=2]
+calluot:view[number=3]
+callout:get[number=4,arg0=index,arg1=/]
+
+=== Thymeleaf template
+
+Create a thymeleaf template:
+
+resource:views/home.html[]
+
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
+
+- The @api@/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
+injects into the model a `security` map with the authenticated user.  See https://micronaut-projects.github.io/micronaut-views/latest/guide/index.html#views-security[User in a view] documentation.
+
+include::{commondir}/common-runapp.adoc[]
+
+image::auth0video.gif[]
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+After you execute the native image, navigate to localhost:8080 and authenticate with Auth0.
+
+:exclude-for-languages:
+
+== Next steps
+
+Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
