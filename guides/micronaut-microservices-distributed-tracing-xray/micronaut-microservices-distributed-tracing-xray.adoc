@@ -1,0 +1,148 @@
+include::{commondir}/common-header-top.adoc[]
+
+== Getting Starter
+
+In this guide, we will integrate https://aws.amazon.com/xray/[AWS X-Ray] in a Micronaut application composed of three microservices.
+
+____
+AWS X-Ray helps developers analyze and debug production, distributed applications, such as those built using a microservices architecture. With X-Ray, you can understand how your application and its underlying services are performing to identify and troubleshoot the root cause of performance issues and errors. X-Ray provides an end-to-end view of requests as they travel through your application, and shows a map of your application’s underlying components. You can use X-Ray to analyze both applications in development and in production, from simple three-tier applications to complex microservices applications consisting of thousands of services.
+____
+
+You will discover how the Micronaut framework eases AWS X-Ray integration.
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the application
+
+To learn more about this sample application read https://guides.micronaut.io/micronaut-microservices-services-discover-consul/guide/[Consul and Micronaut Framework - Microservices service discovery^] guide. The application contains three microservices.
+
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and ISBN.
+
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and ISBN.
+
+* `bookrecommendation` - It consumes previous services and exposes and endpoint which recommends book names which are in stock.
+
+The `bookcatalogue` service consumes endpoints exposed by the other services. The following image illustrates the application flow:
+
+image::flow.svg[]
+
+A request to `bookrecommendation` (`http://localhost:8080/books[http://localhost:8080/books^]`) triggers several requests through our microservices mesh.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+== Running the AWS X-Ray daemon locally
+
+https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon-local.html[Run the AWS X-Ray daemon locally] on your operating system of choice.
+
+=== Book catalogue
+
+Add Micronaut X-Ray dependency:
+
+dependency:micronaut-aws-xray[groupId=io.micronaut.aws,scope=runtimeOnly]
+
+=== Book inventory
+
+Add Micronaut X-Ray dependency:
+
+dependency:micronaut-aws-xray[groupId=io.micronaut.aws,scope=runtimeOnly]
+
+=== Book recommendation
+
+Add Micronaut X-Ray dependency:
+
+dependency:micronaut-aws-xray[groupId=io.micronaut.aws,scope=runtimeOnly]
+
+== Running the application
+
+Run `bookcatalogue` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:28:34.034 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 499ms. Server Running: http://localhost:8081
+----
+
+Run `bookinventory` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:13.104 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 506ms. Server Running: http://localhost:8082
+----
+
+Run `bookrecommendation` microservice:
+
+:exclude-for-build:maven
+
+To run the application execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:57.389 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 523ms. Server Running: http://localhost:8080
+----
+
+You can run a cURL command to test the whole application:
+
+[source, bash]
+----
+$ curl http://localhost:8080/books
+[{"name":"Building Microservices"}
+----
+
+You can then navigate to AWS Console and access the X-Ray UI
+
+The previous request generates such a trace:
+
+image::xraytrace.png[]
+
+In the previous image, you can see that:
+
+- Whenever a Micronaut HTTP client executes a new network request, it creates a new subsegment.
+- Whenever a Micronaut server receives a request, it creates a new segment.
+
+Moreover, you can see the requests to `bookinventory` are done in parallel.
+
+== Next steps
+
+As you have seen in this guide, without any annotations you get distributing tracing up-and-running fast with the Micronaut framework.
+
+The Micronaut framework includes several annotations to give you more flexibility.
+
+Make sure to read the documentation about https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#xray[Micronaut X-Ray] integration.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
