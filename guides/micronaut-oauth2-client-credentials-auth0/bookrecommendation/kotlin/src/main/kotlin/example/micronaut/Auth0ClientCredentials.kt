@@ -16,14 +16,14 @@ import jakarta.inject.Singleton
 internal class Auth0ClientCredentials(@Named("auth0") oauthClientConfiguration: OauthClientConfiguration,  // <5>
                                       tokenEndpointClient: TokenEndpointClient, private val auth0Configuration: Auth0Configuration)
     : DefaultClientCredentialsClient(oauthClientConfiguration, tokenEndpointClient) { // <4>
-    override fun createTokenRequestContext(@Nullable scope: String): ClientCredentialsTokenRequestContext {
+    override fun createTokenRequestContext(scope: String?): ClientCredentialsTokenRequestContext {
         return ClientCredentialsTokenRequestContextExtension(
             scope, oauthClientConfiguration,
             auth0Configuration
         )
     }
 
-    internal class ClientCredentialsTokenRequestContextExtension(scope: String,
+    internal class ClientCredentialsTokenRequestContextExtension(scope: String?,
                                                                  clientConfiguration: OauthClientConfiguration,
                                                                  private val auth0Configuration: Auth0Configuration)
         : ClientCredentialsTokenRequestContext(scope, clientConfiguration) {
