@@ -20,7 +20,7 @@ public class BookController {
     }
 
     @Get
-    @Secured(IS_ANONYMOUS)
+    @Secured(IS_ANONYMOUS) // <1>
     public Publisher<BookRecommendation> index() {
         return Flux.from(bookCatalogueOperations.findAll())
                 .flatMap(b -> Flux.from(bookInventoryOperations.stock(b.getIsbn()))
