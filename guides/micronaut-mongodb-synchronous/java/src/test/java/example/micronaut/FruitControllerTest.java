@@ -39,7 +39,14 @@ public class FruitControllerTest {
         assertFalse(fruits.isEmpty());
         assertEquals("banana", fruits.get(0).getName());
         assertNull(fruits.get(0).getDescription());
-
+        
+        response = client.exchange(HttpRequest.POST("/fruits", new Fruit("Apple", "Keeps the doctor away")));
+        assertEquals(HttpStatus.CREATED, response.getStatus());
+        fruits = client.retrieve(HttpRequest.GET("/fruits"), Argument.listOf(Fruit.class));    
+        assertTrue(fruits.stream()
+            .filter(f -> f.getDescription() != null && f.getDescription().equals("Keeps the doctor away"))
+            .findFirst()
+            .isPresent());
         httpClient.close();
         embeddedServer.close();
         mongoDBContainer.close();

@@ -56,9 +56,11 @@ public class MongoDbFruitRepository implements FruitRepository {
 
     @NonNull
     private Document fruitToDocument(@NonNull Fruit fruit) {
-        return new Document()
-                .append("name", fruit.getName())
-                .append("description", fruit.getDescription());
+        Document doc = new Document().append("name", fruit.getName());
+        if (fruit.getDescription() != null) {
+            return doc.append("description", fruit.getDescription());    
+        }        
+        return doc;
     }
 
     @NonNull
