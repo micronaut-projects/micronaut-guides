@@ -1,0 +1,180 @@
+include::{commondir}/common-header.adoc[]
+
+You will use https://www.mongodb.com[MongoDB] for persistence.
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app \
+    --features=mongo-sync,graalvm example.micronaut.micronautguide \
+    --build=@build@ \
+    --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add the `mongo-sync` feature.
+
+include::{commondir}/common-default-package.adoc[]
+
+diffLink:[]
+
+=== POJO
+
+Create `Fruit` POJO:
+
+source:Fruit[]
+
+callout:introspected[1]
+callout:constraints[2]
+<3> Since the POJO does not have an empty constructor, use the annotations `@BsonCreator` and `BsonProperty` to define data conversion between BSON and POJO with the MongoDB Java driver. See https://docs.mongodb.com/drivers/java/sync/current/fundamentals/data-formats/pojo-customization/#pojos-without-no-argument-constructors[POJOs without No-Argument Constructor].
+callout:creator[4]
+
+=== Repository
+
+Create an interface to encapsulate the CRUD actions for `Fruit`. 
+
+source:FruitRepository[]
+
+callout:valid[1]
+
+=== Controller
+
+Create `FruitController`:
+
+source:FruitController[]
+
+callout:controller[number=1,arg0=/fruits]
+callout:executes-on[2]
+callout:constructor-di[number=3,arg0=FruitRepository]
+callout:get[number=4,arg0=list,arg1=/fruits]
+callout:post[number=5,arg0=save,arg1=/fruits]
+callout:valid[6]
+<7> Micronaut controller methods can return reactive types 
+
+=== Configuration
+
+Create a configuration object to encapsulate the MongoDB database name and collection name.
+
+source:MongoDbConfiguration[]
+
+callout:configuration-properties[1]
+
+Define the values via configuration:
+
+resource:application.yml[tag=db]
+
+=== MongoDB repository
+
+Implement `FruitRepository` by using a `MongoClient`
+
+source:MongoDbFruitRepository[]
+
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=MongoDbConfiguration]
+callout:constructor-di[number=3,arg0=MongoClient]
+<4> `MongoClient` methods return reactive sequences. 
+
+By using the feature `mongo-reactive`, the application includes the following dependency:
+
+dependency:micronaut-mongo-reactive[groupId=io.micronaut.mongodb]
+
+It registers a non-blocking reactive streams MongoDB client with https://mongodb.github.io/mongo-java-driver/4.0/apidocs/mongodb-driver-reactivestreams/com/mongodb/reactivestreams/client/MongoClient.html[MongoClient] which you can inject in other Micronaut beans as illustrated in the above code sample. 
+
+=== Test
+
+Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
+
+test:FruitClient[]
+
+By using the feature `mongo-sync`, the application includes the following test dependencies:
+
+:dependencies:
+dependency:junit-jupiter[groupId=org.testcontainers,scope=test]
+dependency:mongodb[groupId=org.testcontainers,scope=test]
+dependency:testcontainers[groupId=org.testcontainers,scope=test]
+:dependencies:
+
+We use https://www.testcontainers.org/modules/databases/mongodb/[Testcontainers MongoDB Module] to test the application.
+
+Create a class to ease the start-up and shutdown of MongoDb with TestContainers.
+
+test:MongoDbUtils[]
+
+Create a test:
+
+test:FruitControllerTest[]
+
+include::{commondir}/common-testApp.adoc[]
+
+== Start MongoDB via Docker
+
+
+You can run MongoDb via docker: 
+
+[source,bash]
+----
+docker run -ti --rm -p 27017:27017 mongo:4.0
+----
+
+The application connects to it thanks to the following configuration:
+
+resource:application.yml[tag=mongodb]
+
+include::{commondir}/common-runapp.adoc[]
+
+[source, bash]
+----
+% curl -d '{"name":"Pear"}' 
+    -H "Content-Type: application/json" 
+    -X POST http://localhost:8080/fruits
+
+% curl -i localhost:8080/fruits                                                                     
+HTTP/1.1 200 OK
+date: Wed, 15 Sep 2021 12:40:15 GMT
+Content-Type: application/json
+content-length: 110
+connection: keep-alive
+
+[{"name":"Pear"}]% 
+----
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Consume the endpoints exposed by the native image with curl:
+
+:exclude-for-languages:
+
+[source, bash]
+----
+% curl -d '{"name":"Pear"}' 
+    -H "Content-Type: application/json" 
+    -X POST http://localhost:8080/fruits
+
+% curl -i localhost:8080/fruits                                                                     
+HTTP/1.1 200 OK
+date: Wed, 15 Sep 2021 12:40:15 GMT
+Content-Type: application/json
+content-length: 110
+connection: keep-alive
+
+[{"name":"Pear"}]% 
+----
+
+include::{commondir}/common-next.adoc[]
+
+== Next steps
+
+Read more about the https://micronaut-projects.github.io/micronaut-mongodb/latest/guide/[integration between Micronaut Framework and MongoDB].
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
+```
