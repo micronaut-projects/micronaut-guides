@@ -17,22 +17,21 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Controller("/fruits") // <1>
+@ExecuteOn(TaskExecutors.IO)  // <2>
 public class FruitController {
 
     private final FruitRepository fruitService;
 
-    public FruitController(FruitRepository fruitService) {  // <2>
+    public FruitController(FruitRepository fruitService) {  // <3>
         this.fruitService = fruitService;
     }
 
-    @ExecuteOn(TaskExecutors.IO)  // <3>
     @Get  // <4>
     public List<Fruit> list() {
         return StreamSupport.stream(fruitService.list().spliterator(), false)
                 .collect(Collectors.toList());
     }
 
-    @ExecuteOn(TaskExecutors.IO)  // <3>
     @Post // <5>
     @Status(HttpStatus.CREATED) // <6>
     public void save(@NonNull @NotNull @Valid Fruit fruit) { // <7>
