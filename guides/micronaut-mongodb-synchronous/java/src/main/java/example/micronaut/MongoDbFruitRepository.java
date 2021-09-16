@@ -2,18 +2,12 @@ package example.micronaut;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
-import org.bson.Document;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Singleton // <1>
 public class MongoDbFruitRepository implements FruitRepository {
@@ -34,8 +28,8 @@ public class MongoDbFruitRepository implements FruitRepository {
 
     @Override
     @NonNull
-    public Iterable<Fruit> list() {
-        return getCollection().find();
+    public List<Fruit> list() {
+        return getCollection().find().into(new ArrayList<>());
     }
     
     @NonNull

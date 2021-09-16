@@ -8,13 +8,9 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Status;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Controller("/fruits") // <1>
 @ExecuteOn(TaskExecutors.IO)  // <2>
@@ -28,8 +24,7 @@ public class FruitController {
 
     @Get  // <4>
     public List<Fruit> list() {
-        return StreamSupport.stream(fruitService.list().spliterator(), false)
-                .collect(Collectors.toList());
+        return fruitService.list();
     }
 
     @Post // <5>

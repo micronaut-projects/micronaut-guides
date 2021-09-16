@@ -4,10 +4,11 @@ import io.micronaut.core.annotation.NonNull;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Iterator;
+import java.util.List;
 
 public interface FruitRepository {
     @NonNull
-    Iterable<Fruit> list();
+    List<Fruit> list();
 
     void save(@NonNull @NotNull @Valid Fruit fruit); // <1>
 }
