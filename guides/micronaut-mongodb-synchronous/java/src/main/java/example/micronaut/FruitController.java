@@ -11,7 +11,10 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Controller("/fruits") // <1>
 public class FruitController {
@@ -25,7 +28,8 @@ public class FruitController {
     @ExecuteOn(TaskExecutors.IO)  // <3>
     @Get  // <4>
     public List<Fruit> list() {
-        return fruitService.list();
+        return StreamSupport.stream(fruitService.list().spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     @ExecuteOn(TaskExecutors.IO)  // <3>

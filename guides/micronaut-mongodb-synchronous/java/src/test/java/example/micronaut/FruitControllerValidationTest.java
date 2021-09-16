@@ -31,7 +31,7 @@ public class FruitControllerValidationTest {
     @Test
     public void testFruitIsValidated() {
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () ->
-                httpClient.toBlocking().exchange(HttpRequest.POST("/fruits", new Fruit(""))));
+                httpClient.toBlocking().exchange(HttpRequest.POST("/fruits",new Fruit("", "Hola"))));
         assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
     }
 
