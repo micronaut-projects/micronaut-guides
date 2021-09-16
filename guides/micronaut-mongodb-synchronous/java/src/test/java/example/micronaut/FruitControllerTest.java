@@ -1,8 +1,9 @@
 package example.micronaut;
 
-import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.runtime.server.EmbeddedServer;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.test.support.TestPropertyProvider;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -10,16 +11,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.TestInstance;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.utility.DockerImageName;
 
-public class FruitControllerTest {
+@MicronautTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class FruitControllerTest implements TestPropertyProvider {
+    static MongoDBContainer mongoDBContainer;
+    @Inject FruitClient fruitClient;
 
     @Test
     void fruitsEndpointInteractsWithMongo() {        
-        EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer.class, 
-            Collections.singletonMap("mongodb.uri", MongoDbUtils.getMongoDbUri()));
-        FruitClient fruitClient = embeddedServer.getApplicationContext()
-            .getBean(FruitClient.class);
-
         List<Fruit> fruits = fruitClient.findAll();
         assertTrue(fruits.isEmpty());
 
@@ -38,7 +43,21 @@ public class FruitControllerTest {
             .filter(f -> f.getDescription() != null && f.getDescription().equals("Keeps the doctor away"))
             .findFirst()
             .isPresent());
-        embeddedServer.close();
-        MongoDbUtils.closeMongoDb();
+    }
+
+    @Override
+    public Map<String, String> getProperties() {
+        mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"))
+                                .withExposedPorts(27017);
+
+        mongoDBContainer.start();
+        return Collections.singletonMap("mongodb.uri", mongoDBContainer.getReplicaSetUrl());
+    }
+
+    @AfterAll
+    static void shutdownMongo() {
+        if (mongoDBContainer != null) {
+            mongoDBContainer.stop();
+        }
     }
 }
