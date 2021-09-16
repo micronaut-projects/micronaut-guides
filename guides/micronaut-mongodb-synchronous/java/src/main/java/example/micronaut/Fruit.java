@@ -4,6 +4,9 @@ import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
 import javax.validation.constraints.NotBlank;
 
 @Introspected // <1>
@@ -11,30 +14,22 @@ public class Fruit {
 
     @NonNull
     @NotBlank // <2>
-    private String name;
+    @BsonProperty("name") // <3>
+    private final String name;
 
     @Nullable
+    @BsonProperty("description") // <3>
     private String description;
 
-    public Fruit() {
-
-    }
-    
     public Fruit(@NonNull String name) {
-        this(name, null);        
-    }
-    
-    @Creator
-    public Fruit(@NonNull String name, @Nullable String description) {
-        this.name = name;
-        this.description = description;
+        this(name, null);
     }
 
-    public void setName(@NonNull String name) {
+    @Creator // <4>
+    @BsonCreator// <3>
+    public Fruit(@NonNull @BsonProperty("name") String name,  // <3>
+                 @Nullable @BsonProperty("description") String description) {  // <3>
         this.name = name;
-    }
-
-    public void setDescription(@Nullable String description) {
         this.description = description;
     }
 
@@ -47,5 +42,4 @@ public class Fruit {
     public String getDescription() {
         return description;
     }
-
 }
