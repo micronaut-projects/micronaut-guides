@@ -256,7 +256,7 @@ class IndexGenerator {
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
             case Category.ORACLE_CLOUD:
-                return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg' // TODO
+                return 'https://micronaut.io/wp-content/uploads/2021/05/Oracle-1.svg'
 
             default:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
