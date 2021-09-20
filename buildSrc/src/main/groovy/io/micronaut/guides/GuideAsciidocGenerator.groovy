@@ -164,7 +164,7 @@ class GuideAsciidocGenerator {
         return rawLines
     }
 
-    static Optional<String> parseFileName(String line, String preffix, String suffix = '.adoc') {
+    private static Optional<String> parseFileName(String line, String preffix, String suffix = '.adoc') {
         if (line.contains(preffix) && line.contains('[')) {
             String name = line.substring(line.indexOf(preffix) + preffix.length(), line.indexOf('['))
             if (!name.endsWith(suffix)) {
@@ -175,7 +175,7 @@ class GuideAsciidocGenerator {
         Optional.empty()
     }
 
-    static Optional<Integer> parseNumber(String rawLine) {
+    private static Optional<Integer> parseNumber(String rawLine) {
         if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
             String number = extractFromParametersLine(rawLine, 'number')
             try {
@@ -183,14 +183,12 @@ class GuideAsciidocGenerator {
                     return Optional.of(Integer.valueOf(number))
                 }
                 return Optional.of(Integer.valueOf(rawLine.substring(rawLine.indexOf('[') + '['.length(), rawLine.indexOf(']'))))
-            } catch(NumberFormatException e) {
-
-            }
+            } catch(NumberFormatException ignored) {}
         }
         Optional.empty()
     }
 
-    static List<String> commonLines(File destinationFolder, String commonFileName) {
+    private static List<String> commonLines(File destinationFolder, String commonFileName) {
         File commonFile = Paths.get(destinationFolder.absolutePath, "../common/$commonFileName").toFile()
         assert commonFile.exists()
         return expandAllCommonIncludes(commonFile.readLines(), destinationFolder)
