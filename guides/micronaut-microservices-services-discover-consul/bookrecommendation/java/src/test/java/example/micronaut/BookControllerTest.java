@@ -1,7 +1,8 @@
 package example.micronaut;
 
+import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.client.StreamingHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -18,15 +19,13 @@ public class BookControllerTest {
 
     @Inject
     @Client("/")
-    StreamingHttpClient client;
+    HttpClient client;
 
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     @Test
     public void testRetrieveBooks() {
-        List<BookRecommendation> books = Flux
-                .from(client.jsonStream(HttpRequest.GET("/books"), BookRecommendation.class))
-                .collectList()
-                .block();
+        List<BookRecommendation> books = client.toBlocking()
+                .retrieve(HttpRequest.GET("/books"), Argument.listOf(BookRecommendation.class));
         assertEquals(1, books.size());
         assertEquals("Building Microservices", books.get(0).getName());
     }

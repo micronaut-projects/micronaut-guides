@@ -1,11 +1,11 @@
 package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.StreamingHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
-import reactor.core.publisher.Flux
+import io.micronaut.core.type.Argument
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 
@@ -14,15 +14,12 @@ class BookControllerSpec extends Specification {
 
     @Inject
     @Client("/")
-    StreamingHttpClient client
+    HttpClient client
 
     @IgnoreIf({env['CI'] as boolean})
     void "retrieve books"() {
         when:
-        List<BookRecommendation> books = Flux
-                .from(client.jsonStream(HttpRequest.GET("/books"), BookRecommendation))
-                .collectList()
-                .block()
+        List<BookRecommendation> books = client.toBlocking().retrieve(HttpRequest.GET("/books"), Argument.listOf(BookRecommendation))
 
         then:
         books.size() == 1
