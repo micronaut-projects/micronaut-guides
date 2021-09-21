@@ -8,5 +8,5 @@ import io.micronaut.http.annotation.Get
 class HelloController {
 
     @Get(produces = [MediaType.TEXT_PLAIN])
-    fun index() = "Micronaut Framework on Oracle Cloud"
+    fun index() = "the Micronaut framework on Oracle Cloud"
 }
