@@ -11,9 +11,9 @@ import jakarta.inject.Singleton
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 
-@Named("linkedin")
-@Singleton
-class LinkedInOauthAuthenticationMapper(private val linkedInApiClient: LinkedInApiClient) : OauthAuthenticationMapper {
+@Named("linkedin") // <1>
+@Singleton // <2>
+class LinkedInOauthAuthenticationMapper(private val linkedInApiClient: LinkedInApiClient) : OauthAuthenticationMapper {  // <3>
 
     override fun createAuthenticationResponse(tokenResponse: TokenResponse,
                                               @Nullable state: State): Publisher<AuthenticationResponse> =

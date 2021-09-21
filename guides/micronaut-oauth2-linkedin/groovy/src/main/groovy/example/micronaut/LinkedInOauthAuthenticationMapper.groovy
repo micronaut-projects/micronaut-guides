@@ -14,13 +14,13 @@ import reactor.core.publisher.Mono
 import static io.micronaut.http.HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER
 
 @CompileStatic
-@Named('linkedin')
-@Singleton
+@Named('linkedin') // <1>
+@Singleton // <2>
 class LinkedInOauthAuthenticationMapper implements OauthAuthenticationMapper {
 
     private final LinkedInApiClient linkedInApiClient
 
-    LinkedInOauthAuthenticationMapper(LinkedInApiClient linkedInApiClient) {
+    LinkedInOauthAuthenticationMapper(LinkedInApiClient linkedInApiClient) { // <3>
         this.linkedInApiClient = linkedInApiClient
     }
 

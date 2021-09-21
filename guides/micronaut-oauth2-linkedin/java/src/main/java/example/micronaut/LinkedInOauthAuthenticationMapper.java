@@ -16,13 +16,13 @@ import java.util.Map;
 
 import static io.micronaut.http.HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER;
 
-@Named("linkedin")
-@Singleton
+@Named("linkedin") // <1>
+@Singleton // <2>
 public class LinkedInOauthAuthenticationMapper implements OauthAuthenticationMapper {
 
     private final LinkedInApiClient linkedInApiClient;
 
-    public LinkedInOauthAuthenticationMapper(LinkedInApiClient linkedInApiClient) {
+    public LinkedInOauthAuthenticationMapper(LinkedInApiClient linkedInApiClient) { // <3>
         this.linkedInApiClient = linkedInApiClient;
     }
 
