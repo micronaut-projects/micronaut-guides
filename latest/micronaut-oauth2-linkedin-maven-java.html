@@ -137,8 +137,9 @@
 <ul class="sectlevel2">
 <li><a href="#views">5.1. Views</a></li>
 <li><a href="#home">5.2. Home</a></li>
-<li><a href="#oauth-2-0-configuration">5.3. OAuth 2.0 Configuration</a></li>
-<li><a href="#user-details-mapper">5.4. User Details Mapper</a></li>
+<li><a href="#oauth-2-0-authorization-code-grant-flow">5.3. OAuth 2.0 authorization code grant flow</a></li>
+<li><a href="#oauth-2-0-configuration">5.4. OAuth 2.0 Configuration</a></li>
+<li><a href="#oauth-2-0-details-mapper">5.5. OAuth 2.0 Details Mapper</a></li>
 </ul>
 </li>
 <li><a href="#running-the-application">6. Running the Application</a></li>
@@ -420,7 +421,18 @@ injects into the model a <code>security</code> map with the authenticated user. 
 </div>
 </div>
 <div class="sect2">
-<h3 id="oauth-2-0-configuration">5.3. OAuth 2.0 Configuration</h3>
+<h3 id="oauth-2-0-authorization-code-grant-flow">5.3. OAuth 2.0 authorization code grant flow</h3>
+<div class="paragraph">
+<p>Here is a high level diagram of how the authorization code grant flow works with an OAuth 2.0 provider such as LinkedIn.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/standard-oauth.svg" alt="standard oauth">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oauth-2-0-configuration">5.4. OAuth 2.0 Configuration</h3>
 <div class="paragraph">
 <p>Add the following OAuth2 Configuration:</p>
 </div>
@@ -507,15 +519,7 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="user-details-mapper">5.4. User Details Mapper</h3>
-<div class="paragraph">
-<p>Here is a high level diagram of how the authorization code grant flow works with an OAuth 2.0 provider such as LinkedIn.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/standard-oauth.svg" alt="standard oauth">
-</div>
-</div>
+<h3 id="oauth-2-0-details-mapper">5.5. OAuth 2.0 Details Mapper</h3>
 <div class="paragraph">
 <p>We need an HTTP Client to retrieve the user info. Create a POJO to represent a LinkedIn user:</p>
 </div>
@@ -622,6 +626,71 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
       <span class="key">linkedin</span>:
         <span class="key">url</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.linkedin.com</span><span class="delimiter">&quot;</span></span></code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Create an implementation of <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/oauth2/endpoint/token/response/OauthAuthenticationMapper.html">OauthAuthenticationMapper</a>. The implementation must be qualified by a name that matches the name present in the client configuration. The value specified in the client configuration is <code>linkedin</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/LinkedInOauthAuthenticationMapper.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.util.CollectionUtils</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.authorization.state.State</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.OauthAuthenticationMapper</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.TokenResponse</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Named</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
+
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER</span>;
+
+<span class="annotation">@Named</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">linkedin</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">LinkedInOauthAuthenticationMapper</span> <span class="directive">implements</span> OauthAuthenticationMapper {
+
+    <span class="directive">private</span> <span class="directive">final</span> LinkedInApiClient linkedInApiClient;
+
+    <span class="directive">public</span> LinkedInOauthAuthenticationMapper(LinkedInApiClient linkedInApiClient) { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.linkedInApiClient = linkedInApiClient;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; createAuthenticationResponse(TokenResponse tokenResponse,
+                                                                          <span class="annotation">@Nullable</span> State state) {
+        <span class="keyword">return</span> Mono.from(linkedInApiClient.me(AUTHORIZATION_PREFIX_BEARER + <span class="string"><span class="delimiter">'</span><span class="content"> </span><span class="delimiter">'</span></span> + tokenResponse.getAccessToken()))
+                .map(linkedMe -&gt; {
+                    <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; attributes = CollectionUtils.mapOf(
+                            <span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>, linkedMe.getLocalizedFirstName(),
+                            <span class="string"><span class="delimiter">&quot;</span><span class="content">lastName</span><span class="delimiter">&quot;</span></span>, linkedMe.getLocalizedLastName());
+                    <span class="predefined-type">String</span> username = linkedMe.getId();
+                    <span class="keyword">return</span> AuthenticationResponse.success(username, <span class="predefined-type">Collections</span>.emptyList(), attributes);
+                });
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Declare <code>@Named</code> at the class level of a bean to explicitly define the name of the bean.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use constructor injection to inject a bean of type <code>LinkedInApiClient</code></td>
+</tr>
+</table>
 </div>
 </div>
 </div>
