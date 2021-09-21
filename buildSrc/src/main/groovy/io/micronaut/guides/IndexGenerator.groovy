@@ -11,12 +11,13 @@ import java.nio.file.Paths
 
 @CompileStatic
 class IndexGenerator {
+
     private static final String DEFAULT_CARD = "micronauttwittercard.png";
+    private static final String DEFAULT_INTRO = "Step by Step tutorials to learn the Micronaut Framework"
+    private static final String DEFAULT_TITLE = "Micronaut Guides"
     private static final String GUIDES_URL = "https://guides.micronaut.io"
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
-    public static final String DEFAULT_TITLE = "Micronaut Guides"
-    public static final String DEFAULT_INTRO = "Step by Step tutorials to learn the Micronaut Framework"
 
     static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
