@@ -4,7 +4,7 @@ import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.StreamingHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
@@ -18,7 +18,7 @@ class GithubControllerSpec extends Specification {
 
     @Inject
     @Client("/")
-    StreamingHttpClient client // <2>
+    HttpClient client // <2>
 
     @Shared
     List<String> expectedReleases = ["Micronaut 2.5.0", "Micronaut 2.4.4", "Micronaut 2.4.3"]
@@ -47,8 +47,7 @@ class GithubControllerSpec extends Specification {
         when:
         HttpRequest request = HttpRequest.GET('/github/releases-lowlevel')
 
-        Publisher<GithubRelease> githubReleaseStream = client.jsonStream(request, GithubRelease) // <7>
-        Iterable<GithubRelease> githubReleases = Flux.from(githubReleaseStream).toIterable()
+        List<GithubRelease> githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease)) // <7>
 
         then:
         for (String name : expectedReleases) {
