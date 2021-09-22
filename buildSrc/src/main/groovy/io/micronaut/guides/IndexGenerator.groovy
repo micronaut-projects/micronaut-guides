@@ -16,7 +16,7 @@ class IndexGenerator {
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
     public static final String DEFAULT_TITLE = "Micronaut Guides"
-    public static final String DEFAULT_INTRO = "Step by Step tutorials to learn the Micronaut framework"
+    public static final String DEFAULT_INTRO = "Step-by-step tutorials to learn the Micronaut framework"
 
     static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
