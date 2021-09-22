@@ -55,7 +55,7 @@ class GithubControllerTest {
         //when:
         HttpRequest<Object> request = HttpRequest.GET("/github/releases-lowlevel");
 
-        List<GithubRelease> githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease.class));
+        List<GithubRelease> githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease.class)); // <7>
 
         //then:
         for (String name : expectedReleases) {
