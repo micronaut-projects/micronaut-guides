@@ -1176,11 +1176,11 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.StreamingHttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
 <span class="keyword">import</span> <span class="include">spock.lang.IgnoreIf</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 
@@ -1189,15 +1189,12 @@ If you have an existing Micronaut application and want to add the functionality 
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    StreamingHttpClient client
+    HttpClient client
 
     <span class="annotation">@IgnoreIf</span>({env[<span class="string"><span class="delimiter">'</span><span class="content">CI</span><span class="delimiter">'</span></span>] <span class="keyword">as</span> <span class="type">boolean</span>})
     <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">retrieve books</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;BookRecommendation&gt; books = Flux
-                .from(client.jsonStream(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>), BookRecommendation))
-                .collectList()
-                .block()
+        <span class="predefined-type">List</span>&lt;BookRecommendation&gt; books = client.toBlocking().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>), Argument.listOf(BookRecommendation))
 
         <span class="key">then</span>:
         books.size() == <span class="integer">1</span>

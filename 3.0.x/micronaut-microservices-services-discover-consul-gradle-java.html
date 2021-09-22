@@ -1263,8 +1263,9 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.StreamingHttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
@@ -1281,15 +1282,13 @@ If you have an existing Micronaut application and want to add the functionality 
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    StreamingHttpClient client;
+    HttpClient client;
 
     <span class="annotation">@DisabledIfEnvironmentVariable</span>(named = <span class="string"><span class="delimiter">&quot;</span><span class="content">CI</span><span class="delimiter">&quot;</span></span>, matches = <span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span>)
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testRetrieveBooks() {
-        <span class="predefined-type">List</span>&lt;BookRecommendation&gt; books = Flux
-                .from(client.jsonStream(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>), BookRecommendation.class))
-                .collectList()
-                .block();
+        <span class="predefined-type">List</span>&lt;BookRecommendation&gt; books = client.toBlocking()
+                .retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>), Argument.listOf(BookRecommendation.class));
         assertEquals(<span class="integer">1</span>, books.size());
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>, books.get(<span class="integer">0</span>).getName());
     }
