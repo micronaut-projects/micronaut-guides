@@ -9,6 +9,6 @@ public class HelloController {
 
     @Get(value = "/", produces = MediaType.TEXT_PLAIN)
     public String index() {
-        return "Micronaut Framework on Azure";
+        return "the Micronaut framework on Azure";
     }
 }
