@@ -1,0 +1,58 @@
+include::{commondir}/common-header.adoc[]
+
+
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+
+== Install Logstash
+
+https://www.elastic.co/logstash/[Logstash]:
+
+____
+Logstash is a free and open server-side data processing pipeline that ingests data from a multitude of sources, transforms it, and then sends it to your favorite "stash."
+____
+
+* https://www.elastic.co/downloads/logstash[Download and unzip Logstash]
+* Prepare a https://www.elastic.co/guide/en/logstash/current/configuration.html[`logstash.conf` config file]
+* Run `bin/logstash -f logstash.conf`
+
+
+include::{commondir}/common-create-app.adoc[]
+
+=== Logstash Logback Encoder
+
+Add https://github.com/logstash/logstash-logback-encoder[logstash-logback-encoder] dependency -  a Logback encoder which will output events as Logstash-compatible JSON:
+
+dependency:logstash-logback-encoder[groupId=net.logstash.logback,version=@logstash-logback-encoderVersion@]
+
+=== Modify logback.xml
+
+Modify `logback.xml` and add an extra appender:
+
+resource:logback.xml[]
+
+=== Bootstrap
+
+Add a class which logs when then application starts.
+
+source:Bootstrap[]
+
+callout:singleton[1]
+callout:server-startup-event[2]
+
+include::{commondir}/common-runapp.adoc[]
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+TODO describe how you consume the endpoints exposed by the native image with curl
+
+:exclude-for-languages:
+
+include::{commondir}/common-next.adoc[]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
