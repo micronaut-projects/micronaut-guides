@@ -1,7 +1,7 @@
 package example.micronaut;
 
 import example.micronaut.domain.Genre;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;

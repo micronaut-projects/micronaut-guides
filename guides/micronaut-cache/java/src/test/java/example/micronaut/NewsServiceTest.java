@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.Timeout;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Month;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // <1>
-@MicronautTest // <2>
+@MicronautTest(startApplication = false) // <2>
 class NewsServiceTest {
 
     @Inject // <3>

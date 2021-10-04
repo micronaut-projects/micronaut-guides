@@ -1,16 +1,15 @@
 package example.micronaut;
 
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.client.RxHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.security.authentication.UsernamePasswordCredentials;
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest;
 import io.micronaut.security.token.jwt.render.AccessRefreshToken;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-
-import javax.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -21,7 +20,7 @@ class OauthAccessTokenTest {
 
     @Inject
     @Client("/")
-    RxHttpClient client;
+    HttpClient client;
 
     @Inject
     RefreshTokenRepository refreshTokenRepository;
@@ -31,7 +30,7 @@ class OauthAccessTokenTest {
         String username = "sherlock";
 
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(username, "password");
-        HttpRequest request = HttpRequest.POST("/login", creds);
+        HttpRequest<?> request = HttpRequest.POST("/login", creds);
 
         long oldTokenCount = refreshTokenRepository.count();
         BearerAccessRefreshToken rsp = client.toBlocking().retrieve(request, BearerAccessRefreshToken.class);

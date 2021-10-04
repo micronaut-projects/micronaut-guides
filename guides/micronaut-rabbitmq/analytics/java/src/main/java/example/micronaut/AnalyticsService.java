@@ -1,6 +1,6 @@
 package example.micronaut;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,11 +13,7 @@ public class AnalyticsService {
 
     public void updateBookAnalytics(Book book) { // <2>
         bookAnalytics.compute(book, (b, v) -> {
-            if (v == null) {
-                return 1L;
-            } else {
-                return v + 1;
-            }
+            return v == null ? 1L : v + 1;
         });
     }
 

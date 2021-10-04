@@ -6,7 +6,7 @@ import io.micronaut.cache.annotation.CachePut
 import io.micronaut.cache.annotation.Cacheable
 import java.time.Month
 import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton // <1>
 @CacheConfig("headlines") // <2>

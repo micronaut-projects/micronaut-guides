@@ -1,16 +1,16 @@
 plugins {
     id "java-gradle-plugin"
     id 'groovy'
+    id 'nu.studer.rocker' version '3.0.2'
 }
 
 ext {
-    micronautVersion = new File("${projectDir}/../version.txt").text.trim()
-    micronautDocsVersion='1.0.25'
+    micronautVersion = new File(projectDir, "../version.txt").text.trim()
+    micronautDocsVersion = '1.0.25'
 }
 
 repositories {
     mavenCentral()
-    jcenter()
     maven { url "https://repo.grails.org/grails/core" }
     maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
 }
@@ -25,5 +25,23 @@ dependencies {
     implementation("org.apache.commons:commons-compress:1.20")
     implementation "io.micronaut.docs:micronaut-docs-asciidoc-extensions:$micronautDocsVersion", {
         exclude group: "org.codehaus.groovy"
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/generated/rocker'
+        }
+    }
+}
+
+rocker {
+    configurations {
+        main {
+            templateDir = file('src/main/java')
+            outputDir = file('src/generated/rocker')
+            optimize = true
+        }
     }
 }

@@ -8,8 +8,8 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
-
-import javax.inject.Inject
+import spock.lang.IgnoreIf
+import jakarta.inject.Inject
 
 @MicronautTest
 class BookControllerSpec extends Specification {
@@ -18,6 +18,7 @@ class BookControllerSpec extends Specification {
     @Client("/")
     HttpClient client
 
+    @IgnoreIf({env['CI'] as boolean})
     void "retrieve books"() {
         when:
         HttpResponse response = client.toBlocking().exchange(HttpRequest.GET("/books"), Argument.listOf(BookRecommendation))

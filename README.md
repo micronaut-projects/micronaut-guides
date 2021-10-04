@@ -1,5 +1,8 @@
-[Micronaut Guides](https://guides.micronaut.io)
+[Micronaut Guides](https://guides.micronaut.io) or [Guides Index](https://guides.micronaut.io/latest/)
 
+--- 
+
+## Working on a single guide 
 
 To work on a single guide use the system property `micronaut.guide`
 
@@ -9,19 +12,21 @@ E.g.
 %> ./gradlew -Dmicronaut.guide=micronaut-oauth2-github build
 ````
 
----- 
-To create a new guide create a new asciidoc file under `src/docs/guides` with the following template: 
+----
+
+## Examples
+
+See examples of guides in the `guides` folder.
+
+----
+
+## New Guide Template
+
+To create a new guide create a new asciidoc file under `src/guides` with the following template: 
+ 
 
 ```asciidoc
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -63,3 +68,10 @@ TODO: link to the documentation modules you used in the guide
 
 include::{commondir}/common-helpWithMicronaut.adoc[]
 ```
+
+----
+
+## Deployment
+
+Guides are published to [gh-pages](https://pages.github.com).
+

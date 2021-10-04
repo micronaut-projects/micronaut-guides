@@ -4,8 +4,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.runtime.Micronaut
 import io.micronaut.runtime.server.event.ServerStartupEvent
-
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @CompileStatic
 @Singleton // <1>
@@ -18,7 +17,7 @@ class Application implements ApplicationEventListener<ServerStartupEvent> {  // 
     }
 
     static void main(String[] args) {
-        Micronaut.run(Application.class)
+        Micronaut.run(Application, args)
     }
 
     @Override

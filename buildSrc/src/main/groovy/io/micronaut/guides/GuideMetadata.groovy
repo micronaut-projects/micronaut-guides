@@ -24,11 +24,17 @@ class GuideMetadata {
     boolean skipGradleTests
     boolean skipMavenTests
 
+    Integer minimumJavaVersion
+
+    List<String> zipIncludes
+
     List<App> apps
 
     static class App {
         ApplicationType applicationType
         String name
         List<String> features
+        List<String> excludeSource
+        List<String> excludeTest
     }
 }

@@ -12,13 +12,9 @@ class LoginAuthController {
 
     @Get("/auth") // <3>
     @View("auth") // <4>
-    fun auth(): Map<String, Any> {
-        return HashMap()
-    }
+    fun auth(): Map<String, Any> = mutableMapOf()
 
     @Get("/authFailed") // <5>
     @View("auth") // <4>
-    fun authFailed(): Map<String, Any> {
-        return mapOf(Pair("errors", true))
-    }
+    fun authFailed(): Map<String, Any> = mutableMapOf("errors" to true)
 }

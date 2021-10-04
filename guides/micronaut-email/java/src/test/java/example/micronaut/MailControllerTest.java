@@ -5,12 +5,12 @@ import io.micronaut.context.annotation.Property;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.RxHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +25,7 @@ class MailControllerTest {
 
     @Inject
     @Client("/")
-    RxHttpClient client; // <4>
+    HttpClient client; // <4>
 
     @Test
     public void mailsendInteractsOnceEmailService() {
@@ -35,9 +35,6 @@ class MailControllerTest {
         cmd.setTextBody("Hola hola");
 
         HttpRequest<EmailCmd> request = HttpRequest.POST("/mail/send", cmd); // <5>
-        Collection<EmailService> emailServices = applicationContext.getBeansOfType(EmailService.class);
-        assertEquals(1, emailServices.size());
-
         EmailService emailService = applicationContext.getBean(EmailService.class);
         assertTrue(emailService instanceof MockEmailService);
 

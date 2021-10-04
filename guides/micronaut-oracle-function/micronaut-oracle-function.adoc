@@ -1,0 +1,533 @@
+include::{commondir}/common-header.adoc[]
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+* JDK 11 or greater installed with `JAVA_HOME` configured appropriately
+* Docker installed
+* A paid or free trial Oracle Cloud account (create an account at https://signup.oraclecloud.com[signup.oraclecloud.com])
+* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the App
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app --features=graalvm,oracle-function example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the `graalvm` and `oracle-function` features.
+
+include::{commondir}/common-default-package.adoc[]
+
+diffLink:[]
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+The generated application contains a `Function` class with a simple Oracle Cloud API call to retrieve the tenancy OCID from the injected `TenancyIdProvider` bean. That will be sufficient to ensure that the deployed function works correctly:
+
+source:Function[]
+
+<1> This is needed because Project.fn invokes the function handler via reflection
+
+include::{commondir}/common-testApp.adoc[]
+
+== Configuring Oracle Cloud Resources
+
+We need to configure some cloud infrastructure to support deploying functions.
+
+First, login to your Oracle Cloud tenancy as an administrator, or a user with sufficient permissions to create the infrastructure described below.
+
+=== Compartment
+
+Use an existing compartment to create your function in, or create a new one by opening the Oracle Cloud Menu and clicking "Identity & Security", and then "Compartments"
+
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingcompartment.htm[Compartments docs] for more information.
+
+=== Function user and group
+
+Create a group for Oracle Functions users by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Groups":
+
+image::oraclefn/user1.png[]
+
+Click "Create Group":
+
+image::oraclefn/user2.png[]
+
+Choose a name and a description, e.g. "mn-function-group", and click "Create":
+
+image::oraclefn/user3.png[]
+
+Create a user by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Users":
+
+image::oraclefn/user4.png[]
+
+Click "Create User":
+
+image::oraclefn/user5.png[]
+
+Choose a name and a description, e.g. "mn-function-user", and click "Create":
+
+image::oraclefn/user6.png[]
+
+Scroll down and click "Add User to Group":
+
+image::oraclefn/user7.png[]
+
+Select the group you created and click "Add":
+
+image::oraclefn/user8.png[]
+
+You'll need an auth token to authenticate to the container registry that will contain the Docker images for your functions. Click "Auth Tokens" and then "Generate Token":
+
+image::oraclefn/user9.png[]
+
+Enter a name for the token, e.g. "mn-ocir", and click "Generate Token":
+
+image::oraclefn/user10.png[]
+
+Copy the token to the clipboard and save it for later:
+
+image::oraclefn/user11.png[]
+
+You will need a password to login as this user, so click the "Create/Reset Password" button:
+
+image::oraclefn/user12.png[]
+
+and then click the "Create/Reset Password" button in the dialog:
+
+image::oraclefn/user13.png[]
+
+Click the "Copy" link and save the generated password for later.
+
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm[Groups and Users docs] for more information.
+
+=== Oracle Cloud Infrastructure Registry (OCIR) repository
+
+Your function will be deployed as a Docker image, so you need to choose a repo name in your tenancy. The repo will be created for you the first time you push an image to it.
+
+The name can be simple, e.g. "mn-functions", or you can add a path prefix to help group the repos when there are many of them, e.g. "my-username/my-repo/mn-functions"
+
+Update your build script with the location to deploy the Docker container.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` and replace `REGION`, `TENANCY`, and `REPO` with appropriate values:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuild {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name:$project.version"]
+}
+----
+
+For `REGION`, use the lowercase value from the "Region Key" column in https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm[Regions and Availability Domains], e.g. `iad`.
+
+For `TENANCY`, use the Object Storage namespace string of the tenancy (as shown on the Tenancy Information page), e.g. `my-tenancy`.
+
+For `REPO`, use the name of the repository to use, e.g. `mn-functions` (or `my-username/my-repo/mn-functions`).
+
+The final value should look something like this:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuild {
+    images = ["iad.ocir.io/my-tenancy/mn-functions/$project.name:$project.version"]
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Edit `pom.xml` and add these three properties in the `<properties>` section, replacing `REGION`, `TENANCY`, and `REPO` with appropriate values:
+
+[source, xml]
+.pom.xml
+----
+<exec.mainClass>example.micronaut.Function</exec.mainClass>
+
+<jib.docker.image>[REGION].ocir.io/[TENANCY]/[REPO]/${project.artifactId}</jib.docker.image>
+
+<jib.docker.tag>${project.version}</jib.docker.tag>
+----
+
+For `REGION`, use the lowercase value from the "Region Key" column in https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm[Regions and Availability Domains], e.g. `iad`.
+
+For `TENANCY`, use the Object Storage namespace string of the tenancy (as shown on the Tenancy Information page), e.g. `my-tenancy`.
+
+For `REPO`, use the name of the repository to use, e.g. `mn-functions` (or `my-username/my-repo/mn-functions`).
+
+The final properties should look something like this:
+
+[source, xml]
+.pom.xml
+----
+<exec.mainClass>example.micronaut.Function</exec.mainClass>
+
+<jib.docker.image>iad.ocir.io/my-tenancy/mn-functions/${project.artifactId}</jib.docker.image>
+
+<jib.docker.tag>${project.version}</jib.docker.tag>
+----
+
+:exclude-for-build:
+
+=== OCIR authentication
+
+Login to OCIR by running:
+
+[source, bash]
+----
+docker login <region-key>.ocir.io
+----
+
+Replace `<region-key>` with the value you used for `REGION` above, e.g. `iad.ocir.io`.
+
+For the username, enter <tenancy-namespace>/<username>, e.g. `my-tenancy/mn-function-user`. If your tenancy is federated with Oracle Identity Cloud Service, use the format `<tenancy-namespace>/oracleidentitycloudservice/<username>`.
+
+For the password, use the auth token you copied earlier.
+
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionslogintoocir.htm#Log_in_to_Oracle_Cloud_Infrastructure_Registry[OCIR login] docs for more information.
+
+=== Virtual Cloud Network (VCN) and Subnet
+
+If you have a suitable VCN and subnet you can use those, or create new ones.
+
+To create a VCN, open the Oracle Cloud Menu and click "Networking", then "Virtual Cloud Networks":
+
+image::oraclefn/vcn1.png[]
+
+Click "Start VCN Wizard":
+
+image::oraclefn/vcn2.png[]
+
+Select "VCN with Internet Connectivity" and click "Start VCN Wizard":
+
+image::oraclefn/vcn3.png[]
+
+Enter a name for the VCN, e.g. "mn-functions-vcn", and change the CIDR block values if needed:
+
+image::oraclefn/vcn4.png[]
+
+Review the settings and click "Create":
+
+image::oraclefn/vcn5.png[]
+
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingvcn.htm[VCN and Subnets] docs for more information.
+
+=== Policies
+
+We'll need to create some policies to grant various function-related permissions.
+
+Open the Oracle Cloud Menu and click "Identity & Security", and then "Policies":
+
+image::oraclefn/policy1.png[]
+
+Select the root compartment from the drop-down and click "Create Policy":
+
+image::oraclefn/policy2.png[]
+
+Choose a name and description, e.g. "mn-functions-root-policy", and click "Show Manual Editor". Copy the following and paste it into the "Policy Builder" field, replacing "<group-name>" with the name of the group created earlier (e.g. "mn-function-group") and "<compartment-name>" with the name of the compartment you're using, and click "Create":
+
+[source]
+----
+Allow group <group-name> to manage repos in tenancy
+Allow group <group-name> to read objectstorage-namespaces in tenancy
+Allow group <group-name> to manage logging-family in compartment <compartment-name>
+----
+
+image::oraclefn/policy3.png[]
+
+Create another policy in the compartment where your function will be and choose a name and description, e.g. "mn-functions-compartment-policy". Copy the following and paste it into the "Policy Builder" field, again replacing "<group-name>" and "<compartment-name>", and click "Create":
+
+[source]
+----
+Allow group <group-name> to manage functions-family in compartment <compartment-name>
+Allow group <group-name> to read metrics in compartment <compartment-name>
+Allow group <group-name> to use virtual-network-family in compartment <compartment-name>
+Allow group <group-name> to use apm-domains in compartment <compartment-name>
+Allow service faas to use apm-domains in compartment <compartment-name>
+----
+
+image::oraclefn/policy4.png[]
+
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingpolicies.htm[Policies] docs for more information.
+
+== Creating the function
+
+First we'll need to build the function as a Docker image and push it to the OCIR repository.
+
+From the demo project directory, run:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerPush
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw deploy -Dpackaging=docker
+----
+
+:exclude-for-build:
+
+Once you've pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.
+
+Open the Oracle Cloud Menu and click "Developer Services", and then "Applications" under "Functions":
+
+image::oraclefn/function1.png[]
+
+Click "Create Application":
+
+image::oraclefn/function2.png[]
+
+Choose a name for the application, e.g. "mn-guide-function-app", and select the VCN created earlier. Select the private subnet, and click "Create":
+
+image::oraclefn/function3.png[]
+
+Click "Functions" (under "Resources") in the lower left, and then click "Create Function":
+
+image::oraclefn/function4.png[]
+
+Choose a name for the function, e.g. "mn-guide-function", select the repository where you pushed the Docker image, and select the uploaded image. Select 512MB memory and click "Create":
+
+image::oraclefn/function5.png[]
+
+Click the function link in the list, and click the "Copy" link in the OCID row; you'll need the OCID of the function to invoke the function:
+
+image::oraclefn/function6.png[]
+
+== Enable Tracing and Logs
+
+Open the Oracle Cloud Menu and click "Observability & Management", and then "Administration" under "Application Performance...":
+
+image::oraclefn/logs1.png[]
+
+Click "Create APM Domain":
+
+image::oraclefn/logs2.png[]
+
+Choose a name and description, e.g. "mn-function-apm", the compartment (and optionally check "Create as Always Free Domain"), then click "Create":
+
+image::oraclefn/logs3.png[]
+
+Navigate back to the function application page and click "Logs" (under "Resources") in the lower left:
+
+image::oraclefn/logs4.png[]
+
+Click the slider to enable logs, then choose the compartment to store them in, a log group, a log name, and the retention policy, and click "Enable Log":
+
+image::oraclefn/logs5.png[]
+
+Next, click "Traces" in the lower left:
+
+image::oraclefn/logs6.png[]
+
+Click "Configure", then choose the compartment, and the APM domain created earlier, and click "Enable Trace":
+
+image::oraclefn/logs7.png[]
+
+Finally, navigate to the application's function page and click the button to enable function tracing:
+
+image::oraclefn/logs8.png[]
+
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsexportingfunctionlogfiles.htm[Logging] and https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionstracing.htm[Tracing] docs for more information.
+
+== Invoking the function
+
+We'll use the OCI command line to invoke the function. If you haven't already, install the https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] and run `oci setup config`.
+
+Run the following, replacing `<OCID>` with the OCID of the function you copied above:
+
+[source, bash]
+----
+oci fn function invoke --function-id <OCID> --file "-" --body ""
+----
+
+The output should look something like:
+
+[source, bash]
+----
+Your tenancy is: ocid1.tenancy.oc1..aaaaaaaaud4g4e5ovjawn5cij7ke.................
+----
+
+The first invocation ("cold start") will take a while as the infrastructure is configured, probably 10-20 seconds or more but subsequent invocations should return in 1-2 seconds.
+
+:exclude-for-languages:groovy
+
+== Deploying as a Native Image
+
+=== Install GraalVM
+
+include::{commondir}/common-install-graal-function.adoc[]
+
+=== Building and deploying the native image
+
+Deploying the function as a native image is similar to the earlier deployment above.
+
+First you need to update your build script with the location to deploy the native image Docker container.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` like before, but set the `images` property in the `dockerBuildNative` block this time, replacing `REGION`, `TENANCY`, and `REPO` as before:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuildNative {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name-native:$project.version"]
+}
+----
+
+Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuildNative {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name:$project.version"]
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo. If you wish to separate the native image containers, edit `pom.xml` and update the `jib.docker.image` property, appending "-native" to the value:
+
+[source, xml]
+.pom.xml
+----
+<jib.docker.image>[REGION].ocir.io/[TENANCY]/[REPO]/${project.artifactId}-native</jib.docker.image>
+----
+
+:exclude-for-build:
+
+Next, update the version.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` and increment the version to `0.2`:
+
+[source, groovy]
+.build.gradle
+----
+version = "0.2"
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Edit `pom.xml` and increment the version to `0.2`:
+
+[source, xml]
+.pom.xml
+----
+<version>0.2</version>
+----
+
+:exclude-for-build:
+
+Depending on the Micronaut version you're using, you might also need to update some properties in your build script to update the Docker configuration.
+
+:exclude-for-build:maven
+
+In your `build.gradle`, if the `nativeImage` block includes `--static` in the `args` list, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in the `dockerfileNative` block:
+
+[source, groovy]
+.build.gradle
+----
+nativeImage {
+    args("-H:+StaticExecutableWithDynamicLibC",
+         "-Dfn.handler=example.micronaut.Function::handleRequest",
+         "--initialize-at-build-time=example.micronaut")
+}
+
+dockerfileNative {
+    args("-XX:MaximumHeapSizePercent=80")
+    buildStrategy.set(ORACLE_FUNCTION)
+    defaultCommand.set("example.micronaut.Function::handleRequest")
+    baseImage('frolvlad/alpine-glibc:alpine-3.12')
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+In your `pom.xml`, if the `nativeImageBuildArgs` block in the configuration section of the `micronaut-maven-plugin` plugin includes an `arg` with value `--static`, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in a new `baseImageRun` element:
+
+[source, xml]
+.pom.xml
+----
+<plugin>
+  <groupId>io.micronaut.build</groupId>
+  <artifactId>micronaut-maven-plugin</artifactId>
+  <configuration>
+    <baseImageRun>frolvlad/alpine-glibc:alpine-3.12</baseImageRun>
+    <nativeImageBuildArgs>
+      <arg>-H:+StaticExecutableWithDynamicLibC</arg>
+      <arg>-Dfn.handler=${exec.mainClass}::handleRequest</arg>
+      <arg>--initialize-at-build-time=example.micronaut</arg>
+    </nativeImageBuildArgs>
+    <appArguments>
+      <arg>${exec.mainClass}::handleRequest</arg>
+    </appArguments>
+  </configuration>
+</plugin>
+----
+
+:exclude-for-build:
+
+Then from the demo project directory, run:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerPushNative
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw deploy -Dpackaging=docker-native
+----
+
+:exclude-for-build:
+
+Once you've pushed the Docker container, edit the function in the console to use the new container, and to reduce the memory to 128MB:
+
+image::oraclefn/function7.png[]
+
+Use the same OCI command as before to invoke the function. No changes are needed because the function OCID doesn't change when deploying new containers.
+
+:exclude-for-languages:
+
+include::{commondir}/common-next.adoc[]
+
+Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud] integration.
+
+Also check out the https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm[Oracle Cloud Function documentation] for more information on the available functionality.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

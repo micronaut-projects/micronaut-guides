@@ -11,7 +11,7 @@ import software.amazon.awssdk.services.ses.model.Destination
 import software.amazon.awssdk.services.ses.model.Message
 import software.amazon.awssdk.services.ses.model.SendEmailRequest
 import software.amazon.awssdk.services.ses.model.SendEmailResponse
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
@@ -39,9 +39,7 @@ class AwsSesMailService(
             )
             .build()
         val response: SendEmailResponse = ses.sendEmail(sendEmailRequest)
-        if (LOG.isInfoEnabled) {
-            LOG.info("Sent email with id: {}", response.messageId())
-        }
+        LOG.info("Sent email with id: {}", response.messageId())
     }
 
     companion object {

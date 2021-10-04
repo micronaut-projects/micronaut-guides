@@ -1,15 +1,8 @@
-= @guideTitle@
+include::{commondir}/common-header-top.adoc[]
 
-@guideIntro@
+== Getting Started
 
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
-
-In this guide, we are going to create three microservices and communicate each other with https://www.rabbitmq.com/[RabbitMQ]
-using the request-response pattern with https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc[RPC]
+In this guide, we will create three microservices that will communicate with each other with https://www.rabbitmq.com/[RabbitMQ] using the request-response pattern with https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc[RPC]
 _(Remote Procedure Call)_.
 
 ____
@@ -18,65 +11,62 @@ and has since been extended with a plug-in architecture to support Streaming Tex
 Message Queuing Telemetry Transport (MQTT), and other protocols.
 ____
 
-
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-== Writing the app
+== Writing the Application
 
-Let's describe the microservices you are going to build through the tutorial.
+Let's describe the microservices you will build through the guide.
 
-* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and isbn.
+* `bookcatalogue` - This returns a list of books. It uses a domain consisting of a book name and an ISBN.
 
-* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and isbn.
+* `bookinventory` - This exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and an ISBN.
 
-* `bookrecommendation` - It consumes previous services and exposes an endpoint which recommends book names which are in stock.
-
+* `bookrecommendation` - This consumes previous services and exposes an endpoint that recommends book names that are in stock.
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
-
-
 === Catalogue microservice
 
-Create the `bookcatalogue` microservice:
+Create the `bookcatalogue` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
-`mn create-app example.micronaut.bookcatalogue`
+[source,bash]
+----
+mn create-app --features=rabbitmq,graalvm example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
+----
 
-The previous command creates a folder named `bookcatalogue, and a Micronaut app inside it with default package:
-`example.micronaut`.
+include::{commondir}/common-build-lang-arguments.adoc[]
 
-Add `rabbitmq` dependency. As we only want to use RabbitMQ to receive requests we can remove Micronaut HTTP client and Server.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq` and `graalvm` features.
 
-dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
+The previous command creates a directory named `bookcatalogue` and a Micronaut application inside it with default package `example.micronaut`.
 
-By default Micronaut will connect to a RabbitMQ instance running on `localhost` so it is not necessary to add anything
-to `application.yml`. In case you want to change the configuration, add the following:
+diffLink:[app=bookcatalogue]
+
+By default, a Micronaut application will connect to a RabbitMQ instance running on `localhost`, so it is not necessary to add anything to `application.yml`. In case you want to change the configuration, add the following:
 
 resource:application.yml[app=bookcatalogue,tag=rabbitmq]
 
+==== Create RabbitMQ exchange, queue, and binding
 
-==== Create RabbitMQ exchange, queue and binding
+Before being able to send and receive messages using RabbitMQ, it is necessary to define the exchange, queue, and binding.
+One option is to create them directly in the RabbitMQ Admin UI available on `http://localhost:15672[http://localhost:15672]`.
+Use `guest` for both username and password.
 
-Before being able to send and receive messages using RabbitMQ it is necessary to define the exchange, queue and binding.
-One option is create them directly in the RabbitMQ Admin UI available on `http://localhost:15672`. Use `guest` for both
-username and password.
-
-Another option is create them programmatically with Micronaut. Create the class `ChannelPoolListener.java`:
+Another option is to create them programmatically. Create the class `ChannelPoolListener.java`:
 
 source:ChannelPoolListener[app=bookcatalogue]
 
-<1> Define an exchange named `micronaut`. From the producer point of view everything is sent to the exchange with the
+<1> Define an exchange named `micronaut`. From the producer point of view, everything is sent to the exchange with the
 appropriate routing key.
 <2> Define a queue named `inventory`. The consumer will listen for messages in that queue.
 <3> Define a binding between the exchange and the queue using the routing key `books.inventory`.
 <4> Define a queue named `catalogue`. The consumer will listen for messages in that queue.
 <5> Define a binding between the exchange and the queue using the routing key `books.catalogue`.
 
-NOTE: In this Catalogue Microservice the only necessary element is the `catalogue` queue, but it is a good practice to define
+NOTE: In this Catalogue Microservice, the only necessary element is the `catalogue` queue, but it is a good practice to define
 all the elements in the same file and share the file between all the projects.
-
 
 ==== Create consumer
 
@@ -85,34 +75,34 @@ Create a `BookCatalogueService` class to handle incoming RPC requests into the `
 source:BookCatalogueService[app=bookcatalogue]
 
 <1> Annotate the class with `@RabbitListener` to indicate that this bean will consume messages from RabbitMQ.
-<2> Annotate the method with `@Queue`. This listener will listen to messages in `catalogue` queue.
+<2> Annotate the method with `@Queue`. This listener will listen to messages in the `catalogue` queue.
 
 The previous service responds a `List<Book>`. Create the `Book` POJO:
 
 source:Book[app=bookcatalogue]
 
-
-
-
 === Inventory microservice
 
-Create the `bookinventory` microservice:
+Create the `bookinventory` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
-`mn create-app example.micronaut.bookinventory`
+[source,bash]
+----
+mn create-app --features=rabbitmq,graalvm example.micronaut.bookinventory --build=@build@ --lang=@lang@
+----
 
-The previous command creates a folder named `bookinventory`, and a Micronaut app inside it with default package :
-`example.micronaut`.
+include::{commondir}/common-build-lang-arguments.adoc[]
 
-Add `rabbitmq` dependency. As we only want to use RabbitMQ to receive requests we can remove Micronaut HTTP client and Server.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq` and `graalvm` features.
 
-dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
+The previous command creates a directory named `bookinventory` and a Micronaut application inside it with default package `example.micronaut`.
 
+diffLink:[app=bookinventory]
+
+The previous command creates a directory named `bookinventory` and a Micronaut application inside it with default package `example.micronaut`.
 
 ==== Create RabbitMQ exchange, queue and binding
 
-As we did in `Catalogue` Microservice, create the class `ChannelPoolListener.java` in `bookinventory/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java`
-with the same content as before.
-
+Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookinventory/src/main/@lang@/example/micronaut/bookcatalogue`.
 
 ==== Create consumer
 
@@ -127,47 +117,43 @@ The previous service uses `BookInventory` POJO. Create it:
 
 source:BookInventory[app=bookinventory]
 
-
-
-
 === Recommendation microservice
 
-Create the `bookrecommendation` microservice:
+Create the `bookrecommendation` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
-`mn create-app example.micronaut.bookrecommendation`
+[source,bash]
+----
+mn create-app --features=rabbitmq,reactor,graalvm example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
+----
 
-The previous command creates a folder named `bookrecommendation`, and a Micronaut app inside it with
-default package: `example.micronaut`.
+include::{commondir}/common-build-lang-arguments.adoc[]
 
-Add `rabbitmq` dependency. In this microservice we will use Micronaut HTTP Server to receive REST request, so it is
-not necessary to remove any dependency.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq`, `reactor`, and `graalvm` features.
 
-dependency:micronaut-rabbitmq[groupId=io.micronaut.rabbitmq]
+The previous command creates a directory named `bookrecommendation` and a Micronaut application inside it with default package `example.micronaut`.
 
+diffLink:[app=bookrecommendation]
 
 ==== Create RabbitMQ exchange, queue and binding
 
-As we did in `Catalogue` Microservice, create the class `ChannelPoolListener.java` in `bookrecommendation/src/main/java/example/micronaut/bookcatalogue/ChannelPoolListener.java`
-with the same content as before.
-
+Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookrecommendation/src/main/java/example/micronaut/bookcatalogue`.
 
 ==== Create clients
 
-Let's create two interfaces to send messages to RabbitMQ. Micronaut will implement the interfaces at compilation time.
+Let's create two interfaces to send messages to RabbitMQ. The Micronaut framework will implement the interfaces at compilation time.
 Create `CatalogueClient.java`:
 
 source:CatalogueClient[app=bookrecommendation]
 
 <1> Send the messages to exchange `micronaut`.
 <2> Set the `replyTo` property to `amq.rabbitmq.reply-to`. This is a special queue that always exists and does not need
-to be created. That it is why we did not create the queue in the `ChannelInitializer`. RabbitMQ uses that queue in a
-special way and setting the value of the property `replyTo` to that queue will enable this call as a RPC one. RabbitMQ
+to be created. That is why we did not create the queue in the `ChannelInitializer`. RabbitMQ uses that queue in a
+special way, and setting the value of the property `replyTo` to that queue will enable this call as an RPC one. RabbitMQ
 will create a temporary queue for the callback.
 <3> Set the routing key.
-<4> Define the method that will "mirror" the one in the consumer. Keep in mind that in the consumer it is not possible to
+<4> Define the method that will "mirror" the one in the consumer. Keep in mind that in the consumer, it is not possible to
 return a reactive type, but on the client side it is. Also, it is necessary to send something, even if it's not
 used in the consumer.
-
 
 Create `InventoryClient.java`:
 
@@ -176,29 +162,24 @@ source:InventoryClient[app=bookrecommendation]
 <1> Send the messages to exchange `micronaut`.
 <2> Set the `replyTo` property to `amq.rabbitmq.reply-to`.
 <3> Set the routing key.
-<4> Define the method that will "mirror" the one in the consumer. As we did with `CatalogueClient` we use a reactive
+<4> Define the method that will "mirror" the one in the consumer. As we did with `CatalogueClient`, we use a reactive
 type to wrap the result.
-
 
 ==== Create the controller
 
-Create a Controller which injects both clients.
+Create a Controller that injects both clients.
 
 source:BookController[app=bookrecommendation]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/books`
+callout:controller[number=1,arg0=/books]
 <2> Clients are injected via constructor injection
-<3> The `@Get` annotation is used to map the index method to an HTTP GET request on `/books`.
+callout:get[number=3,arg0=index,arg1=/books]
 
-
-The previous controller returns a `Flowable<BookRecommendation>`. Create the `BookRecommendation` POJO:
+The previous controller returns a `Publisher<BookRecommendation>`. Create the `BookRecommendation` POJO:
 
 source:BookRecommendation[app=bookrecommendation]
 
-
-
-
-== RabbitMQ and Micronaut
+== RabbitMQ and the Micronaut Framework
 
 === Install RabbitMQ via Docker
 
@@ -214,18 +195,13 @@ docker run --rm -it \
 
 Alternatively you can https://www.rabbitmq.com/download.html[install and run a local RabbitMQ instance].
 
-
-
-== Running the app
-
+== Running the Application
 
 Configure `bookinventory` to run on port 8082:
 
 resource:application.yml[app=bookinventory,tag=port]
 
-
 Run `bookinventory` microservice:
-
 
 :exclude-for-build:maven
 
@@ -249,17 +225,13 @@ bookinventory $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
-
 Configure `bookcatalogue` to run on port 8081:
 
 resource:application.yml[app=bookcatalogue,tag=port]
 
-
 Run `bookcatalogue` microservice:
 
 :exclude-for-build:maven
-
 
 [source,bash]
 ----
@@ -281,14 +253,11 @@ bookcatalogue $ ./mvnw mn:run
 
 :exclude-for-build:
 
-
 Configure `bookrecommendation` to run on port 8080:
 
 resource:application.yml[app=bookrecommendation,tag=port]
 
 NOTE: 8080 is the default port if you don't specify `micronaut.server.port` property
-
-
 
 Run `bookrecommendation` microservice:
 
@@ -322,7 +291,6 @@ $ curl http://localhost:8080/books
 [{"name":"Building Microservices"}]
 ----
 
-
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
@@ -331,8 +299,6 @@ Start the native images for the two microservices and run the same `curl` reques
 
 :exclude-for-languages:
 
+== Next Steps
 
-
-== Next steps
-
-Read more about https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc[RabbitMQ RPC support] inside Micronaut.
+Read more about https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/#rpc[RabbitMQ RPC Support] in the Micronaut framework.

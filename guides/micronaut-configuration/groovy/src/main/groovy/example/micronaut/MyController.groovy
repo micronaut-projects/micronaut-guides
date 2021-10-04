@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 
-import javax.inject.Named
+import jakarta.inject.Named
 
 @CompileStatic
 @Controller("/my")

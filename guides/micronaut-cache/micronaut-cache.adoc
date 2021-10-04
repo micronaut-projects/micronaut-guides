@@ -1,15 +1,8 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
+include::{commondir}/common-header-top.adoc[]
 
 == Getting Started
 
-In this guide, you are going to use Micronaut’s caching annotations to speed up your application.
-
+In this guide, you will use Micronaut caching annotations to speed up your application.
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -19,8 +12,7 @@ include::{commondir}/common-create-app.adoc[]
 
 === Configure the Application
 
-In this sample application, we cache news headlines. Add https://micronaut-projects.github.io/micronaut-cache/latest/guide/index.html[Micronaut Caffeine Cache] dependency
-which adds support for cache using https://github.com/ben-manes/caffeine[Caffeine].
+In this sample application, we cache news headlines. Add https://micronaut-projects.github.io/micronaut-cache/latest/guide/[Micronaut Caffeine Cache] dependency which adds support for cache using https://github.com/ben-manes/caffeine[Caffeine].
 
 dependency:micronaut-cache-caffeine[groupId=io.micronaut.cache]
 
@@ -32,17 +24,17 @@ resource:application.yml[tag=config]
 
 TIP: Check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/configurationreference.html#io.micronaut.cache.caffeine.DefaultCacheConfiguration[properties (`maximum-size`, `expire-after-write` and `expire-after-access`)] to configure the size and expiration of your caches. It is important to keep the caches' size under control.
 
-=== Micronaut Cache Api
+=== Micronaut Cache API
 
 Imagine a service which retrieves headlines for a given month. This operation may be expensive and you may want to cache it.
 
 source:NewsService[]
 
-<1> To register a Singleton in Micronaut’s application context annotate your class with `javax.inject.Singleton`.
+callout:singleton[1]
 <2> Specifies the cache name `headlines` to store cache operation values in.
-<3> Indicates a method is cacheable. The cache name `headlines` specified in `@CacheConfig` is used. Since the method has only one parameter, you don't need to specify the `month` parameters attribute of the the annation.
+<3> Indicates a method is cacheable. The cache name `headlines` specified in `@CacheConfig` is used. Since the method has only one parameter, you don't need to specify the `month` parameters attribute of the annotation.
 <4> Emulate an expensive operation by sleeping for several seconds.
-<5> The return value is cached with name `headlines` for the supplied `month`. The method invocation is never skipped even if the cache `headlines` for the supplied `month` already existed.
+<5> The return value is cached with name `headlines` for the supplied `month`. The method invocation is never skipped even if the cache `headlines` for the supplied `month` already exists.
 <6> Method invocation causes the invalidation of the cache `headlines` for the supplied `month`.
 
 TIP: If you don't annotate the class with `@CacheConfig`, specify the cache name in the cache annotations. E.g. `@Cacheable(value = "headlines", parameters = {"month"})`
@@ -54,7 +46,7 @@ We can verify that the cache works as expected:
 test:NewsServiceTest[]
 
 <1> Used to configure the test method execution order for the annotated test class.
-<2> Annotation used to define a Micronaut test
+callout:micronaut-test[2]
 <3> Inject `NewsService` bean.
 <4> Timeout annotation fails a test if its execution exceeds a given duration. It helps us verify that we are leaveraging the cache.
 
@@ -78,7 +70,6 @@ test:NewsControllerTest[]
 
 <1> We call the endpoint twice and verify with the `@Timeout` annotation that the cache is being used.
 
-
 include::{commondir}/common-runapp.adoc[]
 
 include::{commondir}/common-graal-with-plugins.adoc[]
@@ -91,7 +82,7 @@ You should be able to execute `curl localhost:8080/NOVEMBER` and see results
 
 == Next steps
 
-Read about Micronaut's https://docs.micronaut.io/latest/guide/index.html#caching[Cache Advice].
-Moreover, check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/index.html[Micronaut Cache] project for more information.
+Read about Micronaut https://docs.micronaut.io/latest/guide/#caching[Cache Advice].
+Moreover, check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/[Micronaut Cache] project for more information.
 
 include::{commondir}/common-helpWithMicronaut.adoc[]

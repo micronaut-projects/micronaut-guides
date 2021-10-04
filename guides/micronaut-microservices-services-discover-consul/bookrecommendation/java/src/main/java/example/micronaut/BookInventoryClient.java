@@ -2,13 +2,15 @@
 package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.client.annotation.Client;
-import io.reactivex.Maybe;
 import io.micronaut.retry.annotation.Recoverable;
+import reactor.core.publisher.Mono;
+
 import javax.validation.constraints.NotBlank;
+
+import static io.micronaut.http.MediaType.TEXT_PLAIN;
 //end::packageandimports[]
 
 /*
@@ -24,8 +26,8 @@ import javax.validation.constraints.NotBlank;
 //tag::clazz[]
 interface BookInventoryClient extends BookInventoryOperations {
 
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(TEXT_PLAIN)
     @Get("/books/stock/{isbn}")
-    Maybe<Boolean> stock(@NonNull @NotBlank String isbn);
+    Mono<Boolean> stock(@NonNull @NotBlank String isbn);
 }
 //end::clazz[]

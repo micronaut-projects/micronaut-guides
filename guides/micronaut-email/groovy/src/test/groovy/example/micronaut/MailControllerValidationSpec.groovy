@@ -5,12 +5,12 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest // <1>
 @Property(name = "spec.name", value = "mailcontroller") // <2>
@@ -21,7 +21,7 @@ class MailControllerValidationSpec extends Specification {
 
     @Inject
     @Client("/")
-    RxHttpClient client;
+    HttpClient client;
 
     void "mail send cannot be invoked without subject"() {
         given:

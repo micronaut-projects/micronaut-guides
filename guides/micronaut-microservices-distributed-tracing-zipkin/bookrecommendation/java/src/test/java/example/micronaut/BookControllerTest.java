@@ -1,13 +1,16 @@
 package example.micronaut;
 
+import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.client.RxStreamingHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.reactivex.Flowable;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import reactor.core.publisher.Flux;
 
-import javax.inject.Inject;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,12 +19,14 @@ public class BookControllerTest {
 
     @Inject
     @Client("/")
-    RxStreamingHttpClient client;
+    HttpClient client;
 
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     @Test
     public void testRetrieveBooks() {
-        Flowable<BookRecommendation> books = client.jsonStream(HttpRequest.GET("/books"), BookRecommendation.class);
-        assertEquals(books.toList().blockingGet().size(), 1);
-        assertEquals(books.toList().blockingGet().get(0).getName(), "Building Microservices");
+        List<BookRecommendation> books = client.toBlocking()
+                .retrieve(HttpRequest.GET("/books"), Argument.listOf(BookRecommendation.class));
+        assertEquals(1, books.size());
+        assertEquals("Building Microservices", books.get(0).getName());
     }
 }

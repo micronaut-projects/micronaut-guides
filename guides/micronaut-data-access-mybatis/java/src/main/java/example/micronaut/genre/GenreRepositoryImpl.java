@@ -4,7 +4,7 @@ import io.micronaut.core.annotation.NonNull;
 import example.micronaut.ListingArguments;
 import example.micronaut.domain.Genre;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;

@@ -5,12 +5,12 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest // <1>
 @Property(name = "spec.name", value = "mailcontroller") // <2>
@@ -21,18 +21,12 @@ class MailControllerSpec extends Specification {
 
     @Inject
     @Client("/")
-    RxHttpClient client // <4>
+    HttpClient client // <4>
 
     void "mail send interacts once email service"() {
         given:
         EmailCmd cmd = new EmailCmd(subject: "Test", recipient: "delamos@grails.example", textBody: "Hola hola")
         HttpRequest<EmailCmd> request = HttpRequest.POST("/mail/send", cmd) // <5>
-
-        when:
-        Collection<EmailService> emailServices = applicationContext.getBeansOfType(EmailService.class)
-
-        then:
-        1 == emailServices.size()
 
         when:
         EmailService emailService = applicationContext.getBean(EmailService.class)

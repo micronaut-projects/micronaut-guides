@@ -1,21 +1,22 @@
 package example.micronaut
 
 import io.micronaut.context.annotation.Requires
-import io.micronaut.context.env.Environment
 import io.micronaut.retry.annotation.Fallback
-import io.reactivex.Flowable
+import jakarta.inject.Singleton
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
 
-import javax.inject.Singleton
+import static io.micronaut.context.env.Environment.TEST
 
-@Requires(env = Environment.TEST)
+@Requires(env = TEST)
 @Fallback
 @Singleton
 class BookCatalogueClientStub implements BookCatalogueOperations {
 
     @Override
-    Flowable<Book> findAll() {
+    Publisher<Book> findAll() {
         Book buildingMicroservices = new Book("1491950358", "Building Microservices")
         Book releaseIt = new Book("1680502395", "Release It!")
-        Flowable.just(buildingMicroservices, releaseIt)
+        Flux.just(buildingMicroservices, releaseIt)
     }
 }

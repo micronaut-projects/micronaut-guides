@@ -1,12 +1,4 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -14,19 +6,17 @@ include::{commondir}/common-completesolution.adoc[]
 
 include::{commondir}/common-create-app.adoc[]
 
-
 === Controller
 
 Create `MailController` which use a collaborator, `emailService` to send and email.
 
 source:MailController[]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/mail/send`
+callout:controller[number=1,arg0=/mail/send]
 <2> Constructor injection
-<3> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html[@Post] annotation is used to map the index method to all requests that use an HTTP POST
+<3> The @api@/io/micronaut/http/annotation/Post.html[@Post] annotation maps the index method to all requests that use an HTTP POST
 <4> Add `@Valid` to any method parameter which requires validation. Use a POGO supplied as a JSON payload in the request to populate the email.
 <5> Return 200 OK as the result
-
 
 The previous controller uses a POJO supplied in the request body as a JSON Payload
 
@@ -50,13 +40,13 @@ ____
 
 Add a dependency to AWS SES SDK:
 
-dependency:ses:2.16.18[groupId=software.amazon.awssdk]
+dependency:ses[groupId=software.amazon.awssdk,version=@sesVersion@]
 
 Create service which uses AWS Simple Email Service client to send the email
 
 source:AwsSesMailService[]
 
-<1> Use `javax.inject.Singleton` to designate a class a a singleton
+callout:singleton[1]
 <2> Bean will not loaded unless condition is met.
 <3> In case of multiple possible interface implementations of `EmailService`, `@Secondary` reduces the priority.
 <4> Values for region and source email are resolved from environment variables or system properties.
@@ -83,7 +73,6 @@ Add a test to verify the service is loaded:
 
 test:AwsSesMailServiceTest[]
 
-
 ==== SendGrid
 
 https://sendgrid.com/[SendGrid] is a transactional email service.
@@ -94,7 +83,7 @@ ____
 
 Add a dependency to SendGrid SDK:
 
-dependency:sendgrid-java:4.7.2[groupId=com.sendgrid]
+dependency:sendgrid-java[groupId=com.sendgrid,version=@sendgrid-javaVersion@]
 
 Create a service which encapsulates the integration with SendGrid. The bean will not be loaded if the
 system properties (`sendgrid.apikey`, `sendgrid.fromemail`) or environment variables (`SENDGRID_APIKEY`, `SENDGRID_FROM_EMAIL`) are not present.
@@ -105,10 +94,9 @@ Add a test:
 
 test:SendGridEmailConditionTest[]
 
-
 source:SendGridEmailService[]
 
-<1> Use `javax.inject.Singleton` to designate a class a a singleton
+callout:singleton[1]
 <2> Bean will not loaded unless condition is met.
 <3> Values will be resolved from system properties.
 
@@ -116,14 +104,13 @@ Add a test:
 
 test:SendGridEmailServiceTest[]
 
-
-=== Run the app
+=== Run the application
 
 Add a logger to get more visibility:
 
 resource:logback.xml[tag=logger]
 
-To use SendGrid, define the required environment variables and run the app
+To use SendGrid, define the required environment variables and run the application.
 
 [source, bash]
 ----
@@ -137,8 +124,7 @@ $ ./mvnw mn:run
 :exclude-for-build:
 ----
 
-
-To use AWS SES, define the required environment variables and run the app
+To use AWS SES, define the required environment variables and run the application.
 
 [source, bash]
 ----
@@ -153,7 +139,6 @@ $ ./gradlew run
 $ ./mvnw mn:run
 :exclude-for-build:
 ----
-
 
 If you supply both AWS SES and SendGrid  system properties, the SendGrid `EmailService` implementation will be used due to the `@Secondary` annotation in `AwsSesMailService`.
 
@@ -172,7 +157,7 @@ curl -X "POST" "http://localhost:8080/mail/send" \
 
 In our acceptance test, beans `SendGridEmailService` or `AwsSesMailService` will not be loaded since system properties are not present.
 
-Instead, we setup a Mock which we can verify interactions against.
+Instead, we set up a Mock which we can verify interactions against.
 
 test:MockEmailService[]
 
@@ -180,11 +165,11 @@ Create the next test:
 
 test:MailControllerTest[]
 
-<1> Annotate the class with `@MicronatTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html]
-<2> Define a property used to run the test
+callout:micronaut-test[1]
+callout:property[2]
 <3> Inject the `ApplicationContext` bean
-<4> Inject the `RxHttpClient` bean
-<5> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+callout:http-client[4]
+callout:http-request[5]
 <6> `emailService.send` method is invoked once.
 
 === Validation
@@ -193,14 +178,13 @@ We want to ensure any email request contains a subject, recipient and a text bod
 
 include::{commondir}/common-validation.adoc[]
 
-
 Create the next test:
 
 test:MailControllerValidationTest[]
 
-<1> Annotate the class with `@MicronatTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
+callout:micronaut-test[1]
 <2> Define a property available for the application.
-<3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+callout:http-request[3]
 
 In order to satisfy the test, create an email constraints annotation
 
@@ -211,10 +195,9 @@ and a constraint validator in a `@Factory` class:
 source:EmailConstraintsFactory[]
 
 Annotate `EmailCmd` with `EmailConstraints` and `@Introspected` (to generate the
-https://docs.micronaut.io/latest/guide/index.html#introspection[Bean Introspection information]).
+https://docs.micronaut.io/latest/guide/#introspection[Bean Introspection information]).
 
 source:EmailCmd[tags=clazzwithannotations|clazz|properties|close]
-
 
 include::{commondir}/common-testApp.adoc[]
 

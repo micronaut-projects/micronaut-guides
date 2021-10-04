@@ -6,7 +6,57 @@ import io.micronaut.starter.options.BuildTool
 @CompileStatic
 class TestScriptGenerator {
 
-    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure) {
+    public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
+    public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
+
+    static String emptyScript() {
+        '''\
+#!/usr/bin/env bash
+set -e
+exit 0
+'''
+    }
+
+    private static List<String> guidesChanged(String[] changedFiles) {
+        changedFiles.findAll { path ->
+            path.startsWith('guides')
+        }.collect { path ->
+            String guideFolder = path.substring('guides/'.length())
+            guideFolder.substring(0, guideFolder.indexOf('/'))
+        }.unique()
+    }
+
+    private static boolean changesMicronautVersion(String[] changedFiles) {
+        changedFiles.any { str -> str.contains("version.txt") }
+    }
+
+    private static boolean changesDependencies(String[] changedFiles, List<String> changedGuides) {
+        if (changedGuides) {
+            return false
+        }
+        changedFiles.any { str -> str.contains("pom.xml") }
+    }
+
+    private static boolean changesBuildScr(String[] changedFiles) {
+        changedFiles.any { str -> str.contains('buildSrc') }
+    }
+
+    private static boolean shouldSkip(GuideMetadata metadata,
+                                      List<String> guidesChanged,
+                                      boolean forceExecuteEveryTest) {
+
+        if (!Utils.process(metadata, true)) {
+            return true
+        }
+
+        if (forceExecuteEveryTest) {
+            return false
+        }
+
+        return !guidesChanged.contains(metadata.slug)
+    }
+
+    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
         String bashScript = '''\
 #!/usr/bin/env bash
 set -e
@@ -14,9 +64,14 @@ set -e
 FAILED_PROJECTS=()
 EXIT_STATUS=0
 '''
+        List<String> slugsChanged = guidesChanged(changedFiles)
+        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
+                                        changesDependencies(changedFiles, slugsChanged) ||
+                                        changesBuildScr(changedFiles) ||
+                                        (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI)
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = !(System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) != null ? System.getProperty(GuideProjectGenerator.SYS_PROP_MICRONAUT_GUIDE) == metadata.slug : true)
+            boolean skip = shouldSkip(metadata, slugsChanged, forceExecuteEveryTest)
             if (skip) {
                 continue
             }
@@ -36,7 +91,7 @@ EXIT_STATUS=0
                     bashScript += """\
 cd ${folder}
 """
-                    for (GuideMetadata.App app: metadata.apps) {
+                    for (GuideMetadata.App app : metadata.apps) {
                         bashScript += scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool)
                     }
                     bashScript += """\
@@ -66,7 +121,7 @@ fi
         bashScript
     }
 
-    static String scriptForFolder(String nestedFolder, String folder, boolean stopIfFailure, BuildTool buildTool) {
+    private static String scriptForFolder(String nestedFolder, String folder, boolean stopIfFailure, BuildTool buildTool) {
         String bashScript = """\
 cd ${nestedFolder}
 echo "-------------------------------------------------"

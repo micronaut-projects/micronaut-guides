@@ -1,7 +1,8 @@
 package example.micronaut;
 
-import io.reactivex.Single;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 public interface UsernameFetcher {
-    Single<String> findUsername();
+    Mono<String> findUsername();
 }

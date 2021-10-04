@@ -1,16 +1,15 @@
 //tag::packageandimports[]
 package example.micronaut
 
-import io.micronaut.http.MediaType
+import io.micronaut.http.MediaType.TEXT_PLAIN
 import io.micronaut.http.annotation.Consumes
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
-import io.reactivex.Maybe
-
+import reactor.core.publisher.Mono
 import javax.validation.constraints.NotBlank
-
 //end::packageandimports[]
+
 /*
 //tag::harcoded[]
 @Client("http://localhost:8082") // <1>
@@ -24,8 +23,8 @@ import javax.validation.constraints.NotBlank
 //tag::clazz[]
 interface BookInventoryClient : BookInventoryOperations {
 
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(TEXT_PLAIN)
     @Get("/books/stock/{isbn}")
-    override fun stock(@NotBlank isbn: String): Maybe<Boolean>
+    override fun stock(@NotBlank isbn: String): Mono<Boolean>
 }
 //end::clazz[]

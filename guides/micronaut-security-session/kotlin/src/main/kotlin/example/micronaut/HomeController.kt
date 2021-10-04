@@ -14,10 +14,9 @@ class HomeController {
     @Get // <3>
     @View("home") // <4>
     fun index(principal: Principal?): Map<String, Any> { // <5>
-        val data = mutableMapOf<String, Any>()
-        data["loggedIn"] = (principal != null) as Any
+        val data = mutableMapOf<String, Any>("loggedIn" to (principal != null))
         if (principal != null) {
-            data["username"] = principal.name as Any
+            data["username"] = principal.name
         }
         return data
     }

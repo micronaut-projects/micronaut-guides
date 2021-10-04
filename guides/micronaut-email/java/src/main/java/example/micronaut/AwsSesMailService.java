@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.ses.model.Message;
 import software.amazon.awssdk.services.ses.model.SendEmailRequest;
 import software.amazon.awssdk.services.ses.model.SendEmailResponse;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -48,8 +48,6 @@ public class AwsSesMailService implements EmailService {
                         .body(Body.builder().text(Content.builder().data(email.getTextBody()).build()).build()).build())
                 .build();
         SendEmailResponse response =ses.sendEmail(sendEmailRequest);
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Sent email with id: {}", response.messageId());
-        }
+        LOG.info("Sent email with id: {}", response.messageId());
     }
 }

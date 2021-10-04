@@ -1,5 +1,6 @@
 package io.micronaut.guides;
 
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 
@@ -10,6 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.micronaut.starter.options.BuildTool.GRADLE;
+import static io.micronaut.starter.options.BuildTool.MAVEN;
+import static io.micronaut.starter.options.Language.GROOVY;
+import static io.micronaut.starter.options.Language.KOTLIN;
+
 public class DependencyLines {
 
     private static final String SCOPE_COMPILE = "compile";
@@ -17,7 +23,7 @@ public class DependencyLines {
     private static final String SCOPE_ANNOTATION_PROCESSOR = "annotationProcessor";
     private static final String SCOPE_ANNOTATION_PROCESSOR_KAPT = "kapt";
 
-    static String toMavenScope(Map<String, String> attributes) {
+    private static String toMavenScope(Map<String, String> attributes) {
         String s = attributes.get("scope");
         if (s == null) {
             return null;
@@ -28,7 +34,6 @@ public class DependencyLines {
             case "annotationProcessor":
                 return "compile";
             case "testCompile":
-            case "testRuntime":
             case "testRuntimeOnly":
             case "testImplementation":
                 return "test";
@@ -41,7 +46,7 @@ public class DependencyLines {
         }
     }
 
-    static String toGradleScope(Map<String, String> attributes, Language language) {
+    private static String toGradleScope(Map<String, String> attributes, Language language) {
         String s = attributes.get("scope");
         if (s == null) {
             return null;
@@ -56,9 +61,10 @@ public class DependencyLines {
             case "provided":
                 return "developmentOnly";
             case "annotationProcessor":
-                if (language.equals(Language.KOTLIN)) {
+                if (language == KOTLIN) {
                     return "kapt";
-                } else if (language.equals(Language.GROOVY)) {
+                }
+                if (language == GROOVY) {
                     return "compileOnly";
                 }
             default:
@@ -74,11 +80,11 @@ public class DependencyLines {
         List<String> dependencyLines = new ArrayList<>();
 
         // Open Asciidoctor code block
-        if (buildTool == BuildTool.GRADLE) {
+        if (buildTool == GRADLE) {
             dependencyLines.add("[source, groovy]");
             dependencyLines.add(".build.gradle");
             dependencyLines.add("----");
-        } else if (buildTool == BuildTool.MAVEN) {
+        } else if (buildTool == MAVEN) {
             dependencyLines.add("[source, xml]");
             dependencyLines.add(".pom.xml");
             dependencyLines.add("----");
@@ -98,11 +104,22 @@ public class DependencyLines {
             String groupId = attributes.getOrDefault("groupId", "io.micronaut");
             String gradleScope = Optional.ofNullable(toGradleScope(attributes, language)).orElse(SCOPE_IMPLEMENTATION);
             String mavenScope = Optional.ofNullable(toMavenScope(attributes)).orElse(SCOPE_COMPILE);
+            String version = attributes.get("version");
             String callout = extractCallout(attributes);
+            boolean pom = "true".equalsIgnoreCase(attributes.getOrDefault("pom", "false"));
 
-            if (buildTool == BuildTool.GRADLE) {
-                dependencyLines.add(gradleScope + "(\"" + groupId + ":" + artifactId + "\")" + callout);
-            } else if (buildTool == BuildTool.MAVEN) {
+            if (buildTool == GRADLE) {
+                String rendered = gradleScope;
+                if (pom) {
+                    rendered += " platform";
+                }
+                rendered += "(\"" + groupId + ':' + artifactId;
+                if (version != null) {
+                    rendered += ':' + version;
+                }
+                rendered += "\")" + callout;
+                dependencyLines.add(rendered);
+            } else if (buildTool == MAVEN) {
                 if (gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR) || gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR_KAPT)) {
                     String mavenScopeAnnotationProcessor = getMavenAnnotationScopeXMLPath(language);
 
@@ -110,13 +127,30 @@ public class DependencyLines {
                     dependencyLines.add("<" + mavenScopeAnnotationProcessor + ">" + callout);
                     dependencyLines.add("    <groupId>" + groupId + "</groupId>");
                     dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
+                    if (StringUtils.isNotEmpty(version)) {
+                        dependencyLines.add("    <version>" + version + "</version>");
+                    }
                     dependencyLines.add("</" + mavenScopeAnnotationProcessor + ">");
                 } else {
+                    if (pom) {
+                        dependencyLines.add("<!-- Add the following to your dependencyManagement element -->");
+                    }
                     dependencyLines.add("<dependency>" + callout);
                     dependencyLines.add("    <groupId>" + groupId + "</groupId>");
                     dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
-                    dependencyLines.add("    <scope>" + mavenScope + "</scope>");
+                    if (version != null) {
+                        dependencyLines.add("    <version>" + version + "</version>");
+                    }
+                    if (pom) {
+                        dependencyLines.add("    <type>pom</type>");
+                        dependencyLines.add("    <scope>import</scope>");
+                    } else {
+                        dependencyLines.add("    <scope>" + mavenScope + "</scope>");
+                    }
                     dependencyLines.add("</dependency>");
+                    if (pom) {
+                        dependencyLines.add("");
+                    }
                 }
             }
         }

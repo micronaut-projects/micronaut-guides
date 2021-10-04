@@ -1,27 +1,28 @@
 package example.micronaut;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.retry.annotation.Fallback;
-import io.reactivex.Maybe;
+import jakarta.inject.Singleton;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 
-@Requires(env = Environment.TEST) // <1>
+import static io.micronaut.context.env.Environment.TEST;
+
+@Requires(env = TEST) // <1>
 @Fallback
 @Singleton
 public class BookInventoryClientStub implements BookInventoryOperations {
 
     @Override
-    public Maybe<Boolean> stock(@NonNull @NotBlank String isbn) {
+    public Mono<Boolean> stock(@NonNull @NotBlank String isbn) {
         if (isbn.equals("1491950358")) {
-            return Maybe.just(Boolean.TRUE); // <2>
-
-        } else if (isbn.equals("1680502395")) {
-            return Maybe.just(Boolean.FALSE); // <3>
+            return Mono.just(true); // <2>
         }
-        return Maybe.empty(); // <4>
+        if (isbn.equals("1680502395")) {
+            return Mono.just(false); // <3>
+        }
+        return Mono.empty(); // <4>
     }
 }

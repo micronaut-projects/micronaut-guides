@@ -1,0 +1,115 @@
+include::{commondir}/common-header-top.adoc[]
+
+== Introduction
+
+Please read about https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support] to learn more about different Lambda runtime, Triggers, and Handlers, and how to integrate with a Micronaut application.
+
+The biggest problem with Java applications and Lambda is how to mitigate Cold startups. Executing GraalVM Native images of a Micronaut function in a Lambda Custom runtime is a solution to this problem.
+
+If you want to respond to triggers such as queue events, S3 events, or single endpoints, you should opt to code your Micronaut functions as Serverless functions.
+
+== Getting Started
+
+In this guide, we will deploy a Micronaut function written in @language@ as a GraalVM Native image to an AWS Lambda custom runtime.
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+== Writing the Application
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app example.micronaut.micronautguide --features=graalvm,aws-lambda --build=@build@ --lang=@lang@
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+include::{commondir}/common-default-package.adoc[]
+
+NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select `Serverless function` as application type and add the `graalvm` and `aws-lambda` features.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+== Code
+
+The generated project contains sample code. Let's explore it.
+
+We want to support a JavaBean as input and output types.
+
+The input is a `Book` object:
+
+source:Book[]
+
+* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+
+The output is a `BookSaved` object:
+
+source:BookSaved[]
+
+* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+
+The application contains a class extending https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler]
+
+source:BookRequestHandler[]
+
+* The class extends https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler] and defines input and output types.
+
+The generated test shows how to verify the function behaviour:
+
+test:BookRequestHandlerTest[]
+
+* When you instantiate the Handler, the application context starts.
+* Remember to close your application context when you end your test. You can use your handler to obtain it.
+* Invoke the `execute` method of the handler.
+
+include::{commondir}/common-testApp.adoc[]
+
+== Lambda
+
+Create a Lambda Function. As a runtime, select `Custom Runtime`
+
+image::create-function-bootstrap.png[]
+
+=== Upload Code
+
+The Micronaut framework eases the deployment of your functions as a https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html[Custom AWS Lambda runtime].
+
+The main API you will interact with is https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/runtime/AbstractMicronautLambdaRuntime.html[AbstractMicronautLambdaRuntime]. This is an abstract class which you can subclass to create your custom runtime `mainClass`. That class includes the code to perform the https:/
+/docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html#runtimes-custom-build[Processing Tasks] described in the Custom Runtime documentation.
+
+The generated project contains such a class:
+
+source:BookLambdaRuntime[]
+
+include::{commondir}/common-build-native-lambda.adoc[]
+
+Once you have a ZIP file, upload it
+
+image::lambda-custom-runtime-uploadcode.png[]
+
+=== Handler
+
+The handler used is the one created at `BookLambdaRuntime`.
+
+Thus, you don't need to specify the handler in the AWS Lambda console.
+
+However, I like to specify it in the console as well:
+
+`example.micronaut.BookRequestHandler`
+
+image::lambda-custom-runtime-bookrequest-handler.png[]
+
+include::{commondir}/common-test-apigatewayawsproxy.adoc[]
+
+include::{commondir}/common-next.adoc[]
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support]
+
+* https://aws.amazon.com/lambda/[AWS Lambda]
+
+include::{commondir}/common-helpWithMicronaut.adoc[]

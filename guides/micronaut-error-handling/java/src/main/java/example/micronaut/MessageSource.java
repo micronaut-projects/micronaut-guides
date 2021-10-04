@@ -1,6 +1,6 @@
 package example.micronaut;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import java.util.List;

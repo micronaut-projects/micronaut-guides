@@ -4,7 +4,7 @@ import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.runtime.Micronaut;
 import io.micronaut.runtime.server.event.ServerStartupEvent;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton // <1>
 public class Application implements ApplicationEventListener<ServerStartupEvent> {  // <2>

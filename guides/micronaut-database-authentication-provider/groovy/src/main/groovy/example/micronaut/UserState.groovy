@@ -1,15 +1,16 @@
 package example.micronaut
 
 interface UserState {
-    String getUsername();
 
-    String getPassword();
+    String getUsername()
 
-    boolean isEnabled();
+    String getPassword()
 
-    boolean isAccountExpired();
+    boolean isEnabled()
 
-    boolean isAccountLocked();
+    boolean isAccountExpired()
 
-    boolean isPasswordExpired();
+    boolean isAccountLocked()
+
+    boolean isPasswordExpired()
 }

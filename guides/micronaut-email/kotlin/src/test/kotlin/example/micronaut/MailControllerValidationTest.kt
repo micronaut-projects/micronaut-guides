@@ -5,14 +5,15 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest // <1>
 @Property(name = "spec.name", value = "mailcontroller") // <2>
@@ -23,7 +24,7 @@ class MailControllerValidationTest {
 
     @Inject
     @field:Client("/")
-    lateinit var client: RxHttpClient
+    lateinit var client: HttpClient
 
     @Test
     fun mailSendCannotBeInvokedWithoubSubject() {
@@ -33,9 +34,9 @@ class MailControllerValidationTest {
 
         val request: HttpRequest<EmailCmd> = HttpRequest.POST("/mail/send", cmd) // <3>
         val e = Executable { client.toBlocking().exchange<EmailCmd, Any>(request) }
-        val thrown = Assertions.assertThrows(HttpClientResponseException::class.java, e)
+        val thrown = assertThrows(HttpClientResponseException::class.java, e)
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrown.status)
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.status)
     }
 
     @Test
@@ -46,9 +47,9 @@ class MailControllerValidationTest {
 
         val request: HttpRequest<EmailCmd> = HttpRequest.POST("/mail/send", cmd) // <3>
         val e = Executable { client.toBlocking().exchange<EmailCmd, Any>(request) }
-        val thrown = Assertions.assertThrows(HttpClientResponseException::class.java, e)
+        val thrown = assertThrows(HttpClientResponseException::class.java, e)
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrown.status)
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.status)
     }
 
     @Test
@@ -59,9 +60,9 @@ class MailControllerValidationTest {
 
         val request: HttpRequest<EmailCmd> = HttpRequest.POST("/mail/send", cmd) // <3>
         val e = Executable { client.toBlocking().exchange<EmailCmd, Any>(request) }
-        val thrown = Assertions.assertThrows(HttpClientResponseException::class.java, e)
+        val thrown = assertThrows(HttpClientResponseException::class.java, e)
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrown.status)
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.status)
     }
 
     @Test
@@ -74,7 +75,7 @@ class MailControllerValidationTest {
         val request: HttpRequest<EmailCmd> = HttpRequest.POST("/mail/send", cmd) // <3>
         val rsp: HttpResponse<*> = client.toBlocking().exchange<EmailCmd, Any>(request)
 
-        Assertions.assertEquals(HttpStatus.OK, rsp.status)
+        assertEquals(HttpStatus.OK, rsp.status)
     }
 
     @Test
@@ -87,6 +88,6 @@ class MailControllerValidationTest {
         val request: HttpRequest<EmailCmd> = HttpRequest.POST("/mail/send", cmd) // <3>
         val rsp: HttpResponse<*> = client.toBlocking().exchange<EmailCmd, Any>(request)
 
-        Assertions.assertEquals(HttpStatus.OK, rsp.status)
+        assertEquals(HttpStatus.OK, rsp.status)
     }
 }

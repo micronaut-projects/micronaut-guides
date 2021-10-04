@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 @MicronautTest // <1>
@@ -27,8 +27,8 @@ public class AnalyticsServiceTest {
         List<BookAnalytics> analytics = analyticsService.listAnalytics();
         assertEquals(2, analytics.size());
 
-        assertEquals(3, findBookAnalytics(b1, analytics).getCount().intValue());
-        assertEquals(1, findBookAnalytics(b2, analytics).getCount().intValue());
+        assertEquals(3, findBookAnalytics(b1, analytics).getCount());
+        assertEquals(1, findBookAnalytics(b2, analytics).getCount());
     }
 
     private BookAnalytics findBookAnalytics(Book b, List<BookAnalytics> analytics) {

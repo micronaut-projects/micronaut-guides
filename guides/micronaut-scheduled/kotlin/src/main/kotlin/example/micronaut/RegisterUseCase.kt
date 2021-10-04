@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.util.Date
-import javax.inject.Named
-import javax.inject.Singleton
+import jakarta.inject.Named
+import jakarta.inject.Singleton
 
 @Singleton
 class RegisterUseCase(private val emailUseCase: EmailUseCase, // <1>
@@ -15,7 +15,7 @@ class RegisterUseCase(private val emailUseCase: EmailUseCase, // <1>
 
     fun register(email: String) {
         LOG.info("saving {} at {}", email, SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(Date()))
-        scheduleFollowupEmail(email, "Welcome to Micronaut")
+        scheduleFollowupEmail(email, "Welcome to the Micronaut framework")
     }
 
     private fun scheduleFollowupEmail(email: String, message: String) {

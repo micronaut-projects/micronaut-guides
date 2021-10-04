@@ -4,13 +4,14 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.RxStreamingHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.reactivex.Flowable;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
-import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -24,7 +25,7 @@ class GithubControllerTest {
 
     @Inject
     @Client("/")
-    RxStreamingHttpClient client; // <2>
+    HttpClient client; // <2>
 
     private static final List<String> expectedReleases = Arrays.asList("Micronaut 2.5.0", "Micronaut 2.4.4", "Micronaut 2.4.3");
 
@@ -54,12 +55,11 @@ class GithubControllerTest {
         //when:
         HttpRequest<Object> request = HttpRequest.GET("/github/releases-lowlevel");
 
-        Flowable<GithubRelease> githubReleaseStream = client.jsonStream(request, GithubRelease.class); // <7>
-        Iterable<GithubRelease> githubReleases = githubReleaseStream.blockingIterable();
+        List<GithubRelease> githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease.class)); // <7>
 
         //then:
         for (String name : expectedReleases) {
-            assertTrue(StreamSupport.stream(githubReleases.spliterator(), false)
+            assertTrue(githubReleases.stream()
                     .map(GithubRelease::getName)
                     .anyMatch(name::equals));
         }

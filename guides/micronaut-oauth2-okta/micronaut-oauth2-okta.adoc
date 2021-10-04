@@ -1,12 +1,4 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-header.adoc[]
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -16,7 +8,7 @@ include::{commondir}/common-create-app.adoc[]
 
 === Views
 
-Although Micronaut is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
+Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
 
 To use https://www.thymeleaf.org/[Thymeleaf] Java template engine to render views in a Micronaut application add the following dependency on your classpath.
 
@@ -24,36 +16,35 @@ dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
 
 === OAuth 2.0
 
-Sign up at https://developer.okta.com[developer.okta.com] and create a Web app with the following characteristics:
+Sign up at https://developer.okta.com[developer.okta.com] and create a Web application with the following characteristics:
 
 - Check `Authorization Code` grant type.
-- Add `http://localhost:8080/oauth/callback/okta` as a login redirect URIs.
-- Add `http://localhost:8080/logout` as a Logout redirect URIs.
+- Add `\http://localhost:8080/oauth/callback/okta` as a login redirect URIs.
+- Add `\http://localhost:8080/logout` as a Logout redirect URI.
 - Annotate the Client ID and Secret.
 
 image::okta-app.png[]
 
-To use OAuth 2.0 integration, add the next dependency:
-
+To use OAuth 2.0 integration, add the following dependency:
 
 dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
 
-Add also JWT https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwt[Micronaut’s JWT support] dependencies:
+Also add JWT https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support] dependencies:
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
-Add the following Oauth2 Configuration:
+Add the following OAuth2 Configuration:
 
 resource:application.yml[tag=oauth2]
 
-<1> Set `micronaut.security.authentication` as `idtoken`. The idtoken provided by Okta when the OAuth 2.0 Authorization code flow ends will be saved in a cookie. The id token is a signed JWT. For every request, Micronaut extracts the JWT from the Cookie and validates the JWT signature with the remote Json Web Key Set exposed by Okta. JWKS is exposed by the `jws-uri` entry of Okta `.well-known/openid-configuration`
-<2> The provider identifier should match the last part of the url you entered as a redirect url `/oauth/callback/okta`
+callout:authentication-idtoken[number=1,arg0=Okta]
+<2> The provider identifier should match the last part of the URL you entered as a redirect URL `/oauth/callback/okta`
 <3> Client Secret. See previous screenshot.
 <4> Client ID. See previous screenshot.
-<5> `issuer` url. It allows micronaut to discover the configuration of the OpenID Connect server.
+<5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
 <6> Accept GET request to the `/logout` endpoint.
 
-The previous configuration uses several placeholders. You will need to setup `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OIDC_ISSUER_DOMAIN` and `OIDC_ISSUER_AUTHSERVERID` environment variables.
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OIDC_ISSUER_DOMAIN` and `OIDC_ISSUER_AUTHSERVERID` environment variables.
 
 [soruce, bash]
 ----
@@ -71,14 +62,14 @@ image::diagramm.png[]
 
 === Home
 
-Create a controller to handle the requests to `/`. You are going to display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we are going to use a Thymeleaf template.
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
 
 source:HomeController[]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/`.
-<2> Annotate with `io.micronaut.security.Secured` to configure secured access. The `SecurityRule.IS_ANONYMOUS` expression will allow access without authentication.
-<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template would you like to render the response against.
-<4> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the `index` method to GET `/` requests.
+callout:controller[number=1,arg0=/]
+callout:secured-anonymous[number=2]
+<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
 
 Create a thymeleaf template:
 
@@ -86,9 +77,9 @@ resource:views/home.html[]
 
 Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
 
-- The https://docs.micronaut.io/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
+- The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
 injects into the model a `security` map with the authenticated user.  See
-https://micronaut-projects.github.io/micronaut-views/latest/guide/index.html#views-security[User in a view] documentation.
+https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
 
 include::{commondir}/common-runapp.adoc[]
 
