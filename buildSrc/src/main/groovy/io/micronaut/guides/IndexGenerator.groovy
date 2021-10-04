@@ -88,13 +88,16 @@ class IndexGenerator {
         text
     }
 
+    static String rootUrl() {
+        System.getenv("CI") ? GUIDES_URL : ''
+    }
+
     static String twitterCardHtml(File distDir, GuideMetadata guideMetadata) {
-        String rootUrl = System.getenv("CI") ? GUIDES_URL : ""
         String filename = new File(distDir.absolutePath, "/images/cards/" + guideMetadata.slug + ".png").exists() ?
                 guideMetadata.slug + ".png" : DEFAULT_CARD
 """\
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:image" content="${rootUrl}/latest/images/cards/${filename}"/>
+    <meta name="twitter:image" content="${rootUrl()}/latest/images/cards/${filename}"/>
     <meta name="twitter:creator" content="${TWITTER_MICRONAUT}"/>
     <meta name="twitter:site" content="${TWITTER_MICRONAUT}"/>
     <meta name="twitter:title" content="${guideMetadata.title?.replaceAll('"', "&quot;") ?: DEFAULT_TITLE}"/>
