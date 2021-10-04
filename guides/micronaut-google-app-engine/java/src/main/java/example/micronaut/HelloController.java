@@ -5,12 +5,12 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
 
-@Controller
+@Controller("/hello") // <1>
 public class HelloController {
-
-    @Produces(MediaType.TEXT_PLAIN)
-    @Get
+    
+    @Get // <2>
+    @Produces(MediaType.TEXT_PLAIN) // <3>
     public String index() {
-        return "Micronaut on App Engine";
+        return "Hello World"; // <4>
     }
 }

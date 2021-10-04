@@ -1,54 +1,19 @@
-= @guideTitle@
+include::{commondir}/common-header.adoc[]
 
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-== Introduction
-
-In this guide, you are going to deploy a Micronaut application
+You will deploy the Micronaut application
 to https://cloud.google.com/appengine/docs/flexible/[Google App Engine Flexible Environment].
 
-== Costs
-
-This guide uses paid services; you may need to enable Billing in Google Cloud
-to complete some steps in this guide.
-
-include::{commondir}/common-gettingStarted.adoc[]
+include::{commondir}/common-costs-gcloud.adoc[]
 
 include::{commondir}/common-requirements.adoc[]
 
 include::{commondir}/common-completesolution.adoc[]
 
-== Configuration
+include::{commondir}/common-create-app.adoc[]
 
-In order to deploy the app you would need to complete several configuration steps in Google Cloud:
+include::{commondir}/common-hello-world-controller.adoc[]
 
-* Signup for Cloud SDK and install Cloud SDK.
-
-* Initialize an App Engine application within the current Google Cloud project.
-
-Checkout the guide steps for more details.
-
-== Cloud SDK
-
-Signup for https://console.cloud.google.com/[Google Cloud Platform] and create a new project:
-
-image::google-cloud-create-project.png[]
-
-image::google-cloud-create-project-2.png[]
-
-We named the project `micronautgooglecloud`
-
-Install https://cloud.google.com/sdk/downloads[Cloud SDK] for your operating system.
-
-After you have installed the SDK, run the init command in your terminal:
-
-`$ gcloud init`
-
-It will prompt you to select the Google account and the project which you want to use.
+include::{commondir}/common-gcp.adoc[]
 
 == Google App Engine
 
@@ -65,14 +30,53 @@ to initialize an App Engine application within the current Google Cloud project.
 
 NOTE: You will need to choose the region where you want your App Engine Application located.
 
-include::{commondir}/common-create-app.adoc[]
+== App Engine Build Plugins
+
+:exclude-for-build:gradle
+
+To deploy to App Engine, add the https://github.com/GoogleCloudPlatform/app-maven-plugin[Google App Engine Maven plugin] to your project.
+
+> In your Maven App Engine Java app, add the following plugin to your pom.xml:
+
+dependency:appengine-maven-plugin[groupId=com.google.cloud.tools,version=@appengine-maven-pluginVersion@]
+
+:exclude-for-build:
 
 :exclude-for-build:maven
 
-== Google App Engine Gradle Plugin
-
 To deploy to App Engine, add the https://github.com/GoogleCloudPlatform/app-gradle-plugin[Google App Engine Gradle Plugin] to your project.
 
+> Since the appengine-gradle-plugin is not published to the gradle plugin portal, you must refrence it from the Central Maven repository. Add the maven central resolution to your `settings.gradle`
+
+[source, groovy]
+.build.gradle
+----
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    // add mavenLocal() if you are using a locally built version of the plugin
+  }
+  resolutionStrategy {
+    eachPlugin {
+      if (requested.id.id.startsWith('com.google.cloud.tools.appengine')) {
+        useModule("com.google.cloud.tools:appengine-gradle-plugin:${requested.version}")
+      }
+    }
+  }
+}
+----
+
+> Apply the plugin in your plugins block in your build.gradle
+
+[source, groovy]
+.build.gradle
+----
+plugins {
+  id 'com.google.cloud.tools.appengine' version '2.4.2'
+  ....
+}
+----
 Configure the deployment properties:
 
 [source,groovy]
@@ -102,39 +106,68 @@ It describes the application’s deployment configuration:
 
 resource:../appengine/app.yaml[]
 
-== Sample Controller
+== App Engine Deploy
 
-Create a controller which we can invoke once the app is deployed.
-
-source:HelloController[]
-
-== Deploying the app
+include::{commondir}/common-jdk8.adoc[]
 
 To deploy the app to Google App Engine run:
 
+:exclude-for-build:maven
+
 `$ ./gradlew appengineDeploy`
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+./mvnw package appengine:deploy -Dapp.deploy.projectId=PROJECT_ID -Dapp.deploy.version=1
+----
+
+Replace PROJECT_ID with the ID of your Cloud project. 
+
+:exclude-for-build:
 
 Initial deployment may take a while. When finished, you will be able to
 access your app:
 
-[source, bash]
+[source,bash]
 ----
-Deployed service [default] to [https://calm-history-228704.appspot.com]
+....
+...
+..
+.
+Deployed service [default] to [ https://micronaut-guides.ue.r.appspot.com]
 
 You can stream logs from the command line by running:
   $ gcloud app logs tail -s default
 
 To view your application in the web browser run:
   $ gcloud app browse
-
-BUILD SUCCESSFUL in 7m 26s
-13 actionable tasks: 11 executed, 2 up-to-date
-$ curl https://calm-history-228704.appspot.com
-Micronaut on App Engine
+....
+...
+..
+.
 ----
 
 If you go to the https://console.cloud.google.com/appengine/versions[Versions] section
 in the App Engine administration panel, you will see the deployed app.
+
+== Running the app
+
+[source,bash]
+----
+curl -i https://micronaut-guides.ue.r.appspot.com/hello
+HTTP/2 200 
+date: Mon, 04 Oct 2021 05:29:04 GMT
+content-type: text/plain
+content-length: 11
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
+
+Hello World
+----
 
 == Logging
 
@@ -154,31 +187,7 @@ After you've finished this guide, you can clean up the resources you created on
 Google Cloud Platform so you won't be billed for them in the future. The following
 sections describe how to delete or turn off these resources.
 
-=== Deleting the project
-
-The easiest way to eliminate billing is to delete the project you created for the tutorial.
-
-To delete the project:
-
-WARNING: Deleting a project has the following consequences:
-
-- If you used an existing project, you'll also delete any other work you've done in the project.
-
-- You can't reuse the project ID of a deleted project. If you created a custom project ID that you plan to use in the future, you should delete the resources inside the project instead. This ensures that URLs that use the project ID, such as an appspot.com URL, remain available.
-
-- If you are exploring multiple tutorials and quickstarts, reusing projects instead of deleting them prevents you from exceeding project quota limits.
-
-In the Cloud Platform Console, go to the Projects page.
-
-https://console.cloud.google.com/iam-admin/projects[GO TO THE PROJECTS PAGE]
-
-In the project list, select the project you want to delete and click Delete project. After selecting the checkbox next to the project name, click `Delete project`
-
-In the dialog, type the project ID, and then click Shut down to delete the project.
-
-Deleting or turning off specific resources
-
-You can individually delete or turn off some of the resources that you created during the tutorial.
+include::{commondir}/common-gcloud-delete-project.adoc[]
 
 === Deleting app versions
 
