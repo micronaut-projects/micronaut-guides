@@ -714,7 +714,7 @@ class GithubFilter(val configuration: GithubConfiguration) : HttpClientFilter { 
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The Micronaut framework will not load the bean unless configuration properties are set.</td>
+<td>Kotlin doesn&#8217;t support runtime repeatable annotations (see <a href="https://youtrack.jetbrains.com/issue/KT-12794">KT-12794</a>. We use a custom condition to enable the bean where appropriate.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -723,6 +723,53 @@ class GithubFilter(val configuration: GithubConfiguration) : HttpClientFilter { 
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
 <td>Enhance every request sent to GitHub API providing Basic Authentication.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a custom Condition:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/GithubFilterCondition.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.condition.Condition
+import io.micronaut.context.condition.ConditionContext
+import io.micronaut.context.exceptions.NoSuchBeanException
+
+class GithubFilterCondition : Condition { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    override fun matches(context: ConditionContext&lt;*&gt;?): Boolean {
+        if (context != null &amp;&amp; context.beanContext != null) {
+            try {
+                val githubConfiguration: GithubConfiguration =
+                    context.beanContext.getBean(GithubConfiguration::class.java) <i class="conum" data-value="2"></i><b>(2)</b>
+                if (githubConfiguration.token != null &amp;&amp; githubConfiguration.username != null) {
+                    return true <i class="conum" data-value="3"></i><b>(3)</b>
+                }
+            } catch (e: NoSuchBeanException) {
+            }
+        }
+        return false
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implement Micronaut <code>Condition</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Get the <code>GithubConfiguration</code> bean from the application context.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Only return <code>true</code> when the <code>token</code> and the <code>username</code> exist.</td>
 </tr>
 </table>
 </div>
