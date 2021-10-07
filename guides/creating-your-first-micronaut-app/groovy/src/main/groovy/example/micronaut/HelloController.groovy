@@ -9,7 +9,7 @@ import io.micronaut.http.MediaType
 @CompileStatic
 @Controller("/hello") // <1>
 class HelloController {
-    @Get("/") // <2>
+    @Get // <2>
     @Produces(MediaType.TEXT_PLAIN) // <3>
     String index() {
         "Hello World" // <4>
