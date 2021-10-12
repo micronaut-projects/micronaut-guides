@@ -332,9 +332,11 @@ class GuideAsciidocGenerator {
         List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
         String asciidoctorLang = resolveAsciidoctorLanguage(fileName)
 
+        String pathcallout = fileName.startsWith('../') ? ".${module}src/${resourceDir}/${fileName.substring('../'.length())}" :
+                ".${module}src/${resourceDir}/resources/${fileName}"
         List<String> lines = [
             "[source,${asciidoctorLang}]".toString(),
-            ".${module}src/${resourceDir}/resources/${fileName}".toString(),
+            pathcallout,
             "----",
         ]
         if (tags) {
