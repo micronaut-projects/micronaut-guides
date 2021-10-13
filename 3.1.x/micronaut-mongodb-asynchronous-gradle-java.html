@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Micronaut MongoDB Asynchronous</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-mongodb-asynchronous.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Micronaut MongoDB Asynchronous"/>
+    <meta name="twitter:description" content="Learn how to use a non-blocking reactive streams MongoDB client with a Micronaut application"/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-mongodb-asynchronous.html">Micronaut MongoDB Asynchronous</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-app">4. Writing the App</a>
+<ul class="sectlevel2">
+<li><a href="#pojo">4.1. POJO</a></li>
+<li><a href="#repository">4.2. Repository</a></li>
+<li><a href="#controller">4.3. Controller</a></li>
+<li><a href="#configuration">4.4. Configuration</a></li>
+<li><a href="#mongodb-repository">4.5. MongoDB repository</a></li>
+<li><a href="#test">4.6. Test</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">5. Testing the Application</a></li>
+<li><a href="#start-mongodb-via-docker">6. Start MongoDB via Docker</a></li>
+<li><a href="#running-the-application">7. Running the Application</a></li>
+<li><a href="#generate-a-micronaut-application-native-image-with-graalvm">8. Generate a Micronaut Application Native Image with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#native-image-generation">8.1. Native image generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">9. Next steps</a></li>
+<li><a href="#next-steps-2">10. Next Steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">11. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Micronaut MongoDB Asynchronous</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to use a non-blocking reactive streams MongoDB client with a Micronaut application</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.1.0</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+<div class="paragraph">
+<p>You will use <a href="https://www.mongodb.com">MongoDB</a> for persistence.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-mongodb-asynchronous-gradle-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-app">4. Writing the App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app \
+    --features=mongo-sync,graalvm example.micronaut.micronautguide \
+    --build=gradle \
+    --lang=java</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>mongo-sync</code> feature.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=mongo-reactive&amp;features=reactor&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="pojo">4.1. POJO</h3>
+<div class="paragraph">
+<p>Create <code>Fruit</code> POJO:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Fruit.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Creator</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">org.bson.codecs.pojo.annotations.BsonCreator</span>;
+<span class="keyword">import</span> <span class="include">org.bson.codecs.pojo.annotations.BsonProperty</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+
+<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">Fruit</span> {
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@BsonProperty</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
+
+    <span class="annotation">@Nullable</span>
+    <span class="annotation">@BsonProperty</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="directive">private</span> <span class="predefined-type">String</span> description;
+
+    <span class="directive">public</span> Fruit(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>(name, <span class="predefined-constant">null</span>);
+    }
+
+    <span class="annotation">@Creator</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="annotation">@BsonCreator</span><i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="directive">public</span> Fruit(<span class="annotation">@NonNull</span> <span class="annotation">@BsonProperty</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> name,  <i class="conum" data-value="3"></i><b>(3)</b>
+                 <span class="annotation">@Nullable</span> <span class="annotation">@BsonProperty</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> description) {  <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.name = name;
+        <span class="local-variable">this</span>.description = description;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
+        <span class="keyword">return</span> name;
+    }
+
+    <span class="annotation">@Nullable</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getDescription() {
+        <span class="keyword">return</span> description;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>javax.validation.constraints</code> Constraints to ensure the data matches your expectations.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Since the POJO does not have an empty constructor, use the annotations <code>@BsonCreator</code> and <code>BsonProperty</code> to define data conversion between BSON and POJO with the MongoDB Java driver. See <a href="https://docs.mongodb.com/drivers/java/sync/current/fundamentals/data-formats/pojo-customization/#pojos-without-no-argument-constructors">POJOs without No-Argument Constructor</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Annotate with <code>@Creator</code> to provide a hint as to which constructor is the primary constructor.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repository">4.2. Repository</h3>
+<div class="paragraph">
+<p>Create an interface to encapsulate the CRUD actions for <code>Fruit</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/FruitRepository.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
+
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">FruitRepository</span> {
+    <span class="annotation">@NonNull</span>
+    Publisher&lt;Fruit&gt; list();
+
+    Mono&lt;<span class="predefined-type">Boolean</span>&gt; save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit); <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Add <code>@Valid</code> to any method parameter which requires validation.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controller">4.3. Controller</h3>
+<div class="paragraph">
+<p>Create <code>FruitController</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/FruitController.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Status</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/fruits</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@ExecuteOn</span>(TaskExecutors.IO)  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">FruitController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> FruitRepository fruitService;
+
+    <span class="directive">public</span> FruitController(FruitRepository fruitService) {  <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.fruitService = fruitService;
+    }
+
+    <span class="annotation">@Get</span>  <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="directive">public</span> Publisher&lt;Fruit&gt; list() {
+        <span class="keyword">return</span> fruitService.list();
+    }
+
+    <span class="annotation">@Post</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="directive">public</span> Mono&lt;HttpStatus&gt; save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit) { <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="keyword">return</span> fruitService.save(fruit) <i class="conum" data-value="7"></i><b>(7)</b>
+                .map(added -&gt; (added) ? HttpStatus.CREATED : HttpStatus.CONFLICT);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/fruits</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use constructor injection to inject a bean of type <code>FruitRepository</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>list</code> method to an HTTP GET request on <code>/fruits</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html">@Post</a> annotation maps the <code>save</code> method to an HTTP POST request on <code>/fruits</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Add <code>@Valid</code> to any method parameter which requires validation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Micronaut controller methods can return reactive types</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration">4.4. Configuration</h3>
+<div class="paragraph">
+<p>Create a configuration object to encapsulate the MongoDB database name and collection name.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/MongoDbConfiguration.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.naming.Named</span>;
+
+<span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">db</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">MongoDbConfiguration</span> <span class="directive">extends</span> Named {
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> getCollection();
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>@ConfigurationProperties</code> annotation takes the configuration prefix</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Define the values via configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">db</span>:
+  <span class="key">name</span>: <span class="string"><span class="content">'fruit'</span></span>
+  <span class="key">collection</span>: <span class="string"><span class="content">'fruit'</span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mongodb-repository">4.5. MongoDB repository</h3>
+<div class="paragraph">
+<p>Implement <code>FruitRepository</code> by using a <code>MongoClient</code></p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/MongoDbFruitRepository.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">com.mongodb.client.result.InsertOneResult</span>;
+<span class="keyword">import</span> <span class="include">com.mongodb.reactivestreams.client.MongoClient</span>;
+<span class="keyword">import</span> <span class="include">com.mongodb.reactivestreams.client.MongoCollection</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
+
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">MongoDbFruitRepository</span> <span class="directive">implements</span> FruitRepository {
+
+    <span class="directive">private</span> <span class="directive">final</span> MongoDbConfiguration mongoConf;
+    <span class="directive">private</span> <span class="directive">final</span> MongoClient mongoClient;
+
+    <span class="directive">public</span> MongoDbFruitRepository(MongoDbConfiguration mongoConf,  <i class="conum" data-value="2"></i><b>(2)</b>
+                                  MongoClient mongoClient) {  <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.mongoConf = mongoConf;
+        <span class="local-variable">this</span>.mongoClient = mongoClient;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> Mono&lt;<span class="predefined-type">Boolean</span>&gt; save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit){
+        <span class="keyword">return</span> Mono.from(getCollection().insertOne(fruit)) <i class="conum" data-value="4"></i><b>(4)</b>
+                .map(insertOneResult -&gt; <span class="predefined-type">Boolean</span>.TRUE)
+                .onErrorReturn(<span class="predefined-type">Boolean</span>.FALSE);
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> Publisher&lt;Fruit&gt; list() {
+        <span class="keyword">return</span> getCollection().find(); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+    
+    <span class="annotation">@NonNull</span>
+    <span class="directive">private</span> MongoCollection&lt;Fruit&gt; getCollection(){
+        <span class="keyword">return</span> mongoClient.getDatabase(mongoConf.getName())
+                .getCollection(mongoConf.getCollection(), Fruit.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use constructor injection to inject a bean of type <code>MongoDbConfiguration</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use constructor injection to inject a bean of type <code>MongoClient</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>MongoClient</code> methods return reactive sequences.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>By using the feature <code>mongo-reactive</code>, the application includes the following dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.mongodb:micronaut-mongo-reactive</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This registers a non-blocking reactive streams MongoDB client with <a href="https://mongodb.github.io/mongo-java-driver/4.0/apidocs/mongodb-driver-reactivestreams/com/mongodb/reactivestreams/client/MongoClient.html">MongoClient</a>, which you can inject in other Micronaut beans as illustrated in the above code sample.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="test">4.6. Test</h3>
+<div class="paragraph">
+<p>Add a <a href="https://docs.micronaut.io/latest/guide/#httpClient">Micronaut declarative HTTP Client</a> to <code>src/test</code> to ease the testing of the application&#8217;s API.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/FruitClient.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/fruits</span><span class="delimiter">&quot;</span></span>)
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">FruitClient</span> {
+
+    <span class="annotation">@Post</span>
+    <span class="annotation">@NonNull</span>
+    HttpStatus save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit);
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@Get</span>
+    <span class="predefined-type">List</span>&lt;Fruit&gt; findAll();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By using the feature <code>mongo-sync</code>, the application includes the following test dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.testcontainers:junit-jupiter</span><span class="delimiter">&quot;</span></span>)
+testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.testcontainers:mongodb</span><span class="delimiter">&quot;</span></span>)
+testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.testcontainers:testcontainers</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We use <a href="https://www.testcontainers.org/modules/databases/mongodb/">Testcontainers MongoDB Module</a> to test the application.</p>
+</div>
+<div class="paragraph">
+<p>Create a class to ease the start-up and shutdown of MongoDb with TestContainers.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/MongoDbUtils.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">org.testcontainers.containers.MongoDBContainer</span>;
+<span class="keyword">import</span> <span class="include">org.testcontainers.utility.DockerImageName</span>;
+
+<span class="directive">public</span> <span class="type">class</span> <span class="class">MongoDbUtils</span> {
+    <span class="directive">static</span> MongoDBContainer mongoDBContainer;
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> startMongoDb() {
+        <span class="keyword">if</span> (mongoDBContainer == <span class="predefined-constant">null</span>) {
+            mongoDBContainer = <span class="keyword">new</span> MongoDBContainer(DockerImageName.parse(<span class="string"><span class="delimiter">&quot;</span><span class="content">mongo:4.0.10</span><span class="delimiter">&quot;</span></span>))
+                    .withExposedPorts(<span class="integer">27017</span>);
+        }
+        <span class="keyword">if</span> (!mongoDBContainer.isRunning()) {
+            mongoDBContainer.start();
+        }
+    }
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="predefined-type">String</span> getMongoDbUri() {
+        <span class="keyword">if</span> (mongoDBContainer == <span class="predefined-constant">null</span> || !mongoDBContainer.isRunning()) {
+            startMongoDb();
+        }
+        <span class="keyword">return</span> mongoDBContainer.getReplicaSetUrl();
+    }
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> closeMongoDb() {
+        <span class="keyword">if</span> (mongoDBContainer != <span class="predefined-constant">null</span>) {
+            mongoDBContainer.close();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a test:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/FruitControllerTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNull</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertFalse</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="directive">public</span> <span class="type">class</span> <span class="class">FruitControllerTest</span> {
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> fruitsEndpointInteractsWithMongo() {        
+        EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer.class, 
+            <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">mongodb.uri</span><span class="delimiter">&quot;</span></span>, MongoDbUtils.getMongoDbUri()));
+        FruitClient fruitClient = embeddedServer.getApplicationContext()
+            .getBean(FruitClient.class);
+
+        <span class="predefined-type">List</span>&lt;Fruit&gt; fruits = fruitClient.findAll();
+        assertTrue(fruits.isEmpty());
+
+        HttpStatus status = fruitClient.save(<span class="keyword">new</span> Fruit(<span class="string"><span class="delimiter">&quot;</span><span class="content">banana</span><span class="delimiter">&quot;</span></span>));
+
+        assertEquals(HttpStatus.CREATED, status);
+        fruits = fruitClient.findAll();
+        assertFalse(fruits.isEmpty());
+        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">banana</span><span class="delimiter">&quot;</span></span>, fruits.get(<span class="integer">0</span>).getName());
+        assertNull(fruits.get(<span class="integer">0</span>).getDescription());
+
+        status = fruitClient.save(<span class="keyword">new</span> Fruit(<span class="string"><span class="delimiter">&quot;</span><span class="content">Apple</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>));
+        assertEquals(HttpStatus.CREATED, status);
+        fruits = fruitClient.findAll();
+        assertTrue(fruits.stream()
+            .filter(f -&gt; f.getDescription() != <span class="predefined-constant">null</span> &amp;&amp; f.getDescription().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>))
+            .findFirst()
+            .isPresent());
+        embeddedServer.close();
+        MongoDbUtils.closeMongoDb();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ ./gradlew test
+$ open build/reports/tests/test/index.html</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="start-mongodb-via-docker">6. Start MongoDB via Docker</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can run MongoDb via Docker:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run -ti --rm -p 27017:27017 mongo:4.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The application connects to MongoDb, run via Docker, thanks to the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">mongodb</span>:
+  <span class="key">uri</span>: <span class="string"><span class="content">mongodb://${MONGO_HOST:localhost}:${MONGO_PORT:27017}</span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">7. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command which starts the application on port 8080.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">% curl -d '{&quot;name&quot;:&quot;Pear&quot;}'
+    -H &quot;Content-Type: application/json&quot;
+    -X POST http://localhost:8080/fruits
+
+% curl -i localhost:8080/fruits
+HTTP/1.1 200 OK
+date: Wed, 15 Sep 2021 12:40:15 GMT
+Content-Type: application/json
+content-length: 110
+connection: keep-alive
+
+[{&quot;name&quot;:&quot;Pear&quot;}]%</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-image-with-graalvm">8. Generate a Micronaut Application Native Image with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native image of our Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling native images ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="native-image-generation">8.1. Native image generation</h3>
+<div class="paragraph">
+<p>The easiest way to install GraalVM is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 8</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 21.2.0.r8-grl</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Java 11</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 21.2.0.r11-grl</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Java 16</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 21.2.0.r16-grl</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Our recommended approach is to use GraalVM JDK11 even if you still use
+Java 8 for your project. There are no Java 8 distributions of GraalVM
+Community Edition 21.2 available for macOs. See
+<a href="https://github.com/graalvm/graalvm-ce-builds/releases">github.com/graalvm/graalvm-ce-builds/releases</a>
+for OS compatibility information.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You need to install the <code>native-image</code> component, which is not installed by default.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ gu install native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate a native image using Gradle, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ ./gradlew nativeImage</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native image is created in <code>build/native-image/application</code> and can be run with <code>./build/native-image/application</code></p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native image or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">nativeImage {
+    args(<span class="string"><span class="delimiter">'</span><span class="content">--verbose</span><span class="delimiter">'</span></span>)
+    imageName(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native image name will now be <code>mn-graalvm-application</code></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Consume the endpoints exposed by the native image with cURL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">% curl -d '{&quot;name&quot;:&quot;Pear&quot;}'
+    -H &quot;Content-Type: application/json&quot;
+    -X POST http://localhost:8080/fruits
+
+% curl -i localhost:8080/fruits
+HTTP/1.1 200 OK
+date: Wed, 15 Sep 2021 12:40:15 GMT
+Content-Type: application/json
+content-length: 110
+connection: keep-alive
+
+[{&quot;name&quot;:&quot;Pear&quot;}]%</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">9. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps-2">10. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about the <a href="https://micronaut-projects.github.io/micronaut-mongodb/latest/guide/">integration between the Micronaut framework and MongoDB</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">11. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code></code></pre>
+</div>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li id="menu-item-2885" class="show-on-blog menu-item menu-item-type-custom menu-item-object-custom menu-item-2885">
+                                <a target="_blank" rel="noopener" href="https://micronaut.io/feed/rss/">
+                                    <i class="fas fa-rss">
+                                        <span class="sr-only">RSS</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2886" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2886">
+                                <a target="_blank" rel="noopener" href="https://twitter.com/micronautfw">
+                                    <i class="fab fa-twitter">
+                                        <span class="sr-only">Twitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2887" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2887">
+                                <a href="mailto:info@micronaut.io">
+                                    <i class="fas fa-envelope">
+                                        <span class="sr-only">Mail</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2888" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2888">
+                                <a target="_blank" rel="noopener" href="https://gitter.im/micronautfw/">
+                                    <i class="fab fa-gitter">
+                                        <span class="sr-only">Gitter</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2889" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2889">
+                                <a target="_blank" rel="noopener" href="https://github.com/micronaut-projects/">
+                                    <i class="fab fa-github">
+                                        <span class="sr-only">GitHub</span>
+                                    </i>
+                                </a>
+                            </li>
+                            <li id="menu-item-2890" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2890">
+                                <a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLI74De5M9T72YshO4Sc90wtGr286nM8Yu">
+                                    <i class="fab fa-youtube">
+                                        <span class="sr-only">YouTube</span>
+                                    </i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
