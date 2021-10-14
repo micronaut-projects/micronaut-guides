@@ -45,7 +45,7 @@ exit 0
                                       List<String> guidesChanged,
                                       boolean forceExecuteEveryTest) {
 
-        if (!Utils.process(metadata, true)) {
+        if (!Utils.process(metadata)) {
             return true
         }
 
