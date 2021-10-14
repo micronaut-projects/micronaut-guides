@@ -2,7 +2,7 @@ include::{commondir}/common-header.adoc[]
 
 Nowadays it is pretty usual to have some kind of cron or scheduled task that needs to run every midnight, every hour, a few times a week,...
 
-In this guide you will learn how to use Micronaut framework capabilities to schedule periodic tasks inside a Micronaut microservice.
+In this guide you will learn how to use Micronaut capabilities to schedule periodic tasks inside a Micronaut microservice.
 
 include::{commondir}/common-requirements.adoc[]
 
@@ -12,9 +12,9 @@ include::{commondir}/common-create-app.adoc[]
 
 === Set log level INFO for package demo
 
-During this guide, we will use several log statements to show Job execution.
+In this guide, we will use several log statements to show Job execution.
 
-Add at the end of `logback.xml` the next statement:
+Add this statement to the end of `logback.xml`:
 
 resource:logback.xml[tag=logger,indent=0]
 
@@ -33,17 +33,17 @@ callout:singleton[1]
 
 :exclude-for-build:maven
 
-Now start the application. Execute the `./gradlew run` command which will start the application on port 8080.
+Now start the application. Execute the `./gradlew run` command, which will start the application on port 8080.
 
 :exclude-for-build:
 
 :exclude-for-build:gradle
 
-Now start the application. Execute the `./mvnw mn:run` command which will start the application on port 8080.
+Now start the application. Execute the `./mvnw mn:run` command, which will start the application on port 8080.
 
 :exclude-for-build:
 
-After a few seconds you will see the following output:
+After a few seconds, you will see the following output:
 
 [source, bash]
 ----
@@ -57,33 +57,33 @@ After a few seconds you will see the following output:
 ... Simple Job every 10 seconds :15/5/2018 12:48:52
 ----
 
-<1> First execution of 10 seconds job just after the application starts
-<2> The 45 seconds job just starts 5 seconds after the application starts
-<3> Second execution of 10 seconds job just 10 seconds after the first execution
-<4> Second execution of 45 seconds job just 45 seconds after the first execution
+<1> First execution of 10 seconds Job after the application starts
+<2> The 45 seconds Job starts 5 seconds after the application starts
+<3> Second execution of 10 seconds Job 10 seconds after the first execution
+<4> Second execution of 45 seconds Job 45 seconds after the first execution
 
 === Business logic in dedicated Use Cases
 
 Although the previous example is valid, usually you don't want to put your business logic in a Job. A better approach is
-to create an additional bean which the `Job` invokes. This approach decouples your business logic from the scheduling logic.
+to create an additional bean that the `Job` invokes. This approach decouples your business logic from the scheduling logic.
 Moreover, it facilitates testing and maintenance. Let's see an example:
 
 Create the following use case:
 
 source:EmailUseCase[]
 
-And then the job:
+And then the Job:
 
 source:DailyEmailJob[]
 
 callout:singleton[1]
 <2> Constructor injection.
-<3> Trigger the job once a day at 04:30 AM
+<3> Trigger the Job once a day at 04:30 AM
 <4> Call the injected use case
 
 === Scheduling a Job Manually
 
-Consider the following scenario. You want to send every user an email two hours after they registered into your application. You want to ask them about their experiences during this first interaction with your application.
+Consider the following scenario. You want to send every user an email two hours after they register on your application and ask them about their experiences during this first interaction.
 
 For this guide, we will schedule a Job to trigger after one minute.
 
@@ -96,7 +96,7 @@ source:Application[]
 callout:singleton[1]
 <2> Listen to the event `ServerStartupEvent`
 <3> Constructor injection of `RegisterUseCase`
-<4> `onApplicationEvent` is invoked when the application starts.
+<4> `onApplicationEvent` is invoked when the application starts
 
 As you see in the previous example, subscribing to an event is as easy as implementing `ApplicationEventListener`.
 
@@ -104,35 +104,35 @@ Create a runnable task `EmailTask.@languageextension@`
 
 source:EmailTask[]
 
-Create `RegisterUseCase.@languageextension@` which schedules the previous task.
+Create `RegisterUseCase.@languageextension@`, which schedules the previous task.
 
 source:RegisterUseCase[]
 
 <1> Constructor injection of `EmailUseCase`
 <2> Inject the `TaskScheduler` bean
-<3> Create a `Runnable` task.
-<4> Schedule the task to run a minute from now.
+<3> Create a `Runnable` task
+<4> Schedule the task to run a minute from now
 
-If you execute the above code you will see the Job being executed one minute after we schedule it and with the supplied email address.
+If you execute the above code, you will see the Job being executed one minute after we schedule it and with the supplied email address.
 
 [source, bash]
 ----
 INFO  example.micronaut.RegisterUseCase - saving harry@micronaut.example at 15/5/2018 06:25:14
 INFO  example.micronaut.RegisterUseCase - saving ron@micronaut.example at 15/5/2018 06:25:34
 INFO  example.micronaut.EmailUseCase - Sending email to harry@micronaut.example : Welcome to Micronaut at 15/5/2018 06:26:14
-INFO  example.micronaut.EmailUseCase - Sending email to ron@micronaut.example : Welcome to Micronaut Framework at 15/5/2018 06:26:34
+INFO  example.micronaut.EmailUseCase - Sending email to ron@micronaut.example : Welcome to the Micronaut framework at 15/5/2018 06:26:34
 ----
 
 == Summary
 
 During this guide, we learned how to configure Jobs using the `@Scheduled` annotation using fixedDelay, initialDelay,
-and cron as well as manually configuring jobs with a `TaskScheduler` and tasks.
+and cron, as well as manually configuring Jobs with a `TaskScheduler` and tasks.
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-Execute the native image, and you will see the log message of the jobs appear:
+Execute the native image, and you will see the log message of the Jobs appear:
 
 [source, bash]
 ----

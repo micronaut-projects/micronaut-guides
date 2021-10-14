@@ -76,6 +76,12 @@ Also, note that we return an empty model in the controller. However, we are acce
 injects into the model a `security` map with the authenticated user.  See
 https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view^] documentation.
 
+=== OAuth 2.0 authorization code grant flow
+
+Here is a high level diagram of how the authorization code grant flow works with an OAuth 2.0 provider such as LinkedIn.
+
+image::standard-oauth.svg[]
+
 === OAuth 2.0 Configuration
 
 Add the following OAuth2 Configuration:
@@ -93,7 +99,7 @@ callout:oauth2-client-name[number=4,arg0=linkedin]
 <9> Map manually the LinkedIn's https://tools.ietf.org/html/rfc6749#section-3.2[Token endpoint^].
 <10> Accept GET request to the `/logout` endpoint.
 
-The previous configuration uses several placeholders. You will need to setup `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
 
 [soruce, bash]
 ----
@@ -101,11 +107,7 @@ export OAUTH_CLIENT_ID=XXXXXXXXXX
 export OAUTH_CLIENT_SECRET=YYYYYYYYYY
 ----
 
-=== User Details Mapper
-
-Here is a high level diagram of how the authorization code grant flow works with an OAuth 2.0 provider such as LinkedIn.
-
-image::standard-oauth.svg[]
+=== OAuth 2.0 Details Mapper
 
 We need an HTTP Client to retrieve the user info. Create a POJO to represent a LinkedIn user:
 
@@ -123,6 +125,14 @@ source:LinkedInApiClient[]
 Specify the URL for the `linkedin` service.
 
 resource:application.yml[tag=micronaut-http-services]
+
+Create an implementation of https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/oauth2/endpoint/token/response/OauthAuthenticationMapper.html[OauthAuthenticationMapper]. The implementation must be qualified by a name that matches the name present in the client configuration. The value specified in the client configuration is `linkedin`.
+
+source:LinkedInOauthAuthenticationMapper[]
+
+callout:at-named[1]
+callout:singleton[2]
+callout:constructor-di[number=3,arg0=LinkedInApiClient]
 
 include::{commondir}/common-runapp.adoc[]
 

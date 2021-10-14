@@ -11,12 +11,13 @@ import java.nio.file.Paths
 
 @CompileStatic
 class IndexGenerator {
+
     private static final String DEFAULT_CARD = "micronauttwittercard.png";
+    private static final String DEFAULT_INTRO = "Step-by-step tutorials to learn the Micronaut framework"
+    private static final String DEFAULT_TITLE = "Micronaut Guides"
     private static final String GUIDES_URL = "https://guides.micronaut.io"
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
-    public static final String DEFAULT_TITLE = "Micronaut Guides"
-    public static final String DEFAULT_INTRO = "Step by Step tutorials to learn the Micronaut Framework"
 
     static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
@@ -87,13 +88,16 @@ class IndexGenerator {
         text
     }
 
+    static String rootUrl() {
+        System.getenv("CI") ? GUIDES_URL : ''
+    }
+
     static String twitterCardHtml(File distDir, GuideMetadata guideMetadata) {
-        String rootUrl = System.getenv("CI") ? GUIDES_URL : ""
         String filename = new File(distDir.absolutePath, "/images/cards/" + guideMetadata.slug + ".png").exists() ?
                 guideMetadata.slug + ".png" : DEFAULT_CARD
 """\
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:image" content="${rootUrl}/latest/images/cards/${filename}"/>
+    <meta name="twitter:image" content="${rootUrl()}/latest/images/cards/${filename}"/>
     <meta name="twitter:creator" content="${TWITTER_MICRONAUT}"/>
     <meta name="twitter:site" content="${TWITTER_MICRONAUT}"/>
     <meta name="twitter:title" content="${guideMetadata.title?.replaceAll('"', "&quot;") ?: DEFAULT_TITLE}"/>
@@ -256,7 +260,7 @@ class IndexGenerator {
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
             case Category.ORACLE_CLOUD:
-                return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg' // TODO
+                return 'https://micronaut.io/wp-content/uploads/2021/05/Oracle-1.svg'
 
             default:
                 return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'

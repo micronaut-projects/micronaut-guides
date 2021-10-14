@@ -29,7 +29,11 @@ public class GenerateGuideZip {
             if (file.isDirectory()) {
                 compressDirectoryToZipfile(rootDir, sourceDir + File.separatorChar + file.getName(), out);
             } else {
-                ZipArchiveEntry entry = new ZipArchiveEntry(sourceDir.replace(rootDir, "") + File.separatorChar + file.getName());
+                String zipPath = sourceDir.replace(rootDir, "") + '/' + file.getName();
+                if (zipPath.charAt(0) == '/') {
+                    zipPath = zipPath.substring(1);
+                }
+                ZipArchiveEntry entry = new ZipArchiveEntry(zipPath);
                 if (EXECUTABLES.contains(file.getName())) {
                     entry.setUnixMode(UnixStat.FILE_FLAG | 0755);
                 }

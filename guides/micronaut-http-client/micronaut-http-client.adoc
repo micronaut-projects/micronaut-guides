@@ -114,12 +114,12 @@ Create a test to verify that both clients work as expected, and the controller e
 test:GithubControllerTest[]
 
 callout:micronaut-test[1]
-<2> Inject the `StreamingHttpClient` bean in the application context.
+<2> Inject the `HttpClient` bean in the application context.
 <3> Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 <4> The Micronaut framework makes it easy to parse JSON into Java objects.
 <5> Use `status` to check the HTTP status code.
 callout:body-method[6]
-<7> Use the `jsonStream` method, which returns a `Publisher`, to consume the endpoint which generates a JSON Stream.
+callout:binding-json-array[7]
 
 include::{commondir}/common-testApp.adoc[]
 
@@ -137,9 +137,30 @@ Create a Filter:
 source:GithubFilter[]
 
 <1> Supply the pattern you want to match to the `@Filter` annotation.
+
+:exclude-for-languages:kotlin
 <2> The Micronaut framework will not load the bean unless configuration properties are set.
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy
+<2> Kotlin doesn't support runtime repeatable annotations (see https://youtrack.jetbrains.com/issue/KT-12794[KT-12794]. We use a custom condition to enable the bean where appropriate.
+:exclude-for-languages:
+
 <3> Constructor injection of the configuration parameters.
 <4> Enhance every request sent to GitHub API providing Basic Authentication.
+
+
+:exclude-for-languages:java,groovy
+
+Create a custom Condition:
+
+source:GithubFilterCondition[]
+
+<1> Implement Micronaut `Condition`.
+<2> Get the `GithubConfiguration` bean from the application context.
+<3> Only return `true` when the `token` and the `username` exist.
+
+:exclude-for-languages:
 
 === Configuration Parameters
 
