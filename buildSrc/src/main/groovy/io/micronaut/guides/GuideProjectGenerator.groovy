@@ -108,7 +108,7 @@ class GuideProjectGenerator implements Closeable {
 
         guidesFolder.eachDir { dir ->
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
-            if (Utils.process(metadata)) {
+            if (Utils.process(metadata, true)) {
                 generateOne(metadata, dir, output)
                 GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
             }
