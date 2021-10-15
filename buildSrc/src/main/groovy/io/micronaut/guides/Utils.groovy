@@ -15,7 +15,7 @@ class Utils {
         System.getProperty(SYS_PROP_MICRONAUT_GUIDE)
     }
 
-    static boolean process(GuideMetadata metadata, boolean checkJdk = false) {
+    static boolean process(GuideMetadata metadata, boolean checkJdk = true) {
 
         boolean processGuide = singleGuide() == null || singleGuide() == metadata.slug
         if (!processGuide) {
