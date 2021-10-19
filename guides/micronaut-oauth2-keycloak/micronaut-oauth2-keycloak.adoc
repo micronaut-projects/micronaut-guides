@@ -1,0 +1,93 @@
+include::{commondir}/common-header.adoc[]
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-create-app.adoc[]
+
+=== Views
+
+Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
+
+To use https://www.thymeleaf.org/[Thymeleaf] Java template engine to render views in a Micronaut application add the following dependency on your classpath.
+
+dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+
+=== OAuth 2.0
+
+TODO: Explain how to install keycloak, run it and setup an app. Add screenshots
+
+
+To use OAuth 2.0 integration, add the following dependency:
+
+dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
+
+Also add JWT https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support] dependencies:
+
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+Add the following OAuth2 Configuration:
+
+resource:application.yml[tag=oauth2]
+
+callout:authentication-idtoken[number=1,arg0=Keycloack]
+<2> The provider identifier should match the last part of the URL you entered as a redirect URL `/oauth/callback/keycloak`
+<3> Client Secret. See previous screenshot.
+<4> Client ID. See previous screenshot.
+<5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
+<6> Accept GET request to the `/logout` endpoint.
+
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OIDC_ISSUER_DOMAIN` and `OIDC_ISSUER_AUTHSERVERID` environment variables.
+
+[soruce, bash]
+----
+export OAUTH_CLIENT_ID=XXXXXXXXXX
+export OAUTH_CLIENT_SECRET=YYYYYYYYYY
+export OIDC_ISSUER_DOMAIN=ZZZZZ
+----
+
+TODO add link to .well-known/openid-configuration 
+
+We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
+
+image::diagramm.png[]
+
+=== Home
+
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+
+source:HomeController[]
+
+callout:controller[number=1,arg0=/]
+callout:secured-anonymous[number=2]
+<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
+
+Create a thymeleaf template:
+
+resource:views/home.html[]
+
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
+
+- The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
+injects into the model a `security` map with the authenticated user.  See
+https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
+
+include::{commondir}/common-runapp.adoc[]
+
+TODO add keycloak gif
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+After you execute the native image, navigate to localhost:8080 and authenticate with Keycloak.
+
+:exclude-for-languages:
+
+== Next steps
+
+Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
+
+Checkout https://www.keycloak.org[Keycloak] website.
