@@ -618,7 +618,37 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/MongoDbUtils.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in micronaut-mongodb-synchronous-gradle-java.adoc - include::build/code/micronaut-mongodb-synchronous-gradle-java/src/test/java/example/micronaut/MongoDbUtils.java<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">org.testcontainers.containers.MongoDBContainer</span>;
+<span class="keyword">import</span> <span class="include">org.testcontainers.utility.DockerImageName</span>;
+
+<span class="directive">public</span> <span class="type">class</span> <span class="class">MongoDbUtils</span> {
+    <span class="directive">static</span> MongoDBContainer mongoDBContainer;
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> startMongoDb() {
+        <span class="keyword">if</span> (mongoDBContainer == <span class="predefined-constant">null</span>) {
+            mongoDBContainer = <span class="keyword">new</span> MongoDBContainer(DockerImageName.parse(<span class="string"><span class="delimiter">&quot;</span><span class="content">mongo:4.0.10</span><span class="delimiter">&quot;</span></span>))
+                    .withExposedPorts(<span class="integer">27017</span>);
+        }
+        <span class="keyword">if</span> (!mongoDBContainer.isRunning()) {
+            mongoDBContainer.start();
+        }
+    }
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="predefined-type">String</span> getMongoDbUri() {
+        <span class="keyword">if</span> (mongoDBContainer == <span class="predefined-constant">null</span> || !mongoDBContainer.isRunning()) {
+            startMongoDb();
+        }
+        <span class="keyword">return</span> mongoDBContainer.getReplicaSetUrl();
+    }
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> closeMongoDb() {
+        <span class="keyword">if</span> (mongoDBContainer != <span class="predefined-constant">null</span>) {
+            mongoDBContainer.close();
+        }
+    }
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -632,28 +662,21 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.support.TestPropertyProvider</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNull</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertFalse</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions</span>.*;
 <span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 <span class="keyword">import</span> <span class="include">java.util.Map</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.AfterAll</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.containers.MongoDBContainer</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.utility.DockerImageName</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance.Lifecycle</span>;
 
 <span class="annotation">@MicronautTest</span>
-<span class="annotation">@TestInstance</span>(TestInstance.Lifecycle.PER_CLASS)
+<span class="annotation">@TestInstance</span>(Lifecycle.PER_CLASS)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">FruitControllerTest</span> <span class="directive">implements</span> TestPropertyProvider {
-    <span class="directive">static</span> MongoDBContainer mongoDBContainer;
-    <span class="annotation">@Inject</span> FruitClient fruitClient;
 
     <span class="annotation">@Test</span>
-    <span class="type">void</span> fruitsEndpointInteractsWithMongo() {        
+    <span class="type">void</span> fruitsEndpointInteractsWithMongo(FruitClient fruitClient) {
         <span class="predefined-type">List</span>&lt;Fruit&gt; fruits = fruitClient.findAll();
         assertTrue(fruits.isEmpty());
 
@@ -669,25 +692,20 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
         assertEquals(HttpStatus.CREATED, status);
         fruits = fruitClient.findAll();
         assertTrue(fruits.stream()
-            .filter(f -&gt; f.getDescription() != <span class="predefined-constant">null</span> &amp;&amp; f.getDescription().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>))
-            .findFirst()
-            .isPresent());
+                .filter(f -&gt; f.getDescription() != <span class="predefined-constant">null</span> &amp;&amp; f.getDescription().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>))
+                .findFirst()
+                .isPresent());
+    }
+
+    <span class="annotation">@AfterAll</span>
+    <span class="directive">static</span> <span class="type">void</span> cleanup() {
+        MongoDbUtils.closeMongoDb();
     }
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() {
-        mongoDBContainer = <span class="keyword">new</span> MongoDBContainer(DockerImageName.parse(<span class="string"><span class="delimiter">&quot;</span><span class="content">mongo:4.0.10</span><span class="delimiter">&quot;</span></span>))
-                                .withExposedPorts(<span class="integer">27017</span>);
-
-        mongoDBContainer.start();
-        <span class="keyword">return</span> <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">mongodb.uri</span><span class="delimiter">&quot;</span></span>, mongoDBContainer.getReplicaSetUrl());
-    }
-
-    <span class="annotation">@AfterAll</span>
-    <span class="directive">static</span> <span class="type">void</span> shutdownMongo() {
-        <span class="keyword">if</span> (mongoDBContainer != <span class="predefined-constant">null</span>) {
-            mongoDBContainer.stop();
-        }
+        MongoDbUtils.startMongoDb();
+        <span class="keyword">return</span> <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">mongodb.uri</span><span class="delimiter">&quot;</span></span>, MongoDbUtils.getMongoDbUri());
     }
 }</code></pre>
 </div>

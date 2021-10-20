@@ -668,26 +668,24 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.support.TestPropertyProvider</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNull</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertFalse</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions</span>.*;
 <span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.AfterAll</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance.Lifecycle</span>;
 
-<span class="directive">public</span> <span class="type">class</span> <span class="class">FruitControllerTest</span> {
+<span class="annotation">@MicronautTest</span>
+<span class="annotation">@TestInstance</span>(Lifecycle.PER_CLASS)
+<span class="directive">public</span> <span class="type">class</span> <span class="class">FruitControllerTest</span> <span class="directive">implements</span> TestPropertyProvider {
 
     <span class="annotation">@Test</span>
-    <span class="type">void</span> fruitsEndpointInteractsWithMongo() {        
-        EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer.class, 
-            <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">mongodb.uri</span><span class="delimiter">&quot;</span></span>, MongoDbUtils.getMongoDbUri()));
-        FruitClient fruitClient = embeddedServer.getApplicationContext()
-            .getBean(FruitClient.class);
-
+    <span class="type">void</span> fruitsEndpointInteractsWithMongo(FruitClient fruitClient) {
         <span class="predefined-type">List</span>&lt;Fruit&gt; fruits = fruitClient.findAll();
         assertTrue(fruits.isEmpty());
 
@@ -703,11 +701,20 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
         assertEquals(HttpStatus.CREATED, status);
         fruits = fruitClient.findAll();
         assertTrue(fruits.stream()
-            .filter(f -&gt; f.getDescription() != <span class="predefined-constant">null</span> &amp;&amp; f.getDescription().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>))
-            .findFirst()
-            .isPresent());
-        embeddedServer.close();
+                .filter(f -&gt; f.getDescription() != <span class="predefined-constant">null</span> &amp;&amp; f.getDescription().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>))
+                .findFirst()
+                .isPresent());
+    }
+
+    <span class="annotation">@AfterAll</span>
+    <span class="directive">static</span> <span class="type">void</span> cleanup() {
         MongoDbUtils.closeMongoDb();
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() {
+        MongoDbUtils.startMongoDb();
+        <span class="keyword">return</span> <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">mongodb.uri</span><span class="delimiter">&quot;</span></span>, MongoDbUtils.getMongoDbUri());
     }
 }</code></pre>
 </div>
