@@ -1,25 +1,23 @@
 package example.micronaut;
 
-import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.runtime.server.EmbeddedServer;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.test.support.TestPropertyProvider;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 
-public class FruitControllerTest {
+@MicronautTest
+@TestInstance(Lifecycle.PER_CLASS)
+public class FruitControllerTest implements TestPropertyProvider {
 
     @Test
-    void fruitsEndpointInteractsWithMongo() {        
-        EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer.class, 
-            Collections.singletonMap("mongodb.uri", MongoDbUtils.getMongoDbUri()));
-        FruitClient fruitClient = embeddedServer.getApplicationContext()
-            .getBean(FruitClient.class);
-
+    void fruitsEndpointInteractsWithMongo(FruitClient fruitClient) {
         List<Fruit> fruits = fruitClient.findAll();
         assertTrue(fruits.isEmpty());
 
@@ -35,10 +33,19 @@ public class FruitControllerTest {
         assertEquals(HttpStatus.CREATED, status);
         fruits = fruitClient.findAll();
         assertTrue(fruits.stream()
-            .filter(f -> f.getDescription() != null && f.getDescription().equals("Keeps the doctor away"))
-            .findFirst()
-            .isPresent());
-        embeddedServer.close();
+                .filter(f -> f.getDescription() != null && f.getDescription().equals("Keeps the doctor away"))
+                .findFirst()
+                .isPresent());
+    }
+
+    @AfterAll
+    static void cleanup() {
         MongoDbUtils.closeMongoDb();
+    }
+
+    @Override
+    public Map<String, String> getProperties() {
+        MongoDbUtils.startMongoDb();
+        return Collections.singletonMap("mongodb.uri", MongoDbUtils.getMongoDbUri());
     }
 }
