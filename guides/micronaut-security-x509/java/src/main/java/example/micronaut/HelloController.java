@@ -19,23 +19,17 @@ class HelloController {
     @Get(produces = TEXT_PLAIN) // <2>
     String hello(@Nullable X509Authentication x509Authentication, // <3>
                  @Nullable Authentication authentication) { // <4>
-
-        String username = "unknown!"; // <5>
-
+        if (x509Authentication == null && authentication == null) {
+            return "Hello unknown!"; // <5>
+        }
         if (x509Authentication == null) {
-            if (authentication != null) {
-                return "ERROR: Authentication is present but not X509Authentication"; // <6>
-            }
+            return "ERROR: Authentication is present but not X509Authentication"; // <6>
         }
-        else {
-            if (x509Authentication != authentication) {
-                return "ERROR: Authentication and X509Authentication should be the same instance"; // <7>
-            }
-            X509Certificate clientCertificate = x509Authentication.getCertificate();
-            String issuer = clientCertificate.getIssuerDN().getName();
-            username = x509Authentication.getName() + " (X.509 cert issued by " + issuer + ')'; // <8>
+        if (x509Authentication != authentication) {
+            return "ERROR: Authentication and X509Authentication should be the same instance"; // <7>
         }
-
-        return "Hello " + username;
+        return "Hello " +
+                x509Authentication.getName() +
+                " (X.509 cert issued by " + x509Authentication.getCertificate().getIssuerX500Principal().getName() + ')'; // <8>
     }
 }
