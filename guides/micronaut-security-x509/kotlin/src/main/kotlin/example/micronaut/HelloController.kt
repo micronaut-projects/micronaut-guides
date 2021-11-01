@@ -15,21 +15,15 @@ class HelloController {
     @Get(produces = [TEXT_PLAIN]) // <2>
     fun hello(x509Authentication: X509Authentication?,  // <3>
               authentication: Authentication?): String { // <4>
-
-        var username = "unknown!" // <5>
-        if (x509Authentication == null) {
-            if (authentication != null) {
-                return "ERROR: Authentication is present but not X509Authentication" // <6>
-            }
-        } else {
-            if (x509Authentication !== authentication) {
-                return "ERROR: Authentication and X509Authentication should be the same instance" // <7>
-            }
-            val clientCertificate = x509Authentication.certificate
-            val issuer = clientCertificate.issuerDN.name
-            username = "${x509Authentication.name} (X.509 cert issued by ${issuer})" // <8>
+        if (x509Authentication == null && authentication == null) {
+            return "Hello unknown!" // <5>
         }
+        if (x509Authentication == null) {
+            return "ERROR: Authentication is present but not X509Authentication" // <6>
+        }
+        return if (x509Authentication !== authentication) {
+            "ERROR: Authentication and X509Authentication should be the same instance" // <7>
+        } else "Hello ${x509Authentication.name} (X.509 cert issued by ${x509Authentication.certificate.issuerX500Principal.name})" // <8>
 
-        return "Hello ${username}"
     }
 }
