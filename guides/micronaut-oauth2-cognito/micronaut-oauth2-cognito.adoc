@@ -10,53 +10,23 @@ include::{commondir}/common-create-app.adoc[]
 
 Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
 
-To use https://www.thymeleaf.org/[Thymeleaf^] Java template engine to render views in a Micronaut application add the following dependency on your classpath.
+To use https://www.thymeleaf.org/[Thymeleaf] Java template engine to render views in a Micronaut application add the following dependency on your classpath.
 
 dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
 
 === OAuth 2.0
 
-To provide authentication, sign in to your https://aws.amazon.com[AWS^] account and go to https://aws.amazon.com/cognito[AWS Cognito^].
-
-____
-With the Amazon Cognito SDK, you just write a few lines of code to enable your users to sign-up and sign-in to your mobile and web apps.
-
-**Standards-based authentication**
-
-Amazon Cognito uses common identity management standards including OpenID Connect, OAuth 2.0, and SAML 2.0.
-____
-
-First, create an Amazon Cognito User Pool:
-
-____
-**Amazon Cognito User Pools - A directory for all your users**
-
-You can quickly create your own directory to sign up and sign in users, and to store user profiles using Amazon Cognito User Pools. User Pools provide a user interface you can customize to match your application. User Pools also enable easy integration with social identity providers such as Facebook, Google, and Amazon, and enterprise identity providers such as Microsoft Active Directory through SAML.
-____
-
-image::aws-cognito-1.png[]
-
-image::aws-cognito-2.png[]
-
-Amazon Cognito Pools are regional. Thus, annotate the region you are using.
-
-While you setup the Amazon Cognito User Pool, you will need to save the pool id:
-
-image::aws-cognito-3.png[]
+include::{commondir}/common-cognito.adoc[]
 
 Configure the appropriate callback, make sure you allow `Authorization code grant` OAuth Flow, and also the scopes `openid` and `email` are selected.
 
 image::aws-cognito-5.png[]
 
-Save the client id and client secret:
-
-image::aws-cognito-4.png[]
-
 To use OAuth 2.0 integration, add the following dependency:
 
 dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
 
-Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support^] dependencies:
+Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support] dependencies:
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
@@ -64,14 +34,14 @@ Add the following OAuth2 Configuration:
 
 resource:application.yml[tag=oauth2]
 
-<1> Set `micronaut.security.authentication` as idtoken. The idtoken provided by Cognito when the OAuth 2.0 Authorization code flow ends will be saved in a cookie. The id token is a signed JWT. For every request, the Micronaut framework extracts the JWT from the Cookie and validates the JWT signature with the remote Json Web Key Set exposed by Cognito. JWKS is exposed by the `jws-uri` entry of Cognito `.well-known/openid-configuration`
+callout:authentication-idtoken[number=1,arg0=Cognito]
 callout:oauth2-client-name[number=2,arg0=cognito]
 <3> Client ID. See previous screenshot.
 <4> Client Secret. See previous screenshot.
 <5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server. Note: we will use the pool id and region mentioned previously.
 <6> Accept GET request to the `/logout` endpoint.
 
-The previous configuration uses several placeholders. You will need to setup `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `COGNITO_REGION` and `COGNITO_POOL_ID` environment variables.
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `COGNITO_REGION` and `COGNITO_POOL_ID` environment variables.
 
 [soruce, bash]
 ----
@@ -81,7 +51,7 @@ export COGNITO_REGION=eu-west-1
 export COGNITO_POOL_ID=eu-west-XXCCCAZZZ
 ----
 
-Although undocumented in the https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html[Amazon Cognito User Pools Auth API Reference^], Cognito provides an https://openid.net/specs/openid-connect-discovery-1_0.html[openid-configuration endpoint^] which the Micronaut framework uses to configure your application.
+Although undocumented in the https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html[Amazon Cognito User Pools Auth API Reference], Cognito provides an https://openid.net/specs/openid-connect-discovery-1_0.html[openid-configuration endpoint] which the Micronaut framework uses to configure your application.
 
 [source, bash]
 ----
@@ -99,9 +69,9 @@ Create a controller to handle the requests to `/`. You will display the email of
 source:HomeController[]
 
 callout:controller[number=1,arg0=/]
-<2> Annotate with `io.micronaut.security.Secured` to configure secured access. The `SecurityRule.IS_ANONYMOUS` expression will allow access without authentication.
-<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View^] annotation to specify which template to use to render the response.
-<4> The @api@/io/micronaut/http/annotation/Get.html[@Get^] annotation maps the `index` method to GET `/` requests.
+callout:secured-anonymous[number=2]
+<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
 
 Create a thymeleaf template:
 
@@ -110,7 +80,7 @@ resource:views/home.html[]
 Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
 
 - The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
-injects into the model a `security` map with the authenticated user.  See https://micronaut-projects.github.io/micronaut-views/latest/guide/#views-security[User in a view^] documentation.
+injects into the model a `security` map with the authenticated user.  See https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view^] documentation.
 
 include::{commondir}/common-runapp.adoc[]
 
@@ -126,6 +96,6 @@ After you execute the native image, navigate to localhost:8080 and authenticate 
 
 == Next steps
 
-Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation^] to learn more.
+Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
 
 include::{commondir}/common-helpWithMicronaut.adoc[]

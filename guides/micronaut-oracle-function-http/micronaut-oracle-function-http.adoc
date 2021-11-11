@@ -8,25 +8,27 @@ To complete this guide, you will need the following:
 * A decent text editor or IDE
 * JDK 11 or greater installed with `JAVA_HOME` configured appropriately
 * Docker installed
-* A paid or free trial Oracle Cloud account (create an account at https://signup.oraclecloud.com[signup.oraclecloud.com^])
-* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI^] installed, with local access to Oracle Cloud configured by running `oci setup config`
+* A paid or free trial Oracle Cloud account (create an account at https://signup.oraclecloud.com[signup.oraclecloud.com])
+* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
 
 include::{commondir}/common-completesolution.adoc[]
 
-== Writing the App
+== Writing the Application
 
 include::{commondir}/common-cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-app --features=oracle-function,oracle-cloud-sdk example.micronaut.micronautguide --build=@build@ --lang=@lang@
+mn create-app --features=oracle-function,oracle-cloud-sdk,graalvm example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
 ----
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use https://launch.micronaut.io[Micronaut Launch^], select Micronaut Application as application type and add the `oracle-function` and `oracle-cloud-sdk` features.
+If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type, JDK version 11 or higher, and add the `oracle-function`, `oracle-cloud-sdk`, and `graalvm` features.
 
 include::{commondir}/common-default-package.adoc[]
+
+diffLink:[featureExcludes=oci-java-sdk-core]
 
 include::{commondir}/common-annotationprocessors.adoc[]
 
@@ -58,11 +60,11 @@ source:MicronautguideController[]
 
 == Testing the Application
 
-NOTE: The code in this guide should work with recent versions of Micronaut Framework 2.5+, but the tests require at least version 2.5.7
+NOTE: The code in this guide should work with recent versions of the Micronaut framework 2.5+, but the tests require at least version 2.5.7
 
 We need to update the generated `MicronautguideControllerTest` to test the changes we made in `MicronautguideController`.
 
-This will be a unit test, so we'll need some mock beans to replace the beans auto-registered by the `oracle-cloud-sdk` module which make requests to Oracle Cloud. We also need to take into consideration the strict class loader isolation used by https://fnproject.io/[Fn Project^] (which powers Oracle Cloud Functions).
+This will be a unit test, so we'll need some mock beans to replace the beans auto-registered by the `oracle-cloud-sdk` module which make requests to Oracle Cloud. We also need to take into consideration the strict class loader isolation used by https://fnproject.io/[Fn Project] (which powers Oracle Cloud Functions).
 
 When running our tests, the test and mock classes are loaded by the regular Micronaut framework classloader, but the function invocations are made in a custom `Fn` classloader, so it is not _directly_ possible to share state between the two, which complicates traditional approaches to mocking. There is support in `Fn` for sharing classes however, so instead of setting values in mock instances from the test to be used by the controller we'll set values in a `MockData` helper class that's registered as a class that's shared between classloaders.
 
@@ -119,7 +121,14 @@ $ ./mvnw test
 
 We need to configure some cloud infrastructure to support deploying functions.
 
-Initially, do all the configuration steps described in the https://guides.micronaut.io/latest/micronaut-oracle-function.html[Deploy a Micronaut Function (Serverless) app to Oracle Cloud^] guide's "Configuring Oracle Cloud Resources" and "Enable Tracing and Logs" sections since they're the same as for HTTP Gateway functions.
+Initially, do all the configuration steps described in the https://guides.micronaut.io/latest/micronaut-oracle-function.html[Deploy a Micronaut Function (Serverless) application to Oracle Cloud] guide's "Configuring Oracle Cloud Resources" section since they're the same as for HTTP Gateway functions. To summarize, do the following (unless a resource exists and can be used):
+
+- create a compartment
+- create a function user and group
+- create an auth token
+- configure the OCIR repository in your build script and authenticate to OCIR
+- create a VCN and subnet
+- create policies
 
 :exclude-for-build:gradle
 
@@ -133,23 +142,7 @@ There is some more infrastructure configuration to do, but we'll need to create 
 
 First, build the function as a Docker image and push it to the OCIR repository by running:
 
-:exclude-for-build:maven
-
-[source, bash]
-----
-./gradlew dockerPush
-----
-
-:exclude-for-build:
-
-:exclude-for-build:gradle
-
-[source, bash]
-----
-./mvnw deploy -Dpackaging=docker
-----
-
-:exclude-for-build:
+include::{commondir}/common-docker-push.adoc[]
 
 Once you've pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.
 
@@ -165,7 +158,7 @@ Choose a name for the application, e.g. `mn-guide-http-function-app`, and select
 
 image::oraclefnhttp/function3.png[]
 
-Click the application link in the list, and then click "Create Function":
+Click "Functions" under "Resources" on the left, and then click "Create Function":
 
 image::oraclefnhttp/function4.png[]
 
@@ -174,6 +167,12 @@ Choose a name for the function, e.g. `mn-guide-http-function`, select the reposi
 image::oraclefnhttp/function5.png[]
 
 == Configuring Oracle Cloud Resources (continued)
+
+Like earlier, do all the configuration steps described in the https://guides.micronaut.io/latest/micronaut-oracle-function.html[Deploy a Micronaut Function (Serverless) application to Oracle Cloud] guide's "Enable Tracing and Logs" section since they're the same as for HTTP Gateway functions. To summarize, do the following (unless a resource exists and can be used):
+
+- create an APM domain
+- enable logs for your HTTP function
+- enable traces for your HTTP function
 
 Next we'll create an API Gateway, plus a few smaller tasks.
 
@@ -211,7 +210,7 @@ Click the "Copy" link in the "Endpoint" column; this is the base controller URL 
 
 image::oraclefnhttp/gateway8.png[]
 
-See the https://docs.oracle.com/en-us/iaas/Content/APIGateway/Concepts/apigatewayoverview.htm[API Gateway docs^] for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/APIGateway/Concepts/apigatewayoverview.htm[API Gateway docs] for more information.
 
 === Remaining Configuration
 
@@ -253,7 +252,7 @@ Then enter a name and description for the group, e.g. "mn-guide-dg", and a match
 
 image::oraclefnhttp/dynamicgroup3.png[]
 
-See the https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm[Dynamic Group docs^] for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm[Dynamic Group docs] for more information.
 
 ==== Dynamic Group Policy Statement
 
@@ -279,7 +278,7 @@ image::oraclefnhttp/policy5.png[]
 
 == Invoking the function
 
-Since the function works with Compute Instances, make sure you have at least one running. If you don't have any, one easy option is with the https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[Deploy a Micronaut application to Oracle Cloud^] guide.
+Since the function works with Compute Instances, make sure you have at least one running. If you don't have any, one easy option is with the https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[Deploy a Micronaut application to Oracle Cloud] guide.
 
 Now is when you need the base controller URL that you copied when creating the API Gateway; it should look something like `\https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute` and end in `/compute` since that's the root URI of the controller.
 
@@ -287,7 +286,7 @@ First, get the status of an instance in a web browser or with cURL by appending 
 
 [source, bash]
 ----
-$ curl -i https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/status/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
+curl -i https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/status/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
 ----
 
 and the output should look something like this:
@@ -313,7 +312,7 @@ Next, stop the instance with the same URL, except replace `/status/` with `/stop
 
 [source, bash]
 ----
-$ curl -i -H "Content-Type: application/json" -X POST https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/stop/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
+curl -i -H "Content-Type: application/json" -X POST https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/stop/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
 ----
 
 and the output should look something like this (it should be the same as before except `lifecycleState` should be `STOPPING`):
@@ -335,7 +334,7 @@ Once the status is `STOPPED` you can start it again with the same URL, except re
 
 [source, bash]
 ----
-$ curl -i -H "Content-Type: application/json" -X POST https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/start/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
+curl -i -H "Content-Type: application/json" -X POST https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute/start/ocid1.instance.oc1.iad.anuwcljrbnqp5k...
 ----
 
 and the output should look something like this (it should be the same as before except `lifecycleState` should be `STARTING`):
@@ -353,10 +352,131 @@ and the output should look something like this (it should be the same as before 
 }
 ----
 
+== Deploying as a Native Image
+
+=== Install GraalVM
+
+include::{commondir}/common-install-graal-function.adoc[]
+
+=== Building and deploying the native image
+
+Deploying the function as a native image is similar to the earlier deployment above.
+
+First you need to update your build script with the location to deploy the native image Docker container.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` like before, but set the `images` property in the `dockerBuildNative` block this time, replacing `REGION`, `TENANCY`, and `REPO` as before:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuildNative {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name-native:$project.version"]
+}
+----
+
+Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo:
+
+[source, groovy]
+.build.gradle
+----
+dockerBuildNative {
+    images = ["[REGION].ocir.io/[TENANCY]/[REPO]/$project.name:$project.version"]
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo. If you wish to separate the native image containers, edit `pom.xml` and update the `jib.docker.image` property, appending "-native" to the value:
+
+[source, xml]
+.pom.xml
+----
+<jib.docker.image>[REGION].ocir.io/[TENANCY]/[REPO]/${project.artifactId}-native</jib.docker.image>
+----
+
+:exclude-for-build:
+
+Next, update the version.
+
+:exclude-for-build:maven
+
+Edit `build.gradle` and increment the version to `0.2`:
+
+[source, groovy]
+.build.gradle
+----
+version = "0.2"
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Edit `pom.xml` and increment the version to `0.2`:
+
+[source, xml]
+.pom.xml
+----
+<version>0.2</version>
+----
+
+:exclude-for-build:
+
+Depending on the Micronaut version you're using, you might also need to update some properties in your build script to update the Docker configuration.
+
+:exclude-for-build:maven
+
+In your `build.gradle`, change the base image to `gcr.io/distroless/cc-debian10` in the `dockerfileNative` block:
+
+[source, groovy]
+.build.gradle
+----
+dockerfileNative {
+    args("-XX:MaximumHeapSizePercent=80")
+    baseImage('gcr.io/distroless/cc-debian10')
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+In the "configuration" block of the "micronaut-maven-plugin" plugin in your `pom.xml`, change the base image to `gcr.io/distroless/cc-debian10` in a new `baseImageRun` element:
+
+[source, xml]
+.pom.xml
+----
+<plugin>
+  <groupId>io.micronaut.build</groupId>
+  <artifactId>micronaut-maven-plugin</artifactId>
+  <configuration>
+    <baseImageRun>gcr.io/distroless/cc-debian10</baseImageRun>
+  </configuration>
+</plugin>
+----
+
+:exclude-for-build:
+
+Then from the demo project directory, run:
+
+include::{commondir}/common-docker-push-native.adoc[]
+
+Once you've pushed the Docker container, edit the function in the console to use the new container, and to reduce the memory to 128MB:
+
+image::oraclefnhttp/editfunction.png[]
+
+Use the same OCI command as before to invoke the function. No changes are needed because the function OCID doesn't change when deploying new containers.
+
+:exclude-for-languages:
+
 include::{commondir}/common-next.adoc[]
 
-Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud^] integration.
+Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud] integration.
 
-Also check out the https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm[Oracle Cloud Function documentation^] for more information on the available functionality.
+Also check out the https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm[Oracle Cloud Function documentation] for more information on the available functionality.
 
 include::{commondir}/common-helpWithMicronaut.adoc[]

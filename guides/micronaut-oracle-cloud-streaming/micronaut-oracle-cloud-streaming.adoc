@@ -2,24 +2,24 @@ include::{commondir}/common-header-top.adoc[]
 
 == Getting Started
 
-In this guide, we will create two Micronaut microservices written in @language@ that will use https://docs.oracle.com/en-us/iaas/Content/Streaming/Concepts/streamingoverview.htm[Oracle Cloud Streaming^] to communicate with each other in an asynchronous and decoupled way.
+In this guide, we will create two Micronaut microservices written in @language@ that will use https://docs.oracle.com/en-us/iaas/Content/Streaming/Concepts/streamingoverview.htm[Oracle Cloud Streaming] to communicate with each other in an asynchronous and decoupled way.
 
-== What you will need
+== What You Will Need
 
 To complete this guide, you will need the following:
 
 * Some time on your hands
 * A decent text editor or IDE
 * JDK 11 or greater installed with `JAVA_HOME` configured appropriately
-* An Oracle Cloud account (create a free trial account at https://signup.oraclecloud.com[signup.oraclecloud.com^])
-* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI^] installed, with local access to Oracle Cloud configured by running `oci setup config`
-* https://www.docker.io/gettingstarted/#h_installation[Docker^] and https://docs.docker.com/compose/install/[Docker Compose^] installed if you will be running Kafka in Docker, and for running tests.
+* An Oracle Cloud account (create a free trial account at https://signup.oraclecloud.com[signup.oraclecloud.com])
+* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed with local access to Oracle Cloud configured by running `oci setup config`
+* https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker and for running tests.
 
 include::{commondir}/common-completesolution.adoc[]
 
-== Writing the application
+== Writing the Application
 
-The microservices will use Oracle Cloud Streaming and the Kafka API to send and receive messages. The messages will represent events occurring chess game play, including game start and end, and each move.
+The microservices will use Oracle Cloud Streaming and the Kafka API to send and receive messages. The messages will represent chess gameplay events, including game start and end and each move.
 
 The microservices are:
 
@@ -31,7 +31,7 @@ include::{commondir}/common-annotationprocessors.adoc[]
 
 === chess-game Microservice
 
-Create the `chess-game` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^] or with https://launch.micronaut.io[Micronaut Launch^].
+Create the `chess-game` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
 [source,bash]
 ----
@@ -44,7 +44,7 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 
 The previous command creates a directory named `chess-game` and a Micronaut application inside it with default package `example.micronaut`.
 
-In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for https://www.testcontainers.org/modules/kafka/[Kafka in Testcontainers^], along with one for the http://www.awaitility.org/[Awaitility^] library:
+In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for https://www.testcontainers.org/modules/kafka/[Kafka in Testcontainers], along with one for the http://www.awaitility.org/[Awaitility] library:
 
 :dependencies:
 dependency:kafka[groupId=org.testcontainers,scope=test]
@@ -61,7 +61,7 @@ source:chess/dto/Player[app=chess-game]
 
 :exclude-for-languages:
 
-Create a `GameDTO` data transfer object to represent game data:
+Create a `GameDTO` data-transfer object to represent game data:
 
 source:chess/dto/GameDTO[app=chess-game]
 
@@ -69,7 +69,7 @@ callout:introspected[1]
 <2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
 <3> Annotate with `@Creator` to indicate the constructor to use when deserializing from JSON
 
-Create a `GameStateDTO` data transfer object to represent game move data:
+Create a `GameStateDTO` data-transfer object to represent game move data:
 
 source:chess/dto/GameStateDTO[app=chess-game]
 
@@ -139,7 +139,7 @@ Create `index.html` with the simple chess game UI:
 
 resource:public/index.html[app=chess-game]
 
-The HTML page includes the https://chessboardjs.com/[chessboard.js^] JavaScript library to create a chess board and the https://github.com/jhlywa/chess.js[chess.js^] JavaScript library for chess game logic.
+The HTML page includes the https://chessboardjs.com/[chessboard.js] JavaScript library to create a chess board and the https://github.com/jhlywa/chess.js[chess.js] JavaScript library for chess game logic.
 
 Create `micronaut-chess.js` used by `index.html` with the JavaScript code:
 
@@ -155,7 +155,7 @@ Right-click each image and save to your local file system, or extract the comple
 
 === chess-listener Microservice
 
-Create the `chess-listener` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface^] or with https://launch.micronaut.io[Micronaut Launch^].
+Create the `chess-listener` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
 [source,bash]
 ----
@@ -184,7 +184,7 @@ resource:application.yml[app=chess-listener,tag=flyway]
 
 ==== DTOs
 
-The same data transfer objects (`GameDTO` and `GameStateDTO`...) as above in the `chess-game` microservice. In a real application these would be in a shared library but to keep things simple we'll just duplicate them.
+The same data transfer objects (`GameDTO` and `GameStateDTO`...) as above in the `chess-game` microservice. In a real application, these would be in a shared library, but to keep things simple, we'll just duplicate them.
 
 ==== Entity Classes
 
@@ -207,7 +207,7 @@ and a `H2GameRepository` interface that extends `GameRepository` and specifies t
 source:chess/repository/H2GameRepository[app=chess-listener]
 
 <1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `H2` dialect. The Micronaut framework will generate persistence logic at compile time and use H2-specific SQL.
-<2> Restrict the bean to only be available in the development environment
+<2> Restrict the bean to be available only in the development environment
 
 Create a "base" `GameStateRepository` interface to have access to methods for `GameState` entity persistence:
 
@@ -231,7 +231,7 @@ Create `ChessListener` Kafka listener to receive messages sent from the `chess-g
 
 source:chess/ChessListener[app=chess-listener]
 
-<1> Annotate the class with `@KafkaListener` to declare it as a Kafka message listener; The Micronaut framework will generate the receiving code at compile time
+<1> Annotate the class with `@KafkaListener` to declare it as a Kafka message listener; the Micronaut framework will generate the receiving code at compile time
 <2> Dependency injection for `GameService`
 <3> Annotate the method with `@Topic` and specify the topic name
 <4> Use `GameService` to record that the game ended in a draw
@@ -262,11 +262,11 @@ resource:db/migration/h2/V1__create-schema.sql[app=chess-listener]
 
 == Kafka
 
-We'll use Oracle Cloud Streaming in the "real" application, but for local development we can use a local Kafka instance.
+We'll use Oracle Cloud Streaming in the "real" application, but for local development, we can use a local Kafka instance.
 
 === Install Kafka
 
-A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker^]. Create this `docker-compose.yml` file:
+A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker]. Create this `docker-compose.yml` file:
 
 zipInclude:docker/docker-compose.yml[]
 
@@ -280,7 +280,7 @@ Start Zookeeper and Kafka (use CTRL-C to stop both):
 $ docker-compose up
 ----
 
-Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance^].
+Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance].
 
 == Running the application
 
@@ -326,7 +326,7 @@ chess-listener $ ./mvnw mn:run
 
 :exclude-for-build:
 
-Test the app functionality by opening http://localhost:8080/[http://localhost:8080/^] in a browser. The UI lets you choose one or more chess games that will auto-play with the specified delay between plays. Events (game start and end, player moves) are sent to the server via Ajax and then sent to the `chess-listener` microservice for processing, analysis, etc.
+Test the app functionality by opening http://localhost:8080/[http://localhost:8080/] in a browser. The UI lets you choose one or more chess games that will auto-play with the specified delay between plays. Events (game start and end, player moves) are sent to the server via Ajax and then sent to the `chess-listener` microservice for processing, analysis, etc.
 
 You can, for example, start a single game with a moderately large delay between plays:
 
@@ -350,7 +350,7 @@ image::oraclecloudstream/ui4.png[]
 
 Update the `chess-listener` microservice to support Oracle in addition to the in-memory H2 database.
 
-Use the https://guides.micronaut.io/latest/micronaut-oracle-autonomous-db.html[Oracle Autonomous Database guide^] to provision an Oracle database at OCI.
+Use the https://guides.micronaut.io/latest/micronaut-oracle-autonomous-db.html[Oracle Autonomous Database guide] to provision an Oracle database at OCI.
 
 ==== Dependencies
 
@@ -367,7 +367,7 @@ resource:application-oraclecloud.yml[app=chess-listener,tag=atp]
 <1> Set the value of the `ocid` property with the database OCID unique identifier you saved when creating the database
 <2> Set the `walletPassword` property with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
 <3> Set the `password` property with the `micronautdemo` schema user password you created
-<4> Change the profile name if you're not using the default, and optionally add a value for the path to the config file if necessary as described in the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth[Authentication section^] of the Micronaut Oracle Cloud docs
+<4> Change the profile name if you're not using the default, and optionally add a value for the path to the config file if necessary as described in the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth[Authentication section] of the Micronaut Oracle Cloud docs
 <5> Configure Flyway to look for migration scripts in `src/main/resources/db/migration/oracle`
 
 ==== Repositories
@@ -377,7 +377,7 @@ Create the `OracleGameRepository` interface that extends `GameRepository` and sp
 source:chess/repository/OracleGameRepository[app=chess-listener]
 
 <1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `ORACLE` dialect. The Micronaut framework will generate persistence logic at compile time and use Oracle-specific SQL.
-<2> Restrict the bean to only be available in the `oraclecloud` environment
+<2> Restrict the bean to be available only in the `oraclecloud` environment
 
 Create the `OracleGameStateRepository` interface that extends `GameStateRepository`:
 
@@ -391,11 +391,11 @@ resource:db/migration/oracle/V1__create-schema.sql[app=chess-listener]
 
 === Oracle Cloud Streaming
 
-Up to now we've been using a local Kafka, but let's configure the equivalent infrastructure in OCI. This will involve minimal application changes thanks to the ability to send and receive Cloud Streaming messages using Kafka APIs, and https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut Framework support for Kafka^].
+Up to now, we've been using a local Kafka, but let's configure the equivalent infrastructure in OCI. This will involve minimal application changes thanks to the ability to send and receive Cloud Streaming messages using Kafka APIs, and https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut support for Kafka].
 
 ==== Stream Pool and Streams
 
-Login to your Oracle Cloud tenancy, and from the Oracle Cloud Menu select "Analytics & AI" and then "Streaming":
+Log in to your Oracle Cloud tenancy and from the Oracle Cloud Menu, select "Analytics & AI" and then "Streaming":
 
 image::oraclecloudstream/create.stream.1.png[]
 
@@ -403,7 +403,7 @@ Choose the compartment to create the streams in, then click "Create Stream Pool"
 
 image::oraclecloudstream/create.stream.2.png[]
 
-Enter a name for the pool, e.g. "mn-guide-pool" and click "Create":
+Enter a name for the pool, e.g., "mn-guide-pool", and click "Create":
 
 image::oraclecloudstream/create.stream.3.png[]
 
@@ -421,7 +421,7 @@ image::oraclecloudstream/create.stream.6.png[]
 
 ==== User and Group
 
-Create a group for the streams by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Groups":
+Create a group for the streams by clicking the Oracle Cloud menu and selecting "Identity & Security" and then click "Groups":
 
 image::oraclecloudstream/user1.png[]
 
@@ -429,11 +429,11 @@ Click "Create Group":
 
 image::oraclecloudstream/user2.png[]
 
-Choose a name and a description, e.g. "mn-guide-streaming-group", and click "Create":
+Choose a name and a description, e.g., "mn-guide-streaming-group", and click "Create":
 
 image::oraclecloudstream/user3.png[]
 
-Create a user by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Users":
+Create a user by clicking the Oracle Cloud menu and selecting "Identity & Security" and then click "Users":
 
 image::oraclecloudstream/user4.png[]
 
@@ -441,7 +441,7 @@ Click "Create User":
 
 image::oraclecloudstream/user5.png[]
 
-Choose a name and a description, e.g. "mn-guide-streaming-user", and click "Create":
+Choose a name and a description, e.g., "mn-guide-streaming-user", and click "Create":
 
 image::oraclecloudstream/user6.png[]
 
@@ -457,7 +457,7 @@ You'll need an auth token to use as the password in the Micronaut Kafka configur
 
 image::oraclecloudstream/user9.png[]
 
-Enter a name for the token, e.g. "mn-guide-streaming", and click "Generate Token":
+Enter a name for the token, e.g., "mn-guide-streaming", and click "Generate Token":
 
 image::oraclecloudstream/user10.png[]
 
@@ -465,21 +465,21 @@ Copy the token to the clipboard and save it for later:
 
 image::oraclecloudstream/user11.png[]
 
-See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm[Groups and Users docs^] for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm[Groups and Users docs] for more information.
 
 ==== Policy
 
 Create a policy to grant various Streams access to the user and group you created.
 
-Open the Oracle Cloud Menu and click "Identity & Security", and then "Policies":
+Open the Oracle Cloud Menu and click "Identity & Security" and then "Policies":
 
 image::oraclecloudstream/policy1.png[]
 
-Select the compartment where you created the streams from the drop-down and click "Create Policy":
+Select the compartment where you created the streams from the dropdown and click "Create Policy":
 
 image::oraclecloudstream/policy2.png[]
 
-Choose a name and description, e.g. "mn-guide-streaming-policy", and click "Show Manual Editor". Copy the following and paste it into the "Policy Builder" field, replacing "micronaut-guides" with the name of the compartment you're using, and click "Create":
+Choose a name and description, e.g., "mn-guide-streaming-policy", and click "Show Manual Editor". Copy the following and paste it into the "Policy Builder" field, replacing "micronaut-guides" with the name of the compartment you're using, and click "Create":
 
 image::oraclecloudstream/policy3.png[]
 
@@ -494,7 +494,7 @@ resource:application-oraclecloud.yml[app=chess-game]
 <3> Limit request size to 1MB
 <4> Limit request size to 1MB per partition
 
-== Local testing with cloud resources
+== Local Testing with Cloud Resources
 
 You can now start both microservices in the `oraclecloud` environment to use Cloud Streaming and the ATP database you created:
 
@@ -536,7 +536,7 @@ or if you use Windows:
 
 == Writing Tests
 
-We'll run Kafka inside a Docker container using https://www.testcontainers.org/[Testcontainers^] for both application tests, and also run Oracle database inside a Docker container for testing persistence in the `chess-listener` tests.
+We'll run Kafka inside a Docker container using https://www.testcontainers.org/[Testcontainers] for both application tests and also run Oracle database inside a Docker container for testing persistence in the `chess-listener` tests.
 
 === chess-game tests
 
@@ -554,7 +554,7 @@ test:GameReporterTest[app=chess-game]
 <8> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
 <9> Use a Map to hold form parameter names and values
 <10> Use the `HttpClient` to send a POST request that indicates a game has started, which will trigger sending a message with Kafka
-<11> Use the `HttpClient` to send a POST request that indicates a game move occurred, which will trigger sending a message with Kafka
+<11> Use the `HttpClient` to send a POST request that indicates a game move has occurred, which will trigger sending a message with Kafka
 <12> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
 
 === chess-listener tests
@@ -587,17 +587,17 @@ include::{commondir}/common-testApp-noheader.adoc[]
 
 Once you've verified that the microservices work with the configured cloud resources, you can deploy the microservices to Compute instances and run everything in Oracle Cloud.
 
-Follow the steps in https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[this guide^] for each service.
+Follow the steps in https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[this guide] for each service.
 
 === Instance Principal authentication
 
-The current configuration in `application-oraclecloud.yml` works when running locally using OCI resources (ATP database and Cloud Streams) but won't work when deploying the application because it doesn't make sense to install the Oracle Cloud CLI in Compute instances. Instead, we'll use https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#instance-principals[Instance Principal authentication^].
+The current configuration in `application-oraclecloud.yml` works when running locally using OCI resources (ATP database and Cloud Streams) but won't work when deploying the application because it doesn't make sense to install the Oracle Cloud CLI in Compute instances. Instead, we'll use https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#instance-principals[Instance Principal authentication].
 
-To use this we need to update the config, and create a dynamic group and add policy statements granting permissions.
+To use this, we need to update the config, create a dynamic group, and add policy statements granting permissions.
 
 ==== Dynamic Group
 
-Create a Dynamic Group by clicking the Oracle Cloud menu and selecting "Identity & Security", and then click "Dynamic Groups":
+Create a Dynamic Group by clicking the Oracle Cloud menu and selecting "Identity & Security" and then click "Dynamic Groups":
 
 image::oraclecloudstream/dynamicgroup1.png[]
 
@@ -605,15 +605,15 @@ Click "Create Dynamic Group":
 
 image::oraclecloudstream/dynamicgroup2.png[]
 
-Then enter a name and description for the group, e.g. "mn-streaming-guide-dg", and a matching rule, i.e. the logic that will be used to determine group membership. We'll make the rule fairly broad - enter `ALL {instance.compartment.id = 'ocid1.compartment.oc1..aaaaaxxxxx'}` replacing `ocid1.compartment.oc1..aaaaaxxxxx` with the compartment OCID where you're creating your Compute instances, and click "Create":
+Then enter a name and description for the group, e.g., "mn-streaming-guide-dg", and a matching rule, i.e., the logic that will be used to determine group membership. We'll make the rule fairly broad - enter `ALL {instance.compartment.id = 'ocid1.compartment.oc1..aaaaaxxxxx'}` replacing `ocid1.compartment.oc1..aaaaaxxxxx` with the compartment OCID where you're creating your Compute instances and click "Create":
 
 image::oraclecloudstream/dynamicgroup3.png[]
 
-See the https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm[Dynamic Group docs^] for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm[Dynamic Group docs] for more information.
 
 ==== Dynamic Group Policy Statements
 
-Edit the policy you created earlier and add three new policies; one to grant access to Autonomous Database, one to allow sending stream messages, and one to allow receiving stream messages:
+Edit the policy you created earlier and add three new policies: one to grant access to Autonomous Database, one to allow sending stream messages, and one to allow receiving stream messages:
 
 image::oraclecloudstream/policy4.png[]
 
@@ -672,7 +672,7 @@ $ ./mvnw package -Dpackaging=docker-native
 
 Then you just need to extract the native image applications from the Docker images you built.
 
-You'll need the Docker image ids, so run:
+You'll need the Docker image IDs, so run:
 
 [source, bash]
 ----
@@ -694,9 +694,9 @@ frolvlad/alpine-glibc        alpine-3.12     39c4d33bd807   2 months ago     17.
 portainer/portainer          latest          cd645f5a4769   13 months ago    79.1MB
 ----
 
-The ids should be at the top since they're the most recent.
+The IDs should be at the top since they're the most recent.
 
-Then run this for each image, replacing `image_id` with the Docker image id, e.g. `0e262e1754a7` and `43f567f2fed6`:
+Then run this for each image, replacing `image_id` with the Docker image ID, e.g., `0e262e1754a7` and `43f567f2fed6`:
 
 [source, bash]
 ----
@@ -711,6 +711,6 @@ Now you can scp each native image to a Compute instance with no Java installed a
 
 == Next steps
 
-Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support^] in Micronaut framework.
+Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in the Micronaut framework.
 
-Also see https://guides.micronaut.io/latest/micronaut-kafka.html[this guide on Micronaut Framework + Kafka^].
+Also see https://guides.micronaut.io/latest/micronaut-kafka.html[this guide on the Micronaut framework + Kafka].

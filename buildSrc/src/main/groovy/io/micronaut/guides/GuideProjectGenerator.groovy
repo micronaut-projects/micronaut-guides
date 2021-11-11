@@ -20,19 +20,28 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 
+import static io.micronaut.starter.api.TestFramework.JUNIT
+import static io.micronaut.starter.api.TestFramework.SPOCK
+import static io.micronaut.starter.options.BuildTool.GRADLE
+import static io.micronaut.starter.options.BuildTool.MAVEN
+import static io.micronaut.starter.options.JdkVersion.JDK_11
+import static io.micronaut.starter.options.JdkVersion.JDK_8
+import static io.micronaut.starter.options.Language.GROOVY
+import static io.micronaut.starter.options.Language.JAVA
+import static io.micronaut.starter.options.Language.KOTLIN
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
 class GuideProjectGenerator implements Closeable {
 
-    public static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = Arrays.asList(JdkVersion.JDK_8, JdkVersion.JDK_11)
     public static final String DEFAULT_APP_NAME = 'default'
+
+    private static final String APP_NAME = 'micronautguide'
+    private static final String BASE_PACKAGE = 'example.micronaut'
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = Arrays.asList(JDK_8, JDK_11)
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
-
-    String basePackage = 'example.micronaut'
-    String appName = 'micronautguide'
 
     GuideProjectGenerator() {
         applicationContext = ApplicationContext.run()
@@ -100,7 +109,7 @@ class GuideProjectGenerator implements Closeable {
         guidesFolder.eachDir { dir ->
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
             if (Utils.process(metadata)) {
-                generate(metadata, dir, output)
+                generateOne(metadata, dir, output)
                 GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
             }
         }
@@ -110,8 +119,8 @@ class GuideProjectGenerator implements Closeable {
         "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language}"
     }
 
-    void generate(GuideMetadata metadata, File inputDir, File outputDir) {
-        String packageAndName = "${basePackage}.${appName}"
+    private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
+        String packageAndName = "${BASE_PACKAGE}.${APP_NAME}"
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
         JdkVersion javaVersion = Utils.parseJdkVersion()
@@ -128,12 +137,12 @@ class GuideProjectGenerator implements Closeable {
             for (App app: metadata.apps) {
                 List<String> appFeatures = [] + app.features
 
-                if (guidesOption.language == Language.GROOVY ||
+                if (guidesOption.language == GROOVY ||
                         !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(javaVersion)) {
                     appFeatures.remove('graalvm')
                 }
 
-                if (testFramework == TestFramework.SPOCK) {
+                if (testFramework == SPOCK) {
                     appFeatures.remove('mockito')
                 }
 
@@ -144,6 +153,7 @@ class GuideProjectGenerator implements Closeable {
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
                 destination.mkdir()
+
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
 
                 final String srcFolder = 'src'
@@ -151,16 +161,20 @@ class GuideProjectGenerator implements Closeable {
                 if (srcPath.toFile().exists()) {
                     Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destination.path, srcFolder)))
                 }
+
                 Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
                 if (!sourcePath.toFile().exists()) {
                     throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
                 }
+
                 Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
+
                 if (app.excludeSource) {
                     for (String mainSource : app.excludeSource) {
                         deleteFile(destination, GuideAsciidocGenerator.mainPath(appName, mainSource), guidesOption)
                     }
                 }
+
                 if (app.excludeTest) {
                     for (String testSource : app.excludeTest) {
                         deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
@@ -176,7 +190,7 @@ class GuideProjectGenerator implements Closeable {
         }
     }
 
-    private void deleteFile(File destination, String path, GuidesOption guidesOption) {
+    private static void deleteFile(File destination, String path, GuidesOption guidesOption) {
         Paths.get(destination.absolutePath, path
                 .replace("@lang@", guidesOption.language.toString())
                 .replace("@languageextension@", guidesOption.language.extension))
@@ -202,26 +216,26 @@ class GuideProjectGenerator implements Closeable {
         String testFramework = guideMetadata.testFramework
         List<GuidesOption> guidesOptionList = []
 
-        if (buildTools.contains(BuildTool.GRADLE.toString())) {
-            if (languages.contains(Language.JAVA.toString())) {
-                guidesOptionList << createGuidesOption(BuildTool.GRADLE, Language.JAVA, testFramework)
+        if (buildTools.contains(GRADLE.toString())) {
+            if (languages.contains(JAVA.toString())) {
+                guidesOptionList << createGuidesOption(GRADLE, JAVA, testFramework)
             }
-            if (languages.contains(Language.KOTLIN.toString())) {
-                guidesOptionList << createGuidesOption(BuildTool.GRADLE, Language.KOTLIN, testFramework)
+            if (languages.contains(KOTLIN.toString())) {
+                guidesOptionList << createGuidesOption(GRADLE, KOTLIN, testFramework)
             }
-            if (languages.contains(Language.GROOVY.toString())) {
-                guidesOptionList << createGuidesOption(BuildTool.GRADLE, Language.GROOVY, testFramework)
+            if (languages.contains(GROOVY.toString())) {
+                guidesOptionList << createGuidesOption(GRADLE, GROOVY, testFramework)
             }
         }
-        if (buildTools.contains(BuildTool.MAVEN.toString())) {
-            if (languages.contains(Language.JAVA.toString())) {
-                guidesOptionList << createGuidesOption(BuildTool.MAVEN, Language.JAVA, testFramework)
+        if (buildTools.contains(MAVEN.toString())) {
+            if (languages.contains(JAVA.toString())) {
+                guidesOptionList << createGuidesOption(MAVEN, JAVA, testFramework)
             }
-            if (languages.contains(Language.KOTLIN.toString())) {
-                guidesOptionList << createGuidesOption(BuildTool.MAVEN, Language.KOTLIN, testFramework)
+            if (languages.contains(KOTLIN.toString())) {
+                guidesOptionList << createGuidesOption(MAVEN, KOTLIN, testFramework)
             }
-            if (languages.contains(Language.GROOVY.toString())) {
-                guidesOptionList << createGuidesOption(BuildTool.MAVEN, Language.GROOVY, testFramework)
+            if (languages.contains(GROOVY.toString())) {
+                guidesOptionList << createGuidesOption(MAVEN, GROOVY, testFramework)
             }
         }
         guidesOptionList
@@ -238,9 +252,9 @@ class GuideProjectGenerator implements Closeable {
         if (testFramework != null) {
             return TestFramework.valueOf(testFramework.toUpperCase())
         }
-        if (language == Language.GROOVY) {
-            return TestFramework.SPOCK
+        if (language == GROOVY) {
+            return SPOCK
         }
-        TestFramework.JUNIT
+        JUNIT
     }
 }

@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.micronaut.starter.options.BuildTool.GRADLE;
+import static io.micronaut.starter.options.BuildTool.MAVEN;
+import static io.micronaut.starter.options.Language.GROOVY;
+import static io.micronaut.starter.options.Language.KOTLIN;
+
 public class DependencyLines {
 
     private static final String SCOPE_COMPILE = "compile";
@@ -18,7 +23,7 @@ public class DependencyLines {
     private static final String SCOPE_ANNOTATION_PROCESSOR = "annotationProcessor";
     private static final String SCOPE_ANNOTATION_PROCESSOR_KAPT = "kapt";
 
-    static String toMavenScope(Map<String, String> attributes) {
+    private static String toMavenScope(Map<String, String> attributes) {
         String s = attributes.get("scope");
         if (s == null) {
             return null;
@@ -41,7 +46,7 @@ public class DependencyLines {
         }
     }
 
-    static String toGradleScope(Map<String, String> attributes, Language language) {
+    private static String toGradleScope(Map<String, String> attributes, Language language) {
         String s = attributes.get("scope");
         if (s == null) {
             return null;
@@ -56,9 +61,10 @@ public class DependencyLines {
             case "provided":
                 return "developmentOnly";
             case "annotationProcessor":
-                if (language.equals(Language.KOTLIN)) {
+                if (language == KOTLIN) {
                     return "kapt";
-                } else if (language.equals(Language.GROOVY)) {
+                }
+                if (language == GROOVY) {
                     return "compileOnly";
                 }
             default:
@@ -74,11 +80,11 @@ public class DependencyLines {
         List<String> dependencyLines = new ArrayList<>();
 
         // Open Asciidoctor code block
-        if (buildTool == BuildTool.GRADLE) {
+        if (buildTool == GRADLE) {
             dependencyLines.add("[source, groovy]");
             dependencyLines.add(".build.gradle");
             dependencyLines.add("----");
-        } else if (buildTool == BuildTool.MAVEN) {
+        } else if (buildTool == MAVEN) {
             dependencyLines.add("[source, xml]");
             dependencyLines.add(".pom.xml");
             dependencyLines.add("----");
@@ -102,7 +108,7 @@ public class DependencyLines {
             String callout = extractCallout(attributes);
             boolean pom = "true".equalsIgnoreCase(attributes.getOrDefault("pom", "false"));
 
-            if (buildTool == BuildTool.GRADLE) {
+            if (buildTool == GRADLE) {
                 String rendered = gradleScope;
                 if (pom) {
                     rendered += " platform";
@@ -113,7 +119,7 @@ public class DependencyLines {
                 }
                 rendered += "\")" + callout;
                 dependencyLines.add(rendered);
-            } else if (buildTool == BuildTool.MAVEN) {
+            } else if (buildTool == MAVEN) {
                 if (gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR) || gradleScope.equals(SCOPE_ANNOTATION_PROCESSOR_KAPT)) {
                     String mavenScopeAnnotationProcessor = getMavenAnnotationScopeXMLPath(language);
 

@@ -8,8 +8,8 @@ To complete this guide, you will need the following:
 * A decent text editor or IDE
 * JDK 11 or greater installed with `JAVA_HOME` configured appropriately
 * Docker installed
-* A paid or free trial Oracle Cloud account (create an account at https://signup.oraclecloud.com[signup.oraclecloud.com^])
-* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI^] installed, with local access to Oracle Cloud configured by running `oci setup config`
+* A paid or free trial Oracle Cloud account (create an account at https://signup.oraclecloud.com[signup.oraclecloud.com])
+* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
 
 include::{commondir}/common-completesolution.adoc[]
 
@@ -24,7 +24,7 @@ mn create-function-app --features=graalvm,oracle-function example.micronaut.micr
 
 include::{commondir}/common-build-lang-arguments.adoc[]
 
-If you use https://launch.micronaut.io[Micronaut Launch^], select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the `graalvm` and `oracle-function` features.
+If you use https://launch.micronaut.io[Micronaut Launch], select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the `graalvm` and `oracle-function` features.
 
 include::{commondir}/common-default-package.adoc[]
 
@@ -50,7 +50,7 @@ First, login to your Oracle Cloud tenancy as an administrator, or a user with su
 
 Use an existing compartment to create your function in, or create a new one by opening the Oracle Cloud Menu and clicking "Identity & Security", and then "Compartments"
 
-See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingcompartment.htm[Compartments docs^] for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingcompartment.htm[Compartments docs] for more information.
 
 === Function user and group
 
@@ -108,7 +108,7 @@ image::oraclefn/user13.png[]
 
 Click the "Copy" link and save the generated password for later.
 
-See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm[Groups and Users docs^] for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatinggroupsusers.htm[Groups and Users docs] for more information.
 
 === Oracle Cloud Infrastructure Registry (OCIR) repository
 
@@ -130,7 +130,7 @@ dockerBuild {
 }
 ----
 
-For `REGION`, use the lowercase value from the "Region Key" column in https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm[Regions and Availability Domains^], e.g. `iad`.
+For `REGION`, use the lowercase value from the "Region Key" column in https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm[Regions and Availability Domains], e.g. `iad`.
 
 For `TENANCY`, use the Object Storage namespace string of the tenancy (as shown on the Tenancy Information page), e.g. `my-tenancy`.
 
@@ -162,7 +162,7 @@ Edit `pom.xml` and add these three properties in the `<properties>` section, rep
 <jib.docker.tag>${project.version}</jib.docker.tag>
 ----
 
-For `REGION`, use the lowercase value from the "Region Key" column in https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm[Regions and Availability Domains^], e.g. `iad`.
+For `REGION`, use the lowercase value from the "Region Key" column in https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm[Regions and Availability Domains], e.g. `iad`.
 
 For `TENANCY`, use the Object Storage namespace string of the tenancy (as shown on the Tenancy Information page), e.g. `my-tenancy`.
 
@@ -197,7 +197,7 @@ For the username, enter <tenancy-namespace>/<username>, e.g. `my-tenancy/mn-func
 
 For the password, use the auth token you copied earlier.
 
-See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionslogintoocir.htm#Log_in_to_Oracle_Cloud_Infrastructure_Registry[OCIR login^] docs for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionslogintoocir.htm#Log_in_to_Oracle_Cloud_Infrastructure_Registry[OCIR login] docs for more information.
 
 === Virtual Cloud Network (VCN) and Subnet
 
@@ -223,7 +223,7 @@ Review the settings and click "Create":
 
 image::oraclefn/vcn5.png[]
 
-See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingvcn.htm[VCN and Subnets^] docs for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingvcn.htm[VCN and Subnets] docs for more information.
 
 === Policies
 
@@ -261,7 +261,7 @@ Allow service faas to use apm-domains in compartment <compartment-name>
 
 image::oraclefn/policy4.png[]
 
-See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingpolicies.htm[Policies^] docs for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionscreatingpolicies.htm[Policies] docs for more information.
 
 == Creating the function
 
@@ -269,23 +269,7 @@ First we'll need to build the function as a Docker image and push it to the OCIR
 
 From the demo project directory, run:
 
-:exclude-for-build:maven
-
-[source, bash]
-----
-./gradlew dockerPush
-----
-
-:exclude-for-build:
-
-:exclude-for-build:gradle
-
-[source, bash]
-----
-./mvnw deploy -Dpackaging=docker
-----
-
-:exclude-for-build:
+include::{commondir}/common-docker-push.adoc[]
 
 Once you've pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.
 
@@ -347,11 +331,11 @@ Finally, navigate to the application's function page and click the button to ena
 
 image::oraclefn/logs8.png[]
 
-See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsexportingfunctionlogfiles.htm[Logging^] and https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionstracing.htm[Tracing^] docs for more information.
+See the https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsexportingfunctionlogfiles.htm[Logging] and https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionstracing.htm[Tracing] docs for more information.
 
 == Invoking the function
 
-We'll use the OCI command line to invoke the function. If you haven't already, install the https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI^] and run `oci setup config`.
+We'll use the OCI command line to invoke the function. If you haven't already, install the https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] and run `oci setup config`.
 
 Run the following, replacing `<OCID>` with the OCID of the function you copied above:
 
@@ -375,13 +359,7 @@ The first invocation ("cold start") will take a while as the infrastructure is c
 
 === Install GraalVM
 
-We will use https://www.graalvm.org/[GraalVM^], the polyglot embeddable virtual machine, to generate a Native image of our function.
-
-Compiling native images ahead-of-time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications and functions.
-
-NOTE: Only Java and Kotlin projects support using GraalVM's `native-image` tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
-
-include::{commondir}/common-install-graalvm-sdkman.adoc[]
+include::{commondir}/common-install-graal-function.adoc[]
 
 === Building and deploying the native image
 
@@ -491,7 +469,7 @@ In your `pom.xml`, if the `nativeImageBuildArgs` block in the configuration sect
     <nativeImageBuildArgs>
       <arg>-H:+StaticExecutableWithDynamicLibC</arg>
       <arg>-Dfn.handler=${exec.mainClass}::handleRequest</arg>
-      <arg>--initialize-at-build-time=com.example</arg>
+      <arg>--initialize-at-build-time=example.micronaut</arg>
     </nativeImageBuildArgs>
     <appArguments>
       <arg>${exec.mainClass}::handleRequest</arg>
@@ -504,23 +482,7 @@ In your `pom.xml`, if the `nativeImageBuildArgs` block in the configuration sect
 
 Then from the demo project directory, run:
 
-:exclude-for-build:maven
-
-[source, bash]
-----
-./gradlew dockerPushNative
-----
-
-:exclude-for-build:
-
-:exclude-for-build:gradle
-
-[source, bash]
-----
-./mvnw deploy -Dpackaging=docker-native
-----
-
-:exclude-for-build:
+include::{commondir}/common-docker-push-native.adoc[]
 
 Once you've pushed the Docker container, edit the function in the console to use the new container, and to reduce the memory to 128MB:
 
@@ -532,8 +494,8 @@ Use the same OCI command as before to invoke the function. No changes are needed
 
 include::{commondir}/common-next.adoc[]
 
-Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud^] integration.
+Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud] integration.
 
-Also check out the https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm[Oracle Cloud Function documentation^] for more information on the available functionality.
+Also check out the https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm[Oracle Cloud Function documentation] for more information on the available functionality.
 
 include::{commondir}/common-helpWithMicronaut.adoc[]

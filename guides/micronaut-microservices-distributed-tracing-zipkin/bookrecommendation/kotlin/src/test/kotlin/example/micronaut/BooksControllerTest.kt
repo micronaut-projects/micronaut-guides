@@ -1,7 +1,8 @@
 package example.micronaut
 
+import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.StreamingHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,14 +15,13 @@ import reactor.core.publisher.Flux
 class BooksControllerTest {
     @Inject
     @field:Client("/")
-    lateinit var client: StreamingHttpClient
+    lateinit var client:HttpClient
 
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     @Test
     fun testRetrieveBooks() {
-        val books = Flux.from(client.jsonStream(HttpRequest.GET<Any>("/books"), BookRecommendation::class.java))
-                .collectList()
-                .block()
+        val books = client.toBlocking().retrieve(HttpRequest.GET<Any>("/books"),
+            Argument.listOf(BookRecommendation::class.java))
         assertEquals(books.size, 1)
         assertEquals(books[0].name, "Building Microservices")
     }
