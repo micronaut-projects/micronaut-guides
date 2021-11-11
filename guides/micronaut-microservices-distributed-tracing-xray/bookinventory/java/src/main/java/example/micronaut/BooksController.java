@@ -4,9 +4,6 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
-import io.micronaut.tracing.annotation.ContinueSpan;
-import io.micronaut.tracing.annotation.SpanTag;
-
 import javax.validation.constraints.NotBlank;
 import java.util.Optional;
 
@@ -15,8 +12,7 @@ public class BooksController {
 
     @Produces(MediaType.TEXT_PLAIN)
     @Get("/stock/{isbn}")
-    @ContinueSpan // <1>
-    public Boolean stock(@SpanTag("stock.isbn") @NotBlank String isbn) { // <2>
+    public Boolean stock(@NotBlank String isbn) { // <2>
         return bookInventoryByIsbn(isbn).map(bi -> bi.getStock() > 0).orElse(null);
     }
 
