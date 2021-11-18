@@ -45,14 +45,12 @@ class BookControllerTest {
                         Manage security with user-to-service and service-to-service models
                         Understand the challenges of scaling microservice architectures
                         """;        
-        Book b = new Book(1L, // null // <5>  
-            title, 
-            isbn, 
+        Book b = new Book(isbn,
+            title,
             new BigDecimal("38.15"), 
             about);
         Book book = bookRepository.save(b);
-        assertNotNull(book);
-        assertNotNull(book.id());
+        assertEquals(1, bookRepository.count());
         BlockingHttpClient client = httpClient.toBlocking();
         List<BookForSale> books = client.retrieve(HttpRequest.GET("/books"),
                 Argument.listOf(BookForSale.class)); // <6>

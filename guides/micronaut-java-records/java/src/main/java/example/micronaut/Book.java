@@ -10,9 +10,8 @@ import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @MappedEntity // <1>
-public record Book(/* @GeneratedValue */ @Id @Nullable Long id, // <2>
+public record Book(@Id @NonNull @NotBlank @Size(max = 255) String isbn, // <2>
                    @NonNull @NotBlank @Size(max = 255) String title, // <3>
-                   @NonNull @NotBlank @Size(max = 255) String isbn, // <3>
                    @NonNull @NotNull BigDecimal price, // <3>
                    @Nullable String about) {  // <4>
 }

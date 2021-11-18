@@ -6,6 +6,6 @@ import io.micronaut.data.repository.CrudRepository;
 import java.util.List;
 
 @JdbcRepository(dialect = Dialect.POSTGRES) // <1>
-public interface BookRepository extends CrudRepository<Book, Long> { // <2>
+public interface BookRepository extends CrudRepository<Book, String> { // <2>
     List<BookCard> find(); // <3>
 }

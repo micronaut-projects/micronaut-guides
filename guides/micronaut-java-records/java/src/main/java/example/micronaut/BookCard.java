@@ -1,4 +1,3 @@
-
 package example.micronaut;
 
 import io.micronaut.core.annotation.Introspected;
@@ -14,8 +13,7 @@ import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @Introspected // <1>
-public record BookCard(@NonNull @NotNull Long id, // <1>
+public record BookCard(@NonNull @NotBlank @Size(max = 255) String isbn, // <2>
                        @NonNull @NotBlank @Size(max = 255) String title, // <2>
-                       @NonNull @NotBlank @Size(max = 255) String isbn, // <2>
                        @NonNull @NotNull BigDecimal price) {
 }
