@@ -124,7 +124,9 @@ class GuideAsciidocGenerator {
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
-                text = text.replace("@${entry.key}Version@", entry.value.version)
+                if (entry.value.version) {
+                    text = text.replace("@${entry.key}Version@", entry.value.version)
+                }
             }
 
             Path destinationPath = Paths.get(destinationFolder.absolutePath, projectName + ".adoc")
