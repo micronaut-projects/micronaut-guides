@@ -574,8 +574,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import reactor.core.publisher.Flux
-import java.util.stream.StreamSupport
 
 @MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
 class GithubControllerTest {
@@ -599,8 +597,11 @@ class GithubControllerTest {
         val releases = rsp.body()
 
         //then:
-        for (name in expectedReleases) {
-            assertTrue(releases.stream().map(GithubRelease::name).anyMatch { anObject: String? -&gt; name.equals(anObject) })
+        assertNotNull(releases)
+        val regex = Regex(&quot;Micronaut [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?&quot;)
+        for (release in releases) {
+            println(release.name)
+            assertTrue(regex.matches(release.name))
         }
     }
 
@@ -611,15 +612,11 @@ class GithubControllerTest {
         val githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease::class.java)) <i class="conum" data-value="7"></i><b>(7)</b>
 
         //then:
-        for (name in expectedReleases) {
-            assertTrue(githubReleases.stream()
-                .map(GithubRelease::name)
-                .anyMatch { anObject: String? -&gt; name.equals(anObject) })
+        val regex = Regex(&quot;Micronaut [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?&quot;)
+        for (release in githubReleases) {
+            println(release.name)
+            assertTrue(regex.matches(release.name))
         }
-    }
-
-    companion object {
-        private val expectedReleases = listOf(&quot;Micronaut 2.5.0&quot;, &quot;Micronaut 2.4.4&quot;, &quot;Micronaut 2.4.3&quot;)
     }
 }</code></pre>
 </div>

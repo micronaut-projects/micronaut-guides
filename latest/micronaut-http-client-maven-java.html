@@ -643,16 +643,11 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
-
-<span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
-<span class="keyword">import</span> <span class="include">java.util.stream.StreamSupport</span>;
-
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
+<span class="keyword">import</span> <span class="include">java.util.regex.Pattern</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">GithubControllerTest</span> {
@@ -661,7 +656,7 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
     HttpClient client; <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; expectedReleases = <span class="predefined-type">Arrays</span>.asList(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut 2.5.0</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut 2.4.4</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut 2.4.3</span><span class="delimiter">&quot;</span></span>);
+    <span class="directive">private</span> <span class="directive">static</span> <span class="predefined-type">Pattern</span> MICRONAUT_RELEASE = <span class="predefined-type">Pattern</span>.compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?</span><span class="delimiter">&quot;</span></span>);
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {
@@ -679,9 +674,11 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
         <span class="predefined-type">List</span>&lt;GithubRelease&gt; releases = rsp.body();
 
         <span class="comment">//then:</span>
-        <span class="keyword">for</span> (<span class="predefined-type">String</span> name : expectedReleases) {
-            assertTrue(releases.stream().map(GithubRelease::getName).anyMatch(name::equals));
-        }
+        assertNotNull(releases);
+        assertTrue(releases.stream()
+                .map(GithubRelease::getName)
+                .allMatch(name -&gt; MICRONAUT_RELEASE.matcher(name)
+                        .find()));
     }
 
     <span class="annotation">@Test</span>
@@ -692,11 +689,10 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
         <span class="predefined-type">List</span>&lt;GithubRelease&gt; githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease.class)); <i class="conum" data-value="7"></i><b>(7)</b>
 
         <span class="comment">//then:</span>
-        <span class="keyword">for</span> (<span class="predefined-type">String</span> name : expectedReleases) {
-            assertTrue(githubReleases.stream()
-                    .map(GithubRelease::getName)
-                    .anyMatch(name::equals));
-        }
+        assertTrue(githubReleases.stream()
+                .map(GithubRelease::getName)
+                .allMatch(name -&gt; MICRONAUT_RELEASE.matcher(name)
+                        .find()));
     }
 }</code></pre>
 </div>
