@@ -120,7 +120,7 @@ class GuideAsciidocGenerator {
             text = text.replace("@languageextension@", guidesOption.language.extension)
             text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
             text = text.replace("@sourceDir@", projectName)
-            text = text.replace("@minJdk@", metadata.minimumJavaVersion.toString() ?: "1.8")
+            text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
