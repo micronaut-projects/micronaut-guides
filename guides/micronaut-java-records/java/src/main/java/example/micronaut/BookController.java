@@ -9,6 +9,8 @@ import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
 
 @Controller("/books") // <1>
 class BookController {
@@ -22,8 +24,9 @@ class BookController {
         this.valueAddedTaxConfiguration = valueAddedTaxConfiguration;
     }
 
-    @Get // <3>
-    List<BookForSale> index() { // <4>
+    @ExecuteOn(TaskExecutors.IO) // <3>
+    @Get // <4>
+    List<BookForSale> index() { // <5>
         return bookRepository.find()
                 .stream()
                 .map(bookCard -> new BookForSale(bookCard.isbn(), 
