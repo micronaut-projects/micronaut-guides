@@ -16,7 +16,7 @@ class ThemeProcessor {
 '''
         String sectionbody = '<div class="sectionbody">'
         for (GuideMetadata metadata : metadatas) {
-            if (!Utils.process(metadata)) {
+            if (!Utils.process(metadata, false)) {
                 continue
             }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
