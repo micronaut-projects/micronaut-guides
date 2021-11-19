@@ -15,10 +15,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@MicronautTest
+@MicronautTest // <1>
 public class LiquibaseEndpointTest {
     @Inject
-    @Client("/")
+    @Client("/")  // <2>
     HttpClient httpClient;
 
     @Test
