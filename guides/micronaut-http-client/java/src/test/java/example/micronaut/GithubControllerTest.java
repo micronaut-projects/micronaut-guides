@@ -9,16 +9,11 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.StreamSupport;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.regex.Pattern;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest // <1>
 class GithubControllerTest {
@@ -27,7 +22,7 @@ class GithubControllerTest {
     @Client("/")
     HttpClient client; // <2>
 
-    private static final List<String> expectedReleases = Arrays.asList("Micronaut 2.5.0", "Micronaut 2.4.4", "Micronaut 2.4.3");
+    private static Pattern MICRONAUT_RELEASE = Pattern.compile("Micronaut [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?");
 
     @Test
     public void verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {
@@ -45,9 +40,11 @@ class GithubControllerTest {
         List<GithubRelease> releases = rsp.body();
 
         //then:
-        for (String name : expectedReleases) {
-            assertTrue(releases.stream().map(GithubRelease::getName).anyMatch(name::equals));
-        }
+        assertNotNull(releases);
+        assertTrue(releases.stream()
+                .map(GithubRelease::getName)
+                .allMatch(name -> MICRONAUT_RELEASE.matcher(name)
+                        .find()));
     }
 
     @Test
@@ -58,10 +55,9 @@ class GithubControllerTest {
         List<GithubRelease> githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease.class)); // <7>
 
         //then:
-        for (String name : expectedReleases) {
-            assertTrue(githubReleases.stream()
-                    .map(GithubRelease::getName)
-                    .anyMatch(name::equals));
-        }
+        assertTrue(githubReleases.stream()
+                .map(GithubRelease::getName)
+                .allMatch(name -> MICRONAUT_RELEASE.matcher(name)
+                        .find()));
     }
 }
