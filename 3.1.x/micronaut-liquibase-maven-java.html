@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Schema Migration with Liquibase</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronauttwittercard.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Schema Migration with Liquibase"/>
+    <meta name="twitter:description" content="Learn how to use the Liquibase to manage your schema migrations."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-liquibase.html">Schema Migration with Liquibase</a> » <span class="breadcrumb_last" aria-current="page">maven | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        <ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a>
+<ul class="sectlevel2">
+<li><a href="#enable-annotation-processing">3.1. Enable annotation Processing</a></li>
+<li><a href="#create-entity">3.2. Create Entity</a></li>
+<li><a href="#database-migration-with-liquibase">3.3. Database Migration with Liquibase</a></li>
+<li><a href="#drop-not-null-constraint">3.4. Drop Not Null Constraint</a></li>
+</ul>
+</li>
+<li><a href="#liquibase">4. Liquibase</a>
+<ul class="sectlevel2">
+<li><a href="#testing-with-postgresql-via-testcontainers">4.1. Testing with PostgreSQL via TestContainers</a></li>
+<li><a href="#test">4.2. Test</a></li>
+<li><a href="#running-the-application">4.3. Running the application</a></li>
+</ul>
+</li>
+<li><a href="#generate-a-micronaut-application-native-image-with-graalvm">5. Generate a Micronaut Application Native Image with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#native-image-generation">5.1. Native image generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">6. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">7. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Schema Migration with Liquibase</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to use the Liquibase to manage your schema migrations.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.1.4</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-liquibase-maven-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app
+   example.micronaut.micronautguide \
+   --features=data-jdbc,postgres,liquibase \
+   --build=maven \
+   --lang=java \</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "Micronaut Application" as application type and add <code>postgres</code>, <code>data-jdbc</code>, and <code>liquibase</code> as features.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enable-annotation-processing">3.1. Enable annotation Processing</h3>
+<div class="paragraph">
+<p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-entity">3.2. Create Entity</h3>
+<div class="paragraph">
+<p>Create a <code>@MappedEntity</code> to save persons. Initially, consider name and age required. Use <code>int</code> primitive for the age.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Person.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.GeneratedValue</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Id</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.MappedEntity</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Version</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+
+<span class="annotation">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">Person</span> {
+    <span class="annotation">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="directive">private</span> <span class="predefined-type">Long</span> id;
+
+    <span class="annotation">@Version</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="directive">private</span> <span class="predefined-type">Long</span> version;
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="type">int</span> age;
+
+    <span class="directive">public</span> Person(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name, <span class="type">int</span> age) {
+        <span class="local-variable">this</span>.name = name;
+        <span class="local-variable">this</span>.age = age;
+    }
+
+    <span class="directive">public</span> <span class="type">int</span> getAge() {
+        <span class="keyword">return</span> age;
+    }
+
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
+        <span class="keyword">return</span> name;
+    }
+
+    <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
+        <span class="keyword">return</span> id;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setId(<span class="predefined-type">Long</span> id) {
+        <span class="local-variable">this</span>.id = id;
+    }
+
+    <span class="directive">public</span> <span class="predefined-type">Long</span> getVersion() {
+        <span class="keyword">return</span> version;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setVersion(<span class="predefined-type">Long</span> version) {
+        <span class="local-variable">this</span>.version = version;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specifies that the property value is generated by the database and not included in inserts</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Annotate the field with <code>@Version</code> to enable optimistic locking for your entity</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-migration-with-liquibase">3.3. Database Migration with Liquibase</h3>
+<div class="paragraph">
+<p>We need a way to create the database schema. For that, we use
+<a href="https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/">Micronaut integration with Liquibase</a>.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut.liquibase<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-liquibase<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure the database migrations directory for <a href="http://www.liquibase.org">Liquibase</a> in <code>application.yml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">liquibase</span>:
+  <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">change-log</span>: <span class="string"><span class="content">'classpath:db/liquibase-changelog.xml'</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create the following files with the database schema creation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/liquibase-changelog.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="preprocessor">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="tag">&lt;databaseChangeLog</span>
+  <span class="attribute-name">xmlns</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog</span><span class="delimiter">&quot;</span></span>
+  <span class="attribute-name">xmlns:xsi</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.w3.org/2001/XMLSchema-instance</span><span class="delimiter">&quot;</span></span>
+  <span class="attribute-name">xsi:schemaLocation</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+  <span class="tag">&lt;include</span> <span class="attribute-name">file</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">changelog/01-create-person.xml</span><span class="delimiter">&quot;</span></span>
+           <span class="attribute-name">relativeToChangelogFile</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;include</span> <span class="attribute-name">file</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">changelog/02-nullable-age.xml</span><span class="delimiter">&quot;</span></span>
+           <span class="attribute-name">relativeToChangelogFile</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+<span class="tag">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/changelog/01-create-person.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="preprocessor">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="tag">&lt;databaseChangeLog</span>
+  <span class="attribute-name">xmlns</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog</span><span class="delimiter">&quot;</span></span>
+  <span class="attribute-name">xmlns:xsi</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.w3.org/2001/XMLSchema-instance</span><span class="delimiter">&quot;</span></span>
+  <span class="attribute-name">xsi:schemaLocation</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+  <span class="tag">&lt;changeSet</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">01</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">author</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">sdelamo</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+    <span class="tag">&lt;createTable</span> <span class="attribute-name">tableName</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">person</span><span class="delimiter">&quot;</span></span>
+          <span class="attribute-name">remarks</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">A table to contain persons</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+          <span class="tag">&lt;column</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">BIGINT</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+            <span class="tag">&lt;constraints</span> <span class="attribute-name">nullable</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">false</span><span class="delimiter">&quot;</span></span>
+                             <span class="attribute-name">unique</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span>
+                                        <span class="attribute-name">primaryKey</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span>
+                                         <span class="attribute-name">primaryKeyName</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">personPK</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+          <span class="tag">&lt;/column&gt;</span>
+          <span class="tag">&lt;column</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">version</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">BIGINT</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+            <span class="tag">&lt;constraints</span> <span class="attribute-name">nullable</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">false</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+          <span class="tag">&lt;/column&gt;</span>
+          <span class="tag">&lt;column</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">age</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">INT</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+            <span class="tag">&lt;constraints</span> <span class="attribute-name">nullable</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">false</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+          <span class="tag">&lt;/column&gt;</span>
+        <span class="tag">&lt;/createTable&gt;</span>
+  <span class="tag">&lt;/changeSet&gt;</span>
+<span class="tag">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>During application startup, <a href="http://www.liquibase.org">Liquibase</a> executes the SQL file and creates the schema needed for the application.</p>
+</div>
+<div class="paragraph">
+<p>If you check the database schema, there are three tables:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>databasechangelog</code></p>
+</li>
+<li>
+<p><code>databasechangeloglock</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The tables <code>databasechangelog</code> and <code>databasechangeloglock</code> are used by Liquibase to keep track of database migrations.</p>
+</div>
+<div class="paragraph">
+<p>The <code>person</code> table looks like:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Column</th>
+<th class="tableblock halign-left valign-top">Nullable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NO</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>version</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NO</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NO</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>age</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NO</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="drop-not-null-constraint">3.4. Drop Not Null Constraint</h3>
+<div class="paragraph">
+<p>Applications change. Make <code>age</code> optional:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Person.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">    <span class="annotation">@Nullable</span>
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">Integer</span> age;
+
+    <span class="directive">public</span> Person(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name,
+                  <span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> age) {
+        <span class="local-variable">this</span>.name = name;
+        <span class="local-variable">this</span>.age = age;
+    }
+
+    <span class="annotation">@Nullable</span>
+    <span class="directive">public</span> <span class="predefined-type">Integer</span> getAge() {
+        <span class="keyword">return</span> age;
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add a new changeset to drop the null constraint:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/liquibase-changelog.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="preprocessor">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="tag">&lt;databaseChangeLog</span>
+  <span class="attribute-name">xmlns</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog</span><span class="delimiter">&quot;</span></span>
+  <span class="attribute-name">xmlns:xsi</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.w3.org/2001/XMLSchema-instance</span><span class="delimiter">&quot;</span></span>
+  <span class="attribute-name">xsi:schemaLocation</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+  <span class="tag">&lt;include</span> <span class="attribute-name">file</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">changelog/01-create-person.xml</span><span class="delimiter">&quot;</span></span>
+           <span class="attribute-name">relativeToChangelogFile</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;include</span> <span class="attribute-name">file</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">changelog/02-nullable-age.xml</span><span class="delimiter">&quot;</span></span>
+           <span class="attribute-name">relativeToChangelogFile</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+<span class="tag">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/changelog/02-nullable-age.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="preprocessor">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="tag">&lt;databaseChangeLog</span>
+  <span class="attribute-name">xmlns</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog</span><span class="delimiter">&quot;</span></span>
+  <span class="attribute-name">xmlns:xsi</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.w3.org/2001/XMLSchema-instance</span><span class="delimiter">&quot;</span></span>
+  <span class="attribute-name">xsi:schemaLocation</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+  <span class="tag">&lt;changeSet</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">02</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">author</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">sdelamo</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+    <span class="tag">&lt;dropNotNullConstraint</span> <span class="attribute-name">tableName</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">person</span><span class="delimiter">&quot;</span></span>
+                           <span class="attribute-name">columnName</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">age</span><span class="delimiter">&quot;</span></span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;/changeSet&gt;</span>
+<span class="tag">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After the changeset, the <code>person</code> table looks like:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Column</th>
+<th class="tableblock halign-left valign-top">Nullable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NO</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>version</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NO</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NO</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>age</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">YES</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="liquibase">4. Liquibase</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To enable the Liquibase endpoint, add the <code>management</code> dependency on your classpath.</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-management<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Enable the Liquibase endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">endpoints</span>:
+  <span class="key">liquibase</span>:
+    <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+    <span class="key">sensitive</span>: <span class="string"><span class="content">false</span></span></code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-with-postgresql-via-testcontainers">4.1. Testing with PostgreSQL via TestContainers</h3>
+<div class="paragraph">
+<p>We use <a href="https://www.testcontainers.org/modules/databases/postgres/">Test Containers</a> to test against a PostgreSQL database.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary test container dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>postgresql<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span>
+<span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>testcontainers<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure the default datasource to use the PostgreSQL database provided by TestContainers for the test environment:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/application-test.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+    <span class="key">default</span>:
+        <span class="key">url</span>: <span class="string"><span class="content">jdbc:tc:postgresql:12:///postgres </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="key">driverClassName</span>: <span class="string"><span class="content">org.testcontainers.jdbc.ContainerDatabaseDriver</span></span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>By using a specially modified JDBC URL, Testcontainers provides a disposable stand-in database that can be used without requiring modification to your application code. See <a href="https://www.testcontainers.org/modules/databases/jdbc/">Test Containers JDBC URL</a>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="test">4.2. Test</h3>
+<div class="paragraph">
+<p>Create a test that invokes the Liquibase endpoint</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/LiquibaseEndpointTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">LiquibaseEndpointTest</span> {
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)  <i class="conum" data-value="2"></i><b>(2)</b>
+    HttpClient httpClient;
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> migrationsAreExposedViaAndEndpoint() {
+        BlockingHttpClient client = httpClient.toBlocking();
+        HttpResponse&lt;LiquibaseReport&gt; response = client.exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/liquibase</span><span class="delimiter">&quot;</span></span>), LiquibaseReport.class);
+        assertEquals(HttpStatus.OK, response.status());
+        LiquibaseReport liquibaseReport = response.body();
+        assertNotNull(liquibaseReport);
+        assertNotNull(liquibaseReport.getChangeSets());
+        assertEquals(<span class="integer">2</span>, liquibaseReport.getChangeSets().size());
+    }
+
+    <span class="directive">static</span> <span class="type">class</span> <span class="class">LiquibaseReport</span> {
+        <span class="directive">private</span> <span class="predefined-type">List</span>&lt;ChangeSet&gt; changeSets;
+
+        <span class="directive">public</span> <span class="type">void</span> setChangeSets(<span class="predefined-type">List</span>&lt;ChangeSet&gt; changeSets) {
+            <span class="local-variable">this</span>.changeSets = changeSets;
+        }
+
+        <span class="directive">public</span> <span class="predefined-type">List</span>&lt;ChangeSet&gt; getChangeSets() {
+            <span class="keyword">return</span> changeSets;
+        }
+    }
+
+    <span class="directive">static</span> <span class="type">class</span> <span class="class">ChangeSet</span> {
+        <span class="directive">private</span> <span class="predefined-type">String</span> id;
+
+        <span class="directive">public</span> <span class="type">void</span> setId(<span class="predefined-type">String</span> id) {
+            <span class="local-variable">this</span>.id = id;
+        }
+
+        <span class="directive">public</span> <span class="predefined-type">String</span> getId() {
+            <span class="keyword">return</span> id;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-the-application">4.3. Running the application</h3>
+<div class="paragraph">
+<p>After installing Docker, execute the following command to run a PostgreSQL container:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run -it --rm \
+     -p 5432:5432 \
+     -e POSTGRES_USER=dbuser \
+     -e POSTGRES_PASSWORD=theSecretPassword \
+     -e POSTGRES_DB=postgres \
+     postgres:11.5-alpine</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Set up the following environment variables to connect to the PostgreSQL database you started with Docker.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+  <span class="key">default</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">jdbc:postgresql://localhost:5432/postgres  </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">org.postgresql.Driver  </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="key">dialect</span>: <span class="string"><span class="content">POSTGRES </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="key">schema-generate</span>: <span class="string"><span class="content">NONE </span></span><i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The JDBC URL matches the database name you used in the previous command.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use PostgreSQL driver.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Configure the PostgreSQL dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You handle database migrations via Liquibase</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">export DATASOURCES_DEFAULT_USERNAME=dbuser
+export DATASOURCES_DEFAULT_PASSWORD=theSecretPassword
+export VAT_PERCENTAGE=20</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure your default datasource to use the PostgreSQL database you started with Docker:</p>
+</div>
+<div class="paragraph">
+<p>To run the application, use the <code>./mvnw mn:run</code> command which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>You can run a cURL command to test the application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8080/liquibase</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will see information about migrations.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-image-with-graalvm">5. Generate a Micronaut Application Native Image with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native image of our Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling native images ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="native-image-generation">5.1. Native image generation</h3>
+<div class="paragraph">
+<p>The easiest way to install GraalVM is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 11</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 21.3.0.r11-grl</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Java 17</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 21.3.0.r17-grl</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you still use Java 8 use the GraalVM JDK11 version.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You need to install the <code>native-image</code> component, which is not installed by default.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ gu install native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate a native image using Maven run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ ./mvnw package -Dpackaging=native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native image is created in <code>target/application</code> and can be run with <code>./target/application</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can run a cURL command to test the application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8080/liquibase</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will see information about migrations.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">6. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Check <a href="https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/">Micronaut Liquibase</a> integration.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">7. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2021 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
