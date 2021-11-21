@@ -24,7 +24,7 @@ class GuideAsciidocGenerator {
     private static final String CALLOUT = 'callout:'
     public static final int DEFAULT_MIN_JDK = 8
     public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
-    public static final String EXCLUDE_FOR_MIN_JDK = ':exclude-for-min-jdk:'
+    public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
 
     static void generate(GuideMetadata metadata, File inputDir, File destinationFolder) {
@@ -52,7 +52,7 @@ class GuideAsciidocGenerator {
                     excludeLineForBuild = false
                 } else if (line == EXCLUDE_FOR_LANGUAGES) {
                     excludeLineForLanguage = false
-                } else if (line == EXCLUDE_FOR_MIN_JDK) {
+                } else if (line == EXCLUDE_FOR_JDK_LOWER_THAN) {
                     excludeLineForMinJdk = false
                 }
                 if (excludeLineForLanguage || excludeLineForBuild || excludeLineForMinJdk) {
@@ -102,9 +102,9 @@ class GuideAsciidocGenerator {
                     if (languages.any { it == guidesOption.language.toString() }) {
                         excludeLineForLanguage = true
                     }
-                } else if (line.startsWith(EXCLUDE_FOR_MIN_JDK)) {
+                } else if (line.startsWith(EXCLUDE_FOR_JDK_LOWER_THAN)) {
                     try {
-                        String str = line.substring(EXCLUDE_FOR_MIN_JDK.length());
+                        String str = line.substring(EXCLUDE_FOR_JDK_LOWER_THAN.length());
                         if (StringUtils.isNotEmpty(str)) {
                             Integer minJdk = Integer.valueOf(str)
                             if ((metadata.minimumJavaVersion ?: DEFAULT_MIN_JDK) >= minJdk) {
