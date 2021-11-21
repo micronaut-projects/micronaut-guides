@@ -108,9 +108,12 @@ class GuideProjectGenerator implements Closeable {
 
         guidesFolder.eachDir { dir ->
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
-            if (Utils.process(metadata)) {
-                generateOne(metadata, dir, output)
-                GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+            try {
+                if (Utils.process(metadata, false)) {
+                    generateOne(metadata, dir, output)
+                    GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+                }
+            } catch(IllegalArgumentException e) {
             }
         }
     }
