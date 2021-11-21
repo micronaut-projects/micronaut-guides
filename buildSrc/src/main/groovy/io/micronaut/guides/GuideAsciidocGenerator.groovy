@@ -22,6 +22,10 @@ class GuideAsciidocGenerator {
 
     private static final String INCLUDE_COMMONDIR = 'include::{commondir}/'
     private static final String CALLOUT = 'callout:'
+    public static final int DEFAULT_MIN_JDK = 8
+    public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
+    public static final String EXCLUDE_FOR_MIN_JDK = ':exclude-for-min-jdk:'
+    public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
 
     static void generate(GuideMetadata metadata, File inputDir, File destinationFolder) {
         Path asciidocPath = Paths.get(inputDir.absolutePath, metadata.asciidoctor)
@@ -38,17 +42,20 @@ class GuideAsciidocGenerator {
 
             List<String> lines = []
             boolean excludeLineForLanguage = false
+            boolean excludeLineForMinJdk = false
             boolean excludeLineForBuild = false
             boolean groupDependencies = false
             List<String> groupedDependencies = []
             for (String line : rawLinesExpanded) {
 
-                if (line == ':exclude-for-build:') {
+                if (line == EXCLUDE_FOR_BUILD) {
                     excludeLineForBuild = false
-                } else if (line == ':exclude-for-languages:') {
+                } else if (line == EXCLUDE_FOR_LANGUAGES) {
                     excludeLineForLanguage = false
+                } else if (line == EXCLUDE_FOR_MIN_JDK) {
+                    excludeLineForMinJdk = false
                 }
-                if (excludeLineForLanguage || excludeLineForBuild) {
+                if (excludeLineForLanguage || excludeLineForBuild || excludeLineForMinJdk) {
                     continue
                 }
 
@@ -85,16 +92,27 @@ class GuideAsciidocGenerator {
                         lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool, guidesOption.language))
                     }
 
-                } else if (line.startsWith(':exclude-for-build:')) {
-                    String[] builds = line.substring(':exclude-for-build:'.length()).split(',')
+                } else if (line.startsWith(EXCLUDE_FOR_BUILD)) {
+                    String[] builds = line.substring(EXCLUDE_FOR_BUILD.length()).split(',')
                     if (builds.any { it == guidesOption.buildTool.toString() }) {
                         excludeLineForBuild = true
                     }
-
-                } else if (line.startsWith(':exclude-for-languages:')) {
-                    String[] languages = line.substring(':exclude-for-languages:'.length()).split(',')
+                } else if (line.startsWith(EXCLUDE_FOR_LANGUAGES)) {
+                    String[] languages = line.substring(EXCLUDE_FOR_LANGUAGES.length()).split(',')
                     if (languages.any { it == guidesOption.language.toString() }) {
                         excludeLineForLanguage = true
+                    }
+                } else if (line.startsWith(EXCLUDE_FOR_MIN_JDK)) {
+                    try {
+                        String str = line.substring(EXCLUDE_FOR_MIN_JDK.length());
+                        if (StringUtils.isNotEmpty(str)) {
+                            Integer minJdk = Integer.valueOf(str)
+                            if ((metadata.minimumJavaVersion ?: DEFAULT_MIN_JDK) >= minJdk) {
+                                excludeLineForMinJdk = true
+                            }
+                        }
+                    } catch(NumberFormatException e) {
+
                     }
                 } else if (shouldProcessLine(line, 'rocker:')) {
                     lines.addAll(includeRocker(line))
