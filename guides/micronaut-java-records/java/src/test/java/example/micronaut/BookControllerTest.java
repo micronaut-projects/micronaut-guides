@@ -53,7 +53,7 @@ class BookControllerTest {
         assertEquals(1, bookRepository.count());
         BlockingHttpClient client = httpClient.toBlocking();
         List<BookForSale> books = client.retrieve(HttpRequest.GET("/books"),
-                Argument.listOf(BookForSale.class)); // <6>
+                Argument.listOf(BookForSale.class)); // <5>
         assertNotNull(books);
         assertEquals(1, books.size());
         assertEquals("Building Microservices", books.get(0).title());
