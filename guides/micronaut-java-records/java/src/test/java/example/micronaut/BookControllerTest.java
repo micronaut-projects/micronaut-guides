@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @MicronautTest(transactional = false)  // <2>
 class BookControllerTest {
 
+    int booksInsertedInDbByMigration = 1;
+
     @Inject
     @Client("/")
     HttpClient httpClient; // <3>
@@ -50,15 +52,15 @@ class BookControllerTest {
             new BigDecimal("38.15"), 
             about);
         Book book = bookRepository.save(b);
-        assertEquals(1, bookRepository.count());
+        assertEquals(booksInsertedInDbByMigration + 1, bookRepository.count());
         BlockingHttpClient client = httpClient.toBlocking();
         List<BookForSale> books = client.retrieve(HttpRequest.GET("/books"),
                 Argument.listOf(BookForSale.class)); // <5>
         assertNotNull(books);
-        assertEquals(1, books.size());
-        assertEquals("Building Microservices", books.get(0).title());
-        assertEquals("1491950358", books.get(0).isbn());
-        assertEquals(new BigDecimal("46.16"), books.get(0).price());
+        assertEquals(booksInsertedInDbByMigration + 1, books.size());
+        assertEquals("Building Microservices", books.get(1).title());
+        assertEquals("1491950358", books.get(1).isbn());
+        assertEquals(new BigDecimal("46.16"), books.get(1).price());
         bookRepository.delete(book);
     }
 }

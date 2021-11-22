@@ -61,13 +61,15 @@ Configure the database migrations directory for http://www.liquibase.org[Liquiba
 
 resource:application.yml[tag=liquibase]
 
-Create the following files with the database schema creation:
+Create the following files with the database schema creation and a book:
 
 resource:db/liquibase-changelog.xml[]
 
 resource:db/changelog/01-create-books-schema.xml[]
 
-During application startup, http://www.liquibase.org[Liquibase] executes the SQL file and creates the schema needed for the application.
+resource:db/changelog/02-insert-book.xml[]
+
+During application startup, http://www.liquibase.org[Liquibase] executes the SQL file, creates the schema needed for the application and inserts one book.
 
 === Mapped Entities with Java Records
 
@@ -161,10 +163,9 @@ You can run a cURL command to test the application:
 [source, bash]
 ----
 $ curl http://localhost:8080/books
-[]
+[{"isbn":"0321601912","title":"Continuous Delivery","price":47.99}]
 ----
 
-You receive an empty array because there are no books in the database. You can create a Liquibase changelog to add seed data.
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
@@ -173,7 +174,7 @@ You can run a cURL command to test the application:
 [source, bash]
 ----
 $ curl http://localhost:8080/books
-[]
+[{"isbn":"0321601912","title":"Continuous Delivery","price":47.99}]
 ----
 
 You receive an empty array because there are no books in the database. You can create a Liquibase changelog to add seed data.
