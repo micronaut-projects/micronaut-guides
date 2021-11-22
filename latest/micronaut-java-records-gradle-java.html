@@ -384,7 +384,7 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "M
 </div>
 </div>
 <div class="paragraph">
-<p>Create the following files with the database schema creation:</p>
+<p>Create the following files with the database schema creation and a book:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/db/liquibase-changelog.xml</div>
@@ -396,6 +396,7 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "M
         <span class="attribute-name">xsi:schemaLocation</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog</span>
          <span class="content">http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
     <span class="tag">&lt;include</span> <span class="attribute-name">file</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">changelog/01-create-books-schema.xml</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">relativeToChangelogFile</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;include</span> <span class="attribute-name">file</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">changelog/02-insert-book.xml</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">relativeToChangelogFile</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">true</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
 <span class="tag">&lt;/databaseChangeLog&gt;</span></code></pre>
 </div>
 </div>
@@ -428,8 +429,29 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "M
 <span class="tag">&lt;/databaseChangeLog&gt;</span></code></pre>
 </div>
 </div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/changelog/02-insert-book.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="preprocessor">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+
+<span class="tag">&lt;databaseChangeLog</span>
+        <span class="attribute-name">xmlns</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog</span><span class="delimiter">&quot;</span></span>
+        <span class="attribute-name">xmlns:xsi</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.w3.org/2001/XMLSchema-instance</span><span class="delimiter">&quot;</span></span>
+        <span class="attribute-name">xsi:schemaLocation</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.liquibase.org/xml/ns/dbchangelog</span>
+         <span class="content">http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+    <span class="tag">&lt;changeSet</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">02</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">author</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">sdelamo</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+        <span class="tag">&lt;insert</span> <span class="attribute-name">tableName</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">book</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+            <span class="tag">&lt;column</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">isbn</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>0321601912<span class="tag">&lt;/column&gt;</span>
+            <span class="tag">&lt;column</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Continuous Delivery<span class="tag">&lt;/column&gt;</span>
+            <span class="tag">&lt;column</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">price</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>39.99<span class="tag">&lt;/column&gt;</span>
+            <span class="tag">&lt;column</span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">about</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Winner of the 2011 Jolt Excellence Award! Getting software released to users is often a painful, risky, and time-consuming process. This groundbreaking new book sets out the principles and technical practices that enable rapid, incremental delivery of high quality, valuable new functionality to users.<span class="tag">&lt;/column&gt;</span>
+        <span class="tag">&lt;/insert&gt;</span>
+    <span class="tag">&lt;/changeSet&gt;</span>
+<span class="tag">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
 <div class="paragraph">
-<p>During application startup, <a href="http://www.liquibase.org">Liquibase</a> executes the SQL file and creates the schema needed for the application.</p>
+<p>During application startup, <a href="http://www.liquibase.org">Liquibase</a> executes the SQL file, creates the schema needed for the application and inserts one book.</p>
 </div>
 </div>
 <div class="sect2">
@@ -569,12 +591,14 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "M
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.ReflectiveAccess</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
 
 <span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> record BookForSale(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@ReflectiveAccess</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> record BookForSale(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,  <i class="conum" data-value="3"></i><b>(3)</b>
                           <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> title,
                           <span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">BigDecimal</span> price) { }</code></pre>
 </div>
@@ -587,6 +611,10 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "M
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Jackson requires reflection to use Records. With <code>@ReflectiveAccess</code> the Micronaut framework will add the class to the GraalVM <code>reflect-config.json</code> file.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>Use <code>javax.validation.constraints</code> Constraints to ensure the data matches your expectations.</td>
 </tr>
 </table>
@@ -736,6 +764,8 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <span class="annotation">@MicronautTest</span>(transactional = <span class="predefined-constant">false</span>)  <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="type">class</span> <span class="class">BookControllerTest</span> {
 
+    <span class="type">int</span> booksInsertedInDbByMigration = <span class="integer">1</span>;
+
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
     HttpClient httpClient; <i class="conum" data-value="3"></i><b>(3)</b>
@@ -766,15 +796,15 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
             <span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">38.15</span><span class="delimiter">&quot;</span></span>), 
             about);
         <span class="predefined-type">Book</span> book = bookRepository.save(b);
-        assertEquals(<span class="integer">1</span>, bookRepository.count());
+        assertEquals(booksInsertedInDbByMigration + <span class="integer">1</span>, bookRepository.count());
         BlockingHttpClient client = httpClient.toBlocking();
         <span class="predefined-type">List</span>&lt;BookForSale&gt; books = client.retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>),
                 Argument.listOf(BookForSale.class)); <i class="conum" data-value="5"></i><b>(5)</b>
         assertNotNull(books);
-        assertEquals(<span class="integer">1</span>, books.size());
-        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>, books.get(<span class="integer">0</span>).title());
-        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>, books.get(<span class="integer">0</span>).isbn());
-        assertEquals(<span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">46.16</span><span class="delimiter">&quot;</span></span>), books.get(<span class="integer">0</span>).price());
+        assertEquals(booksInsertedInDbByMigration + <span class="integer">1</span>, books.size());
+        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>, books.get(<span class="integer">1</span>).title());
+        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>, books.get(<span class="integer">1</span>).isbn());
+        assertEquals(<span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">46.16</span><span class="delimiter">&quot;</span></span>), books.get(<span class="integer">1</span>).price());
         bookRepository.delete(book);
     }
 }</code></pre>
@@ -873,11 +903,8 @@ export VAT_PERCENTAGE=20</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8080/books
-[]</code></pre>
+[{&quot;isbn&quot;:&quot;0321601912&quot;,&quot;title&quot;:&quot;Continuous Delivery&quot;,&quot;price&quot;:47.99}]</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>You receive an empty array because there are no books in the database. You can create a Liquibase changelog to add seed data.</p>
 </div>
 </div>
 </div>
@@ -953,13 +980,31 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </tr>
 </table>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Due to a <a href="https://github.com/oracle/graal/issues/3984">bug with GraalVM and Java Records</a> it is necessary to include the flag <code>--report-unsupported-elements-at-runtime</code> when building the native image. Create the file <code>native-image.properties</code>:
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/META-INF/native-image/example.micronaut/guide/native-image.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">Args = --report-unsupported-elements-at-runtime</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>You can run a cURL command to test the application:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8080/books
-[]</code></pre>
+[{&quot;isbn&quot;:&quot;0321601912&quot;,&quot;title&quot;:&quot;Continuous Delivery&quot;,&quot;price&quot;:47.99}]</code></pre>
 </div>
 </div>
 <div class="paragraph">
