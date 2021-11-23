@@ -18,23 +18,22 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Controller("/fruits") // <1>
-@ExecuteOn(TaskExecutors.IO)  // <2>
 public class FruitController {
 
     private final FruitRepository fruitService;
 
-    public FruitController(FruitRepository fruitService) {  // <3>
+    public FruitController(FruitRepository fruitService) {  // <2>
         this.fruitService = fruitService;
     }
 
-    @Get  // <4>
+    @Get  // <3>
     public Publisher<Fruit> list() {
         return fruitService.list();
     }
 
-    @Post // <5>
-    public Mono<HttpStatus> save(@NonNull @NotNull @Valid Fruit fruit) { // <6>
-        return fruitService.save(fruit) // <7>
+    @Post // <4>
+    public Mono<HttpStatus> save(@NonNull @NotNull @Valid Fruit fruit) { // <5>
+        return fruitService.save(fruit) // <6>
                 .map(added -> (added) ? HttpStatus.CREATED : HttpStatus.CONFLICT);
     }
 }

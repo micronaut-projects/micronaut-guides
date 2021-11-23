@@ -17,7 +17,7 @@ exit 0
 '''
     }
 
-    private static List<String> guidesChanged(String[] changedFiles) {
+    private static List<String> guidesChanged(List<String> changedFiles) {
         changedFiles.findAll { path ->
             path.startsWith('guides')
         }.collect { path ->
@@ -26,18 +26,18 @@ exit 0
         }.unique()
     }
 
-    private static boolean changesMicronautVersion(String[] changedFiles) {
+    private static boolean changesMicronautVersion(List<String> changedFiles) {
         changedFiles.any { str -> str.contains("version.txt") }
     }
 
-    private static boolean changesDependencies(String[] changedFiles, List<String> changedGuides) {
+    private static boolean changesDependencies(List<String> changedFiles, List<String> changedGuides) {
         if (changedGuides) {
             return false
         }
         changedFiles.any { str -> str.contains("pom.xml") }
     }
 
-    private static boolean changesBuildScr(String[] changedFiles) {
+    private static boolean changesBuildScr(List<String> changedFiles) {
         changedFiles.any { str -> str.contains('buildSrc') }
     }
 
@@ -56,7 +56,7 @@ exit 0
         return !guidesChanged.contains(metadata.slug)
     }
 
-    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, String[] changedFiles) {
+    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, List<String> changedFiles) {
         String bashScript = '''\
 #!/usr/bin/env bash
 set -e

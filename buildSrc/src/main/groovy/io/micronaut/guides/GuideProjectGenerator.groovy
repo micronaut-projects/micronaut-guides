@@ -108,9 +108,12 @@ class GuideProjectGenerator implements Closeable {
 
         guidesFolder.eachDir { dir ->
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
-            if (Utils.process(metadata)) {
-                generateOne(metadata, dir, output)
-                GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+            try {
+                if (Utils.process(metadata, false)) {
+                    generateOne(metadata, dir, output)
+                    GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+                }
+            } catch(IllegalArgumentException e) {
             }
         }
     }
@@ -154,6 +157,12 @@ class GuideProjectGenerator implements Closeable {
                 File destination = destinationPath.toFile()
                 destination.mkdir()
 
+                if (metadata.minimumJavaVersion != null) {
+                    JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
+                    if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
+                        javaVersion = minimumJavaVersion
+                    }
+                }
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
 
                 final String srcFolder = 'src'
