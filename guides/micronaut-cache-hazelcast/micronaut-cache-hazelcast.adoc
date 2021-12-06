@@ -1,0 +1,166 @@
+include::{commondir}/common-header.adoc[]
+
+In this guide, you will use Micronaut caching annotations to speed up your application.
+
+You are going to use a cache powered by https://hazelcast.com[Hazelcast].
+
+____
+Hazelcast is a streaming and memory-first application platform for fast, stateful, data-intensive workloads on-premises, at the edge or as fully managed cloud service.
+____
+
+include::{commondir}/common-requirements.adoc[]
+
+include::{commondir}/common-completesolution.adoc[]
+
+include::{commondir}/common-cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app \
+   example.micronaut.micronautguide \
+   --features=cache-hazelcast,testcontainers \ 
+   --build=@build@ \
+   --lang=@lang@ \
+----
+
+include::{commondir}/common-build-lang-arguments.adoc[]
+
+include::{commondir}/common-default-package.adoc[]
+
+NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add `cache-hazelcast` and `testcontainers` features.
+
+include::{commondir}/common-annotationprocessors.adoc[]
+
+=== Configure the Application
+
+In this sample application, we cache news headlines. Add https://micronaut-projects.github.io/micronaut-cache/latest/guide/#hazelcast[Micronaut Hazelcast] dependency which adds support for cache using http://hazelcast.com[Hazelcast].
+
+dependency:micronaut-cache-hazelcast[groupId=io.micronaut.cache]
+
+Configure your caches in `application.yml`:
+
+resource:application.yml[tag=config]
+
+<1> Configure a cache called `headlines`.
+
+TIP: Check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/configurationreference.html#io.micronaut.cache.caffeine.DefaultCacheConfiguration[properties (`maximum-size`, `expire-after-write` and `expire-after-access`)] to configure the size and expiration of your caches. It is important to keep the caches' size under control.
+
+=== Micronaut Cache API
+
+Imagine a service which retrieves headlines for a given month. This operation may be expensive and you may want to cache it.
+
+source:NewsService[]
+
+callout:singleton[1]
+<2> Specifies the cache name `headlines` to store cache operation values in.
+<3> Indicates a method is cacheable. The cache name `headlines` specified in `@CacheConfig` is used. Since the method has only one parameter, you don't need to specify the `month` parameters attribute of the annotation.
+<4> Emulate an expensive operation by sleeping for several seconds.
+<5> The return value is cached with name `headlines` for the supplied `month`. The method invocation is never skipped even if the cache `headlines` for the supplied `month` already exists.
+<6> Method invocation causes the invalidation of the cache `headlines` for the supplied `month`.
+
+TIP: If you don't annotate the class with `@CacheConfig`, specify the cache name in the cache annotations. E.g. `@Cacheable(value = "headlines", parameters = {"month"})`
+
+=== Test the Cache
+
+We can verify that the cache works as expected:
+
+test:NewsServiceTest[]
+
+:exclude-for-languages:groovy
+callout:test-method-order[1]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+callout:stepwise[1]
+:exclude-for-languages:
+callout:micronaut-test-start-application-false[2]
+callout:testcontainers[3]
+callout:test-property-provider[4]
+:exclude-for-languages:groovy
+callout:testcontainers-container[5]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+callout:testcontainers-shared[5]
+:exclude-for-languages:
+<6> Inject `NewsService` bean.
+callout:timeout[7]
+:exclude-for-languages:groovy
+callout:order[8]
+:exclude-for-languages:
+
+=== Controller
+
+Create a controller which engages the previous service:
+
+source:News[]
+
+callout:introspected[1]
+
+source:NewsController[]
+
+callout:controller[number=1,arg0=/]
+
+Add a test. We call the endpoint twice and verify with the `@Timeout` annotation that the cache is being used.
+
+test:NewsControllerTest[]
+
+:exclude-for-languages:groovy
+callout:test-method-order[1]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+callout:stepwise[1]
+:exclude-for-languages:
+callout:micronaut-test[2]
+callout:testcontainers[3]
+callout:test-property-provider[4]
+:exclude-for-languages:groovy
+callout:testcontainers-container[5]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+callout:testcontainers-shared[5]
+:exclude-for-languages:
+callout:http-client[6]
+callout:timeout[7]
+:exclude-for-languages:groovy
+callout:order[8]
+:exclude-for-languages:
+
+include::{commondir}/common-testApp.adoc[]
+
+=== Configure Hazelcast 
+
+The minimal configuration to use Hazelcast is to simply declare `hazelcast:` with a network configuration for addresses of the Hazelcast cluster:
+
+resource:application.yml[tag=hazelcast]
+
+Replace `192.168.4.67` with your host machine address. See following section.
+
+== Running Hazelcast via Docker 
+
+Run https://hub.docker.com/r/hazelcast/hazelcast[Hazelcast via Docker]
+
+Create a Hazelcast cluster with two Docker containers and access it from the client application.
+
+[source, bash]
+----
+$ docker run -e HZ_NETWORK_PUBLICADDRESS=192.168.4.67:5701 -p 5701:5701 hazelcast/hazelcast:4.2.1
+$ docker run -e HZ_NETWORK_PUBLICADDRESS=192.168.4.67:5702 -p 5702:5701 hazelcast/hazelcast:4.2.1
+----
+
+Replace `192.168.4.67` with your host machine address. It is used for the Hazelcast communication.
+
+include::{commondir}/common-runapp.adoc[]
+
+include::{commondir}/common-graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You should be able to execute `curl localhost:8080/NOVEMBER` and see results
+
+:exclude-for-languages:
+
+== Next steps
+
+Read about Micronaut https://docs.micronaut.io/latest/guide/#caching[Cache Advice].
+Moreover, check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/[Micronaut Cache] project for more information.
+
+include::{commondir}/common-helpWithMicronaut.adoc[]
