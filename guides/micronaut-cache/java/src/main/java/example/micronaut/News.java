@@ -5,7 +5,7 @@ import io.micronaut.core.annotation.Introspected;
 import java.time.Month;
 import java.util.List;
 
-@Introspected
+@Introspected // <1>
 public class News {
     private Month month;
 

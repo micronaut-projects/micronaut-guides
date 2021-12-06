@@ -6,7 +6,7 @@ import io.micronaut.core.annotation.Introspected
 import java.time.Month
 
 @CompileStatic
-@Introspected
+@Introspected // <1>
 class News {
     Month month
     List<String> headlines
