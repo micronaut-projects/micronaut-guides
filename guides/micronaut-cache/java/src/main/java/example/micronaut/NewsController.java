@@ -5,7 +5,7 @@ import io.micronaut.http.annotation.Get;
 
 import java.time.Month;
 
-@Controller
+@Controller // <1>
 public class NewsController {
 
     private final NewsService newsService;
