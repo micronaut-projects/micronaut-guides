@@ -7,7 +7,6 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.uri.UriBuilder
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
-import org.testcontainers.containers.GenericContainer
 import org.testcontainers.spock.Testcontainers
 import spock.lang.Shared
 import spock.lang.Specification
@@ -18,31 +17,27 @@ import java.time.Month
 
 @Stepwise // <1>
 @MicronautTest // <2>
-@Testcontainers // <3>
 class NewsControllerSpec extends Specification
-        implements TestPropertyProvider { // <4>
-
-    @Shared // <5>
-    GenericContainer hazelcast = new GenericContainer("hazelcast/hazelcast:4.2.1")
-            .withExposedPorts(5701)
+        implements TestPropertyProvider { // <3>
 
     @Override
     @NonNull
-    Map<String, String> getProperties() { // <4>
-        if (!hazelcast.isRunning()) {
-            hazelcast.start()
-        }
-        ["hazelcast.client.network.addresses": "127.0.0.1:$hazelcast.firstMappedPort"]
+    Map<String, String> getProperties() { // <3>
+        ["hazelcast.client.network.addresses": HazelcastUtils.url]
+    }
+
+    def cleanupSpec() {
+        HazelcastUtils.close()
     }
 
     @Shared
     String expected = "Micronaut AOP: Awesome flexibility without the complexity"
 
     @Inject
-    @Client("/") // <6>
+    @Client("/") // <4>
     HttpClient client
 
-    @Timeout(12) // <7>
+    @Timeout(30) // <5>
     void "fetching october headlines first time does not use cache"() {
         when:
         News news = client.toBlocking().retrieve(createRequest(), News)
@@ -51,7 +46,7 @@ class NewsControllerSpec extends Specification
         [expected] == news.headlines
     }
 
-    @Timeout(1) // <7>
+    @Timeout(1) // <5>
     void "fetching october headlines second time uses cache"() {
         when:
         News news = client.toBlocking().retrieve(createRequest(), News)

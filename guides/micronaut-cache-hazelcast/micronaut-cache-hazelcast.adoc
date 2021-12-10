@@ -62,29 +62,32 @@ TIP: If you don't annotate the class with `@CacheConfig`, specify the cache name
 
 === Test the Cache
 
+We use https://testcontainers.org[Testcontainers] to test the application.
+
+Create a class to ease the start-up and shutdown of Hazelcast with TestContainers.
+
+test:HazelcastUtils[]
+
 We can verify that the cache works as expected:
 
 test:NewsServiceTest[]
 
 :exclude-for-languages:groovy
 callout:test-method-order[1]
+callout:micronaut-test-start-application-false[2]
+callout:test-instance-per-class[3]
+callout:test-property-provider[4]
+<5> Inject `NewsService` bean.
+callout:timeout[6]
+callout:order[7]
 :exclude-for-languages:
+
 :exclude-for-languages:java,kotlin
 callout:stepwise[1]
-:exclude-for-languages:
 callout:micronaut-test-start-application-false[2]
-callout:testcontainers[3]
-callout:test-property-provider[4]
-:exclude-for-languages:groovy
-callout:testcontainers-container[5]
-:exclude-for-languages:
-:exclude-for-languages:java,kotlin
-callout:testcontainers-shared[5]
-:exclude-for-languages:
-<6> Inject `NewsService` bean.
-callout:timeout[7]
-:exclude-for-languages:groovy
-callout:order[8]
+callout:test-property-provider[3]
+<4> Inject `NewsService` bean.
+callout:timeout[5]
 :exclude-for-languages:
 
 === Controller
@@ -105,23 +108,20 @@ test:NewsControllerTest[]
 
 :exclude-for-languages:groovy
 callout:test-method-order[1]
+callout:micronaut-test[2]
+callout:test-instance-per-class[3]
+callout:test-property-provider[4]
+callout:http-client[5]
+callout:timeout[6]
+callout:order[7]
 :exclude-for-languages:
+
 :exclude-for-languages:java,kotlin
 callout:stepwise[1]
-:exclude-for-languages:
 callout:micronaut-test[2]
-callout:testcontainers[3]
-callout:test-property-provider[4]
-:exclude-for-languages:groovy
-callout:testcontainers-container[5]
-:exclude-for-languages:
-:exclude-for-languages:java,kotlin
-callout:testcontainers-shared[5]
-:exclude-for-languages:
-callout:http-client[6]
-callout:timeout[7]
-:exclude-for-languages:groovy
-callout:order[8]
+callout:test-property-provider[3]
+callout:http-client[4]
+callout:timeout[5]
 :exclude-for-languages:
 
 include::{commondir}/common-testApp.adoc[]
@@ -150,6 +150,8 @@ Replace `192.168.4.67` with your host machine address. It is used for the Hazelc
 
 include::{commondir}/common-runapp.adoc[]
 
+You should be able to execute `curl localhost:8080/NOVEMBER` and see results
+
 include::{commondir}/common-graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
@@ -160,7 +162,10 @@ You should be able to execute `curl localhost:8080/NOVEMBER` and see results
 
 == Next steps
 
-Read about Micronaut https://docs.micronaut.io/latest/guide/#caching[Cache Advice].
-Moreover, check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/[Micronaut Cache] project for more information.
+Learn more about https://training.hazelcast.com[Hazelcast].
+
+Read also about Micronaut https://docs.micronaut.io/latest/guide/#caching[Cache Advice] and check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/[Micronaut Cache] project for more information.
+
+
 
 include::{commondir}/common-helpWithMicronaut.adoc[]

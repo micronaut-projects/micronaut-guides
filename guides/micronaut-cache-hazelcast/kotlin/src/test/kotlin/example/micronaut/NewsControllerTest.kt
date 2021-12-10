@@ -1,5 +1,6 @@
 package example.micronaut
 
+import example.micronaut.HazelcastUtils.close
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
@@ -10,31 +11,29 @@ import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.testcontainers.containers.GenericContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Month
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class) // <1>
 @MicronautTest // <2>
-@Testcontainers // <3>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // <3>
 class NewsControllerTest : TestPropertyProvider { // <4>
-    @Container // <5>
-    var hazelcast = GenericContainer("hazelcast/hazelcast:4.2.1")
-        .withExposedPorts(5701)
-
     @NonNull
     override fun getProperties(): Map<String, String> { // <4>
         return mapOf("hazelcast.client.network.addresses"
-                to "127.0.0.1:" + hazelcast.firstMappedPort)
+                to HazelcastUtils.url())
+    }
+
+    @AfterAll
+    fun cleanup() {
+        HazelcastUtils.close()
     }
 
     @Inject
-    @field:Client("/") // <6>
+    @field:Client("/") // <5>
     lateinit var client: HttpClient
 
-    @Timeout(12) // <7>
-    @Order(1) // <8>
+    @Timeout(30) // <6>
+    @Order(1) // <7>
     @Test
     fun fetchingOctoberHeadlinesFirstTimeDoesNotUseCache() {
         val request: HttpRequest<Any> = HttpRequest.GET(UriBuilder.of("/").path(Month.OCTOBER.name).build())
@@ -43,8 +42,8 @@ class NewsControllerTest : TestPropertyProvider { // <4>
         assertEquals(listOf(expected), news.headlines)
     }
 
-    @Timeout(1) // <7>
-    @Order(2) // <8>
+    @Timeout(1) // <6>
+    @Order(2) // <7>
     @Test
     fun fetchingOctoberHeadlinesSecondTimeUsesCache() {
         val request: HttpRequest<Any> = HttpRequest.GET(UriBuilder.of("/").path(Month.OCTOBER.name).build())

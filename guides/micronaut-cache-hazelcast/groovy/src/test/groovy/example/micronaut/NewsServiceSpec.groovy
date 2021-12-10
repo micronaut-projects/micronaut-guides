@@ -15,27 +15,23 @@ import java.time.Month
 
 @Stepwise // <1>
 @MicronautTest(startApplication = false) // <2>
-@Testcontainers // <3>
 class NewsServiceSpec extends Specification
-        implements TestPropertyProvider { // <4>
-
-    @Shared // <5>
-    GenericContainer hazelcast = new GenericContainer("hazelcast/hazelcast:4.2.1")
-            .withExposedPorts(5701)
+        implements TestPropertyProvider { // <3>
 
     @Override
     @NonNull
-     Map<String, String> getProperties() { // <4>
-        if (!hazelcast.isRunning()) {
-            hazelcast.start()
-        }
-        ["hazelcast.client.network.addresses": "127.0.0.1:$hazelcast.firstMappedPort"]
+     Map<String, String> getProperties() { // <3>
+        ["hazelcast.client.network.addresses": HazelcastUtils.url]
     }
 
-    @Inject // <6>
+    def cleanupSpec() {
+        HazelcastUtils.close()
+    }
+
+    @Inject // <4>
     NewsService newsService;
 
-    @Timeout(12) // <7>
+    @Timeout(30) // <5>
     void "first invocation of November does not hit cache"() {
         when:
         List<String> headlines = newsService.headlines(Month.NOVEMBER)
@@ -44,7 +40,7 @@ class NewsServiceSpec extends Specification
         2 == headlines.size()
     }
 
-    @Timeout(1) // <7>
+    @Timeout(1) // <5>
     void "second invocation of November hits Cache"() {
         when:
         List<String> headlines = newsService.headlines(Month.NOVEMBER)
@@ -53,7 +49,7 @@ class NewsServiceSpec extends Specification
         2 == headlines.size()
     }
 
-    @Timeout(4) // <7>
+    @Timeout(4) // <5>
     void "first invocation of October does not hit Cache"() {
         when:
         List<String> headlines = newsService.headlines(Month.OCTOBER)
@@ -62,7 +58,7 @@ class NewsServiceSpec extends Specification
         1 == headlines.size()
     }
 
-    @Timeout(1) // <7>
+    @Timeout(1) // <5>
     void "second invocation of october hits cache"() {
         when:
         List<String> headlines = newsService.headlines(Month.OCTOBER)
@@ -71,7 +67,7 @@ class NewsServiceSpec extends Specification
         1 == headlines.size()
     }
 
-    @Timeout(1) // <7>
+    @Timeout(1) // <5>
     void "adding a headline to november updates cache"() {
         when:
         List<String> headlines = newsService.addHeadline(Month.NOVEMBER, "Micronaut 1.3 Milestone 1 Released")
@@ -80,7 +76,7 @@ class NewsServiceSpec extends Specification
         3 == headlines.size()
     }
 
-    @Timeout(1) // <7>
+    @Timeout(1) // <5>
     void "november cache was updated by cache put and thus the value is retrieved from the cache"() {
         when:
         List<String> headlines = newsService.headlines(Month.NOVEMBER)
@@ -89,7 +85,7 @@ class NewsServiceSpec extends Specification
         3 == headlines.size()
     }
 
-    @Timeout(1) // <7>
+    @Timeout(1) // <5>
     void "invalidate november cache with cache invalidate"() {
         when:
         newsService.removeHeadline(Month.NOVEMBER, "Micronaut 1.3 Milestone 1 Released")
@@ -98,7 +94,7 @@ class NewsServiceSpec extends Specification
         noExceptionThrown()
     }
 
-    @Timeout(1) // <7>
+    @Timeout(1) // <5>
     void "october cache is still valid"() {
         when:
         List<String> headlines = newsService.headlines(Month.OCTOBER)
@@ -107,7 +103,7 @@ class NewsServiceSpec extends Specification
         1 == headlines.size()
     }
 
-    @Timeout(4) // <7>
+    @Timeout(4) // <5>
     void "november cache was invalidated"() {
         when:
         List<String> headlines = newsService.headlines(Month.NOVEMBER)
