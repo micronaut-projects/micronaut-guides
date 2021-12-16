@@ -7,7 +7,7 @@ import java.time.Month
 
 @CompileStatic
 @Introspected // <1>
-class News {
+class News implements Serializable { // <2>
     Month month
     List<String> headlines
 }

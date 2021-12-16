@@ -2,11 +2,12 @@ package example.micronaut;
 
 import io.micronaut.core.annotation.Introspected;
 
+import java.io.Serializable
 import java.time.Month;
 import java.util.List;
 
 @Introspected // <1>
-public class News {
+public class News implements Serializable { // <2>
     private Month month;
 
     private List<String> headlines;
