@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.Get
 import java.time.Month
 
 @CompileStatic
-@Controller
+@Controller // <1>
 class NewsController {
 
     private final NewsService newsService
