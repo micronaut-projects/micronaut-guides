@@ -433,15 +433,19 @@ Depending on the Micronaut version you're using, you might also need to update s
 
 :exclude-for-build:maven
 
-In your `build.gradle`, if the `nativeImage` block includes `--static` in the `args` list, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in the `dockerfileNative` block:
+In your `build.gradle`, if the `graalvmNative` block includes `--static` in the `args` list, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in the `dockerfileNative` block:
 
 [source, groovy]
 .build.gradle
 ----
-nativeImage {
-    args("-H:+StaticExecutableWithDynamicLibC",
-         "-Dfn.handler=example.micronaut.Function::handleRequest",
-         "--initialize-at-build-time=example.micronaut")
+graalvmNative {
+    binaries {
+        main {
+            buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
+            buildArgs.add('-Dfn.handler=example.micronaut.Function::handleRequest')
+            buildArgs.add('--initialize-at-build-time=example.micronaut')
+        }
+    }
 }
 
 dockerfileNative {
