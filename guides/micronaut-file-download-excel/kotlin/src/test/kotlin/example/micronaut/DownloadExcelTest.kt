@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream
 import java.io.FileNotFoundException
 import java.io.InputStream
 
-@MicronautTest
+@MicronautTest // <1>
 class DownloadExcelTest {
 
     @Inject
