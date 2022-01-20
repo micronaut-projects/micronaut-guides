@@ -355,20 +355,22 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">BookRepositoryImpl</span> <span class="directive">implements</span> BookRepository {
+
     <span class="annotation">@NonNull</span>
     <span class="annotation">@Override</span>
     <span class="directive">public</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; findAll() {
-        <span class="predefined-type">Book</span> buildingMicroservices = <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>);
-        <span class="predefined-type">Book</span> releaseIt = <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Release It!</span><span class="delimiter">&quot;</span></span>);
-        <span class="predefined-type">Book</span> cidelivery = <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">0321601912</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Continuous Delivery:</span><span class="delimiter">&quot;</span></span>);
-        <span class="keyword">return</span> <span class="predefined-type">Arrays</span>.asList(buildingMicroservices, releaseIt, cidelivery);
+        <span class="keyword">return</span> <span class="predefined-type">Arrays</span>.asList(
+                <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>),
+                <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Release It!</span><span class="delimiter">&quot;</span></span>),
+                <span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">0321601912</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Continuous Delivery:</span><span class="delimiter">&quot;</span></span>));
     }
 }</code></pre>
 </div>
@@ -480,14 +482,13 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.exceptions.HttpStatusException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.server.types.files.SystemFile</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
 <span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.io.File</span>;
@@ -513,11 +514,12 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
                                     cd.style(BookExcelStylesheet.STYLE_HEADER);
                                 })
                             ));
-                    bookList.stream()
-                            .forEach( book -&gt; s.row(r -&gt; {
-                                r.cell(book.getIsbn());
-                                r.cell(book.getName());
-                            }));
+                    <span class="keyword">for</span> (<span class="predefined-type">Book</span> book : bookList) {
+                        s.row(r -&gt; {
+                            r.cell(book.getIsbn());
+                            r.cell(book.getName());
+                        });
+                    }
                 });
             });
             <span class="keyword">return</span> <span class="keyword">new</span> SystemFile(file).attach(HEADER_EXCEL_FILENAME);
@@ -574,8 +576,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="annotation">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">HomeController</span> {
 
-    <span class="directive">protected</span> <span class="directive">final</span> BookRepository bookRepository;
-    <span class="directive">protected</span> <span class="directive">final</span> BookExcelService bookExcelService;
+    <span class="directive">private</span> <span class="directive">final</span> BookRepository bookRepository;
+    <span class="directive">private</span> <span class="directive">final</span> BookExcelService bookExcelService;
 
     <span class="directive">public</span> HomeController(BookRepository bookRepository,  <i class="conum" data-value="2"></i><b>(2)</b>
                           BookExcelService bookExcelService) {
@@ -691,7 +693,8 @@ file downloads but also that the downloaded file contents match our expectations
                     sheetCriterion.row(rowCriterion -&gt;
                             rowCriterion.cell(cellCriterion -&gt; cellCriterion.value(<span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>))));
         });
-        assertEquals(result.getCells().size(), <span class="integer">1</span>);
+
+        assertEquals(<span class="integer">1</span>, result.getCells().size());
     }
 }</code></pre>
 </div>

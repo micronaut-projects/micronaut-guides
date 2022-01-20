@@ -290,7 +290,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.DefaultImplementation</span>
 
-<span class="annotation">@DefaultImplementation</span>(BookRepositoryImpl.class)
+<span class="annotation">@DefaultImplementation</span>(BookRepositoryImpl)
 <span class="type">interface</span> BookRepository {
 
     <span class="annotation">@NonNull</span>
@@ -447,7 +447,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="keyword">try</span> {
             <span class="predefined-type">File</span> file = <span class="predefined-type">File</span>.createTempFile(HEADER_EXCEL_FILE_PREFIX, HEADER_EXCEL_FILE_SUFIX);
             PoiSpreadsheetBuilder.create(file).build(w -&gt; {
-                w.apply(BookExcelStylesheet.class)
+                w.apply(BookExcelStylesheet)
                 w.sheet(SHEET_NAME, s -&gt; {
                     s.row(r -&gt; Stream.of(HEADER_ISBN, HEADER_NAME)
                             .forEach(header -&gt; r.cell(cd -&gt; {
@@ -512,11 +512,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="annotation">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">HomeController</span> {
 
-    <span class="directive">protected</span> <span class="directive">final</span> BookRepository bookRepository
-    <span class="directive">protected</span> <span class="directive">final</span> BookExcelService bookExcelService
+    <span class="directive">private</span> <span class="directive">final</span> BookRepository bookRepository
+    <span class="directive">private</span> <span class="directive">final</span> BookExcelService bookExcelService
 
     HomeController(BookRepository bookRepository,  <i class="conum" data-value="2"></i><b>(2)</b>
-                          BookExcelService bookExcelService) {
+                   BookExcelService bookExcelService) {
         <span class="local-variable">this</span>.bookRepository = bookRepository
         <span class="local-variable">this</span>.bookExcelService = bookExcelService
     }
@@ -631,6 +631,7 @@ file downloads but also that the downloaded file contents match our expectations
                 })
             })
         })
+
         <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">a row is found</span><span class="delimiter">'</span></span>
         result.cells.size() == <span class="integer">1</span>
     }
