@@ -13,8 +13,8 @@ import java.util.Map;
 @Controller // <1>
 public class HomeController {
 
-    protected final BookRepository bookRepository;
-    protected final BookExcelService bookExcelService;
+    private final BookRepository bookRepository;
+    private final BookExcelService bookExcelService;
 
     public HomeController(BookRepository bookRepository,  // <2>
                           BookExcelService bookExcelService) {
