@@ -22,6 +22,7 @@ import static io.micronaut.starter.api.TestFramework.SPOCK
 class GuideAsciidocGenerator {
 
     private static final String INCLUDE_COMMONDIR = 'include::{commondir}/'
+    private static final String INCLUDE_PARTIAL = 'include::{partial}/'
     private static final String CALLOUT = 'callout:'
 
     public static final int DEFAULT_MIN_JDK = 8
@@ -174,16 +175,24 @@ class GuideAsciidocGenerator {
                 }
                 rawLines << line
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
-                String commonFileName = parseFileName(rawLine, INCLUDE_COMMONDIR)
-                        .orElseThrow(() -> new GradleException("could not parse filename from commondir line" + rawLine))
-                rawLines << '// Start: ' + commonFileName
-                rawLines.addAll(commonLines(destinationFolder, 'snippets/' + commonFileName))
-                rawLines << '// End: ' + commonFileName
+                include rawLine, rawLines, destinationFolder, INCLUDE_COMMONDIR, 'snippets'
+            } else if (rawLine.startsWith(INCLUDE_PARTIAL) && rawLine.endsWith('[]')) {
+                include rawLine, rawLines, destinationFolder, INCLUDE_PARTIAL, 'partial'
             } else {
                 rawLines << rawLine
             }
         }
         return rawLines
+    }
+
+    private static void include(String rawLine, List<String> rawLines,
+                                File destinationFolder, String prefix, String subdirectory) {
+        String commonFileName = parseFileName(rawLine, prefix)
+                .orElseThrow(() -> new GradleException("could not parse filename from include line: " + rawLine))
+        rawLines << '// Start: ' + commonFileName
+        rawLines.addAll(commonLines(destinationFolder, subdirectory + '/' + commonFileName))
+        rawLines << '// End: ' + commonFileName
+
     }
 
     private static Optional<String> parseFileName(String line, String prefix, String suffix = '.adoc') {
