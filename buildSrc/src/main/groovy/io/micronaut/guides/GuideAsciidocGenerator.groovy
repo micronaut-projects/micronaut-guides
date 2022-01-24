@@ -164,7 +164,7 @@ class GuideAsciidocGenerator {
                         .map(str -> 'callout-' + str)
                         .orElseThrow(() -> new GradleException("could not parse filename from callout for line" + rawLine))
                 Optional<Integer> number = parseNumber(rawLine)
-                List<String> newLines = commonLines(destinationFolder, commonFileName)
+                List<String> newLines = commonLines(destinationFolder, 'callouts/' + commonFileName)
                 String line = "${number.map(num -> '<' + num + '>').orElse('*')} ${newLines.first()}".toString()
                 for (int i = 0; i < 10; i++) {
                     String value = extractFromParametersLine(rawLine, "arg" + i)
