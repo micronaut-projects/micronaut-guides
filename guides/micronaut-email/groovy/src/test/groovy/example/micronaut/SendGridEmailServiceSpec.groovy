@@ -11,7 +11,7 @@ class SendGridEmailServiceSpec extends Specification {
         ApplicationContext ctx = ApplicationContext.run()
 
         expect:
-        !ctx.containsBean(SendGridEmailService.class)
+        !ctx.containsBean(SendGridEmailService)
 
         cleanup:
         ctx.close()
@@ -23,7 +23,7 @@ class SendGridEmailServiceSpec extends Specification {
         System.setProperty("sendgrid.apikey", "XXXX")
         System.setProperty("sendgrid.fromemail", "me@micronaut.example")
         ApplicationContext ctx = ApplicationContext.run()
-        SendGridEmailService bean = ctx.getBean(SendGridEmailService.class)
+        SendGridEmailService bean = ctx.getBean(SendGridEmailService)
 
         expect:
         "XXXX" == bean.apiKey
