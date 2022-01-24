@@ -3,6 +3,10 @@ package io.micronaut.guides
 import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
 
+import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
+import static io.micronaut.starter.options.BuildTool.GRADLE
+import static io.micronaut.starter.options.BuildTool.MAVEN
+
 @CompileStatic
 class TestScriptGenerator {
 
@@ -27,18 +31,18 @@ exit 0
     }
 
     private static boolean changesMicronautVersion(List<String> changedFiles) {
-        changedFiles.any { str -> str.contains("version.txt") }
+        changedFiles.any { it.contains("version.txt") }
     }
 
     private static boolean changesDependencies(List<String> changedFiles, List<String> changedGuides) {
         if (changedGuides) {
             return false
         }
-        changedFiles.any { str -> str.contains("pom.xml") }
+        changedFiles.any { it.contains("pom.xml") }
     }
 
     private static boolean changesBuildScr(List<String> changedFiles) {
-        changedFiles.any { str -> str.contains('buildSrc') }
+        changedFiles.any { it.contains('buildSrc') }
     }
 
     private static boolean shouldSkip(GuideMetadata metadata,
@@ -56,7 +60,8 @@ exit 0
         return !guidesChanged.contains(metadata.slug)
     }
 
-    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, List<String> changedFiles) {
+    static String generateScript(File guidesFolder, String metadataConfigName,
+                                 boolean stopIfFailure, List<String> changedFiles) {
         String bashScript = '''\
 #!/usr/bin/env bash
 set -e
@@ -79,14 +84,14 @@ EXIT_STATUS=0
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                BuildTool buildTool = folder.contains(BuildTool.MAVEN.toString()) ? BuildTool.MAVEN : BuildTool.GRADLE
-                if (buildTool == BuildTool.MAVEN && metadata.skipMavenTests) {
+                BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE
+                if (buildTool == MAVEN && metadata.skipMavenTests) {
                     continue
                 }
-                if (buildTool == BuildTool.GRADLE && metadata.skipGradleTests) {
+                if (buildTool == GRADLE && metadata.skipGradleTests) {
                     continue
                 }
-                if (metadata.apps.any { it.name == GuideProjectGenerator.DEFAULT_APP_NAME } ) {
+                if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
                     bashScript += scriptForFolder(folder, folder, stopIfFailure, buildTool)
                 } else {
                     bashScript += """\
@@ -122,26 +127,27 @@ fi
         bashScript
     }
 
-    private static String scriptForFolder(String nestedFolder, String folder, boolean stopIfFailure, BuildTool buildTool) {
+    private static String scriptForFolder(String nestedFolder, String folder,
+                                          boolean stopIfFailure, BuildTool buildTool) {
         String bashScript = """\
-cd ${nestedFolder}
+cd $nestedFolder
 echo "-------------------------------------------------"
-echo "Executing '${folder}' tests"
-${buildTool == BuildTool.MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
+echo "Executing '$folder' tests"
+${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
 cd ..
 """
         if (stopIfFailure) {
             bashScript += """\
 if [ \$EXIT_STATUS -ne 0 ]; then
-  echo "'${folder}' tests failed => exit \$EXIT_STATUS"
+  echo "'$folder' tests failed => exit \$EXIT_STATUS"
   exit \$EXIT_STATUS
 fi
 """
         } else {
             bashScript += """\
 if [ \$EXIT_STATUS -ne 0 ]; then
-  FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" ${folder})
-  echo "'${folder}' tests failed => exit \$EXIT_STATUS"
+  FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" $folder)
+  echo "'$folder' tests failed => exit \$EXIT_STATUS"
 fi
 EXIT_STATUS=0
 """

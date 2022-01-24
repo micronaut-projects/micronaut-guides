@@ -6,7 +6,6 @@ import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
-import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
@@ -20,6 +19,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 
+import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.options.BuildTool.GRADLE
@@ -32,13 +32,13 @@ import static io.micronaut.starter.options.Language.KOTLIN
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
-class GuideProjectGenerator implements Closeable {
+class GuideProjectGenerator implements AutoCloseable {
 
     public static final String DEFAULT_APP_NAME = 'default'
 
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = Arrays.asList(JDK_8, JDK_11)
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
@@ -49,7 +49,7 @@ class GuideProjectGenerator implements Closeable {
     }
 
     @Override
-    void close() throws IOException {
+    void close() {
         applicationContext.close()
     }
 
@@ -67,7 +67,7 @@ class GuideProjectGenerator implements Closeable {
     private static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
-            throw new GradleException("metadata file not found for ${dir.name}")
+            throw new GradleException("metadata file not found for " + dir.name)
         }
         def config = new JsonSlurper().parse(configFile)
         Category cat = Category.values().find {it.toString() == config.category }
@@ -90,12 +90,12 @@ class GuideProjectGenerator implements Closeable {
                 skipMavenTests: config.skipMavenTests ?: false,
                 minimumJavaVersion: config.minimumJavaVersion,
                 zipIncludes: config.zipIncludes ?: [],
-                apps: config.apps.collect { it -> new App(name: it.name,
+                apps: config.apps.collect { it -> new App(
+                        name: it.name,
                         features: it.features,
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                         excludeSource:  it.excludeSource,
-                        excludeTest:  it.excludeTest,
-                )
+                        excludeTest:  it.excludeTest)
                 }
         )
     }
@@ -113,17 +113,17 @@ class GuideProjectGenerator implements Closeable {
                     generateOne(metadata, dir, output)
                     GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
                 }
-            } catch(IllegalArgumentException e) {
+            } catch(IllegalArgumentException ignored) {
             }
         }
     }
 
     static String folderName(String slug, GuidesOption guidesOption) {
-        "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language}"
+        "${slug}-${guidesOption.buildTool}-${guidesOption.language}"
     }
 
     private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
-        String packageAndName = "${BASE_PACKAGE}.${APP_NAME}"
+        String packageAndName = BASE_PACKAGE + '.' + APP_NAME
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
         JdkVersion javaVersion = Utils.parseJdkVersion()
@@ -149,22 +149,24 @@ class GuideProjectGenerator implements Closeable {
                     appFeatures.remove('mockito')
                 }
 
-                // Normal guide use 'default' as name, multi project guides have different modules
-                String appName = app.name == DEFAULT_APP_NAME ? StringUtils.EMPTY_STRING : app.name
-                String folder = folderName(metadata.slug, guidesOption)
-
-                Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
-                File destination = destinationPath.toFile()
-                destination.mkdir()
-
                 if (metadata.minimumJavaVersion != null) {
                     JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
                     if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
                         javaVersion = minimumJavaVersion
                     }
                 }
+
+                // typical guides use 'default' as name, multi-project guides have different modules
+                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
+                String folder = folderName(metadata.slug, guidesOption)
+
+                Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
+                File destination = destinationPath.toFile()
+                destination.mkdir()
+
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
 
+                // look for a common 'src' directory shared by multiple languages and copy those files first
                 final String srcFolder = 'src'
                 Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
                 if (srcPath.toFile().exists()) {
@@ -176,6 +178,7 @@ class GuideProjectGenerator implements Closeable {
                     throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
                 }
 
+                // copy source/resource files for the current language
                 Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
 
                 if (app.excludeSource) {
@@ -189,6 +192,7 @@ class GuideProjectGenerator implements Closeable {
                         deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
                     }
                 }
+
                 if (metadata.zipIncludes) {
                     File destinationRoot = new File(outputDir.absolutePath, folder)
                     for (String zipInclude : metadata.zipIncludes) {
@@ -207,7 +211,7 @@ class GuideProjectGenerator implements Closeable {
                 .delete()
     }
 
-    private void copyFile(File inputDir, File destinationRoot, String filePath) {
+    private static void copyFile(File inputDir, File destinationRoot, String filePath) {
         File sourceFile = new File(inputDir, filePath)
         File destinationFile = new File(destinationRoot, filePath)
 
