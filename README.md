@@ -26,13 +26,13 @@ To create a new guide create a new asciidoc file under `src/guides` with the fol
  
 
 ```asciidoc
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+common:create-app.adoc[]
 
 TODO: Describe the user step by step how to write the app. Use includes to reference real code: 
 
@@ -44,11 +44,11 @@ Example of a Test
 
 test:HelloControllerTest[]
 
-include::{commondir}/common-testApp.adoc[]
+common:testApp.adoc[]
 
-include::{commondir}/common-runapp.adoc[]
+common:runapp.adoc[]
 
-include::{commondir}/common-graal-with-plugins.adoc[]
+common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
@@ -58,7 +58,7 @@ TODO describe how you consume the endpoints exposed by the native image with cur
 
 TODO Use the generic next step 
 
-include::{commondir}/common-next.adoc[]
+common:next.adoc[]
 
 TODO or a personalized guide for the guide:
 
@@ -66,7 +66,7 @@ TODO or a personalized guide for the guide:
 
 TODO: link to the documentation modules you used in the guide
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]
 ```
 
 ----

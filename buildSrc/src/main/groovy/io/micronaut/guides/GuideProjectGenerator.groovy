@@ -101,17 +101,22 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    void generate(File guidesFolder,
+    void generate(File guidesDir,
                   File output,
                   String metadataConfigName,
-                  File asciidocDir) {
+                  File projectDir) {
 
-        guidesFolder.eachDir { dir ->
+        File asciidocDir = new File(projectDir, 'src/docs/asciidoc')
+        if (!asciidocDir.exists()) {
+            asciidocDir.mkdir()
+        }
+
+        guidesDir.eachDir { dir ->
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
             try {
                 if (Utils.process(metadata, false)) {
                     generateOne(metadata, dir, output)
-                    GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+                    GuideAsciidocGenerator.generate(metadata, dir, asciidocDir, projectDir)
                 }
             } catch(IllegalArgumentException ignored) {
             }
