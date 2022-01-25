@@ -18,11 +18,10 @@ include::{commondir}/common-cli-or-launch.adoc[]
 ----
 mn create-app --jdk=17 \
    example.micronaut.micronautguide \
-   --features=data-jdbc,postgres,liquibase \ 
+   --features=data-jdbc,postgres,liquibase \
    --build=@build@ \
    --lang=@lang@ \
 ----
-
 
 NOTE: To use Java records, specify JDK 17 when you create the application.
 
@@ -46,7 +45,6 @@ test:ValueAddedTaxConfigurationTest[]
 
 callout:property[1]
 callout:micronaut-test-start-application-false[2]
-
 
 === Database Migration with Liquibase
 
@@ -101,7 +99,7 @@ callout:dto-projection[3]
 
 === JSON serialization with Java Records
 
-Create a Java record to represent a JSON response: 
+Create a Java record to represent a JSON response:
 
 source:BookForSale[]
 
@@ -109,7 +107,7 @@ callout:introspected[1]
 <2> Jackson requires reflection to use Records. With `@ReflectiveAccess` the Micronaut framework will add the class to the GraalVM `reflect-config.json` file.
 callout:constraints[3]
 
-Create a Controller that uses the previous record: 
+Create a Controller that uses the previous record:
 
 source:BookController[]
 
@@ -121,7 +119,6 @@ callout:get[number=4,arg0=index,arg1='/']
 
 include::{commondir}/common-testcontainers-postgres.adoc[]
 
-
 === Create a Test
 
 Create a test:
@@ -131,7 +128,7 @@ test:BookControllerTest[]
 callout:property[1]
 callout:micronaut-test-transactional-false[2]
 callout:http-client[3]
-<4> Multiline string 
+<4> Multiline string
 callout:binding-json-array[5]
 
 === Running the application
@@ -162,10 +159,13 @@ You can run a cURL command to test the application:
 
 [source, bash]
 ----
-$ curl http://localhost:8080/books
-[{"isbn":"0321601912","title":"Continuous Delivery","price":47.99}]
+curl http://localhost:8080/books
 ----
 
+[source,json]
+----
+[{"isbn":"0321601912","title":"Continuous Delivery","price":47.99}]
+----
 
 include::{commondir}/common-graal-with-plugins.adoc[]
 
@@ -173,12 +173,15 @@ WARNING: Due to a https://github.com/oracle/graal/issues/3984[bug with GraalVM a
 
 resource:META-INF/native-image/example.micronaut/guide/native-image.properties[]
 
-
 You can run a cURL command to test the application:
 
 [source, bash]
 ----
-$ curl http://localhost:8080/books
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
 [{"isbn":"0321601912","title":"Continuous Delivery","price":47.99}]
 ----
 
@@ -187,4 +190,3 @@ You receive an empty array because there are no books in the database. You can c
 include::{commondir}/common-next.adoc[]
 
 include::{commondir}/common-helpWithMicronaut.adoc[]
-

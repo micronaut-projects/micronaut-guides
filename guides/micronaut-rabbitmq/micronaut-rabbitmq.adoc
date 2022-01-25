@@ -89,8 +89,7 @@ Write a test:
 
 test:AnalyticsServiceTest[app=analytics]
 
-<1> Starting with Micronaut 1.1.0 `micronaut-test-junit5` is added automatically to `build.gradle` (or `pom.xml`) when
-creating an application with the CLI. For more information take a look https://micronaut-projects.github.io/micronaut-test/latest/guide/[at the documentation].
+<1> `micronaut-test-junit5` is added automatically to `build.gradle` (or `pom.xml`) when creating an application with the CLI. For more information, see https://micronaut-projects.github.io/micronaut-test/latest/guide/[the documentation].
 <2> Just inject the collaborator and `@MicronautTest` will take care of everything.
 
 Create a Controller to expose the analytics:
@@ -110,8 +109,9 @@ To run the tests:
 :exclude-for-build:maven
 
 [source, bash]
+.analytics
 ----
-analytics $ ./gradlew test
+./gradlew test
 ----
 
 :exclude-for-build:
@@ -119,8 +119,9 @@ analytics $ ./gradlew test
 :exclude-for-build:gradle
 
 [source, bash]
+.analytics
 ----
-analytics $ ./mvnw test
+./mvnw test
 ----
 
 :exclude-for-build:
@@ -142,18 +143,26 @@ Run the `books` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.books
 ----
-books $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
 Run `analytics` microservice:
 
 [source,bash]
+.analytics
 ----
-analytics $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
@@ -162,34 +171,60 @@ analytics $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.books
 ----
-books $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
 Run `analytics` microservice:
 
 [source,bash]
+.analytics
 ----
-analytics $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
 :exclude-for-build:
 
-You can run a `curl` command to test the application:
+You can run `curl` commands to test the application:
 
 [source, bash]
 ----
-$ curl http://localhost:8080/books
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
 [{"isbn":"1491950358","name":"Building Microservices"},{"isbn":"1680502395","name":"Release It!"},{"isbn":"0321601912","name":"Continuous Delivery"}]
+----
 
-$ curl http://localhost:8080/books/1491950358
+[source, bash]
+----
+curl http://localhost:8080/books/1491950358
+----
+
+[source,json]
+----
 {"isbn":"1491950358","name":"Building Microservices"}
+----
 
-$ curl http://localhost:8081/analytics
+[source, bash]
+----
+curl http://localhost:8081/analytics
+----
+
+[source,json]
+----
 []
 ----
 
@@ -221,7 +256,7 @@ resource:application.yml[app=books,tag=rabbitmq]
 ==== Create RabbitMQ exchange, queue and binding
 
 Before being able to send and receive messages using RabbitMQ it is necessary to define the exchange, queue and binding.
-One option is create them directly in the RabbitMQ Admin UI available on `http://localhost:15672[http://localhost:15672]`.Use `guest` for both
+One option is create them directly in the RabbitMQ Admin UI available on http://localhost:15672. Use `guest` for both
 username and password.
 
 Another option is create them programatically. Create the class `ChannelPoolListener`:
@@ -247,7 +282,7 @@ source:AnalyticsClient[app=books]
 Sending a message to RabbitMQ is as simple as injecting `AnalyticsClient` and calling `updateAnalytics` method. The goal
 is to do it automatically every time a book is returned, i.e., every time there is a call to `\http://localhost:8080/books/{isbn}`.
 To achieve this we will create an https://docs.micronaut.io/latest/guide/#filters[Http Server Filter].
-Create the file `AnalyticsFilter`:
+Create the `AnalyticsFilter` class:
 
 source:AnalyticsFilter[app=books]
 
@@ -291,9 +326,13 @@ Run `books` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.books
 ----
-books $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
@@ -302,9 +341,13 @@ books $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.books
 ----
-books $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
@@ -314,11 +357,15 @@ Execute a `curl` request to get one book:
 
 [source, bash]
 ----
-$ curl http://localhost:8080/books/1491950358
+curl http://localhost:8080/books/1491950358
+----
+
+[source,json]
+----
 {"isbn":"1491950358","name":"Building Microservices"}
 ----
 
-Open RabbitMQ Admin UI on `http://localhost:15672[http://localhost:15672]` and use `guest` for both username and password. Select `queues` and
+Open RabbitMQ Admin UI on http://localhost:15672 and use `guest` for both username and password. Select `queues` and
 `analytics` queue. You can see that there is a message in the queue.
 
 image::rabbitmq-message.png[]
@@ -333,9 +380,13 @@ Run `analytics` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.analytics
 ----
-analytics $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
@@ -344,9 +395,13 @@ analytics $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.analytics
 ----
-analytics $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
@@ -360,7 +415,11 @@ Now, run a `curl` to get the analytics:
 
 [source, bash]
 ----
-$ curl http://localhost:8081/analytics
+curl http://localhost:8081/analytics
+----
+
+[source,json]
+----
 [{"bookIsbn":"1491950358","count":1}]
 ----
 
@@ -375,4 +434,3 @@ Start the native images for the two microservices and run the same `curl` reques
 == Next steps
 
 Read more about https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/[RabbitMQ support] in the Micronaut framework.
-

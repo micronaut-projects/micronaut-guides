@@ -9,11 +9,11 @@ import io.micronaut.views.View
 @Controller // <1>
 class HomeController {
 
-    protected final BookRepository bookRepository
-    protected final BookExcelService bookExcelService
+    private final BookRepository bookRepository
+    private final BookExcelService bookExcelService
 
     HomeController(BookRepository bookRepository,  // <2>
-                          BookExcelService bookExcelService) {
+                   BookExcelService bookExcelService) {
         this.bookRepository = bookRepository
         this.bookExcelService = bookExcelService
     }

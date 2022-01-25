@@ -34,7 +34,7 @@ resource:application.yml[tag=datasource]
 
 As there is no out-of-the-box support yet in the Micronaut framework for MyBatis, it is necessary to manually wire `SqlSessionFactory`.
 
-Create the following https://docs.micronaut.io/latest/guide/#factories[@Factory] file `src/main/java/example/micronaut/MybatisFactory.java`:
+Create the following https://docs.micronaut.io/latest/guide/#factories[@Factory] class in  `src/main/java/example/micronaut/MybatisFactory.java`:
 
 source:MybatisFactory[]
 <1> Annotate the class with `@Factory`.
@@ -144,7 +144,7 @@ Run the tests:
 
 [source, bash]
 ----
-$ ./gradlew test
+./gradlew test
 ----
 
 :exclude-for-build:
@@ -153,7 +153,7 @@ $ ./gradlew test
 
 [source, bash]
 ----
-$ ./mvnw test
+./mvnw test
 ----
 
 :exclude-for-build:
@@ -166,21 +166,56 @@ We can use `curl` to check that everything works as expected:
 
 [source,bash]
 ----
-$ curl http://localhost:8080/genres/list
+curl http://localhost:8080/genres/list
+----
+
+[source,json]
+----
 []
+----
 
-$ curl -X POST -d '{"name":"Sci-fi"}' -H "Content-Type: application/json" http://localhost:8080/genres
+[source,bash]
+----
+curl -X POST -d '{"name":"Sci-fi"}' -H "Content-Type: application/json" http://localhost:8080/genres
+----
+
+[source,json]
+----
 {"id":1,"name":"Sci-fi"}
+----
 
-$ curl -X POST -d '{"name":"Science"}' -H "Content-Type: application/json" http://localhost:8080/genres
+[source,bash]
+----
+curl -X POST -d '{"name":"Science"}' -H "Content-Type: application/json" http://localhost:8080/genres
+----
+
+[source,json]
+----
 {"id":2,"name":"Science"}
+----
 
-$ curl http://localhost:8080/genres/list
+[source,bash]
+----
+curl http://localhost:8080/genres/list
+----
+
+[source,json]
+----
 [{"id":1,"name":"Sci-fi"},{"id":2,"name":"Science"}]
+----
 
-$ curl -X DELETE http://localhost:8080/genres/1
+[source,bash]
+----
+curl -X DELETE http://localhost:8080/genres/1
+----
 
-$ curl http://localhost:8080/genres/list
+[source,bash]
+----
+curl http://localhost:8080/genres/list
+----
+
+[source,json]
+----
 [{"id":2,"name":"Science"}]
 ----
 
