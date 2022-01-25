@@ -22,5 +22,5 @@ public interface GenreRepository extends PageableRepository<Genre, Long> { // <2
         throw new DataAccessException("test exception");
     }
 
-    Long update(@NonNull @NotNull @Id Long id, @NonNull @NotBlank String name);
+    long update(@NonNull @NotNull @Id Long id, @NonNull @NotBlank String name);
 }

@@ -22,6 +22,6 @@ abstract class GenreRepository implements PageableRepository<Genre, Long> { // <
         throw new DataAccessException('test exception')
     }
 
-    abstract int update(@NonNull @NotNull @Id Long id, @NonNull @NotBlank String name)
+    abstract long update(@NonNull @NotNull @Id Long id, @NonNull @NotBlank String name)
 
 }
