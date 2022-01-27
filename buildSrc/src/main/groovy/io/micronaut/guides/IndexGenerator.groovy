@@ -22,21 +22,9 @@ class IndexGenerator {
     static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
 
-        String templateText = template.text
-        templateText =
-                templateText.substring(0, templateText.indexOf('''\
-<main id="main">
-    <div class="container">''') + '''\
-<main id="main">
-    <div class="container">'''.length()) +
-                        '@content@' +
-                        templateText.substring(templateText.indexOf('''\
-    </div>
-</main>'''))
-
-//        String templateText = template.text.replaceFirst(~/(?s)(.*<main id="main">)(.*)(<\/main>.*)/) { List<String> it ->
-//            "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
-//        }
+        String templateText = template.text.replaceFirst(~/(?s)(.*<main id="main">)(.*)(<\/main>.*)/) { List<String> it ->
+            "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
+        }
 
         save(templateText, 'dist/index.html', buildDir, metadatas)
         for (GuideMetadata metadata :  metadatas) {
