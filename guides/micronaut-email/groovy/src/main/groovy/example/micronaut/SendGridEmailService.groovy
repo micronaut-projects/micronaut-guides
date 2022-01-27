@@ -13,16 +13,17 @@ import io.micronaut.context.annotation.Value
 import io.micronaut.core.annotation.NonNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.stream.Collectors
 import jakarta.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @CompileStatic
 @Singleton // <1>
-@Requires(condition = SendGridEmailCondition) // <2>
+@Requires(condition = SendGridEmailCondition.class) // <2>
 class SendGridEmailService implements EmailService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailService)
+    private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailService.class)
 
     protected final String apiKey
 
@@ -47,7 +48,7 @@ class SendGridEmailService implements EmailService {
     }
 
     @Override
-    void send(@NonNull @NotNull @Valid Email email) {
+    public void send(@NonNull @NotNull @Valid Email email) {
 
         Personalization personalization = new Personalization()
         personalization.setSubject(email.subject)
@@ -88,13 +89,13 @@ class SendGridEmailService implements EmailService {
 
             Response response = sg.api(request)
 
-            if (LOG.infoEnabled) {
-                LOG.info("Status Code: {}", String.valueOf(response.statusCode))
-                LOG.info("Body: {}", response.body)
-                LOG.info("Headers {}", response.headers.collect { k, v -> "$k=$v" }.join(", "))
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Status Code: {}", String.valueOf(response.getStatusCode()))
+                LOG.info("Body: {}", response.getBody())
+                LOG.info("Headers {}", "{${response.headers.collect { k, v -> "$k=$v" }.join(", ")}}".toString())
             }
-        } catch (IOException e) {
-            LOG.error(e.message, e)
+        } catch (IOException ex) {
+            LOG.error(ex.getMessage())
         }
     }
 }
