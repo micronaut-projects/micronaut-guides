@@ -34,6 +34,10 @@ class IndexGenerator {
     </div>
 </main>'''))
 
+//        String templateText = template.text.replaceFirst(~/(?s)(.*<main id="main">)(.*)(<\/main>.*)/) { List<String> it ->
+//            "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
+//        }
+
         save(templateText, 'dist/index.html', buildDir, metadatas)
         for (GuideMetadata metadata :  metadatas) {
             save(templateText, "dist/${metadata.slug}.html", buildDir, [metadata], metadata.title)
