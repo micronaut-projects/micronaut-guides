@@ -84,7 +84,7 @@ class DelegatingAuthenticationProvider implements AuthenticationProvider {
     }
 
     private UserState fetchUserState(AuthenticationRequest authRequest) {
-        final String username = authRequest.identity.toString()
+        final String username = authRequest.identity
         userFetcher.findByUsername(username)
     }
 

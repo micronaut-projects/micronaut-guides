@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank
 
 //tag::harcoded[]
 @Client("http://localhost:8082") // <1>
-@Recoverable(api = BookInventoryOperations.class)
+@Recoverable(api = BookInventoryOperations)
 //end::harcoded[]
 //tag::clazz[]
 interface BookInventoryClient extends BookInventoryOperations {

@@ -27,18 +27,18 @@ exit 0
     }
 
     private static boolean changesMicronautVersion(List<String> changedFiles) {
-        changedFiles.any { str -> str.contains("version.txt") }
+        changedFiles.any { it.contains("version.txt") }
     }
 
     private static boolean changesDependencies(List<String> changedFiles, List<String> changedGuides) {
         if (changedGuides) {
             return false
         }
-        changedFiles.any { str -> str.contains("pom.xml") }
+        changedFiles.any { it.contains("pom.xml") }
     }
 
     private static boolean changesBuildScr(List<String> changedFiles) {
-        changedFiles.any { str -> str.contains('buildSrc') }
+        changedFiles.any { it.contains('buildSrc') }
     }
 
     private static boolean shouldSkip(GuideMetadata metadata,

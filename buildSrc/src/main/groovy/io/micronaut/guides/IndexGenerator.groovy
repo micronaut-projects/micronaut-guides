@@ -12,7 +12,7 @@ import java.nio.file.Paths
 @CompileStatic
 class IndexGenerator {
 
-    private static final String DEFAULT_CARD = "micronauttwittercard.png";
+    private static final String DEFAULT_CARD = "micronauttwittercard.png"
     private static final String DEFAULT_INTRO = "Step-by-step tutorials to learn the Micronaut framework"
     private static final String DEFAULT_TITLE = "Micronaut Guides"
     private static final String GUIDES_URL = "https://guides.micronaut.io"
