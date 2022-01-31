@@ -10,7 +10,7 @@ import org.reactivestreams.Publisher
 
 //tag::harcoded[]
 @Client("http://localhost:8081") // <1>
-@Recoverable(api = BookCatalogueOperations.class)
+@Recoverable(api = BookCatalogueOperations)
 //end::harcoded[]
 //tag::clazz[]
 interface BookCatalogueClient extends BookCatalogueOperations {

@@ -20,18 +20,17 @@ import javax.validation.constraints.NotNull
 
 @CompileStatic
 @Singleton // <1>
-@Requires(condition = SendGridEmailCondition.class) // <2>
+@Requires(condition = SendGridEmailCondition) // <2>
 class SendGridEmailService implements EmailService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailService.class)
+    private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailService)
 
     protected final String apiKey
 
     protected final String fromEmail
 
     SendGridEmailService(@Value('${SENDGRID_APIKEY:none}') String apiKeyEnv, // <3>
-                         @Value('${SENDGRID_FROM_EMAIL:none}') String fromEmailEnv,
-                         @Value('${sendgrid.apikey:none}') String apiKeyProp,
+                         @Value('${SENDGRID_FROM_EMAIL:none}') String fromEmailEnv,                         @Value('${sendgrid.apikey:none}') String apiKeyProp,
                          @Value('${sendgrid.fromemail:none}') String fromEmailProp) {
         this.apiKey = apiKeyEnv != null && !apiKeyEnv.equals("none") ? apiKeyEnv : apiKeyProp
         this.fromEmail = fromEmailEnv != null && !fromEmailEnv.equals("none")  ? fromEmailEnv: fromEmailProp

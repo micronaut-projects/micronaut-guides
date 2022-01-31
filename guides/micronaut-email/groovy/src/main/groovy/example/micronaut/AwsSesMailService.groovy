@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull
 
 @CompileStatic
 @Singleton // <1>
-@Requires(condition = AwsResourceAccessCondition.class)  // <2>
+@Requires(condition = AwsResourceAccessCondition)  // <2>
 @Secondary // <3>
 public class AwsSesMailService implements EmailService {
     private static final Logger LOG = LoggerFactory.getLogger(AwsSesMailService.class)
@@ -40,8 +40,7 @@ public class AwsSesMailService implements EmailService {
         this.ses = SesClient.builder().region(Region.of(awsRegion)).build()
     }
 
-    @Override
-    void send(@NonNull @NotNull @Valid Email email) {
+    @Override    void send(@NonNull @NotNull @Valid Email email) {
         SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
                 .destination(Destination.builder().toAddresses(email.recipient).build())
                 .source(sourceEmail)

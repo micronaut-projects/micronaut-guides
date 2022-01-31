@@ -13,7 +13,7 @@ class AwsSesMailServiceSpec extends Specification {
         ApplicationContext ctx = ApplicationContext.run()
 
         expect:
-        !ctx.containsBean(AwsSesMailService.class)
+        !ctx.containsBean(AwsSesMailService)
 
         cleanup:
         ctx.close();
@@ -29,7 +29,7 @@ class AwsSesMailServiceSpec extends Specification {
         ApplicationContext ctx = ApplicationContext.run()
 
         when:
-        AwsSesMailService bean = ctx.getBean(AwsSesMailService.class)
+        AwsSesMailService bean = ctx.getBean(AwsSesMailService)
 
         then:
         "me@micronaut.example" == bean.sourceEmail

@@ -27,6 +27,6 @@ class AwsResourceAccessCondition implements Condition {
             return true
         }
 
-        context != null && context.getBean(Environment.class).getActiveNames().contains(Environment.AMAZON_EC2) // <4>
+        context && context.getBean(Environment).activeNames.contains(Environment.AMAZON_EC2) // <4>
     }
 }
