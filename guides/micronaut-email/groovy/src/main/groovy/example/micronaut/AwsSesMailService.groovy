@@ -42,8 +42,7 @@ class AwsSesMailService implements EmailService {
         this.ses = SesClient.builder().region(Region.of(awsRegion)).build()
     }
 
-    @Override
-    void send(@NonNull @NotNull @Valid Email email) {
+    @Override    void send(@NonNull @NotNull @Valid Email email) {
         SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
                 .destination(Destination.builder().toAddresses(email.recipient).build())
                 .source(sourceEmail)
