@@ -38,7 +38,7 @@ class GuideProjectGenerator implements Closeable {
 
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = Arrays.asList(JDK_8, JDK_11)
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
