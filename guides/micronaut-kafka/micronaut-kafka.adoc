@@ -1,4 +1,4 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
 In this guide, we will create two microservices that will use https://kafka.apache.org/[Kafka] to communicate with each other in an asynchronous and decoupled way.
 
@@ -11,7 +11,7 @@ To complete this guide, you will need the following:
 * JDK 1.8 or greater installed with `JAVA_HOME` configured appropriately
 * https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker, and for running tests.
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
 == Writing the application
 
@@ -21,7 +21,7 @@ Let's describe the microservices you will build through the guide.
 
 * `analytics` - It connects to Kafka to update the analytics for every book (a counter). It also exposes an endpoint to get the analytics.
 
-include::{commondir}/common-annotationprocessors.adoc[]
+common:annotationprocessors.adoc[]
 
 === Books Microservice
 
@@ -32,7 +32,7 @@ Create the `books` microservice using the https://docs.micronaut.io/latest/guide
 mn create-app --features=kafka,reactor,graalvm,testcontainers example.micronaut.books --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `reactor`, `graalvm`, and `testcontainers` features.
 
@@ -71,7 +71,7 @@ Create the `analytics` microservice using the https://docs.micronaut.io/latest/g
 mn create-app --features=kafka,graalvm example.micronaut.analytics --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka` and `graalvm` features.
 
@@ -113,8 +113,9 @@ To run the tests:
 :exclude-for-build:maven
 
 [source, bash]
+.analytics
 ----
-analytics $ ./gradlew test
+./gradlew test
 ----
 
 :exclude-for-build:
@@ -122,17 +123,18 @@ analytics $ ./gradlew test
 :exclude-for-build:gradle
 
 [source, bash]
+.analytics
 ----
-analytics $ ./mvnw test
+./mvnw test
 ----
 
 :exclude-for-build:
 
-include::{commondir}/common-default-dev-environment-application.adoc[]
+common:default-dev-environment-application.adoc[]
 
 source:Application[app=analytics]
 
-include::{commondir}/common-default-dev-environment-application-dev-yaml.adoc[]
+common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.yml[app=analytics]
 
@@ -145,18 +147,26 @@ Start the `books` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.books
 ----
-books $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
 Start the `analytics` microservice:
 
 [source,bash]
+.analytics
 ----
-analytics $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
@@ -165,18 +175,26 @@ analytics $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.books
 ----
-books $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
 Start the `analytics` microservice:
 
 [source,bash]
+.analytics
 ----
-analytics $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
@@ -186,13 +204,31 @@ You can use `curl` to test the application:
 
 [source, bash]
 ----
-$ curl http://localhost:8080/books
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
 [{"isbn":"1491950358","name":"Building Microservices"},{"isbn":"1680502395","name":"Release It!"},{"isbn":"0321601912","name":"Continuous Delivery"}]
+----
 
-$ curl http://localhost:8080/books/1491950358
+[source, bash]
+----
+curl http://localhost:8080/books/1491950358
+----
+
+[source,json]
+----
 {"isbn":"1491950358","name":"Building Microservices"}
+----
 
-$ curl http://localhost:8081/analytics
+[source, bash]
+----
+curl http://localhost:8081/analytics
+----
+
+[source,json]
+----
 []
 ----
 
@@ -213,7 +249,7 @@ Start Zookeeper and Kafka (use CTRL-C to stop both):
 
 [source,bash]
 ----
-$ docker-compose up
+docker-compose up
 ----
 
 Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance].
@@ -290,9 +326,13 @@ Start the `books` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.books
 ----
-books $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
@@ -301,9 +341,13 @@ books $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.books
 ----
-books $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
@@ -313,7 +357,11 @@ Execute a `curl` request to get one book:
 
 [source, bash]
 ----
-$ curl http://localhost:8080/books/1491950358
+curl http://localhost:8080/books/1491950358
+----
+
+[source,json]
+----
 {"isbn":"1491950358","name":"Building Microservices"}
 ----
 
@@ -322,9 +370,13 @@ Start the `analytics` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.analytics
 ----
-analytics $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
@@ -333,9 +385,13 @@ analytics $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.analytics
 ----
-analytics $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
@@ -347,13 +403,17 @@ Now, use `curl` to see the analytics:
 
 [source, bash]
 ----
-$ curl http://localhost:8081/analytics
+curl http://localhost:8081/analytics
+----
+
+[source,json]
+----
 [{"bookIsbn":"1491950358","count":1}]
 ----
 
 Update the `curl` command to the `books` microservice to retrieve other books and repeat the invocations, then re-run the `curl` command to the `analytics` microservice to see that the counts increase.
 
-include::{commondir}/common-graal-with-plugins-multi.adoc[]
+common:graal-with-plugins-multi.adoc[]
 
 :exclude-for-languages:groovy
 

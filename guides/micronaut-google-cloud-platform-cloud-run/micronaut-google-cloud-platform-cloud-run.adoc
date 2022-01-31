@@ -1,16 +1,16 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
 You are going to deploy a Micronaut application to https://cloud.google.com/run[Google Cloud Run].
 
 > Develop and deploy highly scalable containerized applications on a fully managed serverless platform.
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
 You need a https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account and a GCP project.
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+common:create-app.adoc[]
 
 === Controller
 
@@ -35,11 +35,11 @@ callout:micronaut-test[1]
 callout:http-client[2]
 callout:http-request[3]
 
-include::{commondir}/common-testApp.adoc[]
+common:testApp.adoc[]
 
 == Google Cloud Platform (CLI)
 
-You need a https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account. 
+You need a https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account.
 
 You need a GCP project:
 
@@ -53,10 +53,10 @@ Log in to your Google Cloud Platform:
 
 [source,bash]
 ----
-gcloud auth login 
+gcloud auth login
 ----
 
-Change your project: 
+Change your project:
 
 [source,bash]
 ----
@@ -79,14 +79,14 @@ Run `auth configure-docker` via the Google Cloud CLI:
 Adding credentials for all GCR repositories.
 WARNING: A long list of credential helpers may cause delays running 'docker build'. We recommend passing the registry name to configure only the registry you are using.
 After update, the following will be written to your Docker config file
- located at [/Users/sdelamo/.docker/config.json]:
+ located at [~/.docker/config.json]:
  {
   "credHelpers": {
-    "gcr.io": "gcloud", 
-    "marketplace.gcr.io": "gcloud", 
-    "eu.gcr.io": "gcloud", 
-    "us.gcr.io": "gcloud", 
-    "staging-k8s.gcr.io": "gcloud", 
+    "gcr.io": "gcloud",
+    "marketplace.gcr.io": "gcloud",
+    "eu.gcr.io": "gcloud",
+    "us.gcr.io": "gcloud",
+    "staging-k8s.gcr.io": "gcloud",
     "asia.gcr.io": "gcloud"
   }
 }
@@ -94,13 +94,13 @@ After update, the following will be written to your Docker config file
 
 == Docker Push
 
-Push the Docker image of your application to https://cloud.google.com/container-registry[Google Cloud Container Registry]. 
+Push the Docker image of your application to https://cloud.google.com/container-registry[Google Cloud Container Registry].
 
 :exclude-for-build:
 
 :exclude-for-build:maven
 
-Modify your Gradle build and configure the 
+Modify your Gradle build and configure the
 
 [source,groovy]
 ----
@@ -114,13 +114,13 @@ dockerBuild {
 
 :exclude-for-build:
 
-include::{commondir}/common-docker-push-gradle.adoc[]
+common:docker-push-gradle.adoc[]
 
 :exclude-for-build:gradle
 
 [source, bash]
 ----
-./mvnw deploy \ 
+./mvnw deploy \
      -Dpackaging=docker \
      -Djib.to.image=gcr.io/micronaut-guides/micronautguide:latest
 ----
@@ -129,7 +129,7 @@ include::{commondir}/common-docker-push-gradle.adoc[]
 
 The previous URL uses the pattern: `gcr.io/PROJECT_ID/micronautguide:latest`. Change it to use your Project ID.
 
-You get an output such as:  
+You get an output such as:
 
 [source, bash]
 ----
@@ -147,15 +147,15 @@ You can deploy to Google Cloud Run via the CLI. Use the value you configured in 
 ----
 gcloud run deploy \
     --image=gcr.io/micronaut-guides/micronautguide:latest \
-    --platform managed \ 
+    --platform managed \
     --allow-unauthenticated
 ----
 
-You will see an output such as: 
+You will see an output such as:
 
 [source, bash]
 ----
-Service name (micronautguide):  
+Service name (micronautguide):
 Please specify a region:
 ...
 ..
@@ -171,25 +171,28 @@ Please enter your numeric choice:  23
 
 To make this the default region, run `gcloud config set run/region us-east1`.
 
-Deploying container to Cloud Run service [micronautguide] 
+Deploying container to Cloud Run service [micronautguide]
 in project [micronaut-guides] region [us-east1]
-✓ Deploying... Done.                                                                                                                    
-  ✓ Creating Revision...                                                                                                                
-  ✓ Routing traffic...                                                                                                                  
-  ✓ Setting IAM Policy...                                                                                                               
-Done.                                                                                                                                   
+✓ Deploying... Done.
+  ✓ Creating Revision...
+  ✓ Routing traffic...
+  ✓ Setting IAM Policy...
+Done.
 Service [micronautguide] revision [micronautguide-00002-fat] has been deployed
  and is serving 100 percent of traffic at
  https://micronautguide-li3tercjmq-ue.a.run.app
 ----
-
 
 == Running the Application
 
 [source, bash]
 ----
 curl -i https://micronautguide-li3tercjmq-ue.a.run.app/hello
-HTTP/2 200 
+----
+
+[source]
+----
+HTTP/2 200
 content-type: text/plain
 x-cloud-trace-context: ae42a5a18907ef640ae99520958488ff
 date: Sat, 02 Oct 2021 05:53:16 GMT
@@ -210,4 +213,4 @@ Read more about:
 - https://cloud.google.com/run[Google Cloud Run]
 - https://micronaut-projects.github.io/micronaut-gcp/latest/guide/[Micronaut Google Cloud Platform (GCP)] integration.
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

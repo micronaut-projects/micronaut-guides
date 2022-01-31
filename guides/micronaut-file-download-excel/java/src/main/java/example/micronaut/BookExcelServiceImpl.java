@@ -2,14 +2,13 @@ package example.micronaut;
 
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.exceptions.HttpStatusException;
 import io.micronaut.http.server.types.files.SystemFile;
+import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -35,11 +34,12 @@ public class BookExcelServiceImpl implements BookExcelService {
                                     cd.style(BookExcelStylesheet.STYLE_HEADER);
                                 })
                             ));
-                    bookList.stream()
-                            .forEach( book -> s.row(r -> {
-                                r.cell(book.getIsbn());
-                                r.cell(book.getName());
-                            }));
+                    for (Book book : bookList) {
+                        s.row(r -> {
+                            r.cell(book.getIsbn());
+                            r.cell(book.getName());
+                        });
+                    }
                 });
             });
             return new SystemFile(file).attach(HEADER_EXCEL_FILENAME);

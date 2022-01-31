@@ -20,7 +20,7 @@ import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 @CompileStatic
 class GuideAsciidocGenerator {
 
-    private static final String INCLUDE_COMMONDIR = 'include::{commondir}/'
+    private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
     public static final int DEFAULT_MIN_JDK = 8
     public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
@@ -159,7 +159,7 @@ class GuideAsciidocGenerator {
 
         for (String rawLine : lines) {
             if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
-                String commonFileName = parseFileName(rawLine, CALLOUT)
+                String commonFileName = "callouts/" + parseFileName(rawLine, CALLOUT)
                         .map(str -> 'callout-' + str)
                         .orElseThrow(() -> new GradleException("could not parse filename from callout for line" + rawLine))
                 Optional<Integer> number = parseNumber(rawLine)
@@ -173,7 +173,7 @@ class GuideAsciidocGenerator {
                 }
                 rawLines.add(line)
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
-                String commonFileName = parseFileName(rawLine, INCLUDE_COMMONDIR)
+                String commonFileName = "snippets/common-" + parseFileName(rawLine, INCLUDE_COMMONDIR)
                         .orElseThrow(() -> new GradleException("could not parse filename from commondir line" + rawLine))
                 rawLines.add("// Start: ${commonFileName}".toString())
                 rawLines.addAll(commonLines(destinationFolder, commonFileName))
