@@ -408,7 +408,7 @@ for businesses of all sizes that use email to keep in contact with their custome
 
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Requires</span>(condition = AwsResourceAccessCondition.class)  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@Requires</span>(condition = AwsResourceAccessCondition)  <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="annotation">@Secondary</span> <i class="conum" data-value="3"></i><b>(3)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">AwsSesMailService</span> <span class="directive">implements</span> EmailService {
     <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(AwsSesMailService.class)
@@ -425,8 +425,7 @@ for businesses of all sizes that use email to keep in contact with their custome
         <span class="local-variable">this</span>.ses = SesClient.builder().region(<span class="predefined-type">Region</span>.of(awsRegion)).build()
     }
 
-    <span class="annotation">@Override</span>
-    <span class="type">void</span> send(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email) {
+    <span class="annotation">@Override</span>    <span class="type">void</span> send(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email) {
         SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
                 .destination(<span class="predefined-type">Destination</span>.builder().toAddresses(email.recipient).build())
                 .source(sourceEmail)
@@ -533,7 +532,7 @@ for businesses of all sizes that use email to keep in contact with their custome
             <span class="keyword">return</span> <span class="predefined-constant">true</span>
         }
 
-        context != <span class="predefined-constant">null</span> &amp;&amp; context.getBean(Environment.class).getActiveNames().contains(Environment.AMAZON_EC2) <i class="conum" data-value="4"></i><b>(4)</b>
+        context &amp;&amp; context.getBean(Environment).activeNames.contains(Environment.AMAZON_EC2) <i class="conum" data-value="4"></i><b>(4)</b>
     }
 }</code></pre>
 </div>
@@ -559,7 +558,7 @@ for businesses of all sizes that use email to keep in contact with their custome
         ApplicationContext ctx = ApplicationContext.run()
 
         <span class="key">expect</span>:
-        !ctx.containsBean(AwsSesMailService.class)
+        !ctx.containsBean(AwsSesMailService)
 
         <span class="key">cleanup</span>:
         ctx.close();
@@ -575,7 +574,7 @@ for businesses of all sizes that use email to keep in contact with their custome
         ApplicationContext ctx = ApplicationContext.run()
 
         <span class="key">when</span>:
-        AwsSesMailService bean = ctx.getBean(AwsSesMailService.class)
+        AwsSesMailService bean = ctx.getBean(AwsSesMailService)
 
         <span class="key">then</span>:
         <span class="string"><span class="delimiter">&quot;</span><span class="content">me@micronaut.example</span><span class="delimiter">&quot;</span></span> == bean.sourceEmail
@@ -700,18 +699,17 @@ system properties (<code>sendgrid.apikey</code>, <code>sendgrid.fromemail</code>
 
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Requires</span>(condition = SendGridEmailCondition.class) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@Requires</span>(condition = SendGridEmailCondition) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="type">class</span> <span class="class">SendGridEmailService</span> <span class="directive">implements</span> EmailService {
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(SendGridEmailService.class)
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(SendGridEmailService)
 
     <span class="directive">protected</span> <span class="directive">final</span> <span class="predefined-type">String</span> apiKey
 
     <span class="directive">protected</span> <span class="directive">final</span> <span class="predefined-type">String</span> fromEmail
 
     SendGridEmailService(<span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${SENDGRID_APIKEY:none}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> apiKeyEnv, <i class="conum" data-value="3"></i><b>(3)</b>
-                         <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${SENDGRID_FROM_EMAIL:none}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> fromEmailEnv,
-                         <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${sendgrid.apikey:none}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> apiKeyProp,
+                         <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${SENDGRID_FROM_EMAIL:none}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> fromEmailEnv,                         <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${sendgrid.apikey:none}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> apiKeyProp,
                          <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${sendgrid.fromemail:none}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> fromEmailProp) {
         <span class="local-variable">this</span>.apiKey = apiKeyEnv != <span class="predefined-constant">null</span> &amp;&amp; !apiKeyEnv.equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">none</span><span class="delimiter">&quot;</span></span>) ? apiKeyEnv : apiKeyProp
         <span class="local-variable">this</span>.fromEmail = fromEmailEnv != <span class="predefined-constant">null</span> &amp;&amp; !fromEmailEnv.equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">none</span><span class="delimiter">&quot;</span></span>)  ? fromEmailEnv: fromEmailProp
@@ -816,7 +814,7 @@ system properties (<code>sendgrid.apikey</code>, <code>sendgrid.fromemail</code>
         ApplicationContext ctx = ApplicationContext.run()
 
         <span class="key">expect</span>:
-        !ctx.containsBean(SendGridEmailService.class)
+        !ctx.containsBean(SendGridEmailService)
 
         <span class="key">cleanup</span>:
         ctx.close()
@@ -828,7 +826,7 @@ system properties (<code>sendgrid.apikey</code>, <code>sendgrid.fromemail</code>
         <span class="predefined-type">System</span>.setProperty(<span class="string"><span class="delimiter">&quot;</span><span class="content">sendgrid.apikey</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">XXXX</span><span class="delimiter">&quot;</span></span>)
         <span class="predefined-type">System</span>.setProperty(<span class="string"><span class="delimiter">&quot;</span><span class="content">sendgrid.fromemail</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">me@micronaut.example</span><span class="delimiter">&quot;</span></span>)
         ApplicationContext ctx = ApplicationContext.run()
-        SendGridEmailService bean = ctx.getBean(SendGridEmailService.class)
+        SendGridEmailService bean = ctx.getBean(SendGridEmailService)
 
         <span class="key">expect</span>:
         <span class="string"><span class="delimiter">&quot;</span><span class="content">XXXX</span><span class="delimiter">&quot;</span></span> == bean.apiKey
@@ -963,7 +961,7 @@ $ export AWS_SECRET_KEY=XXXXXXXX
         HttpRequest&lt;EmailCmd&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/mail/send</span><span class="delimiter">&quot;</span></span>, cmd) <i class="conum" data-value="5"></i><b>(5)</b>
 
         <span class="key">when</span>:
-        EmailService emailService = applicationContext.getBean(EmailService.class)
+        EmailService emailService = applicationContext.getBean(EmailService)
 
         <span class="key">then</span>:
         emailService <span class="keyword">instanceof</span> MockEmailService
