@@ -44,7 +44,7 @@ class IndexGenerator {
         Path path = Paths.get(buildDir.absolutePath, filename)
         File output = path.toFile()
         output.createNewFile()
-        output.text = text
+        output.setText(text, 'UTF-8')
     }
 
     private static String indexText(File buildDir,

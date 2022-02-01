@@ -150,7 +150,7 @@ class GuideAsciidocGenerator {
             Path destinationPath = Paths.get(destinationFolder.absolutePath, projectName + ".adoc")
             File destination = destinationPath.toFile()
             destination.createNewFile()
-            destination.text = text
+            destination.setText(text, 'UTF-8')
         }
     }
 
