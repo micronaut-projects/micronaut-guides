@@ -118,7 +118,8 @@ class GuideProjectGenerator implements AutoCloseable {
                     generateOne(metadata, dir, output)
                     GuideAsciidocGenerator.generate(metadata, dir, asciidocDir, projectDir)
                 }
-            } catch(IllegalArgumentException ignored) {
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace()
             }
         }
     }
