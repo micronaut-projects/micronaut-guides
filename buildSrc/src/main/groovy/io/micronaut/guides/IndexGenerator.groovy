@@ -20,11 +20,12 @@ class IndexGenerator {
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
     static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
+
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+                .findAll { it.publish }
 
         String templateText = template.text
-        templateText =
-                templateText.substring(0, templateText.indexOf('''\
+        templateText = templateText.substring(0, templateText.indexOf('''\
 <main id="main">
     <div class="container">''') + '''\
 <main id="main">
@@ -283,6 +284,7 @@ class IndexGenerator {
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+                .findAll { it.publish }
 
         List<Map> result = metadatas
             .collect {guide -> [

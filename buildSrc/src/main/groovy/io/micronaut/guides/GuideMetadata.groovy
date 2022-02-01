@@ -19,6 +19,9 @@ class GuideMetadata {
     Category category
     LocalDate publicationDate
 
+    boolean publish
+    String base
+
     List<String> buildTools
     List<String> languages
     String testFramework

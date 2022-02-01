@@ -6,18 +6,21 @@ class ThemeProcessor {
                             File guidesFolder, String metadataConfigName) {
 
         String templateText = template.text
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+
         String tocStart = '''\
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 '''
+
         String startDivContent = '''\
 </div>
 </div>
 <div id="content">
 '''
+
         String sectionbody = '<div class="sectionbody">'
 
+        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
             if (!Utils.process(metadata, false)) {
                 continue

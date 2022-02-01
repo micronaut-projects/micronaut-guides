@@ -67,9 +67,10 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         def config = new JsonSlurper().parse(configFile)
+        boolean publish = config.publish == null ? true : config.publish
 
         Category cat = Category.values().find {it.toString() == config.category }
-        if (!cat) {
+        if (publish && !cat) {
             throw new GradleException("$config.category does not exist in Category enum")
         }
 
@@ -81,7 +82,9 @@ class GuideProjectGenerator implements AutoCloseable {
                 authors: config.authors,
                 tags: config.tags,
                 category: cat,
-                publicationDate: LocalDate.parse(config.publicationDate),
+                publicationDate: publish ? LocalDate.parse(config.publicationDate) : null,
+                publish: publish,
+                base: config.base,
                 languages: config.languages ?: ['java', 'groovy', 'kotlin'],
                 buildTools: config.buildTools ?: ['gradle', 'maven'],
                 testFramework: config.testFramework,

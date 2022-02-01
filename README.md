@@ -60,6 +60,8 @@ Besides, the obvious fields that doesn't need any further explanation, the other
 - `minimumJavaVersion`: If the guide needs a minimum Java version (for example JDK 17 for Records), define it in this property.
 - `maximumJavaVersion`: If the guide needs a maximum Java version (for example JDK 11 for Azure Functions), define it in this property.
 - `zipIncludes`: List of additional files to include in the generated zip file for the guide.
+- `publish`: defaults to true for regular guides; set to false for partial/base guides
+- `base`: defaults to null; if set, indicates directory name of the base guide to copy before copying the current
 - `apps`: List of pairs `name`-`features` for the generated application. There are two types of guides, most of the guides only generate one application (single-app). In this case the name of the applications needs to be `default`. There are a few guides that generate multiple applications, so they need to be declared here:
 ```json
   ...
@@ -165,7 +167,6 @@ We have small pieces of text that are used in different guides. To avoid the dup
 Authors: @authors@
 
 Micronaut Version: @micronaut@
-
 ```
 
 Will render the title, description, authors and version of all the guides. The variables defined between `@` signs will be evaluated and replaced during the first stage of the asciidoctor render. For example, for the Micronaut HTTP Client guide, the previous common snippet will generate:
