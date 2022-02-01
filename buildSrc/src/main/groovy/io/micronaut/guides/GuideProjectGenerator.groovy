@@ -114,6 +114,7 @@ class GuideProjectGenerator implements AutoCloseable {
             GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
             try {
                 if (Utils.process(metadata, false)) {
+                    println "Generating projects for $metadata.slug"
                     generateOne(metadata, dir, output)
                     GuideAsciidocGenerator.generate(metadata, dir, asciidocDir, projectDir)
                 }

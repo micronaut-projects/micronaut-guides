@@ -47,14 +47,20 @@ exit 0
                                       boolean forceExecuteEveryTest) {
 
         if (!Utils.process(metadata)) {
+            println "not adding $metadata.slug projects to test.sh, Utils.process is false"
             return true
         }
 
         if (forceExecuteEveryTest) {
+            println "adding $metadata.slug projects to test.sh, forceExecuteEveryTest is true"
             return false
         }
 
-        return !guidesChanged.contains(metadata.slug)
+        boolean skip = !guidesChanged.contains(metadata.slug)
+        if (skip) {
+            println "not adding $metadata.slug projects to test.sh, not in guidesChanged: $guidesChanged"
+        }
+        skip
     }
 
     static String generateScript(File guidesFolder, String metadataConfigName,
@@ -68,11 +74,20 @@ FAILED_PROJECTS=()
 EXIT_STATUS=0
 ''')
         List<String> slugsChanged = guidesChanged(changedFiles)
-        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
-                                        changesDependencies(changedFiles, slugsChanged) ||
-                                        changesBuildScr(changedFiles) ||
-                                        (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
-                                        (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
+        boolean forceChangedMicronautVersion = changesMicronautVersion(changedFiles)
+        boolean forceChangedDependencies = changesDependencies(changedFiles, slugsChanged)
+        boolean forceChangedBuildScr = changesBuildScr(changedFiles)
+        boolean forceGithubWorkflow = System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI
+        boolean forceNotGithubWorkflow = !changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW)
+
+        boolean forceExecuteEveryTest = forceChangedMicronautVersion ||
+                                        forceChangedDependencies ||
+                                        forceChangedBuildScr ||
+                                        forceGithubWorkflow ||
+                                        forceNotGithubWorkflow
+        if (forceExecuteEveryTest) {
+            println "forceExecuteEveryTest true: changedMicronautVersion: $forceChangedMicronautVersion, changedDependencies: $forceChangedDependencies, changedBuildScr: $forceChangedBuildScr, githubWorkflow: $forceGithubWorkflow, notGithubWorkflow: $forceNotGithubWorkflow"
+        }
 
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         metadatas.sort { it.slug }
