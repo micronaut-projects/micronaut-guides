@@ -410,15 +410,17 @@ for businesses of all sizes that use email to keep in contact with their custome
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Requires</span>(condition = AwsResourceAccessCondition)  <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="annotation">@Secondary</span> <i class="conum" data-value="3"></i><b>(3)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">AwsSesMailService</span> <span class="directive">implements</span> EmailService {
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(AwsSesMailService.class)
+<span class="type">class</span> <span class="class">AwsSesMailService</span> <span class="directive">implements</span> EmailService {
+
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(AwsSesMailService)
+
     <span class="directive">protected</span> <span class="directive">final</span> <span class="predefined-type">String</span> sourceEmail
     <span class="directive">protected</span> <span class="directive">final</span> SesClient ses
 
-    <span class="directive">public</span> AwsSesMailService(<span class="annotation">@Nullable</span> <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${AWS_REGION}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> awsRegionEnv, <i class="conum" data-value="4"></i><b>(4)</b>
-                             <span class="annotation">@Nullable</span> <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${AWS_SOURCE_EMAIL}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> sourceEmailEnv,
-                             <span class="annotation">@Nullable</span> <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${aws.region}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> awsRegionProp,
-                             <span class="annotation">@Nullable</span> <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${aws.sourceemail}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> sourceEmailProp) {
+    AwsSesMailService(<span class="annotation">@Nullable</span> <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${AWS_REGION}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> awsRegionEnv, <i class="conum" data-value="4"></i><b>(4)</b>
+                      <span class="annotation">@Nullable</span> <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${AWS_SOURCE_EMAIL}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> sourceEmailEnv,
+                      <span class="annotation">@Nullable</span> <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${aws.region}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> awsRegionProp,
+                      <span class="annotation">@Nullable</span> <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">'</span><span class="content">${aws.sourceemail}</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> sourceEmailProp) {
 
         <span class="local-variable">this</span>.sourceEmail = sourceEmailEnv != <span class="predefined-constant">null</span> ? sourceEmailEnv : sourceEmailProp
         <span class="predefined-type">String</span> awsRegion = awsRegionEnv != <span class="predefined-constant">null</span> ? awsRegionEnv : awsRegionProp
@@ -520,11 +522,11 @@ for businesses of all sizes that use email to keep in contact with their custome
     <span class="annotation">@Override</span>
     <span class="type">boolean</span> matches(ConditionContext context) {
 
-        <span class="keyword">if</span> (StringUtils.isNotEmpty(<span class="predefined-type">System</span>.getProperty(<span class="string"><span class="delimiter">&quot;</span><span class="content">aws.accessKeyId</span><span class="delimiter">&quot;</span></span>)) &amp;&amp;  StringUtils.isNotEmpty(<span class="predefined-type">System</span>.getProperty(<span class="string"><span class="delimiter">&quot;</span><span class="content">aws.secretAccessKey</span><span class="delimiter">&quot;</span></span>))) { <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="keyword">if</span> (StringUtils.isNotEmpty(<span class="predefined-type">System</span>.getProperty(<span class="string"><span class="delimiter">&quot;</span><span class="content">aws.accessKeyId</span><span class="delimiter">&quot;</span></span>)) &amp;&amp; StringUtils.isNotEmpty(<span class="predefined-type">System</span>.getProperty(<span class="string"><span class="delimiter">&quot;</span><span class="content">aws.secretAccessKey</span><span class="delimiter">&quot;</span></span>))) { <i class="conum" data-value="1"></i><b>(1)</b>
             <span class="keyword">return</span> <span class="predefined-constant">true</span>
         }
 
-        <span class="keyword">if</span> (StringUtils.isNotEmpty(<span class="predefined-type">System</span>.getenv(<span class="string"><span class="delimiter">&quot;</span><span class="content">AWS_ACCESS_KEY_ID</span><span class="delimiter">&quot;</span></span>)) &amp;&amp;  StringUtils.isNotEmpty(<span class="predefined-type">System</span>.getenv(<span class="string"><span class="delimiter">&quot;</span><span class="content">AWS_SECRET_ACCESS_KEY</span><span class="delimiter">&quot;</span></span>))) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="keyword">if</span> (StringUtils.isNotEmpty(<span class="predefined-type">System</span>.getenv(<span class="string"><span class="delimiter">&quot;</span><span class="content">AWS_ACCESS_KEY_ID</span><span class="delimiter">&quot;</span></span>)) &amp;&amp; StringUtils.isNotEmpty(<span class="predefined-type">System</span>.getenv(<span class="string"><span class="delimiter">&quot;</span><span class="content">AWS_SECRET_ACCESS_KEY</span><span class="delimiter">&quot;</span></span>))) { <i class="conum" data-value="2"></i><b>(2)</b>
             <span class="keyword">return</span> <span class="predefined-constant">true</span>
         }
 
@@ -692,7 +694,6 @@ system properties (<code>sendgrid.apikey</code>, <code>sendgrid.fromemail</code>
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 <span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>
 <span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>
-<span class="keyword">import</span> <span class="include">java.util.stream.Collectors</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
 <span class="keyword">import</span> <span class="include">javax.validation.Valid</span>
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
@@ -726,7 +727,7 @@ system properties (<code>sendgrid.apikey</code>, <code>sendgrid.fromemail</code>
     }
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="type">void</span> send(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email) {
+    <span class="type">void</span> send(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email) {
 
         Personalization personalization = <span class="keyword">new</span> Personalization()
         personalization.setSubject(email.subject)
@@ -767,13 +768,13 @@ system properties (<code>sendgrid.apikey</code>, <code>sendgrid.fromemail</code>
 
             Response response = sg.api(request)
 
-            <span class="keyword">if</span> (LOG.isInfoEnabled()) {
-                LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Status Code: {}</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">String</span>.valueOf(response.getStatusCode()))
-                LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Body: {}</span><span class="delimiter">&quot;</span></span>, response.getBody())
-                LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Headers {}</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="inline"><span class="inline-delimiter">${</span>response.headers.collect { k, v -&gt; <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">$</span>k</span><span class="content">=</span><span class="inline"><span class="inline-delimiter">$</span>v</span><span class="delimiter">&quot;</span></span> }.join(<span class="string"><span class="delimiter">&quot;</span><span class="content">, </span><span class="delimiter">&quot;</span></span>)<span class="inline-delimiter">}</span></span><span class="content">}</span><span class="delimiter">&quot;</span></span>.toString())
+            <span class="keyword">if</span> (LOG.infoEnabled) {
+                LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Status Code: {}</span><span class="delimiter">&quot;</span></span>, response.statusCode)
+                LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Body: {}</span><span class="delimiter">&quot;</span></span>, response.body)
+                LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Headers {}</span><span class="delimiter">&quot;</span></span>, response.headers.collect { k, v -&gt; <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">$</span>k</span><span class="content">=</span><span class="inline"><span class="inline-delimiter">$</span>v</span><span class="delimiter">&quot;</span></span> }.join(<span class="string"><span class="delimiter">&quot;</span><span class="content">, </span><span class="delimiter">&quot;</span></span>))
             }
-        } <span class="keyword">catch</span> (<span class="exception">IOException</span> ex) {
-            LOG.error(ex.getMessage())
+        } <span class="keyword">catch</span> (<span class="exception">IOException</span> e) {
+            LOG.error(e.message, e)
         }
     }
 }</code></pre>
