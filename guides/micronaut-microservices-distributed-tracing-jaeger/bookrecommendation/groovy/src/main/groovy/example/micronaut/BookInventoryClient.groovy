@@ -6,7 +6,6 @@ import io.micronaut.http.annotation.Consumes
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
-import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 import javax.validation.constraints.NotBlank
 //end::packageandimports[]

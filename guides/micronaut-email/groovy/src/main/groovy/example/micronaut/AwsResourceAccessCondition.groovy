@@ -15,11 +15,11 @@ class AwsResourceAccessCondition implements Condition {
     @Override
     boolean matches(ConditionContext context) {
 
-        if (StringUtils.isNotEmpty(System.getProperty("aws.accessKeyId")) &&  StringUtils.isNotEmpty(System.getProperty("aws.secretAccessKey"))) { // <1>
+        if (StringUtils.isNotEmpty(System.getProperty("aws.accessKeyId")) && StringUtils.isNotEmpty(System.getProperty("aws.secretAccessKey"))) { // <1>
             return true
         }
 
-        if (StringUtils.isNotEmpty(System.getenv("AWS_ACCESS_KEY_ID")) &&  StringUtils.isNotEmpty(System.getenv("AWS_SECRET_ACCESS_KEY"))) { // <2>
+        if (StringUtils.isNotEmpty(System.getenv("AWS_ACCESS_KEY_ID")) && StringUtils.isNotEmpty(System.getenv("AWS_SECRET_ACCESS_KEY"))) { // <2>
             return true
         }
 

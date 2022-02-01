@@ -25,15 +25,17 @@ import javax.validation.constraints.NotNull
 @Singleton // <1>
 @Requires(condition = AwsResourceAccessCondition)  // <2>
 @Secondary // <3>
-public class AwsSesMailService implements EmailService {
-    private static final Logger LOG = LoggerFactory.getLogger(AwsSesMailService.class)
+class AwsSesMailService implements EmailService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AwsSesMailService)
+
     protected final String sourceEmail
     protected final SesClient ses
 
-    public AwsSesMailService(@Nullable @Value('${AWS_REGION}') String awsRegionEnv, // <4>
-                             @Nullable @Value('${AWS_SOURCE_EMAIL}') String sourceEmailEnv,
-                             @Nullable @Value('${aws.region}') String awsRegionProp,
-                             @Nullable @Value('${aws.sourceemail}') String sourceEmailProp) {
+    AwsSesMailService(@Nullable @Value('${AWS_REGION}') String awsRegionEnv, // <4>
+                      @Nullable @Value('${AWS_SOURCE_EMAIL}') String sourceEmailEnv,
+                      @Nullable @Value('${aws.region}') String awsRegionProp,
+                      @Nullable @Value('${aws.sourceemail}') String sourceEmailProp) {
 
         this.sourceEmail = sourceEmailEnv != null ? sourceEmailEnv : sourceEmailProp
         String awsRegion = awsRegionEnv != null ? awsRegionEnv : awsRegionProp
