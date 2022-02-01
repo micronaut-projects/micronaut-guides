@@ -88,6 +88,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 skipGradleTests: config.skipGradleTests ?: false,
                 skipMavenTests: config.skipMavenTests ?: false,
                 minimumJavaVersion: config.minimumJavaVersion,
+                maximumJavaVersion: config.maximumJavaVersion,
                 zipIncludes: config.zipIncludes ?: [],
                 apps: config.apps.collect { it -> new App(
                         name: it.name,
