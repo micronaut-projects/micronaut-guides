@@ -186,20 +186,17 @@ class GuideProjectGenerator implements AutoCloseable {
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)
 
-                // look for a common 'src' directory shared by multiple languages and copy those files first
-                final String srcFolder = 'src'
-                Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
-                if (srcPath.toFile().exists()) {
-                    Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destination.path, srcFolder)))
+                boolean ignoreMissingDirectories = false
+
+                if (metadata.base) {
+                    ignoreMissingDirectories = true
+                    File baseDir = new File(inputDir.parentFile, metadata.base)
+                    copyGuideSourceFiles baseDir, destinationPath, appName,
+                            guidesOption.language.toString(), ignoreMissingDirectories
                 }
 
-                Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
-                if (!sourcePath.toFile().exists()) {
-                    throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
-                }
-
-                // copy source/resource files for the current language
-                Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
+                copyGuideSourceFiles inputDir, destinationPath, appName,
+                        guidesOption.language.toString(), ignoreMissingDirectories
 
                 if (app.excludeSource) {
                     for (String mainSource : app.excludeSource) {
@@ -220,6 +217,26 @@ class GuideProjectGenerator implements AutoCloseable {
                     }
                 }
             }
+        }
+    }
+
+    private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
+                                             String appName, String language,
+                                             boolean ignoreMissingDirectories) {
+
+        // look for a common 'src' directory shared by multiple languages and copy those files first
+        final String srcFolder = 'src'
+        Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
+        if (srcPath.toFile().exists()) {
+            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toFile().path, srcFolder)))
+        }
+
+        Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
+        if (sourcePath.toFile().exists()) {
+            // copy source/resource files for the current language
+            Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
+        } else if (!ignoreMissingDirectories) {
+            throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
         }
     }
 
