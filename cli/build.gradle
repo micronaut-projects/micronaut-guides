@@ -1,7 +1,7 @@
 plugins {
     id("groovy")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("io.micronaut.application") version "2.0.3"
+    id("com.github.johnrengelman.shadow") version "7.1.0"
+    id("io.micronaut.application") version "3.0.0"
 }
 
 version = "0.1"
@@ -33,6 +33,12 @@ dependencies {
     testImplementation("io.micronaut:micronaut-http-client")
 }
 
+
+// TODO: Workaround for Gradle 7.3 and https://github.com/micronaut-projects/micronaut-gradle-plugin/issues/296
+// Remove this when upgrading to 7.3.1 if the underlying Gradle bug is fixed.
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
 
 application {
     mainClass.set("io.micronaut.guides.TweetsCommand")

@@ -13,25 +13,23 @@ import io.micronaut.context.annotation.Value
 import io.micronaut.core.annotation.NonNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.stream.Collectors
 import jakarta.inject.Singleton
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @CompileStatic
 @Singleton // <1>
-@Requires(condition = SendGridEmailCondition.class) // <2>
+@Requires(condition = SendGridEmailCondition) // <2>
 class SendGridEmailService implements EmailService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailService.class)
+    private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailService)
 
     protected final String apiKey
 
     protected final String fromEmail
 
     SendGridEmailService(@Value('${SENDGRID_APIKEY:none}') String apiKeyEnv, // <3>
-                         @Value('${SENDGRID_FROM_EMAIL:none}') String fromEmailEnv,
-                         @Value('${sendgrid.apikey:none}') String apiKeyProp,
+                         @Value('${SENDGRID_FROM_EMAIL:none}') String fromEmailEnv,                         @Value('${sendgrid.apikey:none}') String apiKeyProp,
                          @Value('${sendgrid.fromemail:none}') String fromEmailProp) {
         this.apiKey = apiKeyEnv != null && !apiKeyEnv.equals("none") ? apiKeyEnv : apiKeyProp
         this.fromEmail = fromEmailEnv != null && !fromEmailEnv.equals("none")  ? fromEmailEnv: fromEmailProp
@@ -48,7 +46,7 @@ class SendGridEmailService implements EmailService {
     }
 
     @Override
-    public void send(@NonNull @NotNull @Valid Email email) {
+    void send(@NonNull @NotNull @Valid Email email) {
 
         Personalization personalization = new Personalization()
         personalization.setSubject(email.subject)
@@ -89,13 +87,13 @@ class SendGridEmailService implements EmailService {
 
             Response response = sg.api(request)
 
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Status Code: {}", String.valueOf(response.getStatusCode()))
-                LOG.info("Body: {}", response.getBody())
-                LOG.info("Headers {}", "{${response.headers.collect { k, v -> "$k=$v" }.join(", ")}}".toString())
+            if (LOG.infoEnabled) {
+                LOG.info("Status Code: {}", response.statusCode)
+                LOG.info("Body: {}", response.body)
+                LOG.info("Headers {}", response.headers.collect { k, v -> "$k=$v" }.join(", "))
             }
-        } catch (IOException ex) {
-            LOG.error(ex.getMessage())
+        } catch (IOException e) {
+            LOG.error(e.message, e)
         }
     }
 }

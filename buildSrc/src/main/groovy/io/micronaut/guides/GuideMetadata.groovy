@@ -25,6 +25,7 @@ class GuideMetadata {
     boolean skipMavenTests
 
     Integer minimumJavaVersion
+    Integer maximumJavaVersion
 
     List<String> zipIncludes
 
