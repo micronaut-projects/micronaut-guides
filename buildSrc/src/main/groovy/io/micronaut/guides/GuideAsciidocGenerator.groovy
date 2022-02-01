@@ -11,7 +11,6 @@ import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
 import org.gradle.api.GradleException
 
-import java.nio.file.Paths
 import java.util.Map.Entry
 
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
@@ -28,15 +27,13 @@ class GuideAsciidocGenerator {
     public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
 
-    static void generate(GuideMetadata metadata, File inputDir, File destinationFolder) {
+    static void generate(GuideMetadata metadata, File inputDir,
+                         File asciidocDir, File projectDir) {
+
         File asciidocFile = new File(inputDir, metadata.asciidoctor)
         assert asciidocFile.exists()
 
-        if (!destinationFolder.exists()) {
-            destinationFolder.mkdir()
-        }
-
-        List<String> rawLinesExpanded = expandAllCommonIncludes(asciidocFile.readLines(), destinationFolder)
+        List<String> rawLinesExpanded = expandAllCommonIncludes(asciidocFile.readLines(), projectDir)
 
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
@@ -124,7 +121,7 @@ class GuideAsciidocGenerator {
                 }
             }
 
-            String version = new File(destinationFolder, '../../../version.txt').text
+            String version = new File(projectDir, 'version.txt').text.trim()
 
             String text = lines.join('\n')
             text = text.replace("{githubSlug}", metadata.slug)
@@ -148,20 +145,20 @@ class GuideAsciidocGenerator {
                 }
             }
 
-            File renderedAsciidocFile = new File(destinationFolder, projectName + '.adoc')
+            File renderedAsciidocFile = new File(asciidocDir, projectName + '.adoc')
             renderedAsciidocFile.createNewFile()
             renderedAsciidocFile.text = text
         }
     }
 
-    private static List<String> expandAllCommonIncludes(List<String> lines, File destinationFolder) {
+    private static List<String> expandAllCommonIncludes(List<String> lines, File projectDir) {
         List<String> rawLines = []
 
         for (String rawLine : lines) {
             if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
-                rawLines << callout(rawLine, destinationFolder)
+                rawLines << callout(rawLine, projectDir)
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
-                include rawLine, rawLines, destinationFolder
+                include rawLine, rawLines, projectDir
             } else {
                 rawLines << rawLine
             }
@@ -169,13 +166,14 @@ class GuideAsciidocGenerator {
         return rawLines
     }
 
-    private static String callout(String rawLine, File destinationFolder) {
-
+    private static String callout(String rawLine, File projectDir) {
         String relativePath = parseFileName(rawLine, CALLOUT)
                 .orElseThrow(() -> new GradleException("could not parse filename from callout for line: " + rawLine))
-        relativePath = 'callouts/callout-' + relativePath
+        relativePath = 'src/docs/common/callouts/callout-' + relativePath
 
-        List<String> newLines = commonLines(destinationFolder, relativePath)
+        File file = new File(projectDir, relativePath)
+
+        List<String> newLines = commonLines(file, projectDir)
 
         Optional<Integer> number = parseNumber(rawLine)
         String line = number.map(num -> '<' + num + '>').orElse('*') + ' ' + newLines.first()
@@ -190,12 +188,17 @@ class GuideAsciidocGenerator {
         line
     }
 
-    private static void include(String rawLine, List<String> rawLines, File destinationFolder) {
-        String commonFileName = "snippets/common-" + parseFileName(rawLine, INCLUDE_COMMONDIR)
-                .orElseThrow(() -> new GradleException("could not parse filename from commondir line" + rawLine))
-        rawLines << '// Start: ' + commonFileName
-        rawLines.addAll commonLines(destinationFolder, commonFileName)
-        rawLines << '// End: ' + commonFileName
+    private static void include(String rawLine, List<String> rawLines, File projectDir) {
+
+        String relativePath = parseFileName(rawLine, INCLUDE_COMMONDIR)
+                .orElseThrow(() -> new GradleException("could not parse filename from commondir line: " + rawLine))
+        relativePath = 'src/docs/common/snippets/common-' + relativePath
+
+        File file = new File(projectDir, relativePath)
+
+        rawLines << '// Start: ' + relativePath
+        rawLines.addAll commonLines(file, projectDir)
+        rawLines << '// End: ' + relativePath
     }
 
     private static Optional<String> parseFileName(String line, String prefix, String suffix = '.adoc') {
@@ -222,10 +225,9 @@ class GuideAsciidocGenerator {
         Optional.empty()
     }
 
-    private static List<String> commonLines(File destinationFolder, String commonFileName) {
-        File commonFile = new File(destinationFolder, '../common/' + commonFileName)
-        assert commonFile.exists()
-        return expandAllCommonIncludes(commonFile.readLines(), destinationFolder)
+    private static List<String> commonLines(File file, File projectDir) {
+        assert file.exists()
+        return expandAllCommonIncludes(file.readLines(), projectDir)
     }
 
     private static boolean shouldProcessLine(String line, String macro) {
