@@ -52,11 +52,15 @@ class GuideProjectGenerator implements AutoCloseable {
     @CompileDynamic
     static List<GuideMetadata> parseGuidesMetadata(File guidesFolder,
                                                    String metadataConfigName) {
-        List<GuideMetadata> result = []
+        List<GuideMetadata> metadatas = []
+
         guidesFolder.eachDir { dir ->
-            result << parseGuideMetadata(dir, metadataConfigName)
+            metadatas << parseGuideMetadata(dir, metadataConfigName)
         }
-        result
+
+        mergeMetadataList(metadatas)
+
+        metadatas
     }
 
     @CompileDynamic
@@ -114,8 +118,13 @@ class GuideProjectGenerator implements AutoCloseable {
             asciidocDir.mkdir()
         }
 
+        Map<String, GuideMetadata> metadatasByDirectory = new TreeMap<>()
         guidesDir.eachDir { dir ->
-            GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
+            metadatasByDirectory[dir.name] = parseGuideMetadata(dir, metadataConfigName)
+        }
+
+        metadatasByDirectory.each { String dirName, GuideMetadata metadata ->
+            File dir = new File(guidesDir, dirName)
             try {
                 if (Utils.process(metadata, false)) {
                     println "Generating projects for $metadata.slug"
@@ -268,5 +277,60 @@ class GuideProjectGenerator implements AutoCloseable {
             return SPOCK
         }
         JUNIT
+    }
+
+    private static void mergeMetadataList(List<GuideMetadata> metadatas) {
+        Map<String, GuideMetadata> metadatasByDirectory = [:]
+        for (GuideMetadata metadata : metadatas) {
+            metadatasByDirectory[metadata.slug] = metadata
+        }
+
+        mergeMetadataMap(metadatasByDirectory)
+    }
+
+    private static void mergeMetadataMap(Map<String, GuideMetadata> metadatasByDirectory) {
+        for (String dir : [] + metadatasByDirectory.keySet()) {
+            GuideMetadata metadata = metadatasByDirectory[dir]
+            if (metadata.base) {
+                GuideMetadata base = metadatasByDirectory[metadata.base]
+                GuideMetadata merged = mergeMetadatas(base, metadata)
+                metadatasByDirectory[dir] = merged
+            }
+        }
+    }
+
+    private static GuideMetadata mergeMetadatas(GuideMetadata base, GuideMetadata metadata) {
+        GuideMetadata merged = new GuideMetadata()
+
+        merged.asciidoctor = metadata.asciidoctor
+        merged.slug = metadata.slug
+        merged.title = metadata.title ?: base.title
+        merged.intro = metadata.intro ?: base.intro
+        merged.authors = mergeLists(base.authors, metadata.authors)
+        merged.tags = mergeLists(base.tags, metadata.tags)
+        merged.category = base.category ?: metadata.category
+        merged.publicationDate = metadata.publicationDate
+        merged.publish = true
+        merged.buildTools = base.buildTools ?: metadata.buildTools
+        merged.languages = base.languages ?: metadata.languages
+        merged.testFramework = base.testFramework ?: metadata.testFramework
+        merged.skipGradleTests = base.skipGradleTests || metadata.skipGradleTests
+        merged.skipMavenTests = base.skipMavenTests || metadata.skipMavenTests
+        merged.minimumJavaVersion = base.minimumJavaVersion ?: metadata.minimumJavaVersion
+        merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
+        merged.apps = base.apps ?: metadata.apps // TODO support merging from base
+
+        merged
+    }
+
+    private static List mergeLists(List base, List others) {
+        List merged = []
+        if (base) {
+            merged.addAll base
+        }
+        if (others) {
+            merged.addAll others
+        }
+        merged
     }
 }
