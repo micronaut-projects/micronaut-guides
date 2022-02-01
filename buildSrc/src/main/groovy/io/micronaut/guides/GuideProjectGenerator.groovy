@@ -334,6 +334,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.skipGradleTests = base.skipGradleTests || metadata.skipGradleTests
         merged.skipMavenTests = base.skipMavenTests || metadata.skipMavenTests
         merged.minimumJavaVersion = base.minimumJavaVersion ?: metadata.minimumJavaVersion
+        merged.maximumJavaVersion = base.maximumJavaVersion ?: metadata.maximumJavaVersion
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
         merged.apps = base.apps ?: metadata.apps // TODO support merging from base
 
