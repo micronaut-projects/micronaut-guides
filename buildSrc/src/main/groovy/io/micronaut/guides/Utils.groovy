@@ -22,9 +22,12 @@ class Utils {
             return false
         }
 
-        if (checkJdk) {
-            return metadata.minimumJavaVersion == null ||
-                    parseJdkVersion().majorVersion() >= metadata.minimumJavaVersion
+        if (checkJdk && metadata.minimumJavaVersion != null) {
+            int jdkVersion = parseJdkVersion().majorVersion()
+            if (jdkVersion < metadata.minimumJavaVersion) {
+                println "not processing $metadata.slug, JDK $jdkVersion < $metadata.minimumJavaVersion"
+                return false
+            }
         }
 
         return true

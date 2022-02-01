@@ -75,6 +75,8 @@ EXIT_STATUS=0
                                         (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
 
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        metadatas.sort { it.slug }
+
         for (GuideMetadata metadata : metadatas) {
             boolean skip = shouldSkip(metadata, slugsChanged, forceExecuteEveryTest)
             if (skip) {
