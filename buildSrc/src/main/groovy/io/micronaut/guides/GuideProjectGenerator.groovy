@@ -50,11 +50,11 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    static List<GuideMetadata> parseGuidesMetadata(File guidesFolder,
+    static List<GuideMetadata> parseGuidesMetadata(File guidesDir,
                                                    String metadataConfigName) {
         List<GuideMetadata> metadatas = []
 
-        guidesFolder.eachDir { dir ->
+        guidesDir.eachDir { dir ->
             metadatas << parseGuideMetadata(dir, metadataConfigName)
         }
 
@@ -118,13 +118,9 @@ class GuideProjectGenerator implements AutoCloseable {
             asciidocDir.mkdir()
         }
 
-        Map<String, GuideMetadata> metadatasByDirectory = new TreeMap<>()
-        guidesDir.eachDir { dir ->
-            metadatasByDirectory[dir.name] = parseGuideMetadata(dir, metadataConfigName)
-        }
-
-        metadatasByDirectory.each { String dirName, GuideMetadata metadata ->
-            File dir = new File(guidesDir, dirName)
+        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName);
+        for (GuideMetadata metadata : metadatas) {
+            File dir = new File(guidesDir, metadata.slug)
             try {
                 if (Utils.process(metadata, false)) {
                     println "Generating projects for $metadata.slug"
@@ -228,7 +224,7 @@ class GuideProjectGenerator implements AutoCloseable {
         final String srcFolder = 'src'
         Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
         if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath, srcFolder)))
+            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
         }
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
@@ -297,12 +293,15 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     private static void mergeMetadataList(List<GuideMetadata> metadatas) {
-        Map<String, GuideMetadata> metadatasByDirectory = [:]
+        Map<String, GuideMetadata> metadatasByDirectory = new TreeMap<>()
         for (GuideMetadata metadata : metadatas) {
             metadatasByDirectory[metadata.slug] = metadata
         }
 
         mergeMetadataMap(metadatasByDirectory)
+
+        metadatas.clear()
+        metadatas.addAll metadatasByDirectory.values()
     }
 
     private static void mergeMetadataMap(Map<String, GuideMetadata> metadatasByDirectory) {
