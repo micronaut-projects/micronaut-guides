@@ -232,7 +232,7 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
-        if (sourcePath.toFile().exists()) {
+        if (Files.exists(sourcePath)) {
             // copy source/resource files for the current language
             Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
         } else if (!ignoreMissingDirectories) {
