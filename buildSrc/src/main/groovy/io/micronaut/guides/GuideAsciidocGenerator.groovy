@@ -9,6 +9,7 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
+import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
 
 import java.nio.file.Path
@@ -140,6 +141,18 @@ class GuideAsciidocGenerator {
             text = text.replace("@sourceDir@", projectName)
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
+
+             text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
+
+                 String app = matches[1] ?: 'default'
+                 List<String> features = metadata.apps.find{ it.name == app }.features
+
+                 if(guidesOption.language == Language.GROOVY) {
+                     features -= 'graalvm'
+                 }
+
+                 features.join(',')
+            }
 
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
                 if (entry.value.version) {

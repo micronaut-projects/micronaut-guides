@@ -10,7 +10,7 @@ import javax.transaction.Transactional
 import javax.validation.constraints.NotBlank
 
 @JdbcRepository(dialect = Dialect.MYSQL) //<1>
-open abstract class GenreRepository : PageableRepository<Genre, Long> { //<2>
+abstract class GenreRepository : PageableRepository<Genre, Long> { //<2>
 
     abstract fun save(@NotBlank name: String) : Genre
 

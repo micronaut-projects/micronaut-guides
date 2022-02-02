@@ -38,7 +38,7 @@ open class GenreController(private val genreRepository: GenreRepository) { //<3>
             .header(HttpHeaders.LOCATION, id.location.path) // <8>
     }
 
-    @Get(value = "/list") // <9>
+    @Get("/list") // <9>
     open fun list(@Valid pageable: Pageable): List<Genre> = //<10>
         genreRepository.findAll(pageable).content
 

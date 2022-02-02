@@ -37,12 +37,13 @@ class GenreController {
     @Put // <6>
     HttpResponse update(@Body @Valid GenreUpdateCommand command) { // <7>
         genreRepository.update(command.id, command.name)
-        return HttpResponse
-                .noContent()
-                .header(HttpHeaders.LOCATION, location(command.id).path) // <8>
+
+        HttpResponse
+            .noContent()
+            .header(HttpHeaders.LOCATION, location(command.id).path) // <8>
     }
 
-    @Get(value = '/list') // <9>
+    @Get('/list') // <9>
     List<Genre> list(@Valid Pageable pageable) { // <10>
         genreRepository.findAll(pageable).content
     }
