@@ -227,7 +227,7 @@ class GuideProjectGenerator implements AutoCloseable {
         // look for a common 'src' directory shared by multiple languages and copy those files first
         final String srcFolder = 'src'
         Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
-        if (srcPath.toFile().exists()) {
+        if (Files.exists(srcPath)) {
             Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toFile().path, srcFolder)))
         }
 
