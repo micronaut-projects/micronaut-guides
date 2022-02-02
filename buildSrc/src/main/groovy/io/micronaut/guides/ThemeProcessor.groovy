@@ -1,24 +1,16 @@
 package io.micronaut.guides
 
+import java.util.regex.Pattern
+
 class ThemeProcessor {
+
+    private static final Pattern TOC_REGEX = ~/(?s)<div id="toc" class="toc2">\s*<div id="toctitle">Table of Contents<\/div>(.*)<\/div>\s*<\/div>\s*<div id="content">/
+    private static final Pattern CONTENT_REGEX = ~/(?s)<div class="sectionbody">(.*)<\/div>\s*<\/div>\s*<\/div>\s*<\/body>/
 
     static void applyThemes(File template, File dist,
                             File guidesFolder, String metadataConfigName) {
 
         String templateText = template.text
-
-        String tocStart = '''\
-<div id="toc" class="toc2">
-<div id="toctitle">Table of Contents</div>
-'''
-
-        String startDivContent = '''\
-</div>
-</div>
-<div id="content">
-'''
-
-        String sectionbody = '<div class="sectionbody">'
 
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
@@ -35,15 +27,10 @@ class ThemeProcessor {
                     File output = new File(dist.path, folder + ".html")
                     String html = output.text
 
-                    String toc = html.indexOf(startDivContent) == -1 ? '' :
-                            html.substring(html.indexOf(tocStart) + tocStart.length(), html.indexOf(startDivContent))
-                    String content = html.indexOf(sectionbody) == -1 ? '' :
-                            html.substring(html.indexOf(sectionbody) + sectionbody.length(), html.indexOf('''\
-</div>
-</div>
-</div>
-</body>
-'''))
+                    String toc = html.find(TOC_REGEX){match, table -> table } ?: ''
+
+                    String content =  html.find(CONTENT_REGEX){match, content -> content } ?: ''
+
                     content = content == '' ? '' : '''\
 <div class="sect1">
 <div class="sectionbody">
