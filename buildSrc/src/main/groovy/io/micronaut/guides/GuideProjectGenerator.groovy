@@ -228,7 +228,7 @@ class GuideProjectGenerator implements AutoCloseable {
         final String srcFolder = 'src'
         Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
         if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toFile().path, srcFolder)))
+            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath, srcFolder)))
         }
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
