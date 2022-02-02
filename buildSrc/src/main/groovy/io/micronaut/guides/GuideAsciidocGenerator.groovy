@@ -147,7 +147,7 @@ class GuideAsciidocGenerator {
 
             File renderedAsciidocFile = new File(asciidocDir, projectName + '.adoc')
             renderedAsciidocFile.createNewFile()
-            renderedAsciidocFile.text = text
+            renderedAsciidocFile.setText(text, 'UTF-8')
         }
     }
 

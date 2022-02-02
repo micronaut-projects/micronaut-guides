@@ -8,6 +8,7 @@ import io.micronaut.starter.options.Language
 
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.regex.Pattern
 
 @CompileStatic
 class IndexGenerator {
@@ -19,20 +20,14 @@ class IndexGenerator {
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
+    private static final Pattern CONTENT_REGEX = ~/(?s)(<main id="main">)(.*)(<\/main>)/
+
     static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
 
-        String templateText = template.text
-        templateText =
-                templateText.substring(0, templateText.indexOf('''\
-<main id="main">
-    <div class="container">''') + '''\
-<main id="main">
-    <div class="container">'''.length()) +
-                        '@content@' +
-                        templateText.substring(templateText.indexOf('''\
-    </div>
-</main>'''))
+        String templateText = template.text.replaceFirst(CONTENT_REGEX) { List<String> it ->
+            "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
+        }
 
         save(templateText, 'dist/index.html', buildDir, metadatas)
         for (GuideMetadata metadata :  metadatas) {
@@ -49,7 +44,7 @@ class IndexGenerator {
         Path path = Paths.get(buildDir.absolutePath, filename)
         File output = path.toFile()
         output.createNewFile()
-        output.text = text
+        output.setText(text, 'UTF-8')
     }
 
     private static String indexText(File buildDir,
