@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @JdbcRepository(dialect = Dialect.MYSQL) // <1>
-trait GenreRepository implements PageableRepository<Genre, Long> { // <2>
+abstract class GenreRepository implements PageableRepository<Genre, Long> { // <2>
 
     abstract Genre save(@NonNull @NotBlank String name)
 
@@ -23,5 +23,4 @@ trait GenreRepository implements PageableRepository<Genre, Long> { // <2>
     }
 
     abstract long update(@NonNull @NotNull @Id Long id, @NonNull @NotBlank String name)
-
 }

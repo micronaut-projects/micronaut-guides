@@ -1,9 +1,10 @@
 package example.micronaut
 
+import io.micronaut.data.exceptions.DataAccessException
 import io.micronaut.scheduling.annotation.ExecuteOn
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
-
+import groovy.transform.CompileStatic
 import example.micronaut.domain.Genre
 import io.micronaut.data.model.Pageable
 import io.micronaut.http.HttpResponse
@@ -18,6 +19,7 @@ import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpStatus
 import io.micronaut.scheduling.TaskExecutors
 
+@CompileStatic
 @ExecuteOn(TaskExecutors.IO) // <1>
 @Controller('/genres') // <2>
 class GenreController {
@@ -39,8 +41,8 @@ class GenreController {
         genreRepository.update(command.id, command.name)
 
         HttpResponse
-            .noContent()
-            .header(HttpHeaders.LOCATION, location(command.id).path) // <8>
+                .noContent()
+                .header(HttpHeaders.LOCATION, location(command.id).path) // <8>
     }
 
     @Get('/list') // <9>
@@ -59,10 +61,10 @@ class GenreController {
     @Post('/ex') // <12>
     HttpResponse<Genre> saveExceptions(@Body @NotBlank String name) {
         try {
-            def genre = genreRepository.saveWithException(name)
-            return HttpResponse.create(genre)
+            Genre genre = genreRepository.saveWithException(name)
+            HttpResponse.created(genre)
                     .headers(headers -> headers.location(location(genre)))
-        } catch(ex) {
+        } catch(DataAccessException ex) {
             return HttpResponse.noContent()
         }
     }
@@ -73,9 +75,8 @@ class GenreController {
         genreRepository.deleteById(id)
     }
 
-    protected URI location(Long id) { URI.create("/genres/$id") }
+    private static URI location(Long id) { URI.create("/genres/$id") }
 
-    protected URI location(Genre genre) { location(genre.id) }
-
+    private static URI location(Genre genre) { location(genre.id) }
 }
 
