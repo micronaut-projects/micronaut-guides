@@ -17,6 +17,10 @@ class Utils {
 
     static boolean process(GuideMetadata metadata, boolean checkJdk = true) {
 
+        if (!metadata.publish) {
+            return false
+        }
+
         boolean processGuide = singleGuide() == null || singleGuide() == metadata.slug
         if (!processGuide) {
             return false

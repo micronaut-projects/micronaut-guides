@@ -11,8 +11,8 @@ class ThemeProcessor {
                             File guidesFolder, String metadataConfigName) {
 
         String templateText = template.text
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
 
+        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
             if (!Utils.process(metadata, false)) {
                 continue

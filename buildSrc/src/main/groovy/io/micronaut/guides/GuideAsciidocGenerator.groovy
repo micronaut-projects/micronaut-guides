@@ -22,6 +22,7 @@ class GuideAsciidocGenerator {
 
     private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
+    private static final String EXTERNAL = 'external:'
     private static final Pattern GUIDE_LINK_REGEX = ~/(.*)guideLink:(.*)\[(.*)](.*)/
 
     public static final int DEFAULT_MIN_JDK = 8
@@ -165,7 +166,9 @@ class GuideAsciidocGenerator {
             if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
                 rawLines << callout(rawLine, projectDir)
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
-                include rawLine, rawLines, projectDir
+                include rawLine, rawLines, projectDir, true
+            } else if (rawLine.startsWith(EXTERNAL) && rawLine.endsWith(']')) {
+                include rawLine, rawLines, projectDir, false
             } else {
                 rawLines << rawLine
             }
@@ -195,11 +198,19 @@ class GuideAsciidocGenerator {
         line
     }
 
-    private static void include(String rawLine, List<String> rawLines, File projectDir) {
+    private static void include(String rawLine, List<String> rawLines, File projectDir,
+                                boolean snippet) {
 
-        String relativePath = parseFileName(rawLine, INCLUDE_COMMONDIR)
-                .orElseThrow(() -> new GradleException("could not parse filename from commondir line: " + rawLine))
-        relativePath = 'src/docs/common/snippets/common-' + relativePath
+        String prefix = snippet ? INCLUDE_COMMONDIR : EXTERNAL
+
+        String relativePath = parseFileName(rawLine, prefix)
+                .orElseThrow(() -> new GradleException("could not parse filename from include line: " + rawLine))
+
+        if (snippet) {
+            relativePath = 'src/docs/common/snippets/common-' + relativePath
+        } else {
+            relativePath = 'guides/' + relativePath
+        }
 
         File file = new File(projectDir, relativePath)
 
