@@ -449,7 +449,7 @@ class GuideAsciidocGenerator {
 
     private static String processGuideLink(String line) {
         line.find(GUIDE_LINK_REGEX) { String match, String before, String slug, String text, String after ->
-            "${before}https://guides.micronaut.io/latest/${slug}.html[$text]$after"
+            "${before}link:${slug}.html[$text]$after"
         }
     }
 
