@@ -12,6 +12,7 @@ import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
 import org.gradle.api.GradleException
 
 import java.util.Map.Entry
+import java.util.regex.Pattern
 
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.api.TestFramework.SPOCK
@@ -22,6 +23,7 @@ class GuideAsciidocGenerator {
     private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
     private static final String EXTERNAL = 'external:'
+    private static final Pattern GUIDE_LINK_REGEX = ~/(.*)guideLink:(.*)\[(.*)](.*)/
 
     public static final int DEFAULT_MIN_JDK = 8
     public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
@@ -34,7 +36,7 @@ class GuideAsciidocGenerator {
         File asciidocFile = new File(inputDir, metadata.asciidoctor)
         assert asciidocFile.exists()
 
-        List<String> rawLinesExpanded = expandAllCommonIncludes(asciidocFile.readLines(), projectDir)
+        List<String> rawLinesExpanded = expandMacros(asciidocFile.readLines(), projectDir)
 
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
@@ -152,10 +154,15 @@ class GuideAsciidocGenerator {
         }
     }
 
-    private static List<String> expandAllCommonIncludes(List<String> lines, File projectDir) {
+    private static List<String> expandMacros(List<String> lines, File projectDir) {
         List<String> rawLines = []
 
         for (String rawLine : lines) {
+
+            if (findInlineMacro(rawLine, 'guideLink:')) {
+                rawLine = processGuideLink(rawLine)
+            }
+
             if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
                 rawLines << callout(rawLine, projectDir)
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
@@ -238,11 +245,20 @@ class GuideAsciidocGenerator {
 
     private static List<String> commonLines(File file, File projectDir) {
         assert file.exists()
-        return expandAllCommonIncludes(file.readLines(), projectDir)
+        return expandMacros(file.readLines(), projectDir)
     }
 
     private static boolean shouldProcessLine(String line, String macro) {
         line.startsWith(macro) && line.contains('[') && line.endsWith(']')
+    }
+
+    private static boolean findInlineMacro(String line, String macro) {
+        if (line.contains(macro)) {
+            int indexBracket = line.indexOf('[')
+            indexBracket > -1 && line.indexOf(']') > indexBracket
+        } else {
+            false
+        }
     }
 
     private static String extractName(String line, String macro) {
@@ -440,6 +456,12 @@ class GuideAsciidocGenerator {
 
         "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can " +
         link + " and apply those changes to your application."
+    }
+
+    private static String processGuideLink(String line) {
+        line.find(GUIDE_LINK_REGEX) { String match, String before, String slug, String text, String after ->
+            "${before}link:${slug}.html[$text]$after"
+        }
     }
 
     private static String extractAppName(String line) {
