@@ -152,6 +152,25 @@ class GuideAsciidocGenerator {
                  features.join(',')
             }
 
+            text = text.replaceAll(~/@(\w*):?features-words@/) { List<String> matches ->
+
+                String app = matches[1] ?: 'default'
+                List<String> features = metadata.apps.find{ it.name == app }.features
+
+                if(guidesOption.language == Language.GROOVY) {
+                    features -= 'graalvm'
+                }
+
+                features = features.collect{ "`$it`".toString()}
+
+                if(features.size() > 1) {
+                    "${features[0..-2].join(', ')} and ${features[-1]}"
+                } else {
+                    features[0]
+                }
+
+            }
+
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
                 if (entry.value.version) {
                     text = text.replace("@${entry.key}Version@", entry.value.version)
