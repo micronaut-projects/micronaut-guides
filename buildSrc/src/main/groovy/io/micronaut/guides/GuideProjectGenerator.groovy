@@ -326,7 +326,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.tags = mergeLists(base.tags, metadata.tags)
         merged.category = base.category ?: metadata.category
         merged.publicationDate = metadata.publicationDate
-        merged.publish = true
+        merged.publish = metadata.publish
         merged.buildTools = base.buildTools ?: metadata.buildTools
         merged.languages = base.languages ?: metadata.languages
         merged.testFramework = base.testFramework ?: metadata.testFramework
