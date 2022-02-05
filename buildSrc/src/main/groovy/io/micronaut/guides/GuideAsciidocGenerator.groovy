@@ -21,14 +21,15 @@ import static io.micronaut.starter.api.TestFramework.SPOCK
 class GuideAsciidocGenerator {
 
     private static final String INCLUDE_COMMONDIR = 'common:'
+    private static final String COMMON_PATH = 'src/docs/common/snippets/common-'
     private static final String CALLOUT = 'callout:'
-    private static final String EXTERNAL = 'external:'
     private static final Pattern GUIDE_LINK_REGEX = ~/(.*)guideLink:(.*)\[(.*)](.*)/
 
     public static final int DEFAULT_MIN_JDK = 8
     public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
     public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
+
 
     static void generate(GuideMetadata metadata, File inputDir,
                          File asciidocDir, File projectDir) {
@@ -166,9 +167,7 @@ class GuideAsciidocGenerator {
             if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
                 rawLines << callout(rawLine, projectDir)
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
-                include rawLine, rawLines, projectDir, true
-            } else if (rawLine.startsWith(EXTERNAL) && rawLine.endsWith(']')) {
-                include rawLine, rawLines, projectDir, false
+                include(rawLine, rawLines, projectDir)
             } else {
                 rawLines << rawLine
             }
@@ -198,22 +197,11 @@ class GuideAsciidocGenerator {
         line
     }
 
-    private static void include(String rawLine, List<String> rawLines, File projectDir,
-                                boolean snippet) {
-
-        String prefix = snippet ? INCLUDE_COMMONDIR : EXTERNAL
-
+    private static void include(String rawLine, List<String> rawLines, File projectDir, String prefix = INCLUDE_COMMONDIR) {
         String relativePath = parseFileName(rawLine, prefix)
                 .orElseThrow(() -> new GradleException("could not parse filename from include line: " + rawLine))
-
-        if (snippet) {
-            relativePath = 'src/docs/common/snippets/common-' + relativePath
-        } else {
-            relativePath = 'guides/' + relativePath
-        }
-
+        relativePath = COMMON_PATH + relativePath
         File file = new File(projectDir, relativePath)
-
         rawLines << '// Start: ' + relativePath
         rawLines.addAll commonLines(file, projectDir)
         rawLines << '// End: ' + relativePath
