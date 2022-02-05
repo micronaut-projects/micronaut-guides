@@ -99,7 +99,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 zipIncludes: config.zipIncludes ?: [],
                 apps: config.apps.collect { it -> new App(
                         name: it.name,
-                        features: it.features,
+                        features: it.features ?: [],
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                         excludeSource:  it.excludeSource,
                         excludeTest:  it.excludeTest)
