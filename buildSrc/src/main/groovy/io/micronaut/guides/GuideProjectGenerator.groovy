@@ -317,7 +317,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private static GuideMetadata mergeMetadatas(GuideMetadata base, GuideMetadata metadata) {
         GuideMetadata merged = new GuideMetadata()
-
+        merged.base = metadata.base
         merged.asciidoctor = metadata.asciidoctor
         merged.slug = metadata.slug
         merged.title = metadata.title ?: base.title
