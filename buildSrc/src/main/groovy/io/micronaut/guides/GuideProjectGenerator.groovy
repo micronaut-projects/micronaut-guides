@@ -335,9 +335,20 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.minimumJavaVersion = base.minimumJavaVersion ?: metadata.minimumJavaVersion
         merged.maximumJavaVersion = base.maximumJavaVersion ?: metadata.maximumJavaVersion
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
-        merged.apps = base.apps ?: metadata.apps // TODO support merging from base
+        merged.apps = mergeApps(base, metadata)
 
         merged
+    }
+
+    private static List<App> mergeApps(GuideMetadata base, GuideMetadata metadata) {
+        List<App> apps = new ArrayList<>(metadata.apps)
+        for (App app : apps) {
+            App baseAppMatchingName = base.apps.find { it.name == app.name }
+            if (baseAppMatchingName) {
+                app.features += baseAppMatchingName.features
+            }
+        }
+        apps
     }
 
     private static List mergeLists(List base, List others) {
