@@ -1,7 +1,5 @@
 package example.micronaut;
 
-import com.sendgrid.Request;
-import com.sendgrid.Response;
 import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.core.util.CollectionUtils;
@@ -10,6 +8,7 @@ import io.micronaut.email.AsyncTransactionalEmailSender;
 import io.micronaut.email.BodyType;
 import io.micronaut.email.Email;
 import io.micronaut.email.EmailException;
+import io.micronaut.email.ses.AsyncSesEmailSender;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
@@ -33,6 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import software.amazon.awssdk.services.ses.model.SendEmailResponse;
+import software.amazon.awssdk.services.ses.model.SesRequest;
+import software.amazon.awssdk.services.ses.model.SesResponse;
 
 @Property(name = "spec.name", value="MailControllerTest") // <1>
 @MicronautTest // <2>
@@ -48,19 +50,20 @@ public class MailControllerTest {
     @Test
     void getMailSendEndpointSendsAnEmail() {
         HttpResponse<?> response = httpClient.toBlocking().exchange(HttpRequest.POST("/mail/send",
-                        Collections.singletonMap("to", "johnsnow@micronaut.example")));
+                Collections.singletonMap("to", "johnsnow@micronaut.example")));
         assertEquals(HttpStatus.ACCEPTED, response.status());
+
         AsyncTransactionalEmailSender<?,?> sender = beanContext.getBean(AsyncTransactionalEmailSender.class);
-        assertTrue(sender instanceof SendgridEmailSenderReplacement);
-        SendgridEmailSenderReplacement sendgridSender = (SendgridEmailSenderReplacement) sender;
-        assertTrue(CollectionUtils.isNotEmpty(sendgridSender.emails));
-        assertEquals(1, sendgridSender.emails.size());
-        Email email = sendgridSender.emails.get(0);
+        assertTrue(sender instanceof AsyncSesEmailSenderReplacement);
+        AsyncSesEmailSenderReplacement sendgridSender = (AsyncSesEmailSenderReplacement) sender;
+        assertTrue(CollectionUtils.isNotEmpty(sendgridSender.getEmails()));
+        assertEquals(1, sendgridSender.getEmails().size());
+        Email email = sendgridSender.getEmails().get(0);
         assertEquals(email.getFrom().getEmail(), "john@micronaut.example");
         assertNotNull(email.getTo());
         assertTrue(email.getTo().stream().findFirst().isPresent());
         assertEquals(email.getTo().stream().findFirst().get().getEmail(), "johnsnow@micronaut.example");
-        assertEquals(email.getSubject(), "Sending email with Twilio Sendgrid is Fun");
+        assertEquals(email.getSubject(), "Sending email with Amazon SES is Fun");
         assertNotNull(email.getBody());
         assertTrue(email.getBody().get(BodyType.HTML).isPresent());
         assertEquals(email.getBody().get(BodyType.HTML).get(), "and <em>easy</em> to do anywhere with <strong>Micronaut Email</strong>");
@@ -68,23 +71,20 @@ public class MailControllerTest {
 
     @Requires(property = "spec.name", value="MailControllerTest") // <1>
     @Singleton
-    @Replaces(AsyncEmailSender.class)
-    @Named(SendgridEmailSenderReplacement.NAME)
-    static class SendgridEmailSenderReplacement implements AsyncTransactionalEmailSender<Request, Response> {
-        public static final String NAME = "sendgrid";
+    @Replaces(AsyncSesEmailSender.class)
+    @Named(AsyncSesEmailSender.NAME)
+    static class AsyncSesEmailSenderReplacement implements AsyncTransactionalEmailSender<SesRequest, SesResponse> {
         private final List<Email> emails = new ArrayList<>();
 
         @Override
         public String getName() {
-            return NAME;
+            return AsyncSesEmailSender.NAME;
         }
 
         @Override
-        public Publisher<Response> sendAsync(@NotNull @Valid Email email, @NotNull Consumer<Request> emailRequest) throws EmailException {
+        public Publisher<SesResponse> sendAsync(@NotNull @Valid Email email, @NotNull Consumer<SesRequest> emailRequest) throws EmailException {
             emails.add(email);
-            Response response = new Response();
-            response.setStatusCode(HttpStatus.ACCEPTED.getCode());
-            return Mono.just(response);
+            return Mono.just(SendEmailResponse.builder().messageId("xxx-yyy-zzz").build());
         }
 
         public List<Email> getEmails() {
