@@ -2,6 +2,7 @@ package io.micronaut.guides;
 
 public enum Category {
     GETTING_STARTED("Getting Started"),
+    EMAIL("Email"),
     DATA_ACCESS("Data Access"),
     CACHE("Cache"),
     MESSAGING("Messaging"),
