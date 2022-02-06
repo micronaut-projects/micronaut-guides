@@ -182,17 +182,12 @@ class GuideProjectGenerator implements AutoCloseable {
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)
 
-                boolean ignoreMissingDirectories = false
-
                 if (metadata.base) {
-                    ignoreMissingDirectories = true
                     File baseDir = new File(inputDir.parentFile, metadata.base)
-                    copyGuideSourceFiles baseDir, destinationPath, appName,
-                            guidesOption.language.toString(), ignoreMissingDirectories
+                    copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.language.toString(), true)
                 }
 
-                copyGuideSourceFiles inputDir, destinationPath, appName,
-                        guidesOption.language.toString(), ignoreMissingDirectories
+                copyGuideSourceFiles(inputDir, destinationPath, appName, guidesOption.language.toString())
 
                 if (app.excludeSource) {
                     for (String mainSource : app.excludeSource) {
@@ -218,7 +213,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
                                              String appName, String language,
-                                             boolean ignoreMissingDirectories) {
+                                             boolean ignoreMissingDirectories = false) {
 
         // look for a common 'src' directory shared by multiple languages and copy those files first
         final String srcFolder = 'src'
