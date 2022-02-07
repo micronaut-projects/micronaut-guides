@@ -20,7 +20,6 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.format.Format;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import jakarta.inject.Inject;
 import reactor.core.publisher.Mono;
 import example.micronaut.library.model.BookInfo;
 import javax.annotation.Generated;
