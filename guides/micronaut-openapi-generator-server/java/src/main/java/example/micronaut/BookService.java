@@ -1,7 +1,7 @@
-package example.micronaut.library;
+package example.micronaut;
 
-import example.micronaut.library.model.BookAvailability;
-import example.micronaut.library.model.BookInfo;
+import example.micronaut.model.BookAvailability;
+import example.micronaut.model.BookInfo;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Arrays;

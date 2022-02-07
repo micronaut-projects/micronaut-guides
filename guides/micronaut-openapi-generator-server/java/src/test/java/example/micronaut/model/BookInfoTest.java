@@ -1,6 +1,6 @@
-package example.micronaut.library.model;
+package example.micronaut.model;
 
-import example.micronaut.library.model.BookAvailability;
+import example.micronaut.model.BookAvailability;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;

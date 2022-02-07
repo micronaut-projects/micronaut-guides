@@ -10,11 +10,11 @@
  * Do not edit the class manually.
  */
 
-package example.micronaut.library.model;
+package example.micronaut.model;
 
 import java.util.Objects;
 import java.util.Arrays;
-import example.micronaut.library.model.BookAvailability;
+import example.micronaut.model.BookAvailability;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import com.fasterxml.jackson.annotation.*;

@@ -10,10 +10,10 @@
  * Do not edit the class manually.
  */
 
-package example.micronaut.library.controller;
+package example.micronaut.controller;
 
 //tag::import[]
-import example.micronaut.library.BookService;
+import example.micronaut.BookService;
 //end::import[]
 import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.Nullable;
@@ -21,7 +21,7 @@ import io.micronaut.core.convert.format.Format;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import reactor.core.publisher.Mono;
-import example.micronaut.library.model.BookInfo;
+import example.micronaut.model.BookInfo;
 import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;

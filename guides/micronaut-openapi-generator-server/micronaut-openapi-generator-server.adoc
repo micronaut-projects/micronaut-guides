@@ -221,8 +221,8 @@ java -jar openapi-generator-cli-5.4.0.jar generate \
     -g java-micronaut-server \# <1>
     -i library-definition.yaml \# <2>
     -o ./ \# <3>
-    -p controllerPackage=example.micronaut.library.controller \# <4>
-    -p modelPackage=example.micronaut.library.model \# <5>
+    -p controllerPackage=example.micronaut.controller \# <4>
+    -p modelPackage=example.micronaut.model \# <5>
     -p build=@build@ \# <6>
     -p test=junit# <7>
 ----
@@ -231,8 +231,8 @@ java -jar openapi-generator-cli-5.4.0.jar generate \
 <3> Specify the output directory to be the current directory (`./`).
 You can specify it to be a different one if you want (e.g. `library-server`).
 <4> We provide generator-specific properties starting with `-p`.
-We want all the controllers to be generated in the `example.micronaut.library.controller` package.
-<5> We want all the models (data models, like `BookInfo`) to be in `example.micronaut.library.model` package.
+We want all the controllers to be generated in the `example.micronaut.controller` package.
+<5> We want all the models (data models, like `BookInfo`) to be in `example.micronaut.model` package.
 <6> We want to use @build@ as build tool. The supported values are `gradle`, `maven` and `all`.
 If nothing is specified, both Maven and Gradle files are generated.
 <7> We want to use JUnit 5 for testing. The supported values are `junit` (JUnit 5) and `spock`.
@@ -244,7 +244,7 @@ If you are using Windows command prompt, run:
 =========
 [source,bash]
 ----
-java -jar openapi-generator-cli-5.4.0.jar generate -g java-micronaut-server -i library-definition.yaml -o ./ -p controllerPackage=example.micronaut.library.controller -p modelPackage=example.micronaut.library.model -p build=@build@ -p test=junit
+java -jar openapi-generator-cli-5.4.0.jar generate -g java-micronaut-server -i library-definition.yaml -o ./ -p controllerPackage=example.micronaut.controller -p modelPackage=example.micronaut.model -p build=@build@ -p test=junit
 ----
 
 [NOTE]
@@ -278,7 +278,7 @@ You should see the following directory structure:
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   └── example/micronaut/library
+│   │   │   └── example/micronaut/
 │   │   │       ├── Application.java # <2>
 │   │   │       ├── controller
 │   │   │       │   └── BooksController.java # <3>
@@ -290,7 +290,7 @@ You should see the following directory structure:
 │   │       └── logback.xml
 │   └── test/
 │       └── java/
-│           └── example/micronaut/library # <6>
+│           └── example/micronaut/ # <6>
 │               ├── controller
 │               │   └── BooksControllerTest.java
 │               └── model
@@ -323,7 +323,7 @@ Along with that it has getters and setters for parameters and Jackson serializat
 To add the required functionality to the server we will first create a service to manage books in our library.
 Create `BookService` with the following implementation:
 
-source:library/BookService[]
+source:BookService[]
 callout:singleton[1]
 
 Now open `BooksController`. The class should have two methods named the same
@@ -331,17 +331,17 @@ as the operations we created in the definition file. The methods have Micronaut 
 required API. We will now write their bodies.
 
 First, inject `BookService`:
-source:library/controller/BooksController[tag=import]
-source:library/controller/BooksController[tag=inject,indent=0]
+source:controller/BooksController[tag=import]
+source:controller/BooksController[tag=inject,indent=0]
 <1> Micronaut will inject the singleton instance of the bean here.
 
 Next, we will add an implementation of the `search` method:
 
-source:library/controller/BooksController[tag=search,indent=0]
+source:controller/BooksController[tag=search,indent=0]
 <1> Return a Reactor publisher, that will return the result of search method.
 
 And finally, we will implement the `addBook` method:
-source:library/controller/BooksController[tag=addBook,indent=0]
+source:controller/BooksController[tag=addBook,indent=0]
 <1> Call the function and return an empty string to create a response with an empty body.
 
 
@@ -398,14 +398,14 @@ the API from the point of a client.
 We will delete the `searchMethodTest()` and modify the `searchClientApiTest()` method to perform a basic check.
 All the modifications compared to the generated version are labeled here:
 
-test:library/controller/BooksControllerTest[tag=search,indent=0]
+test:controller/BooksControllerTest[tag=search,indent=0]
 <1> Remove the `@Disabled` annotation, so that the test would run.
 <2> Specify the value of query the parameter.
 <3> Store the response body in a variable.
 <4> Add assertion: we expect to get two books containing `"Guide"` as response.
 
 We will also update the generated `addBookClientApiTest` for the `/add` path:
-test:library/controller/BooksControllerTest[tag=addBook,indent=0]
+test:controller/BooksControllerTest[tag=addBook,indent=0]
 <1> Remove the `@Disabled` annotation, so that the test would run.
 <2> Change the fields of `BookInfo body` object.
 
@@ -478,8 +478,8 @@ java -jar openapi-generator-cli-5.4.0.jar generate \
     -g java-micronaut-client \
     -i library-definition.yaml \
     -o library-client \
-    -p apiPackage=example.micronaut.library.api \
-    -p modelPackage=example.micronaut.library.model \
+    -p apiPackage=example.micronaut.api \
+    -p modelPackage=example.micronaut.model \
     -p build=@build@ \
     -p test=junit
 ----

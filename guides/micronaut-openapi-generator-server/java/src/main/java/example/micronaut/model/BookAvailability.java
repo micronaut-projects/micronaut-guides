@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-package example.micronaut.library.model;
+package example.micronaut.model;
 
 import java.util.Objects;
 import java.util.Arrays;

@@ -1,7 +1,7 @@
-package example.micronaut.library.controller;
+package example.micronaut.controller;
 
-import example.micronaut.library.model.BookAvailability;
-import example.micronaut.library.model.BookInfo;
+import example.micronaut.model.BookAvailability;
+import example.micronaut.model.BookInfo;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
