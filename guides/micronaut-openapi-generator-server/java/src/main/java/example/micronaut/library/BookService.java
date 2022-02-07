@@ -19,7 +19,6 @@ public class BookService {
     ));
 
     public void addBook(BookInfo bookInfo) {
-        // Add book to the list
         BOOKS.add(bookInfo);
     }
 
