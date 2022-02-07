@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Singleton // <1>
 public class BookService {
     private static final List<BookInfo> BOOKS = new ArrayList<>(Arrays.asList(
-            new BookInfo("Alice's Advantures in Wonderland", BookAvailability.AVAILABLE)
+            new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
                     .author("Lewis Carroll"),
             new BookInfo("The Hitchhiker's Guide to the Galaxy", BookAvailability.RESERVED)
                     .author("Douglas Adams"),
