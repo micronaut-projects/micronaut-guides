@@ -29,7 +29,7 @@ class MailControllerSpec extends Specification {
         HttpRequest<EmailCmd> request = HttpRequest.POST("/mail/send", cmd) // <5>
 
         when:
-        EmailService emailService = applicationContext.getBean(EmailService.class)
+        EmailService emailService = applicationContext.getBean(EmailService)
 
         then:
         emailService instanceof MockEmailService

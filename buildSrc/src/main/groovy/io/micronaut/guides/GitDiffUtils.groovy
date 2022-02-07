@@ -14,7 +14,7 @@ class GitDiffUtils {
         proc.consumeProcessOutput sout, serr
         proc.waitForOrKill 1_000
         if (serr) {
-            println "error: " + serr.toString()
+            println "error: " + serr
             return []
         }
         sout.toString().split("\n") as List<String>
