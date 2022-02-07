@@ -15,9 +15,9 @@ To use OpenAPI Generator we need to install OpenAPI Generator CLI.
 
 We will use the jar option. Download it from
 https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/5.4.0/openapi-generator-cli-5.4.0.jar
-and store it in the folder that you want to use for this project.
+and store it in the directory that you want to use for this project.
 
-Next, open terminal in the same folder. To verify that generator works correctly run the `help` command:
+Next, open terminal in the same directory. To verify that generator works correctly run the `help` command:
 [source,bash]
 ----
 java -jar openapi-generator-cli-5.4.0.jar help
@@ -27,9 +27,15 @@ It should provide a description and a list of commands.
 
 [NOTE]
 ===============================
-All the options for installation are given at the https://openapi-generator.tech/docs/installation[OpenAPI Generator website].
+All the options for installation are given at the https://openapi-generator.tech/docs/installation["CLI Installation" guide on the OpenAPI Generator website].
 
-If you installed the generator with a packet manager or bash launcher script, simply run
+In particular:
+
+* run `brew install openapi-generator` for Homebrew installation,
+* or read the link:https://openapi-generator.tech/docs/installation/#bash-launcher-script["Bash Launcher Script" section]
+to set up a bash script with automatic updates
+
+If you installed the generator with a package manager or bash launcher script, simply run
 [source,bash]
 ----
 openapi-generator-cli help
@@ -49,10 +55,10 @@ We will now create a definition file, that will describe our server API, includi
 //link:{sourceDir}@sourceDir@/library-definition.yaml[library-definition.yaml].
 //However, we do recommend you to look through each of its sections for better understanding.
 
-Openapi generator supports `.yaml` and `.json` file formats for the definition file.
+OpenAPI generator supports `.yaml` and `.json` file formats for the definition file.
 We will use YAML due its simplicity and human readability.
 
-In the folder to which you downloaded the OpenAPI generator CLI create a file named `library-definition.yaml` and open it with your
+In the directory where you downloaded the OpenAPI generator CLI, create a file named `library-definition.yaml` and open it with your
 favourite text editor.
 
 === General server info
@@ -74,7 +80,7 @@ tags: # <3>
     description: Search for books and add new ones
 ----
 <1> The version that will be used for parsing.
-<2> The info object contains general information about the api to its reader.
+<2> The info object contains general information about the API to its reader.
 <3> Tags will be used to logically structure different paths.
 
 NOTE: If you are new to OpenAPI, you might be interested in reading the
@@ -121,22 +127,22 @@ paths:
 <2> We use the `books` tag that we previously defined. Note that for each tag a Controller will be generated
 that will implement its operations.
 <3> The `search` operation id will be used as method name for the given path.
-<4> We define 2 parameters of type string that user should supply in query.
-<5> Validation can be used on parameters. In this case book name must contain at least 3 characters.
+<4> We define two parameters of type string that user should supply in query.
+<5> Validation can be used on parameters. In this case book name must contain at least three characters.
 <6> The `responses` object describes the response codes that can be produced.
 It also defines the structure of body if any.
 <7> In case of correct request we define the body to contain a list of `BookInfo` objects. The schema for the book info
 object will be defined later in `components/schemas` section of definition.
 <8> The `"400"` status code will be produced by Micronaut in case of bad request, like an incorrect type supplied or
 failed validation. Even though Micronaut handles it automatically and no implementation is needed on our side, we add it
-for a complete api specification.
+for a complete API specification.
 
 NOTE: You can read more about parameter descriptions in the
 link:https://swagger.io/docs/specification/describing-parameters/["Describing Parameters" OpenAPI guide].
 All the available types and their validations are described in
 link:https://swagger.io/docs/specification/data-models/data-types/["Data Models (Schemas)" OpenAPI guide].
 
-We will define another path with `POST` operation similarly to the way we created the first one:
+We will define another path with a `POST` operation:
 
 [source,yaml]
 ----
@@ -163,7 +169,7 @@ We will define another path with `POST` operation similarly to the way we create
 <3> We write that `BookInfo` object is required to be in the request body.
 We reference the same `BookInfo` schema that we will define next.
 
-NOTE: If you want to read more about body definitions, you can read the
+NOTE: To read more about body definitions, see the
 link:https://swagger.io/docs/specification/describing-request-body/["Describing Request Body" OpenAPI guide].
 
 === Schemas
@@ -191,12 +197,12 @@ components:
 
 ----
 <1> We define the `BookInfo` schema inside then `components/schemas` section.
-From this schema a java class will be generated with the same `BookInfo` classname.
+From this schema a Java class will be generated with the same `BookInfo` class name.
 <2> We define all the properties of `BookInfo`, including required validation on them. An abbreviated form is used
 for some YAML lists and dictionaries to reduce the number of rows and simplify readability.
-<3> We reference another scheme to be used as a property.
-<4> We define `BookAvailability` scheme to be an enum with 3 available values.
-A java `BookAvailability` class will be generated with given enum values based on our definition.
+<3> We reference another schema to be used as a property.
+<4> We define `BookAvailability` schema to be an enum with three available values.
+A Java `BookAvailability` class will be generated with given enum values based on our definition.
 
 NOTE: You can read more about writing schemas in the
 link:https://swagger.io/docs/specification/data-models/["Data Models (Schemas)" OpenAPI guide].
@@ -207,7 +213,7 @@ Save the file and proceed to the next part of the guide.
 == Generating server API from template
 
 Now we will generate server API files from our definition.
-Open the terminal in the same folder as `libaray-definition.yaml` file and run the following command:
+Open the terminal in the same directory as `library-definition.yaml` file and run the following command:
 
 [source,bash]
 ----
@@ -220,7 +226,7 @@ java -jar openapi-generator-cli-5.4.0.jar generate \
     -p build=@build@ \# <6>
     -p test=junit# <7>
 ----
-<1> Specify that we will use java Micronaut server generator.
+<1> Specify that we will use Java Micronaut server generator.
 <2> Specify our OpenAPI definition file as `library-definition.yaml` which we just created.
 <3> Specify the output directory to be the current directory (`./`).
 You can specify it to be a different one if you want (e.g. `library-server`).
@@ -228,7 +234,7 @@ You can specify it to be a different one if you want (e.g. `library-server`).
 We want all the controllers to be generated in the `example.micronaut.library.controller` package.
 <5> We want all the models (data models, like `BookInfo`) to be in `example.micronaut.library.model` package.
 <6> We want to use @build@ as build tool. The supported values are `gradle`, `maven` and `all`.
-If nothing is specified, both maven and gradle files are generated.
+If nothing is specified, both Maven and Gradle files are generated.
 <7> We want to use JUnit 5 for testing. The supported values are `junit` (JUnit 5) and `spock`.
 If nothing is specified, `junit` is used by default.
 
@@ -254,15 +260,15 @@ java -jar openapi-generator-cli-5.4.0.jar config-help \
 [NOTE]
 =========
 If you plan to change the definition file and regenerate files, consider setting the `-p generateControllerAsAbstract=true`
-parameter (We don't recommend doing it during this guide, though). In this case an abstract class will be generated
-for the API, while all the logic needs to be implemented in a different class (that inherits the API abstract class).
-This way your changes won't be overwritten by generation, but API will be updated.
+parameter (we don't recommend doing it during this guide, though). In this case an abstract class will be generated
+for the API, while all the logic needs to be implemented in a different class (that extends the API abstract class).
+This way your changes won't be overwritten by generation, but the API will be updated.
 =========
 
-After running OpenAPI generator CLI should output information about generated files.
-Now you can open the folder in your favorite IDE or text editor.
+After running the OpenAPI generator CLI should output information about generated files.
+Now you can open the directory in your favorite IDE or text editor.
 
-You should see the following folder structure:
+You should see the following directory structure:
 
 [source,text]
 ----
@@ -293,18 +299,18 @@ You should see the following folder structure:
 ├── README.md
 └── ...
 ----
-<1> The `docs/` folder contains automatically generated markdown files with documentation about your API.
-<2> The `Application.java` will start the Micronaut server with all the detected Controllers.
-<3> The `BooksController.java` is generated based on paths with `books` tag. It is generated in the package we specified
+<1> The `docs/` directory contains automatically generated Markdown files with documentation about your API.
+<2> Starts the Micronaut server with detected Controllers.
+<3> The `BooksController` is generated based on paths with `books` tag. It is generated in the package we specified
 for controllers earlier.
-<4> 2 files are generated in the `models/` folder based on schemas we provided in the definition.
+<4> Two files are generated in the `models/` directory based on schemas we provided in the definition.
 <5> Config file for Micronaut is generated with a default value for server port and other parameters.
 <6> Tests are generated for all the controllers and models.
 
 == Writing the Controller Logic
 
 If you look inside the generated `BookInfo.java` file, you can see the class that was generated with all the parameters
-based on our definition. Notice that the constructor signature has 2 parameters, which were defined as `required` in the
+based on our definition. Notice that the constructor signature has two parameters, which were defined as `required` in the
 YAML definition file:
 
 [source,java]
@@ -312,22 +318,22 @@ YAML definition file:
     public BookInfo(String name, BookAvailability availability);
 ----
 
-Along with that it has getters and setters for parameters and jackson serialization annotation.
+Along with that it has getters and setters for parameters and Jackson serialization annotations.
 
 To add the required functionality to the server we will first create a service to manage books in our library.
-Create file `src/main/java/example/micronaut/library/BookService.java` with the following content:
+Create `BookService` with the following implementation:
 
 source:library/BookService[]
 callout:singleton[1]
 
-Now open the `BooksController.java`. The class `BooksController` should have 2 methods named the same
-as the operations we created in the definition file. The method have Micronaut framework annotations describing the
+Now open `BooksController`. The class should have two methods named the same
+as the operations we created in the definition file. The methods have Micronaut framework annotations describing the
 required API. We will now write their bodies.
 
-First, import and inject a `BookService` instance as a class attribute:
+First, inject `BookService`:
 source:library/controller/BooksController[tag=import]
 source:library/controller/BooksController[tag=inject,indent=0]
-<1> Micronaut will create an instance of the class and inject it here.
+<1> Micronaut will inject the singleton instance of the bean here.
 
 Next, we will add an implementation of the `search` method:
 
@@ -335,8 +341,8 @@ source:library/controller/BooksController[tag=search,indent=0]
 <1> Return a Reactor publisher, that will return the result of search method.
 
 And finally, we will implement the `addBook` method:
-source:library/controller/BooksController[tag=search,indent=0]
-<1> Call the desired function and return empty string, that to send an empty body in response.
+source:library/controller/BooksController[tag=addBook,indent=0]
+<1> Call the function and return an empty string to create a response with an empty body.
 
 
 common:runapp.adoc[]
@@ -381,12 +387,12 @@ content-length: 0
 connection: keep-alive
 ----
 
-== Testing Application
+== Testing the Application
 
 As we have noticed previously, some files were generated as templates for tests.
 
-We will modify the `src/test/java/example/micronaut/library/controllerBooksControllerTest` to test our paths.
-For path `/search` 2 methods were generated: one for testing the `search` method itself, and another for testing
+We will modify `BooksControllerTest` to test our paths.
+For path `/search` two methods were generated: one for testing the `search` method itself, and another for testing
 the API from the point of a client.
 
 We will delete the `searchMethodTest()` and modify the `searchClientApiTest()` method to perform a basic check.
@@ -396,9 +402,9 @@ test:library/controller/BooksControllerTest[tag=search,indent=0]
 <1> Remove the `@Disabled` annotation, so that the test would run.
 <2> Specify the value of query the parameter.
 <3> Store the response body in a variable.
-<4> Add assertion: we expect to get 2 books containing `"Guide"` as response.
+<4> Add assertion: we expect to get two books containing `"Guide"` as response.
 
-We will also add a test to the `/add` path:
+We will also update the generated `addBookClientApiTest` for the `/add` path:
 test:library/controller/BooksControllerTest[tag=addBook,indent=0]
 <1> Remove the `@Disabled` annotation, so that the test would run.
 <2> Change the fields of `BookInfo body` object.
@@ -413,8 +419,8 @@ common:graal-with-plugins.adoc[]
 
 === Add Security
 
-We could have defined our security requirements by adding a security scheme to the `library-definition.yaml` file.
-For example, we will add basic authentication:
+We could have defined our security requirements by adding a security schema to the `library-definition.yaml` file.
+For example, we will add HTTP Basic authentication:
 
 [source,yaml]
 ----
@@ -434,14 +440,14 @@ components:
       type: http
       scheme: basic
 ----
-<1> Define a security scheme inside the `components/securitySchemes`. We want to use basic auth for authentication.
-<2> Add the scheme to the paths that you want to secure. In this case we want to restrict access to
+<1> Define a security schema inside the `components/securitySchemes`. We want to use Basic auth for authentication.
+<2> Add the schema to the paths that you want to secure. In this case we want to restrict access to
 adding books into our library.
 
 NOTE: You can read more about describing various authentication in the
 link:https://swagger.io/docs/specification/authentication/["Authentication and Authorization" OpenAPI guide].
 
-The generator will then annotate such endpoints with Micronaut`s
+The generator will then annotate such endpoints with the
 link:https://micronaut-projects.github.io/micronaut-security/latest/guide/#secured[Secured] annotation accordingly:
 
 [source,java]
@@ -457,14 +463,14 @@ link:https://guides.micronaut.io/latest/micronaut-security-basicauth.html[Micron
 steps to create the `AuthenticationProvider` and appropriate tests.
 
 NOTE: You can also read link:https://micronaut-projects.github.io/micronaut-security/latest/guide/[Micronaut Security documentation]
-or link:https://micronaut.io/guides[Micronaut guides] about security to learn more about all
+or link:https://micronaut.io/guides[Micronaut guides] about security to learn more about
 the supported Authorization strategies.
 
 === Generate Micronaut Client
 
-You can generate Micronaut Client based on the same `library-definition.yaml` file.
+You can generate a Micronaut client based on the same `library-definition.yaml` file.
 
-Run the following in terminal to create client in the `library-client` folder:
+Run the following in terminal to create client in the `library-client` directory:
 
 [source,bash]
 ----
@@ -485,7 +491,7 @@ link:https://micronaut.io/docs/[Micronaut documentation].
 
 === Generate User-Friendly Documentation
 
-You can generate documentation in html file inside the `html-docs/` folder by running
+You can generate documentation in html file inside the `html-docs/` directory by running
 [source,bash]
 ----
 java -jar openapi-generator-cli-5.4.0.jar generate \
@@ -493,5 +499,3 @@ java -jar openapi-generator-cli-5.4.0.jar generate \
     -i library-definition.yaml \
     -o html-docs
 ----
-
-common:helpWithMicronaut.adoc[]

@@ -48,12 +48,12 @@ public class BooksControllerTest {
     BooksController controller;
 
     /**
-     * This test is used to check that the api available to client through
+     * This test is used to check that the API available to client through
      * '/add' to the features of addBook() works as desired.
      */
     //tag::addBook[]
     @Test // <1>
-    void addBookClientApiTest() throws IOException {
+    void addBookClientApiTest() {
         // given
         BookInfo body = new BookInfo("My Book", BookAvailability.fromValue("available")); // <2>
         String uri = UriTemplate.of("/add").expand(new HashMap<>());
@@ -70,12 +70,12 @@ public class BooksControllerTest {
     //end::addBook[]
 
     /**
-     * This test is used to check that the api available to client through
+     * This test is used to check that the API available to client through
      * '/search' to the features of search() works as desired.
      */
     //tag::search[]
     @Test // <1>
-    void searchClientApiTest() throws IOException {
+    void searchClientApiTest() {
         // given
         String uri = UriTemplate.of("/search").expand(new HashMap<>());
         MutableHttpRequest<?> request = HttpRequest.GET(uri)

@@ -37,8 +37,11 @@ import io.swagger.annotations.*;
 public class BooksController {
 
     //tag::inject[]
-    @Inject // <1>
-    BookService bookService;
+    private final BookService bookService;
+
+    public BooksController(BookService bookService) { // <1>
+        this.bookService = bookService;
+    }
     //end::inject[]
 
     /**
