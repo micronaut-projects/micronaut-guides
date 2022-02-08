@@ -16,6 +16,7 @@ import java.util.regex.Pattern
 
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.api.TestFramework.SPOCK
+import static io.micronaut.starter.options.Language.GROOVY
 
 @CompileStatic
 class GuideAsciidocGenerator {
@@ -430,7 +431,7 @@ class GuideAsciidocGenerator {
             featureNames = features.tokenize('|')
         }
         else {
-            featureNames = app.features
+            featureNames = [] + app.features
         }
 
         String featureExcludes = extractFromParametersLine(line, 'featureExcludes')
@@ -442,6 +443,10 @@ class GuideAsciidocGenerator {
             excludedFeatureNames = []
         }
         featureNames.removeAll excludedFeatureNames
+
+        if (guidesOption.language == GROOVY) {
+            featureNames.remove 'graalvm'
+        }
 
         String link = 'https://micronaut.io/launch?' +
                 featureNames.collect {'features=' + it }.join('&') +
