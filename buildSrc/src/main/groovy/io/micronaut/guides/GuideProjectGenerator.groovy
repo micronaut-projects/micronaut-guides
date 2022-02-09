@@ -70,7 +70,7 @@ class GuideProjectGenerator implements AutoCloseable {
             throw new GradleException("metadata file not found for " + dir.name)
         }
 
-        def config = new JsonSlurper().parse(configFile)
+        Map config = new JsonSlurper().parse(configFile)
         boolean publish = config.publish == null ? true : config.publish
 
         Category cat = Category.values().find {it.toString() == config.category }
@@ -79,8 +79,8 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         new GuideMetadata(
-                asciidoctor: config.asciidoctor,
-                slug: config.slug,
+                asciidoctor: publish ? dir.name + '.adoc' : null,
+                slug: dir.name,
                 title: config.title,
                 intro: config.intro,
                 authors: config.authors,
@@ -182,17 +182,12 @@ class GuideProjectGenerator implements AutoCloseable {
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)
 
-                boolean ignoreMissingDirectories = false
-
                 if (metadata.base) {
-                    ignoreMissingDirectories = true
                     File baseDir = new File(inputDir.parentFile, metadata.base)
-                    copyGuideSourceFiles baseDir, destinationPath, appName,
-                            guidesOption.language.toString(), ignoreMissingDirectories
+                    copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.language.toString(), true)
                 }
 
-                copyGuideSourceFiles inputDir, destinationPath, appName,
-                        guidesOption.language.toString(), ignoreMissingDirectories
+                copyGuideSourceFiles(inputDir, destinationPath, appName, guidesOption.language.toString())
 
                 if (app.excludeSource) {
                     for (String mainSource : app.excludeSource) {
@@ -218,7 +213,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
                                              String appName, String language,
-                                             boolean ignoreMissingDirectories) {
+                                             boolean ignoreMissingDirectories = false) {
 
         // look for a common 'src' directory shared by multiple languages and copy those files first
         final String srcFolder = 'src'
@@ -317,7 +312,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private static GuideMetadata mergeMetadatas(GuideMetadata base, GuideMetadata metadata) {
         GuideMetadata merged = new GuideMetadata()
-
+        merged.base = metadata.base
         merged.asciidoctor = metadata.asciidoctor
         merged.slug = metadata.slug
         merged.title = metadata.title ?: base.title
@@ -326,7 +321,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.tags = mergeLists(base.tags, metadata.tags)
         merged.category = base.category ?: metadata.category
         merged.publicationDate = metadata.publicationDate
-        merged.publish = true
+        merged.publish = metadata.publish
         merged.buildTools = base.buildTools ?: metadata.buildTools
         merged.languages = base.languages ?: metadata.languages
         merged.testFramework = base.testFramework ?: metadata.testFramework
@@ -335,9 +330,20 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.minimumJavaVersion = base.minimumJavaVersion ?: metadata.minimumJavaVersion
         merged.maximumJavaVersion = base.maximumJavaVersion ?: metadata.maximumJavaVersion
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
-        merged.apps = base.apps ?: metadata.apps // TODO support merging from base
+        merged.apps = mergeApps(base, metadata)
 
         merged
+    }
+
+    private static List<App> mergeApps(GuideMetadata base, GuideMetadata metadata) {
+        List<App> apps = new ArrayList<>(metadata.apps)
+        for (App app : apps) {
+            App baseAppMatchingName = base.apps.find { it.name == app.name }
+            if (baseAppMatchingName) {
+                app.features += baseAppMatchingName.features
+            }
+        }
+        apps
     }
 
     private static List mergeLists(List base, List others) {
