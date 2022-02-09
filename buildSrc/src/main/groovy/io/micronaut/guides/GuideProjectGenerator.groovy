@@ -336,14 +336,26 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     private static List<App> mergeApps(GuideMetadata base, GuideMetadata metadata) {
-        List<App> apps = new ArrayList<>(metadata.apps)
-        for (App app : apps) {
-            App baseAppMatchingName = base.apps.find { it.name == app.name }
-            if (baseAppMatchingName) {
-                app.features += baseAppMatchingName.features
-            }
+
+        Map<String, App> baseApps = base.apps.collectEntries { [(it.name): it] }
+        Map<String, App> guideApps = metadata.apps.collectEntries { [(it.name): it] }
+
+        Set<String> baseOnly = baseApps.keySet() - guideApps.keySet()
+        Set<String> guideOnly = guideApps.keySet() - baseApps.keySet()
+        Collection<String> inBoth = baseApps.keySet().intersect(guideApps.keySet())
+
+        List<App> merged = []
+        merged.addAll(baseOnly.collect { baseApps[it] })
+        merged.addAll(guideOnly.collect { guideApps[it] })
+
+        for (String name : inBoth) {
+            App baseApp = baseApps[name]
+            App guideApp = guideApps[name]
+            guideApp.features.addAll baseApp.features
+            merged << guideApp
         }
-        apps
+
+        merged
     }
 
     private static List mergeLists(List base, List others) {
