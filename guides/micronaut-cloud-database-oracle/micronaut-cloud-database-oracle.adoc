@@ -1,7 +1,7 @@
 external:micronaut-cloud-database-base/start.adoc[]
 
-* An Oracle Cloud account (create a free trial account at https://signup.oraclecloud.com[signup.oraclecloud.com])
-* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
+common:oracle-cloud-account-paid.adoc[]
+common:oracle-cloud-cli.adoc[]
 
 == Creating a MySQL DB System at Oracle Cloud
 
@@ -160,8 +160,14 @@ Use the `id` of the subnet you want:
   "time-created": "2021-05-04T16:17:10.593000+00:00",
   "vcn-id": "ocid1.vcn.oc1.iad.amaaaaaabnqp5kqam6cm...",
   ...
+  "security-list-ids": [
+    "ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd..."
+  ],
+  ...
 }
 ----
+
+Save the OCIDs of the security lists in the response - we'll need those in a later step.
 
 === Availability Domain
 
@@ -289,19 +295,142 @@ Once the `lifecycle-state` is `ACTIVE` you can make note of the IP address and p
 "port-x": 33060
 ----
 
+=== Create Ingress Rule
+
+To allow our application to connect to the MySQL database, we need to https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/network/security-list/update.html[create an ingress rule] for port 3306 in the subnet.
+
+Use the OCID of the security list you'll be updating (that you saved earlier when finding the subnet OCID) to retrieve the current state:
+
+[source,bash]
+----
+oci network security-list get --security-list-id ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...
+----
+
+The output should look like this:
+
+[source,json]
+----
+...
+"id": "ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...",
+"ingress-security-rules": [
+  {
+    "description": null,
+    "icmp-options": null,
+    "is-stateless": false,
+    "protocol": "6",
+    "source": "0.0.0.0/0",
+    "source-type": "CIDR_BLOCK",
+    "tcp-options": {
+      "destination-port-range": {
+        "max": 22,
+        "min": 22
+      },
+      "source-port-range": null
+    },
+    "udp-options": null
+  },
+  ...
+],
+"lifecycle-state": "AVAILABLE",
+...
+----
+
+The update command we'll run will replace the existing rules with the data specified in the command, so the command must include the existing rules and a new one for port 3306.
+
+Use a text editor to save the JSON list value of `ingress-security-rules` to a file, e.g. `ingress.json`.
+
+Add a new object to the JSON list for the ingress rule on port 3306:
+
+[source,json]
+----
+{
+  "description": "MySQL",
+  "isStateless": false,
+  "protocol": "6",
+  "source": "10.0.0.0/16",
+  "sourceType": "CIDR_BLOCK",
+  "tcpOptions": {
+    "destination-port-range": {
+      "max": 3306,
+      "min": 3306
+    }
+  }
+}
+----
+
+The final contents of `ingress.json` should look like this (it will have different rules, but will likely include one for SSH on port 22 and ICMP, plus the rule for port 8080 you added when creating the VM):
+
+[source,json]
+----
+[
+  {
+    "description": null,
+    "icmp-options": null,
+    "is-stateless": false,
+    "protocol": "6",
+    "source": "0.0.0.0/0",
+    "source-type": "CIDR_BLOCK",
+    "tcp-options": {
+      "destination-port-range": {
+        "max": 22,
+        "min": 22
+      },
+      "source-port-range": null
+    },
+    "udp-options": null
+  },
+  {
+    "description": null,
+    "icmp-options": {
+      "code": 4,
+      "type": 3
+    },
+    "is-stateless": false,
+    "protocol": "1",
+    "source": "0.0.0.0/0",
+    "source-type": "CIDR_BLOCK",
+    "tcp-options": null,
+    "udp-options": null
+  },
+
+  ...
+
+  {
+    "description": "MySQL",
+    "isStateless": false,
+    "protocol": "6",
+    "source": "10.0.0.0/16",
+    "sourceType": "CIDR_BLOCK",
+    "tcpOptions": {
+      "destination-port-range": {
+        "max": 3306,
+        "min": 3306
+      }
+    }
+  }
+]
+----
+
+Run this to add the new ingress rule:
+
+[source,bash]
+----
+oci network security-list update \
+    --security-list-id ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd... \
+    --ingress-security-rules file://ingress.json
+----
+
 external:micronaut-cloud-database-base/create-app.adoc[]
 
 == Deploying the Application
 
 Use the guideLink:micronaut-oracle-cloud[Deploy a Micronaut application to Oracle Cloud] guide to create a compute instance and deploy the application to it; follow the steps in the "Create an Oracle Cloud Compute Instance" and "Deploy to Oracle Cloud" sections up to the step where you start the application. We need to connect the application to the MySQL database before starting it up.
 
-TODO ingress rule
-
 NOTE: When creating the compute VM at Oracle Cloud, use the same subnet as the one where you created the MySQL database, otherwise the application will not be able to access the database.
 
 == Configure MySQL
 
-Flyway will create the database tables for us the first time the application starts, but we must create the database and a database user first.
+Flyway will create the database tables the first time the application starts, but we must create the database and a database user first.
 
 There are no direct ways to externally https://docs.oracle.com/en-us/iaas/mysql-database/doc/connecting-db-system.html[connect to a MySQL database] in Oracle Cloud, so we'll do the work from the compute instance.
 
@@ -351,7 +480,9 @@ Exit the MySQL console:
 mysql> exit
 ----
 
-== MySQL Environment Vars
+== Running the Application
+
+With almost everything in place, we can start the application and try it out. First we need to set environment variables to configure the application datasource, then we can start the app.
 
 Create environment variables for `JDBC_URL`, `JDBC_USER`, `JDBC_PASSWORD` which will be used in the Micronaut app's `application.yml` datasource:
 
@@ -362,7 +493,30 @@ export JDBC_USER=guide_user
 export JDBC_PASSWORD=<user password>
 ----
 
-TODO curl examples to cloud compute instance
+Start the application:
+
+[source,bash]
+----
+java -jar application.jar
+----
+
+You can test the application in a web browser, or with cURL.
+
+Run this with the public IP address of your VM to create a new `Genre`:
+
+[source, bash]
+----
+curl -X "POST" "http://<public IP address>:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+and run this to list the genres:
+
+[source, bash]
+----
+curl <public IP address>:8080/genres/list
+----
 
 == Next steps
 
