@@ -5,18 +5,19 @@ import example.micronaut.model.BookInfo;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Singleton // <1>
 public class BookService {
-    private static final List<BookInfo> BOOKS = new ArrayList<>(Arrays.asList(
+    private static final List<BookInfo> BOOKS = Collections.synchronizedList(new ArrayList<>(Arrays.asList(
             new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
                     .author("Lewis Carroll"),
             new BookInfo("The Hitchhiker's Guide to the Galaxy", BookAvailability.RESERVED)
                     .author("Douglas Adams"),
             new BookInfo("Java Guide for Beginners", BookAvailability.AVAILABLE)
-    ));
+    )));
 
     public void addBook(BookInfo bookInfo) {
         BOOKS.add(bookInfo);
