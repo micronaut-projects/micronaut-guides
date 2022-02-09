@@ -70,7 +70,7 @@ class GuideProjectGenerator implements AutoCloseable {
             throw new GradleException("metadata file not found for " + dir.name)
         }
 
-        def config = new JsonSlurper().parse(configFile)
+        Map config = new JsonSlurper().parse(configFile)
         boolean publish = config.publish == null ? true : config.publish
 
         Category cat = Category.values().find {it.toString() == config.category }
@@ -79,8 +79,8 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         new GuideMetadata(
-                asciidoctor: config.asciidoctor,
-                slug: config.slug,
+                asciidoctor: publish ? dir.name + '.adoc' : null,
+                slug: dir.name,
                 title: config.title,
                 intro: config.intro,
                 authors: config.authors,
