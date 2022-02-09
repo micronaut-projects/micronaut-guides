@@ -61,7 +61,7 @@ class GuideProjectGenerator implements AutoCloseable {
         mergeMetadataList(metadatas)
 
         if (metadatas.publish && !metadatas.category) {
-            throw new GradleException("$metadatas.category was not defined or does not exist in Category enum")
+            throw new GradleException("Category ($metadatas.category) was not defined or does not exist in Category enum")
         }
 
         metadatas
