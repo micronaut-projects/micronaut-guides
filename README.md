@@ -31,8 +31,6 @@ All the guides are in the `guides` directory in separate subdirectories. Inside 
 
 ```json
 {
-  "asciidoctor": "micronaut-http-client.adoc",
-  "slug": "micronaut-http-client",
   "title": "Micronaut HTTP Client",
   "intro": "Learn how to use Micronaut low-level HTTP Client. Simplify your code with the declarative HTTP client.",
   "authors": ["Sergio del Amo", "Iván López"],
@@ -81,7 +79,6 @@ Besides, the obvious fields that doesn't need any further explanation, the other
   ]
 ```
 The features need to be **valid** features from Starter because the list is used directly when generating the applications using Starter infrastructure. If you need a feature that is not available on Starter, create it in `buildSrc/src/main/java/io/micronaut/guides/feature`. Also declare the GAV coordinates and version in `buildSrc/src/main/resources/pom.xml`. Dependabot is configured in this project to look for that file and send pull requests to update the dependencies.
-
 
 Inside the specific guide directory there should be a directory per language with the appropriate directory structure. All these files will be copied into the final guide directory after the guide is generated.
 
@@ -150,10 +147,9 @@ micronaut-microservices-distributed-tracing-zipkin
 
 ### Writing the guide
 
-There is only one Asciidoctor file per guide in the root directory of the guide (sibling to `metadata.json`). This unique file is used to generate all the combinations for the guide (language and build tool) so we need to take that into account when writing the guide.
+There is only one Asciidoctor file per guide in the root directory of the guide (sibling to `metadata.json`). This unique file is used to generate all the combinations for the guide (language and build tool) so we need to take that into account when writing the guide. Name the Asciidoctor file the same as the directory, with an "adoc" extension, e.g. `micronaut-http-client.adoc` for the `micronaut-http-client` guide directory.
 
 We don't really write a valid Asciidoctor file but our "own" Asciidoctor with custom kind-of-macros. Then during the build process we render the final HTML for the guide in two phases. In the first one we evaluate all of our custom macros and include and generate a new language-build tool version of the guide in `src/doc/asciidoc`. This directory is excluded from source control and needs to be considered temporary. Then we render the final HTML of the (up to) six guides from that generated and valid Asciidoctor file.
-
 
 #### Common snippets
 
