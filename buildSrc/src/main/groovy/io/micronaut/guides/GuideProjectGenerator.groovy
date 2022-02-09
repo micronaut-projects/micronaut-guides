@@ -7,6 +7,7 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.GuideMetadata.OpenAPIGeneratorConfig
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
@@ -102,7 +103,12 @@ class GuideProjectGenerator implements AutoCloseable {
                         features: it.features ?: [],
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                         excludeSource:  it.excludeSource,
-                        excludeTest:  it.excludeTest)
+                        excludeTest:  it.excludeTest,
+                        openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
+                            definitionFile: it.openAPIGeneratorConfig.definitionFile,
+                            generatorName: it.openAPIGeneratorConfig.generatorName,
+                            properties: it.openAPIGeneratorConfig.properties ?: [:]
+                        ) : null)
                 }
         )
     }
@@ -138,7 +144,6 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
-
         if (!outputDir.exists()) {
             assert outputDir.mkdir()
         }
@@ -178,6 +183,11 @@ class GuideProjectGenerator implements AutoCloseable {
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
                 destination.mkdir()
+
+                if (app.openAPIGeneratorConfig) {
+                    OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig,
+                            testFramework, buildTool)
+                }
 
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)

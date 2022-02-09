@@ -44,5 +44,14 @@ class GuideMetadata {
         List<String> features
         List<String> excludeSource
         List<String> excludeTest
+        OpenAPIGeneratorConfig openAPIGeneratorConfig
+    }
+
+    @ToString(includeNames = true)
+    @CompileStatic
+    static class OpenAPIGeneratorConfig {
+        String definitionFile
+        String generatorName
+        Map<String, String> properties
     }
 }
