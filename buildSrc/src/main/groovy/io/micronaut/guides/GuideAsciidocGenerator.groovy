@@ -144,10 +144,10 @@ class GuideAsciidocGenerator {
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
-             text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
-                 String app = matches[1] ?: 'default'
-                 List<String> features = featuresForApp(metadata, guidesOption, app)
-                 features.join(',')
+            text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                List<String> features = featuresForApp(metadata, guidesOption, app)
+                features.join(',')
             }
 
             text = text.replaceAll(~/@(\w*):?features-words@/) { List<String> matches ->
@@ -167,10 +167,9 @@ class GuideAsciidocGenerator {
         }
     }
 
-
     private static String featuresWordsForApp(GuideMetadata metadata,
-                                               GuidesOption guidesOption,
-                                               String app) {
+                                              GuidesOption guidesOption,
+                                              String app) {
         List<String> features = featuresForApp(metadata, guidesOption, app)
                 .collect{ "`$it`".toString()}
         if(features.size() > 1) {
@@ -454,11 +453,10 @@ class GuideAsciidocGenerator {
         return rendered.split("\\r?\\n|\\r") as List
     }
 
-    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
-
-        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
-        App app = metadata.apps.find { it.name == appName }
-
+    @NonNull
+    private static List<String> featureNames(@NonNull String line,
+                                              @NonNull App app,
+                                              @NonNull GuidesOption guidesOption) {
         String features = extractFromParametersLine(line, 'features')
         List<String> featureNames
         if (features) {
@@ -481,9 +479,15 @@ class GuideAsciidocGenerator {
         if (guidesOption.language == GROOVY) {
             featureNames.remove 'graalvm'
         }
+        featureNames
+    }
 
+    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
+
+        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
+        App app = metadata.apps.find { it.name == appName }
         String link = 'https://micronaut.io/launch?' +
-                featureNames.collect {'features=' + it }.join('&') +
+                featureNames(line, app, guidesOption).collect {'features=' + it }.join('&') +
                 '&lang=' + guidesOption.language.name() +
                 '&build=' + guidesOption.buildTool.name() +
                 '&test=' + guidesOption.testFramework.name() +
