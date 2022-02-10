@@ -144,9 +144,8 @@
 <li><a href="#native-image-generation">7.1. Native image generation</a></li>
 </ul>
 </li>
-<li><a href="#using-postgresql">8. Using PostgreSQL</a></li>
-<li><a href="#next-steps">9. Next steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">10. Help with the Micronaut Framework</a></li>
+<li><a href="#next-steps">8. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -162,7 +161,7 @@
 <p>Learn how to access a database with Micronaut JDBC repositories.</p>
 </div>
 <div class="paragraph">
-<p>Authors: Sergio del Amo</p>
+<p>Authors: Sergio del Amo, John Shingler</p>
 </div>
 <div class="paragraph">
 <p>Micronaut Version: 3.3.1</p>
@@ -176,7 +175,7 @@
 <p>In this guide, we will create a Micronaut application written in Java.</p>
 </div>
 <div class="paragraph">
-<p>The application exposes some REST endpoints and stores data in a database using Micronaut Data JDBC.</p>
+<p>The application exposes some REST endpoints and stores data in a MySQL database using Micronaut Data JDBC.</p>
 </div>
 </div>
 </div>
@@ -196,6 +195,9 @@
 </li>
 <li>
 <p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+<li>
+<p><a href="https://www.docker.io/gettingstarted/#h_installation">Docker</a> installed to run MySQL and to run tests using <a href="https://www.testcontainers.org">Testcontainers</a>.</p>
 </li>
 </ul>
 </div>
@@ -224,7 +226,9 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=maven --lang=java</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+    --features=data-jdbc,flyway,jdbc-hikari,mysql,testcontainers,graalvm \
+    --build=maven --lang=java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -242,6 +246,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, add <code>data-jdbc</code>, <code>flyway</code>, <code>jdbc-hikari</code>, <code>mysql</code>, <code>testcontainers</code> and <code>graalvm</code> features.</p>
+</div>
 <div class="sect2">
 <h3 id="enable-annotation-processing">4.1. Enable annotation Processing</h3>
 <div class="paragraph">
@@ -256,54 +263,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="sect2">
 <h3 id="data-source-configuration">4.2. Data Source configuration</h3>
 <div class="paragraph">
-<p>Add the following dependencies:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="comment">&lt;!-- Add the following to your annotationProcessorPaths element --&gt;</span>
-<span class="tag">&lt;path&gt;</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.data<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-data-processor<span class="tag">&lt;/artifactId&gt;</span>
-<span class="tag">&lt;/path&gt;</span>
-<span class="tag">&lt;dependency&gt;</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.data<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-data-jdbc<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.sql<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-jdbc-hikari<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="tag">&lt;groupId&gt;</span>com.h2database<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>h2<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>runtime<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Add Micronaut Data annotation processor</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Configures a compile-scoped dependency on the <code>micronaut-data-jdbc</code></td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Configures SQL DataSource instances using Hikari Connection Pool</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Add dependency to in-memory H2 Database</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
 <p>Define the datasource in <code>src/main/resources/application.yml</code>.</p>
 </div>
 <div class="listingblock">
@@ -311,10 +270,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
   <span class="key">default</span>:
-    <span class="key">url</span>: <span class="string"><span class="content">${JDBC_URL:`jdbc:h2:mem:default;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE`}</span></span>
-    <span class="key">username</span>: <span class="string"><span class="content">${JDBC_USER:sa}</span></span>
-    <span class="key">password</span>: <span class="string"><span class="content">${JDBC_PASSWORD:&quot;&quot;}</span></span>
-    <span class="key">driverClassName</span>: <span class="string"><span class="content">${JDBC_DRIVER:org.h2.Driver}</span></span></code></pre>
+    <span class="key">url</span>: <span class="string"><span class="content">${JDBC_URL:`jdbc:mysql://localhost:3306/db`}</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">${JDBC_USER:root}</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">${JDBC_PASSWORD:}</span></span>
+    <span class="key">dialect</span>: <span class="string"><span class="content">MYSQL</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">${JDBC_DRIVER:com.mysql.cj.jdbc.Driver}</span></span></code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -324,8 +284,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-This way of defining the datasource properties enables us to externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined, the Micronaut framework will use the default values.<br>
-Also keep in mind that it is necessary to escape the <code>:</code> in the connection URL using backticks <code>`</code>.
+This way of defining the datasource properties enables us to externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined, the Micronaut framework will use the default values.
 </td>
 </tr>
 </table>
@@ -388,11 +347,11 @@ Micronaut Flyway integration works with multiple datasources.
 <div class="listingblock">
 <div class="title">src/main/resources/db/migration/V1__schema.sql</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">DROP</span> <span class="type">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> GENRE;
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">DROP</span> <span class="type">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> genre;
 
-<span class="class">CREATE</span> <span class="type">TABLE</span> GENRE (
-  id    <span class="predefined-type">BIGINT</span> SERIAL <span class="directive">PRIMARY</span> <span class="type">KEY</span> <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,
-  name <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>)              <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span> <span class="directive">UNIQUE</span>
+<span class="class">CREATE</span> <span class="type">TABLE</span> genre (
+    id   <span class="predefined-type">BIGINT</span> <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span> <span class="directive">AUTO_INCREMENT</span> <span class="directive">UNIQUE</span> <span class="directive">PRIMARY</span> <span class="type">KEY</span>,
+   name  <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>) <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span> <span class="directive">UNIQUE</span>
 );</code></pre>
 </div>
 </div>
@@ -488,7 +447,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
-<span class="annotation">@JdbcRepository</span>(dialect = Dialect.H2) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@JdbcRepository</span>(dialect = Dialect.MYSQL) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">GenreRepository</span> <span class="directive">extends</span> PageableRepository&lt;Genre, <span class="predefined-type">Long</span>&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
 
     Genre save(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
@@ -499,7 +458,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
         <span class="keyword">throw</span> <span class="keyword">new</span> DataAccessException(<span class="string"><span class="delimiter">&quot;</span><span class="content">test exception</span><span class="delimiter">&quot;</span></span>);
     }
 
-    <span class="type">int</span> update(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Id</span> <span class="predefined-type">Long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
+    <span class="type">long</span> update(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Id</span> <span class="predefined-type">Long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
 }</code></pre>
 </div>
 </div>
@@ -656,7 +615,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
                 .header(HttpHeaders.LOCATION, location(command.getId()).getPath()); <i class="conum" data-value="8"></i><b>(8)</b>
     }
 
-    <span class="annotation">@Get</span>(value = <span class="string"><span class="delimiter">&quot;</span><span class="content">/list</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="9"></i><b>(9)</b>
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/list</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="9"></i><b>(9)</b>
     <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Genre&gt; list(<span class="annotation">@Valid</span> <span class="predefined-type">Pageable</span> pageable) { <i class="conum" data-value="10"></i><b>(10)</b>
         <span class="keyword">return</span> genreRepository.findAll(pageable).getContent();
     }
@@ -734,7 +693,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 </tr>
 <tr>
 <td><i class="conum" data-value="9"></i><b>9</b></td>
-<td>Maps a <code>GET</code> request to <code>/genres</code>, which returns a list of genres. This mapping illustrates URL parameters being mapped to a single POJO.</td>
+<td>Maps a <code>GET</code> request to <code>/genres/list</code>, which returns a list of genres. This mapping illustrates URL parameters being mapped to a single POJO.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="10"></i><b>10</b></td>
@@ -934,7 +893,29 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 <h2 id="running-the-application">6. Running the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
+<p>Execute the following command to run a MySQL container:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run -it --rm \
+        -p 3306:3306 \
+        -e MYSQL_DATABASE=db \
+        -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+        mysql:8</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>To run the application, use the <code>./mvnw mn:run</code> command which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>Save one genre, and your <code>genre</code> table will now contain an entry.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/genres&quot; \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ &quot;name&quot;: &quot;music&quot; }'</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -1022,85 +1003,7 @@ If you still use Java 8, use the JDK11 version of GraalVM.
 </div>
 </div>
 <div class="sect1">
-<h2 id="using-postgresql">8. Using PostgreSQL</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>When running on production, you want to use a real database instead of using H2. Let&#8217;s explain how to use PostgreSQL.</p>
-</div>
-<div class="paragraph">
-<p>After installing Docker, execute the following command to run a PostgreSQL container:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker run -it --rm \
-    -p 5432:5432 \
-    -e POSTGRES_USER=dbuser \
-    -e POSTGRES_PASSWORD=theSecretPassword \
-    -e POSTGRES_DB=micronaut \
-    postgres:11.5-alpine</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Add PostgreSQL driver dependency:</p>
-</div>
-<div class="listingblock">
-<div class="title">pom.xml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.postgresql<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>postgresql<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>runtime<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-Change the dialect in the <code>GenreRepository</code> <code>@JdbcRepository</code> annotation.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>To use PostgreSQL, set up several environment variables that match those defined in <code>application.yml</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">$ export JDBC_URL=jdbc:postgresql://localhost:5432/micronaut
-$ export JDBC_USER=dbuser
-$ export JDBC_PASSWORD=theSecretPassword
-$ export JDBC_DRIVER=org.postgresql.Driver</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Run the application again. If you look at the output, you can see that the application uses PostgreSQL.</p>
-</div>
-<div class="paragraph">
-<p>Connect to your PostgreSQL database, and you will see both <code>genre</code> and <code>book</code> tables.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/datagrip.png" alt="datagrip">
-</div>
-</div>
-<div class="paragraph">
-<p>Save one genre, and your <code>genre</code> table will now contain an entry.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/genres&quot; \
-     -H 'Content-Type: application/json; charset=utf-8' \
-     -d $'{ &quot;name&quot;: &quot;music&quot; }'</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="next-steps">9. Next steps</h2>
+<h2 id="next-steps">8. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Read more about <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/">Micronaut Data</a>.</p>
@@ -1108,7 +1011,7 @@ $ export JDBC_DRIVER=org.postgresql.Driver</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">10. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>

@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Access a database with Micronaut Data JDBC</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-data-jdbc-repository.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Access a database with Micronaut Data JDBC"/>
+    <meta name="twitter:description" content="Learn how to access a database with Micronaut JDBC repositories."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-data-jdbc-repository.html">Access a database with Micronaut Data JDBC</a> » <span class="breadcrumb_last" aria-current="page">gradle | kotlin</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#enable-annotation-processing">4.1. Enable annotation Processing</a></li>
+<li><a href="#data-source-configuration">4.2. Data Source configuration</a></li>
+<li><a href="#database-migration-with-flyway">4.3. Database Migration with Flyway</a></li>
+<li><a href="#domain">4.4. Domain</a></li>
+<li><a href="#repository-access">4.5. Repository Access</a></li>
+<li><a href="#controller">4.6. Controller</a></li>
+<li><a href="#writing-tests">4.7. Writing Tests</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">5. Testing the Application</a></li>
+<li><a href="#running-the-application">6. Running the Application</a></li>
+<li><a href="#generate-a-micronaut-application-native-image-with-graalvm">7. Generate a Micronaut Application Native Image with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#native-image-generation">7.1. Native image generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">8. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Access a database with Micronaut Data JDBC</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to access a database with Micronaut JDBC repositories.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo, John Shingler</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.3.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>The application exposes some REST endpoints and stores data in a MySQL database using Micronaut Data JDBC.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+<li>
+<p><a href="https://www.docker.io/gettingstarted/#h_installation">Docker</a> installed to run MySQL and to run tests using <a href="https://www.testcontainers.org">Testcontainers</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-data-jdbc-repository-gradle-kotlin.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+    --features=data-jdbc,flyway,jdbc-hikari,mysql,testcontainers,graalvm \
+    --build=gradle --lang=kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, add <code>data-jdbc</code>, <code>flyway</code>, <code>jdbc-hikari</code>, <code>mysql</code>, <code>testcontainers</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="sect2">
+<h3 id="enable-annotation-processing">4.1. Enable annotation Processing</h3>
+<div class="paragraph">
+<p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="data-source-configuration">4.2. Data Source configuration</h3>
+<div class="paragraph">
+<p>Define the datasource in <code>src/main/resources/application.yml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+  <span class="key">default</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">${JDBC_URL:`jdbc:mysql://localhost:3306/db`}</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">${JDBC_USER:root}</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">${JDBC_PASSWORD:}</span></span>
+    <span class="key">dialect</span>: <span class="string"><span class="content">MYSQL</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">${JDBC_DRIVER:com.mysql.cj.jdbc.Driver}</span></span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This way of defining the datasource properties enables us to externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined, the Micronaut framework will use the default values.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-migration-with-flyway">4.3. Database Migration with Flyway</h3>
+<div class="paragraph">
+<p>We need a way to create the database schema. For that, we use
+<a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut integration with Flyway</a>.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.flyway:micronaut-flyway</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure the database migrations directory for <a href="http://www.flyway.org">Flyway</a> in <code>application.yml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">flyway</span>:
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Enable Flyway for the <code>default</code> datasource.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Micronaut Flyway integration works with multiple datasources.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create the following files with the database schema creation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/migration/V1__schema.sql</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">DROP</span> <span class="type">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> genre;
+
+<span class="class">CREATE</span> <span class="type">TABLE</span> genre (
+    id   <span class="predefined-type">BIGINT</span> <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span> <span class="directive">AUTO_INCREMENT</span> <span class="directive">UNIQUE</span> <span class="directive">PRIMARY</span> <span class="type">KEY</span>,
+   name  <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>) <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span> <span class="directive">UNIQUE</span>
+);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>During application startup, Flyway will execute the SQL file and create the schema needed for the application.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain">4.4. Domain</h3>
+<div class="paragraph">
+<p>Create the domain entities:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/domain/Genre.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.domain
+
+import io.micronaut.data.annotation.GeneratedValue
+import io.micronaut.data.annotation.Id
+import io.micronaut.data.annotation.MappedEntity
+
+@MappedEntity
+data class Genre(
+    @field:Id
+    @field:GeneratedValue(GeneratedValue.Type.AUTO)
+    var id: Long? = null,
+    var name: String
+)</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You could use a <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlAnnotations">subset of supported JPA annotations</a> instead by including the following <code>compileOnly</code> scoped dependency: <code>jakarta.persistence:jakarta.persistence-api</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repository-access">4.5. Repository Access</h3>
+<div class="paragraph">
+<p>Next, create a repository interface to define the operations to access the database. Micronaut Data will implement the interface at compilation time:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/GenreRepository.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import example.micronaut.domain.Genre
+import io.micronaut.data.annotation.Id
+import io.micronaut.data.exceptions.DataAccessException
+import io.micronaut.data.jdbc.annotation.JdbcRepository
+import io.micronaut.data.model.query.builder.sql.Dialect
+import io.micronaut.data.repository.PageableRepository
+import javax.transaction.Transactional
+import javax.validation.constraints.NotBlank
+
+@JdbcRepository(dialect = Dialect.MYSQL) <i class="conum" data-value="1"></i><b>(1)</b>
+abstract class GenreRepository : PageableRepository&lt;Genre, Long&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    abstract fun save(@NotBlank name: String) : Genre
+
+    @Transactional
+    open fun saveWithException(@NotBlank name: String): Genre {
+        save(name)
+        throw DataAccessException(&quot;test exception&quot;)
+    }
+
+    abstract fun update(@Id id: Long, @NotBlank name: String) : Long
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> with a specific dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>Genre</code>, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the <code>GenericRepository</code> interface.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The repository extends from <code>PageableRepository</code>. It inherits the hierarchy <code>PageableRepository</code> &#8594; <code>CrudRepository</code> &#8594; <code>GenericRepository</code>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Repository</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PageableRepository</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A repository that supports pagination. It provides <code>findAll(Pageable)</code> and <code>findAll(Sort)</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CrudRepository</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A repository interface for performing CRUD (Create, Read, Update, Delete). It provides methods such as <code>findAll()</code>, <code>save(Genre)</code>, <code>deleteById(Long)</code>, and <code>findById(Long)</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>GenericRepository</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A root interface that features no methods but defines the entity type and ID type as generic arguments.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="controller">4.6. Controller</h3>
+<div class="paragraph">
+<p>Micronaut validation is built on the standard framework – <a href="https://www.jcp.org/en/jsr/detail?id=380">JSR 380</a>, also known as Bean Validation 2.0.</p>
+</div>
+<div class="paragraph">
+<p>Hibernate Validator is a reference implementation of the validation API. Micronaut <a href="https://docs.micronaut.io/latest/guide/#beanValidation">has built-in support for validation of beans</a> that are annotated with <code>javax.validation</code> annotations.</p>
+</div>
+<div class="paragraph">
+<p>The necessary dependencies are included by default when creating a new application, so you don&#8217;t need to add anything else.</p>
+</div>
+<div class="paragraph">
+<p>Create a class to encapsulate the Update operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/GenreUpdateCommand.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.core.annotation.Introspected
+import javax.validation.constraints.NotBlank
+
+@Introspected <i class="conum" data-value="1"></i><b>(1)</b>
+data class GenreUpdateCommand(
+    val id: Long,
+    @field:NotBlank val name: String
+)</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to the render the POJO as JSON using Jackson without using reflection.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create <code>GenreController</code>, a controller that exposes a resource with the common CRUD operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/GenreController.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import example.micronaut.domain.Genre
+import io.micronaut.data.exceptions.DataAccessException
+import io.micronaut.data.model.Pageable
+import io.micronaut.http.HttpHeaders
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Delete
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.Put
+import io.micronaut.http.annotation.Status
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
+import java.net.URI
+import java.util.Optional
+import javax.validation.Valid
+import javax.validation.constraints.NotBlank
+
+@ExecuteOn(TaskExecutors.IO) <i class="conum" data-value="1"></i><b>(1)</b>
+@Controller(&quot;/genres&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
+open class GenreController(private val genreRepository: GenreRepository) { <i class="conum" data-value="3"></i><b>(3)</b>
+
+
+    @Get(&quot;/{id}&quot;) <i class="conum" data-value="4"></i><b>(4)</b>
+    fun show(id:Long): Optional&lt;Genre&gt; =
+        genreRepository.findById(id) <i class="conum" data-value="5"></i><b>(5)</b>
+
+    @Put <i class="conum" data-value="6"></i><b>(6)</b>
+    open fun update(@Body @Valid command: GenreUpdateCommand): HttpResponse&lt;Genre&gt; { <i class="conum" data-value="7"></i><b>(7)</b>
+        val id = genreRepository.update(command.id, command.name)
+
+        return HttpResponse
+            .noContent&lt;Genre&gt;()
+            .header(HttpHeaders.LOCATION, id.location.path) <i class="conum" data-value="8"></i><b>(8)</b>
+    }
+
+    @Get(&quot;/list&quot;) <i class="conum" data-value="9"></i><b>(9)</b>
+    open fun list(@Valid pageable: Pageable): List&lt;Genre&gt; = <i class="conum" data-value="10"></i><b>(10)</b>
+        genreRepository.findAll(pageable).content
+
+
+    @Post <i class="conum" data-value="11"></i><b>(11)</b>
+    open fun save(@Body(&quot;name&quot;) @NotBlank name: String) : HttpResponse&lt;Genre&gt; {
+        val genre = genreRepository.save(name)
+
+        return HttpResponse
+            .created(genre)
+            .headers { headers -&gt; headers.location(genre.location) }
+    }
+
+    @Post(&quot;/ex&quot;) <i class="conum" data-value="12"></i><b>(12)</b>
+    open fun saveExceptions(@Body @NotBlank name: String): HttpResponse&lt;Genre&gt; {
+        return try {
+            val genre = genreRepository.saveWithException(name)
+
+            HttpResponse
+                .created(genre)
+                .headers { headers -&gt; headers.location(genre.location) }
+        } catch (ex: DataAccessException) {
+            HttpResponse.noContent()
+        }
+    }
+
+    @Delete(&quot;/{id}&quot;) <i class="conum" data-value="13"></i><b>(13)</b>
+    @Status(HttpStatus.NO_CONTENT)
+    fun delete(id: Long) = genreRepository.deleteById(id)
+
+    private val Long?.location : URI
+        get() = URI.create(&quot;/genres/$this&quot;)
+
+    private val Genre.location : URI
+        get() = id.location
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/genres</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use constructor injection to inject a bean of type <code>GenreRepository</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Maps a <code>GET</code> request to <code>/genres/{id}</code>, which attempts to show a genre. This illustrates the use of a URL path variable.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Returning an empty optional when the genre doesn&#8217;t exist makes the Micronaut framework respond with 404 (not found).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Maps a <code>PUT</code> request to <code>/genres</code>, which attempts to update a genre.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Adds <code>@Valid</code> to any method parameter that requires validation. Use a POJO supplied as a JSON payload in the request to populate command.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>It is easy to add custom headers to the response.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Maps a <code>GET</code> request to <code>/genres/list</code>, which returns a list of genres. This mapping illustrates URL parameters being mapped to a single POJO.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>You can bind <code>Pageable</code> as a controller method argument. Check the examples in the following test section and read the <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/configurationreference.html#io.micronaut.data.runtime.config.DataConfiguration.PageableConfiguration">Pageable configuration</a> options. For example, you can configure the default page size with the configuration property <code>micronaut.data.pageable.default-page-size</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>Maps a <code>POST</code> request to <code>/genres</code>, which attempts to save a genre.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="12"></i><b>12</b></td>
+<td>Maps a <code>POST</code> request to <code>/ex</code>, which generates an exception.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="13"></i><b>13</b></td>
+<td>Maps a <code>DELETE</code> request to <code>/genres/{id}</code>, which attempts to remove a genre. This illustrates the use of a URL path variable.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="writing-tests">4.7. Writing Tests</h3>
+<div class="paragraph">
+<p>Create a test to verify the CRUD operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/GenreControllerTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import example.micronaut.domain.Genre
+import io.micronaut.core.type.Argument
+import io.micronaut.http.HttpHeaders
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+
+@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
+class GenreControllerTest {
+
+    @Inject
+    @field:Client(&quot;/&quot;)
+    lateinit var client: HttpClient <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Test
+    fun testFindNonExistingGenreReturn404() {
+        val thrown = assertThrows&lt;HttpClientResponseException&gt;{
+            client.toBlocking().exchange&lt;Any&gt;(&quot;/genres/99&quot;)
+        }
+
+        assertNotNull(thrown.response)
+        assertEquals(HttpStatus.NOT_FOUND, thrown.status)
+    }
+
+    @Test
+    fun testGenreCrudOperations() {
+
+        var request = HttpRequest.POST(&quot;/genres&quot;, mapOf(&quot;name&quot; to &quot;DevOps&quot;)) <i class="conum" data-value="3"></i><b>(3)</b>
+        var response = client.toBlocking().exchange(request, Genre::class.java)
+
+        assertEquals(HttpStatus.CREATED, response.status)
+        assertEquals(&quot;/genres/1&quot;, response.header(HttpHeaders.LOCATION))
+
+        request = HttpRequest.POST(&quot;/genres&quot;, mapOf(&quot;name&quot; to &quot;Microservices&quot;)) <i class="conum" data-value="3"></i><b>(3)</b>
+        response = client.toBlocking().exchange(request, Genre::class.java)
+
+        assertEquals(HttpStatus.CREATED, response.status)
+        assertEquals(&quot;/genres/2&quot;, response.header(HttpHeaders.LOCATION))
+
+        var genre = client.toBlocking().retrieve(&quot;/genres/2&quot;, Genre::class.java) <i class="conum" data-value="4"></i><b>(4)</b>
+
+        assertEquals(&quot;Microservices&quot;, genre.name)
+
+        var cmdRequest = HttpRequest.PUT(&quot;/genres&quot;, GenreUpdateCommand(2, &quot;Micro-services&quot;))
+        response = client.toBlocking().exchange(cmdRequest) <i class="conum" data-value="5"></i><b>(5)</b>
+
+        assertEquals(HttpStatus.NO_CONTENT, response.status())
+
+        genre = client.toBlocking().retrieve(&quot;/genres/2&quot;, Genre::class.java)
+
+        assertEquals(&quot;Micro-services&quot;, genre.name)
+
+        request = HttpRequest.GET(&quot;/genres/list&quot;)
+        var genres = client.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+
+        assertEquals(2, genres.size)
+
+        request = HttpRequest.POST(&quot;/genres/ex&quot;, mapOf(&quot;name&quot; to &quot;Microservices&quot;))
+        response = client.toBlocking().exchange(request)
+
+        assertEquals(HttpStatus.NO_CONTENT, response.status)
+
+        request = HttpRequest.GET(&quot;/genres/list&quot;)
+        genres = client.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+
+        assertEquals(2, genres.size)
+
+        request = HttpRequest.GET(&quot;/genres/list?size=1&quot;)
+        genres= client.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+
+        assertEquals(1, genres.size)
+        assertEquals(&quot;DevOps&quot;, genres[0].name)
+
+        request = HttpRequest.GET(&quot;/genres/list?size=1&amp;sort=name,desc&quot;)
+        genres= client.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+
+        assertEquals(1, genres.size)
+        assertEquals(&quot;Micro-services&quot;, genres[0].name)
+
+        request = HttpRequest.GET(&quot;/genres/list?size=1&amp;page=2&quot;)
+        genres= client.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+
+        assertEquals(0, genres.size)
+
+        for (i in 1..2) {
+            request = HttpRequest.DELETE(&quot;/genres/$i&quot;)
+            response = client.toBlocking().exchange(request)
+
+            assertEquals(HttpStatus.NO_CONTENT, response.status)
+        }
+
+        request = HttpRequest.GET(&quot;/genres/list&quot;)
+        genres = client.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+
+        assertEquals(0, genres.size)
+
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>If you care just about the object in the response, use <code>retrieve</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of <code>retrieve</code>, use the <code>exchange</code> method.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">6. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Execute the following command to run a MySQL container:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run -it --rm \
+        -p 3306:3306 \
+        -e MYSQL_DATABASE=db \
+        -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+        mysql:8</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>Save one genre, and your <code>genre</code> table will now contain an entry.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/genres&quot; \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ &quot;name&quot;: &quot;music&quot; }'</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-image-with-graalvm">7. Generate a Micronaut Application Native Image with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native image of our Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling native images ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="native-image-generation">7.1. Native image generation</h3>
+<div class="paragraph">
+<p>The easiest way to install GraalVM on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 11</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 22.0.0.2.r11-grl</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you still use Java 8, use the JDK11 version of GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Java 17</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 22.0.0.2.r17-grl</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/22.0/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>After installing GraalVM, install the <code>native-image</code> component, which is not installed by default:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gu install native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate a native image using Gradle, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native image is created in <code>build/native/nativeCompile</code> directory and can be run with <code>build/native/nativeCompile/application</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native image or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">graalvmNative {
+    binaries {
+        main {
+            imageName.set(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">--verbose</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native image name will now be <code>mn-graalvm-application</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra arguments to build the native image</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can execute the <code>genres</code> endpoints exposed by the native image, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl localhost:8080/genres/list</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/">Micronaut Data</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
