@@ -151,6 +151,26 @@ There is only one Asciidoctor file per guide in the root directory of the guide 
 
 We don't really write a valid Asciidoctor file but our "own" Asciidoctor with custom kind-of-macros. Then during the build process we render the final HTML for the guide in two phases. In the first one we evaluate all of our custom macros and include and generate a new language-build tool version of the guide in `src/doc/asciidoc`. This directory is excluded from source control and needs to be considered temporary. Then we render the final HTML of the (up to) six guides from that generated and valid Asciidoctor file.
 
+#### Placeholders
+
+You can use the following placeholders while writing a guide: 
+
+* `@language@`
+* `@guideTitle@`
+* `@guideIntro@`
+* `@micronaut@`
+* `@lang@`
+* `@build@`
+* `@testFramework@`
+* `@authors@`
+* `@languageextension@`
+* `@testsuffix@`
+* `@sourceDir@`
+* `@minJdk@`
+* `@api@`
+* `@features@`
+* `@features-words@`
+
 #### Common snippets
 
 We have small pieces of text that are used in different guides. To avoid the duplication we have common snippets in the `src/docs/common` directory. For example the file `common-header-top.adoc`:
