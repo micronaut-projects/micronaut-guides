@@ -20,7 +20,7 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring
 @Factory // <1>
 class GraphQLFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphQLFactory.class)
+    private static final Logger LOG = LoggerFactory.getLogger(GraphQLFactory)
 
     @Bean
     @Singleton

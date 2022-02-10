@@ -1,4 +1,4 @@
-include::{commondir}/common-header-top.adoc[]
+common:header-top.adoc[]
 
 == Getting Started
 
@@ -10,11 +10,11 @@ a complete and understandable description of the data in your API, gives clients
 need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools.
 ____
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+common:create-app.adoc[]
 
 == GraphQL
 
@@ -85,7 +85,7 @@ source:GraphQLFactory[]
 <8> Create the executable schema
 <9> Return the GraphQL bean
 
-include::{commondir}/common-runapp.adoc[]
+common:runapp.adoc[]
 
 We want to execute a GraphQL query to retrieve a book by its id:
 
@@ -107,26 +107,31 @@ Run the  following curl request:
 
 [source, bash]
 ----
-$ curl -X POST 'http://localhost:8080/graphql' \
-               -H 'content-type: application/json' \
-               --data-binary '{"query":"{ bookById(id:\"book-1\") { name, pageCount, author { firstName, lastName} } }"}'
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ bookById(id:\"book-1\") { name, pageCount, author { firstName, lastName} } }"}'
+----
 
+[source,json]
+----
 {"data":{"bookById":{"name":"Harry Potter and the Philosopher's Stone","pageCount":223,"author":{"firstName":"Joanne","lastName":"Rowling"}}}}
 ----
 
-One of the nice features about GraphQL is that the client can decide the fields, and the order they want to retrieve. Now
-we send the following request:
+One of the nice features about GraphQL is that the client can decide the fields, and the order they want to retrieve. Now we send the following request:
 
 [source, bash]
 ----
-$ curl -X POST 'http://localhost:8080/graphql' \
-               -H 'content-type: application/json' \
-               --data-binary '{"query":"{ bookById(id:\"book-1\") { pageCount, name, id } }"}'
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ bookById(id:\"book-1\") { pageCount, name, id } }"}'
+----
 
+[source,json]
+----
 {"data":{"bookById":{"pageCount":223,"name":"Harry Potter and the Philosopher's Stone","id":"book-1"}}}
 ----
 
-Notice that now the application only responses with `pageCount`, `name` and `id` fields in that order.
+Notice that now the application only responds with `pageCount`, `name` and `id` fields, in that order.
 
 == Test the application
 
@@ -141,9 +146,10 @@ To run the tests:
 
 [source, bash]
 ----
-$ ./gradlew test
-$ open build/reports/tests/test/index.html
+./gradlew test
 ----
+
+Then open `build/reports/tests/test/index.html` in a browser to see the results.
 
 :exclude-for-build:
 
@@ -151,7 +157,7 @@ $ open build/reports/tests/test/index.html
 
 [source, bash]
 ----
-$ ./mvnw test
+./mvnw test
 ----
 
 :exclude-for-build:
@@ -165,12 +171,12 @@ It should only be used for development, so it's not enabled by default. Add the 
 
 resource:application.yml[tag=graphiql]
 
-Start the application again and open http://localhost:8080/graphiql[http://localhost:8080/graphiql] in your browser. You can write your GraphQL queries
+Start the application again and open http://localhost:8080/graphiql in your browser. You can write your GraphQL queries
 with integrated auto-completion and execute them to get the results in an easier and nicer way:
 
 image:graphiql-01.png[]
 
-include::{commondir}/common-graal-with-plugins.adoc[]
+common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
@@ -183,4 +189,4 @@ execute the queries.
 
 Take a look at the https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL documentation].
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]
