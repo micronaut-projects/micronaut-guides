@@ -17,12 +17,14 @@ import java.util.regex.Pattern
 
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.api.TestFramework.SPOCK
+import static io.micronaut.starter.options.Language.GROOVY
 
 @CompileStatic
 class GuideAsciidocGenerator {
 
     private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
+    private static final String EXTERNAL = 'external:'
     private static final Pattern GUIDE_LINK_REGEX = ~/(.*)guideLink:(.*)\[(.*)](.*)/
 
     public static final int DEFAULT_MIN_JDK = 8
@@ -199,7 +201,9 @@ class GuideAsciidocGenerator {
             if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
                 rawLines << callout(rawLine, projectDir)
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
-                include rawLine, rawLines, projectDir
+                include rawLine, rawLines, projectDir, true
+            } else if (rawLine.startsWith(EXTERNAL) && rawLine.endsWith(']')) {
+                include rawLine, rawLines, projectDir, false
             } else {
                 rawLines << rawLine
             }
@@ -229,11 +233,19 @@ class GuideAsciidocGenerator {
         line
     }
 
-    private static void include(String rawLine, List<String> rawLines, File projectDir) {
+    private static void include(String rawLine, List<String> rawLines, File projectDir,
+                                boolean snippet) {
 
-        String relativePath = parseFileName(rawLine, INCLUDE_COMMONDIR)
-                .orElseThrow(() -> new GradleException("could not parse filename from commondir line: " + rawLine))
-        relativePath = 'src/docs/common/snippets/common-' + relativePath
+        String prefix = snippet ? INCLUDE_COMMONDIR : EXTERNAL
+
+        String relativePath = parseFileName(rawLine, prefix)
+                .orElseThrow(() -> new GradleException("could not parse filename from include line: " + rawLine))
+
+        if (snippet) {
+            relativePath = 'src/docs/common/snippets/common-' + relativePath
+        } else {
+            relativePath = 'guides/' + relativePath
+        }
 
         File file = new File(projectDir, relativePath)
 
@@ -453,7 +465,7 @@ class GuideAsciidocGenerator {
             featureNames = features.tokenize('|')
         }
         else {
-            featureNames = app.features
+            featureNames = [] + app.features
         }
 
         String featureExcludes = extractFromParametersLine(line, 'featureExcludes')
@@ -465,6 +477,10 @@ class GuideAsciidocGenerator {
             excludedFeatureNames = []
         }
         featureNames.removeAll excludedFeatureNames
+
+        if (guidesOption.language == GROOVY) {
+            featureNames.remove 'graalvm'
+        }
 
         String link = 'https://micronaut.io/launch?' +
                 featureNames.collect {'features=' + it }.join('&') +
@@ -483,7 +499,7 @@ class GuideAsciidocGenerator {
 
     private static String processGuideLink(String line) {
         line.find(GUIDE_LINK_REGEX) { String match, String before, String slug, String text, String after ->
-            "${before}https://guides.micronaut.io/latest/${slug}.html[$text]$after"
+            "${before}link:${slug}.html[$text]$after"
         }
     }
 
