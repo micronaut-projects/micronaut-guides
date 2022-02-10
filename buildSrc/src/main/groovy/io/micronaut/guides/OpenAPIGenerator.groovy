@@ -6,8 +6,6 @@ import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
-import org.gradle.internal.fingerprint.impl.NameOnlyFileCollectionFingerprinter
-import org.gradle.launcher.daemon.protocol.Build
 import org.openapitools.codegen.ClientOptInput
 import org.openapitools.codegen.DefaultGenerator
 import org.openapitools.codegen.Generator
@@ -88,7 +86,6 @@ class OpenAPIGenerator {
         additionalProperties.put(PROPERTY_CONTROLLER_PACKAGE, destinationPackage + PACKAGE_CONTROLLER)
         additionalProperties.put(PROPERTY_API_PACKAGE, destinationPackage + PACKAGE_API)
         additionalProperties.put(PROPERTY_MODEL_PACKAGE, destinationPackage + PACKAGE_MODEL)
-        additionalProperties.put(PROPERTY_GENERATOR_NAME, GuideMetadata.OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER)
         config.properties?.each {k, v ->
             additionalProperties.put(k, v)
         }
