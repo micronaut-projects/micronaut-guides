@@ -60,10 +60,6 @@ class GuideProjectGenerator implements AutoCloseable {
 
         mergeMetadataList(metadatas)
 
-        if (metadatas.publish && !metadatas.category) {
-            throw new GradleException("Category ($metadatas.category) was not defined or does not exist in Category enum")
-        }
-
         metadatas
     }
 
@@ -78,6 +74,9 @@ class GuideProjectGenerator implements AutoCloseable {
         boolean publish = config.publish == null ? true : config.publish
 
         Category cat = Category.values().find {it.toString() == config.category }
+        if (publish && !cat) {
+            throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
+        }
 
         new GuideMetadata(
                 asciidoctor: publish ? dir.name + '.adoc' : null,
