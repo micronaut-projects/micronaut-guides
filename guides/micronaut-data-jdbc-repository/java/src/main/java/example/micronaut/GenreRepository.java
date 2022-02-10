@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@JdbcRepository(dialect = Dialect.H2) // <1>
+@JdbcRepository(dialect = Dialect.MYSQL) // <1>
 public interface GenreRepository extends PageableRepository<Genre, Long> { // <2>
 
     Genre save(@NonNull @NotBlank String name);
@@ -22,5 +22,5 @@ public interface GenreRepository extends PageableRepository<Genre, Long> { // <2
         throw new DataAccessException("test exception");
     }
 
-    int update(@NonNull @NotNull @Id Long id, @NonNull @NotBlank String name);
+    long update(@NonNull @NotNull @Id Long id, @NonNull @NotBlank String name);
 }

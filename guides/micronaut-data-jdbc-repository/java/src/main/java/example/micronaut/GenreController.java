@@ -48,7 +48,7 @@ public class GenreController {
                 .header(HttpHeaders.LOCATION, location(command.getId()).getPath()); // <8>
     }
 
-    @Get(value = "/list") // <9>
+    @Get("/list") // <9>
     public List<Genre> list(@Valid Pageable pageable) { // <10>
         return genreRepository.findAll(pageable).getContent();
     }
