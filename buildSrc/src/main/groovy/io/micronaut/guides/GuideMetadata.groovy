@@ -50,6 +50,7 @@ class GuideMetadata {
     @ToString(includeNames = true)
     @CompileStatic
     static class OpenAPIGeneratorConfig {
+        public static final String GENERATOR_JAVA_MICRONAUT_SERVER = "java-micronaut-server"
         String definitionFile
         String generatorName
         Map<String, String> properties

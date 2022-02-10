@@ -106,7 +106,7 @@ class GuideProjectGenerator implements AutoCloseable {
                         excludeTest:  it.excludeTest,
                         openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
                             definitionFile: it.openAPIGeneratorConfig.definitionFile,
-                            generatorName: it.openAPIGeneratorConfig.generatorName,
+                            generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
                             properties: it.openAPIGeneratorConfig.properties ?: [:]
                         ) : null)
                 }
@@ -185,8 +185,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 destination.mkdir()
 
                 if (app.openAPIGeneratorConfig) {
-                    OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig,
-                            testFramework, buildTool)
+                    OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig, testFramework, buildTool)
                 }
 
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,

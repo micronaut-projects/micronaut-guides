@@ -1,9 +1,13 @@
 package io.micronaut.guides
 
+import groovy.transform.CompileStatic
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
+import org.gradle.internal.fingerprint.impl.NameOnlyFileCollectionFingerprinter
+import org.gradle.launcher.daemon.protocol.Build
 import org.openapitools.codegen.ClientOptInput
 import org.openapitools.codegen.DefaultGenerator
 import org.openapitools.codegen.Generator
@@ -15,45 +19,34 @@ import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.options.BuildTool.GRADLE
 import static io.micronaut.starter.options.BuildTool.MAVEN
 
-@Singleton
+@CompileStatic
 class OpenAPIGenerator {
-    static void generate(
-            File inputDir, File destination, Language lang, String destinationPackage, GuideMetadata.OpenAPIGeneratorConfig config,
-            TestFramework testFramework, BuildTool buildTool
-    ) {
+
+    public static final String TEST = "test"
+    public static final String PROPERTY_BUILD = "build"
+    public static final String PROPERTY_CONTROLLER_PACKAGE = "controllerPackage"
+    public static final String PROPERTY_API_PACKAGE = "apiPackage"
+    public static final String PROPERTY_MODEL_PACKAGE = "modelPackage"
+    public static final String PACKAGE_CONTROLLER = ".controller"
+    public static final String PACKAGE_API = ".api"
+    public static final String PACKAGE_MODEL = ".model"
+    public static final String PROPERTY_GENERATOR_NAME = "generatorName"
+
+    static void generate(File inputDir,
+                         File destination,
+                         Language lang,
+                         String destinationPackage,
+                         GuideMetadata.OpenAPIGeneratorConfig config,
+                         TestFramework testFramework,
+                         BuildTool buildTool) {
         if (!config.definitionFile) {
             throw new GradleException("Need to specify the 'definitionFile' property if using 'openAPIGeneratorConfig'")
         }
-        if (!config.generatorName) {
-            throw new GradleException("Need to specify the 'generatorName' property if using 'openAPIGeneratorConfig'")
-        }
-
         File definitionFilePath = new File(new File(inputDir, lang.getExtension()), config.definitionFile)
         if (!definitionFilePath.isFile()) {
             throw new GradleException("OpenAPI definition file '" + definitionFilePath.getPath() + "' does not exist")
         }
-        CodegenConfigurator configurator = new CodegenConfigurator();
-        configurator.setInputSpec(definitionFilePath.getPath());
-        configurator.setGeneratorName(config.generatorName)
-        configurator.setOutputDir(destination.getPath())
-
-        if (testFramework == SPOCK) {
-            configurator.addAdditionalProperty("test", "spock")
-        } else if (testFramework == JUNIT) {
-            configurator.addAdditionalProperty("test", "junit")
-        }
-        if (buildTool == GRADLE) {
-            configurator.addAdditionalProperty("build", "gradle")
-        } else if (buildTool == MAVEN) {
-            configurator.addAdditionalProperty("build", "maven")
-        }
-        configurator.addAdditionalProperty("controllerPackage", destinationPackage + ".controller")
-        configurator.addAdditionalProperty("apiPackage", destinationPackage + ".api")
-        configurator.addAdditionalProperty("modelPackage", destinationPackage + ".model")
-
-        config.properties?.each {
-            configurator.addAdditionalProperty(it.key, it.value);
-        }
+        CodegenConfigurator configurator = createConfiguration(definitionFilePath, config, destination, testFramework, buildTool, destinationPackage)
 
         try {
             ClientOptInput clientOptInput = configurator.toClientOptInput()
@@ -66,5 +59,57 @@ class OpenAPIGenerator {
         } catch (Exception e) {
             throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"");
         }
+    }
+
+    private static CodegenConfigurator createConfiguration(File definitionFilePath,
+                                                           GuideMetadata.OpenAPIGeneratorConfig config,
+                                                           File destination,
+                                                           TestFramework testFramework,
+                                                           BuildTool buildTool,
+                                                           String destinationPackage) {
+        CodegenConfigurator configurator = new CodegenConfigurator();
+        configurator.setInputSpec(definitionFilePath.getPath());
+        configurator.setGeneratorName(config.generatorName)
+        configurator.setOutputDir(destination.getPath())
+        configurationAdditionalProperties(config, testFramework, buildTool, destinationPackage).each { k, v ->
+            configurator.addAdditionalProperty(k, v);
+        }
+        configurator
+    }
+
+    @NonNull
+    private static Map<String, Object> configurationAdditionalProperties(@NonNull GuideMetadata.OpenAPIGeneratorConfig config,
+                                                                         @NonNull TestFramework testFramework,
+                                                                         @NonNull BuildTool buildTool,
+                                                                         @NonNull String destinationPackage) {
+        Map<String, Object> additionalProperties = [:]
+        testProperty(testFramework).ifPresent(value -> additionalProperties.put(TEST, value))
+        buildProperty(buildTool).ifPresent(value -> additionalProperties.put(PROPERTY_BUILD, value))
+        additionalProperties.put(PROPERTY_CONTROLLER_PACKAGE, destinationPackage + PACKAGE_CONTROLLER)
+        additionalProperties.put(PROPERTY_API_PACKAGE, destinationPackage + PACKAGE_API)
+        additionalProperties.put(PROPERTY_MODEL_PACKAGE, destinationPackage + PACKAGE_MODEL)
+        additionalProperties.put(PROPERTY_GENERATOR_NAME, GuideMetadata.OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER)
+        config.properties?.each {k, v ->
+            additionalProperties.put(k, v)
+        }
+        additionalProperties
+    }
+
+    @NonNull
+    private static Optional<String> buildProperty(@NonNull BuildTool buildTool) {
+        if (buildTool.isGradle()) {
+            return Optional.of(GRADLE.toString())
+        } else if (buildTool == MAVEN) {
+            return Optional.of(MAVEN.toString())
+        }
+        Optional.empty()
+    }
+
+    @NonNull
+    private static Optional<String> testProperty(@NonNull TestFramework testFramework) {
+        if (testFramework == SPOCK || testFramework == JUNIT) {
+            return Optional.of(testFramework.toString())
+        }
+        Optional.empty()
     }
 }
