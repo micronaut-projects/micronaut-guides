@@ -143,6 +143,17 @@ class GuideAsciidocGenerator {
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
+            text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                List<String> features = featuresForApp(metadata, guidesOption, app)
+                features.join(',')
+            }
+
+            text = text.replaceAll(~/@(\w*):?features-words@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                featuresWordsForApp(metadata, guidesOption, app)
+            }
+
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
                 if (entry.value.version) {
                     text = text.replace("@${entry.key}Version@", entry.value.version)
@@ -153,6 +164,27 @@ class GuideAsciidocGenerator {
             renderedAsciidocFile.createNewFile()
             renderedAsciidocFile.setText(text, 'UTF-8')
         }
+    }
+
+    private static String featuresWordsForApp(GuideMetadata metadata,
+                                              GuidesOption guidesOption,
+                                              String app) {
+        List<String> features = featuresForApp(metadata, guidesOption, app)
+                .collect{ "`$it`".toString()}
+        if(features.size() > 1) {
+            return "${features[0..-2].join(', ')} and ${features[-1]}"
+        }
+        features[0]
+    }
+
+    private static List<String> featuresForApp(GuideMetadata metadata,
+                                               GuidesOption guidesOption,
+                                               String app) {
+        List<String> features = metadata.apps.find{ it.name == app }.features
+        if(guidesOption.language == Language.GROOVY) {
+            features -= 'graalvm'
+        }
+        features
     }
 
     private static List<String> expandMacros(List<String> lines, File projectDir) {
