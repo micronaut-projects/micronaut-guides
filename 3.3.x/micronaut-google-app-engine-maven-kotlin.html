@@ -134,27 +134,26 @@
 <li><a href="#test">5.3. Test</a></li>
 </ul>
 </li>
-<li><a href="#testing-the-application">6. Testing the Application</a></li>
-<li><a href="#google-cloud-platform">7. Google Cloud Platform</a>
+<li><a href="#google-cloud-platform">6. Google Cloud Platform</a>
 <ul class="sectlevel2">
-<li><a href="#google-cloud-platform-project">7.1. Google Cloud Platform Project</a></li>
-<li><a href="#cloud-sdk">7.2. Cloud SDK</a></li>
+<li><a href="#google-cloud-platform-project">6.1. Google Cloud Platform Project</a></li>
+<li><a href="#cloud-sdk">6.2. Cloud SDK</a></li>
 </ul>
 </li>
-<li><a href="#google-app-engine">8. Google App Engine</a></li>
-<li><a href="#app-engine-build-plugins">9. App Engine Build Plugins</a></li>
-<li><a href="#application-deployment-configuration">10. Application Deployment Configuration</a></li>
-<li><a href="#app-engine-deploy">11. App Engine Deploy</a></li>
-<li><a href="#running-the-app">12. Running the App</a></li>
-<li><a href="#logging">13. Logging</a></li>
-<li><a href="#cleaning-up">14. Cleaning Up</a>
+<li><a href="#google-app-engine">7. Google App Engine</a></li>
+<li><a href="#app-engine-build-plugins">8. App Engine Build Plugins</a></li>
+<li><a href="#application-deployment-configuration">9. Application Deployment Configuration</a></li>
+<li><a href="#app-engine-deploy">10. App Engine Deploy</a></li>
+<li><a href="#running-the-app">11. Running the App</a></li>
+<li><a href="#logging">12. Logging</a></li>
+<li><a href="#cleaning-up">13. Cleaning Up</a>
 <ul class="sectlevel2">
-<li><a href="#deleting-the-project">14.1. Deleting the project</a></li>
-<li><a href="#deleting-app-versions">14.2. Deleting app versions</a></li>
+<li><a href="#deleting-the-project">13.1. Deleting the project</a></li>
+<li><a href="#deleting-app-versions">13.2. Deleting app versions</a></li>
 </ul>
 </li>
-<li><a href="#next-steps">15. Next Steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">16. Help with the Micronaut Framework</a></li>
+<li><a href="#next-steps">14. Next Steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">15. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -223,6 +222,9 @@ This guide uses paid services; you may need to enable Billing in Google Cloud to
 <li>
 <p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
 </li>
+<li>
+<p>You need a <a href="https://cloud.google.com/gcp/">Google Cloud Platform (GCP)</a> account and a GCP project.</p>
+</li>
 </ul>
 </div>
 </div>
@@ -282,8 +284,10 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="sect2">
 <h3 id="controller">5.2. Controller</h3>
 <div class="paragraph">
-<p>To respond "Hello World" for the route <code>GET</code> <code>/hello</code>,
-create a controller:</p>
+<p>In order to create a microservice that responds with "Hello World" you first need a controller.</p>
+</div>
+<div class="paragraph">
+<p>Create a Controller:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/HelloController.kt</div>
@@ -296,14 +300,14 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
 
 @Controller(&quot;/hello&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
- class HelloController {
+class HelloController {
 
-     @Get<i class="conum" data-value="2"></i><b>(2)</b>
-     @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-     fun index(): String {
-         return &quot;Hello World&quot; <i class="conum" data-value="4"></i><b>(4)</b>
-     }
- }</code></pre>
+    @Get<i class="conum" data-value="2"></i><b>(2)</b>
+    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
+    fun index(): String {
+        return &quot;Hello World&quot; <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -337,29 +341,29 @@ import io.micronaut.http.annotation.Produces
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
- import io.micronaut.http.HttpRequest
- import io.micronaut.http.client.HttpClient
- import io.micronaut.http.client.annotation.Client
- import io.micronaut.test.extensions.junit5.annotation.MicronautTest
- import org.junit.jupiter.api.Assertions.assertEquals
- import org.junit.jupiter.api.Assertions.assertNotNull
- import org.junit.jupiter.api.Test
- import jakarta.inject.Inject
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Test
+import jakarta.inject.Inject
 
- @MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
- class HelloControllerTest {
-     @Inject
-     @field:Client(&quot;/&quot;)  <i class="conum" data-value="2"></i><b>(2)</b>
-     lateinit var client : HttpClient
+@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
+class HelloControllerTest {
+    @Inject
+    @field:Client(&quot;/&quot;)  <i class="conum" data-value="2"></i><b>(2)</b>
+    lateinit var client : HttpClient
 
-     @Test
-     fun testHello() {
-         val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(&quot;/hello&quot;)  <i class="conum" data-value="3"></i><b>(3)</b>
-         val body = client.toBlocking().retrieve(request)
-         assertNotNull(body)
-         assertEquals(&quot;Hello World&quot;, body)
-     }
- }</code></pre>
+    @Test
+    fun testHello() {
+        val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(&quot;/hello&quot;)  <i class="conum" data-value="3"></i><b>(3)</b>
+        val body = client.toBlocking().retrieve(request)
+        assertNotNull(body)
+        assertEquals(&quot;Hello World&quot;, body)
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -382,26 +386,13 @@ import io.micronaut.http.annotation.Produces
 </div>
 </div>
 <div class="sect1">
-<h2 id="testing-the-application">6. Testing the Application</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>To run the tests:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw test</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="google-cloud-platform">7. Google Cloud Platform</h2>
+<h2 id="google-cloud-platform">6. Google Cloud Platform</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Signup for <a href="https://console.cloud.google.com/">Google Cloud Platform</a></p>
 </div>
 <div class="sect2">
-<h3 id="google-cloud-platform-project">7.1. Google Cloud Platform Project</h3>
+<h3 id="google-cloud-platform-project">6.1. Google Cloud Platform Project</h3>
 <div class="paragraph">
 <p>Create a new project:</p>
 </div>
@@ -413,9 +404,9 @@ import io.micronaut.http.annotation.Produces
 </div>
 </div>
 <div class="sect2">
-<h3 id="cloud-sdk">7.2. Cloud SDK</h3>
+<h3 id="cloud-sdk">6.2. Cloud SDK</h3>
 <div class="paragraph">
-<p>Install <a href="https://cloud.google.com/sdk/downloads">Cloud SDK</a> for your operating system.</p>
+<p>Install <a href="https://cloud.google.com/sdk">Cloud SDK</a> for your operating system.</p>
 </div>
 <div class="paragraph">
 <p>Cloud SDK includes the <code>gcloud</code> command-line tool. Run the <code>init</code> command in your terminal:</p>
@@ -426,13 +417,29 @@ import io.micronaut.http.annotation.Produces
 </div>
 </div>
 <div class="paragraph">
-<p>It will prompt you to select the Google account and the project which you want to use.</p>
+<p>Log in to your Google Cloud Platform:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud auth login</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Change your project:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud config set project micronaut-guides</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>My Project ID is <code>micronaut-guides</code>. You can get the IDs of your projects by running the command <code>gcloud projects list</code>.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="google-app-engine">8. Google App Engine</h2>
+<h2 id="google-app-engine">7. Google App Engine</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We are going to deploy the Micronaut application developed in this guide to the
@@ -469,7 +476,7 @@ You will need to choose the region where you want your App Engine Application lo
 </div>
 </div>
 <div class="sect1">
-<h2 id="app-engine-build-plugins">9. App Engine Build Plugins</h2>
+<h2 id="app-engine-build-plugins">8. App Engine Build Plugins</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To deploy to App Engine, add the <a href="https://github.com/GoogleCloudPlatform/app-maven-plugin">Google App Engine Maven plugin</a> to your project.</p>
@@ -495,7 +502,7 @@ You will need to choose the region where you want your App Engine Application lo
 </div>
 </div>
 <div class="sect1">
-<h2 id="application-deployment-configuration">10. Application Deployment Configuration</h2>
+<h2 id="application-deployment-configuration">9. Application Deployment Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To deploy to Google App Engine, add the file <code>src/main/appengine/app.yaml</code></p>
@@ -523,7 +530,7 @@ env: flex</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="app-engine-deploy">11. App Engine Deploy</h2>
+<h2 id="app-engine-deploy">10. App Engine Deploy</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>You will need to use JDK 8.</p>
@@ -582,7 +589,7 @@ in the App Engine administration panel, you will see the deployed app.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="running-the-app">12. Running the App</h2>
+<h2 id="running-the-app">11. Running the App</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -604,7 +611,7 @@ Hello World</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="logging">13. Logging</h2>
+<h2 id="logging">12. Logging</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>For the version you would like to inspect, select Logs in the diagnose dropdown:</p>
@@ -625,7 +632,7 @@ documentation to read more about logs in the flexible environment.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="cleaning-up">14. Cleaning Up</h2>
+<h2 id="cleaning-up">13. Cleaning Up</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>After you&#8217;ve finished this guide, you can clean up the resources you created on
@@ -633,7 +640,7 @@ Google Cloud Platform so you won&#8217;t be billed for them in the future. The f
 sections describe how to delete or turn off these resources.</p>
 </div>
 <div class="sect2">
-<h3 id="deleting-the-project">14.1. Deleting the project</h3>
+<h3 id="deleting-the-project">13.1. Deleting the project</h3>
 <div class="paragraph">
 <p>The easiest way to eliminate billing is to delete the project you created for the tutorial.</p>
 </div>
@@ -685,7 +692,7 @@ Deleting a project has the following consequences:
 </div>
 </div>
 <div class="sect2">
-<h3 id="deleting-app-versions">14.2. Deleting app versions</h3>
+<h3 id="deleting-app-versions">13.2. Deleting app versions</h3>
 <div class="paragraph">
 <p>To delete an app version:</p>
 </div>
@@ -720,7 +727,7 @@ The only way you can delete the default version of your App Engine app is by del
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">15. Next Steps</h2>
+<h2 id="next-steps">14. Next Steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>If you want to learn more about Google Cloud and Micronaut integration, check out the codelab <a href="https://codelabs.developers.google.com/codelabs/cloud-micronaut-kubernetes/">Deploy a Micronaut Application Containerized with Jib to Google Kubernetes Engine</a>.</p>
@@ -728,7 +735,7 @@ The only way you can delete the default version of your App Engine app is by del
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">16. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">15. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
