@@ -1,5 +1,6 @@
 package io.micronaut.guides
 
+import groovy.io.FileType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -19,6 +20,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
+import java.util.regex.Pattern
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
@@ -30,9 +32,8 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
 class GuideProjectGenerator implements AutoCloseable {
-
     public static final String DEFAULT_APP_NAME = 'default'
-
+    private static final Pattern GROOVY_JAVA_OR_KOTLIN = ~/.*\.java|.*\.groovy|.*\.kt/
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
     private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
@@ -186,6 +187,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (app.openAPIGeneratorConfig) {
                     OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig, testFramework, buildTool)
+                    deleteEveryFileButSources(destination)
                 }
 
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
@@ -364,5 +366,38 @@ class GuideProjectGenerator implements AutoCloseable {
             merged.addAll others
         }
         merged
+    }
+
+    static void deleteEveryFileButSources(File dir) {
+        dir.eachFileRecurse(FileType.FILES) { file ->
+            if (!(file ==~ GROOVY_JAVA_OR_KOTLIN)) {
+                file.delete()
+            }
+        }
+        deleteEmptySubDirectories(dir)
+    }
+
+    static void deleteEmptySubDirectories(File dir) {
+        for (;;) {
+            if (deleteSubDirectories(dir) == 0) {
+                break
+            }
+        }
+    }
+    static int deleteSubDirectories(File dir) {
+        int deleted = 0
+
+        List<File> emptyDirs = []
+        dir.eachDirRecurse { f ->
+            if (f.listFiles().length == 0) {
+                emptyDirs.add(f)
+            }
+        }
+        emptyDirs.each { f ->
+            if (f.delete()) {
+                deleted++
+            }
+        }
+        deleted
     }
 }
