@@ -322,16 +322,16 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.intro = metadata.intro ?: base.intro
         merged.authors = mergeLists(base.authors, metadata.authors)
         merged.tags = mergeLists(base.tags, metadata.tags)
-        merged.category = base.category ?: metadata.category
+        merged.category = metadata.category ?: base.category
         merged.publicationDate = metadata.publicationDate
         merged.publish = metadata.publish
-        merged.buildTools = base.buildTools ?: metadata.buildTools
-        merged.languages = base.languages ?: metadata.languages
-        merged.testFramework = base.testFramework ?: metadata.testFramework
+        merged.buildTools = metadata.buildTools ?: base.buildTools
+        merged.languages = metadata.languages ?: base.languages
+        merged.testFramework = metadata.testFramework ?: base.testFramework
         merged.skipGradleTests = base.skipGradleTests || metadata.skipGradleTests
         merged.skipMavenTests = base.skipMavenTests || metadata.skipMavenTests
-        merged.minimumJavaVersion = base.minimumJavaVersion ?: metadata.minimumJavaVersion
-        merged.maximumJavaVersion = base.maximumJavaVersion ?: metadata.maximumJavaVersion
+        merged.minimumJavaVersion = metadata.minimumJavaVersion ?: base.minimumJavaVersion
+        merged.maximumJavaVersion = metadata.maximumJavaVersion ?: base.maximumJavaVersion
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
         merged.apps = mergeApps(base, metadata)
 
