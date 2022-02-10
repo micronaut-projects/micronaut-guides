@@ -17,14 +17,25 @@ class Utils {
 
     static boolean process(GuideMetadata metadata, boolean checkJdk = true) {
 
+        if (!metadata.publish) {
+            return false
+        }
+
         boolean processGuide = singleGuide() == null || singleGuide() == metadata.slug
         if (!processGuide) {
             return false
         }
 
         if (checkJdk) {
-            return metadata.minimumJavaVersion == null ||
-                    parseJdkVersion().majorVersion() >= metadata.minimumJavaVersion
+            int jdkVersion = parseJdkVersion().majorVersion()
+            if (metadata.minimumJavaVersion != null && jdkVersion < metadata.minimumJavaVersion) {
+                println "not processing $metadata.slug, JDK $jdkVersion < $metadata.minimumJavaVersion"
+                return false
+            }
+            if (metadata.maximumJavaVersion != null && jdkVersion > metadata.maximumJavaVersion) {
+                println "not processing $metadata.slug, JDK $jdkVersion > $metadata.maximumJavaVersion"
+                return false
+            }
         }
 
         return true

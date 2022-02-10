@@ -22,7 +22,7 @@ class BookExcelServiceImpl implements BookExcelService {
         try {
             File file = File.createTempFile(HEADER_EXCEL_FILE_PREFIX, HEADER_EXCEL_FILE_SUFIX);
             PoiSpreadsheetBuilder.create(file).build(w -> {
-                w.apply(BookExcelStylesheet.class)
+                w.apply(BookExcelStylesheet)
                 w.sheet(SHEET_NAME, s -> {
                     s.row(r -> Stream.of(HEADER_ISBN, HEADER_NAME)
                             .forEach(header -> r.cell(cd -> {

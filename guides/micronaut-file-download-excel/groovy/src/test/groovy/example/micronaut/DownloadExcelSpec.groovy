@@ -40,6 +40,7 @@ class DownloadExcelSpec extends Specification {
                 })
             })
         })
+
         then: 'a row is found'
         result.cells.size() == 1
     }

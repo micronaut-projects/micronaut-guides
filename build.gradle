@@ -28,7 +28,7 @@ repositories {
 
 ext {
     codeDir = new File(buildDir, 'code')
-    distDir = new File(project.buildDir, 'dist')
+    distDir = new File(buildDir, 'dist')
     guidesDir = new File(projectDir, 'guides')
     metadataConfigName = 'metadata.json'
 }
@@ -74,7 +74,7 @@ task copyJavaScriptToDist(type: Copy) {
 task copyHtmlToDist(type: Copy) {
     group 'guides'
     description 'Copies HTML generated from Asciidoc from build/docs/asciidoc to build/dist'
-    from "${project.buildDir}/docs/asciidoc"
+    from "$buildDir/docs/asciidoc"
     into distDir
     exclude 'common-*.html'
 }
@@ -97,15 +97,16 @@ task generateSampleProjects {
     group 'guides'
     description 'Generates guide applications at build/code'
     doLast {
-        if (!file(buildDir).exists()) {
-           file(buildDir).mkdir()
+        if (!buildDir.exists()) {
+           buildDir.mkdir()
         }
-        if (!file(codeDir).exists()) {
-            file(codeDir).mkdir()
+        if (!codeDir.exists()) {
+            codeDir.mkdir()
         }
-        GuideProjectGenerator generator = new GuideProjectGenerator()
-        generator.generate(guidesDir, codeDir, metadataConfigName, new File(projectDir, "src/docs/asciidoc"))
-        generator.close()
+
+        try (GuideProjectGenerator generator = new GuideProjectGenerator()) {
+            generator.generate(guidesDir, codeDir, metadataConfigName, projectDir)
+        }
     }
     finalizedBy(
             'generateTestScript',
@@ -129,7 +130,7 @@ task generateTestScript {
         }
         testScript.text = generateTestScript
                 ? TestScriptGenerator.generateScript(guidesDir, metadataConfigName, false, changedFiles)
-                : TestScriptGenerator.emptyScript()
+                : TestScriptGenerator.EMPTY_SCRIPT
         testScript.executable = true
     }
 }
@@ -141,8 +142,8 @@ task generateCodeZip {
     dependsOn 'createDist'
     doLast {
         codeDir.eachDir { dir ->
-            String zipFileName = distDir.path + dir.path.substring(dir.path.lastIndexOf('/')) + ".zip"
-            GenerateGuideZip.compressZipfile(dir.path, zipFileName)
+            File zipFile = new File(distDir, dir.name + '.zip')
+            GenerateGuideZip.compressZipfile(dir.path, zipFile.path)
         }
     }
 }
