@@ -9,6 +9,7 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
+import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
 
 import java.util.Map.Entry
@@ -143,6 +144,17 @@ class GuideAsciidocGenerator {
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
+            text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                List<String> features = featuresForApp(metadata, guidesOption, app)
+                features.join(',')
+            }
+
+            text = text.replaceAll(~/@(\w*):?features-words@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                featuresWordsForApp(metadata, guidesOption, app)
+            }
+
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
                 if (entry.value.version) {
                     text = text.replace("@${entry.key}Version@", entry.value.version)
@@ -153,6 +165,27 @@ class GuideAsciidocGenerator {
             renderedAsciidocFile.createNewFile()
             renderedAsciidocFile.setText(text, 'UTF-8')
         }
+    }
+
+    private static String featuresWordsForApp(GuideMetadata metadata,
+                                              GuidesOption guidesOption,
+                                              String app) {
+        List<String> features = featuresForApp(metadata, guidesOption, app)
+                .collect{ "`$it`".toString()}
+        if(features.size() > 1) {
+            return "${features[0..-2].join(', ')} and ${features[-1]}"
+        }
+        features[0]
+    }
+
+    private static List<String> featuresForApp(GuideMetadata metadata,
+                                               GuidesOption guidesOption,
+                                               String app) {
+        List<String> features = metadata.apps.find{ it.name == app }.features
+        if(guidesOption.language == Language.GROOVY) {
+            features -= 'graalvm'
+        }
+        features
     }
 
     private static List<String> expandMacros(List<String> lines, File projectDir) {
@@ -420,11 +453,10 @@ class GuideAsciidocGenerator {
         return rendered.split("\\r?\\n|\\r") as List
     }
 
-    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
-
-        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
-        App app = metadata.apps.find { it.name == appName }
-
+    @NonNull
+    private static List<String> featureNames(@NonNull String line,
+                                              @NonNull App app,
+                                              @NonNull GuidesOption guidesOption) {
         String features = extractFromParametersLine(line, 'features')
         List<String> featureNames
         if (features) {
@@ -447,9 +479,15 @@ class GuideAsciidocGenerator {
         if (guidesOption.language == GROOVY) {
             featureNames.remove 'graalvm'
         }
+        featureNames
+    }
 
+    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
+
+        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
+        App app = metadata.apps.find { it.name == appName }
         String link = 'https://micronaut.io/launch?' +
-                featureNames.collect {'features=' + it }.join('&') +
+                featureNames(line, app, guidesOption).collect {'features=' + it }.join('&') +
                 '&lang=' + guidesOption.language.name() +
                 '&build=' + guidesOption.buildTool.name() +
                 '&test=' + guidesOption.testFramework.name() +
