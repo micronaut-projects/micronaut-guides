@@ -26,18 +26,14 @@ jobs:
         with:
           java-version: 8
       - name: Generate Guides
-        run: ./gradlew build          
-      - id: outputs
+        run: ./gradlew generateSampleProjects -x generateTestScript -x generateGuidesJsonMetadata -x generateGuidesIndex
+      - id: set-matrix
         run: |
-          maven_tests=$(ls build/code | grep -e "-maven-" | jq -R -s -c 'split("\n")')
-          gradle_tests=$(ls build/code | grep -e "-gradle-" | jq -R -s -c 'split("\n")')
-          echo "MAVEN TESTS: $maven_tests"
-          echo "GRADLE TESTS: $gradle_tests"
-          echo "::set-output name=maven_tests::$maven_tests"
-          echo "::set-output name=gradle_tests::$gradle_tests"
+          echo "::set-output name=maven_tests::$(ls build/code | grep -e "-maven-" | jq -R -s -c 'split("\n")')"
+          echo "::set-output name=gradle_tests::$(ls build/code | grep -e "-gradle-" | jq -R -s -c 'split("\n")')"
     outputs:
-      gradle_tests: ${{ steps.outputs.gradle_tests }}
-      maven_tests: ${{ steps.outputs.maven_tests }}
+      gradle_tests: ${{ steps.set-matrix.outputs.gradle_tests }}
+      maven_tests: ${{ steps.set-matrix.outputs.maven_tests }}
   maven-test:
     needs: build-matrix
     runs-on: ubuntu-latest
