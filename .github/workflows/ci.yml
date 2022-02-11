@@ -34,12 +34,12 @@ jobs:
     outputs:
       gradle_tests: ${{ steps.set-matrix.outputs.gradle_tests }}
       maven_tests: ${{ steps.set-matrix.outputs.maven_tests }}
-  maven-test:
+  maven-test-jdk8:
     needs: build-matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: ['8', '11', '17']
+        java: 8
         test_project: ${{ fromJson(needs.build-matrix.outputs.maven_tests) }}
     env:
       JDK_VERSION:  ${{ matrix.java }}
@@ -58,12 +58,12 @@ jobs:
         run: |
           cd "build/code/$test_project"
           ./mvnw test
-  gradle-test:
+  gradle-test-jdk8:
     needs: build-matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: ['8', '11', '17']
+        java: 8
         test_project: ${{ fromJson(needs.build-matrix.outputs.gradle_tests) }}
     env:
       JDK_VERSION:  ${{ matrix.java }}
