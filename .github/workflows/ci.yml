@@ -14,13 +14,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0      
+          fetch-depth: 0  
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-              
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 8
       - name: Generate Guides
-        run: ./gradlew generateSampleProjects          
+        run: ./gradlew build          
       - id: set-matrix
         run: |
           maven_tests=$(ls build/code | grep -e "-maven-" | jq -R -s -c 'split("\n")')
