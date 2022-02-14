@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Deploy a Micronaut MySQL Database Application to Oracle Cloud</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronauttwittercard.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Deploy a Micronaut MySQL Database Application to Oracle Cloud"/>
+    <meta name="twitter:description" content="Learn how to deploy a MySQL Micronaut Database Application to Oracle Cloud."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-cloud-database-oracle.html">Deploy a Micronaut MySQL Database Application to Oracle Cloud</a> » <span class="breadcrumb_last" aria-current="page">maven | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#creating-a-mysql-db-system-at-oracle-cloud">3. Creating a MySQL DB System at Oracle Cloud</a>
+<ul class="sectlevel2">
+<li><a href="#compartment-ocid">3.1. Compartment OCID</a></li>
+<li><a href="#db-shape-name">3.2. DB Shape Name</a></li>
+<li><a href="#db-system-configuration-ocid">3.3. DB System Configuration OCID</a></li>
+<li><a href="#subnet-ocid">3.4. Subnet OCID</a></li>
+<li><a href="#availability-domain">3.5. Availability Domain</a></li>
+<li><a href="#create-the-cloud-database">3.6. Create the Cloud Database</a></li>
+<li><a href="#retrieve-database-info">3.7. Retrieve Database Info</a></li>
+<li><a href="#create-ingress-rule">3.8. Create Ingress Rule</a></li>
+</ul>
+</li>
+<li><a href="#creating-the-application">4. Creating the Application</a></li>
+<li><a href="#deploying-the-application">5. Deploying the Application</a></li>
+<li><a href="#configure-mysql">6. Configure MySQL</a>
+<ul class="sectlevel2">
+<li><a href="#mysql-client">6.1. MySQL client</a></li>
+<li><a href="#create-a-database-and-user">6.2. Create a database and user</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application">7. Running the Application</a></li>
+<li><a href="#next-steps">8. Next steps</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Deploy a Micronaut MySQL Database Application to Oracle Cloud</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to deploy a MySQL Micronaut Database Application to Oracle Cloud.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Burt Beckwith</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.3.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+<div class="paragraph">
+<p>The application uses Micronaut Data JDBC and a MySQL database.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm">Oracle Cloud CLI</a> installed with local access to Oracle Cloud configured by running <code>oci setup config</code></p>
+</li>
+<li>
+<p>A paid or free trial Oracle Cloud account (create an account at <a href="https://signup.oraclecloud.com">signup.oraclecloud.com</a>)</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Your Oracle Cloud account must be a paid account or trial with credits available because there isn&#8217;t currently a free-tier option for MySQL.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="creating-a-mysql-db-system-at-oracle-cloud">3. Creating a MySQL DB System at Oracle Cloud</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We&#8217;ll do the work of creating the database with the Oracle Cloud CLI. See the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql.html">MySQL CLI command reference</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>According to the documentation, there are six required parameters for the create command; compartment OCID, shape name, DB system configuration OCID, subnet OCID, admin username, and admin password. However, there are two more parameters that will be needed, the availability domain and the database initial size.</p>
+</div>
+<div class="sect2">
+<h3 id="compartment-ocid">3.1. Compartment OCID</h3>
+<div class="paragraph">
+<p>First, find the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/iam/compartment/list.html">OCID of the compartment</a> where the database will be created. Run this to list all the compartments in your root compartment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci iam compartment list</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and find the compartment by the name or description in the JSON output. It should look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">compartment-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.tenancy.oc1..aaaaaaaaud4g4e5ovjaw...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">defined-tags</span><span class="delimiter">&quot;</span></span>: {},
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut guides</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">freeform-tags</span><span class="delimiter">&quot;</span></span>: {},
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">inactive-status</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">is-accessible</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycle-state</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTIVE</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">micronaut-guides</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">time-created</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">2021-05-02T23:54:28.392000+00:00</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Use the OCID from the <code>id</code> property; the <code>compartment-id</code> property is the parent compartment.</p>
+</div>
+<div class="paragraph">
+<p>For convenience, save the compartment OCID as an environment variable. For Linux or Mac, run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">export C=ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or for Windows, if using <code>cmd</code> run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">set C=ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and if using PowerShell run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$C = &quot;ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...&quot;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In the examples below we use Linux/Mac syntax for environment variables, e.g. <code>-c $C</code>. If you use Windows <code>cmd</code>, change those to <code>-c %C%</code> (but no change needed if using PowerShell)
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="db-shape-name">3.2. DB Shape Name</h3>
+<div class="paragraph">
+<p>Find the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/shape/list.html">shape name</a> for the database. Run this to list the available shapes in your compartment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci mysql shape list -c $C</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For this guide we&#8217;ll use the smallest database size/shape (8 GB, 1 CPU) shape:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">cpu-core-count</span><span class="delimiter">&quot;</span></span>: <span class="integer">1</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">is-supported-for</span><span class="delimiter">&quot;</span></span>: [
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">DBSYSTEM</span><span class="delimiter">&quot;</span></span>
+  ],
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">memory-size-in-gbs</span><span class="delimiter">&quot;</span></span>: <span class="integer">8</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">MySQL.VM.Standard.E3.1.8GB</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="db-system-configuration-ocid">3.3. DB System Configuration OCID</h3>
+<div class="paragraph">
+<p>Find the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/configuration/list.html">OCID of the configuration</a> for the database. Run this to list the available configurations  in your compartment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci mysql configuration list -c $C</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Use the <code>id</code> of the smallest configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">compartment-id</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">defined-tags</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Default Standalone configuration for the MySQL.VM.Standard.E3.1.8GB MySQL Shape</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">display-name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">MySQL.VM.Standard.E3.1.8GB.Standalone</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">freeform-tags</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.mysqlconfiguration.oc1..aaaaaaaalwzc2a22xqm5...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycle-state</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTIVE</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">shape-name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">MySQL.VM.Standard.E3.1.8GB</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">time-created</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">2018-09-21T10:00:00+00:00</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">time-updated</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">DEFAULT</span><span class="delimiter">&quot;</span></span>
+},</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="subnet-ocid">3.4. Subnet OCID</h3>
+<div class="paragraph">
+<p>To find the subnet OCID, first find the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/network/vcn/list.html">OCID of the subnet&#8217;s VCN</a>. Run this to list the available VCNs in your compartment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci network vcn list -c $C</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Use the <code>id</code> of the VCN you want:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">cidr-block</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">10.0.0.0/16</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">cidr-blocks</span><span class="delimiter">&quot;</span></span>: [
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">10.0.0.0/16</span><span class="delimiter">&quot;</span></span>
+  ],
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">compartment-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">default-dhcp-options-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.dhcpoptions.oc1.iad.aaaaaaaahosh4fpep4jz...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">default-route-table-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.routetable.oc1.iad.aaaaaaaaet7wmwm27vzc...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">default-security-list-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">defined-tags</span><span class="delimiter">&quot;</span></span>: {},
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">display-name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">vcn-20210504-1214</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">dns-label</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">vcn05041217</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">freeform-tags</span><span class="delimiter">&quot;</span></span>: {},
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.vcn.oc1.iad.amaaaaaabnqp5kqam6cm...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">ipv6-cidr-blocks</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycle-state</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">AVAILABLE</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">time-created</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">2021-05-04T16:17:08.461000+00:00</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">vcn-domain-name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">vcn05041217.oraclevcn.com</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then use the VCN OCID to find the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/network/subnet/list.html">OCID of the subnet</a>. Run this to list the subnets in your VCN:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci network subnet list -c $C \
+    --vcn-id ocid1.vcn.oc1.iad.amaaaaaabnqp5kqam6cm...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Use the <code>id</code> of the subnet you want:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">cidr-block</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">10.0.0.0/24</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">compartment-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">display-name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">subnet-20210504-1214</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.subnet.oc1.iad.aaaaaaaaxgumfzpn6sul...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">time-created</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">2021-05-04T16:17:10.593000+00:00</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">vcn-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.vcn.oc1.iad.amaaaaaabnqp5kqam6cm...</span><span class="delimiter">&quot;</span></span>,
+  <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">security-list-ids</span><span class="delimiter">&quot;</span></span>: [
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...</span><span class="delimiter">&quot;</span></span>
+  ],
+  <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Save the OCIDs of the security lists in the response - we&#8217;ll need those in a later step.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="availability-domain">3.5. Availability Domain</h3>
+<div class="paragraph">
+<p>Find the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.17.0/oci_cli_docs/cmdref/iam/availability-domain/list.html">availabilty domain</a> where the database will be created. Run this to list the available domains in your compartment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci iam availability-domain list -c $C</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Use the <code>name</code> of the subnet you want:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">compartment-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.availabilitydomain.oc1..aaaaaaaauvt2n7pijol7...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">nFuS:US-ASHBURN-AD-1</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-the-cloud-database">3.6. Create the Cloud Database</h3>
+<div class="paragraph">
+<p>The last required parameters are the admin username and password.</p>
+</div>
+<div class="paragraph">
+<p>The username must be 1-32 characters, and it cannot contain <code>'</code>, <code>`</code>, <code>"</code>,  or any of the following reserved names: <code>ocirpl</code>, <code>ociadmin</code>, <code>administrator</code>, <code>mysql.sys</code>, <code>mysql.session</code>, or <code>mysql.infoschema</code>.</p>
+</div>
+<div class="paragraph">
+<p>The password must be 8-32 characters and contain at least one uppercase, one lowercase, one numeric, and one special character.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, we&#8217;ll specify the display name since the generated name will be something like <code>mysqldbsystem20220203163902</code>. Choose a name like "Micronaut_Guide_MySQL".</p>
+</div>
+<div class="paragraph">
+<p>Also specify the initial database size; it must be at least 50 GB.</p>
+</div>
+<div class="paragraph">
+<p>Run the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/db-system/create.html">create command</a> with your OCIDs and other parameters substituted:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci mysql db-system create -c $C \
+    --shape-name MySQL.VM.Standard.E3.1.8GB \
+    --configuration-id ocid1.mysqlconfiguration.oc1..aaaaaaaalwzc2a22xqm5... \
+    --subnet-id ocid1.subnet.oc1.iad.aaaaaaaaxgumfzpn6sul... \
+    --admin-username &lt;your username&gt; \
+    --admin-password &lt;your password&gt; \
+    --availability-domain nFuS:US-ASHBURN-AD-1 \
+    --data-storage-size-in-gbs 50 \
+    --display-name Micronaut_Guide_MySQL</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The response should look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">data</span><span class="delimiter">&quot;</span></span>: {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">analytics-cluster</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">availability-domain</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">nFuS:US-ASHBURN-AD-1</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">backup-policy</span><span class="delimiter">&quot;</span></span>: {
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">defined-tags</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">freeform-tags</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">is-enabled</span><span class="delimiter">&quot;</span></span>: <span class="value">true</span>,
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">retention-in-days</span><span class="delimiter">&quot;</span></span>: <span class="integer">7</span>,
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">window-start-time</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">07:11</span><span class="delimiter">&quot;</span></span>
+    },
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">channels</span><span class="delimiter">&quot;</span></span>: [],
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">compartment-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">configuration-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.mysqlconfiguration.oc1..aaaaaaaalwzc2a22xqm5...</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">current-placement</span><span class="delimiter">&quot;</span></span>: {
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">availability-domain</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">fault-domain</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>
+    },
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">data-storage-size-in-gbs</span><span class="delimiter">&quot;</span></span>: <span class="integer">50</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">defined-tags</span><span class="delimiter">&quot;</span></span>: {},
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">display-name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut_Guide_MySQL</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">endpoints</span><span class="delimiter">&quot;</span></span>: [],
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">fault-domain</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">freeform-tags</span><span class="delimiter">&quot;</span></span>: {},
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">heat-wave-cluster</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">hostname-label</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.mysqldbsystem.oc1.iad.aaaaaaaa2pq3a37hftut...</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">ip-address</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">is-analytics-cluster-attached</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">is-heat-wave-cluster-attached</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">is-highly-available</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycle-details</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycle-state</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">CREATING</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">maintenance</span><span class="delimiter">&quot;</span></span>: {
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">window-start-time</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">WEDNESDAY 07:09</span><span class="delimiter">&quot;</span></span>
+    },
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">mysql-version</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">port</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">port-x</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">shape-name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">MySQL.VM.Standard.E3.1.8GB</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">source</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">subnet-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.subnet.oc1.iad.aaaaaaaaxgumfzpn6sul...</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">time-created</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">2022-02-03T16:39:02.762000+00:00</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">time-updated</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">2022-02-03T16:39:02.762000+00:00</span><span class="delimiter">&quot;</span></span>
+  },
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">etag</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">0dea57803672c12742f7710f342bf...</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">opc-work-request-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.mysqlworkrequest.oc1.iad.eb66e373-7274-40a...</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the value for <code>lifecycle-state</code> is <code>CREATING</code>, so not all information (e.g. IP address) is available yet.</p>
+</div>
+<div class="paragraph">
+<p>Save the database OCID from the <code>id</code> property in the response.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="retrieve-database-info">3.7. Retrieve Database Info</h3>
+<div class="paragraph">
+<p>It will take a few minutes for the database to finish provisioning. Wait a bit and run the <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/db-system/get.html">get</a> command with the database OCID:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci mysql db-system get \
+    --db-system-id ocid1.mysqldbsystem.oc1.iad.aaaaaaaa2pq3a37hftut...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once the <code>lifecycle-state</code> is <code>ACTIVE</code> you can make note of the IP address and port (it should be the default value of 3306):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json"><span class="key"><span class="delimiter">&quot;</span><span class="content">ip-address</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">10.0.0.6</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycle-state</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTIVE</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">port</span><span class="delimiter">&quot;</span></span>: <span class="integer">3306</span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">port-x</span><span class="delimiter">&quot;</span></span>: <span class="integer">33060</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-ingress-rule">3.8. Create Ingress Rule</h3>
+<div class="paragraph">
+<p>To allow our application to connect to the MySQL database, we need to <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/network/security-list/update.html">create an ingress rule</a> for port 3306 in the subnet.</p>
+</div>
+<div class="paragraph">
+<p>Use the OCID of the security list you&#8217;ll be updating (that you saved earlier when finding the subnet OCID) to retrieve the current state:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci network security-list get --security-list-id ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json"><span class="error">.</span><span class="error">.</span><span class="error">.</span>
+<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...</span><span class="delimiter">&quot;</span></span>,
+<span class="key"><span class="delimiter">&quot;</span><span class="content">ingress-security-rules</span><span class="delimiter">&quot;</span></span>: [
+  {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">icmp-options</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">is-stateless</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">protocol</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">6</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">source</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">0.0.0.0/0</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">source-type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">CIDR_BLOCK</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">tcp-options</span><span class="delimiter">&quot;</span></span>: {
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">destination-port-range</span><span class="delimiter">&quot;</span></span>: {
+        <span class="key"><span class="delimiter">&quot;</span><span class="content">max</span><span class="delimiter">&quot;</span></span>: <span class="integer">22</span>,
+        <span class="key"><span class="delimiter">&quot;</span><span class="content">min</span><span class="delimiter">&quot;</span></span>: <span class="integer">22</span>
+      },
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">source-port-range</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>
+    },
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">udp-options</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>
+  },
+  <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+],
+<span class="key"><span class="delimiter">&quot;</span><span class="content">lifecycle-state</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">AVAILABLE</span><span class="delimiter">&quot;</span></span>,
+<span class="error">.</span><span class="error">.</span><span class="error">.</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The update command we&#8217;ll run will replace the existing rules with the data specified in the command, so the command must include the existing rules and a new one for port 3306.</p>
+</div>
+<div class="paragraph">
+<p>Use a text editor to save the JSON list value of <code>ingress-security-rules</code> to a file, e.g. <code>ingress.json</code>.</p>
+</div>
+<div class="paragraph">
+<p>Add a new object to the JSON list for the ingress rule on port 3306:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">MySQL</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">isStateless</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">protocol</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">6</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">source</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">10.0.0.0/16</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">sourceType</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">CIDR_BLOCK</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">tcpOptions</span><span class="delimiter">&quot;</span></span>: {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">destination-port-range</span><span class="delimiter">&quot;</span></span>: {
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">max</span><span class="delimiter">&quot;</span></span>: <span class="integer">3306</span>,
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">min</span><span class="delimiter">&quot;</span></span>: <span class="integer">3306</span>
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The final contents of <code>ingress.json</code> should look like this (it will have different rules, but will likely include one for SSH on port 22 and ICMP, plus the rule for port 8080 you added when creating the VM):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">[
+  {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">icmp-options</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">is-stateless</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">protocol</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">6</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">source</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">0.0.0.0/0</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">source-type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">CIDR_BLOCK</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">tcp-options</span><span class="delimiter">&quot;</span></span>: {
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">destination-port-range</span><span class="delimiter">&quot;</span></span>: {
+        <span class="key"><span class="delimiter">&quot;</span><span class="content">max</span><span class="delimiter">&quot;</span></span>: <span class="integer">22</span>,
+        <span class="key"><span class="delimiter">&quot;</span><span class="content">min</span><span class="delimiter">&quot;</span></span>: <span class="integer">22</span>
+      },
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">source-port-range</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>
+    },
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">udp-options</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>
+  },
+  {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">icmp-options</span><span class="delimiter">&quot;</span></span>: {
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">code</span><span class="delimiter">&quot;</span></span>: <span class="integer">4</span>,
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">type</span><span class="delimiter">&quot;</span></span>: <span class="integer">3</span>
+    },
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">is-stateless</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">protocol</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">source</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">0.0.0.0/0</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">source-type</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">CIDR_BLOCK</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">tcp-options</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">udp-options</span><span class="delimiter">&quot;</span></span>: <span class="value">null</span>
+  },
+
+  <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+
+  {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">MySQL</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">isStateless</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">protocol</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">6</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">source</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">10.0.0.0/16</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">sourceType</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">CIDR_BLOCK</span><span class="delimiter">&quot;</span></span>,
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">tcpOptions</span><span class="delimiter">&quot;</span></span>: {
+      <span class="key"><span class="delimiter">&quot;</span><span class="content">destination-port-range</span><span class="delimiter">&quot;</span></span>: {
+        <span class="key"><span class="delimiter">&quot;</span><span class="content">max</span><span class="delimiter">&quot;</span></span>: <span class="integer">3306</span>,
+        <span class="key"><span class="delimiter">&quot;</span><span class="content">min</span><span class="delimiter">&quot;</span></span>: <span class="integer">3306</span>
+      }
+    }
+  }
+]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run this to add the new ingress rule:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci network security-list update \
+    --security-list-id ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd... \
+    --ingress-security-rules file://ingress.json</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-application">4. Creating the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Download the complete solution of the <a href="micronaut-data-jdbc-repository.html">Access a database with Micronaut Data JDBC</a> guide. You will use the sample application as a starting point.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploying-the-application">5. Deploying the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use the <a href="micronaut-oracle-cloud.html">Deploy a Micronaut application to Oracle Cloud</a> guide to create a compute instance and deploy the application to it; follow the steps in the "Create an Oracle Cloud Compute Instance" and "Deploy to Oracle Cloud" sections up to the step where you start the application. We need to connect the application to the MySQL database before starting it up.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+When creating the compute VM at Oracle Cloud, use the same subnet as the one where you created the MySQL database, otherwise the application will not be able to access the database.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configure-mysql">6. Configure MySQL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Flyway will create the database tables the first time the application starts, but we must create the database and a database user first.</p>
+</div>
+<div class="paragraph">
+<p>There are no direct ways to externally <a href="https://docs.oracle.com/en-us/iaas/mysql-database/doc/connecting-db-system.html">connect to a MySQL database</a> in Oracle Cloud, so we&#8217;ll do the work from the compute instance.</p>
+</div>
+<div class="sect2">
+<h3 id="mysql-client">6.1. MySQL client</h3>
+<div class="paragraph">
+<p>Install the MySQL client:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sudo yum install mysql</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Connect to MySQL with the admin username and password you chose earlier and with the MySQL IP address:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mysql --host &lt;MySQL_IPAddress&gt; -u &lt;admin_username&gt; -p</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-a-database-and-user">6.2. Create a database and user</h3>
+<div class="paragraph">
+<p>Create the database (use any valid database name, e.g. <code>micronaut</code>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="mysql">mysql&gt; CREATE DATABASE micronaut;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a database user (use any valid MySQL username, e.g. <code>guide_user</code>, and a valid password):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="mysql">mysql&gt; CREATE USER 'guide_user'@'&lt;compute instance private IP address&gt;' IDENTIFIED BY &lt;user password&gt;;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Grant access to the database for the new user:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="mysql">mysql&gt; GRANT ALL ON micronaut.* TO 'guide_user'@'&lt;compute instance private IP address&gt;';</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Exit the MySQL console:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="mysql">mysql&gt; exit</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">7. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With almost everything in place, we can start the application and try it out. First we need to set environment variables to configure the application datasource, then we can start the app.</p>
+</div>
+<div class="paragraph">
+<p>Create environment variables for <code>JDBC_URL</code>, <code>JDBC_USER</code>, <code>JDBC_PASSWORD</code> which will be used in the Micronaut app&#8217;s <code>application.yml</code> datasource:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">export JDBC_URL=jdbc:mysql://&lt;MySQL IP address&gt;:3306/micronaut
+export JDBC_USER=guide_user
+export JDBC_PASSWORD=&lt;user password&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Start the application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">java -jar application.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can test the application in a web browser, or with cURL.</p>
+</div>
+<div class="paragraph">
+<p>Run this with the public IP address of your VM to create a new <code>Genre</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://&lt;public IP address&gt;:8080/genres&quot; \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ &quot;name&quot;: &quot;music&quot; }'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and run this to list the genres:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl &lt;public IP address&gt;:8080/genres/list</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When you are finished using the database you can <a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/db-system/delete.html">delete it using the CLI</a>. Run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">oci mysql db-system delete \
+    --db-system-id ocid1.mysqldbsystem.oc1.iad.aaaaaaaa2pq3a37hftut...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+<span class="key"><span class="delimiter">&quot;</span><span class="content">opc-work-request-id</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">ocid1.mysqlworkrequest.oc1.iad.e68d5dc7-92be-45...</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/">Micronaut Data</a>.</p>
+</div>
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/">Micronaut Oracle Cloud Support</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
