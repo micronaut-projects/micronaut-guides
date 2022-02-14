@@ -113,6 +113,10 @@ class GuideProjectGenerator implements AutoCloseable {
                   String metadataConfigName,
                   File projectDir) {
 
+        if (!output.exists()) {
+            assert output.mkdir()
+        }
+
         File asciidocDir = new File(projectDir, 'src/docs/asciidoc')
         if (!asciidocDir.exists()) {
             asciidocDir.mkdir()
@@ -138,10 +142,6 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
-
-        if (!outputDir.exists()) {
-            assert outputDir.mkdir()
-        }
 
         String packageAndName = BASE_PACKAGE + '.' + APP_NAME
         JdkVersion javaVersion = Utils.parseJdkVersion()
