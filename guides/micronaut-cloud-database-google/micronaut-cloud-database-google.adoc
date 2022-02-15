@@ -1,0 +1,149 @@
+external:micronaut-cloud-database-base/start.adoc[]
+* You need a https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account and a GCP project.
+
+common:costs-gcloud.adoc[]
+
+common:gcp.adoc[]
+
+== Creating a MySQL Database instance in the Google Cloud
+
+We'll do the work of creating the database with the Google Cloud CLI. See the https://cloud.google.com/sdk/gcloud/reference/sql[MySQL CLI command reference] for more information.
+
+=== Create the MySQL instance
+
+[source,bash]
+----
+gcloud sql instances create micronaut-guides-mysql \
+ --database-version=MYSQL_8_0 \
+ --tier=db-f1-micro \
+ --region=us-east1 \
+ --root-password=<YOUR_ROOT_PASSWORD> \
+ --authorized-networks=<LOCAL_IP_ADDRESS>
+----
+* *_micronaut-guides-mysql_* - Change if you would like to use a different instance name
+* `--database-version` - Specifying MySQL v8.0 (See https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/SqlDatabaseVersion[SQL DB Versions] for other options)
+* `--tier` - Change to match your needs. (Instead of using tiers, you can specify the CPU and memory, with the `--cpu` and `--memory` flags)
+* `--region` - Defaults to `us-central1` if omitted
+* `--root-password` - Default to `password123` if omitted
+* `--authorized-networks` - A single IP or a range of IP Addresses in the CIDR notation
+- `LOCAL_IP_ADDRESS` - This is the local IP address where the Micronaut application is running. You can find out the value your local machine by visiting http://whatismyip.akamai.com/[http://whatismyip.akamai.com/].
+
+[NOTE]
+====
+You might be prompted to enable the Google SQL Admin API
+
+[source, bash]
+----
+API [sqladmin.googleapis.com] not enabled on project [<project-id>].
+
+Would you like to enable and retry (this will take a few minutes)? (y/N)?
+----
+====
+
+You will see the following output:
+
+[source, bash, options="nowrap"]
+----
+NAME                    DATABASE_VERSION  LOCATION    TIER         PRIMARY_ADDRESS  PRIVATE_ADDRESS  STATUS
+micronaut-guides-mysql  MYSQL_8_0         us-east1-c  db-f1-micro  34.xxx.xxx.65    -                RUNNABLE
+----
+
+Make note of the _Primary Address_; you will need this later.
+
+If you need to update or change the `authorized-networks` use:
+[source, bash]
+----
+gcloud sql instances patch micronaut-guides-mysql \
+  --authorized-networks=<DIFFERENT_IP>
+----
+
+==== Create a User (Optional)
+
+Instead of using the _root_ DB User account, you can create one:
+
+[source, bash]
+----
+gcloud sql users create <USER_NAME> \
+  --instance=micronaut-guides-mysql \
+  --password=<USER_PASSWORD>
+----
+
+=== Create the Database
+
+Now that we have our MySQL instance running, we need to create a Database.
+
+[source, bash]
+----
+gcloud sql databases create demo \
+  --instance=micronaut-guides-mysql
+----
+* *_demo_* - Change if you would like to use a different database name
+
+external:micronaut-cloud-database-base/create-app.adoc[]
+
+== Running the Application
+
+With almost everything in place, we can start the application and try it out. First we need to set environment variables to configure the application datasource, then we can start the app.
+
+Create environment variables for `JDBC_URL`, `JDBC_USER`, `JDBC_PASSWORD` which will be used in the Micronaut app's `application.yml` datasource:
+
+[source,bash]
+----
+export JDBC_URL=jdbc:mysql://<DB_INSTANCE_IP>:3306/demo
+export JDBC_USER=<USER_NAME>
+export JDBC_PASSWORD=<ROOT_OR_USER_PASSWORD>
+----
+* *_DB_INSTANCE_IP_* - Is your MySQL instance's primary address
+- _demo_ - Change if you used a different database name
+* `JDBC_USER` - Not needed if you are using the _root_ user
+
+[NOTE]
+.Window System
+====
+Command Prompt:: Change '*export*' to '*set*'
++
+Example: `set JDBC_USER=<USER_NAME>`
+
+PowerShell:: Change '*export* ' to '*$*' and use quotes around the value
++
+Example: `$JDBC_USER="<USER_NAME>"`
+====
+
+common:runapp-instructions.adoc[]
+
+You can test the application in a web browser, or with cURL.
+
+Run from a terminal window to create a `Genre`:
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+and run this to list the genres:
+
+[source, bash]
+----
+curl http://localhost:8080/genres/list
+----
+
+=== Stopping the Instance
+
+[source, bash]
+----
+gcloud sql instances patch micronaut-guides-mysql \
+  --activation-policy=NEVER
+----
+
+common:gcp-project-cleanup.adoc[]
+
+external:micronaut-cloud-database-base/end.adoc[]
+
+
+
+
+
+
+
