@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Model tests for BookAvailability
  */
-@Property(name = "spec.name", value = "BookAvailabilityTest")
+@Property(name = "spec.name", value = "BookAvailabilityTest") // <6>
 @MicronautTest
 public class BookAvailabilityTest {
     @Inject
@@ -33,33 +33,34 @@ public class BookAvailabilityTest {
      * Model tests for BookAvailability
      */
     @Test
-    public void testFromValue() {
+    public void testFromValue() { // <1>
         assertEquals(BookAvailability.AVAILABLE, BookAvailability.fromValue("available"));
         assertEquals(BookAvailability.NOT_AVAILABLE, BookAvailability.fromValue("not available"));
         assertEquals(BookAvailability.RESERVED, BookAvailability.fromValue("reserved"));
     }
 
     @Test
-    public void testToString() {
+    public void testToString() { // <2>
         assertEquals("available", BookAvailability.AVAILABLE.toString());
         assertEquals("not available", BookAvailability.NOT_AVAILABLE.toString());
         assertEquals("reserved", BookAvailability.RESERVED.toString());
     }
 
     @Test
-    public void testJsonCreator() {
-        assertEquals("reserved" ,httpClient.toBlocking()
-                .retrieve(HttpRequest.GET(UriBuilder.of("/bookavailability")
-                        .queryParam("availability", "reserved")
-                        .build())));
+    public void testJsonCreator() { // <7>
+        HttpRequest<?> request = HttpRequest.GET(UriBuilder.of("/bookavailability")
+                .queryParam("availability", "reserved")
+                .build());
+        String response = httpClient.toBlocking().retrieve(request);
+        assertEquals("reserved", response);
     }
 
-    @Requires(property = "spec.name", value = "BookAvailabilityTest")
-    @Controller("/bookavailability")
+    @Requires(property = "spec.name", value = "BookAvailabilityTest") // <5>
+    @Controller("/bookavailability") // <3>
     static class BookAvailabilityController {
         @PermitAll
         @Produces(MediaType.TEXT_PLAIN)
-        @Get
+        @Get // <4>
         String index(@QueryValue BookAvailability availability) {
             return availability.toString();
         }

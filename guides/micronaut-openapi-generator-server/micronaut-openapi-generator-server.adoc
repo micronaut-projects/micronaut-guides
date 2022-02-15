@@ -302,7 +302,7 @@ curl -i "localhost:8080/search?book-name=Gu"
 +
 [source,bash]
 ----
-TP/1.1 400 Bad Request
+HTTP/1.1 400 Bad Request
 Content-Type: application/json
 date: ****
 content-length: 180
@@ -322,7 +322,7 @@ curl -i -d '{"name": "My book", "availability": "available"}' \
 +
 [source,bash]
 ----
-TP/1.1 200 OK
+HTTP/1.1 200 OK
 date: Tue, 1 Feb 2022 00:01:57 GMT
 Content-Type: application/json
 content-length: 0
@@ -340,6 +340,16 @@ We will implement tests for models inside these files. This is done to ensure th
 Implement the test for `BookAvailability` enum:
 
 test:model/BookAvailabilityTest[]
+<1> Test parsing of value from `String`. This will also be used during JSON parsing.
+<2> Test serialization to `String`.
+<3> Create a controller that will be used to test `String` parsing and serialization of the `BookAvailability` object.
+<4> Create a GET method for the path (`/bookavailability`). The method will take a `BookAvailability` object as parameter and
+return it. The conversions from String and back will be based on the generated file for the model.
+<5> Use the link:https://docs.micronaut.io/latest/guide/#metaScopes[Requires] annotation to specify that
+this controller will only be used if the `spec.name` property is set to `BookAvailabilityTest`.
+<6> Set the `spec.name` property for this test. This will make the paths of our controller available for this test,
+while not running it during other tests.
+<7> Send a request to the controller that we just created. Then verify that the response matches the parameter.
 
 Implement the test for `BookInfo` which verifies validation:
 
