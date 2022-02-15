@@ -2,7 +2,7 @@ common:header-top.adoc[]
 
 == Getting Started
 
-In this guide we will write an https://www.openapis.org[OpenAPI] definition file and then use it to generate a Java Micronaut server API with https://openapi-generator.tech[OpenAPI Generator]
+In this guide we will write an https://www.openapis.org[OpenAPI] definition file and then use it to generate a Java Micronaut server API with https://openapi-generator.tech[OpenAPI Generator].
 
 ____
 OpenAPI Generator allows generation of API client libraries (SDK generation), server stubs, documentation and configuration automatically given an OpenAPI Spec (both 2.0 and 3.0 are supported).
@@ -246,11 +246,15 @@ YAML definition file:
 
 Along with that it has getters and setters for parameters and Jackson serialization annotations.
 
+=== Writing a Service
+
 To add the required functionality to the server we will first create a service to manage books in our library.
 Create `BookService` with the following implementation:
 
 source:BookService[]
 callout:singleton[1]
+
+=== Implementing Controller Methods
 
 Now open `BooksController`. The class should have two methods named the same
 as the operations we created in the definition file. The methods have Micronaut framework annotations describing the
@@ -259,7 +263,7 @@ required API. We will now write their bodies.
 First, inject `BookService`:
 source:controller/BooksController[tag=import]
 source:controller/BooksController[tag=inject,indent=0]
-<1> Micronaut will inject the singleton instance of the bean here.
+callout:constructor-di[number=1,arg0=BookService]
 
 Next, we will add an implementation of the `search` method:
 
@@ -273,21 +277,29 @@ source:controller/BooksController[tag=addBook,indent=0]
 
 common:runapp.adoc[]
 
-You can send a few requests to the paths to test the application. As an example, we will use cURL for that:
+You can send a few requests to the paths to test the application. We will use cURL for that.
 
+* The search for book names, that have `"Guide"` as substring should return 2 `BookInfo` objects:
++
 [source,bash]
 ----
 curl "localhost:8080/search?book-name=Guide"
 ----
++
 [source,bash]
 ----
 [{"name":"The Hitchhiker's Guide to the Galaxy","availability":"reserved","author":"Douglas Adams"},
 {"name":"Java Guide for Beginners","availability":"available"}]
 ----
+
+* The search for a substring `"Gu"` in name will return a "Bad Request" error, since we have defined the name parameter to
+have at least three characters:
++
 [source,bash]
 ----
 curl -i "localhost:8080/search?book-name=Gu"
 ----
++
 [source,bash]
 ----
 TP/1.1 400 Bad Request
@@ -299,11 +311,15 @@ connection: keep-alive
 {"message":"Bad Request","_embedded":{"errors":[{"message":"bookName: size must be between 3 and 2147483647"}]},
 "_links":{"self":{"href":"/search?book-name=Gu","templated":false}}}
 ----
+
+* Addition of a new book should not result in errors:
++
 [source,bash]
 ----
 curl -i -d '{"name": "My book", "availability": "available"}' \
   -H 'Content-Type: application/json' -X POST localhost:8080/add
 ----
++
 [source,bash]
 ----
 TP/1.1 200 OK
@@ -312,10 +328,14 @@ Content-Type: application/json
 content-length: 0
 connection: keep-alive
 ----
+You can then verify that the addition was successful by performing another search.
 
 == Testing the Application
 
-As we have noticed previously, some files were generated as templates for tests. Let's implement them.
+=== Testing Models
+
+As we have noticed previously, some files were generated as templates for tests.
+We will implement tests for models inside these files. This is done to ensure that the generated model behaves as we expected.
 
 Implement the test for `BookAvailability` enum:
 
@@ -324,6 +344,8 @@ test:model/BookAvailabilityTest[]
 Implement the test for `BookInfo` which verifies validation:
 
 test:model/BookInfoTest[]
+
+=== Testing the Controller
 
 Replace the contents of `BooksControllerTest`:
 
