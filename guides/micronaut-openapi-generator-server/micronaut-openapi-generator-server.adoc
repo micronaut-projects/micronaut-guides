@@ -71,7 +71,7 @@ Paste the following text to the file:
 resource:library-definition.yaml[tag=info]
 
 <1> The version that will be used for parsing.
-<2> The info object contains general information about the API to its reader.
+<2> The info object contains general information about the API.
 <3> Tags will be used to logically structure different paths.
 
 NOTE: If you are new to OpenAPI, you might be interested in reading the
@@ -85,7 +85,7 @@ We will proceed by defining a path that will be available in our API. Paste the 
 resource:library-definition.yaml[tags=paths|search]
 
 <1> We define the `GET` operation on the `/search` path.
-<2> We use the `books` tag that we previously defined. Note that for each tag a Controller will be generated
+<2> We use the `books` tag that we previously defined. Note that for each tag a controller will be generated
 that will implement its operations.
 <3> The `search` operation id will be used as method name for the given path.
 <4> We define two parameters of type string that user should supply in query.
@@ -226,7 +226,7 @@ You should see the following directory structure:
 └── ...
 ----
 <1> The `docs/` directory contains automatically generated Markdown files with documentation about your API.
-<2> Starts the Micronaut server with detected Controllers.
+<2> Starts the Micronaut server with detected controllers.
 <3> The `BooksController` is generated based on paths with `books` tag. It is generated in the package we specified
 for controllers earlier.
 <4> Two files are generated in the `models/` directory based on schemas we provided in the definition.
@@ -292,7 +292,7 @@ curl "localhost:8080/search?book-name=Guide"
 {"name":"Java Guide for Beginners","availability":"available"}]
 ----
 
-* The search for a substring `"Gu"` in name will return a "Bad Request" error, since we have defined the name parameter to
+* The search for a substring `"Gu"` in name will return a "Bad Request" error, since we have defined the `book-name` parameter to
 have at least three characters:
 +
 [source,bash]
@@ -335,30 +335,63 @@ You can then verify that the addition was successful by performing another searc
 === Testing Models
 
 As we have noticed previously, some files were generated as templates for tests.
-We will implement tests for models inside these files. This is done to ensure that the generated model behaves as we expected.
+We will implement tests for models inside these files. Their main purpose will be to verify that we correctly described
+our API in the YAML file, and therefore the generated files behave as expected.
 
-Implement the test for `BookAvailability` enum:
+We will begin by writing tests for the required properties of `BookInfo` object.
+Define the following imports:
+test:model/BookInfoTest[tag=imports]
 
-test:model/BookAvailabilityTest[]
-<1> Test parsing of value from `String`. This will also be used during JSON parsing.
-<2> Test serialization to `String`.
-<3> Create a controller that will be used to test `String` parsing and serialization of the `BookAvailability` object.
-<4> Create a GET method for the path (`/bookavailability`). The method will take a `BookAvailability` object as parameter and
-return it. The conversions from String and back will be based on the generated file for the model.
-<5> Use the link:https://docs.micronaut.io/latest/guide/#metaScopes[Requires] annotation to specify that
-this controller will only be used if the `spec.name` property is set to `BookAvailabilityTest`.
-<6> Set the `spec.name` property for this test. This will make the paths of our controller available for this test,
-while not running it during other tests.
-<7> Send a request to the controller that we just created. Then verify that the response matches the parameter.
+Add the following methods inside the `BookInfoTest` class:
+test:model/BookInfoTest[tag=requiredProperties]
+<1> Instruct Micronaut to inject an instance of the link:https://docs.micronaut.io/latest/guide/#beanValidation[Validator].
+`Validator` will automatically validate parameters and response bodies annotated with `@Valid` in the controller.
+We will use it test the validations manually.
+<2> Verify that the validator doesn't produce any violations on a correct `BookInfo` instance.
+<3> Verify that `null` value is not allowed for the `name` property, since the property is marked as required.
+<4> Perform the same tests for the required `availability` property.
 
-Implement the test for `BookInfo` which verifies validation:
+We will then write similar test for other properties:
+test:model/BookInfoTest[tag=otherProperties]
+<1> Verify that there are no violations for both `null` or `"Lewis Carol"` used as a value for the `author` property.
+<2> Verify that there is a violation in case the name is too short (at least tree characters are required).
+<3> Verify that there are no violations for valid values of the `ISBN` property.
+<4> Verify that there is a violation in case the value doesn't match the required pattern (A space is present).
 
-test:model/BookInfoTest[]
+Finally, we will test JSON serialization and parsing by writing a simple controller and client:
+test:model/BookInfoTest[tags=annotations|jsonSerialization]
+<1> Create a simple controller that will respond to requests on the `/bookinfo` path.
+<2> Specify the `spec.name` property for this test class.
+<3> Use the link:https://docs.micronaut.io/latest/guide/#metaScopes[Requires] annotation to specify that
+this controller will only be used if the `spec.name` property is set to `BookInfoTest`. This will prevent the controller
+from running during other tests.
+<4> Define a `GET` method that will return a `BookInfo` object in the `application/json` format.
+<5> Create a test that will send a request to the server and verify that the response matches the desired object
+(This means that both serialization and parsing work correctly).
+
+Similarly, we can implement tests for the `BookAvailability` class. The details are not shown in this guide.
+
+// Implement the test for `BookAvailability` enum:
+//
+//test:model/BookAvailabilityTest[]
+//<1> Test parsing of value from `String`. This will also be used during JSON parsing.
+//<2> Test serialization to `String`.
+//<3> Create a controller that will be used to test `String` parsing and serialization of the `BookAvailability` object.
+//<4> Create a GET method for the path (`/bookavailability`). The method will take a `BookAvailability` object as parameter and
+//return it. The conversions from String and back will be based on the generated file for the model.
+//<5> Use the link:https://docs.micronaut.io/latest/guide/#metaScopes[Requires] annotation to specify that
+//this controller will only be used if the `spec.name` property is set to `BookAvailabilityTest`.
+//<6> Set the `spec.name` property for this test. This will make the paths of our controller available for this test,
+//while not running it during other tests.
+//<7> Send a request to the controller that we just created. Then verify that the response matches the parameter.
 
 === Testing the Controller
 
-Replace the contents of `BooksControllerTest`:
+We will write test for the two paths of `BookController`.
+If you open the `BooksControllerTest`, you can see that templates of tests were generated for both paths with examples
+of requests to corresponding paths. The templates can be used to simplify and speed up test writing.
 
+We will simply replace the contents of the file:
 test:controller/BooksControllerTest[]
 
 callout:micronaut-test[1]
@@ -369,7 +402,7 @@ callout:body-method[5]
 
 common:testApp-noheader.adoc[]
 
-The tests should both run successfully.
+All the tests should run successfully.
 
 common:graal-with-plugins.adoc[]
 
@@ -446,6 +479,16 @@ java -jar openapi-generator-cli-5.4.0.jar generate \
 
 To learn more about Micronaut framework and its features visit
 link:https://micronaut.io/docs/[Micronaut documentation].
+
+=== Add Server URL Information
+
+If you have your server running, you can add your website URL to it in the YAML definition file:
+[source,yaml]
+----
+# ... #
+servers:
+  - url: 'http://my.website.com'
+----
 
 === Generate User-Friendly Documentation
 
