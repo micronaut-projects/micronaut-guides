@@ -83,6 +83,9 @@ EXIT_STATUS=0
                 continue
             }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
+            bashScript << """\
+cd $metadata.slug
+"""
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
                 BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE
@@ -106,6 +109,9 @@ cd ..
 """
                 }
             }
+            bashScript << """\
+cd ..
+"""
         }
 
         if (!stopIfFailure) {
