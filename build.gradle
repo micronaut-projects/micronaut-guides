@@ -97,11 +97,8 @@ task generateSampleProjects {
     group 'guides'
     description 'Generates guide applications at build/code'
     doLast {
-        if (!buildDir.exists()) {
-           buildDir.mkdir()
-        }
         if (!codeDir.exists()) {
-            codeDir.mkdir()
+            codeDir.mkdirs()
         }
 
         try (GuideProjectGenerator generator = new GuideProjectGenerator()) {
@@ -153,7 +150,7 @@ task generateGuidesIndex {
     description 'Generates an index.html with all the guides'
     doLast {
         File template = new File(projectDir, "assets/template.html")
-        IndexGenerator.generateGuidesIndex(template, guidesDir, project.buildDir, metadataConfigName)
+        IndexGenerator.generateGuidesIndex(template, guidesDir, distDir, metadataConfigName)
     }
 }
 
@@ -161,6 +158,9 @@ task generateGuidesJsonMetadata {
     group 'guides'
     description 'Generates a guides.json with the metadata for all the guides'
     doLast {
+        if (!distDir.exists()) {
+            distDir.mkdirs()
+        }
         File guidesJson = new File(distDir, 'guides.json')
         guidesJson.createNewFile()
         guidesJson.text = IndexGenerator.generateGuidesJsonIndex(guidesDir, metadataConfigName)
