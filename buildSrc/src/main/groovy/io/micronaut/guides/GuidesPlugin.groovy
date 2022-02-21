@@ -1,14 +1,19 @@
 package io.micronaut.guides
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.core.util.CollectionUtils
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
 import io.micronaut.guides.tasks.SampleProjectGenerationTask
 import io.micronaut.guides.tasks.TestScriptTask
+import io.micronaut.starter.options.BuildTool
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Transformer
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.file.Directory
 import org.gradle.api.tasks.TaskProvider
@@ -17,13 +22,16 @@ import java.util.stream.Collectors
 
 @CompileStatic
 class GuidesPlugin implements Plugin<Project> {
-
+    private static final String TASK_SUFFIX_GENERATE_PROJECTS = "GenerateProjects"
+    private static final List<Integer> JAVA_MATRIX = [8, 11, 17]
     private static final List<String> FINALIZED_TASKS = ['generateTestScript',
                                                          'generateGuidesIndex',
                                                          'generateGuidesJsonMetadata',
                                                          'themeGuides']
-    public static final String KEY_ZIP = "zip"
-    public static final String KEY_DOC = "doc"
+    private static final String KEY_ZIP = "zip"
+    private static final String KEY_WORKFLOW = "workflow"
+    private static final String KEY_DOC = "doc"
+    private static final String COMMA = ","
 
     @Override
     void apply(Project project) {
@@ -36,6 +44,11 @@ class GuidesPlugin implements Plugin<Project> {
                 .filter(guideMetadata -> Utils.process(guideMetadata, false))
                 .map(metadata -> {
                     String taskSlug = kebapCaseToGradleName(metadata.slug)
+
+                    TaskProvider<Copy> githubActionWorkflowTask = registerGenerateGithubActionWorkflow(project,
+                            metadata,
+                            taskSlug)
+
                     List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
                     TaskProvider<SampleProjectGenerationTask> generateTask = registerGenerateTask(project, metadata, projectGenerator, guidesDir, codeDir, taskSlug)
                     TaskProvider<AsciidocGenerationTask> docTask = registerDocTask(project, metadata, guidesDir, generateTask, taskSlug)
@@ -50,7 +63,7 @@ class GuidesPlugin implements Plugin<Project> {
                     TaskProvider<GuidesIndexGradleTask> indexTask = registerIndexTask(project, taskSlug, metadata)
                     TaskProvider<TestScriptTask> testScriptTask = registerTestScriptTask(project, taskSlug, metadata, generateTask)
                     registerGuideBuild(project, taskSlug, docTask, zip, indexTask, testScriptTask)
-                    CollectionUtils.mapOf(KEY_DOC, docTask, KEY_ZIP, zip)
+                    CollectionUtils.mapOf(KEY_DOC, docTask, KEY_ZIP, zip, KEY_WORKFLOW, githubActionWorkflowTask)
                 }).collect(Collectors.toList())
 
         List<TaskProvider<Task>> docTasks = sampleTasks.stream()
@@ -73,6 +86,34 @@ class GuidesPlugin implements Plugin<Project> {
             it.description = 'Generates a ZIP file for each application at build/code into build/dist'
             it.dependsOn(zipTasks, sampleProjects, 'createDist')
         }
+
+        List<TaskProvider<Task>> workflowTasks = sampleTasks.stream()
+                .map() { Map<String, TaskProvider<Task>> m -> m.get(KEY_WORKFLOW) }
+                .collect(Collectors.toList())
+
+        project.tasks.register("generateGithubActionWorkflows") {Task it ->
+            it.group = 'guides'
+            it.description = 'Generates a Github Action Workflow per guide'
+            it.dependsOn(workflowTasks)
+        }
+    }
+
+    /**
+     * https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
+     */
+    private static String worflowPaths(GuideMetadata metadata) {
+        List<String> paths = [
+                'version.txt',
+                //'buildSrc/main/java/io/micronaut/features/**',
+                //'buildSrc/main/resources/pom.xml',
+                "guides/${metadata.slug}/**",
+        ] as List<String>
+        if (metadata.base) {
+            paths.add("guides/${metadata.base}/**".toString())
+        }
+        String.join(COMMA, paths.stream()
+                .map(p -> "\"${p}\"")
+                .collect(Collectors.toList()))
     }
 
     private static String kebapCaseToGradleName(String name) {
@@ -135,11 +176,15 @@ class GuidesPlugin implements Plugin<Project> {
         }
     }
 
+    private static String optionName(GuideMetadata metadata, GuidesOption option) {
+        "${metadata.slug}-${option.buildTool}-${option.language}"
+    }
+
     private static TaskProvider<Zip> registerZipTask(Project project,
                                                      GuideMetadata metadata,
                                                      GuidesOption option,
                                                      TaskProvider<SampleProjectGenerationTask> generateTask) {
-        String name = "${metadata.slug}-${option.buildTool}-${option.language}"
+        String name = optionName(metadata, option)
         String taskName = "${kebapCaseToGradleName(name)}ZipCode"
         String fromPath = "code/$metadata.slug/$name"
         String archiveFileName = "${name}.zip"
@@ -153,13 +198,60 @@ class GuidesPlugin implements Plugin<Project> {
         }
     }
 
+    private static TaskProvider<Copy> registerGenerateGithubActionWorkflow(Project project,
+                                                      GuideMetadata metadata,
+                                                     String taskSlug) {
+
+        List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
+        String gradleProjects =String.join(COMMA, options
+                .stream()
+                .filter(option -> option.buildTool.isGradle())
+                .map(option -> "\"" + optionName(metadata, option) + "\"" )
+                .collect(Collectors.toList()))
+
+        String mavenProjects =String.join(COMMA, options
+                .stream()
+                .filter(option -> option.buildTool == BuildTool.MAVEN)
+                .map(option -> "\"" + optionName(metadata, option) + "\"" )
+                .collect(Collectors.toList()))
+
+        project.tasks.register("${taskSlug}GenerateGithubActionWorkflow", Copy) { Copy it ->
+            it.from("github-action-template.yml")
+            it.into(project.layout.projectDirectory.dir(".github/workflows"))
+            it.filter(ReplaceTokens, tokens: [
+                    gradleTask: "${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}".toString(),
+                    javaMatrix: javaMatrix(metadata),
+                    slug: metadata.slug,
+                    mavenProjects: mavenProjects,
+                    gradleProjects: gradleProjects,
+                    paths: worflowPaths(metadata)
+            ])
+            it.rename(new Transformer<String, String>() {
+                @Override
+                String transform(String s) {
+                    "guide-${metadata.slug}.yml"
+                }
+            })
+        }
+    }
+
+    private static String javaMatrix(GuideMetadata guideMetadata) {
+        String.join(COMMA, (guideMetadata.minimumJavaVersion ? JAVA_MATRIX.stream()
+                    .filter(v -> v >= guideMetadata.minimumJavaVersion )
+                    .collect(Collectors.toList()) : JAVA_MATRIX)
+                .stream()
+                .map(v -> "\"${v}\"")
+                .collect(Collectors.toList()))
+    }
+
+
     private static TaskProvider<SampleProjectGenerationTask> registerGenerateTask(Project project,
                                                                            GuideMetadata metadata,
                                                                            GuideProjectGenerator projectGenerator,
                                                                            Directory guidesDir,
                                                                            Provider<Directory> codeDir,
                                                                            String taskSlug) {
-        project.tasks.register("${taskSlug}GenerateProjects", SampleProjectGenerationTask) { SampleProjectGenerationTask it ->
+        project.tasks.register("${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}", SampleProjectGenerationTask) { SampleProjectGenerationTask it ->
             it.group = 'guides'
             it.description = "Generate sample project for guide '${metadata.title}'"
             it.guidesGenerator = projectGenerator
@@ -174,9 +266,11 @@ class GuidesPlugin implements Plugin<Project> {
     private static TaskProvider<Task> registerGuideBuild(Project project,
                                       String taskSlug,
                                       TaskProvider<? extends Task>... dependsOnTasks) {
-        project.tasks.register("${taskSlug}Build") { Task it ->
+        project.tasks.register("${taskSlug}${TASK_SUFFIX_BUILD}") { Task it ->
             it.group = 'guides' + taskSlug
             it.dependsOn(dependsOnTasks)
         }
     }
+
+    private static final String TASK_SUFFIX_BUILD = "Build";
 }

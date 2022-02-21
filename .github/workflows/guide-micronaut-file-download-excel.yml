@@ -1,0 +1,65 @@
+name: Guides CI
+on:
+  push:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/micronaut-file-download-excel/**"]
+  pull_request:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/micronaut-file-download-excel/**"]
+jobs:
+  maven-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8","11","17"]
+        testproject: ["micronaut-file-download-excel-maven-java","micronaut-file-download-excel-maven-groovy","micronaut-file-download-excel-maven-kotlin"]
+    env:
+      JDK_VERSION:  ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew micronautFileDownloadExcelGenerateProjects
+      - name: Build with Maven
+        run: 'cd build/code/micronaut-file-download-excel/${{ matrix.testproject }};./mvnw test'
+  gradle-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8","11","17"]
+        testproject: ["micronaut-file-download-excel-gradle-java","micronaut-file-download-excel-gradle-groovy","micronaut-file-download-excel-gradle-kotlin"]
+    env:
+      JDK_VERSION: ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew micronautFileDownloadExcelGenerateProjects
+      - name: Build with Gradle
+        run: 'cd build/code/micronaut-file-download-excel/${{ matrix.testproject }};./gradlew test'

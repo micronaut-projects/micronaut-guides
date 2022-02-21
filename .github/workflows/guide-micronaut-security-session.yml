@@ -1,0 +1,65 @@
+name: Guides CI
+on:
+  push:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/micronaut-security-session/**"]
+  pull_request:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/micronaut-security-session/**"]
+jobs:
+  maven-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8","11","17"]
+        testproject: ["micronaut-security-session-maven-java","micronaut-security-session-maven-groovy","micronaut-security-session-maven-kotlin"]
+    env:
+      JDK_VERSION:  ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew micronautSecuritySessionGenerateProjects
+      - name: Build with Maven
+        run: 'cd build/code/micronaut-security-session/${{ matrix.testproject }};./mvnw test'
+  gradle-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8","11","17"]
+        testproject: ["micronaut-security-session-gradle-java","micronaut-security-session-gradle-groovy","micronaut-security-session-gradle-kotlin"]
+    env:
+      JDK_VERSION: ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew micronautSecuritySessionGenerateProjects
+      - name: Build with Gradle
+        run: 'cd build/code/micronaut-security-session/${{ matrix.testproject }};./gradlew test'
