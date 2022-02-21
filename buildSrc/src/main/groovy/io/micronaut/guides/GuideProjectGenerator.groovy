@@ -64,7 +64,7 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    private static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
             throw new GradleException("metadata file not found for " + dir.name)
@@ -122,7 +122,7 @@ class GuideProjectGenerator implements AutoCloseable {
             asciidocDir.mkdir()
         }
 
-        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName);
+        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
             File dir = new File(guidesDir, metadata.slug)
             try {
@@ -141,7 +141,7 @@ class GuideProjectGenerator implements AutoCloseable {
         "${slug}-${guidesOption.buildTool}-${guidesOption.language}"
     }
 
-    private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
+    void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
 
         String packageAndName = BASE_PACKAGE + '.' + APP_NAME
         JdkVersion javaVersion = Utils.parseJdkVersion()
@@ -224,7 +224,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
         if (!Files.exists(sourcePath)) {
-            sourcePath.toFile().mkdir();
+            sourcePath.toFile().mkdir()
         }
         if (Files.exists(sourcePath)) {
             // copy source/resource files for the current language
@@ -290,7 +290,7 @@ class GuideProjectGenerator implements AutoCloseable {
         JUNIT
     }
 
-    private static void mergeMetadataList(List<GuideMetadata> metadatas) {
+    static void mergeMetadataList(List<GuideMetadata> metadatas) {
         Map<String, GuideMetadata> metadatasByDirectory = new TreeMap<>()
         for (GuideMetadata metadata : metadatas) {
             metadatasByDirectory[metadata.slug] = metadata

@@ -3,6 +3,8 @@ package io.micronaut.guides
 import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
 
+import java.util.stream.Collectors
+
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.GRADLE
 import static io.micronaut.starter.options.BuildTool.MAVEN
@@ -57,9 +59,40 @@ exit 0
         return !guidesChanged.contains(metadata.slug)
     }
 
-    static String generateScript(File guidesFolder, String metadataConfigName,
-                                 boolean stopIfFailure, List<String> changedFiles) {
+    static String generateScript(File guidesFolder,
+                                 String metadataConfigName,
+                                 boolean stopIfFailure,
+                                 List<String> changedFiles) {
+        List<String> slugsChanged = guidesChanged(changedFiles)
+        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
+                changesDependencies(changedFiles, slugsChanged) ||
+                changesBuildScr(changedFiles) ||
+                (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
+                (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
 
+        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        metadatas = metadatas.stream()
+                .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
+                .collect(Collectors.toList())
+        generateScript(metadatas, stopIfFailure)
+    }
+
+    static void generateTestScript(File output,
+                                   List<GuideMetadata> metadatas,
+                                   boolean stopIfFailure) {
+        String script = generateScript(metadatas, stopIfFailure)
+        generateTestScript(output, script)
+    }
+
+    static void generateTestScript(File output, String script, String scriptFileName = "test.sh") {
+        File testScript = new File(output, scriptFileName)
+        testScript.createNewFile()
+        testScript.text = script
+        testScript.executable = true
+    }
+
+    static String generateScript(List<GuideMetadata> metadatas,
+                                 boolean stopIfFailure) {
         StringBuilder bashScript = new StringBuilder('''\
 #!/usr/bin/env bash
 set -e
@@ -67,22 +100,12 @@ set -e
 FAILED_PROJECTS=()
 EXIT_STATUS=0
 ''')
-        List<String> slugsChanged = guidesChanged(changedFiles)
-        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
-                                        changesDependencies(changedFiles, slugsChanged) ||
-                                        changesBuildScr(changedFiles) ||
-                                        (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
-                                        (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
 
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         metadatas.sort { it.slug }
-
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = shouldSkip(metadata, slugsChanged, forceExecuteEveryTest)
-            if (skip) {
-                continue
-            }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
+            bashScript << """\
+"""
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
                 BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE

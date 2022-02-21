@@ -15,7 +15,6 @@ public class DockerPushNativeGoogleCloudContainerRegistry extends DockerPushNati
         return "gcr.io/micronaut-guides/micronautguide:latest";
     }
 
-
     @Override
     public String getName() {
         return "docker-push-native-gcr";
