@@ -64,7 +64,7 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    private static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
             throw new GradleException("metadata file not found for " + dir.name)
@@ -113,6 +113,10 @@ class GuideProjectGenerator implements AutoCloseable {
                   String metadataConfigName,
                   File projectDir) {
 
+        if (!output.exists()) {
+            assert output.mkdir()
+        }
+
         File asciidocDir = new File(projectDir, 'src/docs/asciidoc')
         if (!asciidocDir.exists()) {
             asciidocDir.mkdir()
@@ -137,11 +141,7 @@ class GuideProjectGenerator implements AutoCloseable {
         "${slug}-${guidesOption.buildTool}-${guidesOption.language}"
     }
 
-    private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
-
-        if (!outputDir.exists()) {
-            assert outputDir.mkdir()
-        }
+    void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
 
         String packageAndName = BASE_PACKAGE + '.' + APP_NAME
         JdkVersion javaVersion = Utils.parseJdkVersion()
@@ -223,6 +223,9 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
+        if (!Files.exists(sourcePath)) {
+            sourcePath.toFile().mkdir();
+        }
         if (Files.exists(sourcePath)) {
             // copy source/resource files for the current language
             Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
@@ -287,7 +290,7 @@ class GuideProjectGenerator implements AutoCloseable {
         JUNIT
     }
 
-    private static void mergeMetadataList(List<GuideMetadata> metadatas) {
+    static void mergeMetadataList(List<GuideMetadata> metadatas) {
         Map<String, GuideMetadata> metadatasByDirectory = new TreeMap<>()
         for (GuideMetadata metadata : metadatas) {
             metadatasByDirectory[metadata.slug] = metadata
@@ -319,16 +322,16 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.intro = metadata.intro ?: base.intro
         merged.authors = mergeLists(base.authors, metadata.authors)
         merged.tags = mergeLists(base.tags, metadata.tags)
-        merged.category = base.category ?: metadata.category
+        merged.category = metadata.category ?: base.category
         merged.publicationDate = metadata.publicationDate
         merged.publish = metadata.publish
-        merged.buildTools = base.buildTools ?: metadata.buildTools
-        merged.languages = base.languages ?: metadata.languages
-        merged.testFramework = base.testFramework ?: metadata.testFramework
+        merged.buildTools = metadata.buildTools ?: base.buildTools
+        merged.languages = metadata.languages ?: base.languages
+        merged.testFramework = metadata.testFramework ?: base.testFramework
         merged.skipGradleTests = base.skipGradleTests || metadata.skipGradleTests
         merged.skipMavenTests = base.skipMavenTests || metadata.skipMavenTests
-        merged.minimumJavaVersion = base.minimumJavaVersion ?: metadata.minimumJavaVersion
-        merged.maximumJavaVersion = base.maximumJavaVersion ?: metadata.maximumJavaVersion
+        merged.minimumJavaVersion = metadata.minimumJavaVersion ?: base.minimumJavaVersion
+        merged.maximumJavaVersion = metadata.maximumJavaVersion ?: base.maximumJavaVersion
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
         merged.apps = mergeApps(base, metadata)
 
@@ -336,14 +339,26 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     private static List<App> mergeApps(GuideMetadata base, GuideMetadata metadata) {
-        List<App> apps = new ArrayList<>(metadata.apps)
-        for (App app : apps) {
-            App baseAppMatchingName = base.apps.find { it.name == app.name }
-            if (baseAppMatchingName) {
-                app.features += baseAppMatchingName.features
-            }
+
+        Map<String, App> baseApps = base.apps.collectEntries { [(it.name): it] }
+        Map<String, App> guideApps = metadata.apps.collectEntries { [(it.name): it] }
+
+        Set<String> baseOnly = baseApps.keySet() - guideApps.keySet()
+        Set<String> guideOnly = guideApps.keySet() - baseApps.keySet()
+        Collection<String> inBoth = baseApps.keySet().intersect(guideApps.keySet())
+
+        List<App> merged = []
+        merged.addAll(baseOnly.collect { baseApps[it] })
+        merged.addAll(guideOnly.collect { guideApps[it] })
+
+        for (String name : inBoth) {
+            App baseApp = baseApps[name]
+            App guideApp = guideApps[name]
+            guideApp.features.addAll baseApp.features
+            merged << guideApp
         }
-        apps
+
+        merged
     }
 
     private static List mergeLists(List base, List others) {

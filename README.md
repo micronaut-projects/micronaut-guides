@@ -12,10 +12,8 @@ $ ./gradlew build
 
 This will generate all the projects and guides in `build/dist` and this is what needs to be published to GitHub Pages.
 
-To build only one guide use the system property `micronaut.guide`
-
 ```shell
-./gradlew build -Dmicronaut.guide=micronaut-http-client
+./gradlew micronautHttpClientBuild
 ```
 
 ## Create a new guide
@@ -150,6 +148,26 @@ micronaut-microservices-distributed-tracing-zipkin
 There is only one Asciidoctor file per guide in the root directory of the guide (sibling to `metadata.json`). This unique file is used to generate all the combinations for the guide (language and build tool) so we need to take that into account when writing the guide. Name the Asciidoctor file the same as the directory, with an "adoc" extension, e.g. `micronaut-http-client.adoc` for the `micronaut-http-client` guide directory.
 
 We don't really write a valid Asciidoctor file but our "own" Asciidoctor with custom kind-of-macros. Then during the build process we render the final HTML for the guide in two phases. In the first one we evaluate all of our custom macros and include and generate a new language-build tool version of the guide in `src/doc/asciidoc`. This directory is excluded from source control and needs to be considered temporary. Then we render the final HTML of the (up to) six guides from that generated and valid Asciidoctor file.
+
+#### Placeholders
+
+You can use the following placeholders while writing a guide: 
+
+* `@language@`
+* `@guideTitle@`
+* `@guideIntro@`
+* `@micronaut@`
+* `@lang@`
+* `@build@`
+* `@testFramework@`
+* `@authors@`
+* `@languageextension@`
+* `@testsuffix@`
+* `@sourceDir@`
+* `@minJdk@`
+* `@api@`
+* `@features@`
+* `@features-words@`
 
 #### Common snippets
 

@@ -1,18 +1,8 @@
-import io.micronaut.guides.GenerateGuideZip
-import io.micronaut.guides.GuideProjectGenerator
+import io.micronaut.guides.GuidesPlugin
 import io.micronaut.guides.IndexGenerator
 import io.micronaut.guides.TestScriptGenerator
 import io.micronaut.guides.ThemeProcessor
 import io.micronaut.guides.GitDiffUtils
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'io.micronaut.docs:micronaut-docs-asciidoc-extensions:1.0.25'
-    }
-}
 
 plugins {
     id 'groovy'
@@ -20,6 +10,7 @@ plugins {
 }
 
 apply from: "gradle/asciidoc.gradle"
+version '0.0.1'
 
 repositories {
     mavenCentral()
@@ -31,6 +22,7 @@ ext {
     distDir = new File(buildDir, 'dist')
     guidesDir = new File(projectDir, 'guides')
     metadataConfigName = 'metadata.json'
+    micronautVersion = new File(projectDir, 'version.txt').text.trim()
 }
 
 task cleanAsciidoctorFolder {
@@ -43,6 +35,8 @@ task cleanAsciidoctorFolder {
         }
     }
 }
+
+apply plugin: GuidesPlugin
 
 task copyImagesToDist(type: Copy) {
     group 'guides'
@@ -90,36 +84,17 @@ task createDist {
 clean.dependsOn 'cleanAsciidoctorFolder'
 build.dependsOn 'asciidoctor'
 
-asciidoctor.dependsOn 'generateCodeZip'
-asciidoctor.finalizedBy 'copyHtmlToDist'
-
-task generateSampleProjects {
-    group 'guides'
-    description 'Generates guide applications at build/code'
-    doLast {
-        if (!buildDir.exists()) {
-           buildDir.mkdir()
-        }
-        if (!codeDir.exists()) {
-            codeDir.mkdir()
-        }
-
-        try (GuideProjectGenerator generator = new GuideProjectGenerator()) {
-            generator.generate(guidesDir, codeDir, metadataConfigName, projectDir)
-        }
-    }
-    finalizedBy(
-            'generateTestScript',
-            'generateGuidesIndex',
-            'generateGuidesJsonMetadata',
-            'themeGuides'
-    )
+asciidoctor {
+    inputs.dir(project.layout.projectDirectory.dir("src/docs/asciidoc"))
+    dependsOn 'generateCodeZip'
+    finalizedBy 'copyHtmlToDist'
 }
 
 task generateTestScript {
     group 'guides'
     description 'Generates a test.sh to run every guide test at build/code'
     doLast {
+        codeDir.mkdirs()
         File testScript = new File(codeDir, "test.sh")
         testScript.createNewFile()
         List<String> changedFiles = []
@@ -135,25 +110,12 @@ task generateTestScript {
     }
 }
 
-task generateCodeZip {
-    group 'guides'
-    description 'Generates a ZIP file for each application at build/code into build/dist'
-    dependsOn 'generateSampleProjects'
-    dependsOn 'createDist'
-    doLast {
-        codeDir.eachDir { dir ->
-            File zipFile = new File(distDir, dir.name + '.zip')
-            GenerateGuideZip.compressZipfile(dir.path, zipFile.path)
-        }
-    }
-}
-
 task generateGuidesIndex {
     group 'guides'
     description 'Generates an index.html with all the guides'
     doLast {
         File template = new File(projectDir, "assets/template.html")
-        IndexGenerator.generateGuidesIndex(template, guidesDir, project.buildDir, metadataConfigName)
+        IndexGenerator.generateGuidesIndex(template, guidesDir, distDir, metadataConfigName)
     }
 }
 
@@ -161,6 +123,9 @@ task generateGuidesJsonMetadata {
     group 'guides'
     description 'Generates a guides.json with the metadata for all the guides'
     doLast {
+        if (!distDir.exists()) {
+            distDir.mkdirs()
+        }
         File guidesJson = new File(distDir, 'guides.json')
         guidesJson.createNewFile()
         guidesJson.text = IndexGenerator.generateGuidesJsonIndex(guidesDir, metadataConfigName)

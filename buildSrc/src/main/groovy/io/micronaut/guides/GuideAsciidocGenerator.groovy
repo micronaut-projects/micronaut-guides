@@ -9,6 +9,7 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
+import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
 
 import java.util.Map.Entry
@@ -63,22 +64,22 @@ class GuideAsciidocGenerator {
                 }
 
                 if (shouldProcessLine(line, 'source:')) {
-                    lines.addAll(sourceIncludeLines(line))
+                    lines.addAll(sourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'test:')) {
-                    lines.addAll(testIncludeLines(line, guidesOption.testFramework))
+                    lines.addAll(testIncludeLines(metadata.slug, line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'rawTest:')) {
-                    lines.addAll(rawTestIncludeLines(line, guidesOption.testFramework))
+                    lines.addAll(rawTestIncludeLines(metadata.slug, line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'resource:')) {
-                    lines.addAll(resourceIncludeLines(line))
+                    lines.addAll(resourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'testResource:')) {
-                    lines.addAll(testResourceIncludeLines(line))
+                    lines.addAll(testResourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'zipInclude:')) {
-                    lines.addAll(zipIncludeLines(line))
+                    lines.addAll(zipIncludeLines(metadata.slug, line))
 
                 } else if (line == ':dependencies:') {
                     groupDependencies = !groupDependencies
@@ -143,6 +144,17 @@ class GuideAsciidocGenerator {
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
+            text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                List<String> features = featuresForApp(metadata, guidesOption, app)
+                features.join(',')
+            }
+
+            text = text.replaceAll(~/@(\w*):?features-words@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                featuresWordsForApp(metadata, guidesOption, app)
+            }
+
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
                 if (entry.value.version) {
                     text = text.replace("@${entry.key}Version@", entry.value.version)
@@ -153,6 +165,27 @@ class GuideAsciidocGenerator {
             renderedAsciidocFile.createNewFile()
             renderedAsciidocFile.setText(text, 'UTF-8')
         }
+    }
+
+    private static String featuresWordsForApp(GuideMetadata metadata,
+                                              GuidesOption guidesOption,
+                                              String app) {
+        List<String> features = featuresForApp(metadata, guidesOption, app)
+                .collect{ "`$it`".toString()}
+        if(features.size() > 1) {
+            return "${features[0..-2].join(', ')} and ${features[-1]}"
+        }
+        features[0]
+    }
+
+    private static List<String> featuresForApp(GuideMetadata metadata,
+                                               GuidesOption guidesOption,
+                                               String app) {
+        List<String> features = metadata.apps.find{ it.name == app }.features
+        if(guidesOption.language == Language.GROOVY) {
+            features -= 'graalvm'
+        }
+        features
     }
 
     private static List<String> expandMacros(List<String> lines, File projectDir) {
@@ -266,23 +299,23 @@ class GuideAsciidocGenerator {
         line.substring(macro.length(), line.indexOf('['))
     }
 
-    private static List<String> sourceIncludeLines(String line) {
-        sourceIncludeLines(line, null, 'source:')
+    private static List<String> sourceIncludeLines(String slug, String line) {
+        sourceIncludeLines(slug, line, null, 'source:')
     }
 
-    private static List<String> testIncludeLines(String line, TestFramework testFramework) {
-        sourceIncludeLines(line, testFramework, 'test:')
+    private static List<String> testIncludeLines(String slug, String line, TestFramework testFramework) {
+        sourceIncludeLines(slug, line, testFramework, 'test:')
     }
 
-    private static List<String> resourceIncludeLines(String line) {
-        resourceIncludeLines(line, 'main', 'resource:')
+    private static List<String> resourceIncludeLines(String slug, String line) {
+        resourceIncludeLines(slug, line, 'main', 'resource:')
     }
 
-    private static List<String> testResourceIncludeLines(String line) {
-        resourceIncludeLines(line, 'test', 'testResource:')
+    private static List<String> testResourceIncludeLines(String slug, String line) {
+        resourceIncludeLines(slug, line, 'test', 'testResource:')
     }
 
-    private static List<String> zipIncludeLines(String line) {
+    private static List<String> zipIncludeLines(String slug, String line) {
         String fileName = extractName(line, 'zipInclude:')
         List<String> tagNames = extractTags(line)
 
@@ -295,16 +328,16 @@ class GuideAsciidocGenerator {
                 '----']
         if (tags) {
             for (String tag : tags) {
-                lines << "include::{sourceDir}/@sourceDir@/${fileName}[${tag}]\n".toString()
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${fileName}[${tag}]\n".toString()
             }
         } else {
-            lines << "include::{sourceDir}/@sourceDir@/${fileName}[]".toString()
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${fileName}[]".toString()
         }
         lines << '----'
         lines
     }
 
-    private static List<String> sourceIncludeLines(String line, TestFramework testFramework, String macro) {
+    private static List<String> sourceIncludeLines(String slug, String line, TestFramework testFramework, String macro) {
         String name = extractName(line, macro)
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
@@ -319,10 +352,10 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines << "include::{sourceDir}/@sourceDir@/${sourcePath}[${tag}]\n".toString()
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${tag}]\n".toString()
             }
         } else {
-            lines << "include::{sourceDir}/@sourceDir@/${sourcePath}[]".toString()
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[]".toString()
         }
 
         lines << '----'
@@ -354,12 +387,11 @@ class GuideAsciidocGenerator {
     private static String pathByFolder(@NonNull String appName,
                                        @NonNull String fileName,
                                        String folder) {
-
         String module = appName ? appName + '/' : ''
         "${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@"
     }
 
-    private static List<String> rawTestIncludeLines(String line, TestFramework testFramework) {
+    private static List<String> rawTestIncludeLines(String slug, String line, TestFramework testFramework) {
         String fileName = extractName(line, 'rawTest:')
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
@@ -377,17 +409,17 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
+                lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
+            lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
         }
 
         lines.add('----')
         lines
     }
 
-    private static List<String> resourceIncludeLines(String line, String resourceDir, String macro) {
+    private static List<String> resourceIncludeLines(String slug, String line, String resourceDir, String macro) {
         String fileName = extractName(line, macro)
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
@@ -405,10 +437,10 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[${tag}]\n".toString())
+                lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[${tag}]\n".toString())
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[]".toString())
+            lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[]".toString())
         }
         lines << '----'
         lines
@@ -420,11 +452,10 @@ class GuideAsciidocGenerator {
         return rendered.split("\\r?\\n|\\r") as List
     }
 
-    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
-
-        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
-        App app = metadata.apps.find { it.name == appName }
-
+    @NonNull
+    private static List<String> featureNames(@NonNull String line,
+                                              @NonNull App app,
+                                              @NonNull GuidesOption guidesOption) {
         String features = extractFromParametersLine(line, 'features')
         List<String> featureNames
         if (features) {
@@ -447,9 +478,15 @@ class GuideAsciidocGenerator {
         if (guidesOption.language == GROOVY) {
             featureNames.remove 'graalvm'
         }
+        featureNames
+    }
 
+    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
+
+        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
+        App app = metadata.apps.find { it.name == appName }
         String link = 'https://micronaut.io/launch?' +
-                featureNames.collect {'features=' + it }.join('&') +
+                featureNames(line, app, guidesOption).collect {'features=' + it }.join('&') +
                 '&lang=' + guidesOption.language.name() +
                 '&build=' + guidesOption.buildTool.name() +
                 '&test=' + guidesOption.testFramework.name() +
