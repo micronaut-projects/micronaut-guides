@@ -12,10 +12,8 @@ $ ./gradlew build
 
 This will generate all the projects and guides in `build/dist` and this is what needs to be published to GitHub Pages.
 
-To build only one guide use the system property `micronaut.guide`
-
 ```shell
-./gradlew build -Dmicronaut.guide=micronaut-http-client
+./gradlew micronautHttpClientBuild
 ```
 
 ## Create a new guide
@@ -31,8 +29,6 @@ All the guides are in the `guides` directory in separate subdirectories. Inside 
 
 ```json
 {
-  "asciidoctor": "micronaut-http-client.adoc",
-  "slug": "micronaut-http-client",
   "title": "Micronaut HTTP Client",
   "intro": "Learn how to use Micronaut low-level HTTP Client. Simplify your code with the declarative HTTP client.",
   "authors": ["Sergio del Amo", "Iván López"],
@@ -58,7 +54,10 @@ Besides, the obvious fields that doesn't need any further explanation, the other
 - `skipGradleTests`: Set it to `true` to skip running the tests for the Gradle applications for the guide. This is useful when it's not easy to run tests on CI, for example for some cloud guides.
 - `skipMavenTests`: Same as `skipGradleTests` but for Maven applications.
 - `minimumJavaVersion`: If the guide needs a minimum Java version (for example JDK 17 for Records), define it in this property.
+- `maximumJavaVersion`: If the guide needs a maximum Java version (for example JDK 11 for Azure Functions), define it in this property.
 - `zipIncludes`: List of additional files to include in the generated zip file for the guide.
+- `publish`: defaults to true for regular guides; set to false for partial/base guides
+- `base`: defaults to null; if set, indicates directory name of the base guide to copy before copying the current
 - `apps`: List of pairs `name`-`features` for the generated application. There are two types of guides, most of the guides only generate one application (single-app). In this case the name of the applications needs to be `default`. There are a few guides that generate multiple applications, so they need to be declared here:
 ```json
   ...
@@ -78,7 +77,6 @@ Besides, the obvious fields that doesn't need any further explanation, the other
   ]
 ```
 The features need to be **valid** features from Starter because the list is used directly when generating the applications using Starter infrastructure. If you need a feature that is not available on Starter, create it in `buildSrc/src/main/java/io/micronaut/guides/feature`. Also declare the GAV coordinates and version in `buildSrc/src/main/resources/pom.xml`. Dependabot is configured in this project to look for that file and send pull requests to update the dependencies.
-
 
 Inside the specific guide directory there should be a directory per language with the appropriate directory structure. All these files will be copied into the final guide directory after the guide is generated.
 
@@ -147,10 +145,29 @@ micronaut-microservices-distributed-tracing-zipkin
 
 ### Writing the guide
 
-There is only one Asciidoctor file per guide in the root directory of the guide (sibling to `metadata.json`). This unique file is used to generate all the combinations for the guide (language and build tool) so we need to take that into account when writing the guide.
+There is only one Asciidoctor file per guide in the root directory of the guide (sibling to `metadata.json`). This unique file is used to generate all the combinations for the guide (language and build tool) so we need to take that into account when writing the guide. Name the Asciidoctor file the same as the directory, with an "adoc" extension, e.g. `micronaut-http-client.adoc` for the `micronaut-http-client` guide directory.
 
 We don't really write a valid Asciidoctor file but our "own" Asciidoctor with custom kind-of-macros. Then during the build process we render the final HTML for the guide in two phases. In the first one we evaluate all of our custom macros and include and generate a new language-build tool version of the guide in `src/doc/asciidoc`. This directory is excluded from source control and needs to be considered temporary. Then we render the final HTML of the (up to) six guides from that generated and valid Asciidoctor file.
 
+#### Placeholders
+
+You can use the following placeholders while writing a guide: 
+
+* `@language@`
+* `@guideTitle@`
+* `@guideIntro@`
+* `@micronaut@`
+* `@lang@`
+* `@build@`
+* `@testFramework@`
+* `@authors@`
+* `@languageextension@`
+* `@testsuffix@`
+* `@sourceDir@`
+* `@minJdk@`
+* `@api@`
+* `@features@`
+* `@features-words@`
 
 #### Common snippets
 
@@ -164,7 +181,6 @@ We have small pieces of text that are used in different guides. To avoid the dup
 Authors: @authors@
 
 Micronaut Version: @micronaut@
-
 ```
 
 Will render the title, description, authors and version of all the guides. The variables defined between `@` signs will be evaluated and replaced during the first stage of the asciidoctor render. For example, for the Micronaut HTTP Client guide, the previous common snippet will generate:

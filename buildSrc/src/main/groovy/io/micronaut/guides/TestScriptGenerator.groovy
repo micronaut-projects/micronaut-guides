@@ -3,19 +3,22 @@ package io.micronaut.guides
 import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
 
+import java.util.stream.Collectors
+
+import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
+import static io.micronaut.starter.options.BuildTool.GRADLE
+import static io.micronaut.starter.options.BuildTool.MAVEN
+
 @CompileStatic
 class TestScriptGenerator {
 
     public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
     public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
-
-    static String emptyScript() {
-        '''\
+    public static final String EMPTY_SCRIPT = '''\
 #!/usr/bin/env bash
 set -e
 exit 0
 '''
-    }
 
     private static List<String> guidesChanged(List<String> changedFiles) {
         changedFiles.findAll { path ->
@@ -27,18 +30,18 @@ exit 0
     }
 
     private static boolean changesMicronautVersion(List<String> changedFiles) {
-        changedFiles.any { str -> str.contains("version.txt") }
+        changedFiles.any { it.contains("version.txt") }
     }
 
     private static boolean changesDependencies(List<String> changedFiles, List<String> changedGuides) {
         if (changedGuides) {
             return false
         }
-        changedFiles.any { str -> str.contains("pom.xml") }
+        changedFiles.any { it.contains("pom.xml") }
     }
 
     private static boolean changesBuildScr(List<String> changedFiles) {
-        changedFiles.any { str -> str.contains('buildSrc') }
+        changedFiles.any { it.contains('buildSrc') }
     }
 
     private static boolean shouldSkip(GuideMetadata metadata,
@@ -56,46 +59,74 @@ exit 0
         return !guidesChanged.contains(metadata.slug)
     }
 
-    static String generateScript(File guidesFolder, String metadataConfigName, boolean stopIfFailure, List<String> changedFiles) {
-        String bashScript = '''\
+    static String generateScript(File guidesFolder,
+                                 String metadataConfigName,
+                                 boolean stopIfFailure,
+                                 List<String> changedFiles) {
+        List<String> slugsChanged = guidesChanged(changedFiles)
+        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
+                changesDependencies(changedFiles, slugsChanged) ||
+                changesBuildScr(changedFiles) ||
+                (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
+                (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
+
+
+
+        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        metadatas = metadatas.stream()
+                .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
+                .collect(Collectors.toList())
+        generateScript(metadatas, stopIfFailure)
+    }
+
+    static void generateTestScript(File output,
+                                   List<GuideMetadata> metadatas,
+                                   boolean stopIfFailure) {
+        String script = generateScript(metadatas, stopIfFailure)
+        generateTestScript(output, script)
+    }
+
+    static void generateTestScript(File output, String script, String scriptFileName = "test.sh") {
+        File testScript = new File(output, scriptFileName)
+        testScript.createNewFile()
+        testScript.text = script
+        testScript.executable = true
+    }
+
+    static String generateScript(List<GuideMetadata> metadatas,
+                                 boolean stopIfFailure) {
+        StringBuilder bashScript = new StringBuilder('''\
 #!/usr/bin/env bash
 set -e
 
 FAILED_PROJECTS=()
 EXIT_STATUS=0
-'''
-        List<String> slugsChanged = guidesChanged(changedFiles)
-        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
-                                        changesDependencies(changedFiles, slugsChanged) ||
-                                        changesBuildScr(changedFiles) ||
-                                        (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
-                                        (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+''')
+
+        metadatas.sort { it.slug }
         for (GuideMetadata metadata : metadatas) {
-            boolean skip = shouldSkip(metadata, slugsChanged, forceExecuteEveryTest)
-            if (skip) {
-                continue
-            }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
+            bashScript << """\
+"""
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                BuildTool buildTool = folder.contains(BuildTool.MAVEN.toString()) ? BuildTool.MAVEN : BuildTool.GRADLE
-                if (buildTool == BuildTool.MAVEN && metadata.skipMavenTests) {
+                BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE
+                if (buildTool == MAVEN && metadata.skipMavenTests) {
                     continue
                 }
-                if (buildTool == BuildTool.GRADLE && metadata.skipGradleTests) {
+                if (buildTool == GRADLE && metadata.skipGradleTests) {
                     continue
                 }
-                if (metadata.apps.any { it.name == GuideProjectGenerator.DEFAULT_APP_NAME } ) {
-                    bashScript += scriptForFolder(folder, folder, stopIfFailure, buildTool)
+                if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
+                    bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool)
                 } else {
-                    bashScript += """\
-cd ${folder}
+                    bashScript << """\
+cd $folder
 """
                     for (GuideMetadata.App app : metadata.apps) {
-                        bashScript += scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool)
+                        bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool)
                     }
-                    bashScript += """\
+                    bashScript << """\
 cd ..
 """
                 }
@@ -103,7 +134,7 @@ cd ..
         }
 
         if (!stopIfFailure) {
-            bashScript += '''
+            bashScript << '''
 if [ ${#FAILED_PROJECTS[@]} -ne 0 ]; then
   echo ""
   echo "-------------------------------------------------"
@@ -119,29 +150,31 @@ fi
 
 '''
         }
+
         bashScript
     }
 
-    private static String scriptForFolder(String nestedFolder, String folder, boolean stopIfFailure, BuildTool buildTool) {
+    private static String scriptForFolder(String nestedFolder, String folder,
+                                          boolean stopIfFailure, BuildTool buildTool) {
         String bashScript = """\
-cd ${nestedFolder}
+cd $nestedFolder
 echo "-------------------------------------------------"
-echo "Executing '${folder}' tests"
-${buildTool == BuildTool.MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
+echo "Executing '$folder' tests"
+${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
 cd ..
 """
         if (stopIfFailure) {
             bashScript += """\
 if [ \$EXIT_STATUS -ne 0 ]; then
-  echo "'${folder}' tests failed => exit \$EXIT_STATUS"
+  echo "'$folder' tests failed => exit \$EXIT_STATUS"
   exit \$EXIT_STATUS
 fi
 """
         } else {
             bashScript += """\
 if [ \$EXIT_STATUS -ne 0 ]; then
-  FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" ${folder})
-  echo "'${folder}' tests failed => exit \$EXIT_STATUS"
+  FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" $folder)
+  echo "'$folder' tests failed => exit \$EXIT_STATUS"
 fi
 EXIT_STATUS=0
 """

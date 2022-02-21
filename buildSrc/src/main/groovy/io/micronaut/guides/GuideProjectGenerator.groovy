@@ -6,7 +6,6 @@ import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
-import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
@@ -20,25 +19,22 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 
+import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.SPOCK
-import static io.micronaut.starter.options.BuildTool.GRADLE
-import static io.micronaut.starter.options.BuildTool.MAVEN
 import static io.micronaut.starter.options.JdkVersion.JDK_11
 import static io.micronaut.starter.options.JdkVersion.JDK_8
 import static io.micronaut.starter.options.Language.GROOVY
-import static io.micronaut.starter.options.Language.JAVA
-import static io.micronaut.starter.options.Language.KOTLIN
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
-class GuideProjectGenerator implements Closeable {
+class GuideProjectGenerator implements AutoCloseable {
 
     public static final String DEFAULT_APP_NAME = 'default'
 
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = Arrays.asList(JDK_8, JDK_11)
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
@@ -49,93 +45,112 @@ class GuideProjectGenerator implements Closeable {
     }
 
     @Override
-    void close() throws IOException {
+    void close() {
         applicationContext.close()
     }
 
     @CompileDynamic
-    static List<GuideMetadata> parseGuidesMetadata(File guidesFolder,
+    static List<GuideMetadata> parseGuidesMetadata(File guidesDir,
                                                    String metadataConfigName) {
-        List<GuideMetadata> result = []
-        guidesFolder.eachDir { dir ->
-            result << parseGuideMetadata(dir, metadataConfigName)
+        List<GuideMetadata> metadatas = []
+
+        guidesDir.eachDir { dir ->
+            metadatas << parseGuideMetadata(dir, metadataConfigName)
         }
-        result
+
+        mergeMetadataList(metadatas)
+
+        metadatas
     }
 
     @CompileDynamic
-    private static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
-            throw new GradleException("metadata file not found for ${dir.name}")
+            throw new GradleException("metadata file not found for " + dir.name)
         }
-        def config = new JsonSlurper().parse(configFile)
+
+        Map config = new JsonSlurper().parse(configFile)
+        boolean publish = config.publish == null ? true : config.publish
+
         Category cat = Category.values().find {it.toString() == config.category }
-        if (!cat) {
+        if (publish && !cat) {
             throw new GradleException("$config.category does not exist in Category enum")
         }
+
         new GuideMetadata(
-                asciidoctor: config.asciidoctor,
-                slug: config.slug,
+                asciidoctor: publish ? dir.name + '.adoc' : null,
+                slug: dir.name,
                 title: config.title,
                 intro: config.intro,
                 authors: config.authors,
                 tags: config.tags,
                 category: cat,
-                publicationDate: LocalDate.parse(config.publicationDate),
+                publicationDate: publish ? LocalDate.parse(config.publicationDate) : null,
+                publish: publish,
+                base: config.base,
                 languages: config.languages ?: ['java', 'groovy', 'kotlin'],
                 buildTools: config.buildTools ?: ['gradle', 'maven'],
                 testFramework: config.testFramework,
                 skipGradleTests: config.skipGradleTests ?: false,
                 skipMavenTests: config.skipMavenTests ?: false,
                 minimumJavaVersion: config.minimumJavaVersion,
+                maximumJavaVersion: config.maximumJavaVersion,
                 zipIncludes: config.zipIncludes ?: [],
-                apps: config.apps.collect { it -> new App(name: it.name,
-                        features: it.features,
+                apps: config.apps.collect { it -> new App(
+                        name: it.name,
+                        features: it.features ?: [],
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                         excludeSource:  it.excludeSource,
-                        excludeTest:  it.excludeTest,
-                )
+                        excludeTest:  it.excludeTest)
                 }
         )
     }
 
     @CompileDynamic
-    void generate(File guidesFolder,
+    void generate(File guidesDir,
                   File output,
                   String metadataConfigName,
-                  File asciidocDir) {
+                  File projectDir) {
 
-        guidesFolder.eachDir { dir ->
-            GuideMetadata metadata = parseGuideMetadata(dir, metadataConfigName)
+        if (!output.exists()) {
+            assert output.mkdir()
+        }
+
+        File asciidocDir = new File(projectDir, 'src/docs/asciidoc')
+        if (!asciidocDir.exists()) {
+            asciidocDir.mkdir()
+        }
+
+        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName);
+        for (GuideMetadata metadata : metadatas) {
+            File dir = new File(guidesDir, metadata.slug)
             try {
                 if (Utils.process(metadata, false)) {
+                    println "Generating projects for $metadata.slug"
                     generateOne(metadata, dir, output)
-                    GuideAsciidocGenerator.generate(metadata, dir, asciidocDir)
+                    GuideAsciidocGenerator.generate(metadata, dir, asciidocDir, projectDir)
                 }
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace()
             }
         }
     }
 
     static String folderName(String slug, GuidesOption guidesOption) {
-        "${slug}-${guidesOption.buildTool.toString()}-${guidesOption.language}"
+        "${slug}-${guidesOption.buildTool}-${guidesOption.language}"
     }
 
-    private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
-        String packageAndName = "${BASE_PACKAGE}.${APP_NAME}"
+    void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
 
-        List<GuidesOption> guidesOptionList = guidesOptions(metadata)
+        String packageAndName = BASE_PACKAGE + '.' + APP_NAME
         JdkVersion javaVersion = Utils.parseJdkVersion()
 
+        List<GuidesOption> guidesOptionList = guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
             BuildTool buildTool = guidesOption.buildTool
             TestFramework testFramework = guidesOption.testFramework
             Language lang = guidesOption.language
-
-            if (!outputDir.exists()) {
-                assert outputDir.mkdir()
-            }
 
             for (App app: metadata.apps) {
                 List<String> appFeatures = [] + app.features
@@ -149,34 +164,30 @@ class GuideProjectGenerator implements Closeable {
                     appFeatures.remove('mockito')
                 }
 
-                // Normal guide use 'default' as name, multi project guides have different modules
-                String appName = app.name == DEFAULT_APP_NAME ? StringUtils.EMPTY_STRING : app.name
-                String folder = folderName(metadata.slug, guidesOption)
-
-                Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
-                File destination = destinationPath.toFile()
-                destination.mkdir()
-
                 if (metadata.minimumJavaVersion != null) {
                     JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
                     if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
                         javaVersion = minimumJavaVersion
                     }
                 }
-                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, appFeatures, buildTool, testFramework, lang, javaVersion)
 
-                final String srcFolder = 'src'
-                Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
-                if (srcPath.toFile().exists()) {
-                    Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destination.path, srcFolder)))
+                // typical guides use 'default' as name, multi-project guides have different modules
+                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
+                String folder = folderName(metadata.slug, guidesOption)
+
+                Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
+                File destination = destinationPath.toFile()
+                destination.mkdir()
+
+                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
+                        appFeatures, buildTool, testFramework, lang, javaVersion)
+
+                if (metadata.base) {
+                    File baseDir = new File(inputDir.parentFile, metadata.base)
+                    copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.language.toString(), true)
                 }
 
-                Path sourcePath = Paths.get(inputDir.absolutePath, appName, guidesOption.language.toString())
-                if (!sourcePath.toFile().exists()) {
-                    throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
-                }
-
-                Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
+                copyGuideSourceFiles(inputDir, destinationPath, appName, guidesOption.language.toString())
 
                 if (app.excludeSource) {
                     for (String mainSource : app.excludeSource) {
@@ -189,6 +200,7 @@ class GuideProjectGenerator implements Closeable {
                         deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
                     }
                 }
+
                 if (metadata.zipIncludes) {
                     File destinationRoot = new File(outputDir.absolutePath, folder)
                     for (String zipInclude : metadata.zipIncludes) {
@@ -196,6 +208,29 @@ class GuideProjectGenerator implements Closeable {
                     }
                 }
             }
+        }
+    }
+
+    private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
+                                             String appName, String language,
+                                             boolean ignoreMissingDirectories = false) {
+
+        // look for a common 'src' directory shared by multiple languages and copy those files first
+        final String srcFolder = 'src'
+        Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
+        if (Files.exists(srcPath)) {
+            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
+        }
+
+        Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
+        if (!Files.exists(sourcePath)) {
+            sourcePath.toFile().mkdir();
+        }
+        if (Files.exists(sourcePath)) {
+            // copy source/resource files for the current language
+            Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
+        } else if (!ignoreMissingDirectories) {
+            throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
         }
     }
 
@@ -207,7 +242,7 @@ class GuideProjectGenerator implements Closeable {
                 .delete()
     }
 
-    private void copyFile(File inputDir, File destinationRoot, String filePath) {
+    private static void copyFile(File inputDir, File destinationRoot, String filePath) {
         File sourceFile = new File(inputDir, filePath)
         File destinationFile = new File(destinationRoot, filePath)
 
@@ -225,28 +260,16 @@ class GuideProjectGenerator implements Closeable {
         String testFramework = guideMetadata.testFramework
         List<GuidesOption> guidesOptionList = []
 
-        if (buildTools.contains(GRADLE.toString())) {
-            if (languages.contains(JAVA.toString())) {
-                guidesOptionList << createGuidesOption(GRADLE, JAVA, testFramework)
-            }
-            if (languages.contains(KOTLIN.toString())) {
-                guidesOptionList << createGuidesOption(GRADLE, KOTLIN, testFramework)
-            }
-            if (languages.contains(GROOVY.toString())) {
-                guidesOptionList << createGuidesOption(GRADLE, GROOVY, testFramework)
+        for (BuildTool buildTool : BuildTool.values()) {
+            if (buildTools.contains(buildTool.toString())) {
+                for (Language language : Language.values()) {
+                    if (languages.contains(language.toString())) {
+                        guidesOptionList << createGuidesOption(buildTool, language, testFramework)
+                    }
+                }
             }
         }
-        if (buildTools.contains(MAVEN.toString())) {
-            if (languages.contains(JAVA.toString())) {
-                guidesOptionList << createGuidesOption(MAVEN, JAVA, testFramework)
-            }
-            if (languages.contains(KOTLIN.toString())) {
-                guidesOptionList << createGuidesOption(MAVEN, KOTLIN, testFramework)
-            }
-            if (languages.contains(GROOVY.toString())) {
-                guidesOptionList << createGuidesOption(MAVEN, GROOVY, testFramework)
-            }
-        }
+
         guidesOptionList
     }
 
@@ -265,5 +288,87 @@ class GuideProjectGenerator implements Closeable {
             return SPOCK
         }
         JUNIT
+    }
+
+    static void mergeMetadataList(List<GuideMetadata> metadatas) {
+        Map<String, GuideMetadata> metadatasByDirectory = new TreeMap<>()
+        for (GuideMetadata metadata : metadatas) {
+            metadatasByDirectory[metadata.slug] = metadata
+        }
+
+        mergeMetadataMap(metadatasByDirectory)
+
+        metadatas.clear()
+        metadatas.addAll metadatasByDirectory.values()
+    }
+
+    private static void mergeMetadataMap(Map<String, GuideMetadata> metadatasByDirectory) {
+        for (String dir : [] + metadatasByDirectory.keySet()) {
+            GuideMetadata metadata = metadatasByDirectory[dir]
+            if (metadata.base) {
+                GuideMetadata base = metadatasByDirectory[metadata.base]
+                GuideMetadata merged = mergeMetadatas(base, metadata)
+                metadatasByDirectory[dir] = merged
+            }
+        }
+    }
+
+    private static GuideMetadata mergeMetadatas(GuideMetadata base, GuideMetadata metadata) {
+        GuideMetadata merged = new GuideMetadata()
+        merged.base = metadata.base
+        merged.asciidoctor = metadata.asciidoctor
+        merged.slug = metadata.slug
+        merged.title = metadata.title ?: base.title
+        merged.intro = metadata.intro ?: base.intro
+        merged.authors = mergeLists(base.authors, metadata.authors)
+        merged.tags = mergeLists(base.tags, metadata.tags)
+        merged.category = metadata.category ?: base.category
+        merged.publicationDate = metadata.publicationDate
+        merged.publish = metadata.publish
+        merged.buildTools = metadata.buildTools ?: base.buildTools
+        merged.languages = metadata.languages ?: base.languages
+        merged.testFramework = metadata.testFramework ?: base.testFramework
+        merged.skipGradleTests = base.skipGradleTests || metadata.skipGradleTests
+        merged.skipMavenTests = base.skipMavenTests || metadata.skipMavenTests
+        merged.minimumJavaVersion = metadata.minimumJavaVersion ?: base.minimumJavaVersion
+        merged.maximumJavaVersion = metadata.maximumJavaVersion ?: base.maximumJavaVersion
+        merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
+        merged.apps = mergeApps(base, metadata)
+
+        merged
+    }
+
+    private static List<App> mergeApps(GuideMetadata base, GuideMetadata metadata) {
+
+        Map<String, App> baseApps = base.apps.collectEntries { [(it.name): it] }
+        Map<String, App> guideApps = metadata.apps.collectEntries { [(it.name): it] }
+
+        Set<String> baseOnly = baseApps.keySet() - guideApps.keySet()
+        Set<String> guideOnly = guideApps.keySet() - baseApps.keySet()
+        Collection<String> inBoth = baseApps.keySet().intersect(guideApps.keySet())
+
+        List<App> merged = []
+        merged.addAll(baseOnly.collect { baseApps[it] })
+        merged.addAll(guideOnly.collect { guideApps[it] })
+
+        for (String name : inBoth) {
+            App baseApp = baseApps[name]
+            App guideApp = guideApps[name]
+            guideApp.features.addAll baseApp.features
+            merged << guideApp
+        }
+
+        merged
+    }
+
+    private static List mergeLists(List base, List others) {
+        List merged = []
+        if (base) {
+            merged.addAll base
+        }
+        if (others) {
+            merged.addAll others
+        }
+        merged
     }
 }
