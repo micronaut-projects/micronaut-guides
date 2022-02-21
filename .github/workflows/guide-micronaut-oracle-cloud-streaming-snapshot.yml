@@ -1,0 +1,64 @@
+name: Test micronaut-oracle-cloud-streaming Snapshot
+on:
+  schedule:
+    - cron: '0 5 * * 1-5'
+jobs:
+  maven-test:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["11","17"]
+        testproject: ["micronaut-oracle-cloud-streaming-maven-java","micronaut-oracle-cloud-streaming-maven-groovy","micronaut-oracle-cloud-streaming-maven-kotlin"]
+    env:
+      JDK_VERSION:  ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Use next snapshot patch version
+        run: ./increment_version.sh -p
+      - name: Build Projects
+        run: ./gradlew micronautOracleCloudStreamingGenerateProjects
+      - name: Build with Maven
+        run: 'cd build/code/micronaut-oracle-cloud-streaming/${{ matrix.testproject }};./mvnw test'
+  gradle-test:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["11","17"]
+        testproject: ["micronaut-oracle-cloud-streaming-gradle-java","micronaut-oracle-cloud-streaming-gradle-groovy","micronaut-oracle-cloud-streaming-gradle-kotlin"]
+    env:
+      JDK_VERSION: ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Use next snapshot patch version
+        run: ./increment_version.sh -p
+      - name: Build Projects
+        run: ./gradlew micronautOracleCloudStreamingGenerateProjects
+      - name: Build with Gradle
+        run: 'cd build/code/micronaut-oracle-cloud-streaming/${{ matrix.testproject }};./gradlew test'
+
