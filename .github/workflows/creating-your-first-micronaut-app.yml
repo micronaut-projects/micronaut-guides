@@ -1,78 +1,78 @@
 name: Guides CI
-  on:
-    push:
-      branches:
-        - master
-        - '[1-9]+.[0-9]+.x'
-    pull_request:
-      branches:
-        - master
-        - '[1-9]+.[0-9]+.x'
-  jobs:
-    build-matrix:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
-        - uses: actions/cache@v2
-          with:
-            path: ~/.gradle/caches
-            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-            restore-keys: |
-              ${{ runner.os }}-gradle-
-        - name: Set up JDK
-          uses: actions/setup-java@v1
-          with:
-            java-version: 8
-        - name: Generate Guides
-          run: ./gradlew creatingYourFirstMicronautAppBuild
-        - id: set-matrix
-          run: |
-            echo "::set-output name=maven_tests::$(ls build/code/creating-your-first-micronaut-app | grep -e "-maven-" | jq -R -s -c 'split("\n")')"
-            echo "::set-output name=gradle_tests::$(ls build/code/creating-your-first-micronaut-app | grep -e "-gradle-" | jq -R -s -c 'split("\n")')"
-      outputs:
-        gradle_tests: ${{ steps.set-matrix.outputs.gradle_tests }}
-        maven_tests: ${{ steps.set-matrix.outputs.maven_tests }}
-    maven-test-jdk8:
-      needs: build-matrix
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          test_project: ${{ fromJson(needs.build-matrix.outputs.maven_tests) }}
-      steps:
-        - uses: actions/cache@v2
-          with:
-            path: ~/.m2/repository
-            key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-            restore-keys: |
-              ${{ runner.os }}-maven-
-        - name: Set up JDK
-          uses: actions/setup-java@v1
-          with:
-            java-version: 8
-        - name: Build with Maven
-          run: |
-            cd "build/code/$test_project"
-            ./mvnw test
-    gradle-test-jdk8:
-      needs: build-matrix
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          test_project: ${{ fromJson(needs.build-matrix.outputs.gradle_tests) }}
-      steps:
-        - uses: actions/cache@v2
-          with:
-            path: ~/.gradle/caches
-            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-            restore-keys: |
-              ${{ runner.os }}-gradle-
-        - name: Set up JDK
-          uses: actions/setup-java@v1
-          with:
-            java-version: 8
-        - name: Build with Gradle
-          run: |
-            cd "build/code/$test_project"
-            ./gradlew test
+on:
+  push:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+  pull_request:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+jobs:
+  build-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Build Guide
+        run: ./gradlew creatingYourFirstMicronautAppBuild
+      - id: set-matrix
+        run: |
+          echo "::set-output name=maven_tests::$(ls build/code/creating-your-first-micronaut-app | grep -e "-maven-" | jq -R -s -c 'split("\n")')"
+          echo "::set-output name=gradle_tests::$(ls build/code/creating-your-first-micronaut-app | grep -e "-gradle-" | jq -R -s -c 'split("\n")')"
+    outputs:
+      gradle_tests: ${{ steps.set-matrix.outputs.gradle_tests }}
+      maven_tests: ${{ steps.set-matrix.outputs.maven_tests }}
+  maven-test-jdk8:
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_project: ${{ fromJson(needs.build-matrix.outputs.maven_tests) }}
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Build with Maven
+        run: |
+          cd "build/code/creating-your-first-micronaut-app/$test_project"
+          ./mvnw test
+  gradle-test-jdk8:
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_project: ${{ fromJson(needs.build-matrix.outputs.gradle_tests) }}
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Build with Gradle
+        run: |
+          cd "build/code/creating-your-first-micronaut-app/$test_project"
+          ./gradlew test
