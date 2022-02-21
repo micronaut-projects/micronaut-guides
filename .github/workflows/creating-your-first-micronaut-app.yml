@@ -27,21 +27,19 @@ jobs:
           java-version: 8
       - name: Build Guide
         run: ./gradlew creatingYourFirstMicronautAppBuild
-      - id: set-matrix
-        run: |
-          echo "::set-output name=maven_tests::[\"creating-your-first-micronaut-app-maven-groovy\",\"creating-your-first-micronaut-app-maven-java\",\"creating-your-first-micronaut-app-maven-kotlin\"]"
-          echo "::set-output name=gradle_tests::[\"creating-your-first-micronaut-app-gradle-groovy\",\"creating-your-first-micronaut-app-gradle-java\",\"creating-your-first-micronaut-app-gradle-kotlin\"]"
-#          echo "::set-output name=maven_tests::$(echo '[' | tr -d '\n' ; (ls build/code/creating-your-first-micronaut-app | grep -e "-maven-" |sed -e 's/^/\"/'|sed -e 's/,$/\",/'|sed -e 's/\([^,]\)$/\1\"\,/'|sed -e 's/, /\", \"/g' | tr -d '\n') | sed 's/.$//' ;echo ']' | tr -d '\n')"
-#          echo "::set-output name=gradle_tests::$(echo '[' | tr -d '\n' ; (ls build/code/creating-your-first-micronaut-app | grep -e "-gradle-" |sed -e 's/^/\"/'|sed -e 's/,$/\",/'|sed -e 's/\([^,]\)$/\1\"\,/'|sed -e 's/, /\", \"/g' | tr -d '\n') | sed 's/.$//' ;echo ']' | tr -d '\n')"
+      - id: set-mavenmatrix
+        run: echo "::set-output name=mavenmatrix::[creating-your-first-micronaut-app-maven-groovy,creating-your-first-micronaut-app-maven-java,creating-your-first-micronaut-app-maven-kotlin]"
+      - id: set-gradlematrix
+        run: echo "::set-output name=gradlematrix::[creating-your-first-micronaut-app-gradle-groovy,creating-your-first-micronaut-app-gradle-java,creating-your-first-micronaut-app-gradle-kotlin]"
     outputs:
-      gradle_tests: ${{ steps.set-matrix.outputs.gradle_tests }}
-      maven_tests: ${{ steps.set-matrix.outputs.maven_tests }}
+      gradlematrix: ${{ steps.set-matrix.outputs.gradlematrix }}
+      mavenmatrix: ${{ steps.set-matrix.outputs.mavenmatrix }}
   maven-test-jdk8:
     needs: build-matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test_project: ${{ fromJson(needs.build-matrix.outputs.maven_tests) }}
+        test_project: ${{needs.build-matrix.outputs.mavenmatrix}}
     steps:
       - uses: actions/cache@v2
         with:
@@ -62,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test_project: ${{ fromJson(needs.build-matrix.outputs.gradle_tests) }}
+        test_project: ${{needs.build-matrix.outputs.gradlematrix}}
     steps:
       - uses: actions/cache@v2
         with:
