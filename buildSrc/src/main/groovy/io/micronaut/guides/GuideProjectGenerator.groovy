@@ -122,7 +122,7 @@ class GuideProjectGenerator implements AutoCloseable {
             asciidocDir.mkdir()
         }
 
-        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName);
+        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
             File dir = new File(guidesDir, metadata.slug)
             try {
@@ -224,7 +224,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
         if (!Files.exists(sourcePath)) {
-            sourcePath.toFile().mkdir();
+            sourcePath.toFile().mkdir()
         }
         if (Files.exists(sourcePath)) {
             // copy source/resource files for the current language
