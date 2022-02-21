@@ -6,9 +6,8 @@ class ThemeProcessor {
 
     private static final Pattern TOC_REGEX = ~/(?s)<div id="toc" class="toc2">\s*<div id="toctitle">Table of Contents<\/div>(.*)<\/div>\s*<\/div>\s*<div id="content">/
     private static final Pattern CONTENT_REGEX = ~/(?s)<div class="sectionbody">(.*)<\/div>\s*<\/div>\s*<\/div>\s*<\/body>/
-    private static final String HTML_SECT1 = "<div class=\"sect1\">";
-    private static final String HTML_DIV_COL_MD_8 = "</div></div><div class=\"row\"><div class=\"col-md-12\">";
-
+    private static final String HTML_SECT1 = "<div class=\"sect1\">"
+    private static final String HTML_DIV_COL_MD_8 = "</div></div><div class=\"row\"><div class=\"col-md-12\">"
 
     static void applyThemes(File template, File dist,
                             File guidesFolder, String metadataConfigName) {
@@ -66,13 +65,13 @@ class ThemeProcessor {
     }
 
     private static int fourthIndex(String html) {
-        int first = html.indexOf(HTML_SECT1);
+        int first = html.indexOf(HTML_SECT1)
         if (first != -1) {
-            int second = html.indexOf(HTML_SECT1, first + 1);
+            int second = html.indexOf(HTML_SECT1, first + 1)
             if (second != -1) {
-                int third = html.indexOf(HTML_SECT1, second + 1);
+                int third = html.indexOf(HTML_SECT1, second + 1)
                 if (third != -1) {
-                    return html.indexOf(HTML_SECT1, third + 1);
+                    return html.indexOf(HTML_SECT1, third + 1)
                 }
             }
         }

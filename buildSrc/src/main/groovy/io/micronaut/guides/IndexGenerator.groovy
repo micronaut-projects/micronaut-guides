@@ -6,8 +6,6 @@ import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
-import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.regex.Pattern
 
 @CompileStatic
