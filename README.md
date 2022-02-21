@@ -22,7 +22,6 @@ For a high level overview of the Guides Infrastructure, take a look at this [blo
 
 All the guides leverage [Micronaut Starter](https://github.com/micronaut-projects/micronaut-starter) core to create the projects. The idea is that one guide can generate up to six different projects, one per language (Java, Groovy and Kotlin) and build tool (Gradle and Maven).
 
-
 ### Guide structure
 
 All the guides are in the `guides` directory in separate subdirectories. Inside the directory, the main file is `metadata.json` that describes the guide. All the fields are declared in [GuideMetadata](https://github.com/micronaut-projects/micronaut-guides/blob/master/buildSrc/src/main/groovy/io/micronaut/guides/GuideMetadata.groovy) class.
@@ -276,7 +275,6 @@ Now start the application. Execute the `./gradlew run` command, which will start
 
 :exclude-for-build:
 
-
 :exclude-for-build:gradle
 
 Now start the application. Execute the `./mvnw mn:run` command, which will start the application on port 8080.
@@ -351,7 +349,6 @@ Guides are published to [gh-pages](https://pages.github.com) following the same 
 
 - One directory per Micronaut minor version: `3.0.x`, `3.1.x`, `3.2.x`,...
 - One directory with the latest version of the guide: `latest`
-
 
 ## GitHub Actions
 

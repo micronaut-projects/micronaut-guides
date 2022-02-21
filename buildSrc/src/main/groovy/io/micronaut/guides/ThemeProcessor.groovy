@@ -50,7 +50,6 @@ class ThemeProcessor {
                     text = text.replace("@toccontent@", toc)
                     text = text.replace("@content@", content)
 
-
                     int index = fourthIndex(text)
                     if (index != -1) {
                         String start = text.substring(0, index)

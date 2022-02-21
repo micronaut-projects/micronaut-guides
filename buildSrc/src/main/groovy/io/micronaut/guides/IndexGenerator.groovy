@@ -125,7 +125,6 @@ class IndexGenerator {
                 index += "<div class='row'>"
             }
 
-
             if (singleGuide) {
                 index += "<div class='col-sm-8'>"
             } else {

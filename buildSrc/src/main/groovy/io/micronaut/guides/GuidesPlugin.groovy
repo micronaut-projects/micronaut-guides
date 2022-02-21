@@ -22,6 +22,7 @@ import java.util.stream.Collectors
 
 @CompileStatic
 class GuidesPlugin implements Plugin<Project> {
+
     private static final String TASK_SUFFIX_GENERATE_PROJECTS = "GenerateProjects"
     private static final List<Integer> JAVA_MATRIX = [8, 11, 17]
     private static final List<String> FINALIZED_TASKS = ['generateTestScript',
@@ -39,7 +40,9 @@ class GuidesPlugin implements Plugin<Project> {
         GuideProjectGenerator projectGenerator = new GuideProjectGenerator()
         Directory guidesDir = project.layout.projectDirectory.dir("guides")
         Provider<Directory> codeDir = project.layout.buildDirectory.dir("code")
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesDir.asFile, "${project.extensions.extraProperties.get("metadataConfigName")}")
+        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(
+                guidesDir.asFile,
+                "${project.extensions.extraProperties.get("metadataConfigName")}")
         List<Map<String, TaskProvider<Task>>> sampleTasks = metadatas
                 .stream()
                 .filter(guideMetadata -> Utils.process(guideMetadata, false))
@@ -59,10 +62,7 @@ class GuidesPlugin implements Plugin<Project> {
                     TaskProvider<AsciidocGenerationTask> docTask = registerDocTask(project, metadata, guidesDir, generateTask, taskSlug)
                     List<TaskProvider<Zip>> zippers = options.stream()
                             .map(option -> {
-                                registerZipTask(project,
-                                        metadata,
-                                        option,
-                                        generateTask)
+                                registerZipTask(project, metadata, option, generateTask)
                             }).collect(Collectors.toList())
                     TaskProvider<Task> zip = registerZipTask(project, taskSlug, zippers)
                     TaskProvider<GuidesIndexGradleTask> indexTask = registerIndexTask(project, taskSlug, metadata)
@@ -75,7 +75,7 @@ class GuidesPlugin implements Plugin<Project> {
                 .map() { Map<String, TaskProvider<Task>> m -> m.get(KEY_DOC) }
                 .collect(Collectors.toList())
 
-        TaskProvider<Task> sampleProjects = project.tasks.register("generateSampleProjects") {Task it ->
+        TaskProvider<Task> sampleProjects = project.tasks.register("generateSampleProjects") { Task it ->
             it.dependsOn(docTasks)
             it.finalizedBy(FINALIZED_TASKS.stream().map(n -> project.tasks.named(n)).collect(Collectors.toList()))
             it.group = 'guides'
@@ -86,7 +86,7 @@ class GuidesPlugin implements Plugin<Project> {
                 .map() { Map<String, TaskProvider<Task>> m -> m.get(KEY_ZIP) }
                 .collect(Collectors.toList())
 
-        project.tasks.register("generateCodeZip") {Task it ->
+        project.tasks.register("generateCodeZip") { Task it ->
             it.group = 'guides'
             it.description = 'Generates a ZIP file for each application at build/code into build/dist'
             it.dependsOn(zipTasks, sampleProjects, 'createDist')
@@ -99,7 +99,7 @@ class GuidesPlugin implements Plugin<Project> {
                 .map() { Map<String, TaskProvider<Task>> m -> m.get(KEY_WORKFLOW_SNAPSHOT) }
                 .collect(Collectors.toList()))
 
-        project.tasks.register("generateGithubActionWorkflows") {Task it ->
+        project.tasks.register("generateGithubActionWorkflows") { Task it ->
             it.group = 'guides'
             it.description = 'Generates a Github Action Workflow per guide'
             it.dependsOn(workflowTasks)
@@ -173,7 +173,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                                         Directory guidesDir,
                                                                         TaskProvider<SampleProjectGenerationTask> generateTask,
                                                                         String taskSlug) {
-        project.tasks.register("${taskSlug}GenerateDocs", AsciidocGenerationTask) {AsciidocGenerationTask it ->
+        project.tasks.register("${taskSlug}GenerateDocs", AsciidocGenerationTask) { AsciidocGenerationTask it ->
             it.group = 'guides'
             it.dependsOn(generateTask)
             it.description = "Generate asciidoc files for '${metadata.title}'"
@@ -196,7 +196,7 @@ class GuidesPlugin implements Plugin<Project> {
         String taskName = "${kebapCaseToGradleName(name)}ZipCode"
         String fromPath = "code/$metadata.slug/$name"
         String archiveFileName = "${name}.zip"
-        project.tasks.register(taskName, Zip) {Zip it ->
+        project.tasks.register(taskName, Zip) { Zip it ->
             it.group = 'guides'
             it.description = "Zips the source project for '${name}'"
             it.dependsOn(generateTask)
@@ -207,7 +207,7 @@ class GuidesPlugin implements Plugin<Project> {
     }
 
     private static Map<String, Object> workflowTokens(GuideMetadata metadata,
-                                                 String taskSlug) {
+                                                      String taskSlug) {
         List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
         List<GuidesOption> gradleOptions = options
                 .stream()
@@ -223,7 +223,7 @@ class GuidesPlugin implements Plugin<Project> {
                 .map(option -> "\"" + optionName(metadata, option) + "\"" )
                 .collect(Collectors.toList()))
 
-        String mavenProjects =String.join(COMMA, mavenOptions
+        String mavenProjects = String.join(COMMA, mavenOptions
                 .stream()
                 .map(option -> "\"" + optionName(metadata, option) + "\"" )
                 .collect(Collectors.toList()))
@@ -231,14 +231,14 @@ class GuidesPlugin implements Plugin<Project> {
         boolean mavenEnabled = !(CollectionUtils.isEmpty(mavenOptions) || metadata.skipMavenTests)
         boolean gradleEnabled = !(CollectionUtils.isEmpty(gradleOptions) || metadata.skipGradleTests)
         [
-                gradleTask: "${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}".toString(),
-                javaMatrix: javaMatrix(metadata),
-                slug: metadata.slug,
-                mavenProjects: mavenProjects,
+                gradleTask    : "${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}".toString(),
+                javaMatrix    : javaMatrix(metadata),
+                slug          : metadata.slug,
+                mavenProjects : mavenProjects,
                 gradleProjects: gradleProjects,
-                paths: workflowPaths(metadata),
-                mavenEnabled: String.valueOf(mavenEnabled),
-                gradleEnabled: String.valueOf(gradleEnabled)
+                paths         : workflowPaths(metadata),
+                mavenEnabled  : String.valueOf(mavenEnabled),
+                gradleEnabled : String.valueOf(gradleEnabled)
         ] as Map<String, Object>
     }
 
@@ -262,8 +262,8 @@ class GuidesPlugin implements Plugin<Project> {
     }
 
     private static TaskProvider<Copy> registerGenerateGithubActionWorkflow(Project project,
-                                                      GuideMetadata metadata,
-                                                     String taskSlug) {
+                                                                           GuideMetadata metadata,
+                                                                           String taskSlug) {
         Map<String, Object> tokens = workflowTokens(metadata, taskSlug)
         Object workflowName = "Test $metadata.slug".toString()
         tokens.put("workflowName", workflowName)
@@ -282,20 +282,19 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static String javaMatrix(GuideMetadata guideMetadata) {
         String.join(COMMA, (guideMetadata.minimumJavaVersion ? JAVA_MATRIX.stream()
-                    .filter(v -> v >= guideMetadata.minimumJavaVersion )
-                    .collect(Collectors.toList()) : JAVA_MATRIX)
+                .filter(v -> v >= guideMetadata.minimumJavaVersion)
+                .collect(Collectors.toList()) : JAVA_MATRIX)
                 .stream()
                 .map(v -> "\"${v}\"")
                 .collect(Collectors.toList()))
     }
 
-
     private static TaskProvider<SampleProjectGenerationTask> registerGenerateTask(Project project,
-                                                                           GuideMetadata metadata,
-                                                                           GuideProjectGenerator projectGenerator,
-                                                                           Directory guidesDir,
-                                                                           Provider<Directory> codeDir,
-                                                                           String taskSlug) {
+                                                                                  GuideMetadata metadata,
+                                                                                  GuideProjectGenerator projectGenerator,
+                                                                                  Directory guidesDir,
+                                                                                  Provider<Directory> codeDir,
+                                                                                  String taskSlug) {
         project.tasks.register("${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}", SampleProjectGenerationTask) { SampleProjectGenerationTask it ->
             it.group = 'guides'
             it.description = "Generate sample project for guide '${metadata.title}'"
@@ -309,8 +308,8 @@ class GuidesPlugin implements Plugin<Project> {
     }
 
     private static TaskProvider<Task> registerGuideBuild(Project project,
-                                      String taskSlug,
-                                      TaskProvider<? extends Task>... dependsOnTasks) {
+                                                         String taskSlug,
+                                                         TaskProvider<? extends Task>... dependsOnTasks) {
         project.tasks.register("${taskSlug}${TASK_SUFFIX_BUILD}") { Task it ->
             it.group = 'guides' + taskSlug
             it.dependsOn(dependsOnTasks)
