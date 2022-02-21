@@ -246,7 +246,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                                                    GuideMetadata metadata,
                                                                                    String taskSlug) {
         Map<String, Object> tokens = workflowTokens(metadata, taskSlug)
-        Object workflowName = "Test $metadata.slug".toString()
+        Object workflowName = "Test $metadata.slug Snapshot".toString()
         tokens.put("workflowName", workflowName)
         project.tasks.register("${taskSlug}GenerateGithubActionSnapshotWorkflow", Copy) { Copy it ->
             it.from("github-action-snapshot-template.yml")
@@ -265,7 +265,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                       GuideMetadata metadata,
                                                      String taskSlug) {
         Map<String, Object> tokens = workflowTokens(metadata, taskSlug)
-        Object workflowName = "Test $metadata.slug Snapshot".toString()
+        Object workflowName = "Test $metadata.slug".toString()
         tokens.put("workflowName", workflowName)
         project.tasks.register("${taskSlug}GenerateGithubActionWorkflow", Copy) { Copy it ->
             it.from("github-action-template.yml")
