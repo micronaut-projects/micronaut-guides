@@ -28,9 +28,9 @@ jobs:
       - name: Build Guide
         run: ./gradlew creatingYourFirstMicronautAppBuild
       - id: set-mavenmatrix
-        run: echo "::set-output name=mavenmatrix::{\"testproject\":[\"creating-your-first-micronaut-app-maven-groovy\",\"creating-your-first-micronaut-app-maven-java\",\"creating-your-first-micronaut-app-maven-kotlin\"]}"
+        run: echo "::set-output name=mavenmatrix::{\"java\":[\"8\", \"11\", \"17\"],\"testproject\":[\"creating-your-first-micronaut-app-maven-groovy\",\"creating-your-first-micronaut-app-maven-java\",\"creating-your-first-micronaut-app-maven-kotlin\"]}"
       - id: set-gradlematrix
-        run: echo "::set-output name=gradlematrix::{\"testproject\":[\"creating-your-first-micronaut-app-gradle-groovy\",\"creating-your-first-micronaut-app-gradle-java\",\"creating-your-first-micronaut-app-gradle-kotlin\"]}"
+        run: echo "::set-output name=gradlematrix::{\"java\":[\"8\", \"11\", \"17\"],\"testproject\":[\"creating-your-first-micronaut-app-gradle-groovy\",\"creating-your-first-micronaut-app-gradle-java\",\"creating-your-first-micronaut-app-gradle-kotlin\"]}"
     outputs:
       gradlematrix: ${{ steps.set-matrix.outputs.gradlematrix }}
       mavenmatrix: ${{ steps.set-matrix.outputs.mavenmatrix }}
@@ -39,13 +39,10 @@ jobs:
     needs: matrix
     steps:
       - name: Check Gradle Matrix definition
-        run: |
-          matrix='${{ needs.matrix.outputs.gradlematrix }}'
+        run: echo "${{ needs.matrix.outputs.gradlematrix }}'
           echo $matrix
       - name: Check Maven Matrix definition
-        run: |
-          matrix='${{ needs.matrix.outputs.mavenmatrix }}'
-          echo $matrix
+        run: echo "${{ needs.matrix.outputs.mavenmatrix }}'
   maven-test-jdk:
     needs: matrix
     runs-on: ubuntu-latest
@@ -61,7 +58,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: ${{ matrix.java }}
       - name: Build with Maven
         run: |
           cd "build/code/creating-your-first-micronaut-app/$testproject"
@@ -81,7 +78,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: ${{ matrix.java }}
       - name: Build with Gradle
         run: |
           cd "build/code/creating-your-first-micronaut-app/$testproject"
