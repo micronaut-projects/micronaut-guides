@@ -9,7 +9,7 @@ on:
       - master
       - '[1-9]+.[0-9]+.x'
 jobs:
-  build-matrix:
+  matrix:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,18 +28,31 @@ jobs:
       - name: Build Guide
         run: ./gradlew creatingYourFirstMicronautAppBuild
       - id: set-mavenmatrix
-        run: echo "::set-output name=mavenmatrix::[creating-your-first-micronaut-app-maven-groovy,creating-your-first-micronaut-app-maven-java,creating-your-first-micronaut-app-maven-kotlin]"
+        echo "::set-output name=mavenmatrix::$(echo '{"testproject":[' | tr -d '\n' ; (ls build/code/creating-your-first-micronaut-app | grep -e "-maven-" |sed -e 's/^/\"/'|sed -e 's/,$/\",/'|sed -e 's/\([^,]\)$/\1\"\,/'|sed -e 's/, /\", \"/g' | tr -d '\n') | sed 's/.$//' ;echo ']}' | tr -d '\n')"
       - id: set-gradlematrix
-        run: echo "::set-output name=gradlematrix::[creating-your-first-micronaut-app-gradle-groovy,creating-your-first-micronaut-app-gradle-java,creating-your-first-micronaut-app-gradle-kotlin]"
+          echo "::set-output name=gradlematrix::$(echo '{"testproject":[' | tr -d '\n' ; (ls build/code/creating-your-first-micronaut-app | grep -e "-gradle-" |sed -e 's/^/\"/'|sed -e 's/,$/\",/'|sed -e 's/\([^,]\)$/\1\"\,/'|sed -e 's/, /\", \"/g' | tr -d '\n') | sed 's/.$//' ;echo ']}' | tr -d '\n')"
     outputs:
       gradlematrix: ${{ steps.set-matrix.outputs.gradlematrix }}
       mavenmatrix: ${{ steps.set-matrix.outputs.mavenmatrix }}
-  maven-test-jdk8:
-    needs: build-matrix
+  check-matrix:
+    runs-on: ubuntu-latest
+    needs: matrix
+    steps:
+      - name: Install json2yaml
+        run: |
+          sudo npm install -g json2yaml
+
+      - name: Check matrix definition
+        run: |
+          matrix='${{ needs.matrix.outputs.gradlematrix }}'
+          echo $matrix
+          echo $matrix | jq .
+          echo $matrix | json2yaml
+  maven-test-jdk:
+    needs: matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        test_project: ${{needs.build-matrix.outputs.mavenmatrix}}
+      matrix: ${{needs.matrix.outputs.mavenmatrix}}
     steps:
       - uses: actions/cache@v2
         with:
@@ -53,14 +66,13 @@ jobs:
           java-version: 8
       - name: Build with Maven
         run: |
-          cd "build/code/creating-your-first-micronaut-app/$test_project"
+          cd "build/code/creating-your-first-micronaut-app/$testproject"
           ./mvnw test
-  gradle-test-jdk8:
-    needs: build-matrix
+  gradle-test-jdk:
+    needs: matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        test_project: ${{needs.build-matrix.outputs.gradlematrix}}
+      matrix: ${{needs.matrix.outputs.gradlematrix}}
     steps:
       - uses: actions/cache@v2
         with:
@@ -74,5 +86,5 @@ jobs:
           java-version: 8
       - name: Build with Gradle
         run: |
-          cd "build/code/creating-your-first-micronaut-app/$test_project"
+          cd "build/code/creating-your-first-micronaut-app/$testproject"
           ./gradlew test
