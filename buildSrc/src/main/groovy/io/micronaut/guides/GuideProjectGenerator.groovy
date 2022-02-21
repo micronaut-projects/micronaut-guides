@@ -64,7 +64,7 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    private static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
             throw new GradleException("metadata file not found for " + dir.name)
@@ -113,6 +113,10 @@ class GuideProjectGenerator implements AutoCloseable {
                   String metadataConfigName,
                   File projectDir) {
 
+        if (!output.exists()) {
+            assert output.mkdir()
+        }
+
         File asciidocDir = new File(projectDir, 'src/docs/asciidoc')
         if (!asciidocDir.exists()) {
             asciidocDir.mkdir()
@@ -137,11 +141,7 @@ class GuideProjectGenerator implements AutoCloseable {
         "${slug}-${guidesOption.buildTool}-${guidesOption.language}"
     }
 
-    private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
-
-        if (!outputDir.exists()) {
-            assert outputDir.mkdir()
-        }
+    void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
 
         String packageAndName = BASE_PACKAGE + '.' + APP_NAME
         JdkVersion javaVersion = Utils.parseJdkVersion()
@@ -290,7 +290,7 @@ class GuideProjectGenerator implements AutoCloseable {
         JUNIT
     }
 
-    private static void mergeMetadataList(List<GuideMetadata> metadatas) {
+    static void mergeMetadataList(List<GuideMetadata> metadatas) {
         Map<String, GuideMetadata> metadatasByDirectory = new TreeMap<>()
         for (GuideMetadata metadata : metadatas) {
             metadatasByDirectory[metadata.slug] = metadata

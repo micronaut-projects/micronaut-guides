@@ -12,10 +12,8 @@ $ ./gradlew build
 
 This will generate all the projects and guides in `build/dist` and this is what needs to be published to GitHub Pages.
 
-To build only one guide use the system property `micronaut.guide`
-
 ```shell
-./gradlew build -Dmicronaut.guide=micronaut-http-client
+./gradlew micronautHttpClientBuild
 ```
 
 ## Create a new guide

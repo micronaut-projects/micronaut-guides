@@ -22,34 +22,36 @@ class IndexGenerator {
 
     private static final Pattern CONTENT_REGEX = ~/(?s)(<main id="main">)(.*)(<\/main>)/
 
-    static void generateGuidesIndex(File template, File guidesFolder, File buildDir, String metadataConfigName) {
+    static void generateGuidesIndex(File template, File guidesFolder, File distDir, String metadataConfigName) {
 
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
                 .findAll { it.publish }
+        generateGuidesIndex(template, distDir, metadatas)
+    }
 
+    static void generateGuidesIndex(File template, File distDir, List<GuideMetadata> metadatas) {
         String templateText = template.text.replaceFirst(CONTENT_REGEX) { List<String> it ->
             "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
         }
+        save(templateText, 'index.html', distDir, metadatas)
 
-        save(templateText, 'dist/index.html', buildDir, metadatas)
         for (GuideMetadata metadata :  metadatas) {
-            save(templateText, "dist/${metadata.slug}.html", buildDir, [metadata], metadata.title)
+            save(templateText, metadata.slug + '.html', distDir, [metadata], metadata.title)
         }
     }
 
     private static void save(String templateText,
                              String filename,
-                             File buildDir,
+                             File distDir,
                              List<GuideMetadata> metadatas,
                              String title = 'Micronaut Guides') {
-        String text = indexText(buildDir, templateText, metadatas, title)
-        Path path = Paths.get(buildDir.absolutePath, filename)
-        File output = path.toFile()
+        String text = indexText(distDir, templateText, metadatas, title)
+        File output = new File(distDir, filename)
         output.createNewFile()
         output.setText(text, 'UTF-8')
     }
 
-    private static String indexText(File buildDir,
+    private static String indexText(File distDir,
                                     String templateText,
                                     List<GuideMetadata> metadatas,
                                     String title) {
@@ -76,7 +78,7 @@ class IndexGenerator {
         text = text.replace("@title@", title)
         String twittercard = ''
         if (singleGuide) {
-            twittercard = twitterCardHtml(Paths.get(buildDir.absolutePath, "/dist").toFile(), metadatas.get(0))
+            twittercard = twitterCardHtml(distDir, metadatas.get(0))
         }
         text = text.replace("@twittercard@", twittercard)
         text = text.replace("@bodyclass@", 'guideindex')
