@@ -61,7 +61,7 @@ We will now create a definition file, that will describe our server API, includi
 OpenAPI generator supports `.yaml` and `.json` file formats for the definition file.
 We will use YAML due its simplicity and human readability.
 
-In the directory where you downloaded the OpenAPI generator CLI, create a file named `library-definition.yaml` and open it with your
+In the directory where you downloaded the OpenAPI generator CLI, create a file named `library-definition.yaml` and open it in your
 favourite text editor.
 
 === General server info
@@ -292,7 +292,7 @@ curl "localhost:8080/search?book-name=Guide"
 {"name":"Java Guide for Beginners","availability":"available"}]
 ----
 
-* The search for a substring `"Gu"` in name will return a "Bad Request" error, since we have defined the `book-name` parameter to
+* The search for a substring `"Gu"` in name will return a `"Bad Request"` error, since we have defined the `book-name` parameter to
 have at least three characters:
 +
 [source,bash]
@@ -397,8 +397,10 @@ test:controller/BooksControllerTest[]
 callout:micronaut-test[1]
 callout:http-client[2]
 callout:http-request[3]
-callout:binding-json-array[4]
-callout:body-method[5]
+<4> Verify that addition of book info was successful by checking the status code.
+callout:binding-json-array[5]
+callout:body-method[6]
+<7> Verify that there are exactly two books with `"Guide"` substring in title.
 
 common:testApp-noheader.adoc[]
 
@@ -456,6 +458,103 @@ steps to create the `AuthenticationProvider` and appropriate tests.
 NOTE: You can also read link:https://micronaut-projects.github.io/micronaut-security/latest/guide/[Micronaut Security documentation]
 or link:https://micronaut.io/guides[Micronaut guides] about security to learn more about
 the supported Authorization strategies.
+
+=== Configure Database Schema Migration with Flyway
+
+Although storing data in class properties works in our example, using a database is more reliable and secure.
+For our application you can create a MySQL database with the following schema:
+[source,sql]
+----
+CREATE TABLE book (
+             id  BIGINT NOT NULL AUTO_INCREMENT UNIQUE PRIMARY KEY,
+           name  VARCHAR(255) NOT NULL,
+   availability  ENUM('available', 'reserved', 'not available') NOT NULL,
+         author  VARCHAR(255),
+           ISBN  CHAR(13)
+);
+----
+and populate it with sample data with:
+[source,sql]
+----
+INSERT INTO book
+    (name,                                    availability,  author,           ISBN)
+VALUES
+    ("Alice's Adventures in Wonderland",      "available",   "Lewis Caroll",   "9783161484100"),
+    ("The Hitchhiker's Guide to the Galaxy",  "reserved",    "Douglas Adams",  NULL),
+    ("Java Guide for Beginners",              "available",   NULL,             NULL);
+----
+
+Use migrations with link:https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway] to simplify
+database configuration. On start-up it will verify that the database configured according to the migration files and
+run corresponding statements if required.
+
+To start using Flyway, add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-flyway[groupId=io.micronaut.flyway]
+dependency:flyway-mysql[groupId=org.flywaydb,scope=runtimeOnly]
+
+:dependencies:
+
+Then, copy the above SQL queries into separate files inside `src/main/java/resources/db/migration`
+directory, and enable the `default` flyway datasource in configuration.
+
+To complete, read the link:https://guides.micronaut.io/latest/micronaut-flyway.html["Schema Migration with Flyway" guide]
+or  link:https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway documentation].
+
+=== Use Micronaut Data JDBC for Database Access
+
+To access a MySQL Database using Micronaut Data JDBC you will need to do the following:
+
+. Add required dependencies:
++
+--
+:dependencies:
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql]
+dependency:mysql[groupId=mysql-connector-java,scope=runtimeOnly]
+dependency:junit-jupiter[groupId=org.testcontainers,scope=test]
+dependency:mysql[groupId=org.testcontainers,scope=test]
+dependency:testcontainers[groupId=org.testcontainers,scope=test]
+:dependencies:
+--
+
+. Create a `Book` interface annotated with link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlMapping[@MappedEntity]
+similar to the `BookInfo` Object, that you will use to query the database. Add a property of type `Integer` for the ID of entity, and annotate it with
+link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlAnnotations[@Id].
+. Write a `Book` repository class extending from link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#repositories[CrudRepository<Book, Integer>].
+This will automatically generate (Create, Read, Update, Delete) operations for the repository. You can also redefine these
+functions if you desire a different signature. We will use a reactive return type:
++
+[source,java]
+----
+    @NonNull
+    Mono<Book> saveBook(@Valid @NonNull Book bookInfo);
+----
+. Use the link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#explicitQueries[@Query] annotation to
+write a custom query for the search path we have in our controller:
++
+[source,java]
+----
+    @NonNull
+    @Query(value="SELECT * FROM book WHERE (name LIKE CONCAT('%', :name, '%') OR :name IS NULL)" +
+            "AND (author LIKE CONCAT('%', :author, '%') OR :author IS NULL);", nativeQuery = true)
+    Flux<Book> find(@Nullable String name, @Nullable String author);
+----
+Micronaut will generate the implementation of these functions, which you can utilize by injecting the repository similarly
+to the `BookService` we previously used.
+. You will need to implement the controller to utilize the repository. Use methods of Reactor's `Flux` and `Mono`, like `map` to
+optimize the processing of data.
+. Configure the `url`, `user`, `password` and other properties required to establish a connection with your datasource.
+Refer to the link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcConfiguration["Configuration" section of Micronaut Data guide] for details.
+
+If you want to proceed with implementing Database connection with Micronaut Data JDBC, refer to the
+link:https://guides.micronaut.io/latest/micronaut-data-jdbc-repository.html["Access a Database with Micronaut JDBC" Guide].
+
+NOTE: You can read link:https://micronaut-projects.github.io/micronaut-data/latest/guide[Micronaut Data documentation]
+to learn more.
 
 === Generate Micronaut Client
 

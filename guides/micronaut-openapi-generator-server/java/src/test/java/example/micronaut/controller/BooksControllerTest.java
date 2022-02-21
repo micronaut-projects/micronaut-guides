@@ -28,7 +28,7 @@ public class BooksControllerTest {
         BookInfo body = new BookInfo("My Book", BookAvailability.AVAILABLE);
         HttpResponse<?> response = client.toBlocking()
                 .exchange(HttpRequest.POST("/add", body)); // <3>
-        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(HttpStatus.OK, response.status()); // <4>
     }
 
     @Test
@@ -37,9 +37,9 @@ public class BooksControllerTest {
                 .exchange(HttpRequest.GET(UriBuilder.of("/search")
                         .queryParam("book-name", "Guide")
                         .build()
-                ), Argument.listOf(BookInfo.class)); // <4>
-        List<BookInfo> body = response.body(); // <5>
+                ), Argument.listOf(BookInfo.class)); // <5>
+        List<BookInfo> body = response.body(); // <6>
         assertEquals(HttpStatus.OK, response.status());
-        assertEquals(2, body.size());
+        assertEquals(2, body.size()); // <7>
     }
 }
