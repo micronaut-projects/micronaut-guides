@@ -64,22 +64,22 @@ class GuideAsciidocGenerator {
                 }
 
                 if (shouldProcessLine(line, 'source:')) {
-                    lines.addAll(sourceIncludeLines(line))
+                    lines.addAll(sourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'test:')) {
-                    lines.addAll(testIncludeLines(line, guidesOption.testFramework))
+                    lines.addAll(testIncludeLines(metadata.slug, line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'rawTest:')) {
-                    lines.addAll(rawTestIncludeLines(line, guidesOption.testFramework))
+                    lines.addAll(rawTestIncludeLines(metadata.slug, line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'resource:')) {
-                    lines.addAll(resourceIncludeLines(line))
+                    lines.addAll(resourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'testResource:')) {
-                    lines.addAll(testResourceIncludeLines(line))
+                    lines.addAll(testResourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'zipInclude:')) {
-                    lines.addAll(zipIncludeLines(line))
+                    lines.addAll(zipIncludeLines(metadata.slug, line))
 
                 } else if (line == ':dependencies:') {
                     groupDependencies = !groupDependencies
@@ -299,23 +299,23 @@ class GuideAsciidocGenerator {
         line.substring(macro.length(), line.indexOf('['))
     }
 
-    private static List<String> sourceIncludeLines(String line) {
-        sourceIncludeLines(line, null, 'source:')
+    private static List<String> sourceIncludeLines(String slug, String line) {
+        sourceIncludeLines(slug, line, null, 'source:')
     }
 
-    private static List<String> testIncludeLines(String line, TestFramework testFramework) {
-        sourceIncludeLines(line, testFramework, 'test:')
+    private static List<String> testIncludeLines(String slug, String line, TestFramework testFramework) {
+        sourceIncludeLines(slug, line, testFramework, 'test:')
     }
 
-    private static List<String> resourceIncludeLines(String line) {
-        resourceIncludeLines(line, 'main', 'resource:')
+    private static List<String> resourceIncludeLines(String slug, String line) {
+        resourceIncludeLines(slug, line, 'main', 'resource:')
     }
 
-    private static List<String> testResourceIncludeLines(String line) {
-        resourceIncludeLines(line, 'test', 'testResource:')
+    private static List<String> testResourceIncludeLines(String slug, String line) {
+        resourceIncludeLines(slug, line, 'test', 'testResource:')
     }
 
-    private static List<String> zipIncludeLines(String line) {
+    private static List<String> zipIncludeLines(String slug, String line) {
         String fileName = extractName(line, 'zipInclude:')
         List<String> tagNames = extractTags(line)
 
@@ -328,16 +328,16 @@ class GuideAsciidocGenerator {
                 '----']
         if (tags) {
             for (String tag : tags) {
-                lines << "include::{sourceDir}/@sourceDir@/${fileName}[${tag}]\n".toString()
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${fileName}[${tag}]\n".toString()
             }
         } else {
-            lines << "include::{sourceDir}/@sourceDir@/${fileName}[]".toString()
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${fileName}[]".toString()
         }
         lines << '----'
         lines
     }
 
-    private static List<String> sourceIncludeLines(String line, TestFramework testFramework, String macro) {
+    private static List<String> sourceIncludeLines(String slug, String line, TestFramework testFramework, String macro) {
         String name = extractName(line, macro)
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
@@ -352,10 +352,10 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines << "include::{sourceDir}/@sourceDir@/${sourcePath}[${tag}]\n".toString()
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${tag}]\n".toString()
             }
         } else {
-            lines << "include::{sourceDir}/@sourceDir@/${sourcePath}[]".toString()
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[]".toString()
         }
 
         lines << '----'
@@ -387,12 +387,11 @@ class GuideAsciidocGenerator {
     private static String pathByFolder(@NonNull String appName,
                                        @NonNull String fileName,
                                        String folder) {
-
         String module = appName ? appName + '/' : ''
         "${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@"
     }
 
-    private static List<String> rawTestIncludeLines(String line, TestFramework testFramework) {
+    private static List<String> rawTestIncludeLines(String slug, String line, TestFramework testFramework) {
         String fileName = extractName(line, 'rawTest:')
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
@@ -410,17 +409,17 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
+                lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
+            lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
         }
 
         lines.add('----')
         lines
     }
 
-    private static List<String> resourceIncludeLines(String line, String resourceDir, String macro) {
+    private static List<String> resourceIncludeLines(String slug, String line, String resourceDir, String macro) {
         String fileName = extractName(line, macro)
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
@@ -438,10 +437,10 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[${tag}]\n".toString())
+                lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[${tag}]\n".toString())
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[]".toString())
+            lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[]".toString())
         }
         lines << '----'
         lines
