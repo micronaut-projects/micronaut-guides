@@ -30,6 +30,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                          'themeGuides']
     private static final String KEY_ZIP = "zip"
     private static final String KEY_WORKFLOW = "workflow"
+    private static final String KEY_WORKFLOW_SNAPSHOT = "workflow-snapshot"
     private static final String KEY_DOC = "doc"
     private static final String COMMA = ","
 
@@ -49,6 +50,10 @@ class GuidesPlugin implements Plugin<Project> {
                             metadata,
                             taskSlug)
 
+                    TaskProvider<Copy> githubActionSnapshotWorkflowTask = registerGenerateGithubActionSnapshotWorkflow(project,
+                            metadata,
+                            taskSlug)
+
                     List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
                     TaskProvider<SampleProjectGenerationTask> generateTask = registerGenerateTask(project, metadata, projectGenerator, guidesDir, codeDir, taskSlug)
                     TaskProvider<AsciidocGenerationTask> docTask = registerDocTask(project, metadata, guidesDir, generateTask, taskSlug)
@@ -63,7 +68,7 @@ class GuidesPlugin implements Plugin<Project> {
                     TaskProvider<GuidesIndexGradleTask> indexTask = registerIndexTask(project, taskSlug, metadata)
                     TaskProvider<TestScriptTask> testScriptTask = registerTestScriptTask(project, taskSlug, metadata, generateTask)
                     registerGuideBuild(project, taskSlug, docTask, zip, indexTask, testScriptTask)
-                    CollectionUtils.mapOf(KEY_DOC, docTask, KEY_ZIP, zip, KEY_WORKFLOW, githubActionWorkflowTask)
+                    CollectionUtils.mapOf(KEY_DOC, docTask, KEY_ZIP, zip, KEY_WORKFLOW, githubActionWorkflowTask, KEY_WORKFLOW_SNAPSHOT, githubActionSnapshotWorkflowTask)
                 }).collect(Collectors.toList())
 
         List<TaskProvider<Task>> docTasks = sampleTasks.stream()
@@ -90,6 +95,9 @@ class GuidesPlugin implements Plugin<Project> {
         List<TaskProvider<Task>> workflowTasks = sampleTasks.stream()
                 .map() { Map<String, TaskProvider<Task>> m -> m.get(KEY_WORKFLOW) }
                 .collect(Collectors.toList())
+        workflowTasks.addAll(sampleTasks.stream()
+                .map() { Map<String, TaskProvider<Task>> m -> m.get(KEY_WORKFLOW_SNAPSHOT) }
+                .collect(Collectors.toList()))
 
         project.tasks.register("generateGithubActionWorkflows") {Task it ->
             it.group = 'guides'
@@ -198,34 +206,66 @@ class GuidesPlugin implements Plugin<Project> {
         }
     }
 
+    private static Map<String, ?> workflowTokens(GuideMetadata metadata,
+                                                 String taskSlug) {
+        List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
+        List<GuidesOption> gradleOptions = options
+                .stream()
+                .filter(option -> option.buildTool.isGradle())
+                .collect(Collectors.toList())
+        List<GuidesOption> mavenOptions = options
+                .stream()
+                .filter(option -> option.buildTool == BuildTool.MAVEN)
+                .collect(Collectors.toList())
+
+        String gradleProjects = String.join(COMMA, gradleOptions
+                .stream()
+                .map(option -> "\"" + optionName(metadata, option) + "\"" )
+                .collect(Collectors.toList()))
+
+        String mavenProjects =String.join(COMMA, mavenOptions
+                .stream()
+                .map(option -> "\"" + optionName(metadata, option) + "\"" )
+                .collect(Collectors.toList()))
+
+        boolean mavenEnabled = !(CollectionUtils.isEmpty(mavenOptions) || metadata.skipMavenTests)
+        boolean gradleEnabled = !(CollectionUtils.isEmpty(gradleOptions) || metadata.skipGradleTests)
+
+        [
+                gradleTask: "${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}".toString(),
+                javaMatrix: javaMatrix(metadata),
+                slug: metadata.slug,
+                mavenProjects: mavenProjects,
+                gradleProjects: gradleProjects,
+                paths: worflowPaths(metadata),
+                mavenEnabled: String.valueOf(mavenEnabled),
+                gradleEnabled: String.valueOf(gradleEnabled)
+        ]
+    }
+
+    private static TaskProvider<Copy> registerGenerateGithubActionSnapshotWorkflow(Project project,
+                                                                                   GuideMetadata metadata,
+                                                                                   String taskSlug) {
+        project.tasks.register("${taskSlug}GenerateGithubActionSnapshotWorkflow", Copy) { Copy it ->
+            it.from("github-action-snapshot-template.yml")
+            it.into(project.layout.projectDirectory.dir(".github/workflows"))
+            it.filter(ReplaceTokens, tokens: workflowTokens(metadata, taskSlug))
+            it.rename(new Transformer<String, String>() {
+                @Override
+                String transform(String s) {
+                    "guide-${metadata.slug}-snapshot.yml"
+                }
+            })
+        }
+    }
+
     private static TaskProvider<Copy> registerGenerateGithubActionWorkflow(Project project,
                                                       GuideMetadata metadata,
                                                      String taskSlug) {
-
-        List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
-        String gradleProjects =String.join(COMMA, options
-                .stream()
-                .filter(option -> option.buildTool.isGradle())
-                .map(option -> "\"" + optionName(metadata, option) + "\"" )
-                .collect(Collectors.toList()))
-
-        String mavenProjects =String.join(COMMA, options
-                .stream()
-                .filter(option -> option.buildTool == BuildTool.MAVEN)
-                .map(option -> "\"" + optionName(metadata, option) + "\"" )
-                .collect(Collectors.toList()))
-
         project.tasks.register("${taskSlug}GenerateGithubActionWorkflow", Copy) { Copy it ->
             it.from("github-action-template.yml")
             it.into(project.layout.projectDirectory.dir(".github/workflows"))
-            it.filter(ReplaceTokens, tokens: [
-                    gradleTask: "${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}".toString(),
-                    javaMatrix: javaMatrix(metadata),
-                    slug: metadata.slug,
-                    mavenProjects: mavenProjects,
-                    gradleProjects: gradleProjects,
-                    paths: worflowPaths(metadata)
-            ])
+            it.filter(ReplaceTokens, tokens: workflowTokens(metadata, taskSlug))
             it.rename(new Transformer<String, String>() {
                 @Override
                 String transform(String s) {

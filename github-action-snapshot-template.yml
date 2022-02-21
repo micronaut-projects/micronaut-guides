@@ -1,0 +1,64 @@
+name: Build Guides with Micronaut Snapshot
+on:
+  schedule:
+    - cron: '0 5 * * 1-5'
+jobs:
+  maven-test:
+    if: ${{ @mavenEnabled@ }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [@javaMatrix@]
+        testproject: [@mavenProjects@]
+    env:
+      JDK_VERSION:  ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Use next snapshot patch version
+        run: ./increment_version.sh -p
+      - name: Build Projects
+        run: ./gradlew @gradleTask@
+      - name: Build with Maven
+        run: 'cd build/code/@slug@/${{ matrix.testproject }};./mvnw test'
+  gradle-test:
+    if: ${{ @gradleEnabled@ }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [@javaMatrix@]
+        testproject: [@gradleProjects@]
+    env:
+      JDK_VERSION: ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Use next snapshot patch version
+        run: ./increment_version.sh -p
+      - name: Build Projects
+        run: ./gradlew @gradleTask@
+      - name: Build with Gradle
+        run: 'cd build/code/@slug@/${{ matrix.testproject }};./gradlew test'
+
