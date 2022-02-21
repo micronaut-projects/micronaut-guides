@@ -26,11 +26,13 @@ class IndexGenerator {
 
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
                 .findAll { it.publish }
+        generateGuidesIndex(template, distDir, metadatas)
+    }
 
+    static void generateGuidesIndex(File template, File distDir, List<GuideMetadata> metadatas) {
         String templateText = template.text.replaceFirst(CONTENT_REGEX) { List<String> it ->
             "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
         }
-
         save(templateText, 'index.html', distDir, metadatas)
 
         for (GuideMetadata metadata :  metadatas) {

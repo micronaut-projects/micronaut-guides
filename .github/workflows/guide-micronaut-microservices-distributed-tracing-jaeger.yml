@@ -1,0 +1,67 @@
+name: Test micronaut-microservices-distributed-tracing-jaeger Snapshot
+on:
+  push:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/micronaut-microservices-distributed-tracing-jaeger/**"]
+  pull_request:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/micronaut-microservices-distributed-tracing-jaeger/**"]
+jobs:
+  maven-test:
+    if: ${{ true }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8","11","17"]
+        testproject: ["micronaut-microservices-distributed-tracing-jaeger-maven-java","micronaut-microservices-distributed-tracing-jaeger-maven-groovy","micronaut-microservices-distributed-tracing-jaeger-maven-kotlin"]
+    env:
+      JDK_VERSION:  ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew micronautMicroservicesDistributedTracingJaegerGenerateProjects
+      - name: Build with Maven
+        run: 'cd build/code/micronaut-microservices-distributed-tracing-jaeger/${{ matrix.testproject }};./mvnw test'
+  gradle-test:
+    if: ${{ true }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8","11","17"]
+        testproject: ["micronaut-microservices-distributed-tracing-jaeger-gradle-java","micronaut-microservices-distributed-tracing-jaeger-gradle-groovy","micronaut-microservices-distributed-tracing-jaeger-gradle-kotlin"]
+    env:
+      JDK_VERSION: ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew micronautMicroservicesDistributedTracingJaegerGenerateProjects
+      - name: Build with Gradle
+        run: 'cd build/code/micronaut-microservices-distributed-tracing-jaeger/${{ matrix.testproject }};./gradlew test'
