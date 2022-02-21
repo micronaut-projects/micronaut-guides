@@ -109,7 +109,7 @@ class GuidesPlugin implements Plugin<Project> {
     /**
      * https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
      */
-    private static String worflowPaths(GuideMetadata metadata) {
+    private static String workflowPaths(GuideMetadata metadata) {
         List<String> paths = [
                 'version.txt',
                 //'buildSrc/main/java/io/micronaut/features/**',
@@ -206,7 +206,7 @@ class GuidesPlugin implements Plugin<Project> {
         }
     }
 
-    private static Map<String, ?> workflowTokens(GuideMetadata metadata,
+    private static Map<String, Object> workflowTokens(GuideMetadata metadata,
                                                  String taskSlug) {
         List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
         List<GuidesOption> gradleOptions = options
@@ -230,26 +230,28 @@ class GuidesPlugin implements Plugin<Project> {
 
         boolean mavenEnabled = !(CollectionUtils.isEmpty(mavenOptions) || metadata.skipMavenTests)
         boolean gradleEnabled = !(CollectionUtils.isEmpty(gradleOptions) || metadata.skipGradleTests)
-
         [
                 gradleTask: "${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}".toString(),
                 javaMatrix: javaMatrix(metadata),
                 slug: metadata.slug,
                 mavenProjects: mavenProjects,
                 gradleProjects: gradleProjects,
-                paths: worflowPaths(metadata),
+                paths: workflowPaths(metadata),
                 mavenEnabled: String.valueOf(mavenEnabled),
                 gradleEnabled: String.valueOf(gradleEnabled)
-        ]
+        ] as Map<String, Object>
     }
 
     private static TaskProvider<Copy> registerGenerateGithubActionSnapshotWorkflow(Project project,
                                                                                    GuideMetadata metadata,
                                                                                    String taskSlug) {
+        Map<String, Object> tokens = workflowTokens(metadata, taskSlug)
+        Object workflowName = "Test $metadata.slug".toString()
+        tokens.put("workflowName", workflowName)
         project.tasks.register("${taskSlug}GenerateGithubActionSnapshotWorkflow", Copy) { Copy it ->
             it.from("github-action-snapshot-template.yml")
             it.into(project.layout.projectDirectory.dir(".github/workflows"))
-            it.filter(ReplaceTokens, tokens: workflowTokens(metadata, taskSlug))
+            it.filter(ReplaceTokens, tokens: tokens)
             it.rename(new Transformer<String, String>() {
                 @Override
                 String transform(String s) {
@@ -262,10 +264,13 @@ class GuidesPlugin implements Plugin<Project> {
     private static TaskProvider<Copy> registerGenerateGithubActionWorkflow(Project project,
                                                       GuideMetadata metadata,
                                                      String taskSlug) {
+        Map<String, Object> tokens = workflowTokens(metadata, taskSlug)
+        Object workflowName = "Test $metadata.slug Snapshot".toString()
+        tokens.put("workflowName", workflowName)
         project.tasks.register("${taskSlug}GenerateGithubActionWorkflow", Copy) { Copy it ->
             it.from("github-action-template.yml")
             it.into(project.layout.projectDirectory.dir(".github/workflows"))
-            it.filter(ReplaceTokens, tokens: workflowTokens(metadata, taskSlug))
+            it.filter(ReplaceTokens, tokens: tokens)
             it.rename(new Transformer<String, String>() {
                 @Override
                 String transform(String s) {
