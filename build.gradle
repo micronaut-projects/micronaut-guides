@@ -4,25 +4,16 @@ import io.micronaut.guides.TestScriptGenerator
 import io.micronaut.guides.ThemeProcessor
 import io.micronaut.guides.GitDiffUtils
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'io.micronaut.docs:micronaut-docs-asciidoc-extensions:1.0.25'
-    }
-}
-
 plugins {
     id 'groovy'
     id("org.asciidoctor.jvm.convert") version "3.3.2"
 }
 
 apply from: "gradle/asciidoc.gradle"
+version '0.0.1'
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 ext {
@@ -30,6 +21,7 @@ ext {
     distDir = new File(buildDir, 'dist')
     guidesDir = new File(projectDir, 'guides')
     metadataConfigName = 'metadata.json'
+    micronautVersion = new File(projectDir, 'version.txt').text.trim()
 }
 
 task cleanAsciidoctorFolder {
@@ -122,7 +114,7 @@ task generateGuidesIndex {
     description 'Generates an index.html with all the guides'
     doLast {
         File template = new File(projectDir, "assets/template.html")
-        IndexGenerator.generateGuidesIndex(template, guidesDir, project.buildDir, metadataConfigName)
+        IndexGenerator.generateGuidesIndex(template, guidesDir, distDir, metadataConfigName)
     }
 }
 
@@ -130,6 +122,9 @@ task generateGuidesJsonMetadata {
     group 'guides'
     description 'Generates a guides.json with the metadata for all the guides'
     doLast {
+        if (!distDir.exists()) {
+            distDir.mkdirs()
+        }
         File guidesJson = new File(distDir, 'guides.json')
         guidesJson.createNewFile()
         guidesJson.text = IndexGenerator.generateGuidesJsonIndex(guidesDir, metadataConfigName)

@@ -1,8 +1,8 @@
 package io.micronaut.guides.tasks
 
+import groovy.transform.CompileStatic
 import io.micronaut.guides.GuideAsciidocGenerator
 import io.micronaut.guides.GuideMetadata
-import io.micronaut.guides.GuideProjectGenerator
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -15,6 +15,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
+@CompileStatic
 @CacheableTask
 abstract class AsciidocGenerationTask extends DefaultTask {
 

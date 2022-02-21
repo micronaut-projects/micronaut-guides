@@ -1,14 +1,14 @@
 package io.micronaut.guides.tasks
 
 import groovy.transform.CompileStatic
+import io.micronaut.guides.GuideAsciidocGenerator
 import io.micronaut.guides.GuideMetadata
-import io.micronaut.guides.GuideProjectGenerator
+import io.micronaut.guides.IndexGenerator
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.provider.Property
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -17,26 +17,20 @@ import org.gradle.api.tasks.TaskAction
 
 @CompileStatic
 @CacheableTask
-abstract class SampleProjectGenerationTask extends DefaultTask {
-
-    @Internal
-    GuideProjectGenerator guidesGenerator
+abstract class GuidesIndexGradleTask extends DefaultTask {
 
     @Internal
     GuideMetadata metadata
 
-    @Input
-    abstract Property<String> getSlug()
-
-    @InputDirectory
+    @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
-    abstract DirectoryProperty getInputDirectory()
+    abstract RegularFileProperty getTemplate()
 
     @OutputDirectory
     abstract DirectoryProperty getOutputDir()
 
     @TaskAction
     def perform() {
-        guidesGenerator.generateOne(metadata, inputDirectory.get().asFile, outputDir.get().asFile)
+        IndexGenerator.generateGuidesIndex(template.get().asFile, outputDir.get().asFile, Collections.singletonList(metadata))
     }
 }
