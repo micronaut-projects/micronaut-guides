@@ -324,6 +324,7 @@ class GuidesPlugin implements Plugin<Project> {
         project.tasks.register("${taskSlug}${TASK_SUFFIX_BUILD}") { Task it ->
             it.group = 'guides' + taskSlug
             it.dependsOn(dependsOnTasks)
+            it.finalizedBy(project.tasks.named('asciidoctor'), project.tasks.named('themeGuides'))
         }
     }
 
