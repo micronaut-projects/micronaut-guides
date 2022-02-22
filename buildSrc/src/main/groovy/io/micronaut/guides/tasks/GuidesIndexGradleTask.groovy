@@ -1,7 +1,6 @@
 package io.micronaut.guides.tasks
 
 import groovy.transform.CompileStatic
-import io.micronaut.guides.GuideAsciidocGenerator
 import io.micronaut.guides.GuideMetadata
 import io.micronaut.guides.IndexGenerator
 import org.gradle.api.DefaultTask
