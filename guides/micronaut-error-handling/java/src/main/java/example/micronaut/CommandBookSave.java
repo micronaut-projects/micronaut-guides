@@ -3,20 +3,16 @@ package example.micronaut;
 import io.micronaut.core.annotation.Introspected;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 @Introspected // <1>
 public class CommandBookSave {
+
     @NotBlank // <2>
     private String title;
 
-    @NotNull // <3>
-    @Positive // <4>
-    private Integer pages;
-
-    public CommandBookSave() {
-    }
+    @Positive // <3>
+    private int pages;
 
     public String getTitle() {
         return title;
@@ -26,11 +22,11 @@ public class CommandBookSave {
         this.title = title;
     }
 
-    public Integer getPages() {
+    public int getPages() {
         return pages;
     }
 
-    public void setPages(Integer pages) {
+    public void setPages(int pages) {
         this.pages = pages;
     }
 }
