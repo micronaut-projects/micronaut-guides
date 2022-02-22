@@ -144,7 +144,19 @@ class GuideProjectGenerator implements AutoCloseable {
     void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
 
         String packageAndName = BASE_PACKAGE + '.' + APP_NAME
+
         JdkVersion javaVersion = Utils.parseJdkVersion()
+        if (metadata.minimumJavaVersion != null) {
+            JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
+            if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
+                javaVersion = minimumJavaVersion
+            }
+        }
+
+        if (metadata.maximumJavaVersion != null && javaVersion.majorVersion() > metadata.maximumJavaVersion) {
+            println "not generating project for $metadata.slug, JDK ${javaVersion.majorVersion()} > $metadata.maximumJavaVersion"
+            return
+        }
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
@@ -162,13 +174,6 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (testFramework == SPOCK) {
                     appFeatures.remove('mockito')
-                }
-
-                if (metadata.minimumJavaVersion != null) {
-                    JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
-                    if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
-                        javaVersion = minimumJavaVersion
-                    }
                 }
 
                 // typical guides use 'default' as name, multi-project guides have different modules

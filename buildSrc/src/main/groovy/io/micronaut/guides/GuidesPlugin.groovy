@@ -18,6 +18,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 
+import java.util.function.Predicate
 import java.util.stream.Collectors
 
 @CompileStatic
@@ -283,12 +284,20 @@ class GuidesPlugin implements Plugin<Project> {
     }
 
     private static String javaMatrix(GuideMetadata guideMetadata) {
-        String.join(COMMA, (guideMetadata.minimumJavaVersion ? JAVA_MATRIX.stream()
-                .filter(v -> v >= guideMetadata.minimumJavaVersion)
-                .collect(Collectors.toList()) : JAVA_MATRIX)
+        String.join(COMMA, JAVA_MATRIX
                 .stream()
+                .filter(minFilter(guideMetadata))
+                .filter(maxFilter(guideMetadata))
                 .map(v -> quote(v))
                 .collect(Collectors.toList()))
+    }
+
+    private static Predicate<Integer> minFilter(GuideMetadata guideMetadata) {
+        (guideMetadata.minimumJavaVersion ? { int v -> v >= guideMetadata.minimumJavaVersion } : { true }) as Predicate
+    }
+
+    private static Predicate<Integer> maxFilter(GuideMetadata guideMetadata) {
+        (guideMetadata.maximumJavaVersion ? { int v -> v <= guideMetadata.maximumJavaVersion } : { true }) as Predicate
     }
 
     private static TaskProvider<SampleProjectGenerationTask> registerGenerateTask(Project project,
