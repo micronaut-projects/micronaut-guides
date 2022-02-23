@@ -18,5 +18,3 @@ Script execution example:
 ```
 osascript micronautwittercard.scpt ~/github/micronaut-projects/micronaut-guides/twittercard/MicronautTwitterCard.pxd ~/github/micronaut-projects/micronaut-guides/src/docs/images/cards micronaut-security-jwt-cookie "Micronaut JWT authentication via Cookies"
 ```
-
-
