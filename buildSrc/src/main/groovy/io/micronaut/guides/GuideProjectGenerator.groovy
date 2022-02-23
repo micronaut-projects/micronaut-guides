@@ -325,7 +325,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.slug = metadata.slug
         merged.title = metadata.title ?: base.title
         merged.intro = metadata.intro ?: base.intro
-        merged.authors = mergeLists(base.authors, metadata.authors) as Set<String>
+        merged.authors = mergeLists(metadata.authors, base.authors) as Set<String>
         merged.tags = mergeLists(base.tags, metadata.tags)
         merged.category = metadata.category ?: base.category
         merged.publicationDate = metadata.publicationDate
