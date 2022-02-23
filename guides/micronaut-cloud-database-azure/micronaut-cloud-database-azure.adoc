@@ -1,0 +1,198 @@
+external:micronaut-cloud-database-base/start.adoc[]
+common:azure-cli.adoc[]
+common:azure-account-paid.adoc[]
+
+We will then connect the application to https://azure.microsoft.com/en-us/services/mysql/[Azure Database for MySQL].
+
+NOTE: Paid services are used as part of this guide. To follow the tutorial, you will need a paid Azure account or a trial account with credits available.
+
+== Create an Azure Database for MySQL instance
+
+Now, you'll create a new https://azure.microsoft.com/en-us/services/mysql/[Azure Database for MySQL] instance. This is accomplished in three steps, using the https://docs.microsoft.com/en-us/cli/azure/install-azure-cli[Azure CLI]:
+
+1. First, you'll create a resource group that the database will form part of. It is recommended that you create a new resource group just for this guide rather than reusing an existing one.
+2. Next, you'll create the Azure Database for MySQL instance using the CLI.
+3. Finally, you will configure the Azure firewall ingress rules to allow a connection from your local machine to the Azure Database instance.
+
+== Configure Environment Variables
+
+Before getting started, configure the following environment variables. For example, using `bash`:
+
+.Required Environment Variables
+[source,bash]
+----
+export AZURE_RESOURCE_GROUP=micronaut-azure-database-group \
+export AZURE_DATABASE_NAME=micronaut-azure-database \
+export AZURE_REGION=eastus \
+export LOCAL_IP_ADDRESS=<YOUR_LOCAL_IP_ADDRESS> \
+export AZURE_DATABASE_USER=guide_user \
+export AZURE_DATABASE_PASSWORD=<YOUR_MYSQL_PASSWORD> 
+----
+
+The remainder of the guide will use the values of these environments variables, which are described below:
+
+* `AZURE_RESOURCE_GROUP` - The name of the Azure resource group. You can change this value if you prefer another name.
+* `AZURE_DATABASE_NAME` - The name of the database that will be created within the MySQL instance. You can change this value if you prefer another name.
+* `AZURE_REGION` - The Azure region. This guide uses the U.S. east region by default. However, you can change this to a closer region. You can list the regions by running `az account list-locations`.
+* `LOCAL_IP_ADDRESS` - Your local IP address, which will be required to configure the Azure firewall. You will need to replace this value with your local IP address. You can find your local IP address by visiting http://whatismyip.akamai.com/[http://whatismyip.akamai.com/]. 
+* `AZURE_DATABASE_USER` - The database username to establish the connection
+* `AZURE_DATABASE_PASSWORD` - The database password to establish the connection. Replace this value with a password of your choice.
+
+=== Create a Resource Group
+
+First, create a resource group using the Azure CLI, specifying the `AZURE_RESOURCE_GROUP` and `AZURE_REGION` environment variables you configured in the previous section:
+
+[source,bash]
+----
+az group create \
+    --name $AZURE_RESOURCE_GROUP \
+    --location $AZURE_REGION 
+----
+
+The above command should result in a response like:
+
+[source,json]
+----
+{
+  "id": "/subscriptions/18ce9a15-3ebb-4f30-ad7d-bcc0e39329a5/resourceGroups/micronaut-azure-database-group",
+  "location": "eastus",
+  "managedBy": null,
+  "name": "micronaut-azure-database-group",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+----
+
+=== Create the Azure Database Instance
+
+Now create the Azure Database for MySQL instance using the following command:
+
+[source,bash]
+----
+az mysql server create \
+    --version 8.0 \
+    --resource-group $AZURE_RESOURCE_GROUP \
+    --name $AZURE_DATABASE_NAME \
+    --location $AZURE_REGION \
+    --sku-name B_Gen5_1 \
+    --storage-size 5120 \
+    --admin-user $AZURE_DATABASE_USER \
+    --admin-password $AZURE_DATABASE_PASSWORD
+----
+
+NOTE: The above command uses the `--version` flag to create a MySQL 8 instance; see the Azure documentation for https://docs.microsoft.com/en-us/azure/mysql/concepts-supported-versions[supported MySQL versions].
+
+Creating the Azure Database for MySQL instance may take several minutes to complete. Once the operation has completed, you should see output like the following (shortened for brevity):
+
+[source,json]
+----
+{
+  ...
+  "databaseName": "defaultdb",
+  ...
+  "micronaut-azure-database.mysql.database.azure.com",
+  ...
+  "replicationRole": "None",
+  "resourceGroup": "micronaut-azure-database-group",
+  "sku": {
+    "additionalProperties": {},
+    "capacity": 1,
+    "family": "Gen5",
+    "name": "B_Gen5_1",
+    "size": null,
+    "tier": "Basic"
+  },
+  "sslEnforcement": "Enabled",
+  "storageProfile": {
+    "additionalProperties": {},
+    "backupRetentionDays": 7,
+    "geoRedundantBackup": "Disabled",
+    "storageAutogrow": "Enabled",
+    "storageMb": 5120
+  },
+  "tags": null,
+  "type": "Microsoft.DBforMySQL/servers",
+  "userVisibleState": "Ready",
+  "version": "8.0"
+}
+----
+
+=== Configure a firewall rule for your MySQL server
+
+By default, it is not possible to establish a local connection to Azure Database instances. In order to allow incoming connections from a local machine to a Database instance, a firewall rule needs to be created with the Azure CLI:
+
+[source,bash]
+----
+az mysql server firewall-rule create \
+    --resource-group $AZURE_RESOURCE_GROUP \
+    --name $AZURE_DATABASE_NAME-database-allow-local-ip \
+    --server $AZURE_DATABASE_NAME \
+    --start-ip-address $LOCAL_IP_ADDRESS \
+    --end-ip-address $LOCAL_IP_ADDRESS 
+----
+
+== Configure MySQL
+
+Flyway will create the database tables the first time the application starts, but you must create the actual database first.
+
+You can once again use the Azure CLI to achieve this. The following command creates a database called `demo` within the Azure Database for MySQL instance:
+
+.Create the MySQL database
+[source,bash]
+----
+az mysql db create \
+    --resource-group $AZURE_RESOURCE_GROUP \
+    --name demo \
+    --server-name $AZURE_DATABASE_NAME
+----
+
+external:micronaut-cloud-database-base/create-app.adoc[]
+
+== Running the Application
+
+With almost everything in place, you can start the application and try it out. First, set environment variables to configure the application datasource, then start the app.
+
+Create environment variables for `JDBC_URL`, `JDBC_USER`, and `JDBC_PASSWORD`, which will be used in the Micronaut app's `application.yml` datasource:
+
+
+[source,bash]
+----
+export JDBC_URL=jdbc:mysql://$AZURE_DATABASE_NAME.mysql.database.azure.com:3306/demo?serverTimezone=UTC
+export JDBC_USER=guide_user@$AZURE_DATABASE_NAME
+export JDBC_PASSWORD=$AZURE_DATABASE_PASSWORD
+----
+
+common:runapp-instructions.adoc[]
+
+You can test the application in a web browser or with cURL.
+
+Run from a terminal window to create a `Genre`:
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+and run this to list the genres:
+
+[source, bash]
+----
+curl http://localhost:8080/genres/list
+----
+
+== Next steps
+
+When you are finished using the database, you can https://docs.microsoft.com/en-us/cli/azure/group?view=azure-cli-latest#az-group-delete[delete the resource group], which will delete all resources associated with the group, including the database. To do this, run
+
+[source,bash]
+----
+az group delete -n $AZURE_RESOURCE_GROUP
+----
+
+
+external:micronaut-cloud-database-base/end.adoc[]
