@@ -39,3 +39,11 @@ jobs:
           BRANCH: gh-pages
           FOLDER: build/dist
           VERSION: ${{ steps.guides_version.outputs.guides_version }}
+      - name: Publish to latest Github Pages
+        if: success() && github.event_name == 'push' && matrix.java == '11'
+        uses: micronaut-projects/github-pages-deploy-action@master
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: build/dist
+          VERSION: latest
