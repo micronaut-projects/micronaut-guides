@@ -75,7 +75,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
         Category cat = Category.values().find {it.toString() == config.category }
         if (publish && !cat) {
-            throw new GradleException("$config.category does not exist in Category enum")
+            throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
         }
 
         new GuideMetadata(
