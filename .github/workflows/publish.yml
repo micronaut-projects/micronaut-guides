@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Build with Gradle
+        run: ./gradlew build
       - name: Calculate version of the guides
         id: guides_version
         run: |
@@ -36,12 +38,3 @@ jobs:
           BRANCH: gh-pages
           FOLDER: build/dist
           VERSION: ${{ steps.guides_version.outputs.guides_version }}
-          BUILD_SCRIPT: ./gradlew build
-      - name: Publish to latest Github Pages
-        uses: micronaut-projects/github-pages-deploy-action@master
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: build/dist
-          VERSION: latest
-          BUILD_SCRIPT: ./gradlew build
