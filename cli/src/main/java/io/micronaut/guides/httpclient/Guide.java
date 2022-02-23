@@ -19,6 +19,7 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 
 import java.util.List;
+import java.util.Set;
 
 @Introspected
 public class Guide {
@@ -30,7 +31,7 @@ public class Guide {
     private final String intro;
 
     @NonNull
-    private final List<String> authors;
+    private final Set<String> authors;
 
     @NonNull
     private final List<String> tags;
@@ -50,7 +51,7 @@ public class Guide {
     @NonNull
     private final List<Option> options;
 
-    public Guide(@NonNull String title, @NonNull String intro, @NonNull List<String> authors, @NonNull List<String> tags, @NonNull String category, @NonNull String publicationDate, @NonNull String slug, @NonNull String url, @NonNull List<Option> options) {
+    public Guide(@NonNull String title, @NonNull String intro, @NonNull Set<String> authors, @NonNull List<String> tags, @NonNull String category, @NonNull String publicationDate, @NonNull String slug, @NonNull String url, @NonNull List<Option> options) {
         this.title = title;
         this.intro = intro;
         this.authors = authors;
@@ -73,7 +74,7 @@ public class Guide {
     }
 
     @NonNull
-    public List<String> getAuthors() {
+    public Set<String> getAuthors() {
         return authors;
     }
 

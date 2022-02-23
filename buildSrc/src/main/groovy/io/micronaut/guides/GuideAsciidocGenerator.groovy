@@ -9,6 +9,7 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
+import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
 
@@ -34,6 +35,12 @@ class GuideAsciidocGenerator {
 
     static void generate(GuideMetadata metadata, File inputDir,
                          File asciidocDir, File projectDir) {
+
+        JdkVersion javaVersion = Utils.parseJdkVersion()
+        if (metadata.maximumJavaVersion != null && javaVersion.majorVersion() > metadata.maximumJavaVersion) {
+            println "not generating asciidoc for $metadata.slug, JDK ${javaVersion.majorVersion()} > $metadata.maximumJavaVersion"
+            return
+        }
 
         File asciidocFile = new File(inputDir, metadata.asciidoctor)
         assert asciidocFile.exists()

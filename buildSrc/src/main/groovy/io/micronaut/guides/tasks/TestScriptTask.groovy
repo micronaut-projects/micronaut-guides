@@ -13,6 +13,7 @@ import org.gradle.api.tasks.TaskAction
 @CompileStatic
 @CacheableTask
 abstract class TestScriptTask extends DefaultTask {
+
     @Internal
     GuideMetadata metadata
 
