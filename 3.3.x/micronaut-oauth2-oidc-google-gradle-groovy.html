@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Secure a Micronaut application with Google</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-oauth2-oidc-google.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Secure a Micronaut application with Google"/>
+    <meta name="twitter:description" content="Learn how to create a Micronaut application and secure it with Google and provide authentication with OpenID Connect"/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-oauth2-oidc-google.html">Secure a Micronaut application with Google</a> » <span class="breadcrumb_last" aria-current="page">gradle | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#views">4.1. Views</a></li>
+<li><a href="#oauth-2-0">4.2. OAuth 2.0</a></li>
+<li><a href="#home">4.3. Home</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application">5. Running the Application</a>
+<ul class="sectlevel2">
+<li><a href="#custom-id-token-claims-validation">5.1. Custom ID token claims validation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">6. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">7. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Secure a Micronaut application with Google</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to create a Micronaut application and secure it with Google and provide authentication with OpenID Connect</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.3.3</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Groovy.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-oauth2-oidc-google-gradle-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=gradle --lang=groovy</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="views">4.1. Views</h3>
+<div class="paragraph">
+<p>Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.</p>
+</div>
+<div class="paragraph">
+<p>To use <a href="https://www.thymeleaf.org/">Thymeleaf</a> Java template engine to render views within a Micronaut application add the following dependency on your classpath.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.views:micronaut-views-thymeleaf</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oauth-2-0">4.2. OAuth 2.0</h3>
+<div class="paragraph">
+<p>Visit <a href="https://console.developers.google.com">https://console.developers.google.com</a> and create a new project:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/google-1.png" alt="google 1">
+</div>
+</div>
+<div class="paragraph">
+<p>You will also need to create OAuth 2.0 credentials for the project since Google does not do that automatically. From the sidebar, click the <code>Credentials</code> tab, the click <code>Create credentials</code> and choose <code>OAuth client ID</code> from the dropdown.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/google-2.png" alt="google 2">
+</div>
+</div>
+<div class="paragraph">
+<p>The Google Console will prompt for some information about your application such as the product name, a home page, and a logo. On the next page, select <strong>Web Application</strong> type, and enter the redirect URL where the Micronaut application we will build next will wait for the callback.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/google-4.png" alt="google 4">
+</div>
+</div>
+<div class="paragraph">
+<p>You will then receive a client ID and secret.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/google-3.png" alt="google 3">
+</div>
+</div>
+<div class="paragraph">
+<p>To use OAuth 2.0 integration in your Micronaut application, add the following dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.security:micronaut-security-oauth2</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also add <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt">Micronaut JWT support</a> dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.security:micronaut-security-jwt</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add the following OAuth2 Configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="head"><span class="head">---</span></span>
+<span class="key">micronaut</span>:
+  <span class="key">security</span>:
+    <span class="key">authentication</span>: <span class="string"><span class="content">idtoken </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">oauth2</span>:
+      <span class="key">clients</span>:
+        <span class="key">google</span>: <i class="conum" data-value="2"></i><b>(2)</b>
+          <span class="key">client-id</span>: <span class="string"><span class="content">'${OAUTH_CLIENT_ID:xxx}'  </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+          <span class="key">client-secret</span>: <span class="string"><span class="content">'${OAUTH_CLIENT_SECRET:yyy}' </span></span><i class="conum" data-value="4"></i><b>(4)</b>
+          <span class="key">openid</span>:
+            <span class="key">issuer</span>: <span class="string"><span class="content">'https://accounts.google.com' </span></span><i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="key">endpoints</span>:
+      <span class="key">logout</span>:
+        <span class="key">get-allowed</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set <code>micronaut.security.authentication</code> as <code>idtoken</code>. The <code>idtoken</code> provided by Google when the OAuth 2.0 Authorization code flow ends will be saved in a cookie. The id token is a signed JWT. For every request, the Micronaut framework extracts the JWT from the Cookie and validates the JWT signature with the remote Json Web Key Set exposed by Google. JWKS is exposed by the <code>jws-uri</code> entry of Google <code>.well-known/openid-configuration</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>You can choose any name. The name you select, will be used in your routes. E.g. If you set <code>google</code> the login route for this OAuth 2.0 client is <code>/oauth/login/google</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Client Secret. See previous screenshot.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Client ID. See previous screenshot.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>issuer</code> URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Accept GET request to the <code>/logout</code> endpoint.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous configuration uses several placeholders. You will need to set up <code>OAUTH_CLIENT_ID</code>, <code>OAUTH_CLIENT_SECRET</code> environment variables.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>export OAUTH_CLIENT_ID=XXXXXXXXXX
+export OAUTH_CLIENT_SECRET=YYYYYYYYYY</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Check Google <a href="https://accounts.google.com/.well-known/openid-configuration">.well-known/openid-configuration documentation</a>.</p>
+</div>
+<div class="paragraph">
+<p>We want to use an <strong>Authorization Code</strong> grant type flow which it is described in the following diagram:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/diagramm.png" alt="diagramm">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="home">4.3. Home</h3>
+<div class="paragraph">
+<p>Create a controller to handle the requests to <code>/</code>. You will display the email of the authenticated person if any. Annotate the controller endpoint with <code>@View</code> since we will use a Thymeleaf template.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/HomeController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.views.View</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">HomeController</span> {
+
+    <span class="annotation">@Secured</span>(SecurityRule.IS_ANONYMOUS) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@View</span>(<span class="string"><span class="delimiter">'</span><span class="content">home</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Get</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; index() {
+        [:]
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate with <code>io.micronaut.security.Secured</code> to configure secured access. The <code>SecurityRule.IS_ANONYMOUS</code> expression will allow access without authentication.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <a href="https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html">View</a> annotation to specify which template to use to render the response.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>index</code> method to GET <code>/</code> requests.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a thymeleaf template:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/views/home.html</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attribute-name">xmlns:th</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.thymeleaf.org</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Home<span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+<span class="tag">&lt;h1&gt;</span>Micronaut - Google example<span class="tag">&lt;/h1&gt;</span>
+
+<span class="tag">&lt;h2</span> <span class="attribute-name">th:if</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${security}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>username: <span class="tag">&lt;span</span> <span class="attribute-name">th:text</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${security.attributes.get('email')}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/span&gt;</span><span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;h2</span> <span class="attribute-name">th:unless</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${security}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>username: Anonymous<span class="tag">&lt;/h2&gt;</span>
+
+<span class="tag">&lt;nav&gt;</span>
+    <span class="tag">&lt;ul&gt;</span>
+        <span class="tag">&lt;li</span> <span class="attribute-name">th:unless</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${security}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;a</span> <span class="attribute-name">href</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/login/google</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Enter<span class="tag">&lt;/a&gt;</span><span class="tag">&lt;/li&gt;</span>
+        <span class="tag">&lt;li</span> <span class="attribute-name">th:if</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${security}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;a</span> <span class="attribute-name">href</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/logout</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Logout<span class="tag">&lt;/a&gt;</span><span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also, note that we return an empty model in the controller. However, we are accessing <code>security</code> in the thymeleaf template.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <a href="https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html" target="_blank" rel="noopener">SecurityViewModelProcessor</a> injects into the model a <code>security</code> map with the authenticated user. See <a href="https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement">User in a view</a> documentation.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">5. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command which starts the application on port 8080.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/googlevideo.gif" alt="googlevideo">
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-id-token-claims-validation">5.1. Custom ID token claims validation</h3>
+<div class="paragraph">
+<p>Imagine you want to allow sign-in with Google but only to users' in your organization.</p>
+</div>
+<div class="paragraph">
+<p>Google OAuth consent screen settings allows you to do that:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/google-5.png" alt="google 5">
+</div>
+</div>
+<div class="paragraph">
+<p>However, we could also achieve this programmatically. Google id token contains a claim named <code>hd</code> which stands for <code>hosted domain</code>.</p>
+</div>
+<div class="paragraph">
+<p>We can create a configuration object:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/ApplicationConfiguration.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+
+<span class="type">interface</span> ApplicationConfiguration {
+
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> getHostedDomain()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Backed by a <code>@ConfigurationProperties</code> annotated class:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/ApplicationConfigurationProperties.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">'</span><span class="content">app.hosted-domain</span><span class="delimiter">'</span></span>)
+<span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">'</span><span class="content">app</span><span class="delimiter">'</span></span>)
+<span class="type">class</span> <span class="class">ApplicationConfigurationProperties</span> <span class="directive">implements</span> ApplicationConfiguration {
+
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> hostedDomain
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and then implement a <code>OpenIdClaimsValidator</code> bean. The Micronaut framework validates the id token against every bean of type <code>OpenIdClaimsValidator</code>. If the id token <code>hd</code> claim does not match the value configured, it is considered invalid.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/HostedDomainClaimValidator.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.client.OpenIdProviderMetadata</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.configuration.OauthClientConfiguration</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.OpenIdClaims</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.security.oauth2.endpoint.token.response.validation.OpenIdClaimsValidator</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Requires</span>(beans = ApplicationConfiguration)
+<span class="annotation">@Singleton</span>
+<span class="type">class</span> <span class="class">HostedDomainClaimValidator</span> <span class="directive">implements</span> OpenIdClaimsValidator {
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> HOSTED_DOMAIN_CLAIM = <span class="string"><span class="delimiter">'</span><span class="content">hd</span><span class="delimiter">'</span></span>
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> hostedDomain
+
+    HostedDomainClaimValidator(ApplicationConfiguration applicationConfiguration) {
+        <span class="local-variable">this</span>.hostedDomain = applicationConfiguration.hostedDomain
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">boolean</span> validate(OpenIdClaims claims,
+                     OauthClientConfiguration clientConfiguration,
+                     OpenIdProviderMetadata providerMetadata) {
+        <span class="keyword">def</span> hd = claims.get(HOSTED_DOMAIN_CLAIM)
+        <span class="keyword">return</span> hd <span class="keyword">instanceof</span> <span class="predefined-type">String</span> &amp;&amp; ((<span class="predefined-type">String</span>) hd).equalsIgnoreCase(hostedDomain)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add to <code>src/main/resources/application.yaml</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">app</span>:
+  <span class="key">hosted-domain</span>: <span class="string"><span class="content">'objectcomputing.com'</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>if you start the application, you will only be able to sign in with a Google Account within the OCI organization.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">6. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth">Micronaut OAuth 2.0 documentation</a> to learn more.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">7. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
