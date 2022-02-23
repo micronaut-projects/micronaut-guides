@@ -23,7 +23,7 @@ We will also create 2 subnets in different availability zones, and a subnet grou
 # VPC, internet gateway and route table
 export VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 | jq -r '.Vpc.VpcId')
 export IG_ID=$(aws ec2 create-internet-gateway | jq -r '.InternetGateway.InternetGatewayId')
-aws ec2 attach-internet-gateway --internet-gateway-id IG_ID --vpc-id $VPC_ID
+aws ec2 attach-internet-gateway --internet-gateway-id $IG_ID --vpc-id $VPC_ID
 aws ec2 modify-vpc-attribute --enable-dns-hostnames --vpc-id $VPC_ID
 export RT_ID=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID" --query "RouteTables[].RouteTableId" --output text)
 aws ec2 create-route --route-table-id $RT_ID --destination-cidr-block 0.0.0.0/0 --gateway-id $IG_ID
@@ -33,7 +33,7 @@ aws ec2 create-security-group --group-name micronaut-guides-mysql-sg --descripti
 export SG_ID=$(aws ec2 describe-security-groups --query 'SecurityGroups[?GroupName==`micronaut-guides-mysql-sg`].GroupId' --output text)
 aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 3306 --cidr $(curl ifconfig.me)/32
 
-# Subnet and subnet group
+# Subnets and subnet group
 export AZ_0=$(aws ec2 describe-availability-zones --filters "Name=state,Values=available" --query "AvailabilityZones[0].ZoneName" --output text)
 export AZ_1=$(aws ec2 describe-availability-zones --filters "Name=state,Values=available" --query "AvailabilityZones[1].ZoneName" --output text)
 export SN0_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.0.0/20 --availability-zone $AZ_0 | jq -r '.Subnet.SubnetId')
@@ -157,9 +157,22 @@ and run this to list the genres:
 curl http://localhost:8080/genres/list
 ----
 
-=== Stopping the Instance
+=== Stopping the Instance and cleaning up
 
-TODO: cleanup
+Once you are done with this guide, you can stop/delete the AWS resources created, to avoid incurring in unnecessary charges.
+
+[source,bash]
+----
+aws rds delete-db-instance --db-instance-identifier micronaut-guides-mysql --skip-final-snapshot
+aws rds wait db-instance-deleted --db-instance-identifier micronaut-guides-mysql
+aws ec2 delete-subnet --subnet-id $SN0_ID
+aws ec2 delete-subnet --subnet-id $SN1_ID
+aws rds delete-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
+aws ec2 delete-security-group --group-id $SG_ID
+aws ec2 detach-internet-gateway --internet-gateway-id $IG_ID --vpc-id $VPC_ID
+aws ec2 delete-internet-gateway --internet-gateway-id $IG_ID
+aws ec2 delete-vpc --vpc-id $VPC_ID
+----
 
 external:micronaut-cloud-database-base/end.adoc[]
 
