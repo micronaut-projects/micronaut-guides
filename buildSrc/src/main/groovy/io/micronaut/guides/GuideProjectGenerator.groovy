@@ -75,7 +75,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
         Category cat = Category.values().find {it.toString() == config.category }
         if (publish && !cat) {
-            throw new GradleException("$config.category does not exist in Category enum")
+            throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
         }
 
         new GuideMetadata(
@@ -325,7 +325,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.slug = metadata.slug
         merged.title = metadata.title ?: base.title
         merged.intro = metadata.intro ?: base.intro
-        merged.authors = mergeLists(base.authors, metadata.authors) as Set<String>
+        merged.authors = mergeLists(metadata.authors, base.authors) as Set<String>
         merged.tags = mergeLists(base.tags, metadata.tags)
         merged.category = metadata.category ?: base.category
         merged.publicationDate = metadata.publicationDate
