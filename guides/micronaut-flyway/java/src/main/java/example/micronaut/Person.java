@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 
 @MappedEntity // <1>
 public class Person {
+
     @Id // <2>
     @GeneratedValue // <3>
     private Long id;
