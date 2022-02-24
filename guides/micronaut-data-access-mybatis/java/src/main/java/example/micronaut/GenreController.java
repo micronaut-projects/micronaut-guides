@@ -20,14 +20,14 @@ import java.util.List;
 @Controller("/genres") // <1>
 public class GenreController {
 
-    protected final GenreRepository genreRepository;
+    private final GenreRepository genreRepository;
 
     public GenreController(GenreRepository genreRepository) { // <2>
         this.genreRepository = genreRepository;
     }
 
     @Get("/{id}") // <3>
-    public Genre show(Long id) {
+    public Genre show(long id) {
         return genreRepository
                 .findById(id)
                 .orElse(null); // <4>
@@ -56,16 +56,12 @@ public class GenreController {
     }
 
     @Delete("/{id}") // <10>
-    public HttpResponse<?> delete(Long id) {
+    public HttpResponse<?> delete(long id) {
         genreRepository.deleteById(id);
         return HttpResponse.noContent();
     }
 
-    protected URI location(Long id) {
+    private URI location(Long id) {
         return URI.create("/genres/" + id);
-    }
-
-    protected URI location(Genre genre) {
-        return location(genre.getId());
     }
 }
