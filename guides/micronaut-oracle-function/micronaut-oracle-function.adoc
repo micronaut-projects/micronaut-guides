@@ -1,4 +1,4 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
 == What you will need
 
@@ -8,29 +8,29 @@ To complete this guide, you will need the following:
 * A decent text editor or IDE
 * JDK 11 or greater installed with `JAVA_HOME` configured appropriately
 * Docker installed
-* A paid or free trial Oracle Cloud account (create an account at https://signup.oraclecloud.com[signup.oraclecloud.com])
-* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
+common:oracle-cloud-account-paid.adoc[]
+common:oracle-cloud-cli.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
 == Writing the App
 
-include::{commondir}/common-cli-or-launch.adoc[]
+common:cli-or-launch.adoc[]
 
 [source,bash]
 ----
 mn create-function-app --features=graalvm,oracle-function example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use https://launch.micronaut.io[Micronaut Launch], select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the `graalvm` and `oracle-function` features.
 
-include::{commondir}/common-default-package.adoc[]
+common:default-package.adoc[]
 
 diffLink:[]
 
-include::{commondir}/common-annotationprocessors.adoc[]
+common:annotationprocessors.adoc[]
 
 The generated application contains a `Function` class with a simple Oracle Cloud API call to retrieve the tenancy OCID from the injected `TenancyIdProvider` bean. That will be sufficient to ensure that the deployed function works correctly:
 
@@ -38,7 +38,7 @@ source:Function[]
 
 <1> This is needed because Project.fn invokes the function handler via reflection
 
-include::{commondir}/common-testApp.adoc[]
+common:testApp.adoc[]
 
 == Configuring Oracle Cloud Resources
 
@@ -269,7 +269,7 @@ First we'll need to build the function as a Docker image and push it to the OCIR
 
 From the demo project directory, run:
 
-include::{commondir}/common-docker-push.adoc[]
+common:docker-push.adoc[]
 
 Once you've pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.
 
@@ -359,7 +359,7 @@ The first invocation ("cold start") will take a while as the infrastructure is c
 
 === Install GraalVM
 
-include::{commondir}/common-install-graal-function.adoc[]
+common:install-graal-function.adoc[]
 
 === Building and deploying the native image
 
@@ -433,15 +433,19 @@ Depending on the Micronaut version you're using, you might also need to update s
 
 :exclude-for-build:maven
 
-In your `build.gradle`, if the `nativeImage` block includes `--static` in the `args` list, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in the `dockerfileNative` block:
+In your `build.gradle`, if the `graalvmNative` block includes `--static` in the `args` list, replace it with `-H:+StaticExecutableWithDynamicLibC`. Also change the base image to `frolvlad/alpine-glibc:alpine-3.12` in the `dockerfileNative` block:
 
 [source, groovy]
 .build.gradle
 ----
-nativeImage {
-    args("-H:+StaticExecutableWithDynamicLibC",
-         "-Dfn.handler=example.micronaut.Function::handleRequest",
-         "--initialize-at-build-time=example.micronaut")
+graalvmNative {
+    binaries {
+        main {
+            buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
+            buildArgs.add('-Dfn.handler=example.micronaut.Function::handleRequest')
+            buildArgs.add('--initialize-at-build-time=example.micronaut')
+        }
+    }
 }
 
 dockerfileNative {
@@ -482,7 +486,7 @@ In your `pom.xml`, if the `nativeImageBuildArgs` block in the configuration sect
 
 Then from the demo project directory, run:
 
-include::{commondir}/common-docker-push-native.adoc[]
+common:docker-push-native.adoc[]
 
 Once you've pushed the Docker container, edit the function in the console to use the new container, and to reduce the memory to 128MB:
 
@@ -492,10 +496,8 @@ Use the same OCI command as before to invoke the function. No changes are needed
 
 :exclude-for-languages:
 
-include::{commondir}/common-next.adoc[]
+common:next.adoc[]
 
 Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud] integration.
 
 Also check out the https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm[Oracle Cloud Function documentation] for more information on the available functionality.
-
-include::{commondir}/common-helpWithMicronaut.adoc[]

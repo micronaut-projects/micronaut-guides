@@ -4,7 +4,7 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import java.time.Month
 
-@Controller
+@Controller // <1>
 class NewsController(val newsService: NewsService) {
     @Get("/{month}")
     fun index(month: Month): News {

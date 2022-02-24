@@ -1,0 +1,192 @@
+common:header.adoc[]
+
+You are going to use https://docs.oracle.com/en/java/javase/17/language/records.html[Record Classes] in a Micronaut application.
+
+____
+Record classes, which are a special kind of class, help to model plain data aggregates with less ceremony than normal classes.
+
+A record declaration specifies in a header a description of its contents; the appropriate accessors, constructor, equals, hashCode, and toString methods are created automatically. A record's fields are final because the class is intended to serve as a simple "data carrier."
+____
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app --jdk=17 \
+   example.micronaut.micronautguide \
+   --features=data-jdbc,postgres,liquibase \
+   --build=@build@ \
+   --lang=@lang@ \
+----
+
+NOTE: To use Java records, specify JDK 17 when you create the application.
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add `postgres`, `data-jdbc`, and `liquibase` as features.
+
+common:annotationprocessors.adoc[]
+
+=== Immutable Configuration with Java Records
+
+source:ValueAddedTaxConfiguration[]
+
+callout:configuration-properties[1]
+
+Write a test:
+
+test:ValueAddedTaxConfigurationTest[]
+
+callout:property[1]
+callout:micronaut-test-start-application-false[2]
+
+=== Database Migration with Liquibase
+
+We need a way to create the database schema. For that, we use
+https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/[Micronaut integration with Liquibase].
+
+Add the following snippet to include the necessary dependencies:
+
+dependency:micronaut-liquibase[groupId=io.micronaut.liquibase]
+
+Configure the database migrations directory for http://www.liquibase.org[Liquibase] in `application.yml`.
+
+resource:application.yml[tag=liquibase]
+
+Create the following files with the database schema creation and a book:
+
+resource:db/liquibase-changelog.xml[]
+
+resource:db/changelog/01-create-books-schema.xml[]
+
+resource:db/changelog/02-insert-book.xml[]
+
+During application startup, http://www.liquibase.org[Liquibase] executes the SQL file, creates the schema needed for the application and inserts one book.
+
+=== Mapped Entities with Java Records
+
+Create a Micronaut Data Mapped Entity
+
+source:Book[]
+
+callout:mapped-entity[1]
+<2> The primary key is annotated with `@Id`. It is an assigned primary key.
+callout:constraints[3]
+<4> Annotate `about` with `@Nullable`, since it is optional.
+
+=== Projections with Java Records
+
+Create a record to project some data from the `book` table. For example, exclude the `about` field.
+
+source:BookCard[]
+
+callout:introspected[1]
+callout:constraints[2]
+
+Create a https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcRepositories[Repository], which uses the previous Java record as a DTO projection.
+
+source:BookRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:dto-projection[3]
+
+=== JSON serialization with Java Records
+
+Create a Java record to represent a JSON response:
+
+source:BookForSale[]
+
+callout:introspected[1]
+<2> Jackson requires reflection to use Records. With `@ReflectiveAccess` the Micronaut framework will add the class to the GraalVM `reflect-config.json` file.
+callout:constraints[3]
+
+Create a Controller that uses the previous record:
+
+source:BookController[]
+
+callout:controller[number=1,arg0=/books]
+callout:constructor-di[number=2,arg0=BookRepository]
+callout:executes-on[3]
+callout:get[number=4,arg0=index,arg1='/']
+<5> Respond a Java Record and the application responds JSON representation of the object
+
+common:testcontainers-postgres.adoc[]
+
+=== Create a Test
+
+Create a test:
+
+test:BookControllerTest[]
+
+callout:property[1]
+callout:micronaut-test-transactional-false[2]
+callout:http-client[3]
+<4> Multiline string
+callout:binding-json-array[5]
+
+=== Running the application
+
+common:run-postgres-with-docker.adoc[]
+
+Set up the following environment variables to connect to the PostgreSQL database you started with Docker.
+
+resource:application.yml[tag=datasource]
+
+<1> The JDBC URL matches the database name you used in the previous command.
+<2> Use PostgreSQL driver.
+<3> Configure the PostgreSQL dialect.
+<4> You handle database migrations via Liquibase
+
+[source,bash]
+----
+export DATASOURCES_DEFAULT_USERNAME=dbuser
+export DATASOURCES_DEFAULT_PASSWORD=theSecretPassword
+export VAT_PERCENTAGE=20
+----
+
+Configure your default datasource to use the PostgreSQL database you started with Docker:
+
+common:runapp-instructions.adoc[]
+
+You can run a cURL command to test the application:
+
+[source, bash]
+----
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
+[{"isbn":"0321601912","title":"Continuous Delivery","price":47.99}]
+----
+
+common:graal-with-plugins.adoc[]
+
+WARNING: Due to a https://github.com/oracle/graal/issues/3984[bug with GraalVM and Java Records] it is necessary to include the flag `--report-unsupported-elements-at-runtime` when building the native image. Create the file `native-image.properties`:
+
+resource:META-INF/native-image/example.micronaut/guide/native-image.properties[]
+
+You can run a cURL command to test the application:
+
+[source, bash]
+----
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
+[{"isbn":"0321601912","title":"Continuous Delivery","price":47.99}]
+----
+
+You receive an empty array because there are no books in the database. You can create a Liquibase changelog to add seed data.
+
+common:next.adoc[]
+
+common:helpWithMicronaut.adoc[]
