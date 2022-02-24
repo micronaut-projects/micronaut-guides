@@ -49,11 +49,11 @@ public class GenreRepositoryImpl implements GenreRepository {
                     args.getOrder().get());
         }
 
-        if (args.getMax().isPresent() && args.getOffset().isPresent() && (args.getSort().isEmpty() || args.getOrder().isEmpty())) {
+        if (args.getMax().isPresent() && args.getOffset().isPresent() && (!args.getSort().isPresent() || !args.getOrder().isPresent())) {
             return genreMapper.findAllByOffsetAndMax(args.getOffset().get(), args.getMax().get());
         }
 
-        if ((args.getMax().isEmpty() || args.getOffset().isEmpty()) && args.getSort().isPresent() && args.getOrder().isPresent()) {
+        if ((!args.getMax().isPresent() || !args.getOffset().isPresent()) && args.getSort().isPresent() && args.getOrder().isPresent()) {
             return genreMapper.findAllBySortAndOrder(args.getSort().get(), args.getOrder().get());
         }
 
