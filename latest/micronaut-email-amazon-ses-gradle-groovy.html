@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Send Emails with Amazon SES from the Micronaut Framework</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronauttwittercard.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Send Emails with Amazon SES from the Micronaut Framework"/>
+    <meta name="twitter:description" content="Learn how to send emails with Amazon SES from a Micronaut application"/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-email-amazon-ses.html">Send Emails with Amazon SES from the Micronaut Framework</a> » <span class="breadcrumb_last" aria-current="page">gradle | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#controller">4.1. Controller</a></li>
+<li><a href="#configuration">4.2. Configuration</a></li>
+<li><a href="#aws-ses">4.3. AWS SES</a></li>
+<li><a href="#micronaut-aws-sdk-v2">4.4. Micronaut AWS SDK v2</a></li>
+<li><a href="#test">4.5. Test</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">5. Testing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#running-the-application">5.1. Running the Application</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">6. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">7. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Send Emails with Amazon SES from the Micronaut Framework</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to send emails with Amazon SES from a Micronaut application</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.3.3</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Groovy.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-email-amazon-ses-gradle-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+    --features=email-amazon-ses,aws-v2-sdk,reactor \
+    --build=gradle --lang=groovy</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>email-amazon-ses</code>, <code>aws-v2-sdk</code> and <code>reactor</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=email-amazon-ses&amp;features=aws-v2-sdk&amp;features=reactor&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="controller">4.1. Controller</h3>
+<div class="paragraph">
+<p>Create a <code>MailController</code> class. This class uses a collaborator, <code>emailSender</code>, to send an email.</p>
+</div>
+<div class="paragraph">
+<p>You can send emails asynchronously using the <a href="https://micronaut-projects.github.io/micronaut-email/latest/api/index.html">AysnEmailSender</a> API or synchronously using the <a href="https://micronaut-projects.github.io/micronaut-email/latest/api/index.html">EmailSender</a> API.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/MailController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.util.logging.Slf4j</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncEmailSender</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.EmailException</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.exceptions.HttpStatusException</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SendEmailResponse</span>
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesRequest</span>
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesResponse</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.email.BodyType.HTML</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNPROCESSABLE_ENTITY</span>
+
+<span class="annotation">@Slf4j</span>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/mail</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">MailController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> AsyncEmailSender&lt;SesRequest, SesResponse&gt; emailSender
+
+    MailController(AsyncEmailSender&lt;SesRequest, SesResponse&gt; emailSender) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.emailSender = emailSender
+    }
+
+    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">'</span><span class="content">/send</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    Publisher&lt;HttpResponse&lt;?&gt;&gt; send(<span class="annotation">@Body</span>(<span class="string"><span class="delimiter">'</span><span class="content">to</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> to) { <i class="conum" data-value="4"></i><b>(4)</b>
+        Mono.from(emailSender.sendAsync(Email.builder()
+                .to(to)
+                .subject(<span class="string"><span class="delimiter">'</span><span class="content">Sending email with Amazon SES is Fun</span><span class="delimiter">'</span></span>)
+                .body(<span class="string"><span class="delimiter">'</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">'</span></span>, <span class="predefined-type">HTML</span>)))
+                .doOnNext(rsp -&gt; {
+                    <span class="keyword">if</span> (rsp <span class="keyword">instanceof</span> SendEmailResponse) {
+                        log.info(<span class="string"><span class="delimiter">'</span><span class="content">message id: {}</span><span class="delimiter">'</span></span>, ((SendEmailResponse) rsp).messageId())
+                    }
+                }).onErrorMap(EmailException, t -&gt; <span class="keyword">new</span> HttpStatusException(UNPROCESSABLE_ENTITY, <span class="string"><span class="delimiter">'</span><span class="content">Email could not be sent</span><span class="delimiter">'</span></span>))
+                .map(rsp -&gt; HttpResponse.accepted()) <i class="conum" data-value="5"></i><b>(5)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/mail/send</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use constructor injection to inject a bean of type <code>AsyncEmailSender</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html">@Post</a> annotation maps the <code>send</code> method to an HTTP POST request on <code>/mail/send</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can use a qualifier within the HTTP request body. For example, a reference to a nested JSON attribute</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Return 202 ACCEPTED as the result if the email delivery succeeds</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration">4.2. Configuration</h3>
+<div class="paragraph">
+<p>If you want to send every email with the same address, you can set it via configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="head"><span class="head">---</span></span>
+<span class="key">micronaut</span>:
+  <span class="key">email</span>:
+    <span class="key">from</span>:
+      <span class="key">email</span>: <span class="string"><span class="content">'john@micronaut.example'</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is possible thanks to <a href="https://micronaut-projects.github.io/micronaut-email/latest/guide/index.html#decorators">Email Decorators</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="aws-ses">4.3. AWS SES</h3>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Amazon Simple Email Service (Amazon SES) is a cloud-based email-sending service designed to help digital marketers and application developers send marketing, notification, and transactional emails. It is a reliable, cost-effective service for businesses of all sizes that use email to keep in contact with their customers.</p>
+</div>
+</blockquote>
+</div>
+<div class="sect3">
+<h4 id="dependency">4.3.1. Dependency</h4>
+<div class="paragraph">
+<p>Because we added the <code>email-ses</code> feature, the application contains the following dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.micronaut.email:micronaut-email-ses</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="micronaut-aws-sdk-v2">4.4. Micronaut AWS SDK v2</h3>
+<div class="paragraph">
+<p>Micronaut Amazon SES integration uses <a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/#sdkv2">Micronaut AWS SDK v2 integration</a>.</p>
+</div>
+<div class="paragraph">
+<p>Because we added the <code>aws-v2-sdk</code> feature, the application contains the following dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.aws:micronaut-aws-sdk-v2</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Read about:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/#awsCredentials">Supplying AWS Credentials</a>.</p>
+</li>
+<li>
+<p>Select <a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/#awsRegionSelection">AWS Region Selection</a></p>
+</li>
+<li>
+<p><a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/#ses">SES Beans</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="test">4.5. Test</h3>
+<div class="paragraph">
+<p>Create a test bean that <a href="https://docs.micronaut.io/latest/guide/#replaces">replaces</a> the bean of type <a href="https://micronaut-projects.github.io/micronaut-email/latest/api/io/micronaut/email/AsyncTransactionalEmailSender.html">AsyncTransactionalEmailSender</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/EmailSenderReplacement.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncTransactionalEmailSender</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.EmailException</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.ses.AsyncSesEmailSender</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Named</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SendEmailResponse</span>
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesRequest</span>
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesResponse</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+<span class="keyword">import</span> <span class="include">java.util.function.Consumer</span>
+
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">'</span><span class="content">spec.name</span><span class="delimiter">'</span></span>, value = <span class="string"><span class="delimiter">'</span><span class="content">MailControllerSpec</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Singleton</span>
+<span class="annotation">@Replaces</span>(AsyncSesEmailSender)
+<span class="annotation">@Named</span>(AsyncSesEmailSender.NAME)
+<span class="type">class</span> <span class="class">EmailSenderReplacement</span> <span class="directive">implements</span> AsyncTransactionalEmailSender&lt;SesRequest, SesResponse&gt; {
+
+    <span class="directive">final</span> <span class="predefined-type">List</span>&lt;Email&gt; emails = <span class="type">[]</span>
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">String</span> getName() {
+        AsyncSesEmailSender.NAME
+    }
+
+    <span class="annotation">@Override</span>
+    Publisher&lt;SesResponse&gt; sendAsync(<span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email,
+                                     <span class="annotation">@NotNull</span> Consumer&lt;SesRequest&gt; emailRequest) <span class="directive">throws</span> EmailException {
+        emails &lt;&lt; email
+        Mono.just(SendEmailResponse.builder().messageId(<span class="string"><span class="delimiter">'</span><span class="content">xxx-yyy-zzz</span><span class="delimiter">'</span></span>).build())
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Combine <code>@Requires</code> and <code>@Property</code> to avoid bean pollution.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Write a test that uses <code>EmailSenderReplacement</code> to verify that the contents of the email match expectations.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/MailControllerSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.BeanContext</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncTransactionalEmailSender</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.email.BodyType.HTML</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.ACCEPTED</span>
+
+<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">spec.name</span><span class="delimiter">'</span></span>, value = <span class="string"><span class="delimiter">'</span><span class="content">MailControllerSpec</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">MailControllerSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
+    HttpClient httpClient <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="annotation">@Inject</span>
+    <span class="predefined-type">BeanContext</span> beanContext
+
+    <span class="type">void</span> getMailSendEndpointSendsAnEmail() {
+
+        <span class="key">when</span>:
+        HttpResponse&lt;?&gt; response = httpClient.toBlocking().exchange(
+                HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/mail/send</span><span class="delimiter">'</span></span>, [<span class="key">to</span>: <span class="string"><span class="delimiter">'</span><span class="content">johnsnow@micronaut.example</span><span class="delimiter">'</span></span>]))
+
+        <span class="key">then</span>:
+        ACCEPTED == response.status()
+
+        <span class="key">when</span>:
+        AsyncTransactionalEmailSender&lt;?, ?&gt; sender = beanContext.getBean(AsyncTransactionalEmailSender)
+
+        <span class="key">then</span>:
+        sender <span class="keyword">instanceof</span> EmailSenderReplacement
+
+        <span class="key">when</span>:
+        EmailSenderReplacement sendgridSender = (EmailSenderReplacement) sender
+
+        <span class="key">then</span>:
+        sendgridSender.emails
+        <span class="integer">1</span> == sendgridSender.emails.size()
+
+        <span class="key">when</span>:
+        Email email = sendgridSender.emails[<span class="integer">0</span>]
+
+        <span class="key">then</span>:
+        email.from.email == <span class="string"><span class="delimiter">'</span><span class="content">john@micronaut.example</span><span class="delimiter">'</span></span>
+        <span class="predefined-constant">null</span> != email.to
+        email.to.first()
+        email.to.first().email == <span class="string"><span class="delimiter">'</span><span class="content">johnsnow@micronaut.example</span><span class="delimiter">'</span></span>
+        email.subject == <span class="string"><span class="delimiter">'</span><span class="content">Sending email with Amazon SES is Fun</span><span class="delimiter">'</span></span>
+        email.body
+        email.body.get(<span class="predefined-type">HTML</span>).present
+        email.body.get(<span class="predefined-type">HTML</span>).get() == <span class="string"><span class="delimiter">'</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">'</span></span>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Combine <code>@Requires</code> and <code>@Property</code> to avoid bean pollution.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+<div class="sect2">
+<h3 id="running-the-application">5.1. Running the Application</h3>
+<div class="sect3">
+<h4 id="from-email-address">5.1.1. From email address</h4>
+<div class="paragraph">
+<p>Change the property <code>mail.email.from.email</code> to match your Amazon SES verified sender.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="supply-aws-credentials">5.1.2. Supply AWS Credentials</h4>
+<div class="paragraph">
+<p>An easy way to <a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/#awsCredentials">supply AWS Credentials</a> is to define the following environment variables:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">export AWS_ACCESS_KEY_ID=xxx
+export AWS_SECRET_ACCESS_KEY=xxx</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="run">5.1.3. Run</h4>
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command which starts the application on port 8080.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="invoke">5.1.4. Invoke</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -d '{&quot;to&quot;:&quot;john@micronaut.example&quot;}'
+     -H &quot;Content-Type: application/json&quot;
+     -X POST http://localhost:8080/mail/send</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">6. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Learn more about <a href="https://micronaut-projects.github.io/micronaut-email/latest/guide/">Micronaut Email integration</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">7. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

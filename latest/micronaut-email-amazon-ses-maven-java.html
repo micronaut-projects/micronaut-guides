@@ -277,11 +277,9 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncEmailSender</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.BodyType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.email.EmailException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
@@ -294,8 +292,12 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesRequest</span>;
 <span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesResponse</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.email.BodyType.HTML</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNPROCESSABLE_ENTITY</span>;
+
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/mail</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">MailController</span> {
+
     <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(MailController.class);
 
     <span class="directive">private</span> <span class="directive">final</span> AsyncEmailSender&lt;SesRequest, SesResponse&gt; emailSender;
@@ -309,14 +311,12 @@ If you have an existing Micronaut application and want to add the functionality 
         <span class="keyword">return</span> Mono.from(emailSender.sendAsync(Email.builder()
                         .to(to)
                         .subject(<span class="string"><span class="delimiter">&quot;</span><span class="content">Sending email with Amazon SES is Fun</span><span class="delimiter">&quot;</span></span>)
-                        .body(<span class="string"><span class="delimiter">&quot;</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">&quot;</span></span>, BodyType.HTML)))
+                        .body(<span class="string"><span class="delimiter">&quot;</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">HTML</span>)))
                 .doOnNext(rsp -&gt; {
-                        <span class="keyword">if</span> (LOG.isInfoEnabled()) {
-                            <span class="keyword">if</span> (rsp <span class="keyword">instanceof</span> SendEmailResponse) {
-                                LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">message id: {}</span><span class="delimiter">&quot;</span></span>, ((SendEmailResponse) rsp).messageId());
-                            }
-                        }
-                }).onErrorMap(EmailException.class, t -&gt; <span class="keyword">new</span> HttpStatusException(HttpStatus.UNPROCESSABLE_ENTITY, <span class="string"><span class="delimiter">&quot;</span><span class="content">Email could not be sent</span><span class="delimiter">&quot;</span></span>))
+                    <span class="keyword">if</span> (rsp <span class="keyword">instanceof</span> SendEmailResponse) {
+                        LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">message id: {}</span><span class="delimiter">&quot;</span></span>, ((SendEmailResponse) rsp).messageId());
+                    }
+                }).onErrorMap(EmailException.class, t -&gt; <span class="keyword">new</span> HttpStatusException(UNPROCESSABLE_ENTITY, <span class="string"><span class="delimiter">&quot;</span><span class="content">Email could not be sent</span><span class="delimiter">&quot;</span></span>))
                 .map(rsp -&gt; HttpResponse.accepted()); <i class="conum" data-value="5"></i><b>(5)</b>
     }
 }</code></pre>
@@ -430,8 +430,69 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="sect2">
 <h3 id="test">4.6. Test</h3>
 <div class="paragraph">
-<p>Write a test that <a href="https://docs.micronaut.io/latest/guide/#replaces">replaces</a> the bean of type <a href="https://micronaut-projects.github.io/micronaut-email/latest/api/io/micronaut/email/AsyncTransactionalEmailSender.html">AsyncTransactionalEmailSender</a>.
-You can use it to verify that the contents of the email match expectations.</p>
+<p>Create a test bean that <a href="https://docs.micronaut.io/latest/guide/#replaces">replaces</a> the bean of type <a href="https://micronaut-projects.github.io/micronaut-email/latest/api/io/micronaut/email/AsyncTransactionalEmailSender.html">AsyncTransactionalEmailSender</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/EmailSenderReplacement.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncTransactionalEmailSender</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.email.EmailException</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.email.ses.AsyncSesEmailSender</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Named</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SendEmailResponse</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesRequest</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesResponse</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
+<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.function.Consumer</span>;
+
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">MailControllerTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Singleton</span>
+<span class="annotation">@Replaces</span>(AsyncSesEmailSender.class)
+<span class="annotation">@Named</span>(AsyncSesEmailSender.NAME)
+<span class="type">class</span> <span class="class">EmailSenderReplacement</span> <span class="directive">implements</span> AsyncTransactionalEmailSender&lt;SesRequest, SesResponse&gt; {
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;Email&gt; emails = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
+        <span class="keyword">return</span> AsyncSesEmailSender.NAME;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> Publisher&lt;SesResponse&gt; sendAsync(<span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email,
+                                            <span class="annotation">@NotNull</span> Consumer&lt;SesRequest&gt; emailRequest) <span class="directive">throws</span> EmailException {
+        emails.add(email);
+        <span class="keyword">return</span> Mono.just(SendEmailResponse.builder().messageId(<span class="string"><span class="delimiter">&quot;</span><span class="content">xxx-yyy-zzz</span><span class="delimiter">&quot;</span></span>).build());
+    }
+
+    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Email&gt; getEmails() {
+        <span class="keyword">return</span> emails;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Combine <code>@Requires</code> and <code>@Property</code> to avoid bean pollution.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Write a test that uses <code>EmailSenderReplacement</code> to verify that the contents of the email match expectations.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/MailControllerTest.java</div>
@@ -439,42 +500,27 @@ You can use it to verify that the contents of the email match expectations.</p>
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.BeanContext</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.util.CollectionUtils</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncEmailSender</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncTransactionalEmailSender</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.email.BodyType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.EmailException</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.ses.AsyncSesEmailSender</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Named</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
-<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
-<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
-<span class="keyword">import</span> <span class="include">java.util.function.Consumer</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SendEmailResponse</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesRequest</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesResponse</span>;
 
-<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value=<span class="string"><span class="delimiter">&quot;</span><span class="content">MailControllerTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.ACCEPTED</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+
+<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">MailControllerTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">MailControllerTest</span> {
 
@@ -487,15 +533,19 @@ You can use it to verify that the contents of the email match expectations.</p>
 
     <span class="annotation">@Test</span>
     <span class="type">void</span> getMailSendEndpointSendsAnEmail() {
-        HttpResponse&lt;?&gt; response = httpClient.toBlocking().exchange(HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/mail/send</span><span class="delimiter">&quot;</span></span>,
-                <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">to</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">johnsnow@micronaut.example</span><span class="delimiter">&quot;</span></span>)));
-        assertEquals(HttpStatus.ACCEPTED, response.status());
 
-        AsyncTransactionalEmailSender&lt;?,?&gt; sender = beanContext.getBean(AsyncTransactionalEmailSender.class);
-        assertTrue(sender <span class="keyword">instanceof</span> AsyncSesEmailSenderReplacement);
-        AsyncSesEmailSenderReplacement sendgridSender = (AsyncSesEmailSenderReplacement) sender;
+        HttpResponse&lt;?&gt; response = httpClient.toBlocking().exchange(
+                HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/mail/send</span><span class="delimiter">&quot;</span></span>,
+                <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">to</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">johnsnow@micronaut.example</span><span class="delimiter">&quot;</span></span>)));
+        assertEquals(ACCEPTED, response.status());
+
+        AsyncTransactionalEmailSender&lt;?, ?&gt; sender = beanContext.getBean(AsyncTransactionalEmailSender.class);
+        assertTrue(sender <span class="keyword">instanceof</span> EmailSenderReplacement);
+
+        EmailSenderReplacement sendgridSender = (EmailSenderReplacement) sender;
         assertTrue(CollectionUtils.isNotEmpty(sendgridSender.getEmails()));
         assertEquals(<span class="integer">1</span>, sendgridSender.getEmails().size());
+
         Email email = sendgridSender.getEmails().get(<span class="integer">0</span>);
         assertEquals(email.getFrom().getEmail(), <span class="string"><span class="delimiter">&quot;</span><span class="content">john@micronaut.example</span><span class="delimiter">&quot;</span></span>);
         assertNotNull(email.getTo());
@@ -505,29 +555,6 @@ You can use it to verify that the contents of the email match expectations.</p>
         assertNotNull(email.getBody());
         assertTrue(email.getBody().get(BodyType.HTML).isPresent());
         assertEquals(email.getBody().get(BodyType.HTML).get(), <span class="string"><span class="delimiter">&quot;</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">&quot;</span></span>);
-    }
-
-    <span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value=<span class="string"><span class="delimiter">&quot;</span><span class="content">MailControllerTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="annotation">@Singleton</span>
-    <span class="annotation">@Replaces</span>(AsyncSesEmailSender.class)
-    <span class="annotation">@Named</span>(AsyncSesEmailSender.NAME)
-    <span class="directive">static</span> <span class="type">class</span> <span class="class">AsyncSesEmailSenderReplacement</span> <span class="directive">implements</span> AsyncTransactionalEmailSender&lt;SesRequest, SesResponse&gt; {
-        <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;Email&gt; emails = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
-            <span class="keyword">return</span> AsyncSesEmailSender.NAME;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> Publisher&lt;SesResponse&gt; sendAsync(<span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email, <span class="annotation">@NotNull</span> Consumer&lt;SesRequest&gt; emailRequest) <span class="directive">throws</span> EmailException {
-            emails.add(email);
-            <span class="keyword">return</span> Mono.just(SendEmailResponse.builder().messageId(<span class="string"><span class="delimiter">&quot;</span><span class="content">xxx-yyy-zzz</span><span class="delimiter">&quot;</span></span>).build());
-        }
-
-        <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Email&gt; getEmails() {
-            <span class="keyword">return</span> emails;
-        }
     }
 }</code></pre>
 </div>
