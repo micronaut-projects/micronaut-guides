@@ -300,7 +300,7 @@ If you have an existing Micronaut application and want to add the functionality 
 
     <span class="annotation">@Nullable</span>
     <span class="annotation">@BsonProperty</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">description</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="directive">private</span> <span class="predefined-type">String</span> description;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> description;
 
     <span class="directive">public</span> Fruit(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>(name, <span class="predefined-constant">null</span>);
@@ -358,12 +358,13 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
-<span class="keyword">import</span> <span class="include">java.util.Iterator</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">FruitRepository</span> {
+
     <span class="annotation">@NonNull</span>
     <span class="predefined-type">List</span>&lt;Fruit&gt; list();
 
@@ -391,35 +392,37 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Status</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.CREATED</span>;
+
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/fruits</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@ExecuteOn</span>(TaskExecutors.IO)  <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">FruitController</span> {
+<span class="type">class</span> <span class="class">FruitController</span> {
 
     <span class="directive">private</span> <span class="directive">final</span> FruitRepository fruitService;
 
-    <span class="directive">public</span> FruitController(FruitRepository fruitService) {  <i class="conum" data-value="3"></i><b>(3)</b>
+    FruitController(FruitRepository fruitService) {  <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="local-variable">this</span>.fruitService = fruitService;
     }
 
     <span class="annotation">@Get</span>  <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Fruit&gt; list() {
+    <span class="predefined-type">List</span>&lt;Fruit&gt; list() {
         <span class="keyword">return</span> fruitService.list();
     }
 
     <span class="annotation">@Post</span> <i class="conum" data-value="5"></i><b>(5)</b>
-    <span class="annotation">@Status</span>(HttpStatus.CREATED) <i class="conum" data-value="6"></i><b>(6)</b>
-    <span class="directive">public</span> <span class="type">void</span> save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit) { <i class="conum" data-value="7"></i><b>(7)</b>
+    <span class="annotation">@Status</span>(CREATED) <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="type">void</span> save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit) { <i class="conum" data-value="7"></i><b>(7)</b>
         fruitService.save(fruit);
     }
 }</code></pre>
@@ -474,6 +477,7 @@ If you have an existing Micronaut application and want to add the functionality 
 
 <span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">db</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">MongoDbConfiguration</span> <span class="directive">extends</span> Named {
+
     <span class="annotation">@NonNull</span>
     <span class="predefined-type">String</span> getCollection();
 }</code></pre>
@@ -513,6 +517,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="keyword">import</span> <span class="include">com.mongodb.client.MongoCollection</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
@@ -531,7 +536,7 @@ If you have an existing Micronaut application and want to add the functionality 
     }
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="type">void</span> save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit){
+    <span class="directive">public</span> <span class="type">void</span> save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit) {
         getCollection().insertOne(fruit);
     }
 
@@ -540,9 +545,9 @@ If you have an existing Micronaut application and want to add the functionality 
     <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Fruit&gt; list() {
         <span class="keyword">return</span> getCollection().find().into(<span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;());
     }
-    
+
     <span class="annotation">@NonNull</span>
-    <span class="directive">private</span> MongoCollection&lt;Fruit&gt; getCollection(){
+    <span class="directive">private</span> MongoCollection&lt;Fruit&gt; getCollection() {
         <span class="keyword">return</span> mongoClient.getDatabase(mongoConf.getName())
                 .getCollection(mongoConf.getCollection(), Fruit.class);
     }
@@ -593,6 +598,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
@@ -636,6 +642,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <span class="keyword">import</span> <span class="include">org.testcontainers.utility.DockerImageName</span>;
 
 <span class="directive">public</span> <span class="type">class</span> <span class="class">MongoDbUtils</span> {
+
     <span class="directive">static</span> MongoDBContainer mongoDBContainer;
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> startMongoDb() {
@@ -674,39 +681,48 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.support.TestPropertyProvider</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.AfterAll</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions</span>.*;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 <span class="keyword">import</span> <span class="include">java.util.Map</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.AfterAll</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance.Lifecycle</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.CREATED</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertFalse</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNull</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS</span>;
 
 <span class="annotation">@MicronautTest</span>
-<span class="annotation">@TestInstance</span>(Lifecycle.PER_CLASS)
+<span class="annotation">@TestInstance</span>(PER_CLASS)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">FruitControllerTest</span> <span class="directive">implements</span> TestPropertyProvider {
 
+    <span class="annotation">@Inject</span>
+    FruitClient fruitClient;
+
     <span class="annotation">@Test</span>
-    <span class="type">void</span> fruitsEndpointInteractsWithMongo(FruitClient fruitClient) {
+    <span class="type">void</span> fruitsEndpointInteractsWithMongo() {
+
         <span class="predefined-type">List</span>&lt;Fruit&gt; fruits = fruitClient.findAll();
         assertTrue(fruits.isEmpty());
 
         HttpStatus status = fruitClient.save(<span class="keyword">new</span> Fruit(<span class="string"><span class="delimiter">&quot;</span><span class="content">banana</span><span class="delimiter">&quot;</span></span>));
+        assertEquals(CREATED, status);
 
-        assertEquals(HttpStatus.CREATED, status);
         fruits = fruitClient.findAll();
         assertFalse(fruits.isEmpty());
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">banana</span><span class="delimiter">&quot;</span></span>, fruits.get(<span class="integer">0</span>).getName());
         assertNull(fruits.get(<span class="integer">0</span>).getDescription());
 
         status = fruitClient.save(<span class="keyword">new</span> Fruit(<span class="string"><span class="delimiter">&quot;</span><span class="content">Apple</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>));
-        assertEquals(HttpStatus.CREATED, status);
+        assertEquals(CREATED, status);
+
         fruits = fruitClient.findAll();
-        assertTrue(fruits.stream()
-                .filter(f -&gt; f.getDescription() != <span class="predefined-constant">null</span> &amp;&amp; f.getDescription().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>))
-                .findFirst()
-                .isPresent());
+        assertTrue(fruits.stream().anyMatch(f -&gt; <span class="string"><span class="delimiter">&quot;</span><span class="content">Keeps the doctor away</span><span class="delimiter">&quot;</span></span>.equals(f.getDescription())));
     }
 
     <span class="annotation">@AfterAll</span>
