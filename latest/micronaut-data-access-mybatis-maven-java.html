@@ -320,8 +320,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Bean</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Factory</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">org.apache.ibatis.mapping.Environment</span>;
 <span class="keyword">import</span> <span class="include">org.apache.ibatis.session.Configuration</span>;
 <span class="keyword">import</span> <span class="include">org.apache.ibatis.session.SqlSessionFactory</span>;
@@ -329,7 +329,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">org.apache.ibatis.transaction.TransactionFactory</span>;
 <span class="keyword">import</span> <span class="include">org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">javax.sql.DataSource</span>;
 
 <span class="annotation">@Factory</span> <i class="conum" data-value="1"></i><b>(1)</b>
@@ -351,7 +350,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
         <span class="keyword">return</span> <span class="keyword">new</span> SqlSessionFactoryBuilder().build(configuration); <i class="conum" data-value="6"></i><b>(6)</b>
     }
-
 }</code></pre>
 </div>
 </div>
@@ -413,16 +411,13 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@NonNull</span>
     <span class="directive">private</span> <span class="predefined-type">String</span> name;
 
-    <span class="directive">public</span> Genre() {
-    }
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@JsonIgnore</span>
+    <span class="directive">private</span> <span class="predefined-type">Set</span>&lt;<span class="predefined-type">Book</span>&gt; books = <span class="keyword">new</span> <span class="predefined-type">HashSet</span>&lt;&gt;();
 
     <span class="directive">public</span> Genre(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>.name = name;
     }
-
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@JsonIgnore</span>
-    <span class="directive">private</span> <span class="predefined-type">Set</span>&lt;<span class="predefined-type">Book</span>&gt; books = <span class="keyword">new</span> <span class="predefined-type">HashSet</span>&lt;&gt;();
 
     <span class="annotation">@Nullable</span>
     <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
@@ -510,14 +505,13 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
                                       <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> order);
 
     <span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">select * from genre order by ${sort} ${order} limit ${offset}, ${max}</span><span class="delimiter">&quot;</span></span>)
-    <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMaxAndSortAndOrder(<span class="annotation">@NotNull</span> <span class="annotation">@PositiveOrZero</span> <span class="predefined-type">Integer</span> offset,
-                                                     <span class="annotation">@Positive</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Integer</span> max,
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMaxAndSortAndOrder(<span class="annotation">@PositiveOrZero</span> <span class="type">int</span> offset,
+                                                     <span class="annotation">@Positive</span> <span class="type">int</span> max,
                                                      <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">id|name</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> sort,
                                                      <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> order);
 
     <span class="annotation">@Select</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">select * from genre limit ${offset}, ${max}</span><span class="delimiter">&quot;</span></span>)
-    <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMax(<span class="annotation">@NotNull</span> <span class="annotation">@PositiveOrZero</span> <span class="predefined-type">Integer</span> offset, <span class="annotation">@Positive</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Integer</span> max);
-
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMax(<span class="annotation">@PositiveOrZero</span> <span class="type">int</span> offset, <span class="annotation">@Positive</span> <span class="type">int</span> max);
 }</code></pre>
 </div>
 </div>
@@ -530,10 +524,10 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.genre</span>;
 
 <span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">org.apache.ibatis.session.SqlSession</span>;
 <span class="keyword">import</span> <span class="include">org.apache.ibatis.session.SqlSessionFactory</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Positive</span>;
@@ -555,11 +549,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
             <span class="keyword">return</span> getGenreMapper(sqlSession).findById(id); <i class="conum" data-value="5"></i><b>(5)</b>
         }
     }
-
-    <span class="directive">private</span> GenreMapper getGenreMapper(SqlSession sqlSession) {
-        <span class="keyword">return</span> sqlSession.getMapper(GenreMapper.class); <i class="conum" data-value="4"></i><b>(4)</b>
-    }
-
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> <span class="type">void</span> save(Genre genre) {
@@ -601,8 +590,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     }
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMaxAndSortAndOrder(<span class="annotation">@NotNull</span> <span class="annotation">@PositiveOrZero</span> <span class="predefined-type">Integer</span> offset,
-                                                            <span class="annotation">@Positive</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Integer</span> max,
+    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMaxAndSortAndOrder(<span class="annotation">@PositiveOrZero</span> <span class="type">int</span> offset,
+                                                            <span class="annotation">@Positive</span> <span class="type">int</span> max,
                                                             <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">id|name</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> sort,
                                                             <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> order) {
         <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
@@ -611,11 +600,15 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     }
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMax(<span class="annotation">@NotNull</span> <span class="annotation">@PositiveOrZero</span> <span class="predefined-type">Integer</span> offset,
-                                             <span class="annotation">@Positive</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Integer</span> max) {
+    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMax(<span class="annotation">@PositiveOrZero</span> <span class="type">int</span> offset,
+                                             <span class="annotation">@Positive</span> <span class="type">int</span> max) {
         <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             <span class="keyword">return</span> getGenreMapper(sqlSession).findAllByOffsetAndMax(offset, max);
         }
+    }
+
+    <span class="directive">private</span> GenreMapper getGenreMapper(SqlSession sqlSession) {
+        <span class="keyword">return</span> sqlSession.getMapper(GenreMapper.class); <i class="conum" data-value="4"></i><b>(4)</b>
     }
 }</code></pre>
 </div>
@@ -656,9 +649,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.genre</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">example.micronaut.ListingArguments</span>;
 <span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
@@ -668,17 +661,17 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">GenreRepository</span> {
 
     <span class="annotation">@NonNull</span>
-    Optional&lt;Genre&gt; findById(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id);
+    Optional&lt;Genre&gt; findById(<span class="type">long</span> id);
 
     <span class="annotation">@NonNull</span>
     Genre save(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
 
-    <span class="type">void</span> deleteById(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id);
+    <span class="type">void</span> deleteById(<span class="type">long</span> id);
 
     <span class="annotation">@NonNull</span>
     <span class="predefined-type">List</span>&lt;Genre&gt; findAll(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> ListingArguments args);
 
-    <span class="type">int</span> update(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
+    <span class="type">int</span> update(<span class="type">long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
 }</code></pre>
 </div>
 </div>
@@ -690,11 +683,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.genre</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">example.micronaut.ListingArguments</span>;
 <span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>;
-
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
@@ -711,7 +704,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
     <span class="annotation">@Override</span>
     <span class="annotation">@NonNull</span>
-    <span class="directive">public</span> Optional&lt;Genre&gt; findById(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id) {
+    <span class="directive">public</span> Optional&lt;Genre&gt; findById(<span class="type">long</span> id) {
         <span class="keyword">return</span> Optional.ofNullable(genreMapper.findById(id));
     }
 
@@ -724,32 +717,34 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     }
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="type">void</span> deleteById(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id) {
+    <span class="directive">public</span> <span class="type">void</span> deleteById(<span class="type">long</span> id) {
         findById(id).ifPresent(genre -&gt; genreMapper.deleteById(id));
     }
 
     <span class="annotation">@NonNull</span>
     <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Genre&gt; findAll(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> ListingArguments args) {
 
-        <span class="keyword">if</span> (args.getMax().isPresent() &amp;&amp; args.getSort().isPresent() &amp;&amp; args.getOffset().isPresent() &amp;&amp; args.getSort().isPresent()) {
-            <span class="keyword">return</span> genreMapper.findAllByOffsetAndMaxAndSortAndOrder(args.getOffset().get(),
+        <span class="keyword">if</span> (args.getMax().isPresent() &amp;&amp; args.getSort().isPresent() &amp;&amp; args.getOffset().isPresent() &amp;&amp; args.getOrder().isPresent()) {
+            <span class="keyword">return</span> genreMapper.findAllByOffsetAndMaxAndSortAndOrder(
+                    args.getOffset().get(),
                     args.getMax().get(),
                     args.getSort().get(),
                     args.getOrder().get());
         }
+
         <span class="keyword">if</span> (args.getMax().isPresent() &amp;&amp; args.getOffset().isPresent() &amp;&amp; (!args.getSort().isPresent() || !args.getOrder().isPresent())) {
-            <span class="keyword">return</span> genreMapper.findAllByOffsetAndMax(args.getOffset().get(),
-                    args.getMax().get());
+            <span class="keyword">return</span> genreMapper.findAllByOffsetAndMax(args.getOffset().get(), args.getMax().get());
         }
+
         <span class="keyword">if</span> ((!args.getMax().isPresent() || !args.getOffset().isPresent()) &amp;&amp; args.getSort().isPresent() &amp;&amp; args.getOrder().isPresent()) {
-            <span class="keyword">return</span> genreMapper.findAllBySortAndOrder(args.getSort().get(),
-                    args.getOrder().get());
+            <span class="keyword">return</span> genreMapper.findAllBySortAndOrder(args.getSort().get(), args.getOrder().get());
         }
+
         <span class="keyword">return</span> genreMapper.findAll();
     }
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="type">int</span> update(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+    <span class="directive">public</span> <span class="type">int</span> update(<span class="type">long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         genreMapper.update(id, name);
         <span class="keyword">return</span> -<span class="integer">1</span>;
     }
@@ -788,9 +783,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@NonNull</span>
     <span class="directive">private</span> <span class="predefined-type">String</span> name;
 
-    <span class="directive">public</span> GenreSaveCommand() {
-    }
-
     <span class="directive">public</span> GenreSaveCommand(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>.name = name;
     }
@@ -815,33 +807,26 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
 <span class="annotation">@Introspected</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreUpdateCommand</span> {
 
-    <span class="annotation">@NotNull</span>
-    <span class="annotation">@NonNull</span>
-    <span class="directive">private</span> <span class="predefined-type">Long</span> id;
+    <span class="directive">private</span> <span class="type">long</span> id;
 
     <span class="annotation">@NotBlank</span>
     <span class="annotation">@NonNull</span>
     <span class="directive">private</span> <span class="predefined-type">String</span> name;
 
-    <span class="directive">public</span> GenreUpdateCommand() {
-    }
-
-    <span class="directive">public</span> GenreUpdateCommand(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+    <span class="directive">public</span> GenreUpdateCommand(<span class="type">long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>.id = id;
         <span class="local-variable">this</span>.name = name;
     }
 
-    <span class="annotation">@NonNull</span>
-    <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
+    <span class="directive">public</span> <span class="type">long</span> getId() {
         <span class="keyword">return</span> id;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setId(<span class="annotation">@NonNull</span> <span class="predefined-type">Long</span> id) {
+    <span class="directive">public</span> <span class="type">void</span> setId(<span class="type">long</span> id) {
         <span class="local-variable">this</span>.id = id;
     }
 
@@ -864,8 +849,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>;
@@ -893,7 +878,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="directive">private</span> <span class="predefined-type">String</span> order;
 
     <span class="directive">public</span> ListingArguments() {
-
     }
 
     <span class="directive">public</span> Optional&lt;<span class="predefined-type">Integer</span>&gt; getOffset() {
@@ -949,10 +933,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     }
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Builder</span> {
-        <span class="directive">private</span> ListingArguments args = <span class="keyword">new</span> ListingArguments();
+        <span class="directive">private</span> <span class="directive">final</span> ListingArguments args = <span class="keyword">new</span> ListingArguments();
 
         <span class="directive">private</span> Builder() {
-
         }
 
         <span class="directive">public</span> Builder max(<span class="type">int</span> max) {
@@ -976,10 +959,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         }
 
         <span class="directive">public</span> ListingArguments build() {
-            <span class="keyword">return</span> <span class="local-variable">this</span>.args;
+            <span class="keyword">return</span> args;
         }
     }
-
 }</code></pre>
 </div>
 </div>
@@ -991,12 +973,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">ApplicationConfiguration</span> {
 
-    <span class="annotation">@NonNull</span>
-    <span class="predefined-type">Integer</span> getMax();
+    <span class="type">int</span> getMax();
 }</code></pre>
 </div>
 </div>
@@ -1006,26 +985,20 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
 <span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">application</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">ApplicationConfigurationProperties</span> <span class="directive">implements</span> ApplicationConfiguration {
 
-    <span class="directive">protected</span> <span class="directive">final</span> <span class="predefined-type">Integer</span> DEFAULT_MAX = <span class="integer">10</span>;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="type">int</span> DEFAULT_MAX = <span class="integer">10</span>;
 
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotNull</span>
-    <span class="directive">private</span> <span class="predefined-type">Integer</span> max = DEFAULT_MAX;
+    <span class="directive">private</span> <span class="type">int</span> max = DEFAULT_MAX;
 
     <span class="annotation">@Override</span>
-    <span class="annotation">@NonNull</span>
-    <span class="directive">public</span> <span class="predefined-type">Integer</span> getMax() {
+    <span class="directive">public</span> <span class="type">int</span> getMax() {
         <span class="keyword">return</span> max;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setMax(<span class="annotation">@NonNull</span> <span class="predefined-type">Integer</span> max) {
+    <span class="directive">public</span> <span class="type">void</span> setMax(<span class="type">int</span> max) {
         <span class="local-variable">this</span>.max = max;
     }
 }</code></pre>
@@ -1059,14 +1032,14 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreController</span> {
 
-    <span class="directive">protected</span> <span class="directive">final</span> GenreRepository genreRepository;
+    <span class="directive">private</span> <span class="directive">final</span> GenreRepository genreRepository;
 
     <span class="directive">public</span> GenreController(GenreRepository genreRepository) { <i class="conum" data-value="2"></i><b>(2)</b>
         <span class="local-variable">this</span>.genreRepository = genreRepository;
     }
 
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/{id}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="directive">public</span> Genre show(<span class="predefined-type">Long</span> id) {
+    <span class="directive">public</span> Genre show(<span class="type">long</span> id) {
         <span class="keyword">return</span> genreRepository
                 .findById(id)
                 .orElse(<span class="predefined-constant">null</span>); <i class="conum" data-value="4"></i><b>(4)</b>
@@ -1095,17 +1068,13 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     }
 
     <span class="annotation">@Delete</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/{id}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="10"></i><b>(10)</b>
-    <span class="directive">public</span> HttpResponse&lt;?&gt; delete(<span class="predefined-type">Long</span> id) {
+    <span class="directive">public</span> HttpResponse&lt;?&gt; delete(<span class="type">long</span> id) {
         genreRepository.deleteById(id);
         <span class="keyword">return</span> HttpResponse.noContent();
     }
 
-    <span class="directive">protected</span> <span class="predefined-type">URI</span> location(<span class="predefined-type">Long</span> id) {
+    <span class="directive">private</span> <span class="predefined-type">URI</span> location(<span class="predefined-type">Long</span> id) {
         <span class="keyword">return</span> <span class="predefined-type">URI</span>.create(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span> + id);
-    }
-
-    <span class="directive">protected</span> <span class="predefined-type">URI</span> location(Genre genre) {
-        <span class="keyword">return</span> location(genre.getId());
     }
 }</code></pre>
 </div>
@@ -1248,10 +1217,8 @@ Micronaut Flyway integration works with multiple datasources.
 <span class="keyword">import</span> <span class="include">example.micronaut.genre.GenreSaveCommand</span>;
 <span class="keyword">import</span> <span class="include">example.micronaut.genre.GenreUpdateCommand</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpHeaders</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
@@ -1259,17 +1226,18 @@ Micronaut Flyway integration works with multiple datasources.
 <span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriTemplate</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">java.net.URI</span>;
 <span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
 <span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.LOCATION</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.CREATED</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.NO_CONTENT</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNull</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
@@ -1277,47 +1245,31 @@ Micronaut Flyway integration works with multiple datasources.
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    <span class="directive">public</span> HttpClient httpClient; <i class="conum" data-value="2"></i><b>(2)</b>
-
-    BlockingHttpClient getClient() {
-        <span class="keyword">return</span> httpClient.toBlocking();
-    }
+    HttpClient httpClient; <i class="conum" data-value="2"></i><b>(2)</b>
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> supplyAnInvalidOrderTriggersValidationFailure() {
-        assertThrows(HttpClientResponseException.class, () -&gt; {
-            <span class="predefined-type">List</span>&lt;Genre&gt; genres = getClient().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?order=foo</span><span class="delimiter">&quot;</span></span>), Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
-
-            assertNotNull(genres);
-            assertEquals(<span class="integer">0</span>, genres.size());
-        });
+        assertThrows(HttpClientResponseException.class, () -&gt;
+                getClient().retrieve(
+                        HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?order=foo</span><span class="delimiter">&quot;</span></span>),
+                        Argument.of(<span class="predefined-type">List</span>.class, Genre.class)));
     }
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testFindNonExistingGenreReturns404() {
-        assertThrows(HttpClientResponseException.class, () -&gt; {
-            Genre genre = getClient().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/99</span><span class="delimiter">&quot;</span></span>), Argument.of(Genre.class));
-
-            assertNull(genre);
-        });
-    }
-
-    <span class="directive">private</span> HttpResponse saveGenre(<span class="predefined-type">String</span> genre) {
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreSaveCommand(genre)); <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="keyword">return</span> getClient().exchange(request);
+        assertThrows(HttpClientResponseException.class, () -&gt;
+                getClient().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/99</span><span class="delimiter">&quot;</span></span>), Argument.of(Genre.class)));
     }
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testGenreCrudOperations() {
         <span class="predefined-type">List</span>&lt;<span class="predefined-type">Long</span>&gt; genreIds = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
-        HttpResponse response = saveGenre(<span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>);
-        <span class="predefined-type">System</span>.out.println(response);
+        HttpResponse&lt;?&gt; response = saveGenre(<span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>);
         genreIds.add(entityId(response));
-        assertEquals(HttpStatus.CREATED, response.getStatus());
+        assertEquals(CREATED, response.getStatus());
 
         response = saveGenre(<span class="string"><span class="delimiter">&quot;</span><span class="content">Microservices</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="3"></i><b>(3)</b>
-                <span class="predefined-type">System</span>.out.println(response);
-        assertEquals(HttpStatus.CREATED, response.getStatus());
+        assertEquals(CREATED, response.getStatus());
 
         <span class="predefined-type">Long</span> id = entityId(response);
         genreIds.add(id);
@@ -1325,8 +1277,7 @@ Micronaut Flyway integration works with multiple datasources.
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Microservices</span><span class="delimiter">&quot;</span></span>, genre.getName());
 
         response = update(id, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micro-services</span><span class="delimiter">&quot;</span></span>);
-                <span class="predefined-type">System</span>.out.println(response);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
+        assertEquals(NO_CONTENT, response.getStatus());
 
         genre = show(id);
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micro-services</span><span class="delimiter">&quot;</span></span>, genre.getName());
@@ -1346,47 +1297,56 @@ Micronaut Flyway integration works with multiple datasources.
         assertEquals(<span class="integer">0</span>, genres.size());
 
         <span class="comment">// cleanup:</span>
-        <span class="keyword">for</span> (<span class="predefined-type">Long</span> genreId : genreIds) {
+        <span class="keyword">for</span> (<span class="type">long</span> genreId : genreIds) {
             response = delete(genreId);
-            assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
+            assertEquals(NO_CONTENT, response.getStatus());
         }
     }
 
     <span class="directive">private</span> <span class="predefined-type">List</span>&lt;Genre&gt; listGenres(ListingArguments args) {
         <span class="predefined-type">URI</span> uri = args.of(UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list</span><span class="delimiter">&quot;</span></span>));
-        HttpRequest request = HttpRequest.GET(uri);
+        HttpRequest&lt;?&gt; request = HttpRequest.GET(uri);
         <span class="keyword">return</span> getClient().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class)); <i class="conum" data-value="4"></i><b>(4)</b>
     }
 
     <span class="directive">private</span> Genre show(<span class="predefined-type">Long</span> id) {
         <span class="predefined-type">String</span> uri = UriTemplate.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/{id}</span><span class="delimiter">&quot;</span></span>).expand(<span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>, id));
-        HttpRequest request = HttpRequest.GET(uri);
+        HttpRequest&lt;?&gt; request = HttpRequest.GET(uri);
         <span class="keyword">return</span> getClient().retrieve(request, Genre.class);
     }
 
-    <span class="directive">private</span> HttpResponse update(<span class="predefined-type">Long</span> id, <span class="predefined-type">String</span> name) {
-        HttpRequest request = HttpRequest.PUT(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreUpdateCommand(id, name));
+    <span class="directive">private</span> HttpResponse&lt;?&gt; update(<span class="predefined-type">Long</span> id, <span class="predefined-type">String</span> name) {
+        HttpRequest&lt;?&gt; request = HttpRequest.PUT(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreUpdateCommand(id, name));
         <span class="keyword">return</span> getClient().exchange(request); <i class="conum" data-value="5"></i><b>(5)</b>
     }
 
-    <span class="directive">private</span> HttpResponse delete(<span class="predefined-type">Long</span> id) {
-        HttpRequest request = HttpRequest.DELETE(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span> + id);
+    <span class="directive">private</span> HttpResponse&lt;?&gt; delete(<span class="predefined-type">Long</span> id) {
+        HttpRequest&lt;?&gt; request = HttpRequest.DELETE(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span> + id);
         <span class="keyword">return</span> getClient().exchange(request);
     }
 
-    <span class="directive">protected</span> <span class="predefined-type">Long</span> entityId(HttpResponse response) {
-        <span class="predefined-type">String</span> path = <span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span>;
-        <span class="predefined-type">String</span> value = response.header(HttpHeaders.LOCATION);
-        <span class="predefined-type">System</span>.out.println(value);
-
+    <span class="directive">private</span> <span class="predefined-type">Long</span> entityId(HttpResponse&lt;?&gt; response) {
+        <span class="predefined-type">String</span> value = response.header(LOCATION);
         <span class="keyword">if</span> (value == <span class="predefined-constant">null</span>) {
             <span class="keyword">return</span> <span class="predefined-constant">null</span>;
         }
+
+        <span class="predefined-type">String</span> path = <span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span>;
         <span class="type">int</span> index = value.indexOf(path);
         <span class="keyword">if</span> (index != -<span class="integer">1</span>) {
             <span class="keyword">return</span> <span class="predefined-type">Long</span>.valueOf(value.substring(index + path.length()));
         }
+
         <span class="keyword">return</span> <span class="predefined-constant">null</span>;
+    }
+
+    <span class="directive">private</span> BlockingHttpClient getClient() {
+        <span class="keyword">return</span> httpClient.toBlocking();
+    }
+
+    <span class="directive">private</span> HttpResponse&lt;?&gt; saveGenre(<span class="predefined-type">String</span> genre) {
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreSaveCommand(genre)); <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="keyword">return</span> getClient().exchange(request);
     }
 }</code></pre>
 </div>

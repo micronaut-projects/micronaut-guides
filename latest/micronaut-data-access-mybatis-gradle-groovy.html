@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Access a database with MyBatis</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-data-access-mybatis.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Access a database with MyBatis"/>
+    <meta name="twitter:description" content="Learn how to access a database with MyBatis using the Micronaut framework."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-data-access-mybatis.html">Access a database with MyBatis</a> » <span class="breadcrumb_last" aria-current="page">gradle | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#configure-data-source-and-jpa">4.1. Configure Data Source and JPA</a></li>
+<li><a href="#mybatis-configuration">4.2. MyBatis configuration</a></li>
+<li><a href="#domain">4.3. Domain</a></li>
+<li><a href="#repository-access">4.4. Repository Access</a></li>
+<li><a href="#controller">4.5. Controller</a></li>
+<li><a href="#database-migration-with-flyway">4.6. Database Migration with Flyway</a></li>
+<li><a href="#tests">4.7. Tests</a></li>
+<li><a href="#running-the-app">4.8. Running the App</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application">5. Running the Application</a>
+<ul class="sectlevel2">
+<li><a href="#next-steps">5.1. Next Steps</a></li>
+</ul>
+</li>
+<li><a href="#help-with-the-micronaut-framework">6. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Access a database with MyBatis</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to access a database with MyBatis using the Micronaut framework.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Iván López, Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.3.3</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Learn how to access a database with MyBatis using the Micronaut framework.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-data-access-mybatis-gradle-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=gradle --lang=groovy</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="configure-data-source-and-jpa">4.1. Configure Data Source and JPA</h3>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.mybatis:mybatis:3.5.9</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.sql:micronaut-jdbc-hikari</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.h2database:h2</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Add MyBatis dependency.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Configures SQL DataSource instances using Hikari Connection Pool.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Add dependency to in-memory H2 Database.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Define the data source in <code>src/main/resources/application.yml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+  <span class="key">default</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">jdbc:h2:mem:default;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">sa</span></span>
+    <span class="key">password</span>: <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">org.h2.Driver</span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mybatis-configuration">4.2. MyBatis configuration</h3>
+<div class="paragraph">
+<p>As there is no out-of-the-box support yet in the Micronaut framework for MyBatis, it is necessary to manually wire <code>SqlSessionFactory</code>.</p>
+</div>
+<div class="paragraph">
+<p>Create the following <a href="https://docs.micronaut.io/latest/guide/#factories">@Factory</a> class in  <code>src/main/java/example/micronaut/MybatisFactory.java</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/MybatisFactory.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Factory</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.mapping.Environment</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.session.Configuration</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.session.SqlSessionFactory</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.session.SqlSessionFactoryBuilder</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.transaction.TransactionFactory</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory</span>
+
+<span class="keyword">import</span> <span class="include">javax.sql.DataSource</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Factory</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">MybatisFactory</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">DataSource</span> dataSource <i class="conum" data-value="2"></i><b>(2)</b>
+
+    MybatisFactory(<span class="predefined-type">DataSource</span> dataSource) {
+        <span class="local-variable">this</span>.dataSource = dataSource <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    <span class="annotation">@Singleton</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    SqlSessionFactory sqlSessionFactory() {
+        TransactionFactory transactionFactory = <span class="keyword">new</span> JdbcTransactionFactory()
+
+        Environment environment = <span class="keyword">new</span> Environment(<span class="string"><span class="delimiter">'</span><span class="content">dev</span><span class="delimiter">'</span></span>, transactionFactory, dataSource) <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="predefined-type">Configuration</span> configuration = <span class="keyword">new</span> <span class="predefined-type">Configuration</span>(environment)
+        configuration.addMappers(<span class="string"><span class="delimiter">'</span><span class="content">example.micronaut</span><span class="delimiter">'</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
+
+        <span class="keyword">new</span> SqlSessionFactoryBuilder().build(configuration) <i class="conum" data-value="6"></i><b>(6)</b>
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@Factory</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use constructor injection to inject a bean of type <code>DataSource</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Define a <code>@Bean</code> of type <code>SqlSessionFactory</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use the <code>dataSource</code> to create a new MyBatis environment.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Define the package to scan for mappers.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Create a new <code>SqlSessionFactory</code> bean.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain">4.3. Domain</h3>
+<div class="paragraph">
+<p>Create the domain entities:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/domain/Genre.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.domain
+
+<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.annotation.JsonIgnore</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">Genre</span> {
+
+    <span class="annotation">@Nullable</span>
+    <span class="predefined-type">Long</span> id
+
+    <span class="annotation">@NotNull</span>
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> name
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@JsonIgnore</span>
+    <span class="predefined-type">Set</span>&lt;<span class="predefined-type">Book</span>&gt; books = <span class="type">[]</span>
+
+    Genre(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">String</span> toString() {
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">Genre{id=</span><span class="inline"><span class="inline-delimiter">$</span>id</span><span class="content">, name='</span><span class="inline"><span class="inline-delimiter">$</span>name</span><span class="content">', books=</span><span class="inline"><span class="inline-delimiter">$</span>books</span><span class="content">}</span><span class="delimiter">&quot;</span></span>
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repository-access">4.4. Repository Access</h3>
+<div class="paragraph">
+<p>Create an interface to define the operations to access the database and use MyBatis annotations to map the methods to SQL queries:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/genre/GenreMapper.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.genre
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.annotations.Delete</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.annotations.Insert</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.annotations.Options</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.annotations.Param</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.annotations.Select</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.annotations.Update</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.Positive</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.PositiveOrZero</span>
+
+<span class="type">interface</span> GenreMapper {
+
+    <span class="annotation">@Select</span>(<span class="string"><span class="delimiter">'</span><span class="content">select * from genre where id=#{id}</span><span class="delimiter">'</span></span>)
+    Genre findById(<span class="type">long</span> id)
+
+    <span class="annotation">@Insert</span>(<span class="string"><span class="delimiter">'</span><span class="content">insert into genre(name) values(#{name})</span><span class="delimiter">'</span></span>)
+    <span class="annotation">@Options</span>(useGeneratedKeys = <span class="predefined-constant">true</span>, keyProperty = <span class="string"><span class="delimiter">'</span><span class="content">id</span><span class="delimiter">'</span></span>)
+    <span class="type">void</span> save(Genre genre)
+
+    <span class="annotation">@Delete</span>(<span class="string"><span class="delimiter">'</span><span class="content">delete from genre where id=#{id}</span><span class="delimiter">'</span></span>)
+    <span class="type">void</span> deleteById(<span class="type">long</span> id)
+
+    <span class="annotation">@Update</span>(<span class="string"><span class="delimiter">'</span><span class="content">update genre set name=#{name} where id=#{id}</span><span class="delimiter">'</span></span>)
+    <span class="type">void</span> update(<span class="annotation">@Param</span>(<span class="string"><span class="delimiter">'</span><span class="content">id</span><span class="delimiter">'</span></span>) <span class="type">long</span> id, <span class="annotation">@Param</span>(<span class="string"><span class="delimiter">'</span><span class="content">name</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> name)
+
+    <span class="annotation">@Select</span>(<span class="string"><span class="delimiter">'</span><span class="content">select * from genre</span><span class="delimiter">'</span></span>)
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAll()
+
+    <span class="annotation">@Select</span>(<span class="string"><span class="delimiter">'</span><span class="content">select * from genre order by ${sort} ${order}</span><span class="delimiter">'</span></span>)
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAllBySortAndOrder(<span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">id|name</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> sort,
+                                      <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> order)
+
+    <span class="annotation">@Select</span>(<span class="string"><span class="delimiter">'</span><span class="content">select * from genre order by ${sort} ${order} limit ${offset}, ${max}</span><span class="delimiter">'</span></span>)
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMaxAndSortAndOrder(<span class="annotation">@PositiveOrZero</span> <span class="type">int</span> offset,
+                                                     <span class="annotation">@Positive</span> <span class="type">int</span> max,
+                                                     <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">id|name</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> sort,
+                                                     <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> order)
+
+    <span class="annotation">@Select</span>(<span class="string"><span class="delimiter">'</span><span class="content">select * from genre limit ${offset}, ${max}</span><span class="delimiter">'</span></span>)
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMax(<span class="annotation">@PositiveOrZero</span> <span class="type">int</span> offset, <span class="annotation">@Positive</span> <span class="type">int</span> max)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the implementation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/genre/GenreMapperImpl.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.genre
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.session.SqlSession</span>
+<span class="keyword">import</span> <span class="include">org.apache.ibatis.session.SqlSessionFactory</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.Positive</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.PositiveOrZero</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">GenreMapperImpl</span> <span class="directive">implements</span> GenreMapper {
+
+    <span class="directive">private</span> <span class="directive">final</span> SqlSessionFactory sqlSessionFactory <i class="conum" data-value="2"></i><b>(2)</b>
+
+    GenreMapperImpl(SqlSessionFactory sqlSessionFactory) {
+        <span class="local-variable">this</span>.sqlSessionFactory = sqlSessionFactory <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    <span class="annotation">@Override</span>
+    Genre findById(<span class="type">long</span> id) {
+        <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) { <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="keyword">return</span> getGenreMapper(sqlSession).findById(id) <i class="conum" data-value="5"></i><b>(5)</b>
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> save(Genre genre) {
+        <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            getGenreMapper(sqlSession).save(genre)
+            sqlSession.commit() <i class="conum" data-value="6"></i><b>(6)</b>
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> deleteById(<span class="type">long</span> id) {
+        <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            getGenreMapper(sqlSession).deleteById(id)
+            sqlSession.commit()
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> update(<span class="type">long</span> id, <span class="predefined-type">String</span> name) {
+        <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            getGenreMapper(sqlSession).update(id, name)
+            sqlSession.commit()
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAll() {
+        <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            <span class="keyword">return</span> getGenreMapper(sqlSession).findAll()
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAllBySortAndOrder(<span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">id|name</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> sort,
+                                      <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> order) {
+        <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            <span class="keyword">return</span> getGenreMapper(sqlSession).findAllBySortAndOrder(sort, order)
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMaxAndSortAndOrder(<span class="annotation">@PositiveOrZero</span> <span class="type">int</span> offset,
+                                                     <span class="annotation">@Positive</span> <span class="type">int</span> max,
+                                                     <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">id|name</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> sort,
+                                                     <span class="annotation">@NotNull</span> <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> order) {
+        <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            <span class="keyword">return</span> getGenreMapper(sqlSession).findAllByOffsetAndMaxAndSortAndOrder(offset, max, sort, order)
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAllByOffsetAndMax(<span class="annotation">@PositiveOrZero</span> <span class="type">int</span> offset,
+                                      <span class="annotation">@Positive</span> <span class="type">int</span> max) {
+        <span class="keyword">try</span> (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            <span class="keyword">return</span> getGenreMapper(sqlSession).findAllByOffsetAndMax(offset, max)
+        }
+    }
+
+    <span class="directive">private</span> GenreMapper getGenreMapper(SqlSession sqlSession) {
+        sqlSession.getMapper(GenreMapper) <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Easily inject the <code>SqlSessionFactory</code> bean created by the <code>@Factory</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <em>try-with-resources</em> to automatically close the SQL session.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Get MyBatis mapper implementation for the interface.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Execute the desired method using the mapper. This will trigger the SQL query.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>In a database write access, commit the transaction.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create an interface to define the high level operations exposed to the application:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/genre/GenreRepository.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.genre
+
+<span class="keyword">import</span> <span class="include">example.micronaut.ListingArguments</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+
+<span class="type">interface</span> GenreRepository {
+
+    <span class="annotation">@NonNull</span>
+    Optional&lt;Genre&gt; findById(<span class="type">long</span> id)
+
+    <span class="annotation">@NonNull</span>
+    Genre save(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name)
+
+    <span class="type">void</span> deleteById(<span class="type">long</span> id)
+
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAll(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> ListingArguments args)
+
+    <span class="type">int</span> update(<span class="type">long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the implementation using <code>GenreMapper</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/genre/GenreRepositoryImpl.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.genre
+
+<span class="keyword">import</span> <span class="include">example.micronaut.ListingArguments</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">GenreRepositoryImpl</span> <span class="directive">implements</span> GenreRepository {
+
+    <span class="directive">private</span> <span class="directive">final</span> GenreMapper genreMapper
+
+    GenreRepositoryImpl(GenreMapper genreMapper) {
+        <span class="local-variable">this</span>.genreMapper = genreMapper
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    Optional&lt;Genre&gt; findById(<span class="type">long</span> id) {
+        Optional.ofNullable(genreMapper.findById(id))
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    Genre save(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        Genre genre = <span class="keyword">new</span> Genre(name)
+        genreMapper.save(genre)
+        genre
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> deleteById(<span class="type">long</span> id) {
+        findById(id).ifPresent(genre -&gt; genreMapper.deleteById(id))
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAll(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> ListingArguments args) {
+
+        <span class="keyword">if</span> (args.max.present &amp;&amp; args.sort.present &amp;&amp; args.offset.present &amp;&amp; args.order.present) {
+            <span class="keyword">return</span> genreMapper.findAllByOffsetAndMaxAndSortAndOrder(
+                    args.offset.get(),
+                    args.max.get(),
+                    args.sort.get(),
+                    args.order.get())
+        }
+
+        <span class="keyword">if</span> (args.max.present &amp;&amp; args.offset.present &amp;&amp; (!args.sort.present || !args.order.present)) {
+            <span class="keyword">return</span> genreMapper.findAllByOffsetAndMax(args.offset.get(), args.max.get());
+        }
+
+        <span class="keyword">if</span> ((!args.max.present || !args.offset.present) &amp;&amp; args.sort.present &amp;&amp; args.order.present) {
+            <span class="keyword">return</span> genreMapper.findAllBySortAndOrder(args.sort.get(), args.order.get());
+        }
+
+        genreMapper.findAll()
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">int</span> update(<span class="type">long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        genreMapper.update(id, name)
+        -<span class="integer">1</span>
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controller">4.5. Controller</h3>
+<div class="paragraph">
+<p>Micronaut validation is built on the standard framework – <a href="https://www.jcp.org/en/jsr/detail?id=380">JSR 380</a>, also known as Bean Validation 2.0.</p>
+</div>
+<div class="paragraph">
+<p>Hibernate Validator is a reference implementation of the validation API. Micronaut <a href="https://docs.micronaut.io/latest/guide/#beanValidation">has built-in support for validation of beans</a> that are annotated with <code>javax.validation</code> annotations.</p>
+</div>
+<div class="paragraph">
+<p>The necessary dependencies are included by default when creating a new application, so you don&#8217;t need to add anything else.</p>
+</div>
+<div class="paragraph">
+<p>Create two classes to encapsulate Save and Update operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/genre/GenreSaveCommand.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.genre
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">GenreSaveCommand</span> {
+
+    <span class="annotation">@NotBlank</span>
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> name
+
+    GenreSaveCommand(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/genre/GenreUpdateCommand.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.genre
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">GenreUpdateCommand</span> {
+
+    <span class="type">long</span> id
+
+    <span class="annotation">@NotBlank</span>
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> name
+
+    GenreUpdateCommand(<span class="type">long</span> id, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.id = id
+        <span class="local-variable">this</span>.name = name
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a POJO to encapsulate Sorting and Pagination:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/ListingArguments.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.Positive</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.PositiveOrZero</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">ListingArguments</span> {
+
+    <span class="annotation">@PositiveOrZero</span>
+    <span class="directive">private</span> <span class="predefined-type">Integer</span> offset = <span class="integer">0</span>
+
+    <span class="annotation">@Nullable</span>
+    <span class="annotation">@Positive</span>
+    <span class="directive">private</span> <span class="predefined-type">Integer</span> max
+
+    <span class="annotation">@Nullable</span>
+    <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">id|name</span><span class="delimiter">&quot;</span></span>)
+    <span class="directive">private</span> <span class="predefined-type">String</span> sort
+
+    <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">&quot;</span></span>)
+    <span class="annotation">@Nullable</span>
+    <span class="directive">private</span> <span class="predefined-type">String</span> order
+
+    ListingArguments() {
+    }
+
+    Optional&lt;<span class="predefined-type">Integer</span>&gt; getOffset() {
+        Optional.ofNullable(offset)
+    }
+
+    <span class="type">void</span> setOffset(<span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> offset) {
+        <span class="local-variable">this</span>.offset = offset
+    }
+
+    Optional&lt;<span class="predefined-type">Integer</span>&gt; getMax() {
+        Optional.ofNullable(max)
+    }
+
+    <span class="type">void</span> setMax(<span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> max) {
+        <span class="local-variable">this</span>.max = max
+    }
+
+    Optional&lt;<span class="predefined-type">String</span>&gt; getSort() {
+        Optional.ofNullable(sort)
+    }
+
+    <span class="type">void</span> setSort(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> sort) {
+        <span class="local-variable">this</span>.sort = sort
+    }
+
+    Optional&lt;<span class="predefined-type">String</span>&gt; getOrder() {
+        Optional.ofNullable(order)
+    }
+
+    <span class="type">void</span> setOrder(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> order) {
+        <span class="local-variable">this</span>.order = order
+    }
+
+    <span class="directive">static</span> Builder builder() {
+        <span class="keyword">new</span> Builder()
+    }
+
+    <span class="predefined-type">URI</span> of(UriBuilder uriBuilder) {
+        <span class="keyword">if</span> (max != <span class="predefined-constant">null</span>) {
+            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">max</span><span class="delimiter">&quot;</span></span>, max)
+        }
+        <span class="keyword">if</span> (order != <span class="predefined-constant">null</span>) {
+            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">order</span><span class="delimiter">&quot;</span></span>, order)
+        }
+        <span class="keyword">if</span> (offset != <span class="predefined-constant">null</span>) {
+            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">offset</span><span class="delimiter">&quot;</span></span>, offset)
+        }
+        <span class="keyword">if</span> (sort != <span class="predefined-constant">null</span>) {
+            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">sort</span><span class="delimiter">&quot;</span></span>, sort)
+        }
+        uriBuilder.build()
+    }
+
+    <span class="directive">static</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Builder</span> {
+        <span class="directive">private</span> <span class="directive">final</span> ListingArguments args = <span class="keyword">new</span> ListingArguments()
+
+        <span class="directive">private</span> Builder() {
+        }
+
+        Builder max(<span class="type">int</span> max) {
+            args.max = max
+            <span class="local-variable">this</span>
+        }
+
+        Builder sort(<span class="predefined-type">String</span> sort) {
+            args.sort = sort
+            <span class="local-variable">this</span>
+        }
+
+        Builder order(<span class="predefined-type">String</span> order) {
+            args.order = order
+            <span class="local-variable">this</span>
+        }
+
+        Builder offset(<span class="type">int</span> offset) {
+            args.offset = offset
+            <span class="local-variable">this</span>
+        }
+
+        ListingArguments build() {
+            args
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a <code>ConfigurationProperties</code> class to encapsulate the configuration of the default <code>max</code> value.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/ApplicationConfiguration.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="type">interface</span> ApplicationConfiguration {
+
+    <span class="type">int</span> getMax()
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/ApplicationConfigurationProperties.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">application</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">ApplicationConfigurationProperties</span> <span class="directive">implements</span> ApplicationConfiguration {
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="type">int</span> DEFAULT_MAX = <span class="integer">10</span>
+
+    <span class="type">int</span> max = DEFAULT_MAX
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>GenreController</code>, a controller which exposes a resource with the common CRUD operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/GenreController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.genre.GenreRepository</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.genre.GenreSaveCommand</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.genre.GenreUpdateCommand</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Delete</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Put</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.LOCATION</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/genres</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">GenreController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> GenreRepository genreRepository
+
+    GenreController(GenreRepository genreRepository) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.genreRepository = genreRepository
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/{id}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    Genre show(<span class="type">long</span> id) {
+        genreRepository.findById(id).orElse(<span class="predefined-constant">null</span>) <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+
+    <span class="annotation">@Put</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    HttpResponse&lt;?&gt; update(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreUpdateCommand command) { <i class="conum" data-value="6"></i><b>(6)</b>
+        genreRepository.update(command.id, command.name)
+        HttpResponse
+                .noContent()
+                .header(LOCATION, location(command.id).path) <i class="conum" data-value="7"></i><b>(7)</b>
+    }
+
+    <span class="annotation">@Get</span>(value = <span class="string"><span class="delimiter">'</span><span class="content">/list{?args*}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="8"></i><b>(8)</b>
+    <span class="predefined-type">List</span>&lt;Genre&gt; list(<span class="annotation">@Valid</span> ListingArguments args) {
+        genreRepository.findAll(args)
+    }
+
+    <span class="annotation">@Post</span> <i class="conum" data-value="9"></i><b>(9)</b>
+    HttpResponse&lt;Genre&gt; save(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreSaveCommand cmd) {
+        Genre genre = genreRepository.save(cmd.name)
+
+        HttpResponse
+                .created(genre)
+                .headers(headers -&gt; headers.location(location(genre.id)))
+    }
+
+    <span class="annotation">@Delete</span>(<span class="string"><span class="delimiter">'</span><span class="content">/{id}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="10"></i><b>(10)</b>
+    HttpResponse&lt;?&gt; delete(<span class="predefined-type">Long</span> id) {
+        genreRepository.deleteById(id)
+        HttpResponse.noContent()
+    }
+
+    <span class="directive">private</span> <span class="predefined-type">URI</span> location(<span class="predefined-type">Long</span> id) {
+        <span class="predefined-type">URI</span>.create(<span class="string"><span class="delimiter">'</span><span class="content">/genres/</span><span class="delimiter">'</span></span> + id)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/genres</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Constructor injection.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Maps a <code>GET</code> request to <code>/genres/{id}</code> which attempts to show a genre. This illustrates the use of a URL path variable.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Returning <code>null</code> when the genre doesn&#8217;t exist makes the Micronaut framework respond with 404 (not found).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Maps a <code>PUT</code> request to <code>/genres</code> which attempts to update a genre.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Add <code>@Valid</code> to any method parameter which requires validation. Use a POJO supplied as a JSON payload in the request to populate command.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>It is easy to add custom headers to the response.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Maps a <code>GET</code> request to <code>/genres</code> which returns a list of genres. This mapping illustrates optional URL parameters.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Maps a <code>POST</code> request to <code>/genres</code> which attempts to save a genre.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>Maps a <code>DELETE</code> request to <code>/genres/{id}</code> which attempts to remove a genre. This illustrates the use of a URL path variable.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-migration-with-flyway">4.6. Database Migration with Flyway</h3>
+<div class="paragraph">
+<p>We need a way to create the database schema. For that, we use
+<a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut integration with Flyway</a>.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.flyway:micronaut-flyway</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure the database migrations directory for <a href="http://www.flyway.org">Flyway</a> in <code>application.yml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">flyway</span>:
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Enable Flyway for the <code>default</code> datasource.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Micronaut Flyway integration works with multiple datasources.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create the following files with the database schema creation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/migration/V1__schema.sql</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">DROP</span> <span class="type">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> GENRE;
+<span class="class">DROP</span> <span class="type">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> BOOK;
+
+<span class="class">CREATE</span> <span class="type">TABLE</span> GENRE (
+  id    <span class="predefined-type">BIGINT</span> SERIAL <span class="directive">PRIMARY</span> <span class="type">KEY</span> <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,
+  name <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>)              <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span> <span class="directive">UNIQUE</span>
+);
+
+<span class="class">CREATE</span> <span class="type">TABLE</span> BOOK (
+  id    <span class="predefined-type">BIGINT</span> SERIAL <span class="directive">PRIMARY</span> <span class="type">KEY</span> <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,
+  name <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>)              <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,
+  isbn <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>)              <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,
+  genre_id <span class="predefined-type">BIGINT</span>,
+    <span class="type">constraint</span> FKM1T3YVW5I7OLWDF32CWUUL7TA
+    <span class="directive">foreign</span> <span class="type">key</span> (GENRE_ID) <span class="keyword">references</span> GENRE
+);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>During application startup, Flyway will execute the SQL file and create the schema needed for the application.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tests">4.7. Tests</h3>
+<div class="paragraph">
+<p>Create a JUnit test to verify the CRUD operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/GenreControllerSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.genre.GenreSaveCommand</span>
+<span class="keyword">import</span> <span class="include">example.micronaut.genre.GenreUpdateCommand</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriTemplate</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.LOCATION</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.CREATED</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.NO_CONTENT</span>
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">GenreControllerSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
+    HttpClient httpClient <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="type">void</span> supplyAnInvalidOrderTriggersValidationFailure() {
+        <span class="key">when</span>:
+        client.retrieve(
+                HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/list?order=foo</span><span class="delimiter">'</span></span>),
+                Argument.of(<span class="predefined-type">List</span>, Genre))
+
+        <span class="key">then</span>:
+        thrown(HttpClientResponseException)
+    }
+
+    <span class="type">void</span> testFindNonExistingGenreReturns404() {
+        <span class="key">when</span>:
+        client.retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/99</span><span class="delimiter">'</span></span>), Argument.of(Genre))
+
+        <span class="key">then</span>:
+        thrown(HttpClientResponseException)
+    }
+
+    <span class="type">void</span> testGenreCrudOperations() {
+        <span class="key">given</span>:
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Long</span>&gt; genreIds = <span class="type">[]</span>
+
+        <span class="key">when</span>:
+        HttpResponse&lt;?&gt; response = saveGenre(<span class="string"><span class="delimiter">'</span><span class="content">DevOps</span><span class="delimiter">'</span></span>)
+        genreIds &lt;&lt; entityId(response)
+
+        <span class="key">then</span>:
+        CREATED == response.status
+
+        <span class="key">when</span>:
+        response = saveGenre(<span class="string"><span class="delimiter">'</span><span class="content">Microservices</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+
+        <span class="key">then</span>:
+        CREATED == response.status
+
+        <span class="key">when</span>:
+        <span class="predefined-type">Long</span> id = entityId(response)
+        genreIds.add(id)
+        Genre genre = show(id)
+
+        <span class="key">then</span>:
+        <span class="string"><span class="delimiter">'</span><span class="content">Microservices</span><span class="delimiter">'</span></span> == genre.name
+
+        <span class="key">when</span>:
+        response = update(id, <span class="string"><span class="delimiter">'</span><span class="content">Micro-services</span><span class="delimiter">'</span></span>)
+
+        <span class="key">then</span>:
+        NO_CONTENT == response.status
+
+        <span class="key">when</span>:
+        genre = show(id)
+
+        <span class="key">then</span>:
+        <span class="string"><span class="delimiter">'</span><span class="content">Micro-services</span><span class="delimiter">'</span></span> == genre.name
+
+        <span class="key">when</span>:
+        <span class="predefined-type">List</span>&lt;Genre&gt; genres = listGenres(ListingArguments.builder().build())
+
+        <span class="key">then</span>:
+        <span class="integer">2</span> == genres.size()
+
+        <span class="key">when</span>:
+        genres = listGenres(ListingArguments.builder().max(<span class="integer">1</span>).build())
+
+        <span class="key">then</span>:
+        <span class="integer">1</span> == genres.size()
+        <span class="string"><span class="delimiter">'</span><span class="content">DevOps</span><span class="delimiter">'</span></span> == genres[<span class="integer">0</span>].name
+
+        <span class="key">when</span>:
+        genres = listGenres(ListingArguments.builder().max(<span class="integer">1</span>).order(<span class="string"><span class="delimiter">'</span><span class="content">desc</span><span class="delimiter">'</span></span>).sort(<span class="string"><span class="delimiter">'</span><span class="content">name</span><span class="delimiter">'</span></span>).build())
+
+        <span class="key">then</span>:
+        <span class="integer">1</span> == genres.size()
+        <span class="string"><span class="delimiter">'</span><span class="content">Micro-services</span><span class="delimiter">'</span></span> == genres[<span class="integer">0</span>].name
+
+        <span class="key">when</span>:
+        genres = listGenres(ListingArguments.builder().max(<span class="integer">1</span>).offset(<span class="integer">10</span>).build())
+
+        <span class="key">then</span>:
+        <span class="integer">0</span> == genres.size()
+
+        <span class="key">cleanup</span>:
+        <span class="keyword">for</span> (<span class="type">long</span> genreId : genreIds) {
+            response = delete(genreId)
+            <span class="keyword">assert</span> NO_CONTENT == response.status
+        }
+    }
+
+    <span class="directive">private</span> <span class="predefined-type">List</span>&lt;Genre&gt; listGenres(ListingArguments args) {
+        <span class="predefined-type">URI</span> uri = args.of(UriBuilder.of(<span class="string"><span class="delimiter">'</span><span class="content">/genres/list</span><span class="delimiter">'</span></span>))
+        HttpRequest&lt;?&gt; request = HttpRequest.GET(uri)
+        client.retrieve(request, Argument.of(<span class="predefined-type">List</span>, Genre)) <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+
+    <span class="directive">private</span> Genre show(<span class="predefined-type">Long</span> id) {
+        <span class="predefined-type">String</span> uri = UriTemplate.of(<span class="string"><span class="delimiter">'</span><span class="content">/genres/{id}</span><span class="delimiter">'</span></span>).expand(<span class="key">id</span>: id)
+        HttpRequest&lt;?&gt; request = HttpRequest.GET(uri)
+        client.retrieve(request, Genre)
+    }
+
+    <span class="directive">private</span> HttpResponse&lt;?&gt; update(<span class="predefined-type">Long</span> id, <span class="predefined-type">String</span> name) {
+        HttpRequest&lt;?&gt; request = HttpRequest.PUT(<span class="string"><span class="delimiter">'</span><span class="content">/genres</span><span class="delimiter">'</span></span>, <span class="keyword">new</span> GenreUpdateCommand(id, name))
+        client.exchange(request) <i class="conum" data-value="5"></i><b>(5)</b>
+    }
+
+    <span class="directive">private</span> HttpResponse&lt;?&gt; delete(<span class="predefined-type">Long</span> id) {
+        HttpRequest&lt;?&gt; request = HttpRequest.DELETE(<span class="string"><span class="delimiter">'</span><span class="content">/genres/</span><span class="delimiter">'</span></span> + id)
+        client.exchange(request)
+    }
+
+    <span class="directive">private</span> <span class="predefined-type">Long</span> entityId(HttpResponse&lt;?&gt; response) {
+        <span class="predefined-type">String</span> value = response.header(LOCATION)
+        <span class="keyword">if</span> (value == <span class="predefined-constant">null</span>) {
+            <span class="keyword">return</span> <span class="predefined-constant">null</span>
+        }
+
+        <span class="predefined-type">String</span> path = <span class="string"><span class="delimiter">'</span><span class="content">/genres/</span><span class="delimiter">'</span></span>
+        <span class="type">int</span> index = value.indexOf(path)
+        <span class="keyword">if</span> (index != -<span class="integer">1</span>) {
+            <span class="keyword">return</span> value.substring(index + path.length()) <span class="keyword">as</span> <span class="type">long</span>
+        }
+
+        <span class="predefined-constant">null</span>
+    }
+
+    <span class="directive">private</span> BlockingHttpClient getClient() {
+        httpClient.toBlocking()
+    }
+
+    <span class="directive">private</span> HttpResponse&lt;?&gt; saveGenre(<span class="predefined-type">String</span> genre) {
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/genres</span><span class="delimiter">'</span></span>, <span class="keyword">new</span> GenreSaveCommand(genre)) <i class="conum" data-value="3"></i><b>(3)</b>
+        client.exchange(request)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>If you care just about the object in the response use <code>retrieve</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-the-app">4.8. Running the App</h3>
+
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">5. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>We can use <code>curl</code> to check that everything works as expected:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/genres/list</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">[]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X POST -d '{&quot;name&quot;:&quot;Sci-fi&quot;}' -H &quot;Content-Type: application/json&quot; http://localhost:8080/genres</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Sci-fi</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X POST -d '{&quot;name&quot;:&quot;Science&quot;}' -H &quot;Content-Type: application/json&quot; http://localhost:8080/genres</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">2</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Science</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/genres/list</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">[{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Sci-fi</span><span class="delimiter">&quot;</span></span>},{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">2</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Science</span><span class="delimiter">&quot;</span></span>}]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X DELETE http://localhost:8080/genres/1</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/genres/list</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">[{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">2</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Science</span><span class="delimiter">&quot;</span></span>}]</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="next-steps">5.1. Next Steps</h3>
+<div class="paragraph">
+<p>Read more about <a href="https://docs.micronaut.io/latest/guide/#dataAccess">Configurations for Data Access</a> section and
+<a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Flyway</a> support in the Micronaut framework documentation.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">6. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
