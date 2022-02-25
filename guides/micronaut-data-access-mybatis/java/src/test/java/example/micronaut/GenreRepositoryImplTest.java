@@ -2,9 +2,9 @@ package example.micronaut;
 
 import example.micronaut.genre.GenreRepository;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import jakarta.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,21 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class GenreRepositoryImplTest {
 
     @Inject
-    public GenreRepository genreRepository;
-
-    @Test
-    public void constraintsAreValidatedForFindById() {
-        assertThrows(ConstraintViolationException.class, () -> {
-            genreRepository.findById(null);
-        });
-    }
-
-    @Test
-    public void constraintsAreValidatedForDeleteById() {
-        assertThrows(ConstraintViolationException.class, () -> {
-            genreRepository.deleteById(null);
-        });
-    }
+    GenreRepository genreRepository;
 
     @Test
     public void constraintsAreValidatedForFindAll() {
@@ -46,22 +32,14 @@ public class GenreRepositoryImplTest {
     @Test
     public void constraintsAreValidatedForUpdateNameIsNull() {
         assertThrows(ConstraintViolationException.class, () -> {
-            genreRepository.update(12L, null);
+            genreRepository.update(12, null);
         });
     }
-
-    @Test
-    public void constraintsAreValidatedForUpdateIdIsNull() {
-        assertThrows(ConstraintViolationException.class, () -> {
-            genreRepository.update(null, "foo");
-        });
-    }
-
 
     @Test
     public void constraintsAreValidatedForUpdateNameIsBlank() {
         assertThrows(ConstraintViolationException.class, () -> {
-            genreRepository.update(4L, "");
+            genreRepository.update(4, "");
         });
     }
 }

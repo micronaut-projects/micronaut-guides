@@ -1,7 +1,7 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.uri.UriBuilder;
 
 import javax.validation.constraints.Pattern;
@@ -29,7 +29,6 @@ public class ListingArguments {
     private String order;
 
     public ListingArguments() {
-
     }
 
     public Optional<Integer> getOffset() {
@@ -85,10 +84,9 @@ public class ListingArguments {
     }
 
     public static final class Builder {
-        private ListingArguments args = new ListingArguments();
+        private final ListingArguments args = new ListingArguments();
 
         private Builder() {
-
         }
 
         public Builder max(int max) {
@@ -112,8 +110,7 @@ public class ListingArguments {
         }
 
         public ListingArguments build() {
-            return this.args;
+            return args;
         }
     }
-
 }
