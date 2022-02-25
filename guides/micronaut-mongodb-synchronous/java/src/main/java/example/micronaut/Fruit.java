@@ -19,7 +19,7 @@ public class Fruit {
 
     @Nullable
     @BsonProperty("description") // <3>
-    private String description;
+    private final String description;
 
     public Fruit(@NonNull String name) {
         this(name, null);
