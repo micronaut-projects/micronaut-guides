@@ -292,6 +292,7 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "M
 
 <span class="annotation">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Person</span> {
+
     <span class="annotation">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="annotation">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="directive">private</span> <span class="predefined-type">Long</span> id;
@@ -417,9 +418,9 @@ Micronaut Flyway integration works with multiple datasources.
 <div class="title">src/main/resources/db/migration/V1__create-person.sql</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="sql"><span class="class">CREATE</span> <span class="type">TABLE</span> person(
-  id <span class="predefined-type">bigint</span> <span class="directive">primary</span> <span class="type">key</span> <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-  name <span class="predefined-type">varchar</span>(<span class="integer">255</span>) <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-  age <span class="predefined-type">int</span> <span class="keyword">not</span> <span class="predefined-constant">null</span>
+    id   <span class="predefined-type">bigint</span> <span class="directive">primary</span> <span class="type">key</span> <span class="keyword">not</span> <span class="predefined-constant">null</span>,
+    name <span class="predefined-type">varchar</span>(<span class="integer">255</span>)       <span class="keyword">not</span> <span class="predefined-constant">null</span>,
+    age  <span class="predefined-type">int</span>                <span class="keyword">not</span> <span class="predefined-constant">null</span>
 )</code></pre>
 </div>
 </div>
@@ -602,9 +603,9 @@ Micronaut Flyway integration works with multiple datasources.
 <div class="title">src/test/resources/application-test.yml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
-    <span class="key">default</span>:
-        <span class="key">url</span>: <span class="string"><span class="content">jdbc:tc:postgresql:12:///postgres </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="key">driverClassName</span>: <span class="string"><span class="content">org.testcontainers.jdbc.ContainerDatabaseDriver</span></span></code></pre>
+  <span class="key">default</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">jdbc:tc:postgresql:12:///postgres </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">org.testcontainers.jdbc.ContainerDatabaseDriver</span></span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -629,7 +630,6 @@ Micronaut Flyway integration works with multiple datasources.
 <span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
@@ -639,11 +639,13 @@ Micronaut Flyway integration works with multiple datasources.
 
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.OK</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">FlywayEndpointTest</span> {
+
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)  <i class="conum" data-value="2"></i><b>(2)</b>
     HttpClient httpClient;
@@ -651,11 +653,16 @@ Micronaut Flyway integration works with multiple datasources.
     <span class="annotation">@Test</span>
     <span class="type">void</span> migrationsAreExposedViaAndEndpoint() {
         BlockingHttpClient client = httpClient.toBlocking();
-        HttpResponse&lt;<span class="predefined-type">List</span>&lt;FlywayReport&gt;&gt; response = client.exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/flyway</span><span class="delimiter">&quot;</span></span>), Argument.listOf(FlywayReport.class));
-        assertEquals(HttpStatus.OK, response.status());
+
+        HttpResponse&lt;<span class="predefined-type">List</span>&lt;FlywayReport&gt;&gt; response = client.exchange(
+                HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/flyway</span><span class="delimiter">&quot;</span></span>),
+                Argument.listOf(FlywayReport.class));
+        assertEquals(OK, response.status());
+
         <span class="predefined-type">List</span>&lt;FlywayReport&gt; flywayReports = response.body();
         assertNotNull(flywayReports);
         assertEquals(<span class="integer">1</span>, flywayReports.size());
+
         FlywayReport flywayReport = flywayReports.get(<span class="integer">0</span>);
         assertNotNull(flywayReport);
         assertNotNull(flywayReport.getMigrations());
