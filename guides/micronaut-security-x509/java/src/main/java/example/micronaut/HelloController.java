@@ -7,8 +7,6 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.x509.X509Authentication;
 
-import java.security.cert.X509Certificate;
-
 import static io.micronaut.http.MediaType.TEXT_PLAIN;
 import static io.micronaut.security.rules.SecurityRule.IS_ANONYMOUS;
 
