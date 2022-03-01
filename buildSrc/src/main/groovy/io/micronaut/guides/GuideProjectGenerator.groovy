@@ -13,6 +13,8 @@ import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -32,6 +34,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
     public static final String DEFAULT_APP_NAME = 'default'
 
+    private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
     private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
@@ -55,7 +58,7 @@ class GuideProjectGenerator implements AutoCloseable {
         List<GuideMetadata> metadatas = []
 
         guidesDir.eachDir { dir ->
-            metadatas << parseGuideMetadata(dir, metadataConfigName)
+            parseGuideMetadata(dir, metadataConfigName).ifPresent(metadatas::add)
         }
 
         mergeMetadataList(metadatas)
@@ -64,13 +67,14 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    static Optional<GuideMetadata> parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
-            throw new GradleException("metadata file not found for " + dir.name)
+            LOG.warn('metadata file not found for {}', dir.name)
+            return Optional.empty()
         }
 
-        Map config = new JsonSlurper().parse(configFile)
+        Map config = new JsonSlurper().parse(configFile) as Map
         boolean publish = config.publish == null ? true : config.publish
 
         Category cat = Category.values().find {it.toString() == config.category }
@@ -78,7 +82,7 @@ class GuideProjectGenerator implements AutoCloseable {
             throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
         }
 
-        new GuideMetadata(
+        Optional.ofNullable(new GuideMetadata(
                 asciidoctor: publish ? dir.name + '.adoc' : null,
                 slug: dir.name,
                 title: config.title,
@@ -104,7 +108,7 @@ class GuideProjectGenerator implements AutoCloseable {
                         excludeSource:  it.excludeSource,
                         excludeTest:  it.excludeTest)
                 }
-        )
+        ))
     }
 
     @CompileDynamic
