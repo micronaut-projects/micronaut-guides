@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>x.509 Mutual Authentication</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-security-x509.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="x.509 Mutual Authentication"/>
+    <meta name="twitter:description" content="Learn how to implement mutual authentication using SSL and X.509 certificates."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-security-x509.html">x.509 Mutual Authentication</a> » <span class="breadcrumb_last" aria-current="page">gradle | kotlin</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#x-509-mutual-authentication">4. X.509 Mutual Authentication</a></li>
+<li><a href="#create-certificates-for-testing">5. Create certificates for testing</a>
+<ul class="sectlevel2">
+<li><a href="#create-a-certificate-authority-ca">5.1. Create a Certificate Authority (CA)</a></li>
+<li><a href="#create-a-server-ssl-certificate">5.2. Create a Server SSL Certificate</a></li>
+<li><a href="#create-a-keystore-containing-the-server-certificate">5.3. Create a Keystore Containing the Server Certificate</a></li>
+<li><a href="#create-a-truststore-containing-the-ca">5.4. Create a Truststore Containing the CA</a></li>
+<li><a href="#create-a-client-x-509-certificate">5.5. Create a Client X.509 Certificate</a></li>
+</ul>
+</li>
+<li><a href="#writing-the-application">6. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#enable-annotation-processing">6.1. Enable annotation Processing</a></li>
+<li><a href="#copy-certificates">6.2. Copy Certificates</a></li>
+<li><a href="#configuration">6.3. Configuration</a></li>
+<li><a href="#hellocontroller">6.4. HelloController</a></li>
+<li><a href="#writing-tests">6.5. Writing Tests</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">7. Testing the Application</a></li>
+<li><a href="#running-the-application">8. Running the Application</a>
+<ul class="sectlevel2">
+<li><a href="#testing-with-curl">8.1. Testing with cURL</a></li>
+<li><a href="#testing-with-a-web-browser">8.2. Testing with a Web Browser</a></li>
+</ul>
+</li>
+<li><a href="#generate-a-micronaut-application-native-image-with-graalvm">9. Generate a Micronaut Application Native Image with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#native-image-generation">9.1. Native image generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">10. Next steps</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>x.509 Mutual Authentication</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to implement mutual authentication using SSL and X.509 certificates.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Burt Beckwith</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.3.3</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application with X.509 authentication written in Kotlin.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+<li>
+<p><a href="https://www.openssl.org/">OpenSSL</a> installed</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-security-x509-gradle-kotlin.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="x-509-mutual-authentication">4. X.509 Mutual Authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As of Micronaut Security version 3.3, applications can use <a href="https://en.wikipedia.org/wiki/X.509">X.509</a> client certificates when using SSL to enable <a href="https://en.wikipedia.org/wiki/Mutual_authentication">mutual authentication</a>, i.e., in addition to the client verifying the server identity with its SSL certificate, the server can verify the client identity with a client certificate.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-certificates-for-testing">5. Create certificates for testing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First, we&#8217;ll need a Certificate Authority (CA), an SSL certificate for the server, and an X.509 certificate for each application user who will be using mutual authentication. You can use an existing CA, server certificate, and/or client certificate if you already have them; otherwise create your own as described below.</p>
+</div>
+<div class="sect2">
+<h3 id="create-a-certificate-authority-ca">5.1. Create a Certificate Authority (CA)</h3>
+<div class="paragraph">
+<p>Start by creating a self-signed CA with OpenSSL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl req -x509 -sha256 -days 365 -newkey rsa:4096 \
+        -keyout cacert.key -out cacert.pem</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be asked for a CA password ("PEM pass phrase") and a few values for the CA. Most are optional and are useful for identifying a particular certificate; for our needs only the Common Name (CN) is important though - enter a domain name or other identifying value, e.g., "micronaut.guide.x509":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs1.png" alt="certs1">
+</div>
+</div>
+<div class="paragraph">
+<p>This will create two files, <code>cacert.pem</code> (the CA in PEM format) and <code>cacert.key</code> (the private key).</p>
+</div>
+<div class="paragraph">
+<p>You can verify and inspect the CA with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl x509 -in cacert.pem -text
+openssl x509 -purpose -in cacert.pem -inform PEM</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-a-server-ssl-certificate">5.2. Create a Server SSL Certificate</h3>
+<div class="paragraph">
+<p>Next we&#8217;ll create an SSL certificate for the server. This involves creating a certificate signing request (CSR) and creating the certificate by signing the CSR with the CA we created.</p>
+</div>
+<div class="sect3">
+<h4 id="create-a-certificate-signing-request-csr">5.2.1. Create a Certificate Signing Request (CSR)</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl req -newkey rsa:4096 -keyout server.key -out server.csr</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be asked for a password ("PEM pass phrase") and a few values for the certificate. Enter "localhost" for the Common Name (CN); the rest are optional:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs2.png" alt="certs2">
+</div>
+</div>
+<div class="paragraph">
+<p>This will create two files, <code>server.csr</code> (the CSR) and <code>server.key</code> (the private key).</p>
+</div>
+<div class="paragraph">
+<p>You can verify and inspect the CSR with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl req -noout -text -in server.csr</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="sign-the-server-csr-with-the-ca">5.2.2. Sign the Server CSR with the CA</h4>
+<div class="paragraph">
+<p>Next, sign the CSR with the CA to create the server certificate. Create a configuration file <code>server.conf</code> with this content:</p>
+</div>
+<div class="listingblock">
+<div class="title">server.conf</div>
+<div class="content">
+<pre class="CodeRay highlight"><code>authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and generate the certificate:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl x509 -req -CA cacert.pem -CAkey cacert.key \
+        -in server.csr -out server.pem -days 365 \
+        -CAcreateserial -extfile server.conf</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be asked for the CA password that you chose earlier. Everything else is provided via the command line or <code>server.conf</code>:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs3.png" alt="certs3">
+</div>
+</div>
+<div class="paragraph">
+<p>This will create <code>server.pem</code> (the server certificate).</p>
+</div>
+<div class="paragraph">
+<p>You can verify and inspect the certificate with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl x509 -in server.pem -text
+openssl x509 -purpose -in server.pem -inform PEM</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-a-keystore-containing-the-server-certificate">5.3. Create a Keystore Containing the Server Certificate</h3>
+<div class="sect3">
+<h4 id="create-server-p12">5.3.1. Create server.p12</h4>
+<div class="paragraph">
+<p>Bundle the server certificate and private key in <a href="https://en.wikipedia.org/wiki/PKCS_12">PKCS #12</a> format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl pkcs12 -export -out server.p12 -name &quot;localhost&quot; \
+        -inkey server.key -in server.pem</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be asked for the server certificate password that you chose earlier and a new password ("Export Password") for the PKCS #12 archive:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs4.png" alt="certs4">
+</div>
+</div>
+<div class="paragraph">
+<p>This will create <code>server.p12</code>. You can verify and inspect the archive with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl pkcs12 -in server.p12 -noout -info</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-keystore-p12">5.3.2. Create keystore.p12</h4>
+<div class="paragraph">
+<p>Create <code>keystore.p12</code> containing <code>server.p12</code> using the <a href="https://docs.oracle.com/en/java/javase/11/tools/keytool.html">keytool</a> utility from your JDK:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">keytool -importkeystore -srckeystore server.p12 \
+        -srcstoretype pkcs12 -destkeystore keystore.p12 \
+        -deststoretype pkcs12</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be asked for the <code>server.p12</code> password that you chose earlier and a new password for the keystore:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs5.png" alt="certs5">
+</div>
+</div>
+<div class="paragraph">
+<p>This will create <code>keystore.p12</code>. You can verify and inspect the archive with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl pkcs12 -in keystore.p12 -noout -info</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-a-truststore-containing-the-ca">5.4. Create a Truststore Containing the CA</h3>
+<div class="paragraph">
+<p>Create <code>truststore.jks</code> containing the CA:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">keytool -import -trustcacerts -noprompt -alias ca \
+        -ext san=dns:localhost,ip:127.0.0.1 \
+        -file cacert.pem -keystore truststore.jks</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be asked for a new password ("keystore password") for the truststore:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs6.png" alt="certs6">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-a-client-x-509-certificate">5.5. Create a Client X.509 Certificate</h3>
+<div class="sect3">
+<h4 id="create-a-certificate-signing-request-csr-2">5.5.1. Create a Certificate Signing Request (CSR)</h4>
+<div class="paragraph">
+<p>Similar to what we did earlier for the server certificate, create a CSR for the client certificate:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl req -newkey rsa:4096 -nodes -keyout client.key -out client.csr</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For this certificate we&#8217;ll skip the password (via the <code>-nodes</code> command line flag), but you can omit the flag and enter a password if you prefer.</p>
+</div>
+<div class="paragraph">
+<p>Enter a username (e.g., "myusername") for the Common Name (CN); the rest are optional:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs7.png" alt="certs7">
+</div>
+</div>
+<div class="paragraph">
+<p>This will create two files, <code>client.csr</code> (the CSR) and <code>client.key</code> (the private key).</p>
+</div>
+<div class="paragraph">
+<p>You can verify and inspect the CSR with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl req -noout -text -in client.csr</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="sign-the-client-csr-with-the-ca">5.5.2. Sign the Client CSR with the CA</h4>
+<div class="paragraph">
+<p>Sign the client CSR with the CA:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl x509 -req -CA cacert.pem -CAkey cacert.key \
+        -in client.csr -out client.pem -days 365 -CAcreateserial</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be asked for the CA password that you chose earlier.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs8.png" alt="certs8">
+</div>
+</div>
+<div class="paragraph">
+<p>This will create <code>client.pem</code> (the client certificate).</p>
+</div>
+<div class="paragraph">
+<p>You can verify and inspect the client certificate with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl x509 -in client.pem -text</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-client-p12">5.5.3. Create client.p12</h4>
+<div class="paragraph">
+<p>Bundle the client certificate and private key in PKCS #12 format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl pkcs12 -export -out client.p12 -name &quot;client&quot; \
+        -inkey client.key -in client.pem</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will be asked for a new password for the PKCS #12 archive:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/certs9.png" alt="certs9">
+</div>
+</div>
+<div class="paragraph">
+<p>This will create <code>client.p12</code>. You can verify and inspect the archive with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">openssl pkcs12 -in client.p12 -noout -info</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">6. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+   --features=security,graalvm,reactor \
+   --build=gradle --lang=kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=security&amp;features=graalvm&amp;features=reactor&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enable-annotation-processing">6.1. Enable annotation Processing</h3>
+<div class="paragraph">
+<p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="copy-certificates">6.2. Copy Certificates</h3>
+<div class="paragraph">
+<p>Create the <code>src/main/resources/ssl</code> directory and copy the keystore (<code>keystore.p12</code>) and truststore (<code>truststore.jks</code>) that you created earlier into it.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration">6.3. Configuration</h3>
+<div class="paragraph">
+<p>Replace the generated <code>application.yml</code> with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">application</span>:
+    <span class="key">name</span>: <span class="string"><span class="content">micronautguide</span></span>
+
+  <span class="key">security</span>:
+    <span class="key">x509</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+
+  <span class="key">ssl</span>:
+    <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+
+  <span class="key">server</span>:
+    <span class="key">ssl</span>:
+      <span class="key">client-authentication</span>: <span class="string"><span class="content">want </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+      <span class="key">key-store</span>:
+        <span class="key">path</span>: <span class="string"><span class="content">classpath:ssl/keystore.p12 </span></span><i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="key">password</span>: <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="key">type</span>: <span class="string"><span class="content">PKCS12 </span></span><i class="conum" data-value="6"></i><b>(6)</b>
+      <span class="key">trust-store</span>:
+        <span class="key">path</span>: <span class="string"><span class="content">classpath:ssl/truststore.jks </span></span><i class="conum" data-value="7"></i><b>(7)</b>
+        <span class="key">password</span>: <i class="conum" data-value="8"></i><b>(8)</b>
+        <span class="key">type</span>: <span class="string"><span class="content">JKS </span></span><i class="conum" data-value="9"></i><b>(9)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Enable X.509 support</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Enable SSL/TLS at the server</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set <code>client-authentication</code> to <code>want</code>, i.e., accept a client certificate if available, but don&#8217;t block access without one. To require a client certificate for all requests, change to <code>need</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Specify the location of the keystore</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Set this value with the password you used when creating the keystore</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Specify the keystore type as PKCS #12</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Specify the location of the truststore</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Set this value with the password you used when creating the truststore</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Specify the truststore type as JKS (Java Key Store)</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hellocontroller">6.4. HelloController</h3>
+<div class="paragraph">
+<p>Create <code>HelloController</code> to test using client X.509 certificates:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/HelloController.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.authentication.Authentication
+import io.micronaut.security.rules.SecurityRule.IS_ANONYMOUS
+import io.micronaut.security.x509.X509Authentication
+
+@Controller
+class HelloController {
+
+    @Secured(IS_ANONYMOUS) <i class="conum" data-value="1"></i><b>(1)</b>
+    @Get(produces = [TEXT_PLAIN]) <i class="conum" data-value="2"></i><b>(2)</b>
+    fun hello(x509Authentication: X509Authentication?,  <i class="conum" data-value="3"></i><b>(3)</b>
+              authentication: Authentication?): String { <i class="conum" data-value="4"></i><b>(4)</b>
+        if (x509Authentication == null &amp;&amp; authentication == null) {
+            return &quot;Hello unknown!&quot; <i class="conum" data-value="5"></i><b>(5)</b>
+        }
+        if (x509Authentication == null) {
+            return &quot;ERROR: Authentication is present but not X509Authentication&quot; <i class="conum" data-value="6"></i><b>(6)</b>
+        }
+        return if (x509Authentication !== authentication) {
+            &quot;ERROR: Authentication and X509Authentication should be the same instance&quot; <i class="conum" data-value="7"></i><b>(7)</b>
+        } else &quot;Hello ${x509Authentication.name} (X.509 cert issued by ${x509Authentication.certificate.issuerX500Principal.name})&quot; <i class="conum" data-value="8"></i><b>(8)</b>
+
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Allow authenticated and non-authenticated requests</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>By default a Micronaut response uses <code>application/json</code> as <code>Content-Type</code>. We are returning a String not a JSON object, so we set it to <code>text/plain</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Bind the <code>X509Authentication</code> if present, but allow null when not authenticated</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Redundantly bind the <code>Authentication</code> to verify that it&#8217;s the same instance as the <code>X509Authentication</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Default the username for non-authenticated requests</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Sanity check that there&#8217;s no <code>Authentication</code> if there&#8217;s no <code>X509Authentication</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Sanity check that the <code>Authentication</code> is the <code>X509Authentication</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Build the response as the username plus info about the certificate CA for the authenticated user</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="writing-tests">6.5. Writing Tests</h3>
+<div class="paragraph">
+<p>Create a test to verify that X.509 authentication works:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/X509Test.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+
+@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
+class X509Test {
+
+    @Inject
+    @field:Client(&quot;/&quot;)
+    lateinit var httpClient: HttpClient <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Test
+    fun testClientCert() {
+        val response = httpClient.toBlocking().retrieve(&quot;/&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
+        val expected = &quot;Hello myusername (X.509 cert issued by CN=micronaut.guide.x509)&quot;
+        assertEquals(expected, response) <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Make a request to the controller</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Verify the response is correct</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create <code>application-test.yml</code> in <code>src/test/resources</code> with this content:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/application-test.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">ssl</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">-1 </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+  <span class="key">http</span>:
+    <span class="key">client</span>:
+      <span class="key">ssl</span>:
+        <span class="key">key-store</span>:
+          <span class="key">path</span>: <span class="string"><span class="content">classpath:ssl/client.p12 </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+          <span class="key">password</span>: <span class="string"><span class="content">secret </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+          <span class="key">type</span>: <span class="string"><span class="content">PKCS12 </span></span><i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="key">insecureTrustAllCertificates</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="5"></i><b>(5)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Start the server on a random unused SSL port</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specify the location of the client keystore</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Change this value to the password you used when creating the client keystore</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Specify the keystore type as PKCS #12</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">7. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">8. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command, which starts the application on port 8443.</p>
+</div>
+<div class="sect2">
+<h3 id="testing-with-curl">8.1. Testing with cURL</h3>
+<div class="paragraph">
+<p>You can run some cURL requests to test the application. First, make a request without presenting a client certificate:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i --cacert cacert.pem https://localhost:8443/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should look similar to this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>HTTP/1.1 200 OK
+date: Thu, 28 Oct 2021 01:03:40 GMT
+Content-Type: text/plain
+content-length: 14
+connection: keep-alive
+
+Hello unknown!</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, make a request with a client certificate:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i --cert client.pem --key client.key \
+     --cacert cacert.pem https://localhost:8443/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should look similar to this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>HTTP/1.1 200 OK
+date: Thu, 28 Oct 2021 01:05:25 GMT
+Content-Type: text/plain
+content-length: 63
+connection: keep-alive
+
+Hello myusername (X.509 cert issued by CN=micronaut.guide.x509)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-with-a-web-browser">8.2. Testing with a Web Browser</h3>
+<div class="paragraph">
+<p>To make requests in a web browser, you must import the CA and the client certificate into the browser.</p>
+</div>
+<div class="sect3">
+<h4 id="import-certificates-into-firefox">8.2.1. Import Certificates Into Firefox</h4>
+<div class="paragraph">
+<p>To do this in Firefox, navigate to <code>about:preferences#privacy</code> and scroll down to the Certificates section, then click "View Certificates":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser1.png" alt="browser1">
+</div>
+</div>
+<div class="paragraph">
+<p>Go to the "Authorities" tab and click "Import&#8230;&#8203;":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser2.png" alt="browser2">
+</div>
+</div>
+<div class="paragraph">
+<p>Navigate to the <code>cacert.pem</code> CA certificate you created earlier and import it. Check the "Trust this CA to identify websites" checkbox and click OK:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser3.png" alt="browser3">
+</div>
+</div>
+<div class="paragraph">
+<p>The CA will appear as a "Software Security Device" under "micronaut.guide.x509":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser4.png" alt="browser4">
+</div>
+</div>
+<div class="paragraph">
+<p>Go to the "Your Certificates" tab and click "Import&#8230;&#8203;":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser5.png" alt="browser5">
+</div>
+</div>
+<div class="paragraph">
+<p>Navigate to the <code>client.p12</code> archive you created earlier and import it. The certificate will appear as a "Software Security Device" under "myusername":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser6.png" alt="browser6">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="import-certificates-into-chrome">8.2.2. Import Certificates Into Chrome</h4>
+<div class="paragraph">
+<p>To do this in Chrome, navigate to <code>chrome://settings/certificates</code> and go to the "Authorities" tab, then click "Import":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser7.png" alt="browser7">
+</div>
+</div>
+<div class="paragraph">
+<p>Navigate to the <code>cacert.pem</code> CA certificate you created earlier and import it. Check the "Trust this certificate for identifying websites" checkbox and click OK:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser8.png" alt="browser8">
+</div>
+</div>
+<div class="paragraph">
+<p>The CA will appear under "org-micronaut.guide.x509":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser9.png" alt="browser9">
+</div>
+</div>
+<div class="paragraph">
+<p>Go to the "Your certificates" tab and click "Import&#8230;&#8203;":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser10.png" alt="browser10">
+</div>
+</div>
+<div class="paragraph">
+<p>Navigate to the <code>client.p12</code> archive you created earlier and import it. The certificate will appear under "org-myusername":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser11.png" alt="browser11">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="make-a-secure-request">8.2.3. Make a secure request</h4>
+<div class="paragraph">
+<p>Navigate to <a href="https://localhost:8443" class="bare">https://localhost:8443</a> and choose the client certificate you imported earlier when prompted. The response should look like this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/x509/browser12.png" alt="browser12">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-image-with-graalvm">9. Generate a Micronaut Application Native Image with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native image of our Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling native images ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="native-image-generation">9.1. Native image generation</h3>
+<div class="paragraph">
+<p>The easiest way to install GraalVM on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 11</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 22.0.0.2.r11-grl</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you still use Java 8, use the JDK11 version of GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Java 17</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 22.0.0.2.r17-grl</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/22.0/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>After installing GraalVM, install the <code>native-image</code> component, which is not installed by default:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gu install native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate a native image using Gradle, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native image is created in <code>build/native/nativeCompile</code> directory and can be run with <code>build/native/nativeCompile/application</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native image or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">graalvmNative {
+    binaries {
+        main {
+            imageName.set(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">--verbose</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native image name will now be <code>mn-graalvm-application</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra arguments to build the native image</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Run the native image and repeat the cURL calls and browser request that you made earlier.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.micronaut.io/latest/guide/#https">Micronaut documentation on using HTTPS</a>.</p>
+</div>
+<div class="paragraph">
+<p>Also check out <a href="https://micronaut-projects.github.io/micronaut-acme/latest/guide/">Micronaut Acme</a>, a convenient way to configure and refresh SSL certificates using <a href="https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment">Automatic Certificate Management Environment (ACME)</a></p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
