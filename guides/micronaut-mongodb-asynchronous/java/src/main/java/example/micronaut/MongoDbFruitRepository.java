@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.micronaut.core.annotation.NonNull;
@@ -24,10 +23,10 @@ public class MongoDbFruitRepository implements FruitRepository {
     }
 
     @Override
-    public Mono<Boolean> save(@NonNull @NotNull @Valid Fruit fruit){
+    public Mono<Boolean> save(@NonNull @NotNull @Valid Fruit fruit) {
         return Mono.from(getCollection().insertOne(fruit)) // <4>
-                .map(insertOneResult -> Boolean.TRUE)
-                .onErrorReturn(Boolean.FALSE);
+                .map(insertOneResult -> true)
+                .onErrorReturn(false);
     }
 
     @Override
@@ -35,9 +34,9 @@ public class MongoDbFruitRepository implements FruitRepository {
     public Publisher<Fruit> list() {
         return getCollection().find(); // <4>
     }
-    
+
     @NonNull
-    private MongoCollection<Fruit> getCollection(){
+    private MongoCollection<Fruit> getCollection() {
         return mongoClient.getDatabase(mongoConf.getName())
                 .getCollection(mongoConf.getCollection(), Fruit.class);
     }

@@ -75,7 +75,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
         Category cat = Category.values().find {it.toString() == config.category }
         if (publish && !cat) {
-            throw new GradleException("$config.category does not exist in Category enum")
+            throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
         }
 
         new GuideMetadata(
@@ -122,7 +122,7 @@ class GuideProjectGenerator implements AutoCloseable {
             asciidocDir.mkdir()
         }
 
-        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName);
+        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
             File dir = new File(guidesDir, metadata.slug)
             try {
@@ -144,7 +144,19 @@ class GuideProjectGenerator implements AutoCloseable {
     void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
 
         String packageAndName = BASE_PACKAGE + '.' + APP_NAME
+
         JdkVersion javaVersion = Utils.parseJdkVersion()
+        if (metadata.minimumJavaVersion != null) {
+            JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
+            if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
+                javaVersion = minimumJavaVersion
+            }
+        }
+
+        if (metadata.maximumJavaVersion != null && javaVersion.majorVersion() > metadata.maximumJavaVersion) {
+            println "not generating project for $metadata.slug, JDK ${javaVersion.majorVersion()} > $metadata.maximumJavaVersion"
+            return
+        }
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
@@ -162,13 +174,6 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (testFramework == SPOCK) {
                     appFeatures.remove('mockito')
-                }
-
-                if (metadata.minimumJavaVersion != null) {
-                    JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
-                    if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
-                        javaVersion = minimumJavaVersion
-                    }
                 }
 
                 // typical guides use 'default' as name, multi-project guides have different modules
@@ -224,7 +229,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
         if (!Files.exists(sourcePath)) {
-            sourcePath.toFile().mkdir();
+            sourcePath.toFile().mkdir()
         }
         if (Files.exists(sourcePath)) {
             // copy source/resource files for the current language
@@ -320,7 +325,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.slug = metadata.slug
         merged.title = metadata.title ?: base.title
         merged.intro = metadata.intro ?: base.intro
-        merged.authors = mergeLists(base.authors, metadata.authors)
+        merged.authors = mergeLists(metadata.authors, base.authors) as Set<String>
         merged.tags = mergeLists(base.tags, metadata.tags)
         merged.category = metadata.category ?: base.category
         merged.publicationDate = metadata.publicationDate
@@ -361,7 +366,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged
     }
 
-    private static List mergeLists(List base, List others) {
+    private static List mergeLists(Collection base, Collection others) {
         List merged = []
         if (base) {
             merged.addAll base
