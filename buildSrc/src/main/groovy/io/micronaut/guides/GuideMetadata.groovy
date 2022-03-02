@@ -14,7 +14,7 @@ class GuideMetadata {
     String slug
     String title
     String intro
-    List<String> authors
+    Set<String> authors
     List<String> tags
     Category category
     LocalDate publicationDate

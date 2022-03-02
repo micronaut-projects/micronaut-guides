@@ -17,7 +17,6 @@ import io.micronaut.guides.feature.template.appengineGradleSettings;
 import io.micronaut.guides.feature.template.appengineGradle;
 import io.micronaut.guides.feature.template.appengineMaven;
 
-
 @Singleton
 public class GoogleAppEngine implements Feature {
     private final CoordinateResolver coordinateResolver;

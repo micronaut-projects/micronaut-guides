@@ -1,0 +1,67 @@
+name: Test adding-commit-info
+on:
+  push:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/adding-commit-info/**"]
+  pull_request:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/adding-commit-info/**"]
+jobs:
+  maven-test:
+    if: ${{ true }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["11","17"]
+        testproject: ["adding-commit-info-maven-java","adding-commit-info-maven-groovy","adding-commit-info-maven-kotlin"]
+    env:
+      JDK_VERSION:  ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew addingCommitInfoGenerateProjects
+      - name: Build with Maven
+        run: 'cd build/code/adding-commit-info/${{ matrix.testproject }};./mvnw test'
+  gradle-test:
+    if: ${{ true }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["11","17"]
+        testproject: ["adding-commit-info-gradle-java","adding-commit-info-gradle-groovy","adding-commit-info-gradle-kotlin"]
+    env:
+      JDK_VERSION: ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew addingCommitInfoGenerateProjects
+      - name: Build with Gradle
+        run: 'cd build/code/adding-commit-info/${{ matrix.testproject }};./gradlew test'

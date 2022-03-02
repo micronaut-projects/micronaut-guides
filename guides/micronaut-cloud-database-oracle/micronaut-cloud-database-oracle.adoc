@@ -1,0 +1,551 @@
+external:micronaut-cloud-database-base/start.adoc[]
+
+common:oracle-cloud-cli.adoc[]
+common:oracle-cloud-account-paid.adoc[]
+
+NOTE: Your Oracle Cloud account must be a paid account or trial with credits available because there isn't currently a free-tier option for MySQL.
+
+== Creating a MySQL DB System at Oracle Cloud
+
+We'll do the work of creating the database with the Oracle Cloud CLI. See the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql.html[MySQL CLI command reference] for more information.
+
+According to the documentation, there are six required parameters for the create command; compartment OCID, shape name, DB system configuration OCID, subnet OCID, admin username, and admin password. However, there are two more parameters that will be needed, the availability domain and the database initial size.
+
+=== Compartment OCID
+
+First, find the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/iam/compartment/list.html[OCID of the compartment] where the database will be created. Run this to list all the compartments in your root compartment:
+
+[source,bash]
+----
+oci iam compartment list
+----
+
+and find the compartment by the name or description in the JSON output. It should look like this:
+
+[source,json]
+----
+{
+  "compartment-id": "ocid1.tenancy.oc1..aaaaaaaaud4g4e5ovjaw...",
+  "defined-tags": {},
+  "description": "Micronaut guides",
+  "freeform-tags": {},
+  "id": "ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...",
+  "inactive-status": null,
+  "is-accessible": null,
+  "lifecycle-state": "ACTIVE",
+  "name": "micronaut-guides",
+  "time-created": "2021-05-02T23:54:28.392000+00:00"
+}
+----
+
+Use the OCID from the `id` property; the `compartment-id` property is the parent compartment.
+
+For convenience, save the compartment OCID as an environment variable. For Linux or Mac, run
+
+[source,bash]
+----
+export C=ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...
+----
+
+or for Windows, if using `cmd` run
+
+[source,bash]
+----
+set C=ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...
+----
+
+and if using PowerShell run
+
+[source,bash]
+----
+$C = "ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm..."
+----
+
+NOTE: In the examples below we use Linux/Mac syntax for environment variables, e.g. `-c $C`. If you use Windows `cmd`, change those to `-c %C%` (but no change needed if using PowerShell)
+
+=== DB Shape Name
+
+Find the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/shape/list.html[shape name] for the database. Run this to list the available shapes in your compartment:
+
+[source,bash]
+----
+oci mysql shape list -c $C
+----
+
+For this guide we'll use the smallest database size/shape (8 GB, 1 CPU) shape:
+
+[source,json]
+----
+{
+  "cpu-core-count": 1,
+  "is-supported-for": [
+    "DBSYSTEM"
+  ],
+  "memory-size-in-gbs": 8,
+  "name": "MySQL.VM.Standard.E3.1.8GB"
+}
+----
+
+=== DB System Configuration OCID
+
+Find the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/configuration/list.html[OCID of the configuration] for the database. Run this to list the available configurations  in your compartment:
+
+[source,bash]
+----
+oci mysql configuration list -c $C
+----
+
+Use the `id` of the smallest configuration:
+
+[source,json]
+----
+{
+  "compartment-id": null,
+  "defined-tags": null,
+  "description": "Default Standalone configuration for the MySQL.VM.Standard.E3.1.8GB MySQL Shape",
+  "display-name": "MySQL.VM.Standard.E3.1.8GB.Standalone",
+  "freeform-tags": null,
+  "id": "ocid1.mysqlconfiguration.oc1..aaaaaaaalwzc2a22xqm5...",
+  "lifecycle-state": "ACTIVE",
+  "shape-name": "MySQL.VM.Standard.E3.1.8GB",
+  "time-created": "2018-09-21T10:00:00+00:00",
+  "time-updated": null,
+  "type": "DEFAULT"
+},
+----
+
+=== Subnet OCID
+
+To find the subnet OCID, first find the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/network/vcn/list.html[OCID of the subnet's VCN]. Run this to list the available VCNs in your compartment:
+
+[source,bash]
+----
+oci network vcn list -c $C
+----
+
+Use the `id` of the VCN you want:
+
+[source,json]
+----
+{
+  "cidr-block": "10.0.0.0/16",
+  "cidr-blocks": [
+    "10.0.0.0/16"
+  ],
+  "compartment-id": "ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...",
+  "default-dhcp-options-id": "ocid1.dhcpoptions.oc1.iad.aaaaaaaahosh4fpep4jz...",
+  "default-route-table-id": "ocid1.routetable.oc1.iad.aaaaaaaaet7wmwm27vzc...",
+  "default-security-list-id": "ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...",
+  "defined-tags": {},
+  "display-name": "vcn-20210504-1214",
+  "dns-label": "vcn05041217",
+  "freeform-tags": {},
+  "id": "ocid1.vcn.oc1.iad.amaaaaaabnqp5kqam6cm...",
+  "ipv6-cidr-blocks": null,
+  "lifecycle-state": "AVAILABLE",
+  "time-created": "2021-05-04T16:17:08.461000+00:00",
+  "vcn-domain-name": "vcn05041217.oraclevcn.com"
+}
+----
+
+Then use the VCN OCID to find the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/network/subnet/list.html[OCID of the subnet]. Run this to list the subnets in your VCN:
+
+[source,bash]
+----
+oci network subnet list -c $C \
+    --vcn-id ocid1.vcn.oc1.iad.amaaaaaabnqp5kqam6cm...
+----
+
+Use the `id` of the subnet you want:
+
+[source,json]
+----
+{
+  ...
+  "cidr-block": "10.0.0.0/24",
+  "compartment-id": "ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...",
+  "display-name": "subnet-20210504-1214",
+  "id": "ocid1.subnet.oc1.iad.aaaaaaaaxgumfzpn6sul...",
+  "time-created": "2021-05-04T16:17:10.593000+00:00",
+  "vcn-id": "ocid1.vcn.oc1.iad.amaaaaaabnqp5kqam6cm...",
+  ...
+  "security-list-ids": [
+    "ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd..."
+  ],
+  ...
+}
+----
+
+Save the OCIDs of the security lists in the response - we'll need those in a later step.
+
+=== Availability Domain
+
+Find the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.17.0/oci_cli_docs/cmdref/iam/availability-domain/list.html[availabilty domain] where the database will be created. Run this to list the available domains in your compartment:
+
+[source,bash]
+----
+oci iam availability-domain list -c $C
+----
+
+Use the `name` of the subnet you want:
+
+[source,json]
+----
+{
+  "compartment-id": "ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...",
+  "id": "ocid1.availabilitydomain.oc1..aaaaaaaauvt2n7pijol7...",
+  "name": "nFuS:US-ASHBURN-AD-1"
+}
+----
+
+=== Create the Cloud Database
+
+The last required parameters are the admin username and password.
+
+The username must be 1-32 characters, and it cannot contain `'`, ```, `"`,  or any of the following reserved names: `ocirpl`, `ociadmin`, `administrator`, `mysql.sys`, `mysql.session`, or `mysql.infoschema`.
+
+The password must be 8-32 characters and contain at least one uppercase, one lowercase, one numeric, and one special character.
+
+Additionally, we'll specify the display name since the generated name will be something like `mysqldbsystem20220203163902`. Choose a name like "Micronaut_Guide_MySQL".
+
+Also specify the initial database size; it must be at least 50 GB.
+
+Run the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/db-system/create.html[create command] with your OCIDs and other parameters substituted:
+
+[source,bash]
+----
+oci mysql db-system create -c $C \
+    --shape-name MySQL.VM.Standard.E3.1.8GB \
+    --configuration-id ocid1.mysqlconfiguration.oc1..aaaaaaaalwzc2a22xqm5... \
+    --subnet-id ocid1.subnet.oc1.iad.aaaaaaaaxgumfzpn6sul... \
+    --admin-username <your username> \
+    --admin-password <your password> \
+    --availability-domain nFuS:US-ASHBURN-AD-1 \
+    --data-storage-size-in-gbs 50 \
+    --display-name Micronaut_Guide_MySQL
+----
+
+The response should look like this:
+
+[source,json]
+----
+{
+  "data": {
+    "analytics-cluster": null,
+    "availability-domain": "nFuS:US-ASHBURN-AD-1",
+    "backup-policy": {
+      "defined-tags": null,
+      "freeform-tags": null,
+      "is-enabled": true,
+      "retention-in-days": 7,
+      "window-start-time": "07:11"
+    },
+    "channels": [],
+    "compartment-id": "ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...",
+    "configuration-id": "ocid1.mysqlconfiguration.oc1..aaaaaaaalwzc2a22xqm5...",
+    "current-placement": {
+      "availability-domain": null,
+      "fault-domain": null
+    },
+    "data-storage-size-in-gbs": 50,
+    "defined-tags": {},
+    "description": null,
+    "display-name": "Micronaut_Guide_MySQL",
+    "endpoints": [],
+    "fault-domain": null,
+    "freeform-tags": {},
+    "heat-wave-cluster": null,
+    "hostname-label": null,
+    "id": "ocid1.mysqldbsystem.oc1.iad.aaaaaaaa2pq3a37hftut...",
+    "ip-address": null,
+    "is-analytics-cluster-attached": false,
+    "is-heat-wave-cluster-attached": false,
+    "is-highly-available": false,
+    "lifecycle-details": null,
+    "lifecycle-state": "CREATING",
+    "maintenance": {
+      "window-start-time": "WEDNESDAY 07:09"
+    },
+    "mysql-version": null,
+    "port": null,
+    "port-x": null,
+    "shape-name": "MySQL.VM.Standard.E3.1.8GB",
+    "source": null,
+    "subnet-id": "ocid1.subnet.oc1.iad.aaaaaaaaxgumfzpn6sul...",
+    "time-created": "2022-02-03T16:39:02.762000+00:00",
+    "time-updated": "2022-02-03T16:39:02.762000+00:00"
+  },
+  "etag": "0dea57803672c12742f7710f342bf...",
+  "opc-work-request-id": "ocid1.mysqlworkrequest.oc1.iad.eb66e373-7274-40a..."
+}
+----
+
+Note that the value for `lifecycle-state` is `CREATING`, so not all information (e.g. IP address) is available yet.
+
+Save the database OCID from the `id` property in the response.
+
+=== Retrieve Database Info
+
+It will take a few minutes for the database to finish provisioning. Wait a bit and run the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/db-system/get.html[get] command with the database OCID:
+
+[source,bash]
+----
+oci mysql db-system get \
+    --db-system-id ocid1.mysqldbsystem.oc1.iad.aaaaaaaa2pq3a37hftut...
+----
+
+Once the `lifecycle-state` is `ACTIVE` you can make note of the IP address and port (it should be the default value of 3306):
+
+[source,json]
+----
+"ip-address": "10.0.0.6",
+"lifecycle-state": "ACTIVE",
+"port": 3306,
+"port-x": 33060
+----
+
+=== Create Ingress Rule
+
+To allow our application to connect to the MySQL database, we need to https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/network/security-list/update.html[create an ingress rule] for port 3306 in the subnet.
+
+Use the OCID of the security list you'll be updating (that you saved earlier when finding the subnet OCID) to retrieve the current state:
+
+[source,bash]
+----
+oci network security-list get --security-list-id ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...
+----
+
+The output should look like this:
+
+[source,json]
+----
+...
+"id": "ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd...",
+"ingress-security-rules": [
+  {
+    "description": null,
+    "icmp-options": null,
+    "is-stateless": false,
+    "protocol": "6",
+    "source": "0.0.0.0/0",
+    "source-type": "CIDR_BLOCK",
+    "tcp-options": {
+      "destination-port-range": {
+        "max": 22,
+        "min": 22
+      },
+      "source-port-range": null
+    },
+    "udp-options": null
+  },
+  ...
+],
+"lifecycle-state": "AVAILABLE",
+...
+----
+
+The update command we'll run will replace the existing rules with the data specified in the command, so the command must include the existing rules and a new one for port 3306.
+
+Use a text editor to save the JSON list value of `ingress-security-rules` to a file, e.g. `ingress.json`.
+
+Add a new object to the JSON list for the ingress rule on port 3306:
+
+[source,json]
+----
+{
+  "description": "MySQL",
+  "isStateless": false,
+  "protocol": "6",
+  "source": "10.0.0.0/16",
+  "sourceType": "CIDR_BLOCK",
+  "tcpOptions": {
+    "destination-port-range": {
+      "max": 3306,
+      "min": 3306
+    }
+  }
+}
+----
+
+The final contents of `ingress.json` should look like this (it will have different rules, but will likely include one for SSH on port 22 and ICMP, plus the rule for port 8080 you added when creating the VM):
+
+[source,json]
+----
+[
+  {
+    "description": null,
+    "icmp-options": null,
+    "is-stateless": false,
+    "protocol": "6",
+    "source": "0.0.0.0/0",
+    "source-type": "CIDR_BLOCK",
+    "tcp-options": {
+      "destination-port-range": {
+        "max": 22,
+        "min": 22
+      },
+      "source-port-range": null
+    },
+    "udp-options": null
+  },
+  {
+    "description": null,
+    "icmp-options": {
+      "code": 4,
+      "type": 3
+    },
+    "is-stateless": false,
+    "protocol": "1",
+    "source": "0.0.0.0/0",
+    "source-type": "CIDR_BLOCK",
+    "tcp-options": null,
+    "udp-options": null
+  },
+
+  ...
+
+  {
+    "description": "MySQL",
+    "isStateless": false,
+    "protocol": "6",
+    "source": "10.0.0.0/16",
+    "sourceType": "CIDR_BLOCK",
+    "tcpOptions": {
+      "destination-port-range": {
+        "max": 3306,
+        "min": 3306
+      }
+    }
+  }
+]
+----
+
+Run this to add the new ingress rule:
+
+[source,bash]
+----
+oci network security-list update \
+    --security-list-id ocid1.securitylist.oc1.iad.aaaaaaaadlkscc7uktdd... \
+    --ingress-security-rules file://ingress.json
+----
+
+external:micronaut-cloud-database-base/create-app.adoc[]
+
+== Deploying the Application
+
+Use the guideLink:micronaut-oracle-cloud[Deploy a Micronaut application to Oracle Cloud] guide to create a compute instance and deploy the application to it; follow the steps in the "Create an Oracle Cloud Compute Instance" and "Deploy to Oracle Cloud" sections up to the step where you start the application. We need to connect the application to the MySQL database before starting it up.
+
+NOTE: When creating the compute VM at Oracle Cloud, use the same subnet as the one where you created the MySQL database, otherwise the application will not be able to access the database.
+
+== Configure MySQL
+
+Flyway will create the database tables the first time the application starts, but we must create the database and a database user first.
+
+There are no direct ways to externally https://docs.oracle.com/en-us/iaas/mysql-database/doc/connecting-db-system.html[connect to a MySQL database] in Oracle Cloud, so we'll do the work from the compute instance.
+
+=== MySQL client
+
+Install the MySQL client:
+
+[source,bash]
+----
+sudo yum install mysql
+----
+
+Connect to MySQL with the admin username and password you chose earlier and with the MySQL IP address:
+
+[source,bash]
+----
+mysql --host <MySQL_IPAddress> -u <admin_username> -p
+----
+
+=== Create a database and user
+
+Create the database (use any valid database name, e.g. `micronaut`):
+
+[source,mysql]
+----
+mysql> CREATE DATABASE micronaut;
+----
+
+Create a database user (use any valid MySQL username, e.g. `guide_user`, and a valid password):
+
+[source,mysql]
+----
+mysql> CREATE USER 'guide_user'@'<compute instance private IP address>' IDENTIFIED BY <user password>;
+----
+
+Grant access to the database for the new user:
+
+[source,mysql]
+----
+mysql> GRANT ALL ON micronaut.* TO 'guide_user'@'<compute instance private IP address>';
+----
+
+Exit the MySQL console:
+
+[source,mysql]
+----
+mysql> exit
+----
+
+== Running the Application
+
+With almost everything in place, we can start the application and try it out. First we need to set environment variables to configure the application datasource, then we can start the app.
+
+Create environment variables for `JDBC_URL`, `JDBC_USER`, `JDBC_PASSWORD` which will be used in the Micronaut app's `application.yml` datasource:
+
+[source,bash]
+----
+export JDBC_URL=jdbc:mysql://<MySQL IP address>:3306/micronaut
+export JDBC_USER=guide_user
+export JDBC_PASSWORD=<user password>
+----
+
+Start the application:
+
+[source,bash]
+----
+java -jar application.jar
+----
+
+You can test the application in a web browser, or with cURL.
+
+Run this with the public IP address of your VM to create a new `Genre`:
+
+[source, bash]
+----
+curl -X "POST" "http://<public IP address>:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+and run this to list the genres:
+
+[source, bash]
+----
+curl <public IP address>:8080/genres/list
+----
+
+== Next steps
+
+When you are finished using the database you can https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/mysql/db-system/delete.html[delete it using the CLI]. Run
+
+[source,bash]
+----
+oci mysql db-system delete \
+    --db-system-id ocid1.mysqldbsystem.oc1.iad.aaaaaaaa2pq3a37hftut...
+----
+
+The output should look like this:
+
+[source,json]
+----
+{
+"opc-work-request-id": "ocid1.mysqlworkrequest.oc1.iad.e68d5dc7-92be-45..."
+}
+----
+
+external:micronaut-cloud-database-base/end.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud Support].

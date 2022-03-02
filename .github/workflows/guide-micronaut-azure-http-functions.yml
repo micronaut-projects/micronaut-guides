@@ -1,0 +1,67 @@
+name: Test micronaut-azure-http-functions
+on:
+  push:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/micronaut-azure-http-functions/**"]
+  pull_request:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+    paths: ["version.txt","guides/micronaut-azure-http-functions/**"]
+jobs:
+  maven-test:
+    if: ${{ true }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8","11"]
+        testproject: ["micronaut-azure-http-functions-maven-java","micronaut-azure-http-functions-maven-groovy","micronaut-azure-http-functions-maven-kotlin"]
+    env:
+      JDK_VERSION:  ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew micronautAzureHttpFunctionsGenerateProjects
+      - name: Build with Maven
+        run: 'cd build/code/micronaut-azure-http-functions/${{ matrix.testproject }};./mvnw test'
+  gradle-test:
+    if: ${{ true }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["8","11"]
+        testproject: ["micronaut-azure-http-functions-gradle-java","micronaut-azure-http-functions-gradle-groovy","micronaut-azure-http-functions-gradle-kotlin"]
+    env:
+      JDK_VERSION: ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build Projects
+        run: ./gradlew micronautAzureHttpFunctionsGenerateProjects
+      - name: Build with Gradle
+        run: 'cd build/code/micronaut-azure-http-functions/${{ matrix.testproject }};./gradlew test'
