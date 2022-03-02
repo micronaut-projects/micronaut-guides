@@ -15,6 +15,8 @@ import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -34,6 +36,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 class GuideProjectGenerator implements AutoCloseable {
     public static final String DEFAULT_APP_NAME = 'default'
     private static final Pattern GROOVY_JAVA_OR_KOTLIN = ~/.*\.java|.*\.groovy|.*\.kt/
+    private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
     private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
@@ -57,7 +60,7 @@ class GuideProjectGenerator implements AutoCloseable {
         List<GuideMetadata> metadatas = []
 
         guidesDir.eachDir { dir ->
-            metadatas << parseGuideMetadata(dir, metadataConfigName)
+            parseGuideMetadata(dir, metadataConfigName).ifPresent(metadatas::add)
         }
 
         mergeMetadataList(metadatas)
@@ -66,23 +69,24 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    private static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    static Optional<GuideMetadata> parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
-            throw new GradleException("metadata file not found for " + dir.name)
+            LOG.warn('metadata file not found for {}', dir.name)
+            return Optional.empty()
         }
 
-        def config = new JsonSlurper().parse(configFile)
+        Map config = new JsonSlurper().parse(configFile) as Map
         boolean publish = config.publish == null ? true : config.publish
 
         Category cat = Category.values().find {it.toString() == config.category }
         if (publish && !cat) {
-            throw new GradleException("$config.category does not exist in Category enum")
+            throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
         }
 
-        new GuideMetadata(
-                asciidoctor: config.asciidoctor,
-                slug: config.slug,
+        Optional.ofNullable(new GuideMetadata(
+                asciidoctor: publish ? dir.name + '.adoc' : null,
+                slug: dir.name,
                 title: config.title,
                 intro: config.intro,
                 authors: config.authors,
@@ -111,7 +115,7 @@ class GuideProjectGenerator implements AutoCloseable {
                             properties: it.openAPIGeneratorConfig.properties ?: [:]
                         ) : null)
                 }
-        )
+        ))
     }
 
     @CompileDynamic
@@ -120,12 +124,16 @@ class GuideProjectGenerator implements AutoCloseable {
                   String metadataConfigName,
                   File projectDir) {
 
+        if (!output.exists()) {
+            assert output.mkdir()
+        }
+
         File asciidocDir = new File(projectDir, 'src/docs/asciidoc')
         if (!asciidocDir.exists()) {
             asciidocDir.mkdir()
         }
 
-        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName);
+        List<GuideMetadata> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName)
         for (GuideMetadata metadata : metadatas) {
             File dir = new File(guidesDir, metadata.slug)
             try {
@@ -150,7 +158,19 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         String packageAndName = BASE_PACKAGE + '.' + APP_NAME
+
         JdkVersion javaVersion = Utils.parseJdkVersion()
+        if (metadata.minimumJavaVersion != null) {
+            JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
+            if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
+                javaVersion = minimumJavaVersion
+            }
+        }
+
+        if (metadata.maximumJavaVersion != null && javaVersion.majorVersion() > metadata.maximumJavaVersion) {
+            println "not generating project for $metadata.slug, JDK ${javaVersion.majorVersion()} > $metadata.maximumJavaVersion"
+            return
+        }
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
@@ -168,13 +188,6 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (testFramework == SPOCK) {
                     appFeatures.remove('mockito')
-                }
-
-                if (metadata.minimumJavaVersion != null) {
-                    JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
-                    if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
-                        javaVersion = minimumJavaVersion
-                    }
                 }
 
                 // typical guides use 'default' as name, multi-project guides have different modules
@@ -234,6 +247,9 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
+        if (!Files.exists(sourcePath)) {
+            sourcePath.toFile().mkdir()
+        }
         if (Files.exists(sourcePath)) {
             // copy source/resource files for the current language
             Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
@@ -298,7 +314,7 @@ class GuideProjectGenerator implements AutoCloseable {
         JUNIT
     }
 
-    private static void mergeMetadataList(List<GuideMetadata> metadatas) {
+    static void mergeMetadataList(List<GuideMetadata> metadatas) {
         Map<String, GuideMetadata> metadatasByDirectory = new TreeMap<>()
         for (GuideMetadata metadata : metadatas) {
             metadatasByDirectory[metadata.slug] = metadata
@@ -328,18 +344,18 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.slug = metadata.slug
         merged.title = metadata.title ?: base.title
         merged.intro = metadata.intro ?: base.intro
-        merged.authors = mergeLists(base.authors, metadata.authors)
+        merged.authors = mergeLists(metadata.authors, base.authors) as Set<String>
         merged.tags = mergeLists(base.tags, metadata.tags)
-        merged.category = base.category ?: metadata.category
+        merged.category = metadata.category ?: base.category
         merged.publicationDate = metadata.publicationDate
         merged.publish = metadata.publish
-        merged.buildTools = base.buildTools ?: metadata.buildTools
-        merged.languages = base.languages ?: metadata.languages
-        merged.testFramework = base.testFramework ?: metadata.testFramework
+        merged.buildTools = metadata.buildTools ?: base.buildTools
+        merged.languages = metadata.languages ?: base.languages
+        merged.testFramework = metadata.testFramework ?: base.testFramework
         merged.skipGradleTests = base.skipGradleTests || metadata.skipGradleTests
         merged.skipMavenTests = base.skipMavenTests || metadata.skipMavenTests
-        merged.minimumJavaVersion = base.minimumJavaVersion ?: metadata.minimumJavaVersion
-        merged.maximumJavaVersion = base.maximumJavaVersion ?: metadata.maximumJavaVersion
+        merged.minimumJavaVersion = metadata.minimumJavaVersion ?: base.minimumJavaVersion
+        merged.maximumJavaVersion = metadata.maximumJavaVersion ?: base.maximumJavaVersion
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
         merged.apps = mergeApps(base, metadata)
 
@@ -347,17 +363,29 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     private static List<App> mergeApps(GuideMetadata base, GuideMetadata metadata) {
-        List<App> apps = new ArrayList<>(metadata.apps)
-        for (App app : apps) {
-            App baseAppMatchingName = base.apps.find { it.name == app.name }
-            if (baseAppMatchingName) {
-                app.features += baseAppMatchingName.features
-            }
+
+        Map<String, App> baseApps = base.apps.collectEntries { [(it.name): it] }
+        Map<String, App> guideApps = metadata.apps.collectEntries { [(it.name): it] }
+
+        Set<String> baseOnly = baseApps.keySet() - guideApps.keySet()
+        Set<String> guideOnly = guideApps.keySet() - baseApps.keySet()
+        Collection<String> inBoth = baseApps.keySet().intersect(guideApps.keySet())
+
+        List<App> merged = []
+        merged.addAll(baseOnly.collect { baseApps[it] })
+        merged.addAll(guideOnly.collect { guideApps[it] })
+
+        for (String name : inBoth) {
+            App baseApp = baseApps[name]
+            App guideApp = guideApps[name]
+            guideApp.features.addAll baseApp.features
+            merged << guideApp
         }
-        apps
+
+        merged
     }
 
-    private static List mergeLists(List base, List others) {
+    private static List mergeLists(Collection base, Collection others) {
         List merged = []
         if (base) {
             merged.addAll base

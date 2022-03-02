@@ -4,10 +4,8 @@ import example.micronaut.domain.Genre;
 import example.micronaut.genre.GenreSaveCommand;
 import example.micronaut.genre.GenreUpdateCommand;
 import io.micronaut.core.type.Argument;
-import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
@@ -15,17 +13,18 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.http.uri.UriTemplate;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import jakarta.inject.Inject;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static io.micronaut.http.HttpHeaders.LOCATION;
+import static io.micronaut.http.HttpStatus.CREATED;
+import static io.micronaut.http.HttpStatus.NO_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MicronautTest // <1>
@@ -33,47 +32,31 @@ public class GenreControllerTest {
 
     @Inject
     @Client("/")
-    public HttpClient httpClient; // <2>
-
-    BlockingHttpClient getClient() {
-        return httpClient.toBlocking();
-    }
+    HttpClient httpClient; // <2>
 
     @Test
     public void supplyAnInvalidOrderTriggersValidationFailure() {
-        assertThrows(HttpClientResponseException.class, () -> {
-            List<Genre> genres = getClient().retrieve(HttpRequest.GET("/genres/list?order=foo"), Argument.of(List.class, Genre.class));
-
-            assertNotNull(genres);
-            assertEquals(0, genres.size());
-        });
+        assertThrows(HttpClientResponseException.class, () ->
+                getClient().retrieve(
+                        HttpRequest.GET("/genres/list?order=foo"),
+                        Argument.of(List.class, Genre.class)));
     }
 
     @Test
     public void testFindNonExistingGenreReturns404() {
-        assertThrows(HttpClientResponseException.class, () -> {
-            Genre genre = getClient().retrieve(HttpRequest.GET("/genres/99"), Argument.of(Genre.class));
-
-            assertNull(genre);
-        });
-    }
-
-    private HttpResponse saveGenre(String genre) {
-        HttpRequest request = HttpRequest.POST("/genres", new GenreSaveCommand(genre)); // <3>
-        return getClient().exchange(request);
+        assertThrows(HttpClientResponseException.class, () ->
+                getClient().retrieve(HttpRequest.GET("/genres/99"), Argument.of(Genre.class)));
     }
 
     @Test
     public void testGenreCrudOperations() {
         List<Long> genreIds = new ArrayList<>();
-        HttpResponse response = saveGenre("DevOps");
-        System.out.println(response);
+        HttpResponse<?> response = saveGenre("DevOps");
         genreIds.add(entityId(response));
-        assertEquals(HttpStatus.CREATED, response.getStatus());
+        assertEquals(CREATED, response.getStatus());
 
         response = saveGenre("Microservices"); // <3>
-                System.out.println(response);
-        assertEquals(HttpStatus.CREATED, response.getStatus());
+        assertEquals(CREATED, response.getStatus());
 
         Long id = entityId(response);
         genreIds.add(id);
@@ -81,8 +64,7 @@ public class GenreControllerTest {
         assertEquals("Microservices", genre.getName());
 
         response = update(id, "Micro-services");
-                System.out.println(response);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
+        assertEquals(NO_CONTENT, response.getStatus());
 
         genre = show(id);
         assertEquals("Micro-services", genre.getName());
@@ -102,46 +84,55 @@ public class GenreControllerTest {
         assertEquals(0, genres.size());
 
         // cleanup:
-        for (Long genreId : genreIds) {
+        for (long genreId : genreIds) {
             response = delete(genreId);
-            assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
+            assertEquals(NO_CONTENT, response.getStatus());
         }
     }
 
     private List<Genre> listGenres(ListingArguments args) {
         URI uri = args.of(UriBuilder.of("/genres/list"));
-        HttpRequest request = HttpRequest.GET(uri);
+        HttpRequest<?> request = HttpRequest.GET(uri);
         return getClient().retrieve(request, Argument.of(List.class, Genre.class)); // <4>
     }
 
     private Genre show(Long id) {
         String uri = UriTemplate.of("/genres/{id}").expand(Collections.singletonMap("id", id));
-        HttpRequest request = HttpRequest.GET(uri);
+        HttpRequest<?> request = HttpRequest.GET(uri);
         return getClient().retrieve(request, Genre.class);
     }
 
-    private HttpResponse update(Long id, String name) {
-        HttpRequest request = HttpRequest.PUT("/genres", new GenreUpdateCommand(id, name));
+    private HttpResponse<?> update(Long id, String name) {
+        HttpRequest<?> request = HttpRequest.PUT("/genres", new GenreUpdateCommand(id, name));
         return getClient().exchange(request); // <5>
     }
 
-    private HttpResponse delete(Long id) {
-        HttpRequest request = HttpRequest.DELETE("/genres/" + id);
+    private HttpResponse<?> delete(Long id) {
+        HttpRequest<?> request = HttpRequest.DELETE("/genres/" + id);
         return getClient().exchange(request);
     }
 
-    protected Long entityId(HttpResponse response) {
-        String path = "/genres/";
-        String value = response.header(HttpHeaders.LOCATION);
-        System.out.println(value);
-
+    private Long entityId(HttpResponse<?> response) {
+        String value = response.header(LOCATION);
         if (value == null) {
             return null;
         }
+
+        String path = "/genres/";
         int index = value.indexOf(path);
         if (index != -1) {
             return Long.valueOf(value.substring(index + path.length()));
         }
+
         return null;
+    }
+
+    private BlockingHttpClient getClient() {
+        return httpClient.toBlocking();
+    }
+
+    private HttpResponse<?> saveGenre(String genre) {
+        HttpRequest<?> request = HttpRequest.POST("/genres", new GenreSaveCommand(genre)); // <3>
+        return getClient().exchange(request);
     }
 }

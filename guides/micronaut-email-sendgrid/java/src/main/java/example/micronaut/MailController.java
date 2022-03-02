@@ -3,10 +3,8 @@ package example.micronaut;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
 import io.micronaut.email.AsyncEmailSender;
-import io.micronaut.email.BodyType;
 import io.micronaut.email.Email;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
@@ -15,8 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
+import static io.micronaut.email.BodyType.HTML;
+
 @Controller("/mail") // <1>
 public class MailController {
+
     private static final Logger LOG = LoggerFactory.getLogger(MailController.class);
 
     private final AsyncEmailSender<Request, Response> emailSender;
@@ -30,13 +31,10 @@ public class MailController {
         return Mono.from(emailSender.sendAsync(Email.builder()
                         .to(to)
                         .subject("Sending email with Twilio Sendgrid is Fun")
-                        .body("and <em>easy</em> to do anywhere with <strong>Micronaut Email</strong>", BodyType.HTML)))
+                        .body("and <em>easy</em> to do anywhere with <strong>Micronaut Email</strong>", HTML)))
                 .doOnNext(rsp -> {
-                        if (LOG.isInfoEnabled()) {
-                            LOG.info("response status {}", rsp.getStatusCode());
-                            LOG.info("response body {}", rsp.getBody());
-                            LOG.info("response headers {}", rsp.getHeaders());
-                        }
+                    LOG.info("response status {}\nresponse body {}\nresponse headers {}",
+                            rsp.getStatusCode(), rsp.getBody(), rsp.getHeaders());
                 }).map(rsp -> rsp.getStatusCode() >= 400 ?
                         HttpResponse.unprocessableEntity() :
                         HttpResponse.accepted()); // <5>

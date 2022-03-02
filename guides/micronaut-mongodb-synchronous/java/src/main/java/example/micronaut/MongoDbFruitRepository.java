@@ -4,6 +4,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class MongoDbFruitRepository implements FruitRepository {
     }
 
     @Override
-    public void save(@NonNull @NotNull @Valid Fruit fruit){
+    public void save(@NonNull @NotNull @Valid Fruit fruit) {
         getCollection().insertOne(fruit);
     }
 
@@ -31,9 +32,9 @@ public class MongoDbFruitRepository implements FruitRepository {
     public List<Fruit> list() {
         return getCollection().find().into(new ArrayList<>());
     }
-    
+
     @NonNull
-    private MongoCollection<Fruit> getCollection(){
+    private MongoCollection<Fruit> getCollection() {
         return mongoClient.getDatabase(mongoConf.getName())
                 .getCollection(mongoConf.getCollection(), Fruit.class);
     }

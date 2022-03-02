@@ -22,10 +22,9 @@ public class Book {
 
     private Genre genre;
 
-    public Book() {
-    }
-
-    public Book(@NonNull @NotNull String isbn, @NonNull @NotNull String name, Genre genre) {
+    public Book(@NonNull @NotNull String isbn,
+                @NonNull @NotNull String name,
+                Genre genre) {
         this.isbn = isbn;
         this.name = name;
         this.genre = genre;
