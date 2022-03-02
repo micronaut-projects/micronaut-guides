@@ -23,7 +23,7 @@ common:install-openapi-generator.adoc[]
 We will generate a client for link:https://developer.twitter.com/en/docs/twitter-api[Twitter API].
 
 To do this, we will need to download the official Twitter API OpenAPI definition file: link:https://api.twitter.com/2/openapi.json[https://api.twitter.com/2/openapi.json].
-Download it as `twitter-api-definition.json` and move into the directory that you intend to use for the project.
+Save it as `twitter-api-definition.json` and move into the directory that you intend to use for this project.
 
 To generate the Micronaut client from the JSON definition, open the terminal in the directory where the definition file and
 the OpenAPI generator executable are located, and run:
@@ -44,7 +44,7 @@ java -jar openapi-generator-cli-5.4.0.jar generate \
 <3> Specify the output directory to be the current directory (`./`).
 You can specify it to be a different one if you want.
 <4> We provide generator-specific properties starting with `-p`.
-We want all the api files to be generated in the `example.twitter.api` package.
+We want all the API files to be generated in the `example.twitter.api` package.
 <5> We want all the models to be in the `example.twitter.model` package.
 In this package classes for data models, that are used for communication with server will be generated.
 <6> We want to use @build@ as build tool. The supported values are `gradle`, `maven` and `all`.
@@ -138,16 +138,18 @@ Do not forget to save your `API key` and `API secret` values somewhere.
 
 [NOTE]
 ====
-You can read about Twitter OAuth2 authentication in the link:https://developer.twitter.com/en/docs/authentication/oauth-2-0["Authorization" page of Twitter API documentation].
+You can read about Twitter OAuth2 authentication in the link:https://developer.twitter.com/en/docs/authentication/oauth-2-0["Authorization" page of the Twitter API documentation].
 The documentation specifies link:https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only[authentication with Bearer token]
 and link:https://developer.twitter.com/en/docs/authentication/oauth-2-0/bearer-tokens[using an API key].
 ====
 
 [NOTE]
 ====
-If you forgot to save your `API key` and `API secret`, open the settings for your application (inside project settings)
-on the Twitter Developer Portal, find the `Keys and tokens` tab, find the `API key and secret` section and click `Regenerate`
-to retrieve a new pair of keys.
+If you forgot to save your `API key` and `API secret`, you can get a new pair:
+* on the Twitter developer portal, open your project settings,
+* inside project settings, open application settings,
+* find the `Keys and tokens` tab,
+* inside the tab find the `API key and secret` section and click `Regenerate` to retrieve a new pair of keys.
 ====
 
 === Configure Authorization for Micronaut Client
@@ -161,6 +163,8 @@ to access the resources on behalf of itself and requires an `id` and a `secret` 
 <4> Specify the `client-id` and `client-secret` parameters. You could directly put your id and secret directly as values
 in the configuration, however this highly discouraged due to security concerns. We will point to environment variables
 instead.
+<5> Specify that this authorization should be used for all client requests (You would probably want to modify this value
+if you wanted to use multiple clients or reach paths that do not require authorization).
 
 Before running the application we will need to set the values of `client-id` and `client-secret` using environment
 variables. To do it, paste your `API key` and `API secret` into the following command and run in terminal:
@@ -170,11 +174,11 @@ export TWITTER_AUTH_CLIENT_ID=XXXXXXXXXXXXXXXXXXXXXXXXX
 export TWITTER_AUTH_CLIENT_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ----
 
-[NOTE]
+[WARN]
 Do not forget to add these lines before running any tests or application. If you are using an IDE, there probably should
 be an option to add environment variables in the run settings. View the documentation of your specific IDE for details.
 
-Now, the client should authenticate correctly, and we will be able to send requests.
+Now, the client should authorize correctly, and we will be able to send requests.
 
 == Testing the Client
 
@@ -184,7 +188,7 @@ each of the paths, and notice that the sections are also logically split into `T
 
 We will show how we can use the Twitter API by writing some simple tests using the generated Micronaut client.
 First, we will use the link:https://developer.twitter.com/en/docs/twitter-api/tweets/counts/introduction[recent tweet counts API]
-to get the number of tweets about Toronto in the last 7 days. Open the `TweetsApiTest` and paste the following:
+to get the number of tweets about Toronto in the last 7 days. Open the `TweetsApiTest` and rewrite the contents of the file with the following:
 
 test:../twitter/api/TweetsApiTest[tags=imports|class-begin|test-1|class-end]
 <1> Annotating the test with `@MicronautTest` will create a Micronaut context and allows using various Micronaut
@@ -193,9 +197,9 @@ features, like injection.
 <3> Use the `api` to send a request to an API path for counting tweets with a specific query.
 We will count tweets that mentioned `"Toronto"`.
 <4> We will verify that the data is present. Using manipulations with the generated data models we will calculate
-the total number of tweets and verify that there are at least 100 (which reasonably should be always true).
+the total number of tweets and verify that there are at least `100` (which reasonably should be always true).
 
-Now, we will test receiving the latest 10 tweets about New York City (NYC). We will use the
+Now, we will test receiving the latest `10` tweets about New York City (NYC). We will use the
 link:https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/quick-start[recent tweets lookup API].
 To test the data models, we will get multiple properties of the tweet, and also properties of the user
 who posted it. We will add the following test to the `TwetsApiTest` class:
@@ -212,12 +216,12 @@ You can read about expanding in the link:https://developer.twitter.com/en/docs/t
 Finally, we will test getting multiple pages using the same
 link:https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/quick-start[recent tweets lookup API]:
 test:../twitter/api/TweetsApiTest[tags=test-3]
-<1> Retrieve the first 10 tweets that match our query.
-<2> Retrieve the next 10 tweets that match the query using the `nextToken` parameter.
-<3> Verify that the no tweets on the 2 pages match.
+<1> Retrieve the first `10` tweets that match our query.
+<2> Retrieve the next `10` tweets that match the query using the `nextToken` parameter.
+<3> Verify that the no tweets on the two pages match.
 
 We will now proceed to use the API in a simple application. However, you would probably want to also implement
-tests for all other paths of the API, that you were planning to use in your application.
+tests for all other paths of the API, if you were planning to use them in your application.
 
 common:testApp-noheader.adoc[]
 
@@ -225,7 +229,7 @@ All the tests should run successfully.
 
 == Using Client in a Controller
 
-We will now write a controller, that will search for most-frequent words in the latest tweets on
+We will now write a controller, that will search for most frequent words in the latest tweets on
 a given topic.
 
 === Creating an Introspected Class
@@ -234,21 +238,23 @@ We will first define an object to represent the response. Create a file for `Wor
 itself, and the number it occurred as properties:
 source:model/WordFrequency[]
 <1> Annotate the model with the `@Introspected` annotation. This will allow Micronaut to use many features, like
-automatically convert it to JSON in response.
-<2> Define the 2 required properties and create getters for them.
+automatically converting instances to JSON in response.
+<2> Define the two required properties and create getters for them.
 
 === Implementing the Controller
 
 We will create the API of the controller. It will use the generated `TweetApi` client, and the `WordFrequency`
 class, which we just created.
-source:controller/TwitterFrequentWordsController[tags=imporst|class-start|api|class-end]
+Create a file for `TwitterFrequentWordsController` class and paste the following:
+
+source:controller/TwitterFrequentWordsController[tags=imports|class-begin|api|class-end]
 <1> Use the Micronaut link:https://docs.micronaut.io/latest/guide/#httpServer[Controller] annotation
 to define a controller. The controller will automatically start when Micronaut application is run. Set the controller
 to listen for requests on the `/twitter-frequent-words` path.
 <2> Use Micronaut's link:https://docs.micronaut.io/latest/guide/#ioc[constructor injection] to inject an implementation
 of the `TweetApi`.
 <3> Define a get method on the path.
-<4> Specify that the method requires 2 parameters: a query to search the tweets by, and the number of most frequent words to
+<4> Specify that the method requires two parameters: a query to search the tweets by, and the number of most frequent words to
 return.
 <5> Make a request to the tweeter api and process the data using a function that we will implement next. Note that
 no blocking operations should be performed in the method, therefore we manipulate the reactor's link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html[Flux]
@@ -291,7 +297,7 @@ curl -i 'localhost:8080/twitter-frequent-words?words-n=20&search-query=Ukraine'
 ]
 ----
 
-* The results of search for `10` most common words in tweets containing substring `"farm"` also seem to be reasonable:
+* The results of search for `10` most common words in tweets containing the substring `"farm"` also seem to be reasonable:
 +
 [source,bash]
 ----
@@ -309,8 +315,8 @@ curl -i 'localhost:8081/twitter-frequent-words?words-n=10&search-query=farm'
 ]
 ----
 
-It is also highly recommended, that you implement tests for all the controllers you write, but we will skip it in
-this guide.
+It is also highly recommended, that you implement tests for all the controllers you write, but we will skip writing
+tests for our controller in this guide.
 
 common:graal-with-plugins.adoc[]
 
@@ -318,9 +324,9 @@ common:graal-with-plugins.adoc[]
 
 === Learn How to Write OpenAPI Definition and Generate Server Based on It
 Read the link:https://guides.micronaut.io/latest/micronaut-openapi-generator-server.html["Use OpenAPI Definition to Generate a Micronaut Server" Guide]
-to learn:
+to learn how to:
 
-* how you can understand OpenAPI definition files and write your own definition files,
+* understand OpenAPI definition files and write your own definition files,
 * generate server API based on the definitions,
 * implement the functionality of the server based on the API and write comprehensive tests utilizing
 Micronaut`s features.
@@ -330,7 +336,3 @@ Micronaut`s features.
 To learn more about Micronaut framework and its features visit
 link:https://micronaut.io/docs/[Micronaut documentation] or read one of the several
 link:https://micronaut.io/guides/[Micronaut guides].
-
-
-
-

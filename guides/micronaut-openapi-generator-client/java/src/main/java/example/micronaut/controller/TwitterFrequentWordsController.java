@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 // tag::class-begin[]
 @Controller("/twitter-frequent-words") // <1>
 public class TwitterFrequentWordsController {
-    // end::class-begin[]
+// end::class-begin[]
 
     // tag::api[]
     public static int TWEETS_NUMBER = 50;
