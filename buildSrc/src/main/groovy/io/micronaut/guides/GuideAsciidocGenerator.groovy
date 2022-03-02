@@ -13,6 +13,7 @@ import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
 
+import java.nio.file.Paths
 import java.util.Map.Entry
 import java.util.regex.Pattern
 
@@ -352,9 +353,10 @@ class GuideAsciidocGenerator {
         List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
 
         String sourcePath = testFramework ? testPath(appName, name, testFramework) : mainPath(appName, name)
+        String normalizedSourcePath = (Paths.get(sourcePath)).normalize().toString();
         List<String> lines = [
             '[source,@lang@]',
-            '.' + sourcePath,
+            '.' + normalizedSourcePath,
             '----',
         ]
         if (tags) {
