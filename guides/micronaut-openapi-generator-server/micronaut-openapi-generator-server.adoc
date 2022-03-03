@@ -1,0 +1,601 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide we will write an https://www.openapis.org[OpenAPI] definition file and then use it to generate a Java Micronaut server API with https://openapi-generator.tech[OpenAPI Generator].
+
+____
+OpenAPI Generator allows generation of API client libraries (SDK generation), server stubs, documentation and configuration automatically given an OpenAPI Spec (both 2.0 and 3.0 are supported).
+____
+
+Then we will add internal logic to the API and test our implementation.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Installing OpenAPI Generator
+
+To use OpenAPI Generator we need to https://github.com/OpenAPITools/openapi-generator#1---installation[install OpenAPI Generator CLI].
+
+We will use the jar option. https://github.com/OpenAPITools/openapi-generator#13---download-jar[Download it] and store it in the directory that you want to use for this project.
+
+Next, open terminal in the same directory. To verify that generator works correctly run the `help` command:
+[source,bash]
+----
+java -jar openapi-generator-cli-5.4.0.jar help
+----
+
+It should provide a description and a list of commands.
+
+[NOTE]
+===============================
+All the options for installation are given at the https://openapi-generator.tech/docs/installation["CLI Installation" guide on the OpenAPI Generator website].
+
+In particular:
+
+* run `brew install openapi-generator` for Homebrew installation,
+* or read the link:https://openapi-generator.tech/docs/installation/#bash-launcher-script["Bash Launcher Script" section]
+to set up a bash script with automatic updates
+
+If you installed the generator with a package manager or bash launcher script, simply run
+[source,bash]
+----
+openapi-generator-cli help
+----
+===============================
+
+NOTE: You can also use the https://openapi-generator.tech/docs/online[OpenAPI Generator Online Service] but its usage
+is not covered by this guide.
+
+
+== Creating the API definition file
+
+We will now create a definition file, that will describe our server API, including the available paths and operations on them.
+
+//NOTE: You can get the complete version of the config file
+//that we are about to create here:
+//link:{sourceDir}@sourceDir@/library-definition.yaml[library-definition.yaml].
+//However, we do recommend you to look through each of its sections for better understanding.
+
+OpenAPI generator supports `.yaml` and `.json` file formats for the definition file.
+We will use YAML due its simplicity and human readability.
+
+In the directory where you downloaded the OpenAPI generator CLI, create a file named `library-definition.yaml` and open it in your
+favourite text editor.
+
+=== General server info
+
+Paste the following text to the file:
+
+resource:library-definition.yaml[tag=info]
+
+<1> The version that will be used for parsing.
+<2> The info object contains general information about the API.
+<3> Tags will be used to logically structure different paths.
+
+NOTE: If you are new to OpenAPI, you might be interested in reading the
+link:https://swagger.io/docs/specification/about/[OpenAPI guide] or the
+link:https://swagger.io/specification/[OpenAPI 3.0.0 specification] after you finish this guide.
+
+=== Paths and operations definition
+
+We will proceed by defining a path that will be available in our API. Paste the following to our file:
+
+resource:library-definition.yaml[tags=paths|search]
+
+<1> We define the `GET` operation on the `/search` path.
+<2> We use the `books` tag that we previously defined. Note that for each tag a controller will be generated
+that will implement its operations.
+<3> The `search` operation id will be used as method name for the given path.
+<4> We define two parameters of type string that user should supply in query.
+<5> Validation can be used on parameters. In this case book name must contain at least three characters.
+<6> The `responses` object describes the response codes that can be produced.
+It also defines the structure of body if any.
+<7> In case of correct request we define the body to contain a list of `BookInfo` objects. The schema for the book info
+object will be defined later in `components/schemas` section of definition.
+<8> The `"400"` status code will be produced by Micronaut in case of bad request, like an incorrect type supplied or
+failed validation. Even though Micronaut handles it automatically and no implementation is needed on our side, we add it
+for a complete API specification.
+
+NOTE: You can read more about parameter descriptions in the
+link:https://swagger.io/docs/specification/describing-parameters/["Describing Parameters" OpenAPI guide].
+All the available types and their validations are described in
+link:https://swagger.io/docs/specification/data-models/data-types/["Data Models (Schemas)" OpenAPI guide].
+
+We will define another path with a `POST` operation:
+
+resource:library-definition.yaml[tag=add]
+
+<1> We define the `POST` method for the `/add` path, and add the same tag `books` to it.
+<2> We specify that a body is required and what are the supported content-types for it.
+(in this case only `application/json`, but multiple can be allowed).
+<3> We write that `BookInfo` object is required to be in the request body.
+We reference the same `BookInfo` schema that we will define next.
+
+NOTE: To read more about body definitions, see the
+link:https://swagger.io/docs/specification/describing-request-body/["Describing Request Body" OpenAPI guide].
+
+=== Schemas
+
+We will add schemas to the definition file:
+
+resource:library-definition.yaml[tag=components]
+
+<1> We define the `BookInfo` schema inside then `components/schemas` section.
+From this schema a Java class will be generated with the same `BookInfo` class name.
+<2> We define all the properties of `BookInfo`, including required validation on them. An abbreviated form is used
+for some YAML lists and dictionaries to reduce the number of rows and simplify readability.
+<3> We reference another schema to be used as a property.
+<4> We define `BookAvailability` schema to be an enum with three available values.
+A Java `BookAvailability` class will be generated with given enum values based on our definition.
+
+NOTE: You can read more about writing schemas in the
+link:https://swagger.io/docs/specification/data-models/["Data Models (Schemas)" OpenAPI guide].
+
+Save the file and proceed to the next part of the guide.
+//Altogether it should look like this: link:@sourceDir@/library-definition.yaml[library-definition.yaml].
+
+== Generating server API from template
+
+Now we will generate server API files from our definition.
+Open the terminal in the same directory as `library-definition.yaml` file and run the following command:
+
+[source,bash]
+----
+java -jar openapi-generator-cli-5.4.0.jar generate \
+    -g java-micronaut-server \# <1>
+    -i library-definition.yaml \# <2>
+    -o ./ \# <3>
+    -p controllerPackage=example.micronaut.controller \# <4>
+    -p modelPackage=example.micronaut.model \# <5>
+    -p build=@build@ \# <6>
+    -p test=junit# <7>
+----
+<1> Specify that we will use Java Micronaut server generator.
+<2> Specify our OpenAPI definition file as `library-definition.yaml` which we just created.
+<3> Specify the output directory to be the current directory (`./`).
+You can specify it to be a different one if you want (e.g. `library-server`).
+<4> We provide generator-specific properties starting with `-p`.
+We want all the controllers to be generated in the `example.micronaut.controller` package.
+<5> We want all the models (data models, like `BookInfo`) to be in `example.micronaut.model` package.
+<6> We want to use @build@ as build tool. The supported values are `gradle`, `maven` and `all`.
+If nothing is specified, both Maven and Gradle files are generated.
+<7> We want to use JUnit 5 for testing. The supported values are `junit` (JUnit 5) and `spock`.
+If nothing is specified, `junit` is used by default.
+
+//[WARNING]
+//=========
+//If you are using Windows command prompt, run:
+//=========
+//[source,bash]
+//----
+//java -jar openapi-generator-cli-5.4.0.jar generate -g java-micronaut-server -i library-definition.yaml -o ./ -p controllerPackage=example.micronaut.controller -p modelPackage=example.micronaut.model -p build=@build@ -p test=junit
+//----
+
+[NOTE]
+=========
+If you want to view all the available parameters for micronaut server generator, run
+[source,bash]
+----
+java -jar openapi-generator-cli-5.4.0.jar config-help \
+    -g java-micronaut-server
+----
+=========
+
+[NOTE]
+=========
+If you plan to change the definition file and regenerate files, consider setting the `-p generateControllerAsAbstract=true`
+parameter (we don't recommend doing it during this guide, though). In this case an abstract class will be generated
+for the API, while all the logic needs to be implemented in a different class (that extends the API abstract class).
+This way your changes won't be overwritten by generation, but the API will be updated.
+=========
+
+After running, the OpenAPI generator CLI will output information about generated files.
+Now you can open the directory in your favorite IDE or text editor.
+
+You should see the following directory structure:
+
+[source,text]
+----
+./
+├── docs
+│   └── ... # <1>
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── example/micronaut/
+│   │   │       ├── Application.java # <2>
+│   │   │       ├── controller
+│   │   │       │   └── BooksController.java # <3>
+│   │   │       └── model
+│   │   │           ├── BookAvailability.java # <4>
+│   │   │           └── BookInfo.java
+│   │   └── resources/
+│   │       ├── application.yml # <5>
+│   │       └── logback.xml
+│   └── test/
+│       └── java/
+│           └── example/micronaut/ # <6>
+│               ├── controller
+│               │   └── BooksControllerTest.java
+│               └── model
+│                   ├── BookAvailabilityTest.java
+│                   └── BookInfoTest.java
+├── README.md
+└── ...
+----
+<1> The `docs/` directory contains automatically generated Markdown files with documentation about your API.
+<2> Starts the Micronaut server with detected controllers.
+<3> The `BooksController` is generated based on paths with `books` tag. It is generated in the package we specified
+for controllers earlier.
+<4> Two files are generated in the `models/` directory based on schemas we provided in the definition.
+<5> Config file for Micronaut is generated with a default value for server port and other parameters.
+<6> Tests are generated for all the controllers and models.
+
+== Writing the Controller Logic
+
+If you look inside the generated `BookInfo.java` file, you can see the class that was generated with all the parameters
+based on our definition. Notice that the constructor signature has two parameters, which were defined as `required` in the
+YAML definition file:
+
+[source,java]
+----
+    public BookInfo(String name, BookAvailability availability);
+----
+
+Along with that it has getters and setters for parameters and Jackson serialization annotations.
+
+=== Writing a Service
+
+To add the required functionality to the server we will first create a service to manage books in our library.
+Create `BookService` with the following implementation:
+
+source:BookService[]
+callout:singleton[1]
+
+=== Implementing Controller Methods
+
+Now open `BooksController`. The class should have two methods named the same
+as the operations we created in the definition file. The methods have Micronaut framework annotations describing the
+required API. We will now write their bodies.
+
+First, inject `BookService`:
+source:controller/BooksController[tag=import]
+source:controller/BooksController[tag=inject,indent=0]
+callout:constructor-di[number=1,arg0=BookService]
+
+Next, we will add an implementation of the `search` method:
+
+source:controller/BooksController[tag=search,indent=0]
+<1> Return a Reactor publisher, that will return the result of search method.
+
+And finally, we will implement the `addBook` method:
+source:controller/BooksController[tag=addBook,indent=0]
+<1> Call the function and return an empty string to create a response with an empty body.
+
+
+common:runapp.adoc[]
+
+You can send a few requests to the paths to test the application. We will use cURL for that.
+
+* The search for book names, that have `"Guide"` as substring should return 2 `BookInfo` objects:
++
+[source,bash]
+----
+curl "localhost:8080/search?book-name=Guide"
+----
++
+[source,bash]
+----
+[{"name":"The Hitchhiker's Guide to the Galaxy","availability":"reserved","author":"Douglas Adams"},
+{"name":"Java Guide for Beginners","availability":"available"}]
+----
+
+* The search for a substring `"Gu"` in name will return a `"Bad Request"` error, since we have defined the `book-name` parameter to
+have at least three characters:
++
+[source,bash]
+----
+curl -i "localhost:8080/search?book-name=Gu"
+----
++
+[source,bash]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+date: ****
+content-length: 180
+connection: keep-alive
+
+{"message":"Bad Request","_embedded":{"errors":[{"message":"bookName: size must be between 3 and 2147483647"}]},
+"_links":{"self":{"href":"/search?book-name=Gu","templated":false}}}
+----
+
+* Addition of a new book should not result in errors:
++
+[source,bash]
+----
+curl -i -d '{"name": "My book", "availability": "available"}' \
+  -H 'Content-Type: application/json' -X POST localhost:8080/add
+----
++
+[source,bash]
+----
+HTTP/1.1 200 OK
+date: Tue, 1 Feb 2022 00:01:57 GMT
+Content-Type: application/json
+content-length: 0
+connection: keep-alive
+----
+You can then verify that the addition was successful by performing another search.
+
+== Testing the Application
+
+=== Testing Models
+
+As we have noticed previously, some files were generated as templates for tests.
+We will implement tests for models inside these files. Their main purpose will be to verify that we correctly described
+our API in the YAML file, and therefore the generated files behave as expected.
+
+We will begin by writing tests for the required properties of `BookInfo` object.
+Define the following imports:
+test:model/BookInfoTest[tag=imports]
+
+Add the following methods inside the `BookInfoTest` class:
+test:model/BookInfoTest[tag=requiredProperties]
+<1> Instruct Micronaut to inject an instance of the link:https://docs.micronaut.io/latest/guide/#beanValidation[Validator].
+`Validator` will automatically validate parameters and response bodies annotated with `@Valid` in the controller.
+We will use it test the validations manually.
+<2> Verify that the validator doesn't produce any violations on a correct `BookInfo` instance.
+<3> Verify that `null` value is not allowed for the `name` property, since the property is marked as required.
+<4> Perform the same tests for the required `availability` property.
+
+We will then write similar test for other properties:
+test:model/BookInfoTest[tag=otherProperties]
+<1> Verify that there are no violations for both `null` or `"Lewis Carol"` used as a value for the `author` property.
+<2> Verify that there is a violation in case the name is too short (at least tree characters are required).
+<3> Verify that there are no violations for valid values of the `ISBN` property.
+<4> Verify that there is a violation in case the value doesn't match the required pattern (A space is present).
+
+Finally, we will test JSON serialization and parsing by writing a simple controller and client:
+test:model/BookInfoTest[tags=annotations|jsonSerialization]
+<1> Create a simple controller that will respond to requests on the `/bookinfo` path.
+<2> Specify the `spec.name` property for this test class.
+<3> Use the link:https://docs.micronaut.io/latest/guide/#metaScopes[Requires] annotation to specify that
+this controller will only be used if the `spec.name` property is set to `BookInfoTest`. This will prevent the controller
+from running during other tests.
+<4> Define a `GET` method that will return a `BookInfo` object in the `application/json` format.
+<5> Create a test that will send a request to the server and verify that the response matches the desired object
+(This means that both serialization and parsing work correctly).
+
+Similarly, we can implement tests for the `BookAvailability` class. The details are not shown in this guide.
+
+// Implement the test for `BookAvailability` enum:
+//
+//test:model/BookAvailabilityTest[]
+//<1> Test parsing of value from `String`. This will also be used during JSON parsing.
+//<2> Test serialization to `String`.
+//<3> Create a controller that will be used to test `String` parsing and serialization of the `BookAvailability` object.
+//<4> Create a GET method for the path (`/bookavailability`). The method will take a `BookAvailability` object as parameter and
+//return it. The conversions from String and back will be based on the generated file for the model.
+//<5> Use the link:https://docs.micronaut.io/latest/guide/#metaScopes[Requires] annotation to specify that
+//this controller will only be used if the `spec.name` property is set to `BookAvailabilityTest`.
+//<6> Set the `spec.name` property for this test. This will make the paths of our controller available for this test,
+//while not running it during other tests.
+//<7> Send a request to the controller that we just created. Then verify that the response matches the parameter.
+
+=== Testing the Controller
+
+We will write test for the two paths of `BookController`.
+If you open the `BooksControllerTest`, you can see that templates of tests were generated for both paths with examples
+of requests to corresponding paths. The templates can be used to simplify and speed up test writing.
+
+We will simply replace the contents of the file:
+test:controller/BooksControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-request[3]
+<4> Verify that addition of book info was successful by checking the status code.
+callout:binding-json-array[5]
+callout:body-method[6]
+<7> Verify that there are exactly two books with `"Guide"` substring in title.
+
+common:testApp-noheader.adoc[]
+
+All the tests should run successfully.
+
+common:graal-with-plugins.adoc[]
+
+== Next steps
+
+=== Add Security
+
+We could have defined our security requirements by adding a security schema to the `library-definition.yaml` file.
+For example, we will add HTTP Basic authentication:
+
+[source,yaml]
+----
+paths:
+  /search:
+    # ... #
+  /add:
+    post:
+      # ... #
+      security:
+        - MyBasicAuth: [] # <2>
+components:
+  schemas:
+    # ... #
+  securitySchemes:
+    MyBasicAuth: # <1>
+      type: http
+      scheme: basic
+----
+<1> Define a security schema inside the `components/securitySchemes`. We want to use Basic auth for authentication.
+<2> Add the schema to the paths that you want to secure. In this case we want to restrict access to
+adding books into our library.
+
+NOTE: You can read more about describing various authentication in the
+link:https://swagger.io/docs/specification/authentication/["Authentication and Authorization" OpenAPI guide].
+
+The generator will then annotate such endpoints with the
+link:https://micronaut-projects.github.io/micronaut-security/latest/guide/#secured[Secured] annotation accordingly:
+
+[source,java]
+----
+@Secured(SecurityRule.IS_AUTHENTICATED)
+public Mono<Object> addBook( /* ... */ ){ /* ... */ }
+----
+
+You will then need to implement an
+link:https://micronaut-projects.github.io/micronaut-security/latest/guide/#authenticationProviders[AuthenticationProvider]
+that satisfies your needs. If you want to finish implementing the basic authentication, continue to the
+link:https://guides.micronaut.io/latest/micronaut-security-basicauth.html[Micronaut Basic Auth guide] and replicate
+steps to create the `AuthenticationProvider` and appropriate tests.
+
+NOTE: You can also read link:https://micronaut-projects.github.io/micronaut-security/latest/guide/[Micronaut Security documentation]
+or link:https://micronaut.io/guides[Micronaut guides] about security to learn more about
+the supported Authorization strategies.
+
+=== Configure Database Schema Migration with Flyway
+
+Although storing data in class properties works in our example, using a database is more reliable and secure.
+For our application you can create a MySQL database with the following schema:
+[source,sql]
+----
+CREATE TABLE book (
+             id  BIGINT NOT NULL AUTO_INCREMENT UNIQUE PRIMARY KEY,
+           name  VARCHAR(255) NOT NULL,
+   availability  ENUM('available', 'reserved', 'not available') NOT NULL,
+         author  VARCHAR(255),
+           ISBN  CHAR(13)
+);
+----
+and populate it with sample data with:
+[source,sql]
+----
+INSERT INTO book
+    (name,                                    availability,  author,           ISBN)
+VALUES
+    ("Alice's Adventures in Wonderland",      "available",   "Lewis Caroll",   "9783161484100"),
+    ("The Hitchhiker's Guide to the Galaxy",  "reserved",    "Douglas Adams",  NULL),
+    ("Java Guide for Beginners",              "available",   NULL,             NULL);
+----
+
+Use migrations with link:https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway] to simplify
+database configuration. On start-up it will verify that the database configured according to the migration files and
+run corresponding statements if required.
+
+To start using Flyway, add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-flyway[groupId=io.micronaut.flyway]
+dependency:flyway-mysql[groupId=org.flywaydb,scope=runtimeOnly]
+
+:dependencies:
+
+Then, copy the above SQL queries into separate files inside `src/main/java/resources/db/migration`
+directory, and enable the `default` flyway datasource in configuration.
+
+To complete, read the link:https://guides.micronaut.io/latest/micronaut-flyway.html["Schema Migration with Flyway" guide]
+or  link:https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway documentation].
+
+=== Use Micronaut Data JDBC for Database Access
+
+To access a MySQL Database using Micronaut Data JDBC you will need to do the following:
+
+. Add required dependencies:
++
+--
+:dependencies:
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql]
+dependency:mysql[groupId=mysql-connector-java,scope=runtimeOnly]
+dependency:junit-jupiter[groupId=org.testcontainers,scope=test]
+dependency:mysql[groupId=org.testcontainers,scope=test]
+dependency:testcontainers[groupId=org.testcontainers,scope=test]
+:dependencies:
+--
+
+. Create a `Book` interface annotated with link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlMapping[@MappedEntity]
+similar to the `BookInfo` Object, that you will use to query the database. Add a property of type `Integer` for the ID of entity, and annotate it with
+link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlAnnotations[@Id].
+. Write a `Book` repository class extending from link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#repositories[CrudRepository<Book, Integer>].
+This will automatically generate (Create, Read, Update, Delete) operations for the repository. You can also redefine these
+functions if you desire a different signature. We will use a reactive return type:
++
+[source,java]
+----
+    @NonNull
+    Mono<Book> saveBook(@Valid @NonNull Book bookInfo);
+----
+. Use the link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#explicitQueries[@Query] annotation to
+write a custom query for the search path we have in our controller:
++
+[source,java]
+----
+    @NonNull
+    @Query(value="SELECT * FROM book WHERE (name LIKE CONCAT('%', :name, '%') OR :name IS NULL)" +
+            "AND (author LIKE CONCAT('%', :author, '%') OR :author IS NULL);", nativeQuery = true)
+    Flux<Book> find(@Nullable String name, @Nullable String author);
+----
+Micronaut will generate the implementation of these functions, which you can utilize by injecting the repository similarly
+to the `BookService` we previously used.
+. You will need to implement the controller to utilize the repository. Use methods of Reactor's `Flux` and `Mono`, like `map` to
+optimize the processing of data.
+. Configure the `url`, `user`, `password` and other properties required to establish a connection with your datasource.
+Refer to the link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcConfiguration["Configuration" section of Micronaut Data guide] for details.
+
+If you want to proceed with implementing Database connection with Micronaut Data JDBC, refer to the
+link:https://guides.micronaut.io/latest/micronaut-data-jdbc-repository.html["Access a Database with Micronaut JDBC" Guide].
+
+NOTE: You can read link:https://micronaut-projects.github.io/micronaut-data/latest/guide[Micronaut Data documentation]
+to learn more.
+
+=== Generate Micronaut Client
+
+You can generate a Micronaut client based on the same `library-definition.yaml` file.
+
+Run the following in terminal to create client in the `library-client` directory:
+
+[source,bash]
+----
+java -jar openapi-generator-cli-5.4.0.jar generate \
+    -g java-micronaut-client \
+    -i library-definition.yaml \
+    -o library-client \
+    -p apiPackage=example.micronaut.api \
+    -p modelPackage=example.micronaut.model \
+    -p build=@build@ \
+    -p test=junit
+----
+
+=== Learn Micronaut
+
+To learn more about Micronaut framework and its features visit
+link:https://micronaut.io/docs/[Micronaut documentation].
+
+=== Add Server URL Information
+
+If you have your server running, you can add your website URL to it in the YAML definition file:
+[source,yaml]
+----
+# ... #
+servers:
+  - url: 'http://my.website.com'
+----
+
+=== Generate User-Friendly Documentation
+
+You can generate documentation in html file inside the `html-docs/` directory by running
+[source,bash]
+----
+java -jar openapi-generator-cli-5.4.0.jar generate \
+    -g html2 \
+    -i library-definition.yaml \
+    -o html-docs
+----
