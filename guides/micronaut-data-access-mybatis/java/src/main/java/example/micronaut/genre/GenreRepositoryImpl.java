@@ -1,10 +1,10 @@
 package example.micronaut.genre;
 
-import io.micronaut.core.annotation.NonNull;
 import example.micronaut.ListingArguments;
 import example.micronaut.domain.Genre;
-
+import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -21,7 +21,7 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     @NonNull
-    public Optional<Genre> findById(@NonNull @NotNull Long id) {
+    public Optional<Genre> findById(long id) {
         return Optional.ofNullable(genreMapper.findById(id));
     }
 
@@ -34,32 +34,34 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
-    public void deleteById(@NonNull @NotNull Long id) {
+    public void deleteById(long id) {
         findById(id).ifPresent(genre -> genreMapper.deleteById(id));
     }
 
     @NonNull
     public List<Genre> findAll(@NonNull @NotNull ListingArguments args) {
 
-        if (args.getMax().isPresent() && args.getSort().isPresent() && args.getOffset().isPresent() && args.getSort().isPresent()) {
-            return genreMapper.findAllByOffsetAndMaxAndSortAndOrder(args.getOffset().get(),
+        if (args.getMax().isPresent() && args.getSort().isPresent() && args.getOffset().isPresent() && args.getOrder().isPresent()) {
+            return genreMapper.findAllByOffsetAndMaxAndSortAndOrder(
+                    args.getOffset().get(),
                     args.getMax().get(),
                     args.getSort().get(),
                     args.getOrder().get());
         }
+
         if (args.getMax().isPresent() && args.getOffset().isPresent() && (!args.getSort().isPresent() || !args.getOrder().isPresent())) {
-            return genreMapper.findAllByOffsetAndMax(args.getOffset().get(),
-                    args.getMax().get());
+            return genreMapper.findAllByOffsetAndMax(args.getOffset().get(), args.getMax().get());
         }
+
         if ((!args.getMax().isPresent() || !args.getOffset().isPresent()) && args.getSort().isPresent() && args.getOrder().isPresent()) {
-            return genreMapper.findAllBySortAndOrder(args.getSort().get(),
-                    args.getOrder().get());
+            return genreMapper.findAllBySortAndOrder(args.getSort().get(), args.getOrder().get());
         }
+
         return genreMapper.findAll();
     }
 
     @Override
-    public int update(@NonNull @NotNull Long id, @NonNull @NotBlank String name) {
+    public int update(long id, @NonNull @NotBlank String name) {
         genreMapper.update(id, name);
         return -1;
     }

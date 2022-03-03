@@ -9,14 +9,13 @@ import jakarta.inject.Singleton;
 @Replaces(AmazonSesEmailFeature.class)
 @Singleton
 public class AmazonSesFeature extends AmazonSesEmailFeature {
+
     public AmazonSesFeature(TemplateEmailFeature templateEmailFeature) {
         super(templateEmailFeature);
     }
-
 
     @Override
     public String getModule() {
         return "amazon-ses";
     }
-
 }

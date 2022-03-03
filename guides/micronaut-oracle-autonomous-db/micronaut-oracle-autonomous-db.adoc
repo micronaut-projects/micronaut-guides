@@ -39,17 +39,9 @@ On the "Autonomous Database Details" page click the "Copy" link in the `OCID` ro
 
 image::oracleautodb/autonomous.database.6.png[]
 
-Next, create a schema user. On the "Autonomous Database Details" page click the "Service Console" button:
+Next, create a schema user. On the "Autonomous Database Details" page click the "Database Actions" button:
 
 image::oracleautodb/autonomous.database.7.png[]
-
-Login with username "ADMIN" and the admin password you defined earlier:
-
-image::oracleautodb/autonomous.database.7b.png[]
-
-Click "Development" on the left, then click the "Database Actions" tab on the right:
-
-image::oracleautodb/autonomous.database.7c.png[]
 
 Login with username "ADMIN" and the admin password you defined earlier:
 
@@ -81,10 +73,8 @@ common:cli-or-launch.adoc[]
 [source,bash]
 ----
 mn create-app example.micronaut.micronautguide \
-    --features=data-jdbc,flyway,oracle-cloud-atp,testcontainers \
-    --build=@build@ \
-    --lang=@lang@
-    --jdk=11
+    --build=@build@ --lang=@lang@ --jdk=11 \
+    --features=data-jdbc,flyway,oracle-cloud-atp,testcontainers
 ----
 
 common:build-lang-arguments.adoc[]
@@ -125,7 +115,7 @@ Create a new Flyway migration SQL script in `src/main/resources/db/migration/V1_
 
 resource:db/migration/V1__create-schema.sql[]
 
-Edit `src/main/resources/logback.xml` and add the following to monitor the SQL queries that Micronaut Data performs:
+Edit `src/main/resources/logback.xml` and add the following (anywhere in the `<configuration>` element) to monitor the SQL queries that Micronaut Data performs:
 
 [source,xml]
 ----
@@ -341,7 +331,7 @@ Once the key has finished provisioning, click "Secrets" under "Resources", then 
 
 image::oracleautodb/vault7.png[]
 
-This first secret will be for the admin/wallet password, so choose a name like "ATP_ADMIN_PASSWORD". Select the encryption key you created, and put the admin password value in the "Secret Contents" field, then click "Create Secret":
+This first secret will be for the wallet password, so choose a name like "ATP_WALLET_PASSWORD". Select the encryption key you created, and put the wallet password value in the "Secret Contents" field, then click "Create Secret":
 
 image::oracleautodb/vault8.png[]
 
@@ -412,7 +402,7 @@ Delete the `oci.config.profile` property from `application-oraclecloud.yml`, and
 datasources:
   default:
     ocid: ocid1.autonomousdatabase.oc1.iad.anuwcl...
-    walletPassword: ${ATP_ADMIN_PASSWORD}
+    walletPassword: ${ATP_WALLET_PASSWORD}
     username: micronautdemo
     password: ${ATP_USER_PASSWORD}
 ----
