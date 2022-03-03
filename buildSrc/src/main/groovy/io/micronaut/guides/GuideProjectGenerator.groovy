@@ -152,7 +152,7 @@ class GuideProjectGenerator implements AutoCloseable {
         "${slug}-${guidesOption.buildTool}-${guidesOption.language}"
     }
 
-    private void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
+    void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
         if (!outputDir.exists()) {
             assert outputDir.mkdir()
         }
