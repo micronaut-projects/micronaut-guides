@@ -25,7 +25,9 @@ public class BooksControllerTest {
 
     @Test
     void addBookClientApiTest() {
-        BookInfo body = new BookInfo("My Book", BookAvailability.AVAILABLE);
+        BookInfo body = new BookInfo("Building Microservices", BookAvailability.AVAILABLE);
+        body.setAuthor("Sam Newman");
+        body.setISBN("9781492034025");
         HttpResponse<?> response = client.toBlocking()
                 .exchange(HttpRequest.POST("/add", body)); // <3>
         assertEquals(HttpStatus.OK, response.status()); // <4>

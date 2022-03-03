@@ -233,6 +233,40 @@ for controllers earlier.
 <5> Config file for Micronaut is generated with a default value for server port and other parameters.
 <6> Tests are generated for all the controllers and models.
 
+== Writing the app
+
+Next, create a persistence with Micronaut Data JDBC, Database schema generation with Flyway, and use it from the generated code.
+
+common:data-jdbc-mysql[]
+
+common:flyway.adoc[]
+
+resource:db/migration/V1__schema.sql[]
+
+=== MappedEntity
+
+Create an Entity:
+
+source:BookEntity[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+
+=== Writing a Service
+
+common:jdbc-repository-intro[]
+
+source:BookRepository[]
+
+callout:jdbcrepository[1]
+<2> `BookEntity`, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the `GenericRepository` interface.
+callout:jpa-specification-executor[3]
+callout:jpa-specification-findall[4]
+
+Create a class to encapsulate the `Predicate` creation.
+
+source:BookSpecifications[]
+
 == Writing the Controller Logic
 
 If you look inside the generated `BookInfo.java` file, you can see the class that was generated with all the parameters
@@ -246,33 +280,26 @@ YAML definition file:
 
 Along with that it has getters and setters for parameters and Jackson serialization annotations.
 
-=== Writing a Service
-
-To add the required functionality to the server we will first create a service to manage books in our library.
-Create `BookService` with the following implementation:
-
-source:BookService[]
-callout:singleton[1]
-
 === Implementing Controller Methods
 
 Now open `BooksController`. The class should have two methods named the same
 as the operations we created in the definition file. The methods have Micronaut framework annotations describing the
 required API. We will now write their bodies.
 
-First, inject `BookService`:
-source:controller/BooksController[tag=import]
+First, inject `BookRepository`:
 source:controller/BooksController[tag=inject,indent=0]
-callout:constructor-di[number=1,arg0=BookService]
+callout:constructor-di[number=1,arg0=BookRepository]
 
-Next, we will add an implementation of the `search` method:
+Next, replace the `search` method implementation:
 
 source:controller/BooksController[tag=search,indent=0]
-<1> Return a Reactor publisher, that will return the result of search method.
+callout:executes-on[1]
+<2> Criteria API allows you to build a query programmatically and at the runtime.
 
 And finally, we will implement the `addBook` method:
 source:controller/BooksController[tag=addBook,indent=0]
-<1> Call the function and return an empty string to create a response with an empty body.
+callout:executes-on[1]
+callout:at-status[2]
 
 
 common:runapp.adoc[]
@@ -332,6 +359,8 @@ You can then verify that the addition was successful by performing another searc
 
 == Testing the Application
 
+common:testcontainers-mysql.adoc[]
+
 === Testing Models
 
 As we have noticed previously, some files were generated as templates for tests.
@@ -371,27 +400,14 @@ from running during other tests.
 
 Similarly, we can implement tests for the `BookAvailability` class. The details are not shown in this guide.
 
-// Implement the test for `BookAvailability` enum:
-//
-//test:model/BookAvailabilityTest[]
-//<1> Test parsing of value from `String`. This will also be used during JSON parsing.
-//<2> Test serialization to `String`.
-//<3> Create a controller that will be used to test `String` parsing and serialization of the `BookAvailability` object.
-//<4> Create a GET method for the path (`/bookavailability`). The method will take a `BookAvailability` object as parameter and
-//return it. The conversions from String and back will be based on the generated file for the model.
-//<5> Use the link:https://docs.micronaut.io/latest/guide/#metaScopes[Requires] annotation to specify that
-//this controller will only be used if the `spec.name` property is set to `BookAvailabilityTest`.
-//<6> Set the `spec.name` property for this test. This will make the paths of our controller available for this test,
-//while not running it during other tests.
-//<7> Send a request to the controller that we just created. Then verify that the response matches the parameter.
-
 === Testing the Controller
 
 We will write test for the two paths of `BookController`.
-If you open the `BooksControllerTest`, you can see that templates of tests were generated for both paths with examples
-of requests to corresponding paths. The templates can be used to simplify and speed up test writing.
+
+If you open the `BooksControllerTest`, you can see that templates of tests were generated for both paths with examples of requests to corresponding paths. The templates can be used to simplify and speed up test writing.
 
 We will simply replace the contents of the file:
+
 test:controller/BooksControllerTest[]
 
 callout:micronaut-test[1]
@@ -459,103 +475,6 @@ NOTE: You can also read link:https://micronaut-projects.github.io/micronaut-secu
 or link:https://micronaut.io/guides[Micronaut guides] about security to learn more about
 the supported Authorization strategies.
 
-=== Configure Database Schema Migration with Flyway
-
-Although storing data in class properties works in our example, using a database is more reliable and secure.
-For our application you can create a MySQL database with the following schema:
-[source,sql]
-----
-CREATE TABLE book (
-             id  BIGINT NOT NULL AUTO_INCREMENT UNIQUE PRIMARY KEY,
-           name  VARCHAR(255) NOT NULL,
-   availability  ENUM('available', 'reserved', 'not available') NOT NULL,
-         author  VARCHAR(255),
-           ISBN  CHAR(13)
-);
-----
-and populate it with sample data with:
-[source,sql]
-----
-INSERT INTO book
-    (name,                                    availability,  author,           ISBN)
-VALUES
-    ("Alice's Adventures in Wonderland",      "available",   "Lewis Caroll",   "9783161484100"),
-    ("The Hitchhiker's Guide to the Galaxy",  "reserved",    "Douglas Adams",  NULL),
-    ("Java Guide for Beginners",              "available",   NULL,             NULL);
-----
-
-Use migrations with link:https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway] to simplify
-database configuration. On start-up it will verify that the database configured according to the migration files and
-run corresponding statements if required.
-
-To start using Flyway, add the following dependencies:
-
-:dependencies:
-
-dependency:micronaut-flyway[groupId=io.micronaut.flyway]
-dependency:flyway-mysql[groupId=org.flywaydb,scope=runtimeOnly]
-
-:dependencies:
-
-Then, copy the above SQL queries into separate files inside `src/main/java/resources/db/migration`
-directory, and enable the `default` flyway datasource in configuration.
-
-To complete, read the link:https://guides.micronaut.io/latest/micronaut-flyway.html["Schema Migration with Flyway" guide]
-or  link:https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway documentation].
-
-=== Use Micronaut Data JDBC for Database Access
-
-To access a MySQL Database using Micronaut Data JDBC you will need to do the following:
-
-. Add required dependencies:
-+
---
-:dependencies:
-dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor]
-dependency:micronaut-data-jdbc[groupId=io.micronaut.data]
-dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql]
-dependency:mysql[groupId=mysql-connector-java,scope=runtimeOnly]
-dependency:junit-jupiter[groupId=org.testcontainers,scope=test]
-dependency:mysql[groupId=org.testcontainers,scope=test]
-dependency:testcontainers[groupId=org.testcontainers,scope=test]
-:dependencies:
---
-
-. Create a `Book` interface annotated with link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlMapping[@MappedEntity]
-similar to the `BookInfo` Object, that you will use to query the database. Add a property of type `Integer` for the ID of entity, and annotate it with
-link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlAnnotations[@Id].
-. Write a `Book` repository class extending from link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#repositories[CrudRepository<Book, Integer>].
-This will automatically generate (Create, Read, Update, Delete) operations for the repository. You can also redefine these
-functions if you desire a different signature. We will use a reactive return type:
-+
-[source,java]
-----
-    @NonNull
-    Mono<Book> saveBook(@Valid @NonNull Book bookInfo);
-----
-. Use the link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#explicitQueries[@Query] annotation to
-write a custom query for the search path we have in our controller:
-+
-[source,java]
-----
-    @NonNull
-    @Query(value="SELECT * FROM book WHERE (name LIKE CONCAT('%', :name, '%') OR :name IS NULL)" +
-            "AND (author LIKE CONCAT('%', :author, '%') OR :author IS NULL);", nativeQuery = true)
-    Flux<Book> find(@Nullable String name, @Nullable String author);
-----
-Micronaut will generate the implementation of these functions, which you can utilize by injecting the repository similarly
-to the `BookService` we previously used.
-. You will need to implement the controller to utilize the repository. Use methods of Reactor's `Flux` and `Mono`, like `map` to
-optimize the processing of data.
-. Configure the `url`, `user`, `password` and other properties required to establish a connection with your datasource.
-Refer to the link:https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcConfiguration["Configuration" section of Micronaut Data guide] for details.
-
-If you want to proceed with implementing Database connection with Micronaut Data JDBC, refer to the
-link:https://guides.micronaut.io/latest/micronaut-data-jdbc-repository.html["Access a Database with Micronaut JDBC" Guide].
-
-NOTE: You can read link:https://micronaut-projects.github.io/micronaut-data/latest/guide[Micronaut Data documentation]
-to learn more.
-
 === Generate Micronaut Client
 
 You can generate a Micronaut client based on the same `library-definition.yaml` file.
@@ -573,11 +492,6 @@ java -jar openapi-generator-cli-XXX.jar generate \
     -p build=@build@ \
     -p test=junit
 ----
-
-=== Learn Micronaut
-
-To learn more about Micronaut framework and its features visit
-link:https://micronaut.io/docs/[Micronaut documentation].
 
 === Add Server URL Information
 
@@ -599,3 +513,13 @@ java -jar openapi-generator-cli-XXX.jar generate \
     -i library-definition.yaml \
     -o html-docs
 ----
+
+== Next steps
+
+To learn more about:
+
+* https://www.openapis.org[OpenAPI]
+* https://openapi-generator.tech[OpenAPI Generator]
+* link:https://micronaut-projects.github.io/micronaut-openapi/latest/guide[Micronaut OpenAPI]
+* link:https://micronaut-projects.github.io/micronaut-data/latest/guide[Micronaut Data]
+
