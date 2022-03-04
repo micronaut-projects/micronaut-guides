@@ -278,6 +278,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">JwkConfiguration</span> {
+
     <span class="annotation">@NonNull</span>
     <span class="predefined-type">String</span> getPrimary();
 
@@ -387,6 +388,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.signature.rsa.RSASignatureConfiguration</span>;
 <span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
 <span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
+
 <span class="keyword">import</span> <span class="include">java.security.interfaces.RSAPrivateKey</span>;
 <span class="keyword">import</span> <span class="include">java.security.interfaces.RSAPublicKey</span>;
 <span class="keyword">import</span> <span class="include">java.text.ParseException</span>;
@@ -405,18 +407,22 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="directive">public</span> AbstractRSASignatureConfiguration(<span class="predefined-type">String</span> jsonJwk) {
         <span class="predefined-type">RSAKey</span> primaryRSAKey = parseRSAKey(jsonJwk)
                 .orElseThrow(() -&gt; <span class="keyword">new</span> <span class="exception">ConfigurationException</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">could not parse primary JWK to RSA Key</span><span class="delimiter">&quot;</span></span>));
-        <span class="local-variable">this</span>.publicJWK = primaryRSAKey.toPublicJWK();
+
+        publicJWK = primaryRSAKey.toPublicJWK();
+
         <span class="keyword">try</span> {
-            <span class="local-variable">this</span>.privateKey = primaryRSAKey.toRSAPrivateKey();
+            privateKey = primaryRSAKey.toRSAPrivateKey();
         } <span class="keyword">catch</span> (JOSEException e) {
             <span class="keyword">throw</span> <span class="keyword">new</span> <span class="exception">ConfigurationException</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">could not primary RSA private key</span><span class="delimiter">&quot;</span></span>);
         }
+
         <span class="keyword">try</span> {
-            <span class="local-variable">this</span>.publicKey = primaryRSAKey.toRSAPublicKey();
+            publicKey = primaryRSAKey.toRSAPublicKey();
         } <span class="keyword">catch</span> (JOSEException e) {
             <span class="keyword">throw</span> <span class="keyword">new</span> <span class="exception">ConfigurationException</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">could not primary RSA public key</span><span class="delimiter">&quot;</span></span>);
         }
-        <span class="local-variable">this</span>.jwsAlgorithm = parseJWSAlgorithm(primaryRSAKey)
+
+        jwsAlgorithm = parseJWSAlgorithm(primaryRSAKey)
                 .orElseThrow(() -&gt; <span class="keyword">new</span> <span class="exception">ConfigurationException</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">could not parse JWS Algorithm from RSA Key</span><span class="delimiter">&quot;</span></span>));
     }
 
@@ -436,9 +442,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="keyword">if</span> (algorithm == <span class="predefined-constant">null</span>) {
             <span class="keyword">return</span> Optional.empty();
         }
+
         <span class="keyword">if</span> (algorithm <span class="keyword">instanceof</span> JWSAlgorithm) {
             <span class="keyword">return</span> Optional.of((JWSAlgorithm) algorithm);
         }
+
         <span class="keyword">return</span> Optional.of(JWSAlgorithm.parse(algorithm.getName()));
     }
 
@@ -453,8 +461,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
             <span class="keyword">return</span> Optional.of((<span class="predefined-type">RSAKey</span>) jwk);
         } <span class="keyword">catch</span> (<span class="exception">ParseException</span> e) {
             LOG.warn(<span class="string"><span class="delimiter">&quot;</span><span class="content">Could not parse JWK JSON string {}</span><span class="delimiter">&quot;</span></span>, jsonJwk);
+            <span class="keyword">return</span> Optional.empty();
         }
-        <span class="keyword">return</span> Optional.empty();
     }
 }</code></pre>
 </div>
@@ -483,10 +491,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.context.scope.Refreshable</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-
 <span class="annotation">@Refreshable</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">SecondarySignatureConfiguration</span> <span class="directive">extends</span> AbstractRSASignatureConfiguration {
+
     <span class="directive">public</span> SecondarySignatureConfiguration(JwkConfiguration jwkConfiguration) {
         <span class="local-variable">super</span>(jwkConfiguration.getSecondary());
     }
@@ -517,21 +524,21 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">java.security.interfaces.RSAPrivateKey</span>;
 
-<span class="directive">public</span> <span class="type">class</span> <span class="class">AbstractRSAGeneratorSignatureConfiguration</span> <span class="directive">extends</span> AbstractRSASignatureConfiguration
+<span class="directive">public</span> <span class="directive">abstract</span> <span class="type">class</span> <span class="class">AbstractRSAGeneratorSignatureConfiguration</span> <span class="directive">extends</span> AbstractRSASignatureConfiguration
         <span class="directive">implements</span> RSASignatureGeneratorConfiguration { <i class="conum" data-value="1"></i><b>(1)</b>
 
-    <span class="directive">public</span> AbstractRSAGeneratorSignatureConfiguration(<span class="predefined-type">String</span> jsonJwk) {
+    <span class="directive">protected</span> AbstractRSAGeneratorSignatureConfiguration(<span class="predefined-type">String</span> jsonJwk) {
         <span class="local-variable">super</span>(jsonJwk);
     }
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> <span class="predefined-type">RSAPrivateKey</span> getPrivateKey() {
-        <span class="keyword">return</span> <span class="local-variable">this</span>.privateKey;
+        <span class="keyword">return</span> privateKey;
     }
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> JWSAlgorithm getJwsAlgorithm() {
-        <span class="keyword">return</span> <span class="local-variable">this</span>.jwsAlgorithm;
+        <span class="keyword">return</span> jwsAlgorithm;
     }
 }</code></pre>
 </div>
@@ -557,11 +564,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.context.scope.Refreshable</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Named</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 
 <span class="annotation">@Refreshable</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Named</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">generator</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">PrimarySignatureConfiguration</span> <span class="directive">extends</span> AbstractRSAGeneratorSignatureConfiguration {
+
     <span class="directive">public</span> PrimarySignatureConfiguration(JwkConfiguration jwkConfiguration) {
         <span class="local-variable">super</span>(jwkConfiguration.getPrimary());
     }
@@ -594,17 +601,18 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">com.nimbusds.jose.jwk.JWK</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.runtime.context.scope.Refreshable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.endpoints.JwkProvider</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
 <span class="annotation">@Refreshable</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">JsonWebKeysProvider</span> <span class="directive">implements</span>  JwkProvider { <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="directive">private</span> <span class="predefined-type">List</span>&lt;JWK&gt; jwks;
+<span class="directive">public</span> <span class="type">class</span> <span class="class">JsonWebKeysProvider</span> <span class="directive">implements</span> JwkProvider { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;JWK&gt; jwks;
 
     <span class="directive">public</span> JsonWebKeysProvider(PrimarySignatureConfiguration primaryRsaPrivateKey,
                                SecondarySignatureConfiguration secondarySignatureConfiguration) {
-        <span class="local-variable">this</span>.jwks = <span class="predefined-type">Arrays</span>.asList(primaryRsaPrivateKey.getPublicJWK(), secondarySignatureConfiguration.getPublicJWK());
+        jwks = <span class="predefined-type">Arrays</span>.asList(primaryRsaPrivateKey.getPublicJWK(), secondarySignatureConfiguration.getPublicJWK());
     }
 
     <span class="annotation">@Override</span>
@@ -642,8 +650,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
 <span class="keyword">import</span> <span class="include">com.nimbusds.jwt.JWT</span>;
 <span class="keyword">import</span> <span class="include">com.nimbusds.jwt.JWTParser</span>;
 <span class="keyword">import</span> <span class="include">com.nimbusds.jwt.SignedJWT</span>;
@@ -651,12 +657,16 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.generator.TokenGenerator</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.validator.TokenValidator</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
 <span class="keyword">import</span> <span class="include">java.text.ParseException</span>;
 <span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
 
 <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">jwk.primary</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">p</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">_OZyH1Mk3wR0oXw1C31t4kWOcaHFB6Njro1cYx52REnPiznn_JTtwvlAMpvV6LVCIZPgKMzdIEMY1gYs1LsO-5IFqWwegXmYJ0iKXbRrZshfWBCzRLK3QK5fER1le1XUBDhtDk7KIW_Xg-SZF4pf_LUEVKMnyUpspGI5F77jlJ8</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">kty</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">RSA</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">q</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">s9wvl7z8vkHQvo9xOUp-z0a2Z7LFBDil2uIjPh1FQzs34gFXH8dQPRox83TuN5d4KzdLPqQNQAfMXU9_KmxihNb_qDQahYugeELmcem04munxXqBdyZqWhWCy5YmujYqn44irwvoTbw6_RkMqjCmINPTPadptlPivsZ6RhKn8zk</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">d</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">ok3wmhOy8NZEHAotnFiH6ecFD6xf_9x33_fMRkqa3_KE8NZM7vmvNgElox2UvcP_2K5E7jOdL2XQdJCTIW3Qlj66yE2a84SYlbvxIc4hDrIog0XNt4FhavvshxxUIfDQo6Q8qXDR5v7nwt6SCopYC3t3KVRdJh08GzKoVxysd7afJjxXxx178gY29uMRqnwxFN1OGnWaiBr-xGKb1frJ6jOI1zvuuCaljZ4aZjc9vOR4y9ZmobgrzkMFnpDAmQZ7MWcVMyodRMOA2dEOckywPhg-dIVNiVIqzJqe5Yg1ilNookjwtqj2TpNU7Z9gPqzYB73PmQ2p5LMDheAPxcOmEQ</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">e</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">AQAB</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">use</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">sig</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">kid</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">e3be37177a7c42bcbadd7cc63715f216</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">qi</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">r--nAtaYPAgJq_8R1-kynpd53E17n-loDUgtVWBCx_RmdORX4Auilv1S83dD1mbcnYCbV_LmxiEjOiz-4gS_E0qVGqakAqQrO1hVUvJa_Y2uftDgwFmuJNGbpRU-K4Td_uUzdm48za8yJCgOdYsWp6PNMCcmQgiInzkR3XYV83I</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">dp</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">oQUcvmMSw8gzdin-IB2xW_MLecAVEgLu0dGBdD6N8HbKZQvub_xm0dAfFtnvvWXDAFwFyhR96i-uXX67Bos_Q9-6KSAE4E0KGmDucDESfPOw-QJREbl0QgOD1gLQfVGtVy6SCR0TR2zNXFWtP7bD3MNoSXdEOr5fI97CGSNaBWM</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">alg</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">RS256</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">dq</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">DM-WJDy10-dkMu6MpgQEXEcxHtnA5rgSODD7SaVUFaHWLSbjScQslu2SuUCO5y7GxG0_0spklzb2-356FE98BPI7a4Oqj_COEYLSXzLCS45XeN1s80utL5Vwp4eeYo0RJCQ_nDBA76iEmxp5qHWmn5f25-FQykfXUrdYZj1V8SE</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">n</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">sa6m2i-iNvj6ZSTdSHZaBrnv6DId4AqAXhOyl0yA5fNWYe6r51h24SXqk7DsGYHHh74ii74tP1lTpmy6RD67tCK-tbN-d6yc4Z6FfM8R83v2QZUfaAixgHGtw0n2toqsiHf6EloDV-B8q4GYyKDD6cLecoaIuTmMBTY3kts59U2t9W10YoLGsmFqLSz8qNF5HkahzB6_--2DiBfVGUKAXHC-SICGZCi-8efOetv6pt9vFiWEgwU_DgjRNYzLFt1SEmbGFUU4kbjQ7tNTMkHfzfwcT6qLt4kVKy2FNYsEMk24keWtCvW_RyO_fisZc0W9smX7WtYjEXhcAjDeqHgEZw</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span>)
@@ -672,16 +682,14 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
     <span class="annotation">@Test</span>
     <span class="type">void</span> canGenerateSignedJsonWebTokens() <span class="directive">throws</span> <span class="exception">ParseException</span> {
-        Optional&lt;<span class="predefined-type">String</span>&gt; jwtOptional = tokenGenerator.generateToken(<span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">sub</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">sergio</span><span class="delimiter">&quot;</span></span>));
 
+        Optional&lt;<span class="predefined-type">String</span>&gt; jwtOptional = tokenGenerator.generateToken(<span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">sub</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">sergio</span><span class="delimiter">&quot;</span></span>));
         assertTrue(jwtOptional.isPresent());
 
         <span class="predefined-type">String</span> jwtString = jwtOptional.get();
-
         assertDoesNotThrow(() -&gt; JWTParser.parse(jwtString));
 
         JWT jwt = JWTParser.parse(jwtString);
-
         assertTrue(jwt <span class="keyword">instanceof</span> SignedJWT);
 
         tokenValidator.validateToken(jwtString, <span class="predefined-constant">null</span>);
@@ -711,7 +719,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">com.nimbusds.jose.JWSAlgorithm</span>;
 <span class="keyword">import</span> <span class="include">com.nimbusds.jwt.JWT</span>;
 <span class="keyword">import</span> <span class="include">com.nimbusds.jwt.JWTParser</span>;
 <span class="keyword">import</span> <span class="include">com.nimbusds.jwt.SignedJWT</span>;
@@ -721,23 +728,24 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.generator.claims.ClaimsGenerator</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.signature.rsa.RSASignatureGeneratorConfiguration</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.validator.TokenValidator</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">java.security.interfaces.RSAPrivateKey</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
 <span class="keyword">import</span> <span class="include">java.text.ParseException</span>;
 <span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
 
 <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">jwk.primary</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">p</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">_OZyH1Mk3wR0oXw1C31t4kWOcaHFB6Njro1cYx52REnPiznn_JTtwvlAMpvV6LVCIZPgKMzdIEMY1gYs1LsO-5IFqWwegXmYJ0iKXbRrZshfWBCzRLK3QK5fER1le1XUBDhtDk7KIW_Xg-SZF4pf_LUEVKMnyUpspGI5F77jlJ8</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">kty</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">RSA</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">q</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">s9wvl7z8vkHQvo9xOUp-z0a2Z7LFBDil2uIjPh1FQzs34gFXH8dQPRox83TuN5d4KzdLPqQNQAfMXU9_KmxihNb_qDQahYugeELmcem04munxXqBdyZqWhWCy5YmujYqn44irwvoTbw6_RkMqjCmINPTPadptlPivsZ6RhKn8zk</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">d</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">ok3wmhOy8NZEHAotnFiH6ecFD6xf_9x33_fMRkqa3_KE8NZM7vmvNgElox2UvcP_2K5E7jOdL2XQdJCTIW3Qlj66yE2a84SYlbvxIc4hDrIog0XNt4FhavvshxxUIfDQo6Q8qXDR5v7nwt6SCopYC3t3KVRdJh08GzKoVxysd7afJjxXxx178gY29uMRqnwxFN1OGnWaiBr-xGKb1frJ6jOI1zvuuCaljZ4aZjc9vOR4y9ZmobgrzkMFnpDAmQZ7MWcVMyodRMOA2dEOckywPhg-dIVNiVIqzJqe5Yg1ilNookjwtqj2TpNU7Z9gPqzYB73PmQ2p5LMDheAPxcOmEQ</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">e</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">AQAB</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">use</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">sig</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">kid</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">e3be37177a7c42bcbadd7cc63715f216</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">qi</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">r--nAtaYPAgJq_8R1-kynpd53E17n-loDUgtVWBCx_RmdORX4Auilv1S83dD1mbcnYCbV_LmxiEjOiz-4gS_E0qVGqakAqQrO1hVUvJa_Y2uftDgwFmuJNGbpRU-K4Td_uUzdm48za8yJCgOdYsWp6PNMCcmQgiInzkR3XYV83I</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">dp</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">oQUcvmMSw8gzdin-IB2xW_MLecAVEgLu0dGBdD6N8HbKZQvub_xm0dAfFtnvvWXDAFwFyhR96i-uXX67Bos_Q9-6KSAE4E0KGmDucDESfPOw-QJREbl0QgOD1gLQfVGtVy6SCR0TR2zNXFWtP7bD3MNoSXdEOr5fI97CGSNaBWM</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">alg</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">RS256</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">dq</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">DM-WJDy10-dkMu6MpgQEXEcxHtnA5rgSODD7SaVUFaHWLSbjScQslu2SuUCO5y7GxG0_0spklzb2-356FE98BPI7a4Oqj_COEYLSXzLCS45XeN1s80utL5Vwp4eeYo0RJCQ_nDBA76iEmxp5qHWmn5f25-FQykfXUrdYZj1V8SE</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">n</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">sa6m2i-iNvj6ZSTdSHZaBrnv6DId4AqAXhOyl0yA5fNWYe6r51h24SXqk7DsGYHHh74ii74tP1lTpmy6RD67tCK-tbN-d6yc4Z6FfM8R83v2QZUfaAixgHGtw0n2toqsiHf6EloDV-B8q4GYyKDD6cLecoaIuTmMBTY3kts59U2t9W10YoLGsmFqLSz8qNF5HkahzB6_--2DiBfVGUKAXHC-SICGZCi-8efOetv6pt9vFiWEgwU_DgjRNYzLFt1SEmbGFUU4kbjQ7tNTMkHfzfwcT6qLt4kVKy2FNYsEMk24keWtCvW_RyO_fisZc0W9smX7WtYjEXhcAjDeqHgEZw</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span>)
 <span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">jwk.secondary</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">p</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">4qJ9RNlu6SuDT_MLArfzimvKEwmet_j12Z9EQeb5nMjZIOHTcWw__duebUytfWwxsRHhtSVXeMt-EryQAOulm2p1bfiVuparq93z9P5cPnb0oArFaw3eFNFEmX5U-lY8PzUTTsFxO4aVQYAKXD6DP7p5uPzuwpHFuNc71nNIXZE</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">kty</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">RSA</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">q</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">v4OhkWMbS_nq77HFanwZAT_obfJuQfOFOQBORL4ATAHGUXm2y4YqLNExZs7Wj1MA_6ya6Y00s2JBM7fWq_fPe4d9xo5aGrPdcp0G8W21kkfh9vuVPlHVQTgSP7FQ9qahvXxNwK_11yNr3p1HBmScJ5mHlMBpIJsFcvHA-uXe0Ps</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">d</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">EunrjnQ1-jJPSCrt2L94PUpDrakup8a4pXys52YSkJY-W6XidM0roOS6kr06P3G6VQgc6AL_BkvTQ_XS0oXHbXVprDQ5Syam5p9oxHBhhW_vSqIMgUOfm28uyB3Mtw9rBxdUxW3yElHioaR8a-exYhhyVXb1QEhxL_rcnthmhAkM2NcHi2UnxGKFTsC0abQ2MuQc1OAuW5veDiIF2hfdC41qE0_d8vB6FDWbblgUpbwB6uSZaViPs15Buq2oX9dCCw54-PgzkfehDt7lyqgupktbV1psnVVhL86shzt4QFnhd3k7VpFbjCNFtiJTrufV-XBWT0pl2w3VR9wrHJ1bYQ</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">e</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">AQAB</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">use</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">sig</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">kid</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">0794e938379540dc8eaa559508524a79</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">qi</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">jy-TNyXVy_44_n4KGAwIbZO2C4r6uNWuEdehBfQKkPhiP90myG1KZVfOoKNOK9bCv2mvZJcBz4c1ArElgpuSCV4-KFac1ZzQo_ic5aoIej8Qa80y2ogc-_Yv6_ZLHC1S76M-lm4jayk2-rvuBpy2pUvHbW6Srhs_szwz7ZfSkLg</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">dp</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">ApqdV9ortRAj7Ro8ySY17SQ56SgWI8T_hiWXUi6GNa_1FrShik8VGSSZ2GWmJKfGlmM_NaadL60e4LY77VbHy1ZYzQ-rIL60cEAXmnwFsU4Kl4AoLoe1QoX5BM53yXyOKqfAdgow898i_eKru82YEnZhCagWUjP8kpgefuNKNJE</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">alg</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">RS256</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">dq</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">bFF78WoXh0pMCdQHL2oPDnjh8kWa_OxKHmpA2nqIWnTqgSyRKd2xPvX2tgooqpmsx-8NEymNdCQPcrv4y_z2OgzxI3tiFRZEGs4bnjOJ7bmAYZv71mqcbi3TjHiyrT6j3jNPGrurFUpweVGFWWVQOMmKOKT3ELz9QPzhREb9Vj8</span><span class="char">\&quot;</span><span class="content">,</span><span class="char">\&quot;</span><span class="content">n</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">qYvDpV8DRU5hx9eXpE4Ms8nUXicEwrxUUz5gb5gkXpIeY82mqfQKKCP6PSFnkKYtRFTOUSm9cgGGfOd7O4NFsIsxLwXCj34X7ORr19eXKBLvG3bZJLxqRlbYuQshDMkQOui1sDBxvYnj5p4iHne6l2btH5grHOCShUWG-bKps5Y8bKNHod1pIOOBabVCmn3sUVUkZw8nyXkQqZbv-c8x6z0TEfhNOPOIt2AmmlNgrE_8g7-dnCvqfJnhv0c7qkOJzsb7OMmvVwsQNiM59D6uaWZr-vdANo6NggiZmCKUS3tpUvdXW7ec9WMPJWhrVEkRcbWXQnZ_C7pXFrz7rLeNKw</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span>)
 <span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">ValidateSecondarySignedJwtTest</span> {
+
     <span class="annotation">@Inject</span>
     ClaimsGenerator claimsGenerator;
 
@@ -754,15 +762,12 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         TokenGenerator tokenGenerator = <span class="keyword">new</span> JwtTokenGenerator(signatureGeneratorConfiguration, <span class="predefined-constant">null</span>, claimsGenerator);
 
         Optional&lt;<span class="predefined-type">String</span>&gt; jwtOptional = tokenGenerator.generateToken(<span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">sub</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">sergio</span><span class="delimiter">&quot;</span></span>));
-
         assertTrue(jwtOptional.isPresent());
 
         <span class="predefined-type">String</span> jwtString = jwtOptional.get();
-
         assertDoesNotThrow(() -&gt; JWTParser.parse(jwtString));
 
         JWT jwt = JWTParser.parse(jwtString);
-
         assertTrue(jwt <span class="keyword">instanceof</span> SignedJWT);
 
         tokenValidator.validateToken(jwtString, <span class="predefined-constant">null</span>);
@@ -800,8 +805,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
 
 <i class="conum" data-value="1"></i><b>(1)</b>
