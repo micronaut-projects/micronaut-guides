@@ -7,6 +7,6 @@ import java.math.BigDecimal;
 @MqttPublisher // <1>
 public interface TemperatureClient {
 
-    @Topic("house/livingroom/temperature") // <1>
+    @Topic("house/livingroom/temperature") // <2>
     void publishLivingroomTemperature(byte[] data);
 }
