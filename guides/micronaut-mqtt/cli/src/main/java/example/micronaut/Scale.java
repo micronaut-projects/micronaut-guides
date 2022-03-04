@@ -2,9 +2,7 @@ package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -41,7 +39,7 @@ public enum Scale {
 
     @Override
     public String toString() {
-        return this.name;
+        return name;
     }
 
     public static Set<String> candidates() {

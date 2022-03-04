@@ -6,16 +6,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 
-@MqttSubscriber // <1>
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+@MqttSubscriber
 public class TemperatureListener {
+
     private static final Logger LOG = LoggerFactory.getLogger(TemperatureListener.class);
 
-    @Topic("house/livingroom/temperature") // <2>
+    @Topic("house/livingroom/temperature")
     public void receive(byte[] data) {
-        BigDecimal temperature = new BigDecimal(new String(data, StandardCharsets.UTF_8));
+        BigDecimal temperature = new BigDecimal(new String(data, UTF_8));
         LOG.info("temperature: {}", temperature);
     }
-
 }
