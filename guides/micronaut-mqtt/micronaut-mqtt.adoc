@@ -1,0 +1,166 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:mosquitto.adoc[]
+
+For example, in MacOS:
+
+[source,bash]
+----
+/usr/local/opt/mosquitto/sbin/mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf
+
+1646389659: mosquitto version 2.0.14 starting
+1646389659: Config loaded from /usr/local/etc/mosquitto/mosquitto.conf.
+1646389659: Starting in local only mode. Connections will only be possible from clients running on this machine.
+1646389659: Create a configuration file which defines a listener to allow remote access.
+1646389659: For more details see https://mosquitto.org/documentation/authentication-methods/
+1646389659: Opening ipv4 listen socket on port 1883.
+1646389659: Opening ipv6 listen socket on port 1883.
+1646389659: mosquitto version 2.0.14 running
+----
+
+== Writing the CLI (Command Line Interface) Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli:cli-command@ example.micronaut.micronautguide \
+    --features=@cli:features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @cli:features-words@ features.
+
+diffLink:[app=cli]
+
+common:annotationprocessors.adoc[]
+
+### Create an MqttPublisher
+
+Create an interface to publish MQTT Topics:
+
+source:TemperatureClient[app=cli]
+callout:mqtt-publisher[1]
+callout:mqtt-topic[2]
+
+### Writing the CLI Command
+
+Create an enum to allow the user to submit temperatures in Celsius or Fahrenheit:
+
+source:Scale[app=cli]
+
+Create a class which we will use to show completion candidates:
+
+source:TemperatureScaleCandidates[app=cli]
+
+Replace the command:
+
+source:MicronautguideCommand[app=cli]
+
+callout:picocli-command[1]
+callout:picocli-option[2]
+callout:picocli-option-required[3]
+callout:picocli-completion-candidates-variables[4]
+callout:field-injection[5]
+<6> Publish the MQTT Topic
+
+Create a test:
+
+test:MicronautguideCommandTest[app=cli]
+
+Configure the MQTT server uri in configuration:
+
+resource:application.yml[app=cli,tag=mqtt]
+
+## Writing an MQTT subscriber application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @app:cli-command@ example.micronaut.micronautguide \
+    --features=@app:features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @app:features-words@ features.
+
+diffLink:[app=cli]
+
+common:annotationprocessors.adoc[]
+
+### Configuration
+
+Configure the MQTT server uri in configuration:
+
+resource:application.yml[app=app,tag=mqtt]
+
+### Create Subscriber
+
+source:TemperatureListener[app=app]
+
+callout:mqtt-subscriber[1]
+callout:mqtt-topic[2]
+
+== Run both applications
+
+=== Run the Subscriber App
+
+common:runapp-instructions.adoc[]
+
+Keep it running. Once, you publish a topic with the CLI application, you will see a log entry.
+
+=== Run the CLI
+
+==== Generate JAR
+
+common:shade[]
+
+Run the CLI, publish a temperature
+
+[source, bash]
+----
+```
+java -jar build/libs/micronautguide-0.1-all.jar -t 212 -s Fahrenheit
+12:00:49.668 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [cli]
+12:00:50.557 [main] TRACE i.m.m.i.AbstractMqttIntroductionAdvice - Publishing the following message to house/livingroom/temperature
+12:00:50.558 [main] TRACE i.m.m.i.AbstractMqttIntroductionAdvice - Qos = 1, Retained = false, Payload = 100.00
+Topic published
+```
+----
+
+The subscriber receives the MQTT topics as you will see in the logs:
+
+[source, bash]
+----
+12:09:47.280 [MQTT Call: 180d98b5-75b9-41be-a874-295289346592]
+    INFO  e.micronaut.TemperatureListener - temperature: 100.00
+
+----
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Generate GraalVM native images for both the CLI and the messaging application. Execute both messaging and CLI GraalVM native images. Publish a temperature, and you will see it in the logs of the subscriber.
+
+:exclude-for-languages:
+
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-mqtt/latest/guide/[Micronaut MQTT].
+
+common:helpWithMicronaut.adoc[]
