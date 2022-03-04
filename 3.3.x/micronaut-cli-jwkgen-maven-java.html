@@ -305,16 +305,18 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">com.nimbusds.jose.JOSEException</span>;
-<span class="keyword">import</span> <span class="include">com.nimbusds.jose.JWSAlgorithm</span>;
-<span class="keyword">import</span> <span class="include">com.nimbusds.jose.jwk.KeyUse</span>;
 <span class="keyword">import</span> <span class="include">com.nimbusds.jose.jwk.gen.RSAKeyGenerator</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
 <span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 <span class="keyword">import</span> <span class="include">java.util.UUID</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.nimbusds.jose.JWSAlgorithm.RS256</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.nimbusds.jose.jwk.KeyUse.SIGNATURE</span>;
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">RS256JsonWebKeyGenerator</span> <span class="directive">implements</span> JsonWebKeyGenerator {
@@ -326,16 +328,15 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="directive">public</span> Optional&lt;<span class="predefined-type">String</span>&gt; generateJsonWebKey(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> kid) {
         <span class="keyword">try</span> {
             <span class="keyword">return</span> Optional.of(<span class="keyword">new</span> RSAKeyGenerator(<span class="integer">2048</span>)
-                    .algorithm(JWSAlgorithm.RS256)
-                    .keyUse(KeyUse.SIGNATURE) <span class="comment">// indicate the intended use of the key</span>
+                    .algorithm(RS256)
+                    .keyUse(SIGNATURE) <span class="comment">// indicate the intended use of the key</span>
                     .keyID(kid != <span class="predefined-constant">null</span> ? kid : generateKid()) <span class="comment">// give the key a unique ID</span>
                     .generate()
                     .toJSONString());
-
         } <span class="keyword">catch</span> (JOSEException e) {
-            LOG.warn(<span class="string"><span class="delimiter">&quot;</span><span class="content">unable to generate RS256 key</span><span class="delimiter">&quot;</span></span>,  e);
+            LOG.warn(<span class="string"><span class="delimiter">&quot;</span><span class="content">unable to generate RS256 key</span><span class="delimiter">&quot;</span></span>, e);
+            <span class="keyword">return</span> Optional.empty();
         }
-        <span class="keyword">return</span> Optional.empty();
     }
 
     <span class="directive">private</span> <span class="predefined-type">String</span> generateKid() {
@@ -367,13 +368,13 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.configuration.picocli.PicocliRunner</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">picocli.CommandLine.Command</span>;
 <span class="keyword">import</span> <span class="include">picocli.CommandLine.Option</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 
 <span class="annotation">@Command</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">keysgen</span><span class="delimiter">&quot;</span></span>,
-        description = <span class="string"><span class="delimiter">&quot;</span><span class="content">Generates a Json Web Key (JWT) with RS256 algorithm.</span><span class="delimiter">&quot;</span></span>,
-        mixinStandardHelpOptions = <span class="predefined-constant">true</span>)  <i class="conum" data-value="1"></i><b>(1)</b>
+         description = <span class="string"><span class="delimiter">&quot;</span><span class="content">Generates a Json Web Key (JWT) with RS256 algorithm.</span><span class="delimiter">&quot;</span></span>,
+         mixinStandardHelpOptions = <span class="predefined-constant">true</span>)  <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">MicronautguideCommand</span> <span class="directive">implements</span> <span class="predefined-type">Runnable</span> {
 
     <span class="annotation">@Option</span>(names = {<span class="string"><span class="delimiter">&quot;</span><span class="content">-kid</span><span class="delimiter">&quot;</span></span>}, <i class="conum" data-value="2"></i><b>(2)</b>
@@ -384,7 +385,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@Inject</span>
     <span class="directive">public</span> JsonWebKeyGenerator jsonWebKeyGenerator; <i class="conum" data-value="3"></i><b>(3)</b>
 
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) <span class="directive">throws</span> <span class="exception">Exception</span> {
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
         PicocliRunner.run(MicronautguideCommand.class, args);
     }
 
@@ -426,27 +427,32 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">io.micronaut.configuration.picocli.PicocliRunner</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
 <span class="keyword">import</span> <span class="include">java.io.ByteArrayOutputStream</span>;
+<span class="keyword">import</span> <span class="include">java.io.OutputStream</span>;
 <span class="keyword">import</span> <span class="include">java.io.PrintStream</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotEquals</span>;
+
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
 
-<span class="directive">public</span> <span class="type">class</span> <span class="class">MicronautguideCommandTest</span> {
+<span class="type">class</span> <span class="class">MicronautguideCommandTest</span> {
 
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testGenerateJwk() <span class="directive">throws</span> <span class="exception">Exception</span> {
-        <span class="directive">final</span> <span class="predefined-type">String</span> jwkJsonRepresentation = executeCommand(MicronautguideCommand.class, <span class="keyword">new</span> <span class="predefined-type">String</span><span class="type">[]</span> {});
+    <span class="type">void</span> testGenerateJwk() {
+        <span class="directive">final</span> <span class="predefined-type">String</span> jwkJsonRepresentation = executeCommand(MicronautguideCommand.class, <span class="keyword">new</span> <span class="predefined-type">String</span><span class="type">[]</span>{});
         assertNotNull(jwkJsonRepresentation);
+
         <span class="predefined-type">String</span> prefix = <span class="string"><span class="delimiter">&quot;</span><span class="content">JWK: </span><span class="delimiter">&quot;</span></span>;
         assertNotEquals(jwkJsonRepresentation.indexOf(prefix), -<span class="integer">1</span>);
-        assertDoesNotThrow(() -&gt; JWK.parse(jwkJsonRepresentation.substring(jwkJsonRepresentation.indexOf(prefix) + prefix.length())));
+        assertDoesNotThrow(() -&gt;
+                JWK.parse(jwkJsonRepresentation.substring(jwkJsonRepresentation.indexOf(prefix) + prefix.length()))
+        );
     }
 
-    <span class="predefined-type">String</span> executeCommand(<span class="predefined-type">Class</span> commandClass, <span class="predefined-type">String</span><span class="type">[]</span> args) { <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="predefined-type">ByteArrayOutputStream</span> baos = <span class="keyword">new</span> <span class="predefined-type">ByteArrayOutputStream</span>();
+    <span class="directive">private</span> <span class="predefined-type">String</span> executeCommand(<span class="predefined-type">Class</span> commandClass, <span class="predefined-type">String</span><span class="type">[]</span> args) { <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="predefined-type">OutputStream</span> baos = <span class="keyword">new</span> <span class="predefined-type">ByteArrayOutputStream</span>();
         <span class="predefined-type">System</span>.setOut(<span class="keyword">new</span> <span class="predefined-type">PrintStream</span>(baos));
         <span class="keyword">try</span> (ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST)) {
             PicocliRunner.run(commandClass, ctx, args);
