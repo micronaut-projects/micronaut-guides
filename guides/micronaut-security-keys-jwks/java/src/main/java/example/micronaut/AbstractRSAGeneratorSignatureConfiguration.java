@@ -5,20 +5,20 @@ import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGeneratorConfig
 
 import java.security.interfaces.RSAPrivateKey;
 
-public class AbstractRSAGeneratorSignatureConfiguration extends AbstractRSASignatureConfiguration
+public abstract class AbstractRSAGeneratorSignatureConfiguration extends AbstractRSASignatureConfiguration
         implements RSASignatureGeneratorConfiguration { // <1>
 
-    public AbstractRSAGeneratorSignatureConfiguration(String jsonJwk) {
+    protected AbstractRSAGeneratorSignatureConfiguration(String jsonJwk) {
         super(jsonJwk);
     }
 
     @Override
     public RSAPrivateKey getPrivateKey() {
-        return this.privateKey;
+        return privateKey;
     }
 
     @Override
     public JWSAlgorithm getJwsAlgorithm() {
-        return this.jwsAlgorithm;
+        return jwsAlgorithm;
     }
 }

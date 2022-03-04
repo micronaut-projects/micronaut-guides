@@ -10,6 +10,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
@@ -28,18 +29,22 @@ public abstract class AbstractRSASignatureConfiguration
     public AbstractRSASignatureConfiguration(String jsonJwk) {
         RSAKey primaryRSAKey = parseRSAKey(jsonJwk)
                 .orElseThrow(() -> new ConfigurationException("could not parse primary JWK to RSA Key"));
-        this.publicJWK = primaryRSAKey.toPublicJWK();
+
+        publicJWK = primaryRSAKey.toPublicJWK();
+
         try {
-            this.privateKey = primaryRSAKey.toRSAPrivateKey();
+            privateKey = primaryRSAKey.toRSAPrivateKey();
         } catch (JOSEException e) {
             throw new ConfigurationException("could not primary RSA private key");
         }
+
         try {
-            this.publicKey = primaryRSAKey.toRSAPublicKey();
+            publicKey = primaryRSAKey.toRSAPublicKey();
         } catch (JOSEException e) {
             throw new ConfigurationException("could not primary RSA public key");
         }
-        this.jwsAlgorithm = parseJWSAlgorithm(primaryRSAKey)
+
+        jwsAlgorithm = parseJWSAlgorithm(primaryRSAKey)
                 .orElseThrow(() -> new ConfigurationException("could not parse JWS Algorithm from RSA Key"));
     }
 
@@ -59,9 +64,11 @@ public abstract class AbstractRSASignatureConfiguration
         if (algorithm == null) {
             return Optional.empty();
         }
+
         if (algorithm instanceof JWSAlgorithm) {
             return Optional.of((JWSAlgorithm) algorithm);
         }
+
         return Optional.of(JWSAlgorithm.parse(algorithm.getName()));
     }
 
@@ -76,7 +83,7 @@ public abstract class AbstractRSASignatureConfiguration
             return Optional.of((RSAKey) jwk);
         } catch (ParseException e) {
             LOG.warn("Could not parse JWK JSON string {}", jsonJwk);
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }
