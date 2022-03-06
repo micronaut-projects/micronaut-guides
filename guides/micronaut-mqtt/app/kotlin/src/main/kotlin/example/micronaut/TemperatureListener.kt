@@ -6,10 +6,10 @@ import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.nio.charset.StandardCharsets.UTF_8
 
-@MqttSubscriber
+@MqttSubscriber // <1>
 class TemperatureListener {
 
-    @Topic("house/livingroom/temperature")
+    @Topic("house/livingroom/temperature") // <2>
     fun receive(data: ByteArray) {
         val temperature = BigDecimal(String(data, UTF_8))
         LOG.info("temperature: {}", temperature)

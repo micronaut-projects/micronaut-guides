@@ -2,8 +2,6 @@ package example.micronaut;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -17,8 +15,6 @@ import static example.micronaut.Scale.FAHRENHEIT;
          description = "Publish living room temperature",
          mixinStandardHelpOptions = true)
 public class MicronautguideCommand implements Runnable {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MicronautguideCommand.class);
 
     @Option(names = {"-t", "--temperature"}, // <2>
             required = true, // <3>
@@ -45,7 +41,7 @@ public class MicronautguideCommand implements Runnable {
                 ? fahrenheitToCelsius(temperature) : temperature;
         byte[] data = celsius.toPlainString().getBytes();
         temperatureClient.publishLivingroomTemperature(data); // <6>
-        LOG.info("Topic published");
+        System.out.println("Topic published");
     }
 
     private static BigDecimal fahrenheitToCelsius(BigDecimal temperature) {

@@ -3,6 +3,7 @@ package example.micronaut;
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Replaces;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.util.CollectionUtils;
 import jakarta.inject.Singleton;
@@ -43,6 +44,7 @@ class MicronautguideCommandTest {
         }
     }
 
+    @Requires(property = "spec.name", value = "MicronautguideCommandTest")
     @Replaces(TemperatureClient.class)
     @Singleton
     static class TemperatureClientReplacement implements TemperatureClient {

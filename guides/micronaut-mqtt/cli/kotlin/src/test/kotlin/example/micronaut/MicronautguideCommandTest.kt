@@ -3,6 +3,7 @@ package example.micronaut
 import io.micronaut.configuration.picocli.PicocliRunner
 import io.micronaut.context.ApplicationContext
 import io.micronaut.context.annotation.Replaces
+import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 import jakarta.inject.Singleton
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -22,7 +23,7 @@ class MicronautguideCommandTest {
         System.setOut(PrintStream(baos))
 
         ApplicationContext.run(
-                mapOf("spec.name" to "MicronautguideCommandTest"),
+                mapOf("mqtt.enabled" to false, "spec.name" to "MicronautguideCommandTest"),
                 Environment.CLI, Environment.TEST).use { ctx ->
 
             val args = arrayOf("-t", "212", "-s", "Fahrenheit")
@@ -34,6 +35,7 @@ class MicronautguideCommandTest {
         }
     }
 
+    @Requires(property = "spec.name", value = "MicronautguideCommandTest")
     @Replaces(TemperatureClient::class)
     @Singleton
     internal class TemperatureClientReplacement : TemperatureClient {

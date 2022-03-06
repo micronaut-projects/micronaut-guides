@@ -1,7 +1,6 @@
 package example.micronaut
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 import io.micronaut.configuration.picocli.PicocliRunner
 import jakarta.inject.Inject
 import picocli.CommandLine.Command
@@ -12,7 +11,6 @@ import java.math.RoundingMode
 import static example.micronaut.Scale.CELSIUS
 import static example.micronaut.Scale.FAHRENHEIT
 
-@Slf4j
 @CompileStatic
 @Command(name = 'house-livingroom-temperature', // <1>
          description = 'Publish living room temperature',
@@ -44,7 +42,7 @@ class MicronautguideCommand implements Runnable {
                 ? fahrenheitToCelsius(temperature) : temperature
         byte[] data = celsius.toPlainString().bytes
         temperatureClient.publishLivingroomTemperature(data) // <6>
-        log.info('Topic published')
+        println('Topic published')
     }
 
     private static BigDecimal fahrenheitToCelsius(BigDecimal temperature) {

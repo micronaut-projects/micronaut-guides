@@ -4,7 +4,6 @@ import example.micronaut.Scale.CELSIUS
 import example.micronaut.Scale.FAHRENHEIT
 import io.micronaut.configuration.picocli.PicocliRunner
 import jakarta.inject.Inject
-import org.slf4j.LoggerFactory
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
 import java.math.BigDecimal
@@ -34,12 +33,10 @@ class MicronautguideCommand : Runnable {
         val celsius = if (temperatureScale === FAHRENHEIT) fahrenheitToCelsius(temperature!!) else temperature!!
         val data = celsius.toPlainString().toByteArray()
         temperatureClient.publishLivingroomTemperature(data) // <6>
-        LOG.info("Topic published")
+        println("Topic published")
     }
 
     companion object {
-
-        private val LOG = LoggerFactory.getLogger(MicronautguideCommand::class.java)
 
         @JvmStatic
         fun main(args: Array<String>) {

@@ -3,6 +3,7 @@ package example.micronaut
 import io.micronaut.configuration.picocli.PicocliRunner
 import io.micronaut.context.ApplicationContext
 import io.micronaut.context.annotation.Replaces
+import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 import jakarta.inject.Singleton
 import spock.lang.Specification
@@ -17,7 +18,7 @@ class MicronautguideCommandSpec extends Specification {
         System.setOut(new PrintStream(baos))
 
         ApplicationContext ctx = ApplicationContext.run(
-                ['spec.name': 'MicronautguideCommandTest'],
+                ['mqtt.enabled': false, 'spec.name': 'MicronautguideCommandSpec'],
                 Environment.CLI, Environment.TEST)
 
         String[] args = ['-t', '212', '-s', 'Fahrenheit']
@@ -36,6 +37,7 @@ class MicronautguideCommandSpec extends Specification {
         ctx.close()
     }
 
+    @Requires(property = 'spec.name', value = 'MicronautguideCommandSpec')
     @Replaces(TemperatureClient)
     @Singleton
     static class TemperatureClientReplacement implements TemperatureClient {

@@ -9,10 +9,10 @@ import static java.nio.charset.StandardCharsets.UTF_8
 
 @Slf4j
 @CompileStatic
-@MqttSubscriber
+@MqttSubscriber // <1>
 class TemperatureListener {
 
-    @Topic('house/livingroom/temperature')
+    @Topic('house/livingroom/temperature') // <2>
     void receive(byte[] data) {
         BigDecimal temperature = new BigDecimal(new String(data, UTF_8))
         log.info('temperature: {}', temperature)
