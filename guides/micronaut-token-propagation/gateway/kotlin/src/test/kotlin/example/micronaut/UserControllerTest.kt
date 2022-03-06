@@ -35,7 +35,7 @@ class UserControllerTest {
         val bearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
         val username = client.toBlocking()
                 .retrieve(HttpRequest.GET<Any>("/user")
-                .header("Authorization", "Bearer " + bearerAccessRefreshToken.accessToken), String::class.java)
+                .bearerAuth(bearerAccessRefreshToken.accessToken), String::class.java)
         assertEquals("sherlock", username)
     }
 }

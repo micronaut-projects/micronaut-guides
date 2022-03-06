@@ -36,7 +36,7 @@ class UserControllerSpec extends Specification {
         BearerAccessRefreshToken bearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken)
 
         String username = client.toBlocking().retrieve(HttpRequest.GET('/user')
-                .header('Authorization', 'Bearer ' + bearerAccessRefreshToken.accessToken), String)
+                .bearerAuth(bearerAccessRefreshToken.accessToken), String)
 
         then:
         'sherlock' == username

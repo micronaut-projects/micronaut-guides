@@ -38,7 +38,7 @@ class UserControllerTest {
         BearerAccessRefreshToken bearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken.class);
 
         String username = client.toBlocking().retrieve(HttpRequest.GET("/user")
-                .header("Authorization", "Bearer " + bearerAccessRefreshToken.getAccessToken()), String.class);
+                .bearerAuth(bearerAccessRefreshToken.getAccessToken()), String.class);
 
         assertEquals("sherlock", username);
     }
