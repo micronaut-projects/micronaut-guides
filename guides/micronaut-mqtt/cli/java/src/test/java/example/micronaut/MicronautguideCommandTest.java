@@ -4,6 +4,7 @@ import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.env.Environment;
+import io.micronaut.core.util.CollectionUtils;
 import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,9 @@ class MicronautguideCommandTest {
         System.setOut(new PrintStream(baos));
 
         try (ApplicationContext ctx = ApplicationContext.run(
-                Collections.singletonMap("spec.name", "MicronautguideCommandTest"),
+                CollectionUtils.mapOf(
+                        "mqtt.enabled", false,
+                        "spec.name", "MicronautguideCommandTest"),
                 Environment.CLI, Environment.TEST)) {
 
             String[] args = new String[] { "-t", "212", "-s", "Fahrenheit" };
