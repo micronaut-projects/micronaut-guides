@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Micronaut Token Propagation</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-token-propagation.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Micronaut Token Propagation"/>
+    <meta name="twitter:description" content="Learn how to leverage token propagation in the Micronaut framework to simplify your code while keeping your microservices secure."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-token-propagation.html">Micronaut Token Propagation</a> » <span class="breadcrumb_last" aria-current="page">gradle | kotlin</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a>
+<ul class="sectlevel2">
+<li><a href="#enable-annotation-processing">1.1. Enable annotation Processing</a></li>
+</ul>
+</li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#gateway">4.1. Gateway</a></li>
+<li><a href="#user-echo">4.2. User echo</a></li>
+<li><a href="#token-propagation">4.3. Token Propagation</a></li>
+</ul>
+</li>
+<li><a href="#running-the-app">5. Running the App</a></li>
+<li><a href="#generate-a-micronaut-application-native-image-with-graalvm">6. Generate a Micronaut Application Native Image with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#native-image-generation">6.1. Native image generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">7. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">8. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Micronaut Token Propagation</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to leverage token propagation in the Micronaut framework to simplify your code while keeping your microservices secure.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.3.3</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s describe the microservices you will build through the guide.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>gateway</code> - A microservice secured via JWT which exposes an endpoint <code>/user</code>. The output of that endpoint is the result of consuming the <code>userecho</code> endpoint.</p>
+</li>
+<li>
+<p><code>userecho</code> - A microservice secured via JWT which exposes an endpoint <code>/user</code> which responds with the username of the authenticated user.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The next diagram illustrates the flow:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/tokenpropagation.svg" alt="tokenpropagation">
+</div>
+</div>
+<div class="paragraph">
+<p>We generate a valid JWT in the gateway microservice. Then every microservice in our application is able to validate this JWT. We want every internal request to contain a valid JWT token. If we want to talk to another microservice we need to propagate the valid JWT get received.</p>
+</div>
+<div class="sect2">
+<h3 id="enable-annotation-processing">1.1. Enable annotation Processing</h3>
+<div class="paragraph">
+<p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-token-propagation-gradle-kotlin.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will write the application first without token propagation. Then we will configure token propagation, and you will see how much code we can remove.</p>
+</div>
+<div class="sect2">
+<h3 id="gateway">4.1. Gateway</h3>
+<div class="paragraph">
+<p>Create the microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.gateway --build=gradle --lang=kotlin</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add the security-jwt module to the configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">kapt(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.security:micronaut-security-annotations</span><span class="delimiter">&quot;</span></span>)
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.security:micronaut-security-jwt</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To keep this guide simple, create a naive AuthenticationProvider to simulate user&#8217;s authentication.</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-gateway/src/main/kotlin/example/micronaut/AuthenticationProviderUserPassword.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.core.annotation.Nullable
+import io.micronaut.http.HttpRequest
+import io.micronaut.security.authentication.AuthenticationProvider
+import io.micronaut.security.authentication.AuthenticationRequest
+import io.micronaut.security.authentication.AuthenticationResponse
+import jakarta.inject.Singleton
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
+
+@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
+class AuthenticationProviderUserPassword : AuthenticationProvider { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    override fun authenticate(@Nullable httpRequest: HttpRequest&lt;*&gt;?,
+                              authenticationRequest: AuthenticationRequest&lt;*, *&gt;): Publisher&lt;AuthenticationResponse&gt; {
+        return Flux.create({ emitter: FluxSink&lt;AuthenticationResponse&gt; -&gt;
+            if ((authenticationRequest.identity == &quot;sherlock&quot; || authenticationRequest.identity == &quot;watson&quot;) &amp;&amp; authenticationRequest.secret == &quot;password&quot;) {
+                emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
+                emitter.complete()
+            } else {
+                emitter.error(AuthenticationResponse.exception())
+            }
+        }, FluxSink.OverflowStrategy.ERROR)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.AuthenticationProvider</code></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a class <code>UserController</code> which exposes <code>/user</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-gateway/src/main/kotlin/example/micronaut/UserController.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Header
+import io.micronaut.http.annotation.Produces
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED
+import reactor.core.publisher.Mono
+
+@Controller(&quot;/user&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+class UserController(private val usernameFetcher: UsernameFetcher) { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Secured(IS_AUTHENTICATED) <i class="conum" data-value="3"></i><b>(3)</b>
+    @Produces(TEXT_PLAIN) <i class="conum" data-value="4"></i><b>(4)</b>
+    @Get <i class="conum" data-value="5"></i><b>(5)</b>
+    fun index(@Header(&quot;Authorization&quot;) authorization: String): Mono&lt;String&gt; = <i class="conum" data-value="6"></i><b>(6)</b>
+            usernameFetcher.findUsername(authorization)
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate with <code>io.micronaut.http.annotation.Controller</code> to designate the class as a Micronaut controller.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Constructor dependency injection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Annotate with <code>io.micronaut.security.Secured</code> to configure secured access. The <code>isAuthenticated()</code> expression will allow access only to authenticated users.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Since we return a string which is not valid JSON, set the media type to <code>text/plain</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the <code>io.micronaut.http.annotation.Get</code> annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>You can bind an HTTP header to a controller method argument.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create an interface to encapsulate the collaboration with the <code>userecho</code> microservice.</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-gateway/src/main/kotlin/example/micronaut/UsernameFetcher.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.annotation.Header
+import reactor.core.publisher.Mono
+
+interface UsernameFetcher {
+    fun findUsername(@Header(&quot;Authorization&quot;) authorization: String): Mono&lt;String&gt;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a Micronaut HTTP Declarative client:</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-gateway/src/main/kotlin/example/micronaut/UserEchoClient.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.env.Environment.TEST
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Consumes
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Header
+import io.micronaut.http.client.annotation.Client
+import reactor.core.publisher.Mono
+
+@Client(id = &quot;userecho&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+@Requires(notEnv = [TEST]) <i class="conum" data-value="2"></i><b>(2)</b>
+interface UserEchoClient : UsernameFetcher {
+
+    @Consumes(TEXT_PLAIN)
+    @Get(&quot;/user&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
+    override fun findUsername(@Header(&quot;Authorization&quot;) authorization: String): Mono&lt;String&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>@Client</code> annotation is used with a service id. We will reference the exact service id in the configuration shortly.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Don&#8217;t load this bean in the Test environment.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <code>@Get</code> annotation to define the client mapping</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Supply the JWT to the HTTP Authorization header value to the <code>@Client</code> method.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Add this snippet to <code>application.yml</code> to configure the service URL of the <code>echo</code> service</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-gateway/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">http</span>:
+    <span class="key">services</span>:
+      <span class="key">userecho</span>: <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="key">urls</span>:
+          - <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:8081</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This is the same service ID we used in the <code>@Client</code> annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Configure a URL where the <code>userecho</code> microservice resides.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Add this snippet to <code>application.yml</code> to configure security:</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-gateway/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">security</span>:
+    <span class="key">authentication</span>: <span class="string"><span class="content">bearer </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">token</span>:
+      <span class="key">jwt</span>:
+        <span class="key">signatures</span>:
+          <span class="key">secret</span>:
+            <span class="key">generator</span>: <i class="conum" data-value="2"></i><b>(2)</b>
+              <span class="key">secret</span>: <span class="string"><span class="content">'&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;' </span></span><i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set <code>authentication</code> to <code>bearer</code> to receive a JSON response from the login endpoint.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>You can create a SecretSignatureConfiguration named generator via configuration as illustrated above. The generator signature is used to sign the issued JWT claims.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Change this to your own secret and keep it safe (do not store this in your VCS)</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="tests">4.1.1. Tests</h4>
+<div class="paragraph">
+<p>Provide a <code>UsernameFetcher</code> bean replacement for the Test environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-gateway/src/test/kotlin/example/micronaut/UserEchoClientReplacement.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.env.Environment.TEST
+import io.micronaut.http.annotation.Header
+import jakarta.inject.Singleton
+import reactor.core.publisher.Mono
+
+@Requires(env = [TEST])
+@Singleton
+class UserEchoClientReplacement : UsernameFetcher {
+
+    override fun findUsername(@Header(&quot;Authorization&quot;) authorization: String): Mono&lt;String&gt; =
+            Mono.just(&quot;sherlock&quot;)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create tests to verify the application is secured and we can access it after login:</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-gateway/src/test/kotlin/example/micronaut/UserControllerTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpStatus.UNAUTHORIZED
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.security.authentication.UsernamePasswordCredentials
+import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+
+@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
+class UserControllerTest {
+
+    @Inject
+    @field:Client(&quot;/&quot;)
+    lateinit var client: HttpClient <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Test
+    fun testUserEndpointIsSecured() { <i class="conum" data-value="3"></i><b>(3)</b>
+        val thrown = assertThrows(HttpClientResponseException::class.java) {
+            client.toBlocking().exchange&lt;Any, Any&gt;(HttpRequest.GET(&quot;/user&quot;))
+        }
+        assertEquals(UNAUTHORIZED, thrown.response.status)
+    }
+
+    @Test
+    fun testAuthenticatedCanFetchUsername() {
+        val credentials = UsernamePasswordCredentials(&quot;sherlock&quot;, &quot;password&quot;)
+        val request: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/login&quot;, credentials)
+        val bearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
+        val username = client.toBlocking()
+                .retrieve(HttpRequest.GET&lt;Any&gt;(&quot;/user&quot;)
+                        .header(&quot;Authorization&quot;, &quot;Bearer &quot; + bearerAccessRefreshToken.accessToken), String::class.java)
+        assertEquals(&quot;sherlock&quot;, username)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Test endpoint is secured</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="user-echo">4.2. User echo</h3>
+<div class="paragraph">
+<p>Create the microservice:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.userecho --build=gradle --lang=kotlin</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add the security-jwt module to the configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">kapt(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.security:micronaut-security-annotations</span><span class="delimiter">&quot;</span></span>)
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.security:micronaut-security-jwt</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a class <code>UserController</code> which exposes <code>/user</code> endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-userecho/src/main/kotlin/example/micronaut/UserController.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Produces
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED
+import java.security.Principal
+
+@Controller(&quot;/user&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
+class UserController {
+
+    @Secured(IS_AUTHENTICATED) <i class="conum" data-value="2"></i><b>(2)</b>
+    @Produces(TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
+    @Get <i class="conum" data-value="4"></i><b>(4)</b>
+    fun index(principal: Principal): String = principal.name <i class="conum" data-value="5"></i><b>(5)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate with <code>io.micronaut.http.annotation.Controller</code> to designate the class as a Micronaut controller.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate with <code>io.micronaut.security.Secured</code> to configure secured access. The <code>isAuthenticated()</code> expression will allow access only to authenticated users.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Since we return a string which is not valid JSON, set the media type to <code>text/plain</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the <code>io.micronaut.http.annotation.Get</code> annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>If a user is authenticated, the Micronaut framework will bind the user object to an argument of type <code>java.security.Principal</code> (if present).</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Add this snippet to <code>application.yml</code> to change the port where <code>userecho</code> starts:</p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-userecho/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">server</span>:
+    <span class="key">port</span>: <span class="string"><span class="content">8081 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Configure the port where the application listens.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Add this snippet to <code>application.yml</code></p>
+</div>
+<div class="listingblock">
+<div class="title">intermediate-userecho/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">security</span>:
+    <span class="key">token</span>:
+      <span class="key">jwt</span>:
+        <span class="key">signatures</span>:
+          <span class="key">secret</span>:
+            <span class="key">validation</span>: <i class="conum" data-value="1"></i><b>(1)</b>
+              <span class="key">secret</span>: <span class="string"><span class="content">'&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;' </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>You can create a <code>SecretSignatureConfiguration</code> named <code>validation</code> which is able to validate JWT generated by the <code>gateway</code> microservice.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Change this to your own secret and keep it safe (do not store this in your VCS)</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="token-propagation">4.3. Token Propagation</h3>
+<div class="paragraph">
+<p>As you can see, propagating the JWT token to other microservices in our application complicates the code.
+We need to capture the <code>Authorization</code> header in the controller method arguments and then pass it to the <code>@Client</code> bean.
+In an application with several controllers and declarative clients, it can lead to a lot of repetition. Fortunately, the Framework includes a feature called token propagation. We can tell our application to propagate the incoming token to a set of outgoing requests.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s configure token propagation. We need to modify <code>application.yml</code> in the <code>gateway</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">security</span>:
+    <span class="key">token</span>:
+      <span class="key">propagation</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="key">service-id-regex</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">userecho</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Enable token propagation</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We only want to propagate the token to certain services. We can create a regular expression to match those services ids.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We can simplify the code:</p>
+</div>
+<div class="paragraph">
+<p>Edit <code>UserController.java</code> and remove the <code>@Header</code> parameter:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/kotlin/example/micronaut/UserController.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Produces
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED
+import reactor.core.publisher.Mono
+
+@Controller(&quot;/user&quot;)
+class UserController(private val usernameFetcher: UsernameFetcher) {
+
+    @Secured(IS_AUTHENTICATED)
+    @Produces(TEXT_PLAIN)
+    @Get
+    fun index(): Mono&lt;String&gt; = usernameFetcher.findUsername()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Edit <code>UsernameFetcher.java</code> and remove the <code>@Header</code> parameter:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/kotlin/example/micronaut/UsernameFetcher.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import reactor.core.publisher.Mono
+
+interface UsernameFetcher {
+    fun findUsername(): Mono&lt;String&gt;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Edit <code>UserEchoClient.java</code> and remove the <code>@Header</code> parameter:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/main/kotlin/example/micronaut/UserEchoClient.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.env.Environment.TEST
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Consumes
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.client.annotation.Client
+import reactor.core.publisher.Mono
+
+@Client(id = &quot;userecho&quot;)
+@Requires(notEnv = [TEST])
+interface UserEchoClient : UsernameFetcher {
+
+    @Consumes(TEXT_PLAIN)
+    @Get(&quot;/user&quot;)
+    override fun findUsername(): Mono&lt;String&gt;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Edit <code>UserEchoClientReplacement.java</code> and remove the <code>@Header</code> parameter:</p>
+</div>
+<div class="listingblock">
+<div class="title">gateway/src/test/kotlin/example/micronaut/UserEchoClientReplacement.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.env.Environment.TEST
+import jakarta.inject.Singleton
+import reactor.core.publisher.Mono
+
+@Requires(env = [TEST])
+@Singleton
+class UserEchoClientReplacement : UsernameFetcher {
+
+    override fun findUsername(): Mono&lt;String&gt; = Mono.just(&quot;sherlock&quot;)
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-app">5. Running the App</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Run both microservices:</p>
+</div>
+<div class="listingblock">
+<div class="title">userecho</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew run</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>18:29:26.500 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 671ms. Server Running: http://localhost:8081</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">gateway</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew run</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>18:28:35.723 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 707ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Send a curl request to authenticate:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/login&quot; \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{&quot;username&quot;: &quot;sherlock&quot;, &quot;password&quot;: &quot;password&quot;}'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">access_token</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNTkxMDM3Nywicm9sZXMiOltdLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNjE1OTEzOTc3LCJpYXQiOjE2MTU5MTAzNzd9.nWoaNq9YzRzYKDBvDw_QaiUyVyIoc6rHCW_vLfnrtQ8</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">token_type</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Bearer</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">expires_in</span><span class="delimiter">&quot;</span></span>:<span class="integer">3600</span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can call the <code>/user</code> endpoint supplying the access token in the Authorization header.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://localhost:8080/user&quot; -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNTkxMDM3Nywicm9sZXMiOltdLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNjE1OTEzOTc3LCJpYXQiOjE2MTU5MTAzNzd9.nWoaNq9YzRzYKDBvDw_QaiUyVyIoc6rHCW_vLfnrtQ8'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>sherlock</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-image-with-graalvm">6. Generate a Micronaut Application Native Image with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native image of our Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling native images ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="native-image-generation">6.1. Native image generation</h3>
+<div class="paragraph">
+<p>The easiest way to install GraalVM on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 11</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 22.0.0.2.r11-grl</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you still use Java 8, use the JDK11 version of GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Java 17</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ sdk install java 22.0.0.2.r17-grl</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/22.0/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>After installing GraalVM, install the <code>native-image</code> component, which is not installed by default:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gu install native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate a native image using Gradle, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native image is created in <code>build/native/nativeCompile</code> directory and can be run with <code>build/native/nativeCompile/application</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native image or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">graalvmNative {
+    binaries {
+        main {
+            imageName.set(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">--verbose</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native image name will now be <code>mn-graalvm-application</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra arguments to build the native image</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>After creating the native images for both microservices, start them and send the same curl requests as before to check that everything works using GraalVM native images.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">7. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#tokenPropagation">Token Propagation</a> and <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/">Micronaut Security</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">8. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -279,23 +279,20 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationException</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailed</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationProvider</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>;
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span> <span class="directive">implements</span> AuthenticationProvider { <i class="conum" data-value="2"></i><b>(2)</b>
-    
+
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest, AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
+    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest,
+                                                          AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
         <span class="keyword">return</span> Flux.create(emitter -&gt; {
             <span class="keyword">if</span> ((authenticationRequest.getIdentity().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>) || authenticationRequest.getIdentity().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">watson</span><span class="delimiter">&quot;</span></span>)) &amp;&amp;
                     authenticationRequest.getSecret().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>)) {
@@ -305,7 +302,6 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
                 emitter.error(AuthenticationResponse.exception());
             }
         }, FluxSink.OverflowStrategy.ERROR);
-
     }
 }</code></pre>
 </div>
@@ -330,28 +326,28 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED</span>;
+
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/user</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">UserController</span> {
+<span class="type">class</span> <span class="class">UserController</span> {
 
     <span class="directive">private</span> <span class="directive">final</span> UsernameFetcher usernameFetcher;
 
-    <span class="directive">public</span> UserController(UsernameFetcher usernameFetcher) {  <i class="conum" data-value="2"></i><b>(2)</b>
+    UserController(UsernameFetcher usernameFetcher) {  <i class="conum" data-value="2"></i><b>(2)</b>
         <span class="local-variable">this</span>.usernameFetcher = usernameFetcher;
     }
 
-    <span class="annotation">@Secured</span>(SecurityRule.IS_AUTHENTICATED)  <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="annotation">@Get</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="annotation">@Secured</span>(IS_AUTHENTICATED)  <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Produces</span>(TEXT_PLAIN) <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="annotation">@Get</span><i class="conum" data-value="5"></i><b>(5)</b>
     Mono&lt;<span class="predefined-type">String</span>&gt; index(<span class="annotation">@Header</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">Authorization</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> authorization) {  <i class="conum" data-value="6"></i><b>(6)</b>
         <span class="keyword">return</span> usernameFetcher.findUsername(authorization);
     }
@@ -395,7 +391,6 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">UsernameFetcher</span> {
@@ -412,21 +407,21 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
+
 <span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">&quot;</span><span class="content">userecho</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Requires</span>(notEnv = Environment.TEST) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@Requires</span>(notEnv = TEST) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">UserEchoClient</span> <span class="directive">extends</span> UsernameFetcher {
 
     <span class="annotation">@Override</span>
-    <span class="annotation">@Consumes</span>(MediaType.TEXT_PLAIN)
+    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/user</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
     Mono&lt;<span class="predefined-type">String</span>&gt; findUsername(<span class="annotation">@Header</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">Authorization</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> authorization); <i class="conum" data-value="4"></i><b>(4)</b>
 }</code></pre>
@@ -522,13 +517,13 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
-<span class="annotation">@Requires</span>(env = Environment.TEST)
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>;
+
+<span class="annotation">@Requires</span>(env = TEST)
 <span class="annotation">@Singleton</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">UserEchoClientReplacement</span> <span class="directive">implements</span> UsernameFetcher {
 
@@ -548,40 +543,39 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.token.jwt.render.BearerAccessRefreshToken</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNAUTHORIZED</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">UserControllerTest</span> {
+<span class="type">class</span> <span class="class">UserControllerTest</span> {
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
     HttpClient client; <i class="conum" data-value="2"></i><b>(2)</b>
 
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testUserEndpointIsSecured() { <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="type">void</span> testUserEndpointIsSecured() { <i class="conum" data-value="3"></i><b>(3)</b>
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -&gt; {
             client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/user</span><span class="delimiter">&quot;</span></span>));
         });
 
-        assertEquals(HttpStatus.UNAUTHORIZED, thrown.getResponse().getStatus());
+        assertEquals(UNAUTHORIZED, thrown.getResponse().getStatus());
     }
 
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testAuthenticatedCanFetchUsername() {
+    <span class="type">void</span> testAuthenticatedCanFetchUsername() {
         UsernamePasswordCredentials credentials = <span class="keyword">new</span> UsernamePasswordCredentials(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>);
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>, credentials);
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>, credentials);
 
         BearerAccessRefreshToken bearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken.class);
 
@@ -639,21 +633,22 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>;
 
 <span class="keyword">import</span> <span class="include">java.security.Principal</span>;
 
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/user</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">UserController</span> {
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED</span>;
 
-    <span class="annotation">@Secured</span>(SecurityRule.IS_AUTHENTICATED) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@Get</span> <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/user</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">UserController</span> {
+
+    <span class="annotation">@Secured</span>(IS_AUTHENTICATED) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@Produces</span>(TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Get</span><i class="conum" data-value="4"></i><b>(4)</b>
     <span class="predefined-type">String</span> index(<span class="predefined-type">Principal</span> principal) { <i class="conum" data-value="5"></i><b>(5)</b>
         <span class="keyword">return</span> principal.getName();
     }
@@ -776,26 +771,26 @@ In an application with several controllers and declarative clients, it can lead 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED</span>;
+
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/user</span><span class="delimiter">&quot;</span></span>)
-<span class="directive">public</span> <span class="type">class</span> <span class="class">UserController</span> {
+<span class="type">class</span> <span class="class">UserController</span> {
 
     <span class="directive">private</span> <span class="directive">final</span> UsernameFetcher usernameFetcher;
 
-    <span class="directive">public</span> UserController(UsernameFetcher usernameFetcher) {
+    UserController(UsernameFetcher usernameFetcher) {
         <span class="local-variable">this</span>.usernameFetcher = usernameFetcher;
     }
 
-    <span class="annotation">@Secured</span>(SecurityRule.IS_AUTHENTICATED)
-    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN)
+    <span class="annotation">@Secured</span>(IS_AUTHENTICATED)
+    <span class="annotation">@Produces</span>(TEXT_PLAIN)
     <span class="annotation">@Get</span>
     Mono&lt;<span class="predefined-type">String</span>&gt; index() {
         <span class="keyword">return</span> usernameFetcher.findUsername();
@@ -811,7 +806,6 @@ In an application with several controllers and declarative clients, it can lead 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">UsernameFetcher</span> {
@@ -828,19 +822,19 @@ In an application with several controllers and declarative clients, it can lead 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>;
+
 <span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">&quot;</span><span class="content">userecho</span><span class="delimiter">&quot;</span></span>)
-<span class="annotation">@Requires</span>(notEnv = Environment.TEST)
+<span class="annotation">@Requires</span>(notEnv = TEST)
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">UserEchoClient</span> <span class="directive">extends</span> UsernameFetcher {
 
-    <span class="annotation">@Consumes</span>(MediaType.TEXT_PLAIN)
+    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/user</span><span class="delimiter">&quot;</span></span>)
     Mono&lt;<span class="predefined-type">String</span>&gt; findUsername();
 }</code></pre>
@@ -855,12 +849,12 @@ In an application with several controllers and declarative clients, it can lead 
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
 
-<span class="annotation">@Requires</span>(env = Environment.TEST)
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>;
+
+<span class="annotation">@Requires</span>(env = TEST)
 <span class="annotation">@Singleton</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">UserEchoClientReplacement</span> <span class="directive">implements</span> UsernameFetcher {
 
