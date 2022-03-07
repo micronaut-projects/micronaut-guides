@@ -2,11 +2,11 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import io.micronaut.core.util.CollectionUtils
+import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
 import io.micronaut.guides.tasks.SampleProjectGenerationTask
 import io.micronaut.guides.tasks.TestScriptTask
-import io.micronaut.starter.options.BuildTool
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -20,6 +20,9 @@ import org.gradle.api.tasks.bundling.Zip
 
 import java.util.function.Predicate
 import java.util.stream.Collectors
+
+import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
+import static io.micronaut.starter.options.BuildTool.MAVEN
 
 @CompileStatic
 class GuidesPlugin implements Plugin<Project> {
@@ -214,24 +217,20 @@ class GuidesPlugin implements Plugin<Project> {
     private static Map<String, Object> workflowTokens(GuideMetadata metadata,
                                                       String taskSlug) {
         List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
+
         List<GuidesOption> gradleOptions = options
                 .stream()
                 .filter(option -> option.buildTool.isGradle())
                 .collect(Collectors.toList())
+
         List<GuidesOption> mavenOptions = options
                 .stream()
-                .filter(option -> option.buildTool == BuildTool.MAVEN)
+                .filter(option -> option.buildTool == MAVEN)
                 .collect(Collectors.toList())
 
-        String gradleProjects = String.join(COMMA, gradleOptions
-                .stream()
-                .map(option -> quote(optionName(metadata, option)))
-                .collect(Collectors.toList()))
+        String gradleProjects = projects(metadata, gradleOptions)
 
-        String mavenProjects = String.join(COMMA, mavenOptions
-                .stream()
-                .map(option -> quote(optionName(metadata, option)))
-                .collect(Collectors.toList()))
+        String mavenProjects = projects(metadata, mavenOptions)
 
         boolean mavenEnabled = !(CollectionUtils.isEmpty(mavenOptions) || metadata.skipMavenTests)
         boolean gradleEnabled = !(CollectionUtils.isEmpty(gradleOptions) || metadata.skipGradleTests)
@@ -245,6 +244,28 @@ class GuidesPlugin implements Plugin<Project> {
                 mavenEnabled  : String.valueOf(mavenEnabled),
                 gradleEnabled : String.valueOf(gradleEnabled)
         ] as Map
+    }
+
+    private static String projects(GuideMetadata metadata, List<GuidesOption> options) {
+
+        List<String> combinations = options
+                .stream()
+                .map(option -> optionName(metadata, option))
+                .collect(Collectors.toList())
+
+        List<String> allCombinations = []
+
+        for (String combination : combinations) {
+            for (App app : metadata.apps) {
+                if (DEFAULT_APP_NAME.equals(app.name)) {
+                    allCombinations << quote(combination)
+                } else {
+                    allCombinations << quote(combination + '/' + app.name)
+                }
+            }
+        }
+
+        String.join(COMMA, allCombinations)
     }
 
     private static TaskProvider<Copy> registerGenerateGithubActionSnapshotWorkflow(Project project,
