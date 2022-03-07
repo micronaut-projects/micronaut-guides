@@ -1,13 +1,13 @@
 package example.micronaut;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.env.Environment;
 import io.micronaut.http.annotation.Header;
-import org.reactivestreams.Publisher;
 import jakarta.inject.Singleton;
 import reactor.core.publisher.Mono;
 
-@Requires(env = Environment.TEST)
+import static io.micronaut.context.env.Environment.TEST;
+
+@Requires(env = TEST)
 @Singleton
 public class UserEchoClientReplacement implements UsernameFetcher {
 
