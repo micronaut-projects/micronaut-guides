@@ -1,6 +1,7 @@
 package io.micronaut.guides;
 
 public enum Category {
+    API("API"),
     GETTING_STARTED("Getting Started"),
     EMAIL("Email"),
     DATA_ACCESS("Data Access"),
