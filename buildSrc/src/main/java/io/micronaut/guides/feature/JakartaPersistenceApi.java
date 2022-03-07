@@ -8,6 +8,6 @@ import static io.micronaut.starter.build.dependencies.Scope.COMPILE_ONLY;
 public class JakartaPersistenceApi extends AbstractFeature {
 
     public JakartaPersistenceApi() {
-        super("jakarta-persistence-api", "jakarta.persistence-api", COMPILE_ONLY);
+        super("jakarta-persistence-api", "jakarta.persistence-api");
     }
 }
