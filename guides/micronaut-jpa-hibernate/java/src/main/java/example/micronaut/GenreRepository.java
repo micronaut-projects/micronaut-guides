@@ -9,15 +9,15 @@ import java.util.Optional;
 
 public interface GenreRepository {
 
-    Optional<Genre> findById(@NotNull Long id);
+    Optional<Genre> findById(long id);
 
     Genre save(@NotBlank String name);
 
     Genre saveWithException(@NotBlank String name);
 
-    void deleteById(@NotNull Long id);
+    void deleteById(long id);
 
     List<Genre> findAll(@NotNull SortingAndOrderArguments args);
 
-    int update(@NotNull Long id, @NotBlank String name);
+    int update(long id, @NotBlank String name);
 }
