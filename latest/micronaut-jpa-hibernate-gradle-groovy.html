@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Access a database with JPA and Hibernate</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-jpa-hibernate.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Access a database with JPA and Hibernate"/>
+    <meta name="twitter:description" content="Learn how to access a database with JPA and Hibernate using the Micronaut framework."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="https://micronaut.io/guides/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-jpa-hibernate.html">Access a database with JPA and Hibernate</a> » <span class="breadcrumb_last" aria-current="page">gradle | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#data-source-configuration">4.1. Data Source configuration</a></li>
+<li><a href="#jpa-configuration">4.2. JPA configuration</a></li>
+<li><a href="#domain">4.3. Domain</a></li>
+<li><a href="#application-configuration">4.4. Application Configuration</a></li>
+<li><a href="#repository-access">4.5. Repository Access</a></li>
+<li><a href="#controller">4.6. Controller</a></li>
+<li><a href="#writing-tests">4.7. Writing Tests</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">5. Testing the Application</a></li>
+<li><a href="#running-the-application">6. Running the Application</a></li>
+<li><a href="#using-postgresql">7. Using PostgreSQL</a></li>
+<li><a href="#next-steps">8. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Access a database with JPA and Hibernate</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to access a database with JPA and Hibernate using the Micronaut framework.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Iván López, Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.3.4</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Groovy.</p>
+</div>
+<div class="paragraph">
+<p>In this guide, we will write a Micronaut application that exposes some REST endpoints and stores data in a database using JPA and Hibernate.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-jpa-hibernate-gradle-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=gradle --lang=groovy</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="data-source-configuration">4.1. Data Source configuration</h3>
+<div class="paragraph">
+<p>Add the following dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.sql:micronaut-hibernate-jpa</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.sql:micronaut-jdbc-hikari</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.h2database:h2</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">jakarta.persistence:jakarta.persistence-api:2.2.3</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Configures Hibernate/JPA EntityManagerFactory beans.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Configures SQL DataSource instances using Hikari Connection Pool.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Add dependency to in-memory H2 Database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Add dependency to Jakarta Persistence API.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Define the data source in <code>src/main/resources/application.yml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+  <span class="key">default</span>:
+    <span class="key">url</span>: <span class="string"><span class="content">${JDBC_URL:`jdbc:h2:mem:default;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE`}</span></span>
+    <span class="key">username</span>: <span class="string"><span class="content">${JDBC_USER:sa}</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">${JDBC_PASSWORD:&quot;&quot;}</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">${JDBC_DRIVER:org.h2.Driver}</span></span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This way of defining the datasource properties means that we can externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined the Micronaut framework will use the default values.<br>
+Also keep in mind that it is necessary to escape the <code>:</code> in the connection URL using backticks <code>`</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jpa-configuration">4.2. JPA configuration</h3>
+<div class="paragraph">
+<p>Add the next snippet to <code>src/main/resources/application.yml</code> to configure JPA:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">jpa</span>:
+  <span class="key">default</span>:
+    <span class="key">properties</span>:
+      <span class="key">hibernate</span>:
+        <span class="key">hbm2ddl</span>:
+          <span class="key">auto</span>: <span class="string"><span class="content">update</span></span>
+        <span class="key">show_sql</span>: <span class="string"><span class="content">true</span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain">4.3. Domain</h3>
+<div class="paragraph">
+<p>Create the domain entities:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/domain/Genre.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.domain
+
+<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.annotation.JsonIgnore</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="keyword">import</span> <span class="include">javax.persistence.Column</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.Entity</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.GeneratedValue</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.Id</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.OneToMany</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.Table</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">javax.persistence.GenerationType.AUTO</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Entity</span>
+<span class="annotation">@Table</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">genre</span><span class="delimiter">'</span></span>)
+<span class="type">class</span> <span class="class">Genre</span> {
+
+    <span class="annotation">@Id</span>
+    <span class="annotation">@GeneratedValue</span>(strategy = AUTO)
+    <span class="predefined-type">Long</span> id
+
+    <span class="annotation">@NotNull</span>
+    <span class="annotation">@Column</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">name</span><span class="delimiter">'</span></span>, nullable = <span class="predefined-constant">false</span>, unique = <span class="predefined-constant">true</span>)
+    <span class="predefined-type">String</span> name
+
+    <span class="annotation">@JsonIgnore</span>
+    <span class="annotation">@OneToMany</span>(mappedBy = <span class="string"><span class="delimiter">'</span><span class="content">genre</span><span class="delimiter">'</span></span>)
+    <span class="predefined-type">Set</span>&lt;<span class="predefined-type">Book</span>&gt; books = <span class="type">[]</span>
+
+    Genre() {}
+
+    Genre(<span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">String</span> toString() {
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">Genre{id=</span><span class="inline"><span class="inline-delimiter">$</span>id</span><span class="content">, name='</span><span class="inline"><span class="inline-delimiter">$</span>name</span><span class="content">'}</span><span class="delimiter">&quot;</span></span>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous domain has a <code>OneToMany</code> relationship with the domain <code>Book</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/domain/Book.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.domain
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+
+<span class="keyword">import</span> <span class="include">javax.persistence.Column</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.Entity</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.GeneratedValue</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.Id</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.ManyToOne</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.Table</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">javax.persistence.GenerationType.AUTO</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Entity</span>
+<span class="annotation">@Table</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">book</span><span class="delimiter">'</span></span>)
+<span class="type">class</span> <span class="class">Book</span> {
+
+    <span class="annotation">@Id</span>
+    <span class="annotation">@GeneratedValue</span>(strategy = AUTO)
+    <span class="predefined-type">Long</span> id
+
+    <span class="annotation">@NotNull</span>
+    <span class="annotation">@Column</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">name</span><span class="delimiter">'</span></span>, nullable = <span class="predefined-constant">false</span>)
+    <span class="predefined-type">String</span> name
+
+    <span class="annotation">@NotNull</span>
+    <span class="annotation">@Column</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">isbn</span><span class="delimiter">'</span></span>, nullable = <span class="predefined-constant">false</span>)
+    <span class="predefined-type">String</span> isbn
+
+    <span class="annotation">@ManyToOne</span>
+    Genre genre
+
+    <span class="predefined-type">Book</span>() {}
+
+    <span class="predefined-type">Book</span>(<span class="annotation">@NotNull</span> <span class="predefined-type">String</span> isbn,
+         <span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name,
+         Genre genre) {
+        <span class="local-variable">this</span>.isbn = isbn
+        <span class="local-variable">this</span>.name = name
+        <span class="local-variable">this</span>.genre = genre
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="predefined-type">String</span> toString() {
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">Book{id=</span><span class="inline"><span class="inline-delimiter">$</span>id</span><span class="content">, name='</span><span class="inline"><span class="inline-delimiter">$</span>name</span><span class="content">', isbn='</span><span class="inline"><span class="inline-delimiter">$</span>isbn</span><span class="content">', genre=</span><span class="inline"><span class="inline-delimiter">$</span>genre</span><span class="content">}</span><span class="delimiter">&quot;</span></span>
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="application-configuration">4.4. Application Configuration</h3>
+<div class="paragraph">
+<p>Create an interface to encapsulate the application configuration settings:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/ApplicationConfiguration.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="type">interface</span> ApplicationConfiguration {
+    <span class="type">int</span> getMax()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Like Spring Boot and Grails, in Micronaut applications you can create typesafe configuration by creating classes that are annotated with <a href="https://docs.micronaut.io/latest/guide/#configurationProperties">@ConfigurationProperties</a>.</p>
+</div>
+<div class="paragraph">
+<p>Create a <code>ApplicationConfigurationProperties</code> class:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/ApplicationConfigurationProperties.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">'</span><span class="content">application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">ApplicationConfigurationProperties</span> <span class="directive">implements</span> ApplicationConfiguration {
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="type">int</span> DEFAULT_MAX = <span class="integer">10</span>
+
+    <span class="type">int</span> max = DEFAULT_MAX
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>@ConfigurationProperties</code> annotation takes the configuration prefix</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can override <code>max</code> if you add to your <code>src/main/resources/application.yml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">application</span>:
+  <span class="key">max</span>: <span class="string"><span class="content">50</span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repository-access">4.5. Repository Access</h3>
+<div class="paragraph">
+<p>To mark the transaction demarcations, we use the <a href="https://docs.oracle.com/javaee/7/api/javax/transaction/Transactional.html">Java EE 7 javax.transaction.Transactional annotation</a>.</p>
+</div>
+<div class="paragraph">
+<p>To use it, you have to include the <code>micronaut-data-processor</code> dependency in your annotation processor configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">compileOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.data:micronaut-data-hibernate-jpa</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, create a repository interface to define the operations to access the database:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/GenreRepository.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+
+<span class="type">interface</span> GenreRepository {
+
+    Optional&lt;Genre&gt; findById(<span class="type">long</span> id)
+
+    Genre save(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name)
+
+    Genre saveWithException(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name)
+
+    <span class="type">void</span> deleteById(<span class="type">long</span> id)
+
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAll(<span class="annotation">@NotNull</span> SortingAndOrderArguments args)
+
+    <span class="type">int</span> update(<span class="type">long</span> id, <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The implementation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/GenreRepositoryImpl.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.transaction.annotation.ReadOnly</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+
+<span class="keyword">import</span> <span class="include">javax.persistence.EntityManager</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.PersistenceException</span>
+<span class="keyword">import</span> <span class="include">javax.persistence.TypedQuery</span>
+<span class="keyword">import</span> <span class="include">javax.transaction.Transactional</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>
+
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">GenreRepositoryImpl</span> <span class="directive">implements</span> GenreRepository {
+
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; VALID_PROPERTY_NAMES = [<span class="string"><span class="delimiter">'</span><span class="content">id</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">name</span><span class="delimiter">'</span></span>]
+
+    <span class="directive">private</span> <span class="directive">final</span> EntityManager entityManager  <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">private</span> <span class="directive">final</span> ApplicationConfiguration applicationConfiguration
+
+    GenreRepositoryImpl(EntityManager entityManager,
+                        ApplicationConfiguration applicationConfiguration) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.entityManager = entityManager
+        <span class="local-variable">this</span>.applicationConfiguration = applicationConfiguration
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@ReadOnly</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+    Optional&lt;Genre&gt; findById(<span class="type">long</span> id) {
+        Optional.ofNullable(entityManager.find(Genre, id))
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    Genre save(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        Genre genre = <span class="keyword">new</span> Genre(name)
+        entityManager.persist(genre)
+        genre
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="type">void</span> deleteById(<span class="type">long</span> id) {
+        findById(id).ifPresent(<span class="key">entityManager</span>::remove)
+    }
+
+    <span class="annotation">@ReadOnly</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="predefined-type">List</span>&lt;Genre&gt; findAll(<span class="annotation">@NotNull</span> SortingAndOrderArguments args) {
+        <span class="predefined-type">String</span> qlString = <span class="string"><span class="delimiter">'</span><span class="content">SELECT g FROM Genre as g</span><span class="delimiter">'</span></span>
+        <span class="keyword">if</span> (args.order.present &amp;&amp; args.sort.present &amp;&amp; VALID_PROPERTY_NAMES.contains(args.sort.get())) {
+            qlString += <span class="string"><span class="delimiter">'</span><span class="content"> ORDER BY g.</span><span class="delimiter">'</span></span> + args.sort.get() + <span class="string"><span class="delimiter">'</span><span class="content"> </span><span class="delimiter">'</span></span> + args.order.get().toLowerCase()
+        }
+        TypedQuery&lt;Genre&gt; query = entityManager.createQuery(qlString, Genre)
+        query.maxResults = args.max.orElseGet(<span class="key">applicationConfiguration</span>::getMax)
+        args.offset.ifPresent(<span class="key">query</span>::setFirstResult)
+
+        query.resultList
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="type">int</span> update(<span class="type">long</span> id, <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        entityManager.createQuery(<span class="string"><span class="delimiter">'</span><span class="content">UPDATE Genre g SET name = :name where id = :id</span><span class="delimiter">'</span></span>)
+                .setParameter(<span class="string"><span class="delimiter">'</span><span class="content">name</span><span class="delimiter">'</span></span>, name)
+                .setParameter(<span class="string"><span class="delimiter">'</span><span class="content">id</span><span class="delimiter">'</span></span>, id)
+                .executeUpdate()
+    }
+
+    <span class="annotation">@Override</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    Genre saveWithException(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        save(name)
+        <span class="keyword">throw</span> <span class="keyword">new</span> PersistenceException()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Easily inject an <code>EntityManager</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>All database access needs to be wrapped inside a transaction. As the method only reads data from the database, annotate it with <code>@ReadOnly</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>This method modifies the database, thus it is annotated with <code>@Transactional</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controller">4.6. Controller</h3>
+<div class="paragraph">
+<p>Micronaut validation is built on the standard framework – <a href="https://www.jcp.org/en/jsr/detail?id=380">JSR 380</a>, also known as Bean Validation 2.0.</p>
+</div>
+<div class="paragraph">
+<p>Hibernate Validator is a reference implementation of the validation API. Micronaut <a href="https://docs.micronaut.io/latest/guide/#beanValidation">has built-in support for validation of beans</a> that are annotated with <code>javax.validation</code> annotations.</p>
+</div>
+<div class="paragraph">
+<p>The necessary dependencies are included by default when creating a new application, so you don&#8217;t need to add anything else.</p>
+</div>
+<div class="paragraph">
+<p>Create two classes to encapsulate Save and Update operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/GenreSaveCommand.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">GenreSaveCommand</span> {
+
+    <span class="annotation">@NotBlank</span>
+    <span class="predefined-type">String</span> name
+
+    GenreSaveCommand(<span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to the render the POJO as JSON using Jackson without using reflection.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/GenreUpdateCommand.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">GenreUpdateCommand</span> {
+
+    <span class="type">long</span> id
+
+    <span class="annotation">@NotBlank</span>
+    <span class="predefined-type">String</span> name
+
+    GenreUpdateCommand(<span class="type">long</span> id, <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.id = id
+        <span class="local-variable">this</span>.name = name
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a POJO to encapsulate Sorting and Pagination:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/SortingAndOrderArguments.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.Positive</span>
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.PositiveOrZero</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">SortingAndOrderArguments</span> {
+
+    <span class="annotation">@Nullable</span>
+    <span class="annotation">@PositiveOrZero</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="directive">private</span> <span class="predefined-type">Integer</span> offset
+
+    <span class="annotation">@Nullable</span>
+    <span class="annotation">@Positive</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="directive">private</span> <span class="predefined-type">Integer</span> max
+
+    <span class="annotation">@Nullable</span>
+    <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">id|name</span><span class="delimiter">'</span></span>)  <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="directive">private</span> <span class="predefined-type">String</span> sort
+
+    <span class="annotation">@Nullable</span>
+    <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">'</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">'</span></span>)  <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="directive">private</span> <span class="predefined-type">String</span> order
+
+    Optional&lt;<span class="predefined-type">Integer</span>&gt; getOffset() {
+        Optional.ofNullable(offset)
+    }
+
+    <span class="type">void</span> setOffset(<span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> offset) {
+        <span class="local-variable">this</span>.offset = offset
+    }
+
+    Optional&lt;<span class="predefined-type">Integer</span>&gt; getMax() {
+        Optional.ofNullable(max)
+    }
+
+    <span class="type">void</span> setMax(<span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> max) {
+        <span class="local-variable">this</span>.max = max
+    }
+
+    Optional&lt;<span class="predefined-type">String</span>&gt; getSort() {
+        Optional.ofNullable(sort)
+    }
+
+    <span class="type">void</span> setSort(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> sort) {
+        <span class="local-variable">this</span>.sort = sort
+    }
+
+    Optional&lt;<span class="predefined-type">String</span>&gt; getOrder() {
+        Optional.ofNullable(order)
+    }
+
+    <span class="type">void</span> setOrder(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> order) {
+        <span class="local-variable">this</span>.order = order
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>javax.validation.constraints</code> Constraints to ensure the incoming data matches your expectations.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create <code>GenreController</code>, a controller which exposes a resource with the common CRUD operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/GenreController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Delete</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Put</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>
+
+<span class="keyword">import</span> <span class="include">javax.persistence.PersistenceException</span>
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.LOCATION</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@ExecuteOn</span>(TaskExecutors.IO)  <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/genres</span><span class="delimiter">'</span></span>)  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">GenreController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> GenreRepository genreRepository
+
+    GenreController(GenreRepository genreRepository) { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.genreRepository = genreRepository
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/{id}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
+    Genre show(<span class="predefined-type">Long</span> id) {
+        genreRepository
+                .findById(id)
+                .orElse(<span class="predefined-constant">null</span>) <i class="conum" data-value="5"></i><b>(5)</b>
+    }
+
+    <span class="annotation">@Put</span> <i class="conum" data-value="6"></i><b>(6)</b>
+    HttpResponse&lt;?&gt; update(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreUpdateCommand command) { <i class="conum" data-value="7"></i><b>(7)</b>
+        <span class="type">int</span> numberOfEntitiesUpdated = genreRepository.update(command.id, command.name)
+
+        HttpResponse
+                .noContent()
+                .header(LOCATION, location(command.id).path) <i class="conum" data-value="8"></i><b>(8)</b>
+    }
+
+    <span class="annotation">@Get</span>(value = <span class="string"><span class="delimiter">'</span><span class="content">/list{?args*}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="9"></i><b>(9)</b>
+    <span class="predefined-type">List</span>&lt;Genre&gt; list(<span class="annotation">@Valid</span> SortingAndOrderArguments args) {
+        genreRepository.findAll(args)
+    }
+
+    <span class="annotation">@Post</span> <i class="conum" data-value="10"></i><b>(10)</b>
+    HttpResponse&lt;Genre&gt; save(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreSaveCommand cmd) {
+        Genre genre = genreRepository.save(cmd.name)
+
+        HttpResponse
+                .created(genre)
+                .headers(headers -&gt; headers.location(location(genre.id)))
+    }
+
+    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">'</span><span class="content">/ex</span><span class="delimiter">'</span></span>) <i class="conum" data-value="11"></i><b>(11)</b>
+    HttpResponse&lt;Genre&gt; saveExceptions(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreSaveCommand cmd) {
+        <span class="keyword">try</span> {
+            Genre genre = genreRepository.saveWithException(cmd.name)
+            HttpResponse
+                    .created(genre)
+                    .headers(headers -&gt; headers.location(location(genre.id)))
+        } <span class="keyword">catch</span>(PersistenceException ignored) {
+            HttpResponse.noContent()
+        }
+    }
+
+    <span class="annotation">@Delete</span>(<span class="string"><span class="delimiter">'</span><span class="content">/{id}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="12"></i><b>(12)</b>
+    HttpResponse&lt;?&gt; delete(<span class="predefined-type">Long</span> id) {
+        genreRepository.deleteById(id)
+        HttpResponse.noContent()
+    }
+
+    <span class="directive">private</span> <span class="predefined-type">URI</span> location(<span class="predefined-type">Long</span> id) {
+        <span class="predefined-type">URI</span>.create(<span class="string"><span class="delimiter">'</span><span class="content">/genres/</span><span class="delimiter">'</span></span> + id)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/genres</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Constructor injection.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Maps a <code>GET</code> request to <code>/genres/{id}</code> which attempts to show a genre. This illustrates the use of a URL path variable.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Returning <code>null</code> when the genre doesn&#8217;t exist makes the Micronaut framework respond with 404 (not found).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Maps a <code>PUT</code> request to <code>/genres</code> which attempts to update a genre.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Add <code>@Valid</code> to any method parameter which requires validation. Use a POJO supplied as a JSON payload in the request to populate command.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>It is easy to add custom headers to the response.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Maps a <code>GET</code> request to <code>/genres</code> which returns a list of genres. This mapping illustrates URL parameters being mapped to a single POJO.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>Maps a <code>POST</code> request to <code>/genres</code> which attempts to save a genre.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>Maps a <code>POST</code> request to <code>/ex</code> which generates an exception.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="12"></i><b>12</b></td>
+<td>Maps a <code>DELETE</code> request to <code>/genres/{id}</code> which attempts to remove a genre. This illustrates the use of a URL path variable.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="writing-tests">4.7. Writing Tests</h3>
+<div class="paragraph">
+<p>Create a test to verify the CRUD operations:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/GenreControllerSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.LOCATION</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.BAD_REQUEST</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.CREATED</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.NOT_FOUND</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.NO_CONTENT</span>
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">GenreControllerSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="directive">private</span> BlockingHttpClient blockingClient
+
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
+    HttpClient client <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="type">void</span> setup() {
+        blockingClient = client.toBlocking()
+    }
+
+    <span class="type">void</span> supplyAnInvalidOrderTriggersValidationFailure() {
+
+        <span class="key">when</span>:
+        blockingClient.exchange(HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/list?order=foo</span><span class="delimiter">'</span></span>))
+
+        <span class="key">then</span>:
+        HttpClientResponseException e = thrown()
+        e.response
+        BAD_REQUEST == e.status
+    }
+
+    <span class="type">void</span> testFindNonExistingGenreReturns404() {
+        <span class="key">when</span>:
+        blockingClient.exchange(HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/99</span><span class="delimiter">'</span></span>))
+
+        <span class="key">then</span>:
+        HttpClientResponseException e = thrown()
+        e.response
+        NOT_FOUND == e.status
+    }
+
+    <span class="type">void</span> testGenreCrudOperations() {
+
+        <span class="key">given</span>:
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Long</span>&gt; genreIds = <span class="type">[]</span>
+
+        <span class="key">when</span>:
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/genres</span><span class="delimiter">'</span></span>, <span class="keyword">new</span> GenreSaveCommand(<span class="string"><span class="delimiter">'</span><span class="content">DevOps</span><span class="delimiter">'</span></span>)) <i class="conum" data-value="3"></i><b>(3)</b>
+        HttpResponse&lt;?&gt; response = blockingClient.exchange(request)
+        genreIds &lt;&lt; entityId(response)
+
+        <span class="key">then</span>:
+        CREATED == response.status
+
+        <span class="key">when</span>:
+        request = HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/genres</span><span class="delimiter">'</span></span>, <span class="keyword">new</span> GenreSaveCommand(<span class="string"><span class="delimiter">'</span><span class="content">Microservices</span><span class="delimiter">'</span></span>)) <i class="conum" data-value="3"></i><b>(3)</b>
+        response = blockingClient.exchange(request)
+
+        <span class="key">then</span>:
+        CREATED == response.status
+
+        <span class="key">when</span>:
+        <span class="predefined-type">Long</span> id = entityId(response)
+        genreIds &lt;&lt; id
+        request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/</span><span class="delimiter">'</span></span> + id)
+
+        Genre genre = blockingClient.retrieve(request, Genre) <i class="conum" data-value="4"></i><b>(4)</b>
+
+        <span class="key">then</span>:
+        <span class="string"><span class="delimiter">'</span><span class="content">Microservices</span><span class="delimiter">'</span></span> == genre.name
+
+        <span class="key">when</span>:
+        request = HttpRequest.PUT(<span class="string"><span class="delimiter">'</span><span class="content">/genres</span><span class="delimiter">'</span></span>, <span class="keyword">new</span> GenreUpdateCommand(id, <span class="string"><span class="delimiter">'</span><span class="content">Micro-services</span><span class="delimiter">'</span></span>))
+        response = blockingClient.exchange(request)  <i class="conum" data-value="5"></i><b>(5)</b>
+
+        <span class="key">then</span>:
+        NO_CONTENT == response.status
+
+        <span class="key">when</span>:
+        request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/</span><span class="delimiter">'</span></span> + id)
+        genre = blockingClient.retrieve(request, Genre)
+
+
+        <span class="key">then</span>:
+        <span class="string"><span class="delimiter">'</span><span class="content">Micro-services</span><span class="delimiter">'</span></span> == genre.name
+
+        <span class="key">when</span>:
+        request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/list</span><span class="delimiter">'</span></span>)
+        <span class="predefined-type">List</span>&lt;Genre&gt; genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>, Genre))
+
+        <span class="key">then</span>:
+        <span class="integer">2</span> == genres.size()
+
+        <span class="key">when</span>:
+        request = HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/genres/ex</span><span class="delimiter">'</span></span>, <span class="keyword">new</span> GenreSaveCommand(<span class="string"><span class="delimiter">'</span><span class="content">Microservices</span><span class="delimiter">'</span></span>)) <i class="conum" data-value="3"></i><b>(3)</b>
+        response = blockingClient.exchange(request)
+
+        <span class="key">then</span>:
+        NO_CONTENT == response.status
+
+        <span class="key">when</span>:
+        request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/list</span><span class="delimiter">'</span></span>)
+        genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>, Genre))
+
+        <span class="key">then</span>:
+        <span class="integer">2</span> == genres.size()
+
+        <span class="key">when</span>:
+        request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/list?max=1</span><span class="delimiter">'</span></span>)
+        genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>, Genre))
+
+        <span class="key">then</span>:
+        <span class="integer">1</span> == genres.size()
+        <span class="string"><span class="delimiter">'</span><span class="content">DevOps</span><span class="delimiter">'</span></span> == genres[<span class="integer">0</span>].name
+
+        <span class="key">when</span>:
+        request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/list?max=1&amp;order=desc&amp;sort=name</span><span class="delimiter">'</span></span>)
+        genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>, Genre))
+
+        <span class="key">then</span>:
+        <span class="integer">1</span> == genres.size()
+        <span class="string"><span class="delimiter">'</span><span class="content">Micro-services</span><span class="delimiter">'</span></span> == genres[<span class="integer">0</span>].name
+
+        <span class="key">when</span>:
+        request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/genres/list?max=1&amp;offset=10</span><span class="delimiter">'</span></span>)
+        genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>, Genre))
+
+        <span class="key">then</span>:
+        <span class="integer">0</span> == genres.size()
+
+        <span class="key">cleanup</span>:
+        <span class="keyword">for</span> (<span class="predefined-type">Long</span> genreId : genreIds) {
+            request = HttpRequest.DELETE(<span class="string"><span class="delimiter">'</span><span class="content">/genres/</span><span class="delimiter">'</span></span> + genreId)
+            response = blockingClient.exchange(request)
+            <span class="keyword">assert</span> NO_CONTENT == response.status
+        }
+    }
+
+    <span class="directive">private</span> <span class="predefined-type">Long</span> entityId(HttpResponse response) {
+        <span class="predefined-type">String</span> path = <span class="string"><span class="delimiter">'</span><span class="content">/genres/</span><span class="delimiter">'</span></span>
+        <span class="predefined-type">String</span> value = response.header(LOCATION)
+        <span class="keyword">if</span> (value == <span class="predefined-constant">null</span>) {
+            <span class="keyword">return</span> <span class="predefined-constant">null</span>
+        }
+
+        <span class="type">int</span> index = value.indexOf(path)
+        <span class="keyword">if</span> (index != -<span class="integer">1</span>) {
+            <span class="keyword">return</span> value.substring(index + path.length()) <span class="keyword">as</span> <span class="type">long</span>
+        }
+
+        <span class="predefined-constant">null</span>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>If you care just about the object in the response use <code>retrieve</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">6. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command, which starts the application on port 8080.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-postgresql">7. Using PostgreSQL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When running on production you want to use a real database instead of using H2. Let&#8217;s explain how to use PostgreSQL.</p>
+</div>
+<div class="paragraph">
+<p>After installing Docker, execute the following command to run a PostgreSQL container:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run -it --rm \
+    -p 5432:5432 \
+    -e POSTGRES_USER=dbuser \
+    -e POSTGRES_PASSWORD=theSecretPassword \
+    -e POSTGRES_DB=micronaut \
+    postgres:11.5-alpine</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add PostgreSQL driver dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.postgresql:postgresql</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To use PostgreSQL, set up several environment variables which match those defined in <code>application.yml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ export JDBC_URL=jdbc:postgresql://localhost:5432/micronaut
+$ export JDBC_USER=dbuser
+$ export JDBC_PASSWORD=theSecretPassword
+$ export JDBC_DRIVER=org.postgresql.Driver</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run the application again. If you look at the output you can see that the application uses PostgreSQL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">..
+...
+08:40:02.746 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Connect to your PostgreSQL database, and you will see both <code>genre</code> and <code>book</code> tables.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/datagrip.png" alt="datagrip">
+</div>
+</div>
+<div class="paragraph">
+<p>Save one genre, and your <code>genre</code> table will now contain an entry.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/genres&quot; \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ &quot;name&quot;: &quot;music&quot; }'</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://docs.micronaut.io/latest/guide/#dataAccess">Configurations for Data Access</a> section in the Micronaut documentation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://objectcomputing.com/products/2gm-team">Meet the Team</a>.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

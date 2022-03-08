@@ -259,7 +259,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.sql:micronaut-hibernate-jpa</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.sql:micronaut-jdbc-hikari</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.h2database:h2</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.h2database:h2</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">jakarta.persistence:jakarta.persistence-api:2.2.3</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -275,6 +276,10 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>Add dependency to in-memory H2 Database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Add dependency to Jakarta Persistence API.</td>
 </tr>
 </table>
 </div>
@@ -339,7 +344,6 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <span class="keyword">import</span> <span class="include">javax.persistence.Column</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.Entity</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.GeneratedValue</span>;
-<span class="keyword">import</span> <span class="include">javax.persistence.GenerationType</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.Id</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.OneToMany</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.Table</span>;
@@ -347,18 +351,14 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <span class="keyword">import</span> <span class="include">java.util.HashSet</span>;
 <span class="keyword">import</span> <span class="include">java.util.Set</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">javax.persistence.GenerationType.AUTO</span>;
+
 <span class="annotation">@Entity</span>
 <span class="annotation">@Table</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span>)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Genre</span> {
 
-    <span class="directive">public</span> Genre() {}
-
-    <span class="directive">public</span> Genre(<span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
-    }
-
     <span class="annotation">@Id</span>
-    <span class="annotation">@GeneratedValue</span>(strategy = GenerationType.AUTO)
+    <span class="annotation">@GeneratedValue</span>(strategy = AUTO)
     <span class="directive">private</span> <span class="predefined-type">Long</span> id;
 
     <span class="annotation">@NotNull</span>
@@ -368,6 +368,12 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
     <span class="annotation">@JsonIgnore</span>
     <span class="annotation">@OneToMany</span>(mappedBy = <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span>)
     <span class="directive">private</span> <span class="predefined-type">Set</span>&lt;<span class="predefined-type">Book</span>&gt; books = <span class="keyword">new</span> <span class="predefined-type">HashSet</span>&lt;&gt;();
+
+    <span class="directive">public</span> Genre() {}
+
+    <span class="directive">public</span> Genre(<span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name;
+    }
 
     <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
         <span class="keyword">return</span> id;
@@ -414,26 +420,19 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <span class="keyword">import</span> <span class="include">javax.persistence.Column</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.Entity</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.GeneratedValue</span>;
-<span class="keyword">import</span> <span class="include">javax.persistence.GenerationType</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.Id</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.ManyToOne</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.Table</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">javax.persistence.GenerationType.AUTO</span>;
+
 <span class="annotation">@Entity</span>
 <span class="annotation">@Table</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">book</span><span class="delimiter">&quot;</span></span>)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Book</span> {
 
-    <span class="directive">public</span> <span class="predefined-type">Book</span>() {}
-
-    <span class="directive">public</span> <span class="predefined-type">Book</span>(<span class="annotation">@NotNull</span> <span class="predefined-type">String</span> isbn, <span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name, Genre genre) {
-        <span class="local-variable">this</span>.isbn = isbn;
-        <span class="local-variable">this</span>.name = name;
-        <span class="local-variable">this</span>.genre = genre;
-    }
-
     <span class="annotation">@Id</span>
-    <span class="annotation">@GeneratedValue</span>(strategy = GenerationType.AUTO)
+    <span class="annotation">@GeneratedValue</span>(strategy = AUTO)
     <span class="directive">private</span> <span class="predefined-type">Long</span> id;
 
     <span class="annotation">@NotNull</span>
@@ -446,6 +445,16 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 
     <span class="annotation">@ManyToOne</span>
     <span class="directive">private</span> Genre genre;
+
+    <span class="directive">public</span> <span class="predefined-type">Book</span>() {}
+
+    <span class="directive">public</span> <span class="predefined-type">Book</span>(<span class="annotation">@NotNull</span> <span class="predefined-type">String</span> isbn,
+                <span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name,
+                Genre genre) {
+        <span class="local-variable">this</span>.isbn = isbn;
+        <span class="local-variable">this</span>.name = name;
+        <span class="local-variable">this</span>.genre = genre;
+    }
 
     <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
         <span class="keyword">return</span> id;
@@ -502,11 +511,8 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
-
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">ApplicationConfiguration</span> {
-
-    <span class="annotation">@NotNull</span> <span class="predefined-type">Integer</span> getMax();
+    <span class="type">int</span> getMax();
 }</code></pre>
 </div>
 </div>
@@ -522,26 +528,21 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 
 <span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">application</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">ApplicationConfigurationProperties</span> <span class="directive">implements</span> ApplicationConfiguration {
 
-    <span class="directive">protected</span> <span class="directive">final</span> <span class="predefined-type">Integer</span> DEFAULT_MAX = <span class="integer">10</span>;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="type">int</span> DEFAULT_MAX = <span class="integer">10</span>;
 
-    <span class="annotation">@NonNull</span>
-    <span class="directive">private</span> <span class="predefined-type">Integer</span> max = DEFAULT_MAX;
+    <span class="directive">private</span> <span class="type">int</span> max = DEFAULT_MAX;
 
     <span class="annotation">@Override</span>
-    <span class="annotation">@NonNull</span>
-    <span class="directive">public</span> <span class="predefined-type">Integer</span> getMax() {
+    <span class="directive">public</span> <span class="type">int</span> getMax() {
         <span class="keyword">return</span> max;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setMax(<span class="annotation">@NonNull</span> <span class="predefined-type">Integer</span> max) {
-        <span class="keyword">if</span>(max != <span class="predefined-constant">null</span>) {
-            <span class="local-variable">this</span>.max = max;
-        }
+    <span class="directive">public</span> <span class="type">void</span> setMax(<span class="type">int</span> max) {
+        <span class="local-variable">this</span>.max = max;
     }
 }</code></pre>
 </div>
@@ -596,17 +597,17 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">GenreRepository</span> {
 
-    Optional&lt;Genre&gt; findById(<span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id);
+    Optional&lt;Genre&gt; findById(<span class="type">long</span> id);
 
     Genre save(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
 
     Genre saveWithException(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
 
-    <span class="type">void</span> deleteById(<span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id);
+    <span class="type">void</span> deleteById(<span class="type">long</span> id);
 
     <span class="predefined-type">List</span>&lt;Genre&gt; findAll(<span class="annotation">@NotNull</span> SortingAndOrderArguments args);
 
-    <span class="type">int</span> update(<span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id, <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
+    <span class="type">int</span> update(<span class="type">long</span> id, <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
 }</code></pre>
 </div>
 </div>
@@ -619,12 +620,13 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.transaction.annotation.ReadOnly</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
 <span class="keyword">import</span> <span class="include">javax.persistence.EntityManager</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.PersistenceException</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.TypedQuery</span>;
 <span class="keyword">import</span> <span class="include">javax.transaction.Transactional</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.transaction.annotation.ReadOnly</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
@@ -634,26 +636,25 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreRepositoryImpl</span> <span class="directive">implements</span> GenreRepository {
 
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; VALID_PROPERTY_NAMES = <span class="predefined-type">Arrays</span>.asList(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>);
+
     <span class="directive">private</span> <span class="directive">final</span> EntityManager entityManager;  <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="directive">private</span> <span class="directive">final</span> ApplicationConfiguration applicationConfiguration;
 
-    <span class="directive">private</span> <span class="directive">final</span> <span class="directive">static</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; VALID_PROPERTY_NAMES = <span class="predefined-type">Arrays</span>.asList(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>);
-
-    <span class="directive">public</span> GenreRepositoryImpl(EntityManager entityManager,
-                               ApplicationConfiguration applicationConfiguration) { <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">public</span> GenreRepositoryImpl(EntityManager entityManager, <i class="conum" data-value="2"></i><b>(2)</b>
+                               ApplicationConfiguration applicationConfiguration) {
         <span class="local-variable">this</span>.entityManager = entityManager;
         <span class="local-variable">this</span>.applicationConfiguration = applicationConfiguration;
     }
 
     <span class="annotation">@Override</span>
-
-    <span class="annotation">@ReadOnly</span>  <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="directive">public</span> Optional&lt;Genre&gt; findById(<span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id) {
+    <span class="annotation">@ReadOnly</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="directive">public</span> Optional&lt;Genre&gt; findById(<span class="type">long</span> id) {
         <span class="keyword">return</span> Optional.ofNullable(entityManager.find(Genre.class, id));
     }
 
     <span class="annotation">@Override</span>
-    <span class="annotation">@Transactional</span>  <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
     <span class="directive">public</span> Genre save(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         Genre genre = <span class="keyword">new</span> Genre(name);
         entityManager.persist(genre);
@@ -662,7 +663,7 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 
     <span class="annotation">@Override</span>
     <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="directive">public</span> <span class="type">void</span> deleteById(<span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id) {
+    <span class="directive">public</span> <span class="type">void</span> deleteById(<span class="type">long</span> id) {
         findById(id).ifPresent(entityManager::remove);
     }
 
@@ -670,7 +671,7 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
     <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Genre&gt; findAll(<span class="annotation">@NotNull</span> SortingAndOrderArguments args) {
         <span class="predefined-type">String</span> qlString = <span class="string"><span class="delimiter">&quot;</span><span class="content">SELECT g FROM Genre as g</span><span class="delimiter">&quot;</span></span>;
         <span class="keyword">if</span> (args.getOrder().isPresent() &amp;&amp; args.getSort().isPresent() &amp;&amp; VALID_PROPERTY_NAMES.contains(args.getSort().get())) {
-                qlString += <span class="string"><span class="delimiter">&quot;</span><span class="content"> ORDER BY g.</span><span class="delimiter">&quot;</span></span> + args.getSort().get() + <span class="string"><span class="delimiter">&quot;</span><span class="content"> </span><span class="delimiter">&quot;</span></span> + args.getOrder().get().toLowerCase();
+            qlString += <span class="string"><span class="delimiter">&quot;</span><span class="content"> ORDER BY g.</span><span class="delimiter">&quot;</span></span> + args.getSort().get() + <span class="string"><span class="delimiter">'</span><span class="content"> </span><span class="delimiter">'</span></span> + args.getOrder().get().toLowerCase();
         }
         TypedQuery&lt;Genre&gt; query = entityManager.createQuery(qlString, Genre.class);
         query.setMaxResults(args.getMax().orElseGet(applicationConfiguration::getMax));
@@ -680,16 +681,15 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
     }
 
     <span class="annotation">@Override</span>
-
     <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="directive">public</span> <span class="type">int</span> update(<span class="annotation">@NotNull</span> <span class="predefined-type">Long</span> id, <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+    <span class="directive">public</span> <span class="type">int</span> update(<span class="type">long</span> id, <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         <span class="keyword">return</span> entityManager.createQuery(<span class="string"><span class="delimiter">&quot;</span><span class="content">UPDATE Genre g SET name = :name where id = :id</span><span class="delimiter">&quot;</span></span>)
                 .setParameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, name)
                 .setParameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>, id)
                 .executeUpdate();
     }
 
-    <span class="annotation">@Override</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="annotation">@Override</span>
     <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
     <span class="directive">public</span> Genre saveWithException(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
         save(name);
@@ -748,9 +748,6 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
     <span class="annotation">@NotBlank</span>
     <span class="directive">private</span> <span class="predefined-type">String</span> name;
 
-    <span class="directive">public</span> GenreSaveCommand() {
-    }
-
     <span class="directive">public</span> GenreSaveCommand(<span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>.name = name;
     }
@@ -781,29 +778,25 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
 <span class="annotation">@Introspected</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreUpdateCommand</span> {
-    <span class="annotation">@NotNull</span>
-    <span class="directive">private</span> <span class="predefined-type">Long</span> id;
+
+    <span class="directive">private</span> <span class="type">long</span> id;
 
     <span class="annotation">@NotBlank</span>
     <span class="directive">private</span> <span class="predefined-type">String</span> name;
 
-    <span class="directive">public</span> GenreUpdateCommand() {
-    }
-
-    <span class="directive">public</span> GenreUpdateCommand(<span class="predefined-type">Long</span> id, <span class="predefined-type">String</span> name) {
+    <span class="directive">public</span> GenreUpdateCommand(<span class="type">long</span> id, <span class="predefined-type">String</span> name) {
         <span class="local-variable">this</span>.id = id;
         <span class="local-variable">this</span>.name = name;
     }
 
-    <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
+    <span class="directive">public</span> <span class="type">long</span> getId() {
         <span class="keyword">return</span> id;
     }
 
-    <span class="directive">public</span> <span class="type">void</span> setId(<span class="predefined-type">Long</span> id) {
+    <span class="directive">public</span> <span class="type">void</span> setId(<span class="type">long</span> id) {
         <span class="local-variable">this</span>.id = id;
     }
 
@@ -826,8 +819,8 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
-
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Positive</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.PositiveOrZero</span>;
@@ -848,13 +841,9 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
     <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">id|name</span><span class="delimiter">&quot;</span></span>)  <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="directive">private</span> <span class="predefined-type">String</span> sort;
 
-    <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">&quot;</span></span>)  <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="annotation">@Nullable</span>
+    <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">&quot;</span></span>)  <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="directive">private</span> <span class="predefined-type">String</span> order;
-
-    <span class="directive">public</span> SortingAndOrderArguments() {
-
-    }
 
     <span class="directive">public</span> Optional&lt;<span class="predefined-type">Integer</span>&gt; getOffset() {
         <span class="keyword">return</span> Optional.ofNullable(offset);
@@ -907,7 +896,6 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpHeaders</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
@@ -923,39 +911,41 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 <span class="keyword">import</span> <span class="include">java.net.URI</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.LOCATION</span>;
+
 <span class="annotation">@ExecuteOn</span>(TaskExecutors.IO)  <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>)  <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">GenreController</span> {
+<span class="type">class</span> <span class="class">GenreController</span> {
 
-    <span class="directive">protected</span> <span class="directive">final</span> GenreRepository genreRepository;
+    <span class="directive">private</span> <span class="directive">final</span> GenreRepository genreRepository;
 
-    <span class="directive">public</span> GenreController(GenreRepository genreRepository) { <i class="conum" data-value="3"></i><b>(3)</b>
+    GenreController(GenreRepository genreRepository) { <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="local-variable">this</span>.genreRepository = genreRepository;
     }
 
     <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/{id}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="directive">public</span> Genre show(<span class="predefined-type">Long</span> id) {
+    Genre show(<span class="predefined-type">Long</span> id) {
         <span class="keyword">return</span> genreRepository
                 .findById(id)
                 .orElse(<span class="predefined-constant">null</span>); <i class="conum" data-value="5"></i><b>(5)</b>
     }
 
     <span class="annotation">@Put</span> <i class="conum" data-value="6"></i><b>(6)</b>
-    <span class="directive">public</span> HttpResponse update(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreUpdateCommand command) { <i class="conum" data-value="7"></i><b>(7)</b>
+    HttpResponse&lt;?&gt; update(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreUpdateCommand command) { <i class="conum" data-value="7"></i><b>(7)</b>
         <span class="type">int</span> numberOfEntitiesUpdated = genreRepository.update(command.getId(), command.getName());
 
         <span class="keyword">return</span> HttpResponse
                 .noContent()
-                .header(HttpHeaders.LOCATION, location(command.getId()).getPath()); <i class="conum" data-value="8"></i><b>(8)</b>
+                .header(LOCATION, location(command.getId()).getPath()); <i class="conum" data-value="8"></i><b>(8)</b>
     }
 
     <span class="annotation">@Get</span>(value = <span class="string"><span class="delimiter">&quot;</span><span class="content">/list{?args*}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="9"></i><b>(9)</b>
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Genre&gt; list(<span class="annotation">@Valid</span> SortingAndOrderArguments args) {
+    <span class="predefined-type">List</span>&lt;Genre&gt; list(<span class="annotation">@Valid</span> SortingAndOrderArguments args) {
         <span class="keyword">return</span> genreRepository.findAll(args);
     }
 
     <span class="annotation">@Post</span> <i class="conum" data-value="10"></i><b>(10)</b>
-    <span class="directive">public</span> HttpResponse&lt;Genre&gt; save(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreSaveCommand cmd) {
+    HttpResponse&lt;Genre&gt; save(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreSaveCommand cmd) {
         Genre genre = genreRepository.save(cmd.getName());
 
         <span class="keyword">return</span> HttpResponse
@@ -964,7 +954,7 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
     }
 
     <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/ex</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="11"></i><b>(11)</b>
-    <span class="directive">public</span> HttpResponse&lt;Genre&gt; saveExceptions(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreSaveCommand cmd) {
+    HttpResponse&lt;Genre&gt; saveExceptions(<span class="annotation">@Body</span> <span class="annotation">@Valid</span> GenreSaveCommand cmd) {
         <span class="keyword">try</span> {
             Genre genre = genreRepository.saveWithException(cmd.getName());
             <span class="keyword">return</span> HttpResponse
@@ -976,17 +966,13 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
     }
 
     <span class="annotation">@Delete</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/{id}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="12"></i><b>(12)</b>
-    <span class="directive">public</span> HttpResponse delete(<span class="predefined-type">Long</span> id) {
+    HttpResponse&lt;?&gt; delete(<span class="predefined-type">Long</span> id) {
         genreRepository.deleteById(id);
         <span class="keyword">return</span> HttpResponse.noContent();
     }
 
-    <span class="directive">protected</span> <span class="predefined-type">URI</span> location(<span class="predefined-type">Long</span> id) {
+    <span class="directive">private</span> <span class="predefined-type">URI</span> location(<span class="predefined-type">Long</span> id) {
         <span class="keyword">return</span> <span class="predefined-type">URI</span>.create(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span> + id);
-    }
-
-    <span class="directive">protected</span> <span class="predefined-type">URI</span> location(Genre genre) {
-        <span class="keyword">return</span> location(genre.getId());
     }
 }</code></pre>
 </div>
@@ -1056,134 +1042,148 @@ Also keep in mind that it is necessary to escape the <code>:</code> in the conne
 
 <span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpHeaders</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.BeforeEach</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.LOCATION</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.BAD_REQUEST</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.CREATED</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.NOT_FOUND</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.NO_CONTENT</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">GenreControllerTest</span> {
+<span class="type">class</span> <span class="class">GenreControllerTest</span> {
+
+    <span class="directive">private</span> BlockingHttpClient blockingClient;
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
     HttpClient client; <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> supplyAnInvalidOrderTriggersValidationFailure() {
-        HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -&gt; {
-            client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?order=foo</span><span class="delimiter">&quot;</span></span>));
-        });
-
-        assertNotNull(thrown.getResponse());
-        assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
+    <span class="annotation">@BeforeEach</span>
+    <span class="type">void</span> setup() {
+        blockingClient = client.toBlocking();
     }
 
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testFindNonExistingGenreReturns404() {
-        HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -&gt; {
-            client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/99</span><span class="delimiter">&quot;</span></span>));
-        });
+    <span class="type">void</span> supplyAnInvalidOrderTriggersValidationFailure() {
+        HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -&gt;
+                blockingClient.exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?order=foo</span><span class="delimiter">&quot;</span></span>))
+        );
 
         assertNotNull(thrown.getResponse());
-        assertEquals(HttpStatus.NOT_FOUND, thrown.getStatus());
+        assertEquals(BAD_REQUEST, thrown.getStatus());
     }
 
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testGenreCrudOperations() {
+    <span class="type">void</span> testFindNonExistingGenreReturns404() {
+        HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -&gt;
+            blockingClient.exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/99</span><span class="delimiter">&quot;</span></span>))
+        );
+
+        assertNotNull(thrown.getResponse());
+        assertEquals(NOT_FOUND, thrown.getStatus());
+    }
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> testGenreCrudOperations() {
 
         <span class="predefined-type">List</span>&lt;<span class="predefined-type">Long</span>&gt; genreIds = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
 
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreSaveCommand(<span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="3"></i><b>(3)</b>
-        HttpResponse response = client.toBlocking().exchange(request);
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreSaveCommand(<span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="3"></i><b>(3)</b>
+        HttpResponse&lt;?&gt; response = blockingClient.exchange(request);
         genreIds.add(entityId(response));
 
-        assertEquals(HttpStatus.CREATED, response.getStatus());
+        assertEquals(CREATED, response.getStatus());
 
         request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreSaveCommand(<span class="string"><span class="delimiter">&quot;</span><span class="content">Microservices</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="3"></i><b>(3)</b>
-        response = client.toBlocking().exchange(request);
+        response = blockingClient.exchange(request);
 
-        assertEquals(HttpStatus.CREATED, response.getStatus());
+        assertEquals(CREATED, response.getStatus());
 
         <span class="predefined-type">Long</span> id = entityId(response);
         genreIds.add(id);
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span> + id);
 
-        Genre genre = client.toBlocking().retrieve(request, Genre.class); <i class="conum" data-value="4"></i><b>(4)</b>
+        Genre genre = blockingClient.retrieve(request, Genre.class); <i class="conum" data-value="4"></i><b>(4)</b>
 
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Microservices</span><span class="delimiter">&quot;</span></span>, genre.getName());
 
         request = HttpRequest.PUT(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreUpdateCommand(id, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micro-services</span><span class="delimiter">&quot;</span></span>));
-        response = client.toBlocking().exchange(request);  <i class="conum" data-value="5"></i><b>(5)</b>
+        response = blockingClient.exchange(request);  <i class="conum" data-value="5"></i><b>(5)</b>
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
+        assertEquals(NO_CONTENT, response.getStatus());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span> + id);
-        genre = client.toBlocking().retrieve(request, Genre.class);
+        genre = blockingClient.retrieve(request, Genre.class);
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micro-services</span><span class="delimiter">&quot;</span></span>, genre.getName());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list</span><span class="delimiter">&quot;</span></span>);
-        <span class="predefined-type">List</span>&lt;Genre&gt; genres = client.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        <span class="predefined-type">List</span>&lt;Genre&gt; genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
 
         assertEquals(<span class="integer">2</span>, genres.size());
 
         request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/ex</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> GenreSaveCommand(<span class="string"><span class="delimiter">&quot;</span><span class="content">Microservices</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="3"></i><b>(3)</b>
-        response = client.toBlocking().exchange(request);
+        response = blockingClient.exchange(request);
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
+        assertEquals(NO_CONTENT, response.getStatus());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list</span><span class="delimiter">&quot;</span></span>);
-        genres = client.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
 
         assertEquals(<span class="integer">2</span>, genres.size());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?max=1</span><span class="delimiter">&quot;</span></span>);
-        genres = client.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
 
         assertEquals(<span class="integer">1</span>, genres.size());
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>, genres.get(<span class="integer">0</span>).getName());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?max=1&amp;order=desc&amp;sort=name</span><span class="delimiter">&quot;</span></span>);
-        genres = client.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
 
         assertEquals(<span class="integer">1</span>, genres.size());
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micro-services</span><span class="delimiter">&quot;</span></span>, genres.get(<span class="integer">0</span>).getName());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?max=1&amp;offset=10</span><span class="delimiter">&quot;</span></span>);
-        genres = client.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        genres = blockingClient.retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
 
         assertEquals(<span class="integer">0</span>, genres.size());
 
         <span class="comment">// cleanup:</span>
         <span class="keyword">for</span> (<span class="predefined-type">Long</span> genreId : genreIds) {
             request = HttpRequest.DELETE(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span> + genreId);
-            response = client.toBlocking().exchange(request);
-            assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
+            response = blockingClient.exchange(request);
+            assertEquals(NO_CONTENT, response.getStatus());
         }
     }
 
-    <span class="directive">protected</span> <span class="predefined-type">Long</span> entityId(HttpResponse response) {
+    <span class="directive">private</span> <span class="predefined-type">Long</span> entityId(HttpResponse response) {
         <span class="predefined-type">String</span> path = <span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span>;
-        <span class="predefined-type">String</span> value = response.header(HttpHeaders.LOCATION);
+        <span class="predefined-type">String</span> value = response.header(LOCATION);
         <span class="keyword">if</span> (value == <span class="predefined-constant">null</span>) {
             <span class="keyword">return</span> <span class="predefined-constant">null</span>;
         }
+
         <span class="type">int</span> index = value.indexOf(path);
         <span class="keyword">if</span> (index != -<span class="integer">1</span>) {
             <span class="keyword">return</span> <span class="predefined-type">Long</span>.valueOf(value.substring(index + path.length()));
         }
+
         <span class="keyword">return</span> <span class="predefined-constant">null</span>;
     }
 }</code></pre>
