@@ -1,25 +1,37 @@
 package example.micronaut;
 
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.data.annotation.GeneratedValue;
+import io.micronaut.data.annotation.Id;
+import io.micronaut.data.annotation.MappedEntity;
 
-@Introspected
+import javax.validation.constraints.NotNull;
+
+@MappedEntity
 public class ToDo {
 
-    private String id;
-    private String title;
-    private boolean completed;
-    private Author author;
+    @Id
+    @GeneratedValue(GeneratedValue.Type.AUTO)
+    private Long id;
 
-    public ToDo(String title, Author author) {
+    @NotNull
+    private String title;
+
+    private boolean completed;
+
+    @NotNull
+    private Long authorId;
+
+    public ToDo(String title, Long authorId) {
         this.title = title;
-        this.author = author;
+        this.authorId = authorId;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -39,11 +51,11 @@ public class ToDo {
         this.completed = completed;
     }
 
-    public Author getAuthor() {
-        return author;
+    public Long getAuthorId() {
+        return authorId;
     }
 
-    public void setAuthor(Author author) {
-        this.author = author;
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
     }
 }

@@ -1,38 +1,22 @@
 package example.micronaut;
 
-import jakarta.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.micronaut.data.jdbc.annotation.JdbcRepository;
+import io.micronaut.data.model.query.builder.sql.Dialect;
+import io.micronaut.data.repository.CrudRepository;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-@Singleton
-public class AuthorRepository {
+@JdbcRepository(dialect = Dialect.POSTGRES) // <1>
+public interface AuthorRepository extends CrudRepository<Author, Long> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuthorRepository.class);
+    Optional<Author> findByUsername(String username);
 
-    private final Map<String, Author> authors = new HashMap<>();
+    Collection<Author> findByIdInList(Collection<Long> ids);
 
-    public List<Author> findAllById(Collection<String> ids) {
-        LOG.debug("Batch loading authors: {}", ids);
-
-        return authors.values()
-                .stream()
-                .filter(it -> ids.contains(it.getId()))
-                .collect(Collectors.toList());
+    @Transactional
+    default Author findOrCreate(String username) {
+        return findByUsername(username).orElseGet(() -> save(new Author(username)));
     }
-
-    public Author findOrCreate(String username) {
-        if (!authors.containsKey(username)) {
-            authors.put(username, new Author(UUID.randomUUID().toString(), username));
-        }
-
-        return authors.get(username);
-    }
-
 }

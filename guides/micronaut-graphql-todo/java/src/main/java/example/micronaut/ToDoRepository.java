@@ -1,29 +1,9 @@
 package example.micronaut;
 
-import jakarta.inject.Singleton;
+import io.micronaut.data.jdbc.annotation.JdbcRepository;
+import io.micronaut.data.model.query.builder.sql.Dialect;
+import io.micronaut.data.repository.PageableRepository;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
-
-@Singleton
-public class ToDoRepository {
-
-    private final Map<String, ToDo> toDos = new LinkedHashMap<>();
-
-    public Iterable<ToDo> findAll() {
-        return toDos.values();
-    }
-
-    public ToDo findById(String id) {
-        return toDos.get(id);
-    }
-
-    public ToDo save(ToDo toDo) {
-        if (toDo.getId() == null) {
-            toDo.setId(UUID.randomUUID().toString());
-        }
-        toDos.put(toDo.getId(), toDo);
-        return toDo;
-    }
+@JdbcRepository(dialect = Dialect.POSTGRES) // <1>
+public interface ToDoRepository extends PageableRepository<ToDo, Long> {
 }

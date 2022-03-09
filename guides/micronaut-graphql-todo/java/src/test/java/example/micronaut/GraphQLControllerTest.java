@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.core.convert.ConversionService;
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,32 +29,31 @@ class GraphQLControllerTest {
     @Client("/")
     HttpClient client;
 
-    @Inject
-    ConversionService<?> conversionService;
-
     @Test
     void testGraphQLController() {
         // when:
-        List<ToDo> todos = getTodos();
+        List<Map> todos = getTodos();
 
         // then:
         assertTrue(todos.isEmpty());
 
         // when:
-        String id = createToDo("Test GraphQL", "Tim Yates");
+        Long id = createToDo("Test GraphQL", "Tim Yates");
 
         // then: (check it's a UUID)
-        assertNotNull(UUID.fromString(id));
+        assertEquals(1, id);
 
         // when:
         todos = getTodos();
 
         // then:
-
         assertEquals(1, todos.size());
-        assertEquals("Test GraphQL", todos.get(0).getTitle());
-        assertFalse(todos.get(0).isCompleted());
-        assertEquals("Tim Yates", todos.get(0).getAuthor().getUsername());
+
+        Map<?,?> todo = todos.get(0);
+
+        assertEquals("Test GraphQL", todo.get("title"));
+        assertFalse(Boolean.parseBoolean(todo.get("completed").toString()));
+        assertEquals("Tim Yates", ((Map)todo.get("author")).get("username"));
 
         // when:
         Boolean completed = markAsCompleted(id);
@@ -69,10 +66,10 @@ class GraphQLControllerTest {
 
         // then:
         assertEquals(1, todos.size());
-        assertEquals("Test GraphQL", todos.get(0).getTitle());
-        // Completed is now true
-        assertTrue(todos.get(0).isCompleted());
-        assertEquals("Tim Yates", todos.get(0).getAuthor().getUsername());
+        todo = todos.get(0);
+        assertEquals("Test GraphQL", todo.get("title"));
+        assertTrue(Boolean.parseBoolean(todo.get("completed").toString()));
+        assertEquals("Tim Yates", ((Map)todo.get("author")).get("username"));
     }
 
     private HttpResponse<Map> fetch(String query) {
@@ -83,22 +80,19 @@ class GraphQLControllerTest {
         return response;
     }
 
-    private List<ToDo> getTodos() {
+    private List<Map> getTodos() {
         String query = "{\"query\":\"query { toDos { title, completed, author { id, username } } }\"}";
         HttpResponse<Map> response = fetch(query);
-        return conversionService.convert(
-                ((Map)response.getBody(Map.class).get().get("data")).get("toDos"),
-                Argument.listOf(ToDo.class)
-        ).get();
+        return (List<Map>) ((Map) response.getBody().get().get("data")).get("toDos");
     }
 
-    private String createToDo(String title, String author) {
+    private Long createToDo(String title, String author) {
         String query = "{\"query\": \"mutation { createToDo(title: \\\"" + title + "\\\", author: \\\"" + author + "\\\") { id } }\" }";
         HttpResponse<Map> response = fetch(query);
-        return ((Map) ((Map) response.getBody(Map.class).get().get("data")).get("createToDo")).get("id").toString();
+        return Long.parseLong(((Map)((Map) response.getBody(Map.class).get().get("data")).get("createToDo")).get("id").toString());
     }
 
-    private Boolean markAsCompleted(String id) {
+    private Boolean markAsCompleted(Long id) {
         String query = "{\"query\": \"mutation { completeToDo(id: \\\"" + id + "\\\") }\" }";
         HttpResponse<Map> response = fetch(query);
         return (Boolean) ((Map) response.getBody(Map.class).get().get("data")).get("completeToDo");

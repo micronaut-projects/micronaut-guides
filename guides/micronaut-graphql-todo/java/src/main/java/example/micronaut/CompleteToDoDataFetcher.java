@@ -4,6 +4,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.inject.Singleton;
 
+import java.util.Optional;
+
 @Singleton
 public class CompleteToDoDataFetcher implements DataFetcher<Boolean> {
 
@@ -15,11 +17,12 @@ public class CompleteToDoDataFetcher implements DataFetcher<Boolean> {
 
     @Override
     public Boolean get(DataFetchingEnvironment env) {
-        String id = env.getArgument("id");
-        ToDo toDo = toDoRepository.findById(id);
-        if (toDo != null) {
+        Long id = Long.valueOf(env.getArgument("id"));
+        Optional<ToDo> maybeToDo = toDoRepository.findById(id);
+        if (maybeToDo.isPresent()) {
+            ToDo toDo = maybeToDo.get();
             toDo.setCompleted(true);
-            toDoRepository.save(toDo);
+            toDoRepository.update(toDo);
             return true;
         } else {
             return false;

@@ -1,24 +1,38 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.data.annotation.GeneratedValue;
+import io.micronaut.data.annotation.Id;
+import io.micronaut.data.annotation.MappedEntity;
 
-@Introspected
+import javax.validation.constraints.NotNull;
+
+@MappedEntity
 public class Author {
 
-    private final String id;
-    private final String username;
+    @Id
+    @GeneratedValue(GeneratedValue.Type.AUTO)
+    private Long id;
 
-    public Author(String id, String username) {
-        this.id = id;
+    @NotNull
+    private String username;
+
+    public Author(@NotNull String username) {
         this.username = username;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
         return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
