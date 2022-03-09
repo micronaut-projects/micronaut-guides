@@ -1,15 +1,18 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.Introspected;
+
+@Introspected
 public class ToDo {
 
     private String id;
     private String title;
     private boolean completed;
-    private String authorId;
+    private Author author;
 
-    public ToDo(String title, String authorId) {
+    public ToDo(String title, Author author) {
         this.title = title;
-        this.authorId = authorId;
+        this.author = author;
     }
 
     public String getId() {
@@ -36,11 +39,11 @@ public class ToDo {
         this.completed = completed;
     }
 
-    public String getAuthorId() {
-        return authorId;
+    public Author getAuthor() {
+        return author;
     }
 
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
+    public void setAuthor(Author author) {
+        this.author = author;
     }
 }

@@ -22,9 +22,7 @@ public class GraphQLFactory {
     public GraphQL graphQL(ResourceResolver resourceResolver,
                            ToDosDataFetcher toDosDataFetcher,
                            CreateToDoDataFetcher createToDoDataFetcher,
-                           CompleteToDoDataFetcher completeToDoDataFetcher,
-                           DeleteToDoDataFetcher deleteToDoDataFetcher,
-                           AuthorDataFetcher authorDataFetcher) {
+                           CompleteToDoDataFetcher completeToDoDataFetcher) {
 
         SchemaParser schemaParser = new SchemaParser();
         SchemaGenerator schemaGenerator = new SchemaGenerator();
@@ -40,10 +38,7 @@ public class GraphQLFactory {
                         .dataFetcher("toDos", toDosDataFetcher))
                 .type("Mutation", typeWiring -> typeWiring
                         .dataFetcher("createToDo", createToDoDataFetcher)
-                        .dataFetcher("completeToDo", completeToDoDataFetcher)
-                        .dataFetcher("deleteToDo", deleteToDoDataFetcher))
-                .type("ToDo", typeWiring -> typeWiring
-                        .dataFetcher("author", authorDataFetcher))
+                        .dataFetcher("completeToDo", completeToDoDataFetcher))
                 .build();
 
         // Create the executable schema.
