@@ -4,8 +4,6 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.inject.Singleton;
 
-import java.util.Optional;
-
 @Singleton
 public class CompleteToDoDataFetcher implements DataFetcher<Boolean> {
 

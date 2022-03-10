@@ -6,12 +6,14 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import graphql.schema.idl.errors.SchemaMissingError;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.core.io.ResourceResolver;
 import jakarta.inject.Singleton;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 @Factory
@@ -24,14 +26,17 @@ public class GraphQLFactory {
                            CreateToDoDataFetcher createToDoDataFetcher,
                            CompleteToDoDataFetcher completeToDoDataFetcher,
                            AuthorDataFetcher authorDataFetcher) {
-
         SchemaParser schemaParser = new SchemaParser();
         SchemaGenerator schemaGenerator = new SchemaGenerator();
 
         // Parse the schema.
+        InputStream schemaDefinition = resourceResolver
+                .getResourceAsStream("classpath:schema.graphqls")
+                .orElseThrow(SchemaMissingError::new);
+
+        // Merge it into a type registry
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
-        typeRegistry.merge(schemaParser.parse(new BufferedReader(new InputStreamReader(
-                resourceResolver.getResourceAsStream("classpath:schema.graphqls").get()))));
+        typeRegistry.merge(schemaParser.parse(new BufferedReader(new InputStreamReader(schemaDefinition))));
 
         // Create the runtime wiring.
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
