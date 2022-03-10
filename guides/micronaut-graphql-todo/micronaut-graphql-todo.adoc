@@ -1,4 +1,4 @@
-common:header.adoc[]
+common:header-top.adoc[]
 
 == Getting Started
 
@@ -13,9 +13,10 @@ ____
 We will be using:
 
 * A Postgres instance running in Docker.
-* Micronaut-data to persist our ToDos to this database.
-* Flyway to handle our database migrations.
-* Testcontainers to run a Postgres instance at test time.
+* https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut-data] to persist our ToDos to this database.
+* https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Flyway] to handle our database migrations.
+* https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL] to expose our data.
+* Testcontainers to run a Postgres instance for local dev, and tests.
 
 The application will expose a GraphQL endpoint at /graphql for the data to be consumed and modified.
 
@@ -115,9 +116,9 @@ Create the file `schema.graphqls` in `src/main/resources` directory:
 
 resource:schema.graphqls[]
 
-<1> Declare a `toDos` function to fetch all the open todos
-<2> Declare a `createToDo` function to create a new ToDo
-<3> Declare a `completeToDo` function to mark a ToDo as done
+<1> Declare a `toDos` function to fetch all the todos as a list.
+<2> Declare a `createToDo` function to create a new ToDo (and return it)
+<3> Declare a `completeToDo` function to mark a ToDo as done (and return a boolean if successful)
 <4> Declare a `ToDo` type
 <5> Declare an `Author` type
 
@@ -125,13 +126,13 @@ resource:schema.graphqls[]
 
 For each of our queries and mutators in the schema, we create a `DataFetcher` which we will bind to the GraphQL schema and our domain model, and execute the appropriate queries in our datastore.
 
-==== Accessors
+==== Queries
 
-Create class `ToDosDataFetcher` to implement our `toDos` accessor:
+Create class `ToDosDataFetcher` to implement our `toDos` query:
 
 source:ToDosDataFetcher[]
 
-==== Mutators
+==== Mutations
 
 Create class `CreateToDoDataFetcher` for the creation of ToDos:
 
@@ -150,40 +151,40 @@ source:CompleteToDoDataFetcher[]
 
 ==== Wiring
 
-GraphQL allows us to only fetch data on demand.
-In this example, a user may request a list of ToDos, but not require the author to be populated for each.
+GraphQL allows us to fetch data on demand.
+In this example, a user may request a list of ToDos, but not require the author to be populated.
 This means we need a way of optionally loading Authors based on their ID.
 
 To do this, we can register a DataLoader that will find authors based on a set of Ids:
 
 source:AuthorDataLoader[]
 
-Then we can add an AuthorDataFetcher which will be used to populate a ToDo if the author is requested.
-
-source:AuthorDataFetcher[]
-
-<1> Here we get the author data loader defined above in the Factory.
-
-Then to join the two together, we create a `Factory` that returns a `DataLoaderRegistry` with a custom loader.
+We can then register this loader in our DataLoaderRegistry under the key `author`
 
 source:DataLoaderRegistryFactory[]
 
 <1> This registry will have request scope, so will be recreated for every request.
 <2> Register the AuthorDataLoader whenever the loader for `"author"` is requested.
 
-=== Factory
+And finally, add an AuthorDataFetcher which request and use this loader to populate a ToDo if the author is requested.
+
+source:AuthorDataFetcher[]
+
+<1> Here we get the author data loader defined above in the Factory.
+
+=== GraphQL Factory
 
 We can then finally create a class that will bind the GraphQL schema to the code, types and fetchers.
 
 source:GraphQLFactory[]
 
 <1> Wire up the behaviour for our single query action.
-<2> And wire up our mutators.
-<3> Then finally wire up how to populate a ToDo with authors if they are requested.
+<2> Wire up our mutators.
+<3> Wire up how to populate a ToDo with authors if they are requested.
 
 == Running the application
 
-First off, we can use Docker to get an instance of Postgres running locally with a database called `todo` ready for us to use:
+We can use Docker to get an instance of Postgres running locally with a database called `todo` ready for us to use:
 
 [source,bash]
 ----
