@@ -35,13 +35,16 @@ public class GraphQLFactory {
 
         // Create the runtime wiring.
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
-                .type("Query", typeWiring -> typeWiring
+                .type("Query", typeWiring -> typeWiring  // <1>
                         .dataFetcher("toDos", toDosDataFetcher))
-                .type("Mutation", typeWiring -> typeWiring
+
+                .type("Mutation", typeWiring -> typeWiring // <2>
                         .dataFetcher("createToDo", createToDoDataFetcher)
                         .dataFetcher("completeToDo", completeToDoDataFetcher))
-                .type("ToDo", typeWiring -> typeWiring
+
+                .type("ToDo", typeWiring -> typeWiring // <3>
                         .dataFetcher("author", authorDataFetcher))
+
                 .build();
 
         // Create the executable schema.

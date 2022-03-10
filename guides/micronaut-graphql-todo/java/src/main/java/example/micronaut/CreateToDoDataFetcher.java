@@ -19,8 +19,11 @@ public class CreateToDoDataFetcher implements DataFetcher<ToDo> {
     public ToDo get(DataFetchingEnvironment env) {
         String title = env.getArgument("title");
         String username = env.getArgument("author");
-        Author author = authorRepository.findOrCreate(username);
+
+        Author author = authorRepository.findOrCreate(username); // <1>
+
         ToDo toDo = new ToDo(title, author.getId());
-        return toDoRepository.save(toDo);
+
+        return toDoRepository.save(toDo); // <2>
     }
 }

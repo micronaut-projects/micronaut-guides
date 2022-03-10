@@ -10,7 +10,14 @@ a complete and understandable description of the data in your API, gives clients
 need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools.
 ____
 
-The application exposes a GraphQL endpoint and stores data in a Postgres database using Micronaut Data JDBC.
+We will be using:
+
+* A Postgres instance running in Docker.
+* Micronaut-data to persist our ToDos to this database.
+* Flyway to handle our database migrations.
+* Testcontainers to run a Postgres instance at test time.
+
+The application will expose a GraphQL endpoint at /graphql for the data to be consumed and modified.
 
 == What you will need
 
@@ -18,26 +25,89 @@ To complete this guide, you will need the following:
 
 * Some time on your hands
 * A decent text editor or IDE
-* JDK 1.8 or greater installed with `JAVA_HOME` configured appropriately
+* JDK 11 or greater installed with `JAVA_HOME` configured appropriately
 * https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run Postgres and to run tests using https://www.testcontainers.org[Testcontainers].
 
 common:completesolution.adoc[]
 
-common:create-app-features.adoc[]
+== Writing the Application
 
-=== Data Source configuration
+common:cli-or-launch.adoc[]
 
-Define the datasource in `src/main/resources/application.yml`.
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide \
+    --features=@features@ \
+    --jdk=11 \
+    --build=@build@ \
+    --lang=@lang@
+----
 
-resource:application.yml[tag=datasource]
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @features-words@ features.
+
+diffLink:[]
+
+common:annotationprocessors.adoc[]
+
+== Persistence layer
+
+=== Schema migration
+
+We will be using Flyway to manage our schema evolution.  We already have the following dependency configured in our build.
+
+dependency:micronaut-flyway[groupId=io.micronaut.flyway]
+
+and Flyway configured in our configuration:
+
+resource:application.yml[tag=flyway]
+
+So we just need to create our initial schema definition:
+
+resource:db/migration/V1__schema.sql[]
+
+<1> We will store authors in a table separate to the ToDos.  They just have a username.
+<2> The table for our ToDos. They have a title, completion status, and a foreign-key reference to the author.
+
+=== Entities
+
+We can then create an Entity class to hold an Author:
+
+source:Author[]
+
+And another to represent a ToDo:
+
+source:ToDo[]
+
+=== Repositories
+
+To allow fetching of these Entities from the database, we can create https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcRepositories[`JdbcRepositories`] for each.
+
+The simplest of these is the `ToDoRepository` which just requires the default access methods:
+
+source:ToDoRepository[]
+
+<1> We need to specify the dialect, as queries are computed at compile time.
+
+Then we can specify a Repository for our Authors.  We need a few extra finders for this so that we can hook it into GraphQL more easily in the next step:
+
+source:AuthorRepository[]
+
+<1> Again, we need to specify the dialect.
+<2> When creating todos we need to search for an exisiting username.
+<3> When GraphQL loads a ToDo, we will use this to fetch the authors if they are required in the response.
+<4> We need to find an existing author, or else create a new one when creating a ToDo.
 
 == GraphQL
 
-Add the following dependency:
+The initial Micronaut application `create-app` step already added the GraphQL dependency into our build for us:
 
 dependency:micronaut-graphql[groupId=io.micronaut.graphql]
 
-By default GraphQL endpoint `/graphql` is enabled so you don't need to add any extra configuration.
+So the default GraphQL endpoint `/graphql` is enabled, and you don't need to add any extra configuration.
 
 === Describe your schema
 
@@ -51,29 +121,9 @@ resource:schema.graphqls[]
 <4> Declare a `ToDo` type
 <5> Declare an `Author` type
 
-=== ToDo and Author classes
-
-Create `ToDo` and `Author` classes that will mimic the data we want to expose:
-
-source:ToDo[]
-
-source:Author[]
-
-=== Data repository
-
-To keep this example simple, instead of retrieving the information from a database we will keep it in memory and just return it from there. In a real-world example you will use any external storage: relational database, SQL database, etc.
-
-We will create a repository for our `Authors` called `AuthorRepository`:
-
-source:AuthorRepository[]
-
-And another for our ToDos which we will call `ToDoRepository`:
-
-source:ToDoRepository[]
-
 === Data Fetchers
 
-For each of our queries, we create a `DataFetcher` which we will bind to the GraphQL schema and our domain model, and execute the appropriate queries in our datastore.
+For each of our queries and mutators in the schema, we create a `DataFetcher` which we will bind to the GraphQL schema and our domain model, and execute the appropriate queries in our datastore.
 
 ==== Accessors
 
@@ -87,17 +137,90 @@ Create class `CreateToDoDataFetcher` for the creation of ToDos:
 
 source:CreateToDoDataFetcher[]
 
+<1> Find the existing author or create a new one.
+<2> Save the new ToDo in the database.
+
 And a class `CompleteToDoDataFetcher` to mark ToDos as complete:
 
 source:CompleteToDoDataFetcher[]
 
+<1> Find the existing ToDo based on it's id.
+<2> If found, mark it as completed.
+<3> And update the version in the database.
+
+==== Wiring
+
+GraphQL allows us to only fetch data on demand.
+In this example, a user may request a list of ToDos, but not require the author to be populated for each.
+This means we need a way of optionally loading Authors based on their ID.
+
+To do this, we can register a DataLoader that will find authors based on a set of Ids:
+
+source:AuthorDataLoader[]
+
+Then we can add an AuthorDataFetcher which will be used to populate a ToDo if the author is requested.
+
+source:AuthorDataFetcher[]
+
+<1> Here we get the author data loader defined above in the Factory.
+
+Then to join the two together, we create a `Factory` that returns a `DataLoaderRegistry` with a custom loader.
+
+source:DataLoaderRegistryFactory[]
+
+<1> This registry will have request scope, so will be recreated for every request.
+<2> Register the AuthorDataLoader whenever the loader for `"author"` is requested.
+
 === Factory
 
-We can then create a factory that will bind the GraphQL schema to the code and types.
+We can then finally create a class that will bind the GraphQL schema to the code, types and fetchers.
 
 source:GraphQLFactory[]
 
+<1> Wire up the behaviour for our single query action.
+<2> And wire up our mutators.
+<3> Then finally wire up how to populate a ToDo with authors if they are requested.
+
+== Running the application
+
+First off, we can use Docker to get an instance of Postgres running locally with a database called `todo` ready for us to use:
+
+[source,bash]
+----
+docker run -it --rm \
+     -p 5432:5432 \
+     -e POSTGRES_USER=dbuser \
+     -e POSTGRES_PASSWORD=theSecretPassword \
+     -e POSTGRES_DB=todo \
+     postgres:12-alpine
+----
+
+Configure your default datasource to use the PostgreSQL database you started with Docker:
+
+resource:application.yml[tag=datasource]
+
+<1> The JDBC URL matches the database name you used in the previous command (`todo`).
+<2> Use PostgreSQL driver.
+<3> Configure the PostgreSQL dialect.
+<4> You handle database migrations via Flyway.
+
+In a shell, set up the following environment variables to set the credentials to connect to the PostgreSQL database you started with Docker.
+
+[source,bash]
+----
+export DATASOURCES_DEFAULT_USERNAME=dbuser
+export DATASOURCES_DEFAULT_PASSWORD=theSecretPassword
+----
+
+common:runapp-instructions.adoc[]
+
 common:runapp.adoc[]
+
+When it first runs, you will see information about migrations.
+
+== Test the application
+
+=== Manual smoke tests
 
 We want to execute a GraphQL query to retrieve all the current ToDos (there will be none to start with)
 
@@ -153,7 +276,7 @@ curl -X POST 'http://localhost:8080/graphql' \
 [source,json]
 .Response
 ----
-{"data":{"createToDo":{"id":"1bdf0296-3cc9-4792-836c-ca1443d0d9b3"}}}
+{"data":{"createToDo":{"id":"1"}}}
 ----
 
 This new ToDo then appears in our list of all ToDos with `completed` set to false:
@@ -177,7 +300,7 @@ And we can mark it as completed by using this query with the ID from above (your
 .GraphQL query
 ----
 mutation {
-  completeToDo(id: "1bdf0296-3cc9-4792-836c-ca1443d0d9b3")
+  completeToDo(id: 1)
 }
 ----
 
@@ -185,7 +308,7 @@ mutation {
 ----
 curl -X POST 'http://localhost:8080/graphql' \
      -H 'content-type: application/json' \
-     --data-binary '{"query":"mutation { completeToDo(id: \"1bdf0296-3cc9-4792-836c-ca1443d0d9b3\") }"}'
+     --data-binary '{"query":"mutation { completeToDo(id: 1) }"}'
 ----
 
 [source,json]
@@ -210,12 +333,18 @@ curl -X POST 'http://localhost:8080/graphql' \
 {"data":{"toDos":[{"title":"Create GraphQL Guide","completed":true}]}}
 ----
 
-== Test the application
+=== Automated tests
 
 For testing the application we will use Micronaut HTTP Client to send a `POST` request to the `/graphql` endpoint.
 Create the following class:
 
 test:GraphQLControllerTest[]
+
+When this test is executed, Testcontainers will start a new copy of Postgres in a container, so that we can perform a full "as production" end to end test.
+
+To enable the tests to use this Dockerized database, we add a new resource `application-test.yml` to the test resources to overwrite the runtime datasource configuration.
+
+testResource:application-test.yml[tag=testcontainers]
 
 To run the tests:
 

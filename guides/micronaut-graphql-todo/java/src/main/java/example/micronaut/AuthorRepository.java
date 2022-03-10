@@ -11,12 +11,12 @@ import java.util.Optional;
 @JdbcRepository(dialect = Dialect.POSTGRES) // <1>
 public interface AuthorRepository extends CrudRepository<Author, Long> {
 
-    Optional<Author> findByUsername(String username);
+    Optional<Author> findByUsername(String username); // <2>
 
-    Collection<Author> findByIdInList(Collection<Long> ids);
+    Collection<Author> findByIdInList(Collection<Long> ids); // <3>
 
     @Transactional
-    default Author findOrCreate(String username) {
+    default Author findOrCreate(String username) { // <4>
         return findByUsername(username).orElseGet(() -> save(new Author(username)));
     }
 }

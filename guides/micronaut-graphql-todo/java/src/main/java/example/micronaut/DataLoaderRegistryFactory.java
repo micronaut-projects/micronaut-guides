@@ -19,11 +19,16 @@ public class DataLoaderRegistryFactory {
     }
 
     @SuppressWarnings("unused")
-    @RequestScope
+    @RequestScope // <1>
     public DataLoaderRegistry dataLoaderRegistry() {
         DataLoaderRegistry dataLoaderRegistry = new DataLoaderRegistry();
-        dataLoaderRegistry.register("author", DataLoader.newMappedDataLoader(authorDataLoader));
+        dataLoaderRegistry.register(
+                "author",
+                DataLoader.newMappedDataLoader(authorDataLoader)
+        ); // <2>
+
         LOG.trace("Created new data loader registry");
+
         return dataLoaderRegistry;
     }
 
