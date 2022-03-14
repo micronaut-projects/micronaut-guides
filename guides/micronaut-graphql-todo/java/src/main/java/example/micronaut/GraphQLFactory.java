@@ -16,11 +16,10 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-@Factory
+@Factory // <1>
 public class GraphQLFactory {
 
-    @Bean
-    @Singleton
+    @Singleton // <2>
     public GraphQL graphQL(ResourceResolver resourceResolver,
                            ToDosDataFetcher toDosDataFetcher,
                            CreateToDoDataFetcher createToDoDataFetcher,
@@ -29,25 +28,25 @@ public class GraphQLFactory {
         SchemaParser schemaParser = new SchemaParser();
         SchemaGenerator schemaGenerator = new SchemaGenerator();
 
-        // Parse the schema.
+        // Load the schema
         InputStream schemaDefinition = resourceResolver
                 .getResourceAsStream("classpath:schema.graphqls")
                 .orElseThrow(SchemaMissingError::new);
 
-        // Merge it into a type registry
+        // Parse the schema and merge it into a type registry
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
         typeRegistry.merge(schemaParser.parse(new BufferedReader(new InputStreamReader(schemaDefinition))));
 
         // Create the runtime wiring.
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
-                .type("Query", typeWiring -> typeWiring  // <1>
+                .type("Query", typeWiring -> typeWiring  // <3>
                         .dataFetcher("toDos", toDosDataFetcher))
 
-                .type("Mutation", typeWiring -> typeWiring // <2>
+                .type("Mutation", typeWiring -> typeWiring // <4>
                         .dataFetcher("createToDo", createToDoDataFetcher)
                         .dataFetcher("completeToDo", completeToDoDataFetcher))
 
-                .type("ToDo", typeWiring -> typeWiring // <3>
+                .type("ToDo", typeWiring -> typeWiring // <5>
                         .dataFetcher("author", authorDataFetcher))
 
                 .build();

@@ -6,15 +6,17 @@ import io.micronaut.data.annotation.MappedEntity;
 
 import javax.validation.constraints.NotNull;
 
+import static io.micronaut.data.annotation.GeneratedValue.Type.AUTO;
+
 @MappedEntity
 public class Author {
 
     @Id
-    @GeneratedValue(GeneratedValue.Type.AUTO)
+    @GeneratedValue(AUTO)
     private Long id;
 
     @NotNull
-    private String username;
+    private final String username;
 
     public Author(@NotNull String username) {
         this.username = username;
@@ -30,9 +32,5 @@ public class Author {
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 }

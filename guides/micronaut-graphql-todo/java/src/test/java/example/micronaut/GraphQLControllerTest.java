@@ -86,7 +86,7 @@ class GraphQLControllerTest {
         return (List<Map>) ((Map) response.getBody().get().get("data")).get("toDos");
     }
 
-    private Long createToDo(String title, String author) {
+    private long createToDo(String title, String author) {
         String query = "{\"query\": \"mutation { createToDo(title: \\\"" + title + "\\\", author: \\\"" + author + "\\\") { id } }\" }";
         HttpResponse<Map> response = fetch(query);
         return Long.parseLong(((Map)((Map) response.getBody(Map.class).get().get("data")).get("createToDo")).get("id").toString());

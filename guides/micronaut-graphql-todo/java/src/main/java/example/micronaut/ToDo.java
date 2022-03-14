@@ -6,11 +6,13 @@ import io.micronaut.data.annotation.MappedEntity;
 
 import javax.validation.constraints.NotNull;
 
+import static io.micronaut.data.annotation.GeneratedValue.Type.AUTO;
+
 @MappedEntity
 public class ToDo {
 
     @Id
-    @GeneratedValue(GeneratedValue.Type.AUTO)
+    @GeneratedValue(AUTO)
     private Long id;
 
     @NotNull
@@ -18,10 +20,9 @@ public class ToDo {
 
     private boolean completed;
 
-    @NotNull
-    private Long authorId;
+    private final long authorId;
 
-    public ToDo(String title, Long authorId) {
+    public ToDo(String title, long authorId) {
         this.title = title;
         this.authorId = authorId;
     }
@@ -50,11 +51,7 @@ public class ToDo {
         this.completed = completed;
     }
 
-    public Long getAuthorId() {
+    public long getAuthorId() {
         return authorId;
-    }
-
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
     }
 }

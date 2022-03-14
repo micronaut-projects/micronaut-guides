@@ -15,13 +15,17 @@ public class CompleteToDoDataFetcher implements DataFetcher<Boolean> {
 
     @Override
     public Boolean get(DataFetchingEnvironment env) {
-        Long id = Long.valueOf(env.getArgument("id"));
+        long id = Long.parseLong(env.getArgument("id"));
 
-        return toDoRepository.findById(id).map(todo -> { // <1>
-                    todo.setCompleted(true); // <2>
-                    toDoRepository.update(todo); // <3>
-                    return true;
-                })
+        return toDoRepository
+                .findById(id)
+                .map(this::setCompletedAndUpdate)
                 .orElse(false);
+    }
+
+    private boolean setCompletedAndUpdate(ToDo todo) {
+        todo.setCompleted(true);
+        toDoRepository.update(todo);
+        return true;
     }
 }

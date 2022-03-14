@@ -3,6 +3,7 @@ package example.micronaut;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.inject.Singleton;
+import javax.transaction.Transactional;
 
 @Singleton
 public class CreateToDoDataFetcher implements DataFetcher<ToDo> {
@@ -16,6 +17,7 @@ public class CreateToDoDataFetcher implements DataFetcher<ToDo> {
     }
 
     @Override
+    @Transactional
     public ToDo get(DataFetchingEnvironment env) {
         String title = env.getArgument("title");
         String username = env.getArgument("author");

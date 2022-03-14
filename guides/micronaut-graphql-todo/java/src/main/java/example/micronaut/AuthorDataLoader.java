@@ -29,7 +29,7 @@ public class AuthorDataLoader implements MappedBatchLoader<Long, Author> {
     @Override
     public CompletionStage<Map<Long, Author>> load(Set<Long> keys) {
         return CompletableFuture.supplyAsync(() -> authorRepository
-                        .findByIdInList(keys)
+                        .findByIdIn(keys)
                         .stream()
                         .collect(toMap(Author::getId, Function.identity())),
                 executor
