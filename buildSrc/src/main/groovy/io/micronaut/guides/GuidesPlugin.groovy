@@ -6,6 +6,7 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
 import io.micronaut.guides.tasks.SampleProjectGenerationTask
+import io.micronaut.guides.tasks.TestScriptRunnerTask
 import io.micronaut.guides.tasks.TestScriptTask
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin
@@ -52,7 +53,7 @@ class GuidesPlugin implements Plugin<Project> {
                 .stream()
                 .filter(guideMetadata -> Utils.process(guideMetadata, false))
                 .map(metadata -> {
-                    String taskSlug = kebapCaseToGradleName(metadata.slug)
+                    String taskSlug = kebabCaseToGradleName(metadata.slug)
 
                     TaskProvider<Copy> githubActionWorkflowTask = registerGenerateGithubActionWorkflow(project,
                             metadata,
@@ -72,6 +73,7 @@ class GuidesPlugin implements Plugin<Project> {
                     TaskProvider<Task> zip = registerZipTask(project, taskSlug, zippers)
                     TaskProvider<GuidesIndexGradleTask> indexTask = registerIndexTask(project, taskSlug, metadata)
                     TaskProvider<TestScriptTask> testScriptTask = registerTestScriptTask(project, taskSlug, metadata, generateTask)
+                    registerTestScriptRunnerTask(project, taskSlug, metadata, testScriptTask)
                     registerGuideBuild(project, taskSlug, docTask, zip, indexTask, testScriptTask)
                     [(KEY_DOC)              : docTask,
                      (KEY_ZIP)              : zip,
@@ -132,7 +134,7 @@ class GuidesPlugin implements Plugin<Project> {
                 .collect(Collectors.toList()))
     }
 
-    private static String kebapCaseToGradleName(String name) {
+    private static String kebabCaseToGradleName(String name) {
         String str = name.split("-")*.capitalize().join("")
 
         char[] array = str.toCharArray()
@@ -176,6 +178,29 @@ class GuidesPlugin implements Plugin<Project> {
         }
     }
 
+    private static TaskProvider<TestScriptRunnerTask> registerTestScriptRunnerTask(Project project,
+                                                                                   String taskSlug,
+                                                                                   GuideMetadata metadata,
+                                                                                   TaskProvider<TestScriptTask> testScriptTask) {
+        project.tasks.register("${taskSlug}RunTestScript", TestScriptRunnerTask) { TestScriptRunnerTask it ->
+
+            Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug}")
+
+            it.group = 'guides'
+
+            // Define inputs so we can be up to date
+            it.testScript.set(testScriptTask.flatMap { t -> t.outputDir.file("test.sh") })
+            it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug}"))
+
+            // Required for the up to date check
+            it.outputDir.set(codeDirectory)
+
+            // Exec task config
+            it.workingDir(codeDirectory)
+            it.commandLine("./test.sh")
+        }
+    }
+
     private static TaskProvider<AsciidocGenerationTask> registerDocTask(Project project,
                                                                         GuideMetadata metadata,
                                                                         Directory guidesDir,
@@ -201,7 +226,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                      GuidesOption option,
                                                      TaskProvider<SampleProjectGenerationTask> generateTask) {
         String name = optionName(metadata, option)
-        String taskName = "${kebapCaseToGradleName(name)}ZipCode"
+        String taskName = "${kebabCaseToGradleName(name)}ZipCode"
         String fromPath = "code/$metadata.slug/$name"
         String archiveFileName = "${name}.zip"
         project.tasks.register(taskName, Zip) { Zip it ->
