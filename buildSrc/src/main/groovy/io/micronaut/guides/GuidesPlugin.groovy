@@ -73,8 +73,8 @@ class GuidesPlugin implements Plugin<Project> {
                     TaskProvider<Task> zip = registerZipTask(project, taskSlug, zippers)
                     TaskProvider<GuidesIndexGradleTask> indexTask = registerIndexTask(project, taskSlug, metadata)
                     TaskProvider<TestScriptTask> testScriptTask = registerTestScriptTask(project, taskSlug, metadata, generateTask)
-                    registerTestScriptRunnerTask(project, taskSlug, metadata, testScriptTask)
-                    registerGuideBuild(project, taskSlug, docTask, zip, indexTask, testScriptTask)
+                    TaskProvider<TestScriptRunnerTask> testScriptRunnerTask = registerTestScriptRunnerTask(project, taskSlug, metadata, testScriptTask)
+                    registerGuideBuild(project, taskSlug, docTask, zip, indexTask, testScriptTask, testScriptRunnerTask)
                     [(KEY_DOC)              : docTask,
                      (KEY_ZIP)              : zip,
                      (KEY_WORKFLOW)         : githubActionWorkflowTask,
