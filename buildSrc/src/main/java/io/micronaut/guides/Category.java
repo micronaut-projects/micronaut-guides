@@ -6,6 +6,7 @@ public enum Category {
     EMAIL("Email"),
     DATA_ACCESS("Data Access"),
     CACHE("Cache"),
+    GRAPHQL("GraphQL"),
     MESSAGING("Messaging"),
     SECURITY("Micronaut Security"),
     SERVICE_DISCOVERY("Service Discovery"),
