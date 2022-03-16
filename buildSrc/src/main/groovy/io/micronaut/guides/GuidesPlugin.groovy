@@ -193,6 +193,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                                                    GuideMetadata metadata,
                                                                                    TaskProvider<TestScriptTask> testScriptTask) {
         project.tasks.register("${taskSlug}RunTestScript", TestScriptRunnerTask) { TestScriptRunnerTask it ->
+            it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) }
 
             Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug}")
 

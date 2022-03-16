@@ -1,0 +1,39 @@
+name: Test Guides
+on:
+  push:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+  pull_request:
+    branches:
+      - master
+      - '[1-9]+.[0-9]+.x'
+jobs:
+  alltests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ["11","17"]
+    env:
+      JDK_VERSION: ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Run All Guide Tests
+        run: './gradlew runAllGuideTests'
+        env:
+          AWS_ACCESS_KEY_ID: XXX
+          AWS_SECRET_ACCESS_KEY: YYY
+          AWS_REGION: us-east-1
+          GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
