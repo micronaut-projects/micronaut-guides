@@ -26,7 +26,7 @@ class Utils {
             return false
         }
 
-        if (checkJdk) {
+        if (checkJdk && skipBecauseOfJavaVersion(metadata)) {
             println "not processing $metadata.slug, JDK not between $metadata.minimumJavaVersion and $metadata.maximumJavaVersion"
             return false
         }
@@ -38,9 +38,9 @@ class Utils {
         int jdkVersion = parseJdkVersion().majorVersion()
         if ((metadata.minimumJavaVersion != null && jdkVersion < metadata.minimumJavaVersion) ||
                 (metadata.maximumJavaVersion != null && jdkVersion > metadata.maximumJavaVersion)) {
-            return false
-        } else {
             return true
+        } else {
+            return false
         }
     }
 
