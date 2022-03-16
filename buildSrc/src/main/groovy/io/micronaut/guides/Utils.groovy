@@ -27,18 +27,21 @@ class Utils {
         }
 
         if (checkJdk) {
-            int jdkVersion = parseJdkVersion().majorVersion()
-            if (metadata.minimumJavaVersion != null && jdkVersion < metadata.minimumJavaVersion) {
-                println "not processing $metadata.slug, JDK $jdkVersion < $metadata.minimumJavaVersion"
-                return false
-            }
-            if (metadata.maximumJavaVersion != null && jdkVersion > metadata.maximumJavaVersion) {
-                println "not processing $metadata.slug, JDK $jdkVersion > $metadata.maximumJavaVersion"
-                return false
-            }
+            println "not processing $metadata.slug, JDK not between $metadata.minimumJavaVersion and $metadata.maximumJavaVersion"
+            return false
         }
 
         return true
+    }
+
+    static boolean skipBecauseOfJavaVersion(GuideMetadata metadata) {
+        int jdkVersion = parseJdkVersion().majorVersion()
+        if ((metadata.minimumJavaVersion != null && jdkVersion < metadata.minimumJavaVersion) ||
+                (metadata.maximumJavaVersion != null && jdkVersion > metadata.maximumJavaVersion)) {
+            return false
+        } else {
+            return true
+        }
     }
 
     static JdkVersion parseJdkVersion() {
