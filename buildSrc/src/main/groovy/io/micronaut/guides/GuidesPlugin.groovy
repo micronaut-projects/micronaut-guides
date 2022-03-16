@@ -207,10 +207,6 @@ class GuidesPlugin implements Plugin<Project> {
 
             // Required for the up to date check
             it.outputFile.set(project.layout.projectDirectory.file("guides/${metadata.slug}/output.log"))
-
-            // Exec task config
-            it.workingDir(codeDirectory)
-            it.commandLine("./test.sh")
         }
     }
 
