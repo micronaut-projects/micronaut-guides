@@ -34,10 +34,7 @@ abstract class TestScriptRunnerTask extends DefaultTask {
     @TaskAction
     void runScript() {
         workerExecutor
-                .processIsolation(spec -> spec
-                        .forkOptions(o -> o
-                                .setEnvironment(System.getenv()))
-                )
+                .noIsolation()
                 .submit(TestScriptRunnerWorkAction) { parameters ->
                     parameters.testScript.set(testScript)
                 }
