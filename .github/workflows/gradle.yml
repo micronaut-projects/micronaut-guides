@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: ["8","11","17"]
+        java: ["11","17"]
     env:
       JDK_VERSION: ${{ matrix.java }}
     steps:
@@ -31,6 +31,9 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
       - name: Run All Guide Tests
-        run: 'export AWS_ACCESS_KEY_ID=XXX;export AWS_SECRET_ACCESS_KEY=YYY;export AWS_REGION=us-east-1;./gradlew runAllGuideTests'
+        run: './gradlew runAllGuideTests'
         env:
+          AWS_ACCESS_KEY_ID: XXX
+          AWS_SECRET_ACCESS_KEY: YYY
+          AWS_REGION: us-east-1
           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
