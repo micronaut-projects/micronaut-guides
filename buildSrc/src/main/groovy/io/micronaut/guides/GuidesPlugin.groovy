@@ -19,6 +19,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Predicate
 import java.util.stream.Collectors
 
@@ -41,6 +42,8 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String KEY_DOC = "doc"
     private static final String COMMA = ","
     private static final String TASK_SUFFIX_BUILD = "Build"
+
+    private static AtomicBoolean firstGuide = new AtomicBoolean(true)
 
     @Override
     void apply(Project project) {
@@ -204,6 +207,8 @@ class GuidesPlugin implements Plugin<Project> {
             // Define inputs so we can be up to date
             it.testScript.set(testScriptTask.flatMap { t -> t.scriptFile })
             it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug}"))
+            it.await.set(firstGuide.getAndSet(false))
+
 
             // Required for the up to date check
             it.outputFile.set(project.layout.projectDirectory.file("guides/${metadata.slug}/output.log"))

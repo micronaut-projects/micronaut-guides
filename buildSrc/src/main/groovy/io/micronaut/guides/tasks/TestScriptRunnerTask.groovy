@@ -4,12 +4,15 @@ import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.WorkQueue
 import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
@@ -31,12 +34,19 @@ abstract class TestScriptRunnerTask extends DefaultTask {
     @Inject
     abstract WorkerExecutor getWorkerExecutor();
 
+    // We have to wait for the first task to complete as mvnw corrupts the wrapper if downloaded in parallel
+    @Internal
+    abstract Property<Boolean> getAwait()
+
     @TaskAction
     void runScript() {
-        workerExecutor
-                .noIsolation()
-                .submit(TestScriptRunnerWorkAction) { parameters ->
-                    parameters.testScript.set(testScript)
-                }
+        WorkQueue queue = workerExecutor.noIsolation()
+        queue.submit(TestScriptRunnerWorkAction) { parameters ->
+            parameters.testScript.set(testScript)
+        }
+        if (await.get()) {
+            println "Waiting..."
+            queue.await()
+        }
     }
 }
