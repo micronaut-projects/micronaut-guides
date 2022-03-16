@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
-@Singleton
+@Singleton // <1>
 public class AuthorDataLoader implements MappedBatchLoader<Long, Author> {
 
     private final AuthorRepository authorRepository;

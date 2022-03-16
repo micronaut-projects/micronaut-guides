@@ -4,12 +4,12 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.inject.Singleton;
 
-@Singleton
+@Singleton // <1>
 public class ToDosDataFetcher implements DataFetcher<Iterable<ToDo>> {
 
     private final ToDoRepository toDoRepository;
 
-    public ToDosDataFetcher(ToDoRepository toDoRepository) {
+    public ToDosDataFetcher(ToDoRepository toDoRepository) { // <2>
         this.toDoRepository = toDoRepository;
     }
 

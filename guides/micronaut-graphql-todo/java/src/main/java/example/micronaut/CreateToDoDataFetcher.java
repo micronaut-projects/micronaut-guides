@@ -5,13 +5,14 @@ import graphql.schema.DataFetchingEnvironment;
 import jakarta.inject.Singleton;
 import javax.transaction.Transactional;
 
-@Singleton
+@Singleton // <1>
 public class CreateToDoDataFetcher implements DataFetcher<ToDo> {
 
     private final ToDoRepository toDoRepository;
     private final AuthorRepository authorRepository;
 
-    public CreateToDoDataFetcher(ToDoRepository toDoRepository, AuthorRepository authorRepository) {
+    public CreateToDoDataFetcher(ToDoRepository toDoRepository, // <2>
+                                 AuthorRepository authorRepository) {
         this.toDoRepository = toDoRepository;
         this.authorRepository = authorRepository;
     }
@@ -22,10 +23,10 @@ public class CreateToDoDataFetcher implements DataFetcher<ToDo> {
         String title = env.getArgument("title");
         String username = env.getArgument("author");
 
-        Author author = authorRepository.findOrCreate(username); // <1>
+        Author author = authorRepository.findOrCreate(username); // <3>
 
         ToDo toDo = new ToDo(title, author.getId());
 
-        return toDoRepository.save(toDo); // <2>
+        return toDoRepository.save(toDo); // <4>
     }
 }

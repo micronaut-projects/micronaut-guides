@@ -7,25 +7,19 @@ import org.dataloader.DataLoaderRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Factory
+@Factory // <1>
 public class DataLoaderRegistryFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataLoaderRegistryFactory.class);
 
-    private final AuthorDataLoader authorDataLoader;
-
-    public DataLoaderRegistryFactory(AuthorDataLoader authorDataLoader) {
-        this.authorDataLoader = authorDataLoader;
-    }
-
     @SuppressWarnings("unused")
-    @RequestScope // <1>
-    public DataLoaderRegistry dataLoaderRegistry() {
+    @RequestScope // <2>
+    public DataLoaderRegistry dataLoaderRegistry(AuthorDataLoader authorDataLoader) {
         DataLoaderRegistry dataLoaderRegistry = new DataLoaderRegistry();
         dataLoaderRegistry.register(
                 "author",
                 DataLoader.newMappedDataLoader(authorDataLoader)
-        ); // <2>
+        ); // <3>
 
         LOG.trace("Created new data loader registry");
 

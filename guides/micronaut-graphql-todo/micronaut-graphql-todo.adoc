@@ -41,9 +41,15 @@ Create an Entity class to represent an Author:
 
 source:Author[]
 
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+
 And another to represent a ToDo:
 
 source:ToDo[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
 
 === Repositories
 
@@ -53,16 +59,18 @@ The simplest of these is the `ToDoRepository` which just requires the default me
 
 source:ToDoRepository[]
 
-<1> Specify the dialect, as queries are computed at compile time.
+callout:jdbcrepository[1]
+callout:crudrepository[2]
 
 Then create a Repository for the Authors.  This requires extra finders for this to simplify the GraphQL wiring in the next step:
 
 source:AuthorRepository[]
 
-<1> Again, specify the dialect.
-<2> When creating todos a method is required to search for an exisiting username.
-<3> When GraphQL loads a ToDo, it use this to fetch the authors if they are required in the response.
-<4> Find an existing author, or else create a new one when creating a ToDo.
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+<3> When creating todos a method is required to search for an exisiting username.
+<4> When GraphQL loads a ToDo, it use this to fetch the authors if they are required in the response.
+<5> Find an existing author, or else create a new one when creating a ToDo.
 
 == GraphQL
 
@@ -95,22 +103,29 @@ Create class `ToDosDataFetcher` to implement the `toDos` query:
 
 source:ToDosDataFetcher[]
 
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=ToDoRepository]
+
 ==== Mutations
 
 Create `CreateToDoDataFetcher` for the creation of ToDos:
 
 source:CreateToDoDataFetcher[]
 
-<1> Find the existing author or create a new one.
-<2> Persist the new ToDo.
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=ToDoRepository]
+<3> Find the existing author or create a new one.
+<4> Persist the new ToDo.
 
 And `CompleteToDoDataFetcher` to mark ToDos as complete:
 
 source:CompleteToDoDataFetcher[]
 
-<1> Find the existing ToDo based on its id.
-<2> If found, set completed.
-<3> And update the version in the database.
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=ToDoRepository]
+<2> Find the existing ToDo based on its id.
+<3> If found, set completed.
+<4> And update the version in the database.
 
 ==== Wiring
 
@@ -122,18 +137,23 @@ To do this, register a DataLoader that finds authors based on a collection of id
 
 source:AuthorDataLoader[]
 
+callout:singleton[1]
+callout:io-executor-service[2]
+
 This is registered in the DataLoaderRegistry under the key `author`
 
 source:DataLoaderRegistryFactory[]
 
-<1> This registry has request scope, so a new one will be created for every request.
-<2> Register the AuthorDataLoader whenever the loader for `"author"` is requested.
+callout:factory[1]
+<2> This registry has request scope, so a new one will be created for every request.
+<3> Register the AuthorDataLoader whenever the loader for `"author"` is requested.
 
 Add an `AuthorDataFetcher` which requests and uses this loader to populate a `ToDo` if the author when required.
 
 source:AuthorDataFetcher[]
 
-<1> Uses the author data loader defined above in the Factory.
+callout:singleton[1]
+<2> Uses the author data loader defined above in the Factory.
 
 === GraphQL Factory
 
@@ -141,8 +161,8 @@ Finally, create a factory class that will bind the GraphQL schema to the code, t
 
 source:GraphQLFactory[]
 
-<1> Declare this class as a Factory.
-<2> Declare that there will only be a single instance of this class in our application.
+callout:factory[1]
+callout:singleton[2]
 <3> Wire up the query behavior.
 <4> Wire up each mutators.
 <5> Wire up how to populate a ToDo with authors if they are requested.
@@ -304,6 +324,9 @@ For testing the application use the Micronaut HTTP Client to send a `POST` reque
 Create the following class:
 
 test:GraphQLControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
 
 When this test is executed, Testcontainers will start a fresh copy of Postgres in a container and apply the migrations.
 The tests then run "as in production" with real data in a real database.

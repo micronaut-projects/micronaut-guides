@@ -8,10 +8,10 @@ import javax.validation.constraints.NotNull;
 
 import static io.micronaut.data.annotation.GeneratedValue.Type.AUTO;
 
-@MappedEntity
+@MappedEntity // <1>
 public class ToDo {
 
-    @Id
+    @Id // <2>
     @GeneratedValue(AUTO)
     private Long id;
 
