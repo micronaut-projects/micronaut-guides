@@ -10,9 +10,6 @@ public class GenreSaveCommand {
     @NotBlank
     private String name;
 
-    public GenreSaveCommand() {
-    }
-
     public GenreSaveCommand(String name) {
         this.name = name;
     }

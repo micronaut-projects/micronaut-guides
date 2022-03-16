@@ -1,0 +1,183 @@
+external:micronaut-cloud-database-base/start.adoc[]
+* An https://aws.amazon.com/[AWS account] with:
+** An IAM user with enough permissions to create and manage DB instances in RDS.
+** The AWS CLI configured to use the IAM user above.
+* The https://dev.mysql.com/doc/refman/8.0/en/mysql.html[MySQL client CLI].
+
+common:aws.adoc[]
+
+== Creating a MySQL Database instance in Amazon Relational Database Service (Amazon RDS)
+
+You will create the database with the AWS CLI. See the https://awscli.amazonaws.com/v2/documentation/api/latest/reference/rds/index.html[AWS CLI `rds` command] for more information.
+
+=== Create VPC, security group, subnets and subnet group (optional)
+
+To allow connections to the database from your local computer, create a VPC and a security group that allows access to the MySQL default port from your current public IP address.
+
+WARNING: Exposing a database port to the internet is a security risk. This should be done only for development purposes.
+
+You will also create 2 subnets in different availability zones and a subnet group to associate them.
+
+common:jq[]
+
+[source,bash]
+----
+# VPC, internet gateway and route table
+export VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 | jq -r '.Vpc.VpcId')
+export IG_ID=$(aws ec2 create-internet-gateway | jq -r '.InternetGateway.InternetGatewayId')
+aws ec2 attach-internet-gateway --internet-gateway-id $IG_ID --vpc-id $VPC_ID
+aws ec2 modify-vpc-attribute --enable-dns-hostnames --vpc-id $VPC_ID
+export RT_ID=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID" --query "RouteTables[].RouteTableId" --output text)
+aws ec2 create-route --route-table-id $RT_ID --destination-cidr-block 0.0.0.0/0 --gateway-id $IG_ID
+
+# Security group
+aws ec2 create-security-group --group-name micronaut-guides-mysql-sg --description "Security Group for the Micronaut MySQL guide" --vpc-id $VPC_ID
+export SG_ID=$(aws ec2 describe-security-groups --query 'SecurityGroups[?GroupName==`micronaut-guides-mysql-sg`].GroupId' --output text)
+aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 3306 --cidr $(curl ifconfig.me)/32
+
+# Subnets and subnet group
+export AZ_0=$(aws ec2 describe-availability-zones --filters "Name=state,Values=available" --query "AvailabilityZones[0].ZoneName" --output text)
+export AZ_1=$(aws ec2 describe-availability-zones --filters "Name=state,Values=available" --query "AvailabilityZones[1].ZoneName" --output text)
+export SN0_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.0.0/20 --availability-zone $AZ_0 | jq -r '.Subnet.SubnetId')
+export SN1_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.16.0/20 --availability-zone $AZ_1 | jq -r '.Subnet.SubnetId')
+aws ec2 modify-subnet-attribute --subnet-id $SN0_ID --map-public-ip-on-launch
+aws ec2 modify-subnet-attribute --subnet-id $SN1_ID --map-public-ip-on-launch
+aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng --db-subnet-group-description "DB subnet group for the Micronaut MySQL guide" --subnet-ids "$SN0_ID" "$SN1_ID"
+----
+
+=== Create the MySQL instance
+
+[source,bash]
+----
+aws rds create-db-instance \
+    --db-instance-identifier micronaut-guides-mysql \
+    --db-instance-class db.t2.micro \
+    --engine mysql \
+    --master-username admin \
+    --master-user-password secret99 \
+    --allocated-storage 20 \
+    --db-subnet-group-name micronaut-guides-mysql-sng \
+    --vpc-security-group-ids $SG_ID \
+    --publicly-accessible
+----
+
+You then need to wait for the instance to be available:
+
+[source,bash]
+----
+aws rds wait db-instance-available --db-instance-identifier micronaut-guides-mysql
+----
+
+Once the instance is available, you can configure environment variables for its hostname and port:
+
+[source,bash]
+----
+export MYSQL_HOST=$(aws rds describe-db-instances --query 'DBInstances[?DBInstanceIdentifier==`micronaut-guides-mysql`].Endpoint.Address' --output text)
+----
+
+Finally, test connectivity to the database using the MySQL client CLI:
+
+[source,bash]
+----
+mysql -u admin -p
+----
+
+=== Create a database and user
+
+Create the database. You can use any valid database name (e.g., `micronaut`):
+
+[source,mysql]
+----
+mysql> CREATE DATABASE micronaut;
+----
+
+Create a database user. You can use any valid MySQL username (e.g., `guide_user`) and any valid password:
+
+[source,mysql]
+----
+mysql> CREATE USER 'guide_user' IDENTIFIED BY 'M1cr0n4ut!';
+----
+
+Grant access to the database for the new user:
+
+[source,mysql]
+----
+mysql> GRANT ALL ON micronaut.* TO 'guide_user';
+----
+
+Exit the MySQL console:
+
+[source,mysql]
+----
+mysql> exit
+----
+
+external:micronaut-cloud-database-base/create-app.adoc[]
+
+== Running the Application
+
+With almost everything in place, you can start the application and try it out. First, set environment variables to configure the application datasource. Then you can start the app.
+
+Create environment variables for `JDBC_URL`, `JDBC_USER`, and `JDBC_PASSWORD`, which will be used in the Micronaut app's `application.yml` datasource:
+
+[source,bash]
+----
+export JDBC_URL=jdbc:mysql://${MYSQL_HOST}:3306/micronaut
+export JDBC_USER=guide_user
+export JDBC_PASSWORD=M1cr0n4ut!
+----
+
+[NOTE]
+.Window System
+====
+Command Prompt:: Change '*export*' to '*set*'
++
+Example: `set JDBC_USER=guide_user`
+
+PowerShell:: Change '*export* ' to '*$*' and use quotes around the value
++
+Example: `$JDBC_USER="guide_user"`
+====
+
+common:runapp-instructions.adoc[]
+
+You can test the application in a web browser or with cURL.
+
+Run from a terminal window to create a `Genre`:
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+and run this to list the genres:
+
+[source, bash]
+----
+curl http://localhost:8080/genres/list
+----
+
+=== Stopping the Instance and cleaning up
+
+Once you are done with this guide, you can stop/delete the AWS resources created to avoid incurring unnecessary charges.
+
+[source,bash]
+----
+aws rds delete-db-instance --db-instance-identifier micronaut-guides-mysql --skip-final-snapshot
+aws rds wait db-instance-deleted --db-instance-identifier micronaut-guides-mysql
+aws ec2 delete-subnet --subnet-id $SN0_ID
+aws ec2 delete-subnet --subnet-id $SN1_ID
+aws rds delete-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
+aws ec2 delete-security-group --group-id $SG_ID
+aws ec2 detach-internet-gateway --internet-gateway-id $IG_ID --vpc-id $VPC_ID
+aws ec2 delete-internet-gateway --internet-gateway-id $IG_ID
+aws ec2 delete-vpc --vpc-id $VPC_ID
+----
+
+=== Next Steps
+
+external:micronaut-cloud-database-base/end.adoc[]
+
+Discover https://aws.amazon.com/rds/[Amazon Relational Database Service (RDS)].
