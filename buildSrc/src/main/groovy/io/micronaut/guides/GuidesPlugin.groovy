@@ -6,6 +6,7 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
 import io.micronaut.guides.tasks.SampleProjectGenerationTask
+import io.micronaut.guides.tasks.TestScriptRunnerTask
 import io.micronaut.guides.tasks.TestScriptTask
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin
@@ -36,6 +37,7 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String KEY_ZIP = "zip"
     private static final String KEY_WORKFLOW = "workflow"
     private static final String KEY_WORKFLOW_SNAPSHOT = "workflow-snapshot"
+    private static final String TEST_RUNNER = "test-runner"
     private static final String KEY_DOC = "doc"
     private static final String COMMA = ","
     private static final String TASK_SUFFIX_BUILD = "Build"
@@ -52,7 +54,7 @@ class GuidesPlugin implements Plugin<Project> {
                 .stream()
                 .filter(guideMetadata -> Utils.process(guideMetadata, false))
                 .map(metadata -> {
-                    String taskSlug = kebapCaseToGradleName(metadata.slug)
+                    String taskSlug = kebabCaseToGradleName(metadata.slug)
 
                     TaskProvider<Copy> githubActionWorkflowTask = registerGenerateGithubActionWorkflow(project,
                             metadata,
@@ -69,14 +71,16 @@ class GuidesPlugin implements Plugin<Project> {
                             .map(option -> {
                                 registerZipTask(project, metadata, option, generateTask)
                             }).collect(Collectors.toList())
-                    TaskProvider<Task> zip = registerZipTask(project, taskSlug, zippers)
+                    TaskProvider<Task> zip = registerZipTask(project, taskSlug, metadata, zippers)
                     TaskProvider<GuidesIndexGradleTask> indexTask = registerIndexTask(project, taskSlug, metadata)
                     TaskProvider<TestScriptTask> testScriptTask = registerTestScriptTask(project, taskSlug, metadata, generateTask)
-                    registerGuideBuild(project, taskSlug, docTask, zip, indexTask, testScriptTask)
+                    TaskProvider<TestScriptRunnerTask> testScriptRunnerTask = registerTestScriptRunnerTask(project, taskSlug, metadata, testScriptTask)
+                    registerGuideBuild(project, taskSlug, metadata, docTask, zip, indexTask, testScriptTask, testScriptRunnerTask)
                     [(KEY_DOC)              : docTask,
                      (KEY_ZIP)              : zip,
                      (KEY_WORKFLOW)         : githubActionWorkflowTask,
-                     (KEY_WORKFLOW_SNAPSHOT): githubActionSnapshotWorkflowTask]
+                     (KEY_WORKFLOW_SNAPSHOT): githubActionSnapshotWorkflowTask,
+                     (TEST_RUNNER)          : testScriptRunnerTask]
                 }).collect(Collectors.toList())
 
         List<TaskProvider<Task>> docTasks = sampleTasks.stream()
@@ -88,6 +92,12 @@ class GuidesPlugin implements Plugin<Project> {
             it.finalizedBy(FINALIZED_TASKS.stream().map(n -> project.tasks.named(n)).collect(Collectors.toList()))
             it.group = 'guides'
             it.description = 'Generates guide applications at build/code'
+        }
+
+        project.tasks.register("runAllGuideTests") { Task it ->
+            it.group = 'guides'
+            it.description = 'Runs all Guide test scripts'
+            it.dependsOn(sampleTasks.stream().map(m -> m.get(TEST_RUNNER)).collect(Collectors.toList()))
         }
 
         List<TaskProvider<Task>> zipTasks = sampleTasks.stream()
@@ -132,7 +142,7 @@ class GuidesPlugin implements Plugin<Project> {
                 .collect(Collectors.toList()))
     }
 
-    private static String kebapCaseToGradleName(String name) {
+    private static String kebabCaseToGradleName(String name) {
         String str = name.split("-")*.capitalize().join("")
 
         char[] array = str.toCharArray()
@@ -144,9 +154,10 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static TaskProvider<Task> registerZipTask(Project project,
                                                       String taskSlug,
+                                                      GuideMetadata metadata,
                                                       List<TaskProvider<Zip>> zippers) {
         project.tasks.register("${taskSlug}GenerateZips") { Task it ->
-            it.group = 'guides'
+            it.group = "guides $metadata.slug"
             it.dependsOn(zippers)
         }
     }
@@ -155,7 +166,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                                          String taskSlug,
                                                                          GuideMetadata metadata) {
         project.tasks.register("${taskSlug}Index", GuidesIndexGradleTask) { GuidesIndexGradleTask it ->
-            it.group = 'guides'
+            it.group = "guides $metadata.slug"
             it.description = "Generate index.html for '${metadata.title}'"
             it.metadata = metadata
             it.template.set(project.file("assets/template.html"))
@@ -169,10 +180,37 @@ class GuidesPlugin implements Plugin<Project> {
                                                                        GuideMetadata metadata,
                                                                        TaskProvider<SampleProjectGenerationTask> generateTask) {
         project.tasks.register("${taskSlug}TestScript", TestScriptTask) { TestScriptTask it ->
-            it.group = 'guides'
+            it.group = "guides $metadata.slug"
+            it.description = "Create a test.sh script for the projects generated by $metadata.slug"
             it.metadata = metadata
-            it.outputDir.set(project.layout.buildDirectory.dir("code/${metadata.slug}"))
+            it.guideSlug.set(metadata.slug)
+            it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug}").map(d -> d.file("test.sh")))
             it.dependsOn(generateTask)
+        }
+    }
+
+    private static TaskProvider<TestScriptRunnerTask> registerTestScriptRunnerTask(Project project,
+                                                                                   String taskSlug,
+                                                                                   GuideMetadata metadata,
+                                                                                   TaskProvider<TestScriptTask> testScriptTask) {
+        project.tasks.register("${taskSlug}RunTestScript", TestScriptRunnerTask) { TestScriptRunnerTask it ->
+            it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) }
+
+            Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug}")
+
+            it.group = "guides $metadata.slug"
+            it.description = "Run the tests for all projects generated by $metadata.slug"
+
+            // Define inputs so we can be up to date
+            it.testScript.set(testScriptTask.flatMap { t -> t.scriptFile })
+            it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug}"))
+
+            // Required for the up to date check
+            it.outputFile.set(project.layout.projectDirectory.file("guides/${metadata.slug}/output.log"))
+
+            // Exec task config
+            it.workingDir(codeDirectory)
+            it.commandLine("./test.sh")
         }
     }
 
@@ -182,7 +220,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                                         TaskProvider<SampleProjectGenerationTask> generateTask,
                                                                         String taskSlug) {
         project.tasks.register("${taskSlug}GenerateDocs", AsciidocGenerationTask) { AsciidocGenerationTask it ->
-            it.group = 'guides'
+            it.group = "guides $metadata.slug"
             it.dependsOn(generateTask)
             it.description = "Generate asciidoc files for '${metadata.title}'"
             it.slug.set(metadata.slug)
@@ -201,11 +239,11 @@ class GuidesPlugin implements Plugin<Project> {
                                                      GuidesOption option,
                                                      TaskProvider<SampleProjectGenerationTask> generateTask) {
         String name = optionName(metadata, option)
-        String taskName = "${kebapCaseToGradleName(name)}ZipCode"
+        String taskName = "${kebabCaseToGradleName(name)}ZipCode"
         String fromPath = "code/$metadata.slug/$name"
         String archiveFileName = "${name}.zip"
         project.tasks.register(taskName, Zip) { Zip it ->
-            it.group = 'guides'
+            it.group = "guides $metadata.slug"
             it.description = "Zips the source project for '${name}'"
             it.dependsOn(generateTask)
             it.from(project.layout.buildDirectory.dir(fromPath))
@@ -328,7 +366,7 @@ class GuidesPlugin implements Plugin<Project> {
                                                                                   Provider<Directory> codeDir,
                                                                                   String taskSlug) {
         project.tasks.register("${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}", SampleProjectGenerationTask) { SampleProjectGenerationTask it ->
-            it.group = 'guides'
+            it.group = "guides $metadata.slug"
             it.description = "Generate sample project for guide '${metadata.title}'"
             it.guidesGenerator = projectGenerator
             it.slug.set(metadata.slug)
@@ -341,9 +379,10 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static TaskProvider<Task> registerGuideBuild(Project project,
                                                          String taskSlug,
+                                                         GuideMetadata metadata,
                                                          TaskProvider<? extends Task>... dependsOnTasks) {
         project.tasks.register("${taskSlug}${TASK_SUFFIX_BUILD}") { Task it ->
-            it.group = 'guides' + taskSlug
+            it.group = "guides $metadata.slug"
             it.dependsOn(dependsOnTasks)
             it.finalizedBy(project.tasks.named('asciidoctor'), project.tasks.named('themeGuides'))
         }
