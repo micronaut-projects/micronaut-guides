@@ -5,6 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
@@ -17,6 +18,7 @@ import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
 
+@CacheableTask
 @CompileStatic
 abstract class TestScriptRunnerTask extends DefaultTask {
 
@@ -43,10 +45,9 @@ abstract class TestScriptRunnerTask extends DefaultTask {
         WorkQueue queue = workerExecutor.noIsolation()
         queue.submit(TestScriptRunnerWorkAction) { parameters ->
             parameters.testScript.set(testScript)
+            parameters.outputFile.set(outputFile)
         }
-        if (await.get()) {
-            println "Waiting..."
-            queue.await()
-        }
+        // Just run one at a time for now
+        queue.await()
     }
 }

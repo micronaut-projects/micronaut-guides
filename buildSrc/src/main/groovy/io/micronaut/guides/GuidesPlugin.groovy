@@ -209,9 +209,8 @@ class GuidesPlugin implements Plugin<Project> {
             it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug}"))
             it.await.set(firstGuide.getAndSet(false))
 
-
             // Required for the up to date check
-            it.outputFile.set(project.layout.projectDirectory.file("guides/${metadata.slug}/output.log"))
+            it.outputFile.set(codeDirectory.map(d -> d.file("output.log")))
         }
     }
 
