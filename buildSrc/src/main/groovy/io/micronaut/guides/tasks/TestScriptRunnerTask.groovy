@@ -49,7 +49,8 @@ abstract class TestScriptRunnerTask extends DefaultTask {
             parameters.outputFile.set(outputFile)
         }
 
-        // Just run one at a time for now
+        // Just run one at a time for now, when we try to parallelize we will need to await if
+        // getAwait() is true, so that the maven wrapper is downloaded uncorrupted.
         queue.await()
     }
 }
