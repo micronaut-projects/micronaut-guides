@@ -23,7 +23,6 @@ abstract class TestScriptRunnerWorkAction implements WorkAction<TestScriptRunner
             ExecResult result = execOperations.exec(execSpec -> {
                 OutputStream oldOut = execSpec.getStandardOutput();
                 OutputStream oldErr = execSpec.getErrorOutput();
-                println "Writing output to ${parameters.outputFile.get().asFile}"
                 execSpec
                         .commandLine("./test.sh")
                         .setStandardOutput(new TeeOutputStream(oldOut, file))

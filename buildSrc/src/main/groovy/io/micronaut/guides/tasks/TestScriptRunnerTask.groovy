@@ -43,10 +43,12 @@ abstract class TestScriptRunnerTask extends DefaultTask {
     @TaskAction
     void runScript() {
         WorkQueue queue = workerExecutor.noIsolation()
+
         queue.submit(TestScriptRunnerWorkAction) { parameters ->
             parameters.testScript.set(testScript)
             parameters.outputFile.set(outputFile)
         }
+
         // Just run one at a time for now
         queue.await()
     }
