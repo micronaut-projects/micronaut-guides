@@ -97,7 +97,7 @@ exit 0
 #!/usr/bin/env bash
 set -e
 
-# Run app on a random port to prevent collisions when in parallel
+# Any apps that get executed should run on a random port to prevent collisions when in parallel
 export MICRONAUT_SERVER_PORT=-1
 
 FAILED_PROJECTS=()
