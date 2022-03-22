@@ -20,8 +20,10 @@ public class AuthorDataLoader implements MappedBatchLoader<Long, Author> {
     private final AuthorRepository authorRepository;
     private final ExecutorService executor;
 
-    public AuthorDataLoader(AuthorRepository authorRepository,
-                            @Named(TaskExecutors.IO) ExecutorService executor) {
+    public AuthorDataLoader(
+            AuthorRepository authorRepository,
+            @Named(TaskExecutors.IO) ExecutorService executor // <2>
+    ) {
         this.authorRepository = authorRepository;
         this.executor = executor;
     }
