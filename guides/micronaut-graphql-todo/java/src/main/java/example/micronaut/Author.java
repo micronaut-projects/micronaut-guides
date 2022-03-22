@@ -11,7 +11,7 @@ import static io.micronaut.data.annotation.GeneratedValue.Type.AUTO;
 @MappedEntity // <1>
 public class Author {
 
-    @Id // <1>
+    @Id // <2>
     @GeneratedValue(AUTO)
     private Long id;
 
