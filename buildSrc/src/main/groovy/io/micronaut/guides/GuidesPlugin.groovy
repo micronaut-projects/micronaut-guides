@@ -86,9 +86,6 @@ class GuidesPlugin implements Plugin<Project> {
                      (TEST_RUNNER)          : testScriptRunnerTask]
                 }).collect(Collectors.toList())
 
-        // Make sure the other tasks run after the first
-        sampleTasks.stream().skip(1).forEach(map -> map.get(TEST_RUNNER).configure(task -> task.mustRunAfter(sampleTasks.get(0).get(TEST_RUNNER))))
-
         List<TaskProvider<Task>> docTasks = sampleTasks.stream()
                 .map() { Map<String, TaskProvider<Task>> m -> m[KEY_DOC] }
                 .collect(Collectors.toList())
