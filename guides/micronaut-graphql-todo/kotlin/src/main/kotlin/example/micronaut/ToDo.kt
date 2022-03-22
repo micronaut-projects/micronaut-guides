@@ -12,5 +12,5 @@ class ToDo(var title: String, val authorId: Long) {
     @GeneratedValue(AUTO)
     var id: Long? = null
 
-    var isCompleted = false
+    var completed = false
 }

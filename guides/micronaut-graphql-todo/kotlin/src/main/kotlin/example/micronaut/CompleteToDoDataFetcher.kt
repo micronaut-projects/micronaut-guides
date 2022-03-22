@@ -19,7 +19,7 @@ class CompleteToDoDataFetcher(
     }
 
     private fun setCompletedAndUpdate(todo: ToDo): Boolean {
-        todo.isCompleted = true // <4>
+        todo.completed = true // <4>
         toDoRepository.update(todo) // <5>
         return true
     }
