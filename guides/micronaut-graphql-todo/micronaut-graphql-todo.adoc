@@ -1,0 +1,370 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, you will create a Micronaut application written in @language@ that uses https://graphql.org/[GraphQL] to create a todo application.
+
+____
+GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides
+a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they
+need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools.
+____
+
+You will be using:
+
+* A PostgreSQL instance running in Docker.
+* https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data] to persist our ToDos to this database.
+* https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Flyway] to handle our database migrations.
+* https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL] to expose our data.
+* Testcontainers to run a PostgreSQL instance for local dev, and tests.
+
+The application will expose a GraphQL endpoint at `/graphql` for the data to be consumed and modified.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Persistence layer
+
+common:flyway.adoc[]
+
+resource:db/migration/V1__schema.sql[]
+
+<1> Authors will be stored in table separate to the ToDos.  They just have a username.
+<2> ToDos have a title, completion status, and a foreign-key reference to the author.
+
+=== Entities
+
+Create an Entity class to represent an Author:
+
+source:Author[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+
+And another to represent a ToDo:
+
+source:ToDo[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+
+=== Repositories
+
+Create a https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcRepositories[`JdbcRepository`] for each of our Entity classes.
+
+The simplest of these is the `ToDoRepository` which just requires the default methods:
+
+source:ToDoRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+Then create a Repository for the Authors.  This requires extra finders for this to simplify the GraphQL wiring in the next step:
+
+source:AuthorRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+<3> When creating todos a method is required to search for an exisiting username.
+<4> When GraphQL loads a ToDo, it use this to fetch the authors if they are required in the response.
+<5> Find an existing author, or else create a new one when creating a ToDo.
+
+== GraphQL
+
+The initial Micronaut application `create-app` step already added the GraphQL dependency:
+
+dependency:micronaut-graphql[groupId=io.micronaut.graphql]
+
+So the default GraphQL endpoint `/graphql` is enabled, and extra configuration is not required.
+
+=== Describe your schema
+
+Create the file `schema.graphqls`:
+
+resource:schema.graphqls[]
+
+<1> Declare a `toDos` query function to fetch all the todos as a list.
+<2> Declare a `createToDo` mutation function to create and return a new ToDo.
+<3> Declare a `completeToDo` mutation function to mark a ToDo as done (and return a boolean indicating success).
+<4> Declare a `ToDo` type.
+<5> Declare an `Author` type.
+
+=== Data Fetchers
+
+For each query and mutator in the schema, create a `DataFetcher` which will bind the GraphQL schema to our domain model.
+These will execute the appropriate queries in the datastore.
+
+==== Queries
+
+Create class `ToDosDataFetcher` to implement the `toDos` query:
+
+source:ToDosDataFetcher[]
+
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=ToDoRepository]
+
+==== Mutations
+
+Create `CreateToDoDataFetcher` for the creation of ToDos:
+
+source:CreateToDoDataFetcher[]
+
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=ToDoRepository]
+<3> Find the existing author or create a new one.
+<4> Persist the new ToDo.
+
+And `CompleteToDoDataFetcher` to mark ToDos as complete:
+
+source:CompleteToDoDataFetcher[]
+
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=ToDoRepository]
+<3> Find the existing ToDo based on its id.
+<4> If found, set completed.
+<5> And update the version in the database.
+
+==== Wiring
+
+GraphQL allows data to be fetched on demand.
+In this example, a user may request a list of ToDos, but not require the author to be populated.
+A method is required to optionally load Authors based on their ID.
+
+To do this, register a DataLoader that finds authors based on a collection of ids:
+
+source:AuthorDataLoader[]
+
+callout:singleton[1]
+callout:io-executor-service[2]
+
+This is registered in the DataLoaderRegistry under the key `author`
+
+source:DataLoaderRegistryFactory[]
+
+callout:factory[1]
+<2> This registry has request scope, so a new one will be created for every request.
+<3> Register the AuthorDataLoader whenever the loader for `"author"` is requested.
+
+Add an `AuthorDataFetcher` which requests and uses this loader to populate a `ToDo` if the author when required.
+
+source:AuthorDataFetcher[]
+
+callout:singleton[1]
+<2> Uses the author data loader defined above in the Factory.
+
+=== GraphQL Factory
+
+Finally, create a factory class that will bind the GraphQL schema to the code, types and fetchers.
+
+source:GraphQLFactory[]
+
+callout:factory[1]
+callout:singleton[2]
+<3> Wire up the query behavior.
+<4> Wire up each mutators.
+<5> Wire up how to populate a ToDo with authors if they are requested.
+
+== Running the application
+
+Run the following Docker command to get an instance of PostgreSQL running with a database named `todo`:
+
+[source,bash]
+----
+docker run -d --rm \
+     -p 5432:5432 \
+     -e POSTGRES_USER=dbuser \
+     -e POSTGRES_PASSWORD=theSecretPassword \
+     -e POSTGRES_DB=todo \
+     postgres:12-alpine
+----
+
+Configure the default datasource to use the PostgreSQL database running in Docker:
+
+resource:application.yml[tag=datasource]
+
+<1> The JDBC URL matches the database name you used in the previous command (`todo`).
+<2> Use PostgreSQL driver.
+<3> Configure the PostgreSQL dialect.
+<4> Schema migrations are handled by Flyway.
+
+In a shell, set up the following environment variables to set the credentials to connect to the PostgreSQL database you started with Docker.
+
+[source,bash]
+----
+export DATASOURCES_DEFAULT_USERNAME=dbuser
+export DATASOURCES_DEFAULT_PASSWORD=theSecretPassword
+----
+
+common:runapp-instructions.adoc[]
+
+When the application first runs, you will see in the logs that the migrations have been performed.
+
+== Test the application
+
+=== Manual smoke tests
+
+Formulate a GraphQL query to retrieve all the current ToDos (there will be none to start with)
+
+[source,json]
+.Query
+----
+query {
+  toDos {
+    title,
+    completed,
+    author {
+       username
+    }
+  }
+}
+----
+
+Run the following cURL request:
+
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ toDos { title, completed, author { username } } }"}'
+----
+
+[source,json]
+.Response
+----
+{"data":{"toDos":[]}}
+----
+
+Create a ToDo, by issuing a mutation query and return the ID of the newly created ToDo:
+
+[source,json]
+.GraphQL Query
+----
+mutation {
+  createToDo(title: "Create GraphQL Guide", author: "Tim Yates") {
+    id
+  }
+}
+----
+
+Which translates to this cURL command:
+
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"mutation { createToDo(title:\"Create GraphQL Guide\", author:\"Tim Yates\") { id } }"}'
+----
+
+[source,json]
+.Response
+----
+{"data":{"createToDo":{"id":"1"}}}
+----
+
+This new ToDo then appears in the list of all ToDos with `completed` set to false:
+
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ toDos { title, completed, author { username } } }"}'
+----
+
+[source,json]
+.Response
+----
+{"data":{"toDos":[{"title":"Create GraphQL Guide","completed":false,"author":{"username":"Tim Yates"}}]}}
+----
+
+Mark it as completed by using this query with the ID from above:
+
+[source,json]
+.GraphQL query
+----
+mutation {
+  completeToDo(id: 1)
+}
+----
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"mutation { completeToDo(id: 1) }"}'
+----
+
+[source,json]
+.Response
+----
+{"data":{"completeToDo":true}}
+----
+
+Check this has been persisted in our model:
+
+[source,bash]
+.Query
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ toDos { title, completed } }"}'
+----
+
+[source,json]
+.Response
+----
+{"data":{"toDos":[{"title":"Create GraphQL Guide","completed":true}]}}
+----
+
+=== Automated tests
+
+For testing the application use the Micronaut HTTP Client to send a `POST` request to the `/graphql` endpoint.
+Create the following class:
+
+test:GraphQLControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+
+When this test is executed, Testcontainers will start a fresh copy of Postgres in a container and apply the migrations.
+The tests then run "as in production" with real data in a real database.
+
+To enable the tests to use this Dockerized database, create `application-test.yml` to overwrite the runtime datasource configuration.
+
+testResource:application-test.yml[tag=testcontainers]
+
+<1> Specify a https://www.testcontainers.org/modules/databases/jdbc/[TestContainers JDBC URL] to run our tests in a real but temporary PostgreSQL database
+
+common:testApp-noheader.adoc[]
+
+== GraphiQL
+
+As an extra feature that will help during development, you can enable https://github.com/graphql/graphiql[GraphiQL].
+GraphiQL is the GraphQL integrated development environment, and it executes GraphQL queries.
+
+It should only be used for development, so it's not enabled by default.
+Add the following configuration to enable it:
+
+resource:application.yml[tag=graphiql]
+
+Start the application again and open http://localhost:8080/graphiql in a browser.
+GraphQL queries can be executed with integrated auto-completion:
+
+image:graphiql-todo.png[]
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Start the native image and execute the same cURL request as before. You can also use the included GraphiQL browser to
+execute the queries.
+
+:exclude-for-languages:
+
+== Next steps
+
+Take a look at the https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL documentation].
+
+common:helpWithMicronaut.adoc[]

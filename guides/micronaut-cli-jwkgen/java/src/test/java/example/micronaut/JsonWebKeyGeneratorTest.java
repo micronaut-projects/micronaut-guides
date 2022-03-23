@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JsonWebKeyGeneratorTest {
+class JsonWebKeyGeneratorTest {
+
     @Test
     void beanOfTypeJsonWebKeyGeneratorExists() {
         try (ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST)) {

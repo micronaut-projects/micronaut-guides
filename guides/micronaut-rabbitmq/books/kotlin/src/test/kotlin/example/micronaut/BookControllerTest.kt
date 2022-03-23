@@ -40,7 +40,7 @@ class BookControllerTest {
         assertThrows(HttpClientResponseException::class.java) {
             retrieveGet("/books/INVALID")
         }
-        Mockito.verifyZeroInteractions(analyticsClient)
+        Mockito.verifyNoInteractions(analyticsClient)
     }
 
     @Primary

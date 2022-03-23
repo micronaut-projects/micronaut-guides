@@ -1,0 +1,22 @@
+== Amazon Web Services (AWS)
+
+If you don't have one already, https://portal.aws.amazon.com/billing/signup[create an AWS Account].
+
+=== AWS CLI
+
+Follow the https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html[AWS documentation] for installing or updating the latest version of the AWS CLI.
+
+=== Administrator IAM user
+
+Instead of using your AWS root account, it is recommended that you use an IAM administrative user. If you don't have one already, follow the steps below to create one:
+
+[source,bash]
+----
+aws iam create-group --group-name Administrators
+aws iam create-user --user-name Administrator
+aws iam add-user-to-group --user-name Administrator --group-name Administrators
+aws iam attach-group-policy --group-name Administrators --policy-arn $(aws iam list-policies --query 'Policies[?PolicyName==`AdministratorAccess`].{ARN:Arn}' --output text)
+aws iam create-access-key --user-name Administrator
+----
+
+Then, run `aws configure` to configure your AWS CLI to use the Administrator IAM user just created.
