@@ -19,6 +19,7 @@ import java.util.regex.Pattern
 
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.api.TestFramework.SPOCK
+import static io.micronaut.starter.application.ApplicationType.*
 import static io.micronaut.starter.options.Language.GROOVY
 
 @CompileStatic
@@ -33,6 +34,11 @@ class GuideAsciidocGenerator {
     public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
     public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
+    private static final String CLI_MESSAGING = 'create-messaging-app'
+    private static final String CLI_DEFAULT = 'create-app'
+    private static final String CLI_GRPC = 'create-grpc-app'
+    private static final String CLI_FUNCTION = 'create-function-app'
+    private static final String CLI_CLI = 'create-cli-app'
 
     static void generate(GuideMetadata metadata, File inputDir,
                          File asciidocDir, File projectDir) {
@@ -152,6 +158,11 @@ class GuideAsciidocGenerator {
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
+            text = text.replaceAll(~/@(\w*):?cli-command@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                cliCommandForApp(metadata, app).orElse('')
+            }
+
             text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
                 List<String> features = featuresForApp(metadata, guidesOption, app)
@@ -175,6 +186,29 @@ class GuideAsciidocGenerator {
         }
     }
 
+    private static Optional<String> cliCommandForApp(GuideMetadata metadata,
+                                                     String appName) {
+        App app = metadata.apps.find { it.name == appName }
+        if (app) {
+            return Optional.of(cliCommandForApp(app))
+        }
+        Optional.empty()
+    }
+
+    private static String cliCommandForApp(App app) {
+        switch(app.getApplicationType()) {
+            case CLI:
+                return CLI_CLI
+            case FUNCTION:
+                return CLI_FUNCTION
+            case GRPC:
+                return CLI_GRPC
+            case MESSAGING:
+                return CLI_MESSAGING
+            case DEFAULT:
+                return CLI_DEFAULT
+        }
+    }
     private static String featuresWordsForApp(GuideMetadata metadata,
                                               GuidesOption guidesOption,
                                               String app) {

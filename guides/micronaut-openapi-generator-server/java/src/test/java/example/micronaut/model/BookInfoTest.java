@@ -31,9 +31,6 @@ public class BookInfoTest {
     @Inject
     Validator validator; // <1>
 
-    /**
-     * Test the property 'name'
-     */
     @Test
     public void nameTest() {
         BookInfo bookInfo = new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE);
@@ -43,9 +40,6 @@ public class BookInfoTest {
         assertFalse(validator.validate(bookInfo).isEmpty()); // <3>
     }
 
-    /**
-     * Test the property 'availability'
-     */
     @Test
     public void availabilityTest() { // <4>
         BookInfo bookInfo = new BookInfo("ALice's Adventures in Wonderland", BookAvailability.RESERVED);
@@ -57,9 +51,6 @@ public class BookInfoTest {
     //end::requiredProperties[]
 
     //tag::otherProperties[]
-    /**
-     * Test the property 'author'
-     */
     @Test
     public void authorTest() {
         BookInfo bookInfo = new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
@@ -75,9 +66,6 @@ public class BookInfoTest {
         assertFalse(validator.validate(bookInfo).isEmpty()); // <2>
     }
 
-    /**
-     * Test the property 'ISBN'
-     */
     @Test
     public void ISBNTest() {
         BookInfo bookInfo = new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
@@ -113,7 +101,6 @@ public class BookInfoTest {
     @Controller("/bookinfo") // <1>
     static class BookInfoSerdeController {
         @PermitAll
-        @Produces(MediaType.APPLICATION_JSON)
         @Get
         BookInfo index() { // <4>
             return new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)

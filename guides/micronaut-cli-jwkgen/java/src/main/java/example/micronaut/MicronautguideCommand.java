@@ -1,13 +1,13 @@
 package example.micronaut;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
+import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import jakarta.inject.Inject;
 
 @Command(name = "keysgen",
-        description = "Generates a Json Web Key (JWT) with RS256 algorithm.",
-        mixinStandardHelpOptions = true)  // <1>
+         description = "Generates a Json Web Key (JWT) with RS256 algorithm.",
+         mixinStandardHelpOptions = true)  // <1>
 public class MicronautguideCommand implements Runnable {
 
     @Option(names = {"-kid"}, // <2>
@@ -18,7 +18,7 @@ public class MicronautguideCommand implements Runnable {
     @Inject
     public JsonWebKeyGenerator jsonWebKeyGenerator; // <3>
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         PicocliRunner.run(MicronautguideCommand.class, args);
     }
 
