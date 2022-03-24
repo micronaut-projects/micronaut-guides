@@ -12,7 +12,7 @@ We'll use the Oracle Cloud web console to create an OAuth 2.0 "Confidential Appl
 
 === Create a federated user
 
-https://cloud.oracle.com/[Login to your Oracle Cloud tenancy] as an admin (or a user with sufficient permissions to create users and applications), and from the Oracle Cloud Menu select "Identity & Security" and then "Federation":
+https://cloud.oracle.com/[Log in to your Oracle Cloud tenancy] as an admin (or a user with sufficient permissions to create users and applications), and from the Oracle Cloud Menu, select "Identity & Security" and then "Federation":
 
 image::cloud-oidc-oracle/federation01.png[]
 
@@ -32,7 +32,7 @@ Open the email sent to the email address you specified and click the link to set
 
 image::cloud-oidc-oracle/federation05.png[]
 
-Login as the user to verify the password, then log out and back in as the admin user.
+Log in as the user to verify the password, then log out and back in as the admin user.
 
 === Create the OAuth application
 
@@ -57,12 +57,16 @@ image::cloud-oidc-oracle/federation09.png[]
 
 Click "Next" to go to step 2.
 
-Click "Configure this application as a client now", and in the `Allowed Grant Types` section check `Client Credentials` and `Authorization Code`.
+Click "Configure this application as a client now", and in the `Allowed Grant Types` section, check `Client Credentials` and `Authorization Code`.
 
 Check `Allow non-HTTPS URLs` for now to make testing easier and avoid having to use HTTPS locally.
-Be sure to unselect this in production applications which should always use HTTPS.
+Be sure to unselect this in production applications, which should always use HTTPS.
 
-Enter `\http://localhost:8080/oauth/callback/oci` for "Redirect URL", `\http://localhost:8080/logout` for "Logout URL", and `\http://localhost:8080/` for "Post Logout Redirect URL":
+Enter the following:
+
+ - Redirect URL: `\http://localhost:8080/oauth/callback/oci` 
+ - Logout URL: `\http://localhost:8080/logout`
+ - Post Logout Redirect URL: `\http://localhost:8080/`
 
 image::cloud-oidc-oracle/federation10.png[]
 
@@ -105,7 +109,7 @@ Replace the generated `application.yml` with this:
 
 resource:application.yml[]
 
-<1> Set `micronaut.security.authentication` as `idtoken`. The `idtoken` provided by your OAuth 2.0 application when the  Authorization code flow ends (a signed JWT) will be saved in a cookie.
+<1> Set `micronaut.security.authentication` as `idtoken`. The `idtoken` provided by your OAuth 2.0 application when the Authorization code flow ends (a signed JWT) will be saved in a cookie.
 callout:oauth2-client-name[number=2,arg0=oci]
 <3> `client-id`, `client-secret`, and the `issuer` URL will be set as environment variables
 <4> Accept GET requests to the `/logout` endpoint
@@ -122,7 +126,7 @@ callout:view[number=3]
 callout:get[number=4,arg0=index,arg1=/]
 callout:secured-is-authenticated[number=5]
 callout:get[number=6,arg0=secured,arg1=/secure]
-<7> This method simply returns a model map that will be rendered   as JSON since there's no `@View` annotation
+<7> This method simply returns a model map that will be rendered as JSON since there's no `@View` annotation
 
 === Thymeleaf view
 
@@ -130,14 +134,14 @@ Create a Thymeleaf view to render the UI for the controller:
 
 resource:views/home.html[]
 
-Note that we return an empty model in the controller `index()` method, however we are accessing `security` in the Thymeleaf template.
+Note that we return an empty model in the controller `index()` method. However, we are accessing `security` in the Thymeleaf template.
 The Micronaut Security https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
 injects a `security` map into the model with the authenticated user data.
 See the https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
 
 == Running the Application
 
-Before starting the application we need to create some environment variables.
+Before starting the application, we need to create some environment variables.
 We used placeholders in `application.yml` for the `client-id`, `client-secret`, and the `issuer` URL properties, so we need to create `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, and `OAUTH_ISSUER` environment variables.
 Use the client ID and client secret you saved when you created the Oracle Cloud application, and the issuer URL you saved (the root of the Oracle Identity Cloud Service (OICS) console URL):
 
@@ -152,7 +156,7 @@ common:env-vars.adoc[]
 
 common:runapp-instructions.adoc[]
 
-Open http://localhost:8080/secure in a browser and you'll be redirected to the home page because the controller method is annotated with `@Secured(IS_AUTHENTICATED)` and we're not yet authenticated:
+Open http://localhost:8080/secure in a browser, and you'll be redirected to the home page because the controller method is annotated with `@Secured(IS_AUTHENTICATED)`, and you're not yet authenticated:
 
 image::cloud-oidc-oracle/run1.png[]
 
@@ -164,11 +168,11 @@ then click Allow on the next screen:
 
 image::cloud-oidc-oracle/run3.png[]
 
-After you're redirected to the home page you'll see that you're authenticated and now have a `Logout` link, and several authentication details are displayed:
+After you're redirected to the home page, you'll see that you're authenticated and now have a `Logout` link, and several authentication details are displayed:
 
 image::cloud-oidc-oracle/run4.png[]
 
-Navigate again to http://localhost:8080/secure in a browser and you'll see a simple JSON response:
+Navigate again to http://localhost:8080/secure in a browser, and you'll see a simple JSON response:
 
 image::cloud-oidc-oracle/run5.png[]
 
