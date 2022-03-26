@@ -1,0 +1,76 @@
+=== Configure Access for a Data Source
+
+We will use https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbc[Micronaut Data JDBC] to access the MySQL data source.
+
+Add the following required dependencies:
+
+:dependencies:
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql]
+dependency:mysql[groupId=mysql-connector-java,scope=runtimeOnly]
+:dependencies:
+
+We will use the https://hub.docker.com/_/mysql[MySQL Docker Image] to start a MySQL server instance. If you have https://www.docker.com/[Docker] installed, run in the terminal:
+
+[source, bash]
+----
+docker network create mysql # <1>
+docker run -it --rm \
+    --name mysql-server \
+    --network mysql \
+    -p 3306:3306 \
+    -e MYSQL_DATABASE=db \# <3>
+    -e MySQL_ROOT_PASSWORD=aVerySecureRoot \
+    -e MYSQL_USER=micronautApp \
+    -e MYSQL_PASSWORD=aVerySecurePassword \# <4>
+    mysql:8 # <2>
+----
+<1> Create docker network, so that we can access the server from a different container.
+<2> Run a container based on the `mysql:8` image.
+<3> Configure the server to create a database named `db`.
+<4> Set the password for the `root` user, and also create and set password for the `micronautApp` user.
+
+[NOTE]
+====
+You can connect to the sql server by running docker container with mysql client:
+
+[source,bash]
+----
+docker run -it --rm \
+    --name mysql-client \
+    --network mysql \# <2>
+    mysql:8 mysql \# <1>
+    -h mysql-server \# <3>
+    -uroot -paVerySecureRoot # <4>
+----
+<1> Run the `mysql` command of the same image to start the client.
+<2> Use the same network as the server.
+<3> Specify the name of the mysql server container.
+<4> Use root user credentials for connection.
+
+Run MySQL commands:
+
+[source,mysql]
+----
+use db;
+show tables;
+----
+====
+
+Now that we have a MySQL server listening on port `3306` with created `db` database, we can configure it as a datasource in Micronaut application:
+
+resource:application.yml[tag=datasource]
+
+<1> Create datasource called `default`.
+<2> Set the default url for the datasource to be `localhost:3306/db`.
+<3> Set the default username to `micronautApp`, but do not explicitly set the password. Specify to use the `JDBC_PASSWORD` environment variable for it.
+<4> Set the dialect and driver class name.
+
+With the configured data source we will be able to access the data using Micronaut JDBC API, which will be shown further in the guide.
+
+Before running the application you should set the password in the environment variable. In terminal run:
+[source,bash]
+----
+export JDBC_PASSWORD=aVerySecurePassword
+----

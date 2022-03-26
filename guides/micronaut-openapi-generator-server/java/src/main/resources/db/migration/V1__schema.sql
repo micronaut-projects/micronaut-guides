@@ -7,7 +7,7 @@ CREATE TABLE book (
 );
 
 INSERT INTO book
-(name, availability, author,  ISBN)
+    (name, availability, author, ISBN)
 VALUES
     ("Alice's Adventures in Wonderland",      "available",   "Lewis Caroll",   "9783161484100"),
     ("The Hitchhiker's Guide to the Galaxy",  "reserved",    "Douglas Adams",  NULL),
