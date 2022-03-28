@@ -42,31 +42,41 @@ public class TwitterFrequentWordsController {
         return tweetsApi.tweetsRecentSearch(searchQuery,
                 null, null, null, null, TWEETS_NUMBER, null, null,
                 null, null, null, null, null)
-                .flatMapIterable(v -> getTopFrequentWord(v, wordsNumber)); // <5>
+                .flatMapIterable(v -> getTopFrequentWords(v, wordsNumber)); // <5>
     }
     // end::api[]
 
     // tag::method[]
-    public static List<WordFrequency> getTopFrequentWord(@NonNull TweetSearchResponse response,
-                                                         @NonNull Integer wordsNumber) {
+    @NonNull
+    private static Map<String, Integer> getWordOccurrences(@NonNull TweetSearchResponse response) { // <1>
+        Map<String, Integer> wordOccurrences = new HashMap<>(); // <2>
+
+        response.getData().forEach(tweet ->
+                Arrays.stream(tweet.getText().split("[^a-zA-Z]+"))
+                        .map(String::toLowerCase)
+                        .filter(w -> w.length() > 3)
+                        .forEach(word -> wordOccurrences.put(word, wordOccurrences.getOrDefault(word, 0) + 1)) // <3>
+        );
+
+        return wordOccurrences;
+    }
+
+    @NonNull
+    private static List<WordFrequency> getTopFrequentWords(@NonNull TweetSearchResponse response,
+                                                           @NonNull Integer wordsNumber) {
         if (response.getData() == null) {
             return Collections.emptyList();
         }
 
-        Map<String, Integer> wordFrequency = new HashMap<>(); // <1>
-
-        response.getData().forEach(tweet ->
-            Arrays.stream(tweet.getText().split("[^a-zA-Z]+"))
-                    .map(String::toLowerCase)
-                    .filter(w -> w.length() > 3)
-                    .forEach(word -> wordFrequency.put(word, wordFrequency.getOrDefault(word, 0) + 1)) // <2>
-        );
-
-        return wordFrequency.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue((v1, v2) -> v2 - v1))
+        return getWordOccurrences(response).entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(TwitterFrequentWordsController::compareIntegersReversed))
                 .limit(wordsNumber)
                 .map(v -> new WordFrequency(v.getKey(), v.getValue()))
-                .collect(Collectors.toList()); // <3>
+                .collect(Collectors.toList()); // <4>
+    }
+
+    private static Integer compareIntegersReversed(Integer v1, Integer v2) {
+        return v2 - v1;
     }
     // end::method[]
 // tag::class-end[]

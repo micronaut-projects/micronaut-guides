@@ -11,6 +11,7 @@ import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import java.net.URI;
 import java.util.List;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @MicronautTest
+@EnabledIfEnvironmentVariable(named = "TWITTER_AUTH_CLIENT_ID", matches = ".+")
 public class TwitterFrequentWordsControllerTest {
     @Inject
     @Client("/twitter-frequent-words")

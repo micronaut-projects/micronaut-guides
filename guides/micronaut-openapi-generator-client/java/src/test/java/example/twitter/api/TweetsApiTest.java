@@ -9,6 +9,7 @@ import example.twitter.model.User;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 // end::imports[]
 
 //tag::class-begin[]
@@ -29,11 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * API tests for TweetsApi
  */
 @MicronautTest // <1>
+@EnabledIfEnvironmentVariable(named = "TWITTER_AUTH_CLIENT_ID", matches = ".+") // <2>
 public class TweetsApiTest {
 
     @Inject
-    TweetsApi api; // <2>
-
+    TweetsApi api; // <3>
     // end::class-begin[]
 
     // tag::test-1[]
@@ -45,7 +47,7 @@ public class TweetsApiTest {
         // WHEN
         String query = "Toronto";
         TweetCountsResponse response = api.tweetCountsRecentSearch(
-                query, null, null, null, null, null, null).block(); // <3>
+                query, null, null, null, null, null, null).block(); // <4>
 
         // THEN
         assertNotNull(response);
@@ -56,7 +58,7 @@ public class TweetsApiTest {
                 .map(SearchCount::getTweetCount)
                 .reduce(0, Integer::sum);
         // There should be more than 100 tweets with such query in the last 7 days
-        assertTrue(totalCount > 100); // <4>
+        assertTrue(totalCount > 100); // <5>
     }
     // end::test-1[]
 

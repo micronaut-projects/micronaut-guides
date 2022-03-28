@@ -2,15 +2,16 @@ common:header-top.adoc[]
 
 == Getting Started
 
-In this guide we will generate a client API from an https://www.openapis.org[OpenAPI] definition file.
+https://www.openapis.org[OpenAPI] is a specification for describing REST APIs. Many web APIs provide definitions for the available endpoints and parameters in form of OpenAPI documents. OpenAPI infrastructure includes numerous tooling, including the OpenAPI generator.
 
 ____
 OpenAPI Generator allows generation of API client libraries (SDK generation), server stubs, documentation and configuration automatically given an OpenAPI Spec (both 2.0 and 3.0 are supported).
 ____
 
-Then we will use the client inside the application.
-We will generate the client for link:https://developer.twitter.com/en/docs/twitter-api[Twitter API], however the steps
+In this guide we will use the OpenAPI Generator to generate a client API from an OpenAPI definition file. We will generate the client for link:https://developer.twitter.com/en/docs/twitter-api[Twitter API], however the steps
 could easily be replicated with any other API with an OpenAPI definition.
+
+After generation, we will see how to use the client inside a Micronaut application, including performing API calls in controller methods.
 
 common:requirements.adoc[]
 
@@ -163,8 +164,7 @@ to access the resources on behalf of itself and requires an `id` and a `secret` 
 <4> Specify the `client-id` and `client-secret` parameters. You could directly put your id and secret directly as values
 in the configuration, however this highly discouraged due to security concerns. We will point to environment variables
 instead.
-<5> Specify that this authorization should be used for all client requests (You would probably want to modify this value
-if you wanted to use multiple clients or reach paths that do not require authorization).
+<5> Specify that this authorization should be used for all requests to the Twitter api URL (starting with `api.twitter.com`). Also, set it to be used for all service ids.
 
 Before running the application we will need to set the values of `client-id` and `client-secret` using environment
 variables. To do it, paste your `API key` and `API secret` into the following command and run in terminal:
@@ -191,13 +191,11 @@ First, we will use the link:https://developer.twitter.com/en/docs/twitter-api/tw
 to get the number of tweets about Toronto in the last 7 days. Open the `TweetsApiTest` and rewrite the contents of the file with the following:
 
 test:../twitter/api/TweetsApiTest[tags=imports|class-begin|test-1|class-end]
-<1> Annotating the test with `@MicronautTest` will create a Micronaut context and allows using various Micronaut
-features, like injection.
-<2> We will inject an implementation of the `TweetsApi` to use in our tests.
-<3> Use the `api` to send a request to an API path for counting tweets with a specific query.
-We will count tweets that mentioned `"Toronto"`.
-<4> We will verify that the data is present. Using manipulations with the generated data models we will calculate
-the total number of tweets and verify that there are at least `100` (which reasonably should be always true).
+callout:micronaut-test-client[number=1]
+<2> Enable the test only if Twitter developer credentials are present.
+callout:injection[number=3,arg0=TweetsApi]
+<4> Use the `api` to send a request to an API path for counting tweets with a specific query. We will count tweets that mentioned `"Toronto"`.
+<5> We will verify that the data is present. Using manipulations with the generated data models we will calculate the total number of tweets and verify that there are at least `100` (which reasonably should be always true).
 
 Now, we will test receiving the latest `10` tweets about New York City (NYC). We will use the
 link:https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/quick-start[recent tweets lookup API].
@@ -237,8 +235,7 @@ a given topic.
 We will first define an object to represent the response. Create a file for `WordFrequency` class, that will have the word
 itself, and the number it occurred as properties:
 source:model/WordFrequency[]
-<1> Annotate the model with the `@Introspected` annotation. This will allow Micronaut to use many features, like
-automatically converting instances to JSON in response.
+callout:introspected[1]
 <2> Define the two required properties and create getters for them.
 
 === Implementing the Controller
@@ -248,26 +245,19 @@ class, which we just created.
 Create a file for `TwitterFrequentWordsController` class and paste the following:
 
 source:controller/TwitterFrequentWordsController[tags=imports|class-begin|api|class-end]
-<1> Use the Micronaut link:https://docs.micronaut.io/latest/guide/#httpServer[Controller] annotation
-to define a controller. The controller will automatically start when Micronaut application is run. Set the controller
-to listen for requests on the `/twitter-frequent-words` path.
-<2> Use Micronaut's link:https://docs.micronaut.io/latest/guide/#ioc[constructor injection] to inject an implementation
-of the `TweetApi`.
-<3> Define a get method on the path.
-<4> Specify that the method requires two parameters: a query to search the tweets by, and the number of most frequent words to
-return.
-<5> Make a request to the tweeter api and process the data using a function that we will implement next. Note that
-no blocking operations should be performed in the method, therefore we manipulate the reactor's link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html[Flux]
-object and return it as a response.
+callout:controller[number=1,arg0=/twitter-frequent-words]
+callout:injection[number=2,arg0=TweetsApi]
+callout:get[number=3,arg0=get,arg1=/twitter-frequent-words]
+callout:query-value-server[number=4,arg0=`search-query` and `words-n` parameters]
+<5> Make a request to the Twitter api and process the data using a function that we will implement next.
 
 Now add the method responsible for processing the data to the controller. There is no need to get into the details of its
 implementation, but we will leave some description for a curious reader:
 source:controller/TwitterFrequentWordsController[tags=method]
-<1> Create a `Map` to store the number of occurrences for each of the words.
-<2> Split the text of tweets on words (we will split by any non-alphabetic character), filter out all words shorter than
-four characters to remove articles and increment the counter for each word in the `Map`.
-<3> Sort the words by the number of occurrences, limit the number by certain amount,
-and convert the result to a list with instances of `WordFrequency`.
+<1> Create a method to calculate the number of occurrences for all the words.
+<2> Create a `Map` to store the number of occurrences.
+<3> Split the text of tweets on words (we will split by any non-alphabetic character), filter out all words shorter than four characters to remove articles and increment the counter for each word in the `Map`.
+<4> Sort the words by the number of occurrences, limit the number by certain amount, and convert the result to a list with instances of `WordFrequency`.
 
 common:runapp.adoc[]
 
@@ -336,3 +326,7 @@ Micronaut`s features.
 To learn more about Micronaut framework and its features visit
 link:https://micronaut.io/docs/[Micronaut documentation] or read one of the several
 link:https://micronaut.io/guides/[Micronaut guides].
+
+=== Micronaut OpenAPI
+
+* Use link:https://micronaut-projects.github.io/micronaut-openapi/latest/guide[Micronaut OpenAPI] module to generate OpenAPI definition documents from controllers with Micronaut annotations.
