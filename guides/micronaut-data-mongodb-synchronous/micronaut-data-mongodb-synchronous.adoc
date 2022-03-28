@@ -1,0 +1,162 @@
+common:header.adoc[]
+
+You will use https://www.mongodb.com[MongoDB] for persistence.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== POJO
+
+Create `Fruit` POJO:
+
+source:Fruit[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:constraints[3]
+
+=== Repository
+
+Create a repository interface to encapsulate the CRUD actions for `Fruit`.
+
+source:FruitRepository[]
+
+<1> Annotate with `@MongoRepository`.
+<2> Add a finder for finding fruit by a list of names.
+
+=== Service
+
+Create a service `FruitService` to interact with the `Fruit` repository.
+
+source:FruitService[]
+
+callout:singleton[number=1]
+callout:executes-on[number=2]
+
+=== Controller
+
+Create `FruitController`:
+
+source:FruitController[]
+
+callout:controller[number=1,arg0=/fruits]
+callout:constructor-di[number=2,arg0=FruitService]
+callout:get[number=3,arg0=list,arg1=/fruits]
+callout:post[number=4,arg0=save,arg1=/fruits]
+callout:valid[5]
+callout:put[number=6,arg0=save,arg1=/fruits]
+callout:get[number=7,arg0=find,arg1=/fruits/\{id\}]
+callout:get[number=8,arg0=findByNameInList,arg1=/fruits/q]
+<9> Bind a list of Strings to the query parameter `names`
+
+=== Configuration
+
+Define a MongoDB connection string:
+
+resource:application.yml[tag=mongodb]
+
+=== Test
+
+Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
+
+test:FruitClient[]
+
+By using the feature `mongo-sync`, the application includes the following test dependencies:
+
+:dependencies:
+dependency:junit-jupiter[groupId=org.testcontainers,scope=test]
+dependency:mongodb[groupId=org.testcontainers,scope=test]
+dependency:testcontainers[groupId=org.testcontainers,scope=test]
+:dependencies:
+
+We use https://www.testcontainers.org/modules/databases/mongodb/[Testcontainers MongoDB Module] to test the application.
+
+Create a class to ease the start-up and shutdown of MongoDb with TestContainers.
+
+test:MongoDbUtils[]
+
+Create a test:
+
+test:FruitControllerTest[]
+
+common:testApp.adoc[]
+
+== Start MongoDB via Docker
+
+You can run MongoDb via Docker:
+
+[source,bash]
+----
+docker run -ti --rm -p 27017:27017 mongo:4.0
+----
+
+The application connects to MongoDb, run via Docker, thanks to the following configuration:
+
+resource:application.yml[tag=mongodb]
+
+common:runapp.adoc[]
+
+[source, bash]
+----
+curl -d '{"name":"Pear"}'
+     -H "Content-Type: application/json"
+     -X POST http://localhost:8080/fruits
+----
+
+[source, bash]
+----
+curl -i localhost:8080/fruits
+----
+
+[source]
+----
+HTTP/1.1 200 OK
+date: Wed, 15 Sep 2021 12:40:15 GMT
+Content-Type: application/json
+content-length: 110
+connection: keep-alive
+
+[{"name":"Pear"}]
+----
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Consume the endpoints exposed by the native image with cURL:
+
+:exclude-for-languages:
+
+[source, bash]
+----
+curl -d '{"name":"Pear"}'
+     -H "Content-Type: application/json"
+     -X POST http://localhost:8080/fruits
+----
+
+[source, bash]
+----
+curl -i localhost:8080/fruits
+----
+
+[source]
+----
+HTTP/1.1 200 OK
+date: Wed, 15 Sep 2021 12:40:15 GMT
+Content-Type: application/json
+content-length: 110
+connection: keep-alive
+
+[{"name":"Pear"}]
+----
+
+common:next.adoc[]
+
+== Next Steps
+
+Read more about the https://micronaut-projects.github.io/micronaut-mongodb/latest/guide/[integration between the Micronaut framework and MongoDB].
+
+common:helpWithMicronaut.adoc[]
