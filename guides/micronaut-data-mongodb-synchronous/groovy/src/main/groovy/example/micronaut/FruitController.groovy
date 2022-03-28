@@ -27,22 +27,22 @@ class FruitController {
     }
 
     @Post // <4>
-    HttpResponse<Fruit> save(@NonNull @NotNull @Valid Fruit fruit) { // <7>
+    HttpResponse<Fruit> save(@NonNull @NotNull @Valid Fruit fruit) { // <5>
         HttpResponse.created(fruitService.save(fruit))
     }
 
-    @Put // <5>
+    @Put // <6>
     Fruit update(@NonNull @NotNull @Valid Fruit fruit) {
         fruitService.save(fruit)
     }
 
-    @Get("/{id}") // <6>
+    @Get("/{id}") // <7>
     Optional<Fruit> find(@PathVariable String id) {
         fruitService.find(id)
     }
 
-    @Get("/q") // <7>
-    Iterable<Fruit> query(@QueryValue @NotNull List<String> names) { // <8>
+    @Get("/q") // <8>
+    Iterable<Fruit> query(@QueryValue @NotNull List<String> names) { // <9>
         fruitService.findByNameInList(names)
     }
 }
