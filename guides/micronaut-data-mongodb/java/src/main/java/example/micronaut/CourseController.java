@@ -9,32 +9,32 @@ import io.micronaut.http.annotation.Put;
 
 import java.util.Optional;
 
-@Controller("/course")
+@Controller("/course") // <1>
 public class CourseController {
 
-    private final CourseRepository courseRepository;
+    private final RegistrationService registrationService;
 
-    public CourseController(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
+    public CourseController(RegistrationService registrationService) { // <2>
+        this.registrationService = registrationService;
     }
 
-    @Get
+    @Get // <3>
     Iterable<Course> list() {
-        return courseRepository.findAll();
+        return registrationService.findAllCourses();
     }
 
     @Post
     Course create(String name) {
-        return courseRepository.save(new Course(name));
+        return registrationService.createOrUpdateCourse(new Course(name));
     }
 
     @Get("/{id}")
     Optional<Course> get(@PathVariable String id) {
-        return courseRepository.findById(id);
+        return registrationService.findCourseById(id);
     }
 
     @Put
     Course update(Course course) {
-        return courseRepository.update(course);
+        return registrationService.createOrUpdateCourse(course);
     }
 }

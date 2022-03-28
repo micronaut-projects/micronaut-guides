@@ -76,5 +76,23 @@ class StudentCourseCreationSpec extends BaseMongoDataSpec {
         courseClient.get(math.id).get().students.size() == 2
         courseClient.get(art.id).get().students.size() == 1
         courseClient.get(history.id).get().students.size() == 1
+
+        when: "We update a student"
+        tim.name = "Timothy"
+        tim.courses = [math]
+        studentClient.update(tim)
+        result = studentClient.find(tim.id)
+
+        then: "The student is updated"
+        with(result.get()) {
+            it.name == "Timothy"
+            it.courses.size() == 1
+            it.courses.find { it.name == "Math" } != null
+        }
+
+        and:
+        courseClient.get(math.id).get().students.size() == 2
+        courseClient.get(art.id).get().students.size() == 1
+        courseClient.get(history.id).get().students.size() == 0
     }
 }
