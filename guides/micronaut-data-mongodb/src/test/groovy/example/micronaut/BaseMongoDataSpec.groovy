@@ -4,17 +4,27 @@ import example.micronaut.clients.CourseClient
 import example.micronaut.clients.StudentClient
 import io.micronaut.context.ApplicationContext
 import io.micronaut.runtime.EmbeddedApplication
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import io.micronaut.test.support.TestPropertyProvider
+import jakarta.inject.Inject
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Stepwise
 
-abstract class BaseMongoDataSpec extends Specification {
+@MicronautTest
+abstract class BaseMongoDataSpec extends Specification implements TestPropertyProvider {
 
-    static MongoDBContainer mongoDBContainer
+    @Shared
+    @AutoCleanup
+    MongoDBContainer mongoDBContainer
 
-    static void startMongoDb() {
+    @Inject
+    EmbeddedApplication application
+
+    void startMongoDb() {
         if (mongoDBContainer == null) {
             mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:5.0.6"))
                     .withExposedPorts(27017)
@@ -24,38 +34,23 @@ abstract class BaseMongoDataSpec extends Specification {
         }
     }
 
-    static String getMongoDbUri() {
+    String getMongoDbUri() {
         if (!mongoDBContainer?.running) {
             startMongoDb()
         }
         mongoDBContainer.replicaSetUrl
     }
 
-    static void closeMongoDb() {
-        mongoDBContainer?.close()
-    }
-
-    @Shared
-    @AutoCleanup
-    EmbeddedApplication<?> application
-
-    def setupSpec() {
-        startMongoDb()
-        application = ApplicationContext.run(EmbeddedApplication, [
-                'mongodb.uri': getMongoDbUri()
-        ] + extraProperties)
-    }
-
-    protected Map<String, ?> getExtraProperties() {
-        [:]
+    @Override
+    Map<String, String> getProperties() {
+        ['mongodb.uri': mongoDbUri]
     }
 
     def cleanup() {
-        mongoDBContainer.execInContainer("mongosh", "--eval", "db.dropDatabase()")
-    }
-
-    def cleanupSpec() {
-        closeMongoDb()
+        // For non-stepwise tests, clear the database after each test
+        if (!this.getClass().getAnnotation(Stepwise)) {
+            mongoDBContainer.execInContainer("mongosh", "--eval", "db.dropDatabase()")
+        }
     }
 
     CourseClient getCourseClient() {
