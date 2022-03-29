@@ -13,9 +13,9 @@ class HomeController {
     @Secured(IS_ANONYMOUS) // <2>
     @View("home") // <3>
     @Get // <4>
-    fun index(): Map<String, Any> = mutableMapOf()
+    fun index(): Map<String, Any> = mapOf()
 
     @Secured(IS_AUTHENTICATED) // <5>
     @Get("/secure") // <6>
-    fun secured(): Map<String, Any> = mutableMapOf("secured" to true) // <7>
+    fun secured(): Map<String, Any> = mapOf("secured" to true) // <7>
 }

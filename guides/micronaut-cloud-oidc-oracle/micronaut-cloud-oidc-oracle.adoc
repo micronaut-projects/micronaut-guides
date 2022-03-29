@@ -57,14 +57,14 @@ image::cloud-oidc-oracle/federation09.png[]
 
 Click "Next" to go to step 2.
 
-Click "Configure this application as a client now", and in the `Allowed Grant Types` section, check `Client Credentials` and `Authorization Code`.
+Click "Configure this application as a client now", and in the `Allowed Grant Types` section, check `Authorization Code`.
 
 Check `Allow non-HTTPS URLs` for now to make testing easier and avoid having to use HTTPS locally.
 Be sure to unselect this in production applications, which should always use HTTPS.
 
 Enter the following:
 
- - Redirect URL: `\http://localhost:8080/oauth/callback/oci` 
+ - Redirect URL: `\http://localhost:8080/oauth/callback/micronaut`
  - Logout URL: `\http://localhost:8080/logout`
  - Post Logout Redirect URL: `\http://localhost:8080/`
 
@@ -110,7 +110,7 @@ Replace the generated `application.yml` with this:
 resource:application.yml[]
 
 <1> Set `micronaut.security.authentication` as `idtoken`. The `idtoken` provided by your OAuth 2.0 application when the Authorization code flow ends (a signed JWT) will be saved in a cookie.
-callout:oauth2-client-name[number=2,arg0=oci]
+callout:oauth2-client-name[number=2,arg0=micronaut]
 <3> `client-id`, `client-secret`, and the `issuer` URL will be set as environment variables
 <4> Accept GET requests to the `/logout` endpoint
 
@@ -128,16 +128,7 @@ callout:secured-is-authenticated[number=5]
 callout:get[number=6,arg0=secured,arg1=/secure]
 <7> This method simply returns a model map that will be rendered as JSON since there's no `@View` annotation
 
-=== Thymeleaf view
-
-Create a Thymeleaf view to render the UI for the controller:
-
-resource:views/home.html[]
-
-Note that we return an empty model in the controller `index()` method. However, we are accessing `security` in the Thymeleaf template.
-The Micronaut Security https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
-injects a `security` map into the model with the authenticated user data.
-See the https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
+external:micronaut-cloud-oidc-base/view.adoc[]
 
 == Running the Application
 

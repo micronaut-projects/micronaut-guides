@@ -1,11 +1,11 @@
 package example.micronaut;
 
-import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.views.View;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,12 +19,12 @@ public class HomeController {
     @View("home") // <3>
     @Get // <4>
     public Map<String, Object> index() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Secured(IS_AUTHENTICATED) // <5>
     @Get("/secure") // <6>
     public Map<String, Object> secured() {
-        return CollectionUtils.mapOf("secured", true); // <7>
+        return Collections.singletonMap("secured", true); // <7>
     }
 }
