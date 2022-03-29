@@ -23,7 +23,7 @@ class FruitService {
     }
 
     Fruit save(Fruit fruit) {
-        if (fruit.getId() == null) {
+        if (fruit.id == null) {
             fruitRepository.save(fruit)
         } else {
             fruitRepository.update(fruit)
