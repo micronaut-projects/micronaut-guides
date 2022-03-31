@@ -3,7 +3,8 @@ package example.micronaut.domain;
 import io.micronaut.core.annotation.Introspected;
 
 @Introspected
-public class NameDTO {
+public class NameDto {
+
     private String name;
 
     public String getName() {
@@ -12,5 +13,5 @@ public class NameDTO {
 
     public void setName(String name) {
         this.name = name;
-    }  
+    }
 }

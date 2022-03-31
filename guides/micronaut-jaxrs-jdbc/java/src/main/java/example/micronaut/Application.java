@@ -7,6 +7,7 @@ import example.micronaut.repositories.OwnerRepository;
 import example.micronaut.repositories.PetRepository;
 import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.context.event.StartupEvent;
+import io.micronaut.runtime.Micronaut;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,29 +15,31 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 
 @Singleton // <1>
-class Bootstrap implements ApplicationEventListener<StartupEvent> { // <2>
-    private static final Logger LOG = LoggerFactory.getLogger(Bootstrap.class);
+public class Application implements ApplicationEventListener<StartupEvent> { // <2>
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     private final OwnerRepository ownerRepository;
     private final PetRepository petRepository;
 
-    Bootstrap(OwnerRepository ownerRepository,
-              PetRepository petRepository) { // <3>
+    Application(OwnerRepository ownerRepository,
+                PetRepository petRepository) { // <3>
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
     }
 
+    public static void main(String[] args) {
+        Micronaut.run(Application.class, args);
+    }
+
     @Override
     public void onApplicationEvent(StartupEvent event) { // <2>
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Populating data");
-        }
+        log.info("Populating data");
 
         Owner fred = new Owner("Fred");
         fred.setAge(45);
         Owner barney = new Owner("Barney");
         barney.setAge(40);
-        ownerRepository.saveAll(Arrays.asList(fred, barney));
+        ownerRepository.saveAll(Arrays.asList(fred, barney)); // <4>
 
         Pet dino = new Pet("Dino", fred);
         Pet bp = new Pet("Baby Puss", fred);

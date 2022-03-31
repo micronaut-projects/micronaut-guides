@@ -1,6 +1,5 @@
 package example.micronaut.domain;
 
-import io.micronaut.core.annotation.Creator;
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
@@ -16,7 +15,6 @@ public class Owner {
 
     private int age;
 
-    @Creator
     public Owner(String name) {
         this.name = name;
     }
@@ -40,5 +38,4 @@ public class Owner {
     public void setId(Long id) {
         this.id = id;
     }
-  
 }
