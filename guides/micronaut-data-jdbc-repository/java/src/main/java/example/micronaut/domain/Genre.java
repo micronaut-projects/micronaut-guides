@@ -1,12 +1,10 @@
 package example.micronaut.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.data.annotation.Relation;
+
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 @MappedEntity
 public class Genre {
