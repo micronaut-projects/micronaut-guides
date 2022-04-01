@@ -37,14 +37,20 @@ class FruitControllerTest extends BaseMongoDataTest {
         assertEquals(HttpStatus.CREATED, response.getStatus());
 
         fruits = fruitClient.list();
-        assertTrue(StreamSupport.stream(fruits.spliterator(), false).anyMatch(f -> "Keeps the doctor away".equals(f.getDescription())));
+        assertTrue(StreamSupport.stream(fruits.spliterator(), false)
+                .anyMatch(f -> "Keeps the doctor away".equals(f.getDescription())));
 
         banana.setDescription("Yellow and curved");
         fruitClient.update(banana);
 
         fruits = fruitClient.list();
 
-        assertEquals(Set.of("Keeps the doctor away", "Yellow and curved"), StreamSupport.stream(fruits.spliterator(), false).map(Fruit::getDescription).collect(Collectors.toSet()));
+        assertEquals(
+                Set.of("Keeps the doctor away", "Yellow and curved"),
+                StreamSupport.stream(fruits.spliterator(), false)
+                        .map(Fruit::getDescription)
+                        .collect(Collectors.toSet())
+        );
     }
 
     @Test
@@ -55,6 +61,7 @@ class FruitControllerTest extends BaseMongoDataTest {
 
         Iterable<Fruit> fruit = fruitClient.query(List.of("apple", "pineapple"));
 
-        assertTrue(StreamSupport.stream(fruit.spliterator(), false).allMatch(f -> f.getName().equals("apple") || f.getName().equals("pineapple")));
+        assertTrue(StreamSupport.stream(fruit.spliterator(), false)
+                .allMatch(f -> f.getName().equals("apple") || f.getName().equals("pineapple")));
     }
 }

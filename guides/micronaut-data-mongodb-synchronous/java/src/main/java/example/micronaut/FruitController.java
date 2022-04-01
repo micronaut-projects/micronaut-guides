@@ -1,7 +1,7 @@
 package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -31,11 +31,12 @@ class FruitController {
     }
 
     @Post // <4>
-    HttpResponse<Fruit> save(@NonNull @NotNull @Valid Fruit fruit) { // <5>
-        return HttpResponse.created(fruitService.save(fruit));
+    @Status(HttpStatus.CREATED) // <5>
+    Fruit save(@NonNull @NotNull @Valid Fruit fruit) { // <6>
+        return fruitService.save(fruit);
     }
 
-    @Put // <6>
+    @Put
     Fruit update(@NonNull @NotNull @Valid Fruit fruit) {
         return fruitService.save(fruit);
     }

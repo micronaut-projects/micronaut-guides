@@ -1,13 +1,14 @@
 package example.micronaut
 
 import io.micronaut.core.annotation.NonNull
-import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import io.micronaut.http.annotation.QueryValue
+import io.micronaut.http.annotation.Status;
 
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -27,11 +28,12 @@ class FruitController {
     }
 
     @Post // <4>
-    HttpResponse<Fruit> save(@NonNull @NotNull @Valid Fruit fruit) { // <5>
-        HttpResponse.created(fruitService.save(fruit))
+    @Status(HttpStatus.CREATED) // <5>
+    Fruit save(@NonNull @NotNull @Valid Fruit fruit) { // <6>
+        fruitService.save(fruit)
     }
 
-    @Put // <6>
+    @Put
     Fruit update(@NonNull @NotNull @Valid Fruit fruit) {
         fruitService.save(fruit)
     }
