@@ -10,16 +10,17 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import jakarta.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.util.Collections;
+
 @MicronautTest // <1>
 public class GenreControllerTest {
 
@@ -42,8 +43,8 @@ public class GenreControllerTest {
 
         List<Long> genreIds = new ArrayList<>();
 
-        HttpRequest request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <3>
-        HttpResponse response = client.toBlocking().exchange(request);
+        HttpRequest<?> request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <3>
+        HttpResponse<?> response = client.toBlocking().exchange(request);
         genreIds.add(entityId(response));
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
@@ -110,7 +111,7 @@ public class GenreControllerTest {
         }
     }
 
-    protected Long entityId(HttpResponse response) {
+    protected Long entityId(HttpResponse<?> response) {
         String path = "/genres/";
         String value = response.header(HttpHeaders.LOCATION);
         if (value == null) {
