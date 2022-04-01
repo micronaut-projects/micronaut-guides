@@ -377,13 +377,11 @@ Micronaut Flyway integration works with multiple datasources.
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
 
-<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.annotation.JsonIgnore</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.GeneratedValue</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Id</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.MappedEntity</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Relation</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
-<span class="keyword">import</span> <span class="include">java.util.Set</span>;
 
 <span class="annotation">@MappedEntity</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Genre</span> {
@@ -451,6 +449,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 <span class="keyword">import</span> <span class="include">io.micronaut.data.jdbc.annotation.JdbcRepository</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.repository.PageableRepository</span>;
+
 <span class="keyword">import</span> <span class="include">javax.transaction.Transactional</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
@@ -532,6 +531,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
@@ -576,10 +576,11 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">example.micronaut.domain.Genre</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.exceptions.DataAccessException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.model.Pageable</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.data.model.Sort</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpHeaders</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Delete</span>;
@@ -587,17 +588,14 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Put</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Status</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
-<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.data.exceptions.DataAccessException</span>;
+
 <span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">java.net.URI</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
-<span class="keyword">import</span> <span class="include">java.util.stream.Collectors</span>;
-<span class="keyword">import</span> <span class="include">java.util.stream.StreamSupport</span>;
 
 <span class="annotation">@ExecuteOn</span>(TaskExecutors.IO)  <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>)  <i class="conum" data-value="2"></i><b>(2)</b>
@@ -742,16 +740,17 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreControllerTest</span> {
 
@@ -774,8 +773,8 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 
         <span class="predefined-type">List</span>&lt;<span class="predefined-type">Long</span>&gt; genreIds = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
 
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="3"></i><b>(3)</b>
-        HttpResponse response = client.toBlocking().exchange(request);
+        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="3"></i><b>(3)</b>
+        HttpResponse&lt;?&gt; response = client.toBlocking().exchange(request);
         genreIds.add(entityId(response));
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
@@ -842,7 +841,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
         }
     }
 
-    <span class="directive">protected</span> <span class="predefined-type">Long</span> entityId(HttpResponse response) {
+    <span class="directive">protected</span> <span class="predefined-type">Long</span> entityId(HttpResponse&lt;?&gt; response) {
         <span class="predefined-type">String</span> path = <span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/</span><span class="delimiter">&quot;</span></span>;
         <span class="predefined-type">String</span> value = response.header(HttpHeaders.LOCATION);
         <span class="keyword">if</span> (value == <span class="predefined-constant">null</span>) {
