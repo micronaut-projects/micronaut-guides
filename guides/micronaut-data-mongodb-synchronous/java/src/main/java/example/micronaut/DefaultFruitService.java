@@ -20,7 +20,6 @@ class DefaultFruitService implements FruitService {
     }
 
     public Fruit save(Fruit fruit) {
-        System.out.println(Thread.currentThread().getName());
         if (fruit.getId() == null) {
             return fruitRepository.save(fruit);
         } else {
