@@ -1,56 +1,94 @@
 common:header.adoc[]
 
-common:requirements.adoc[]
+The application exposes some REST endpoints using https://projects.eclipse.org/projects/ee4j.jaxrs[JAX-RS annotations] and stores data in a MySQL database using Micronaut Data JDBC.
+
+common:requirements-mysql-testcontainers.adoc[]
 
 common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
-Start by creating the main application class. On startup, this class will populate the database with its initial data.
+common:datasource-configuration.adoc[]
 
-source:Application[]
-
-callout:singleton[1]
-callout:application-event-listener-startup-event[2]
-callout:constructor-di[number=3,arg0=OwnerRepository]
-<4> The database and tables have already been created by the Flyway integration described next, so this data can be saved here.
-
-Create the DDL to model our application's domain, pets and pet owners.
+common:flyway.adoc[]
 
 resource:db/migration/V1__schema.sql[]
-<1> Create the owner table, for the owners of pets.
-<2> Create the pet table, each pet associated with one owner.
-<3> Allow only certain values, mirroring our `PetType` Java enum.
-<4> Enforce the association with an owner.
 
-Set up the H2 database and Flyway.
+During application startup, Flyway will execute the SQL file and create the schema needed for the application.
 
-resource:application.yml[]
-<1> Configure an H2 datasource.
-<2> Configure Flyway to set up our database.
+=== Domain
 
-Define the service endpoints using JAX-RS.
+Create the domain entities:
 
-source:resources/OwnerResource[]
+source:Pet[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+
+The above entity uses an enum:
+
+source:PetType[]
+
+=== Service
+
+Create a POJO `NameDto`:
+
+source:NameDto[]
+
+callout:introspected[1]
+
+Create a https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcRepositories[Repository]:
+
+source:PetRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:dto-projection[3]
+
+=== JAX-RS
+
+==== Dependencies
+
+When you add `jax-rs` feature, the generated application includes the following dependencies:
+
+:dependencies:
+dependency:micronaut-jaxrs-processor[groupId=io.micronaut.jaxrs,scope=annotationProcessor]
+dependency:micronaut-jaxrs-server[groupId=io.micronaut.jaxrs]
+:dependencies:
+
+==== Resource
+
+Define an endpoint using JAX-RS.
+
+source:PetResource[]
+
 <1> A JAX-RS annotation to define the base URI for methods in this class.
-<2> Inject the H2 JDBC repository.
-<3> A JAX-RS annotation to define an endpoint for HTTP Get requests. Mapped to the base URI `/owners` since no `@Path` is provided.
-<4> The response is converted to JSON automatically.
-<5> Paths can be templated for path paremeters, such as the owner's name here.
+callout:constructor-di[number=2,arg0=PetRepository]
+<3> A JAX-RS annotation to define an endpoint for HTTP Get requests. Mapped to the base URI `/pets` since no `@Path` is provided.
+<4> The response is converted to JSON Array automatically.
+<5> Paths can be templated for path parameters, such as the pet's name here.
 <6> Associate the template placeholder name with the Java variable.
 
-Test the service endpoints.
+=== Tests
 
-test:OwnerControllerTest[]
+Add a test for the resource:
 
-Or bypass the service layer and test the underlying repositories.
+test:PetResourceTest[]
 
-test:PetRepositoryTest[]
+callout:micronaut-test-transactional-false[1]
+callout:http-client[2]
+<3> Micronaut returns a 404 response if the resource method returns an empty optional
 
-common:runapp.adoc[]
+common:testApp.adoc[]
+
+common:runapp-mysql-with-docker.adoc[]
 
 common:graal-with-plugins.adoc[]
 
 == Next steps
 
-Read more about https://micronaut-projects.github.io/micronaut-jaxrs/latest/guide/[Micronaut JAX-RS].
+Read more about:
+
+- https://micronaut-projects.github.io/micronaut-jaxrs/latest/guide/[Micronaut JAX-RS].
+- https://jakarta.ee/specifications/restful-ws/[Jakarta RESTful Web Services]

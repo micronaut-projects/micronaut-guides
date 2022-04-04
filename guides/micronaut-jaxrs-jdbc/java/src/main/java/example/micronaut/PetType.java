@@ -1,4 +1,4 @@
-package example.micronaut.domain;
+package example.micronaut;
 
 public enum PetType {
     DOG,
