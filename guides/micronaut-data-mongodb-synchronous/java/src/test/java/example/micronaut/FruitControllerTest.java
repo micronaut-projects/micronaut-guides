@@ -4,9 +4,10 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +47,7 @@ class FruitControllerTest extends BaseMongoDataTest {
         fruits = fruitClient.list();
 
         assertEquals(
-                Set.of("Keeps the doctor away", "Yellow and curved"),
+                Stream.of("Keeps the doctor away", "Yellow and curved").collect(Collectors.toSet()),
                 StreamSupport.stream(fruits.spliterator(), false)
                         .map(Fruit::getDescription)
                         .collect(Collectors.toSet())
@@ -59,7 +60,7 @@ class FruitControllerTest extends BaseMongoDataTest {
         fruitClient.save(new Fruit("pineapple", "Delicious"));
         fruitClient.save(new Fruit("lemon", "Lemonentary my dear Dr Watson"));
 
-        Iterable<Fruit> fruit = fruitClient.query(List.of("apple", "pineapple"));
+        Iterable<Fruit> fruit = fruitClient.query(Arrays.asList("apple", "pineapple"));
 
         assertTrue(StreamSupport.stream(fruit.spliterator(), false)
                 .allMatch(f -> f.getName().equals("apple") || f.getName().equals("pineapple")));

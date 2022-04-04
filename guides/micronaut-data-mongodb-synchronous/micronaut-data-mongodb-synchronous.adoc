@@ -29,12 +29,16 @@ source:FruitRepository[]
 
 === Service
 
-Create a service `FruitService` to interact with the `Fruit` repository.
+Create a service `FruitService` as an API to interact with the `Fruit` repository.
+This will allow you to keep business logic out of the controller, and to test the controller later without interacting with a real database.
 
 source:FruitService[]
 
+And then create a default implementation of this service.
+
+source:DefaultFruitService[]
+
 callout:singleton[number=1]
-callout:executes-on[number=2]
 
 === Controller
 
@@ -43,20 +47,15 @@ Create `FruitController`:
 source:FruitController[]
 
 callout:controller[number=1,arg0=/fruits]
-callout:constructor-di[number=2,arg0=FruitService]
-callout:get[number=3,arg0=list,arg1=/fruits]
-callout:post[number=4,arg0=save,arg1=/fruits]
-<5> You can specify the HTTP status code via the `@Status` annotation.
-callout:valid[6]
-callout:get[number=7,arg0=find,arg1=/fruits/\{id\}]
-callout:get[number=8,arg0=findByNameInList,arg1=/fruits/q]
-<9> Bind a list of Strings to the query parameter `names`
-
-=== Configuration
-
-Define a MongoDB connection string:
-
-resource:application.yml[tag=mongodb]
+callout:executes-on[number=2]
+callout:constructor-di[number=3,arg0=FruitService]
+callout:get[number=4,arg0=list,arg1=/fruits]
+callout:post[number=5,arg0=save,arg1=/fruits]
+<6> You can specify the HTTP status code via the `@Status` annotation.
+callout:valid[7]
+callout:get[number=8,arg0=find,arg1=/fruits/\{id\}]
+callout:get[number=9,arg0=findByNameInList,arg1=/fruits/q]
+<10> Bind a list of Strings to the query parameter `names`
 
 === Test
 
@@ -78,9 +77,17 @@ Create a base test class that handles the start-up and shutdown of MongoDb with 
 
 test:BaseMongoDataTest[]
 
-Create a test:
+Then create a test that verifies the validation of the `Fruit` POJO when we create a new entity via `POST`:
+
+test:FruitValidationControllerTest[]
+
+Create a test that checks our controller works against a real MongoDB database:
 
 test:FruitControllerTest[]
+
+And finally, create a test which uses a replacement `FruitService` to test the controller without touching the database:
+
+test:ControllerIsolationTest[]
 
 common:testApp.adoc[]
 
@@ -101,9 +108,9 @@ common:runapp.adoc[]
 
 [source, bash]
 ----
-curl -d '{"name":"Pear"}'
-     -H "Content-Type: application/json"
-     -X POST http://localhost:8080/fruits
+curl -d '{"name":"Pear"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/fruits \
 ----
 
 [source, bash]

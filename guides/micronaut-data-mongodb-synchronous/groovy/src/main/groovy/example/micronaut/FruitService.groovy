@@ -1,40 +1,14 @@
 package example.micronaut
 
 import io.micronaut.core.annotation.NonNull
-import io.micronaut.scheduling.TaskExecutors
-import io.micronaut.scheduling.annotation.ExecuteOn
-import jakarta.inject.Singleton
 
-import java.util.List
-import java.util.Optional
+interface FruitService {
 
-@Singleton // <1>
-@ExecuteOn(TaskExecutors.IO)  // <2>
-class FruitService {
+    Iterable<Fruit> list()
 
-    private final FruitRepository fruitRepository;
+    Fruit save(Fruit fruit)
 
-    FruitService(FruitRepository fruitRepository) {
-        this.fruitRepository = fruitRepository
-    }
+    Optional<Fruit> find(@NonNull String id)
 
-    Iterable<Fruit> list() {
-        fruitRepository.findAll()
-    }
-
-    Fruit save(Fruit fruit) {
-        if (fruit.id == null) {
-            fruitRepository.save(fruit)
-        } else {
-            fruitRepository.update(fruit)
-        }
-    }
-
-    Optional<Fruit> find(@NonNull String id) {
-        fruitRepository.findById(id)
-    }
-
-    Iterable<Fruit> findByNameInList(List<String> name) {
-        fruitRepository.findByNameInList(name)
-    }
+    Iterable<Fruit> findByNameInList(List<String> name)
 }

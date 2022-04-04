@@ -14,6 +14,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 @MicronautTest
@@ -52,7 +53,7 @@ abstract class BaseMongoDataTest implements TestPropertyProvider {
     @Override
     @NotNull
     public Map<String, String> getProperties() {
-        return Map.of("mongodb.uri", getMongoDbUri());
+        return Collections.singletonMap("mongodb.uri", getMongoDbUri());
     }
 
     @AfterEach

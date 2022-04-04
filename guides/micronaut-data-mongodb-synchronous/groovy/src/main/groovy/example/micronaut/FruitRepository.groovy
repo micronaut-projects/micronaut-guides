@@ -4,8 +4,6 @@ import io.micronaut.core.annotation.NonNull
 import io.micronaut.data.mongodb.annotation.MongoRepository
 import io.micronaut.data.repository.CrudRepository
 
-import java.util.List
-
 @MongoRepository // <1>
 interface FruitRepository extends CrudRepository<Fruit, String> {
 

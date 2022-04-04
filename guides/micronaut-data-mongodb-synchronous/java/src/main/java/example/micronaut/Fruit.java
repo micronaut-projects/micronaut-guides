@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.annotation.GeneratedValue;
