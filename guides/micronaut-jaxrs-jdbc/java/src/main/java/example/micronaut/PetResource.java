@@ -1,5 +1,12 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Status;
+
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.POST;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -26,4 +33,10 @@ class PetResource {
         return petRepository.findByName(petsName);
     }
 
+    @POST
+    @Status(HttpStatus.CREATED)
+    void save(@NonNull @NotNull @Body PetSave petSave) {
+        petRepository.save(petSave.getName(), petSave.getType());
+
+    }
 }

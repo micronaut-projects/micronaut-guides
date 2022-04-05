@@ -59,6 +59,10 @@ dependency:micronaut-jaxrs-server[groupId=io.micronaut.jaxrs]
 
 ==== Resource
 
+Create a POJO to encapsulate the HTTP Request body for a save request:
+
+source:PetSave[]
+
 Define an endpoint using JAX-RS.
 
 source:PetResource[]
@@ -84,7 +88,65 @@ common:testApp.adoc[]
 
 common:runapp-mysql-with-docker.adoc[]
 
+You can execute the endpoints exposed by the application:
+
+[source, bash]
+----
+curl -id '{"name":"Chase", "type":"DOG"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/pets
+----
+
+[source]
+----
+HTTP/1.1 201 Created
+...
+----
+
+[source, bash]
+----
+curl -i localhost:8080/pets
+----
+
+[source]
+----
+HTTP/1.1 200 OK
+...
+[{"name":"Chase"}]
+----
+
 common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You can execute the endpoints exposed by the native image:
+
+[source, bash]
+----
+curl -id '{"name":"Chase", "type":"DOG"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/pets
+----
+
+[source]
+----
+HTTP/1.1 201 Created
+...
+----
+
+[source, bash]
+----
+curl -i localhost:8080/pets
+----
+
+[source]
+----
+HTTP/1.1 200 OK
+...
+[{"name":"Chase"}]
+----
+
+:exclude-for-languages:
 
 == Next steps
 

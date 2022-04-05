@@ -83,4 +83,18 @@ public class PetResourceTest {
 
         repository.deleteById(id);
     }
+
+    @Test
+    void testSave() {
+        String name = "Dino";
+        long oldCount = repository.count();
+        PetSave petSave = new PetSave(name, PetType.DOG);
+        HttpRequest<?> request = HttpRequest.POST("/pets", petSave);
+        HttpResponse<Pet> response = httpClient.toBlocking()
+                .exchange(request, Pet.class);
+        assertEquals(HttpStatus.CREATED , response.status());
+        long count = repository.count();
+        assertEquals(oldCount + 1, count);
+        repository.deleteAll();
+    }
 }
