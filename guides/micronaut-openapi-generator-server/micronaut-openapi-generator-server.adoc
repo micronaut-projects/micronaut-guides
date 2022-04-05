@@ -299,7 +299,7 @@ callout:jdbcrepository[1]
 callout:jpa-specification-executor[3]
 callout:jpa-specification-findall[4]
 
-In the above code snippet we extended the `JpaSpecificationExecutor` interface to define a `findAll` method that supports `Predicate` as argument, which allows to modify the operations performed during runtime. We will now create a factory class for creating predicates that we plan to use in our application:
+In the above code snippet, we extended the `JpaSpecificationExecutor` interface to define a `findAll` method that supports `Predicate` as argument, which allows to modify the operations performed during runtime. We will now create a factory class for creating predicates that we plan to use in our application:
 
 source:BookSpecifications[]
 
@@ -318,9 +318,9 @@ Along with that it has getters and setters for parameters and Jackson serializat
 
 === Implementing Controller Methods
 
-Now open `BooksController`. Thanks to the https://docs.micronaut.io/latest/guide/#httpServer[@Controller] annotation an instance of the class will be initialized when Micronaut application starts and corresponding method will be called when there is a request. The class should also have two methods named the same as the operations we created in the definition file. The methods have Micronaut framework annotations describing the required API. We will now write their bodies.
+Now open `BooksController`. Thanks to the https://docs.micronaut.io/latest/guide/#httpServer[@Controller] annotation, an instance of the class will be initialized when Micronaut application starts, and the corresponding method will be called when there is a request. The class should also have two methods named the same as the operations we created in the definition file. The methods have Micronaut framework annotations describing the required API. We will now write their bodies.
 
-Using the Inversion of Control principle we will inject `BookRepository` so it can be used in the methods. When initializing the controller, Micronaut will automatically provide an instance of the repository as a constructor argument:
+Using the Inversion of Control principle, we will inject `BookRepository` so it can be used in the methods. When initializing the controller, Micronaut will automatically provide an instance of the repository as a constructor argument:
 source:controller/BooksController[tag=inject,indent=0]
 callout:constructor-di[number=1,arg0=BookRepository]
 
@@ -412,17 +412,17 @@ Add the following methods inside the `BookInfoTest` class:
 test:model/BookInfoTest[tag=requiredProperties]
 <1> Instruct Micronaut to inject an instance of the link:https://docs.micronaut.io/latest/guide/#beanValidation[Validator].
 `Validator` will automatically validate parameters and response bodies annotated with `@Valid` in the controller.
-We will use it test the validations manually.
+We will use it to test the validations manually.
 <2> Verify that the validator doesn't produce any violations on a correct `BookInfo` instance.
 <3> Verify that `null` value is not allowed for the `name` property, since the property is marked as required.
 <4> Perform the same tests for the required `availability` property.
 
-We will then write similar test for other properties:
+We will then write similar tests for other properties:
 test:model/BookInfoTest[tag=otherProperties]
 <1> Verify that there are no violations for both `null` or `"Lewis Carol"` used as a value for the `author` property.
-<2> Verify that there is a violation in case the name is too short (at least tree characters are required).
+<2> Verify that there is a violation if the name is too short (at least tree characters are required).
 <3> Verify that there are no violations for valid values of the `ISBN` property.
-<4> Verify that there is a violation in case the value doesn't match the required pattern (A space is present).
+<4> Verify that there is a violation if the value doesn't match the required pattern (A space is present).
 
 Finally, we will test JSON serialization and parsing by writing a simple controller and client:
 test:model/BookInfoTest[tags=annotations|jsonSerialization]
