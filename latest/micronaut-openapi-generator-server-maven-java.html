@@ -123,24 +123,32 @@
                         <div class="underline"></div>
                         
 <ul class="sectlevel1">
-<li><a href="#getting-started">1. Getting Started</a></li>
-<li><a href="#what-you-will-need">2. What you will need</a></li>
-<li><a href="#solution">3. Solution</a></li>
-<li><a href="#installing-openapi-generator">4. Installing OpenAPI Generator</a></li>
-<li><a href="#creating-the-api-definition-file">5. Creating the API definition file</a>
+<li><a href="#getting-started">1. Getting Started</a>
 <ul class="sectlevel2">
-<li><a href="#general-server-info">5.1. General server info</a></li>
-<li><a href="#paths-and-operations-definition">5.2. Paths and operations definition</a></li>
-<li><a href="#schemas">5.3. Schemas</a></li>
+<li><a href="#what-openapi-is">1.1. What OpenAPI Is</a></li>
+<li><a href="#advantages-of-openapi">1.2. Advantages Of OpenAPI</a></li>
+<li><a href="#what-the-openapi-generator-is">1.3. What The OpenAPI Generator Is</a></li>
+<li><a href="#what-you-will-learn">1.4. What You Will Learn</a></li>
+<li><a href="#solution">1.5. Solution</a></li>
 </ul>
 </li>
-<li><a href="#generating-server-api-from-template">6. Generating server API from template</a></li>
-<li><a href="#writing-the-app">7. Writing the app</a>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#installing-openapi-generator">3. Installing OpenAPI Generator</a></li>
+<li><a href="#creating-the-api-definition-file">4. Creating The API Definition File</a>
 <ul class="sectlevel2">
-<li><a href="#use-micronaut-data-jdbc-for-database-access">7.1. Use Micronaut Data JDBC for Database Access</a></li>
+<li><a href="#describing-general-server-info">4.1. Describing General Server Info</a></li>
+<li><a href="#defining-paths-and-operations">4.2. Defining Paths And Operations</a></li>
+<li><a href="#defining-schemas">4.3. Defining Schemas</a></li>
+</ul>
+</li>
+<li><a href="#generating-server-api-from-the-openapi-definition">5. Generating Server API From The OpenAPI Definition</a></li>
+<li><a href="#application-structure">6. Application Structure</a></li>
+<li><a href="#data-storage-and-access-with-mysql-and-jdbc">7. Data Storage And Access With MySQL and JDBC</a>
+<ul class="sectlevel2">
+<li><a href="#configure-access-for-a-data-source">7.1. Configure Access for a Data Source</a></li>
 <li><a href="#database-migration-with-flyway">7.2. Database Migration with Flyway</a></li>
-<li><a href="#mappedentity">7.3. MappedEntity</a></li>
-<li><a href="#writing-a-service">7.4. Writing a Service</a></li>
+<li><a href="#creating-a-mappedentity">7.3. Creating a MappedEntity</a></li>
+<li><a href="#writing-a-repository">7.4. Writing a Repository</a></li>
 </ul>
 </li>
 <li><a href="#writing-the-controller-logic">8. Writing the Controller Logic</a>
@@ -163,13 +171,13 @@
 </li>
 <li><a href="#next-steps">12. Next steps</a>
 <ul class="sectlevel2">
-<li><a href="#add-security">12.1. Add Security</a></li>
-<li><a href="#generate-micronaut-client">12.2. Generate Micronaut Client</a></li>
-<li><a href="#add-server-url-information">12.3. Add Server URL Information</a></li>
-<li><a href="#generate-user-friendly-documentation">12.4. Generate User-Friendly Documentation</a></li>
+<li><a href="#learn-more">12.1. Learn More</a></li>
+<li><a href="#add-security">12.2. Add Security</a></li>
+<li><a href="#generate-micronaut-client">12.3. Generate Micronaut Client</a></li>
+<li><a href="#add-server-url-information">12.4. Add Server URL Information</a></li>
+<li><a href="#generate-user-friendly-documentation">12.5. Generate User-Friendly Documentation</a></li>
 </ul>
 </li>
-<li><a href="#next-steps-2">13. Next steps</a></li>
 </ul>
 
                     </div>
@@ -196,17 +204,76 @@
 <h2 id="getting-started">1. Getting Started</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this guide we will write an <a href="https://www.openapis.org">OpenAPI</a> definition file and then use it to generate a Java Micronaut server API with <a href="https://openapi-generator.tech">OpenAPI Generator</a>.</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>OpenAPI Generator allows generation of API client libraries (SDK generation), server stubs, documentation and configuration automatically given an OpenAPI Spec (both 2.0 and 3.0 are supported).</p>
-</div>
-</blockquote>
+<p>In this guide, we will write an OpenAPI definition file and then use it to generate a Java Micronaut server API with OpenAPI Generator.</p>
 </div>
 <div class="paragraph">
 <p>Then we will add internal logic to the API and test our implementation.</p>
+</div>
+<div class="sect2">
+<h3 id="what-openapi-is">1.1. What OpenAPI Is</h3>
+<div class="paragraph">
+<p>The <a href="https://oai.github.io/Documentation/start-here.html">OpenAPI Specification</a> defines a format for uniquely describing REST APIs that is both human- and machine-readable. Later in this guide, we will discover the structure of documents in the OpenAPI format. We will also create such a document for our desired API. Note that we will refer to the document describing our API as an <strong>API definition</strong> file.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="advantages-of-openapi">1.2. Advantages Of OpenAPI</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>It provides a unique way of describing a REST API that is easy to understand and modify. It is the most broadly adopted industry standard for describing new APIs and has the most developed tooling ecosystem.</p>
+</li>
+<li>
+<p>You can generate interactive documentation and client implementations from the same definition file in numerous languages.</p>
+</li>
+<li>
+<p>You can use the same definition file to generate a server template. The template will include client-server communication specifics based on your API definition. It removes the need for developers to write extensive documentation about each possible path and parameter for the APIs - most can be described in the definition file. This prevents incompatibility issues between the client and server sides which might be caused by ill-communication.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The internal server logic cannot be generated from a definition file and needs to be implemented manually based on the generated server template. The reason for this is very simple: there cannot be a unified way of describing all the possible server implementations.
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="what-the-openapi-generator-is">1.3. What The OpenAPI Generator Is</h3>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>OpenAPI Generator allows the generation of API client libraries (SDK generation), server stubs, documentation, and configuration automatically given an OpenAPI Spec (both 2.0 and 3.0 are supported).</p>
+</div>
+</blockquote>
+</div>
+</div>
+<div class="sect2">
+<h3 id="what-you-will-learn">1.4. What You Will Learn</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>You will discover the general structure of a document in the OpenAPI format and a definition file in this format describing the desired API for our custom server.</p>
+</li>
+<li>
+<p>You will learn to use the <a href="https://openapi-generator.tech/">OpenAPIGenerator</a> to generate Micronaut code in Java for the server application. We will extend the code by implementing internal logic and testing it.</p>
+</li>
+<li>
+<p>You will learn how to use Micronaut Data JDBC to connect to a MySQL database from our application to store and retrieve data. You will complement the application with tests.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="solution">1.5. Solution</h3>
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can directly get the complete solution by downloading and unzipping <a href="micronaut-openapi-generator-server-maven-java.zip">micronaut-openapi-generator-server-maven-java.zip</a>.</p>
+</div>
 </div>
 </div>
 </div>
@@ -232,22 +299,7 @@
 </div>
 </div>
 </div></div><div class="row"><div class="col-md-12"><div class="sect1">
-<h2 id="solution">3. Solution</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="micronaut-openapi-generator-server-maven-java.zip">Download</a> and unzip the source</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="installing-openapi-generator">4. Installing OpenAPI Generator</h2>
+<h2 id="installing-openapi-generator">3. Installing OpenAPI Generator</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To use OpenAPI Generator we need to <a href="https://github.com/OpenAPITools/openapi-generator#1---installation">install OpenAPI Generator CLI</a>.</p>
@@ -256,7 +308,7 @@
 <p>We will use the jar option. <a href="https://github.com/OpenAPITools/openapi-generator#13---download-jar">Download it</a> and store it in the directory that you want to use for this project.</p>
 </div>
 <div class="paragraph">
-<p>Next, open terminal in the same directory. To verify that generator works correctly run the <code>help</code> command:</p>
+<p>Next, open the terminal in the same directory. To verify that generator works correctly, run the <code>help</code> command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -309,8 +361,7 @@ to set up a bash script with automatic updates</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-You can also use the <a href="https://openapi-generator.tech/docs/online">OpenAPI Generator Online Service</a> but its usage
-is not covered by this guide.
+You can also use the <a href="https://openapi-generator.tech/docs/online">OpenAPI Generator Online Service</a> but its usage is not covered by this guide.
 </td>
 </tr>
 </table>
@@ -318,23 +369,24 @@ is not covered by this guide.
 </div>
 </div>
 <div class="sect1">
-<h2 id="creating-the-api-definition-file">5. Creating the API definition file</h2>
+<h2 id="creating-the-api-definition-file">4. Creating The API Definition File</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We will now create a definition file, that will describe our server API, including the available paths and operations on them.</p>
+<p>We will now create a definition file that will describe our server API, including the available paths and operations.</p>
 </div>
 <div class="paragraph">
-<p>OpenAPI generator supports <code>.yaml</code> and <code>.json</code> file formats for the definition file.
-We will use YAML due its simplicity and human readability.</p>
+<p>The definition file must be in the OpenAPI format. The document must have a specific structure. <a href="https://oai.github.io/Documentation/specification.html">"OpenAPI Specification" guide</a> describes it with more detail. We will write sections of the definition document based on the specification.</p>
 </div>
 <div class="paragraph">
-<p>In the directory where you downloaded the OpenAPI generator CLI, create a file named <code>library-definition.yaml</code> and open it in your
-favourite text editor.</p>
+<p>OpenAPI generator supports <code>.yaml</code> and <code>.json</code> file formats for the definition file. We will use YAML due to its simplicity and human readability.</p>
+</div>
+<div class="paragraph">
+<p>In the directory where you downloaded the OpenAPI generator CLI, create a file named <code>library-definition.yaml</code> and open it in your favourite text editor.</p>
 </div>
 <div class="sect2">
-<h3 id="general-server-info">5.1. General server info</h3>
+<h3 id="describing-general-server-info">4.1. Describing General Server Info</h3>
 <div class="paragraph">
-<p>Paste the following text to the file:</p>
+<p>We will first provide general server information in the definition file. Paste the following text to the file:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/library-definition.yaml</div>
@@ -360,7 +412,7 @@ favourite text editor.</p>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The info object contains general information about the API.</td>
+<td>The info object contains general information about the API like a short description and license. In this case, we will be creating a website for a library.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -375,18 +427,22 @@ favourite text editor.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you are new to OpenAPI, you might be interested in reading the
-<a href="https://swagger.io/docs/specification/about/">OpenAPI guide</a> or the
-<a href="https://swagger.io/specification/">OpenAPI 3.0.0 specification</a> after you finish this guide.
+If you are new to OpenAPI, you might be interested in reading the <a href="https://swagger.io/docs/specification/about/">OpenAPI guide</a> or the <a href="https://swagger.io/specification/">OpenAPI 3.0.0 specification</a> after you finish this guide.
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="paths-and-operations-definition">5.2. Paths and operations definition</h3>
+<h3 id="defining-paths-and-operations">4.2. Defining Paths And Operations</h3>
 <div class="paragraph">
-<p>We will proceed by defining a path that will be available in our API. Paste the following to our file:</p>
+<p>The paths section of the definition is described in the <a href="https://oai.github.io/Documentation/specification-paths.html">"API Endpoints" OpenAPI Guide</a>, but can also be understood from a few examples. This section defines paths and various operations (like <code>GET</code>, <code>PUT</code>, and <code>POST</code>) available on these paths.</p>
+</div>
+<div class="paragraph">
+<p>We will proceed by defining a path that is supposed to be used for searching books in our library. The parameters that we will define in the definition will be used to narrow the search results.</p>
+</div>
+<div class="paragraph">
+<p>Paste the following to our file:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/library-definition.yaml</div>
@@ -430,8 +486,7 @@ If you are new to OpenAPI, you might be interested in reading the
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>We use the <code>books</code> tag that we previously defined. Note that for each tag a controller will be generated
-that will implement its operations.</td>
+<td>We use the <code>books</code> tag that we previously defined. Note that for each tag a controller will be generated that will implement its operations.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -439,27 +494,23 @@ that will implement its operations.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>We define two parameters of type string that user should supply in query.</td>
+<td>We define two parameters of type string that the user should supply in the query.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Validation can be used on parameters. In this case book name must contain at least three characters.</td>
+<td>Validation can be used on parameters. In this case, book name must contain at least three characters.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>The <code>responses</code> object describes the response codes that can be produced.
-It also defines the structure of body if any.</td>
+<td>The <code>responses</code> object describes the response codes that can be produced. It also defines the structure of body if any.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="7"></i><b>7</b></td>
-<td>In case of correct request we define the body to contain a list of <code>BookInfo</code> objects. The schema for the book info
-object will be defined later in <code>components/schemas</code> section of definition.</td>
+<td>In case of correct request, we define the body to contain a list of <code>BookInfo</code> objects. The schema for the book info object will be defined later in <code>components/schemas</code> section of the definition.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="8"></i><b>8</b></td>
-<td>The <code>"400"</code> status code will be produced by Micronaut in case of bad request, like an incorrect type supplied or
-failed validation. Even though Micronaut handles it automatically and no implementation is needed on our side, we add it
-for a complete API specification.</td>
+<td>The <code>"400"</code> status code will be produced by Micronaut in case of a bad request, like an incorrect type supplied or failed validation. Even though Micronaut handles it automatically and no implementation is needed on our side, we add it for a complete API specification.</td>
 </tr>
 </table>
 </div>
@@ -479,7 +530,7 @@ All the available types and their validations are described in
 </table>
 </div>
 <div class="paragraph">
-<p>We will define another path with a <code>POST</code> operation:</p>
+<p>We will define another path with a <code>POST</code> operation, that is supposed to be used to add info about a book in our library. In this case, the request will contain a body with all the book information:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/library-definition.yaml</div>
@@ -510,13 +561,11 @@ All the available types and their validations are described in
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>We specify that a body is required and what are the supported content-types for it.
-(in this case only <code>application/json</code>, but multiple can be allowed).</td>
+<td>We specify that a body is required and what are the supported content-types for it. (in this case only <code>application/json</code>, but multiple can be allowed).</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>We write that <code>BookInfo</code> object is required to be in the request body.
-We reference the same <code>BookInfo</code> schema that we will define next.</td>
+<td>We write that <code>BookInfo</code> object is required to be in the request body. We reference the same <code>BookInfo</code> schema that we will define next.</td>
 </tr>
 </table>
 </div>
@@ -535,9 +584,12 @@ To read more about body definitions, see the
 </div>
 </div>
 <div class="sect2">
-<h3 id="schemas">5.3. Schemas</h3>
+<h3 id="defining-schemas">4.3. Defining Schemas</h3>
 <div class="paragraph">
-<p>We will add schemas to the definition file:</p>
+<p>Schemas are required whenever a parameter, request body or a response body we want to describe needs to be an object. In that case we add a schema that defines all the properties of the object. You can find out about the format for schemas in the <a href="https://oai.github.io/Documentation/specification-content.html">"Content of Message Bodies" OpenAPI Guide</a>.</p>
+</div>
+<div class="paragraph">
+<p>We will add schemas to our definition file:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/library-definition.yaml</div>
@@ -563,13 +615,11 @@ To read more about body definitions, see the
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>We define the <code>BookInfo</code> schema inside then <code>components/schemas</code> section.
-From this schema a Java class will be generated with the same <code>BookInfo</code> class name.</td>
+<td>We define the <code>BookInfo</code> schema inside then <code>components/schemas</code> section. From this schema a Java class will be generated with the same <code>BookInfo</code> class name.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>We define all the properties of <code>BookInfo</code>, including required validation on them. An abbreviated form is used
-for some YAML lists and dictionaries to reduce the number of rows and simplify readability.</td>
+<td>We define all the properties of <code>BookInfo</code>, including required validation on them (In this case, it is a minimal length requirement on one string and a regex pattern on another). An abbreviated form is used for some YAML lists and dictionaries to reduce the number of rows and simplify readability.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -577,10 +627,12 @@ for some YAML lists and dictionaries to reduce the number of rows and simplify r
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>We define <code>BookAvailability</code> schema to be an enum with three available values.
-A Java <code>BookAvailability</code> class will be generated with given enum values based on our definition.</td>
+<td>We define <code>BookAvailability</code> schema to be an enum with three available values. A Java <code>BookAvailability</code> class will be generated with given enum values based on our definition.</td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>As you can see, schemas can be defined as enums when they can only be assigned a finite number of values. Also, you can reference other schemas as properties of a schema.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -602,10 +654,10 @@ You can read more about writing schemas in the
 </div>
 </div>
 <div class="sect1">
-<h2 id="generating-server-api-from-template">6. Generating server API from template</h2>
+<h2 id="generating-server-api-from-the-openapi-definition">5. Generating Server API From The OpenAPI Definition</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Now we will generate server API files from our definition.
+<p>Now we will generate server API files from our definition. The generated server code will be in Java and will use the Micronaut features for client-server communication.
 Open the terminal in the same directory as <code>library-definition.yaml</code> file and run the following command:</p>
 </div>
 <div class="listingblock">
@@ -628,7 +680,7 @@ Open the terminal in the same directory as <code>library-definition.yaml</code> 
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Specify our OpenAPI definition file as <code>library-definition.yaml</code> which we just created.</td>
+<td>Specify our OpenAPI definition file as <code>library-definition.yaml</code>, which we just created.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -685,17 +737,16 @@ If nothing is specified, <code>junit</code> is used by default.</td>
 <td class="content">
 <div class="paragraph">
 <p>If you plan to change the definition file and regenerate files, consider setting the <code>-p generateControllerAsAbstract=true</code>
-parameter (we don&#8217;t recommend doing it during this guide, though). In this case an abstract class will be generated
+parameter (we don&#8217;t recommend doing it during this guide, though). In this case, an abstract class will be generated
 for the API, while all the logic needs to be implemented in a different class (that extends the API abstract class).
-This way your changes won&#8217;t be overwritten by generation, but the API will be updated.</p>
+Your changes won&#8217;t be overwritten by generation, but the API will be updated.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>After running, the OpenAPI generator CLI will output information about generated files.
-Now you can open the directory in your favorite IDE or text editor.</p>
+<p>After running, the OpenAPI generator CLI will output information about generated files. Now you can open the directory in your favorite IDE or text editor.</p>
 </div>
 <div class="paragraph">
 <p>You should see the following directory structure:</p>
@@ -762,15 +813,54 @@ for controllers earlier.</td>
 </div>
 </div>
 <div class="sect1">
-<h2 id="writing-the-app">7. Writing the app</h2>
+<h2 id="application-structure">6. Application Structure</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Next, create a persistence with Micronaut Data JDBC, Database schema generation with Flyway, and use it from the generated code.</p>
+<p>To better understand the Micronaut Application we want to develop, let&#8217;s first look at the schematic of the whole application:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/openapi-generator/server-component-scheme.svg" alt="server component scheme">
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The controller will receive client requests utilizing Micronaut server features.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The controller will call repository methods responsible for interaction with the database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The repository methods will be implemented utilizing Micronaut JDBC, and will send queries to the database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The files we generated with OpenAPI generator include Micronaut features responsible for server-client communication, like parameter and body binding, and JSON conversion.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="data-storage-and-access-with-mysql-and-jdbc">7. Data Storage And Access With MySQL and JDBC</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use MySQL database to store and access data. This will ensure that stored data is persistent between the server runs and can be easily accessed and modified by multiple instances of our application.</p>
+</div>
+<div class="paragraph">
+<p>Before implementing any server logic, we need to create a database and configure a connection to it. We will use Flyway to set up the database schema and JDBC for accessing the data.</p>
 </div>
 <div class="sect2">
-<h3 id="use-micronaut-data-jdbc-for-database-access">7.1. Use Micronaut Data JDBC for Database Access</h3>
+<h3 id="configure-access-for-a-data-source">7.1. Configure Access for a Data Source</h3>
 <div class="paragraph">
-<p>To access a MySQL Database using Micronaut Data JDBC, add the following dependencies:</p>
+<p>We will use <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbc">Micronaut Data JDBC</a> to access the MySQL data source.</p>
+</div>
+<div class="paragraph">
+<p>Add the following required dependencies:</p>
 </div>
 <div class="listingblock">
 <div class="title">pom.xml</div>
@@ -797,12 +887,151 @@ for controllers earlier.</td>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>We will use the <a href="https://hub.docker.com/_/mysql">MySQL Docker Image</a> to start a MySQL server instance. If you have <a href="https://www.docker.com/">Docker</a> installed, run in the terminal:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker network create mysql <i class="conum" data-value="1"></i><b>(1)</b>
+docker run -it --rm \
+    --name mysql-server \
+    --network mysql \
+    -p 3306:3306 \
+    -e MYSQL_DATABASE=db \<i class="conum" data-value="3"></i><b>(3)</b>
+    -e MySQL_ROOT_PASSWORD=aVerySecureRoot \
+    -e MYSQL_USER=micronautApp \
+    -e MYSQL_PASSWORD=aVerySecurePassword \<i class="conum" data-value="4"></i><b>(4)</b>
+    mysql:8 <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create docker network, so that we can access the server from a different container.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Run a container based on the <code>mysql:8</code> image.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Configure the server to create a database named <code>db</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Set the password for the <code>root</code> user, and also create and set password for the <code>micronautApp</code> user.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You can connect to the sql server by running docker container with mysql client:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run -it --rm \
+    --name mysql-client \
+    --network mysql \<i class="conum" data-value="2"></i><b>(2)</b>
+    mysql:8 mysql \<i class="conum" data-value="1"></i><b>(1)</b>
+    -h mysql-server \<i class="conum" data-value="3"></i><b>(3)</b>
+    -uroot -paVerySecureRoot <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Run the <code>mysql</code> command of the same image to start the client.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use the same network as the server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specify the name of the mysql server container.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use root user credentials for connection.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Run MySQL commands:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="mysql">use db;
+show tables;</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now that we have a MySQL server listening on port <code>3306</code> with created <code>db</code> database, we can configure it as a datasource in Micronaut application:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
+  <span class="key">default</span>: <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">url</span>: <span class="string"><span class="content">${JDBC_URL:`jdbc:mysql://localhost:3306/db`} </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="key">username</span>: <span class="string"><span class="content">${JDBC_USER:micronautApp}</span></span>
+    <span class="key">password</span>: <span class="string"><span class="content">${JDBC_PASSWORD:} </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="key">dialect</span>: <span class="string"><span class="content">MYSQL</span></span>
+    <span class="key">driverClassName</span>: <span class="string"><span class="content">${JDBC_DRIVER:com.mysql.cj.jdbc.Driver} </span></span><i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create datasource called <code>default</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the default url for the datasource to be <code>localhost:3306/db</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set the default username to <code>micronautApp</code>, but do not explicitly set the password. Specify to use the <code>JDBC_PASSWORD</code> environment variable for it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Set the dialect and driver class name.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>With the configured data source we will be able to access the data using Micronaut JDBC API, which will be shown further in the guide.</p>
+</div>
+<div class="paragraph">
+<p>Before running the application, you should set the password in the environment variable. In terminal run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">export JDBC_PASSWORD=aVerySecurePassword</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="database-migration-with-flyway">7.2. Database Migration with Flyway</h3>
 <div class="paragraph">
 <p>We need a way to create the database schema. For that, we use
 <a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut integration with Flyway</a>.</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.flyway.org">Flyway</a> automates schema changes, significantly simplifying schema management tasks, like migrating, rolling back, and reproducing in multiple environments.</p>
 </div>
 <div class="paragraph">
 <p>Add the following snippet to include the necessary dependencies:</p>
@@ -814,11 +1043,16 @@ for controllers earlier.</td>
     <span class="tag">&lt;groupId&gt;</span>io.micronaut.flyway<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>micronaut-flyway<span class="tag">&lt;/artifactId&gt;</span>
     <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span>
+<span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.flywaydb<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>flyway-mysql<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>runtime<span class="tag">&lt;/scope&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Configure the database migrations directory for <a href="http://www.flyway.org">Flyway</a> in <code>application.yml</code>.</p>
+<p>We will enable Flyway in the <code>application.yml</code> and configure it to perform migration on one of the defined data sources.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
@@ -844,13 +1078,16 @@ for controllers earlier.</td>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Micronaut Flyway integration works with multiple datasources.
+Configuring multiple data sources is as simple as enabling Flyway for each of them. You can also specify folders that will be used for migrating each datasource. Find out more in the <a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut Flyway documentation</a>.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Create the following files with the database schema creation:</p>
+<p>Flyway migration will be automatically triggered before Micronaut application starts. Flyway will read migration commands in the <code>resources/db/migration/</code> directory, execute them if necessary and verify the configured data source is consistent with them.</p>
+</div>
+<div class="paragraph">
+<p>Create the following migration files with the database schema creation:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/db/migration/V1__schema.sql</div>
@@ -864,18 +1101,24 @@ Micronaut Flyway integration works with multiple datasources.
 );
 
 <span class="class">INSERT</span> <span class="class">INTO</span> book
-(name, availability, author,  ISBN)
+    (name, availability, author, ISBN)
 <span class="keyword">VALUES</span>
     (<span class="string"><span class="delimiter">&quot;</span><span class="content">Alice's Adventures in Wonderland</span><span class="delimiter">&quot;</span></span>,      <span class="string"><span class="delimiter">&quot;</span><span class="content">available</span><span class="delimiter">&quot;</span></span>,   <span class="string"><span class="delimiter">&quot;</span><span class="content">Lewis Caroll</span><span class="delimiter">&quot;</span></span>,   <span class="string"><span class="delimiter">&quot;</span><span class="content">9783161484100</span><span class="delimiter">&quot;</span></span>),
     (<span class="string"><span class="delimiter">&quot;</span><span class="content">The Hitchhiker's Guide to the Galaxy</span><span class="delimiter">&quot;</span></span>,  <span class="string"><span class="delimiter">&quot;</span><span class="content">reserved</span><span class="delimiter">&quot;</span></span>,    <span class="string"><span class="delimiter">&quot;</span><span class="content">Douglas Adams</span><span class="delimiter">&quot;</span></span>,  <span class="predefined-constant">NULL</span>),
     (<span class="string"><span class="delimiter">&quot;</span><span class="content">Java Guide for Beginners</span><span class="delimiter">&quot;</span></span>,              <span class="string"><span class="delimiter">&quot;</span><span class="content">available</span><span class="delimiter">&quot;</span></span>,   <span class="predefined-constant">NULL</span>,             <span class="predefined-constant">NULL</span>);</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The SQL commands in the migration will create the <code>book</code> table with <code>id</code> and four columns describing its properties, and populate the table with three sampe rows.</p>
+</div>
 </div>
 <div class="sect2">
-<h3 id="mappedentity">7.3. MappedEntity</h3>
+<h3 id="creating-a-mappedentity">7.3. Creating a MappedEntity</h3>
 <div class="paragraph">
-<p>Create an Entity:</p>
+<p>To retrieve objects from the database, you need to define a class annotated with <a href="https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/annotation/MappedEntity.html">@MappedEntity</a>. Instances of the class will represent a single row retrieved from the database in a query.</p>
+</div>
+<div class="paragraph">
+<p>We will now create <code>BookEntity</code> class. We will be retrieving data from the <code>book</code> table, and therefore class properties match columns in the table. Note that special annotations are added on the property corresponding to the primary key of the table.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/BookEntity.java</div>
@@ -974,9 +1217,9 @@ Micronaut Flyway integration works with multiple datasources.
 </div>
 </div>
 <div class="sect2">
-<h3 id="writing-a-service">7.4. Writing a Service</h3>
+<h3 id="writing-a-repository">7.4. Writing a Repository</h3>
 <div class="paragraph">
-<p>Next, create a repository interface to define the operations to access the database. Micronaut Data will implement the interface at compilation time:</p>
+<p>Next, we will create a repository interface and define the required operations to access the database. Micronaut Data will implement the interface at compilation time. It will determine the operations to be implemented based on method naming and parameters, and supports <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#dataUpdates">simple create, read, update, delete operations</a> along with <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#querying">highly-customizable queries</a>.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/BookRepository.java</div>
@@ -1026,16 +1269,16 @@ Micronaut Flyway integration works with multiple datasources.
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Implement the <code>JpaSpecificationExecutor</code> interface when you need create queries dynamically by composing JPA criteria.</td>
+<td>Implement the <code>JpaSpecificationExecutor</code> interface when you need create queries dynamically by composing <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcCriteriaSpecifications">JPA criteria</a>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>To find multiple entities you can use the <code>findAll</code> method from the <code>JpaSpecificationExecutor</code> interface.</td>
+<td>To find multiple entities, you can use the <code>findAll</code> method from the <code>JpaSpecificationExecutor</code> interface.</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Create a class to encapsulate the <code>Predicate</code> creation.</p>
+<p>In the above code snippet, we extended the <code>JpaSpecificationExecutor</code> interface to define a <code>findAll</code> method that supports <code>Predicate</code> as argument, which allows to modify the operations performed during runtime. We will now create a factory class for creating predicates that we plan to use in our application:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/BookSpecifications.java</div>
@@ -1078,12 +1321,10 @@ YAML definition file:</p>
 <div class="sect2">
 <h3 id="implementing-controller-methods">8.1. Implementing Controller Methods</h3>
 <div class="paragraph">
-<p>Now open <code>BooksController</code>. The class should have two methods named the same
-as the operations we created in the definition file. The methods have Micronaut framework annotations describing the
-required API. We will now write their bodies.</p>
+<p>Now open <code>BooksController</code>. Thanks to the <a href="https://docs.micronaut.io/latest/guide/#httpServer">@Controller</a> annotation, an instance of the class will be initialized when Micronaut application starts, and the corresponding method will be called when there is a request. The class should also have two methods named the same as the operations we created in the definition file. The methods have Micronaut framework annotations describing the required API. We will now write their bodies.</p>
 </div>
 <div class="paragraph">
-<p>First, inject <code>BookRepository</code>:</p>
+<p>Using the Inversion of Control principle, we will inject <code>BookRepository</code> so it can be used in the methods. When initializing the controller, Micronaut will automatically provide an instance of the repository as a constructor argument:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
@@ -1104,7 +1345,7 @@ required API. We will now write their bodies.</p>
 </table>
 </div>
 <div class="paragraph">
-<p>Next, replace the <code>search</code> method implementation:</p>
+<p>Next, keeping all the generated annotations, add this implementation for the <code>search</code> method:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
@@ -1115,7 +1356,7 @@ required API. We will now write their bodies.</p>
             <span class="annotation">@QueryValue</span>(value=<span class="string"><span class="delimiter">&quot;</span><span class="content">author-name</span><span class="delimiter">&quot;</span></span>) <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> authorName) {
         <span class="keyword">return</span> searchEntities(bookName, authorName)
                 .stream()
-                .map(<span class="local-variable">this</span>::map)
+                .map(<span class="local-variable">this</span>::map) <i class="conum" data-value="5"></i><b>(5)</b>
                 .collect(Collectors.toList());
     }
 
@@ -1127,17 +1368,17 @@ required API. We will now write their bodies.</p>
     }
 
     <span class="annotation">@NonNull</span>
-    <span class="directive">private</span> <span class="predefined-type">List</span>&lt;BookEntity&gt; searchEntities(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> name, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> author) {
+    <span class="directive">private</span> <span class="predefined-type">List</span>&lt;BookEntity&gt; searchEntities(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> name, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> author) { <i class="conum" data-value="2"></i><b>(2)</b>
         <span class="keyword">if</span> (StringUtils.isEmpty(name) &amp;&amp; StringUtils.isEmpty(author)) {
             <span class="keyword">return</span> bookRepository.findAll();
         } <span class="keyword">else</span> <span class="keyword">if</span> (StringUtils.isEmpty(name)) {
-            <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.authorLike(author));
+            <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.authorLike(author)); <i class="conum" data-value="3"></i><b>(3)</b>
 
         } <span class="keyword">else</span>  <span class="keyword">if</span> (StringUtils.isEmpty(author)) {
             <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.nameLike(name));
         } <span class="keyword">else</span> {
             <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.authorLike(author)
-                    .and(BookSpecifications.nameLike(name))); <i class="conum" data-value="2"></i><b>(2)</b>
+                    .and(BookSpecifications.nameLike(name))); <i class="conum" data-value="4"></i><b>(4)</b>
         }
     }</code></pre>
 </div>
@@ -1150,12 +1391,24 @@ required API. We will now write their bodies.</p>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Criteria API allows you to build a query programmatically and at the runtime.</td>
+<td>Define the <code>searchEntities</code> method that will manage the different combinations of desired search parameters.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use the predicate we previously defined to search for substring in one column</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use the Criteria API to build a query for combined search in the 2 columns during runtime.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Map the <code>BookEntity</code> instances to the desired return type.</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>And finally, we will implement the <code>addBook</code> method:</p>
+<p>Finally, we will implement the <code>addBook</code> method:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
@@ -1163,7 +1416,7 @@ required API. We will now write their bodies.</p>
 <pre class="CodeRay highlight"><code data-lang="java">    <span class="annotation">@ExecuteOn</span>(TaskExecutors.IO) <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="annotation">@Status</span>(OK) <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="directive">public</span> <span class="type">void</span> addBook(<span class="annotation">@Body</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> BookInfo bookInfo) {
-        bookRepository.save(bookInfo.getName(),
+        bookRepository.save(bookInfo.getName(), <i class="conum" data-value="3"></i><b>(3)</b>
                 bookInfo.getAvailability(),
                 bookInfo.getAuthor(),
                 bookInfo.getISBN());
@@ -1179,6 +1432,10 @@ required API. We will now write their bodies.</p>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>You can return <code>void</code> in your controller&#8217;s method and specify the HTTP status code via the <code>@Status</code> annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Call the repository method that will add an entry to the table.</td>
 </tr>
 </table>
 </div>
@@ -1279,11 +1536,16 @@ connection: keep-alive</code></pre>
     <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>testcontainers<span class="tag">&lt;/artifactId&gt;</span>
     <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span>
+<span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>junit-jupiter<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Configure the default datasource to use the PostgreSQL database provided by TestContainers for the test environment:</p>
+<p>Configure the default datasource to use the MySQL database provided by TestContainers for the test environment:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/test/resources/application-test.yml</div>
@@ -1369,7 +1631,7 @@ Define the following imports:</p>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Instruct Micronaut to inject an instance of the <a href="https://docs.micronaut.io/latest/guide/#beanValidation">Validator</a>.
 <code>Validator</code> will automatically validate parameters and response bodies annotated with <code>@Valid</code> in the controller.
-We will use it test the validations manually.</td>
+We will use it to test the validations manually.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -1386,7 +1648,7 @@ We will use it test the validations manually.</td>
 </table>
 </div>
 <div class="paragraph">
-<p>We will then write similar test for other properties:</p>
+<p>We will then write similar tests for other properties:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/model/BookInfoTest.java</div>
@@ -1430,7 +1692,7 @@ We will use it test the validations manually.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Verify that there is a violation in case the name is too short (at least tree characters are required).</td>
+<td>Verify that there is a violation if the name is too short (at least tree characters are required).</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -1438,7 +1700,7 @@ We will use it test the validations manually.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Verify that there is a violation in case the value doesn&#8217;t match the required pattern (A space is present).</td>
+<td>Verify that there is a violation if the value doesn&#8217;t match the required pattern (A space is present).</td>
 </tr>
 </table>
 </div>
@@ -1513,7 +1775,7 @@ from running during other tests.</td>
 <div class="sect2">
 <h3 id="testing-the-controller">10.3. Testing the Controller</h3>
 <div class="paragraph">
-<p>We will write test for the two paths of <code>BookController</code>.</p>
+<p>We will write tests for the two paths of <code>BookController</code>.</p>
 </div>
 <div class="paragraph">
 <p>If you open the <code>BooksControllerTest</code>, you can see that templates of tests were generated for both paths with examples of requests to corresponding paths. The templates can be used to simplify and speed up test writing.</p>
@@ -1698,7 +1960,29 @@ If you still use Java 8, use the JDK11 version of GraalVM.
 <h2 id="next-steps">12. Next steps</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="add-security">12.1. Add Security</h3>
+<h3 id="learn-more">12.1. Learn More</h3>
+<div class="paragraph">
+<p>Read OpenAPI and Micronaut documentation and guides:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.openapis.org">OpenAPI</a></p>
+</li>
+<li>
+<p><a href="https://openapi-generator.tech">OpenAPI Generator</a></p>
+</li>
+<li>
+<p>Definition files generation from annotated controllers with <a href="https://micronaut-projects.github.io/micronaut-openapi/latest/guide">Micronaut OpenAPI</a></p>
+</li>
+<li>
+<p><a href="https://micronaut-projects.github.io/micronaut-data/latest/guide">Micronaut Data</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-security">12.2. Add Security</h3>
 <div class="paragraph">
 <p>We could have defined our security requirements by adding a security schema to the <code>library-definition.yaml</code> file.
 For example, we will add HTTP Basic authentication:</p>
@@ -1730,7 +2014,7 @@ For example, we will add HTTP Basic authentication:</p>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Add the schema to the paths that you want to secure. In this case we want to restrict access to
+<td>Add the schema to the paths that you want to secure. In this case, we want to restrict access to
 adding books into our library.</td>
 </tr>
 </table>
@@ -1781,7 +2065,7 @@ the supported Authorization strategies.
 </div>
 </div>
 <div class="sect2">
-<h3 id="generate-micronaut-client">12.2. Generate Micronaut Client</h3>
+<h3 id="generate-micronaut-client">12.3. Generate Micronaut Client</h3>
 <div class="paragraph">
 <p>You can generate a Micronaut client based on the same <code>library-definition.yaml</code> file.</p>
 </div>
@@ -1802,7 +2086,7 @@ the supported Authorization strategies.
 </div>
 </div>
 <div class="sect2">
-<h3 id="add-server-url-information">12.3. Add Server URL Information</h3>
+<h3 id="add-server-url-information">12.4. Add Server URL Information</h3>
 <div class="paragraph">
 <p>If you have your server running, you can add your website URL to it in the YAML definition file:</p>
 </div>
@@ -1815,7 +2099,7 @@ the supported Authorization strategies.
 </div>
 </div>
 <div class="sect2">
-<h3 id="generate-user-friendly-documentation">12.4. Generate User-Friendly Documentation</h3>
+<h3 id="generate-user-friendly-documentation">12.5. Generate User-Friendly Documentation</h3>
 <div class="paragraph">
 <p>You can generate documentation in html file inside the <code>html-docs/</code> directory by running</p>
 </div>
@@ -1827,30 +2111,6 @@ the supported Authorization strategies.
     -o html-docs</code></pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="next-steps-2">13. Next steps</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>To learn more about:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://www.openapis.org">OpenAPI</a></p>
-</li>
-<li>
-<p><a href="https://openapi-generator.tech">OpenAPI Generator</a></p>
-</li>
-<li>
-<p><a href="https://micronaut-projects.github.io/micronaut-openapi/latest/guide">Micronaut OpenAPI</a></p>
-</li>
-<li>
-<p><a href="https://micronaut-projects.github.io/micronaut-data/latest/guide">Micronaut Data</a></p>
-</li>
-</ul>
 </div>
 
             </div>

@@ -292,16 +292,20 @@ This way of defining the datasource properties enables us to externalize the con
 <a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut integration with Flyway</a>.</p>
 </div>
 <div class="paragraph">
+<p><a href="http://www.flyway.org">Flyway</a> automates schema changes, significantly simplifying schema management tasks, like migrating, rolling back, and reproducing in multiple environments.</p>
+</div>
+<div class="paragraph">
 <p>Add the following snippet to include the necessary dependencies:</p>
 </div>
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.flyway:micronaut-flyway</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.flyway:micronaut-flyway</span><span class="delimiter">&quot;</span></span>)
+runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.flywaydb:flyway-mysql</span><span class="delimiter">&quot;</span></span>)</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Configure the database migrations directory for <a href="http://www.flyway.org">Flyway</a> in <code>application.yml</code>.</p>
+<p>We will enable Flyway in the <code>application.yml</code> and configure it to perform migration on one of the defined data sources.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
@@ -327,13 +331,16 @@ This way of defining the datasource properties enables us to externalize the con
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Micronaut Flyway integration works with multiple datasources.
+Configuring multiple data sources is as simple as enabling Flyway for each of them. You can also specify folders that will be used for migrating each datasource. Find out more in the <a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut Flyway documentation</a>.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Create the following files with the database schema creation:</p>
+<p>Flyway migration will be automatically triggered before Micronaut application starts. Flyway will read migration commands in the <code>resources/db/migration/</code> directory, execute them if necessary and verify the configured data source is consistent with them.</p>
+</div>
+<div class="paragraph">
+<p>Create the following migration files with the database schema creation:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/db/migration/V1__schema.sql</div>
