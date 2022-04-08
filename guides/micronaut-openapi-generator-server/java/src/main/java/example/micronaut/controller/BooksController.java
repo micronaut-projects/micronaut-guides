@@ -79,7 +79,7 @@ public class BooksController {
     @ExecuteOn(TaskExecutors.IO) // <1>
     @Status(OK) // <2>
     public void addBook(@Body @NotNull @Valid BookInfo bookInfo) {
-        bookRepository.save(bookInfo.getName(),
+        bookRepository.save(bookInfo.getName(), // <3>
                 bookInfo.getAvailability(),
                 bookInfo.getAuthor(),
                 bookInfo.getISBN());
@@ -113,7 +113,7 @@ public class BooksController {
             @QueryValue(value="author-name") @Nullable String authorName) {
         return searchEntities(bookName, authorName)
                 .stream()
-                .map(this::map)
+                .map(this::map) // <5>
                 .collect(Collectors.toList());
     }
 
@@ -125,17 +125,17 @@ public class BooksController {
     }
 
     @NonNull
-    private List<BookEntity> searchEntities(@Nullable String name, @Nullable String author) {
+    private List<BookEntity> searchEntities(@Nullable String name, @Nullable String author) { // <2>
         if (StringUtils.isEmpty(name) && StringUtils.isEmpty(author)) {
             return bookRepository.findAll();
         } else if (StringUtils.isEmpty(name)) {
-            return bookRepository.findAll(BookSpecifications.authorLike(author));
+            return bookRepository.findAll(BookSpecifications.authorLike(author)); // <3>
 
         } else  if (StringUtils.isEmpty(author)) {
             return bookRepository.findAll(BookSpecifications.nameLike(name));
         } else {
             return bookRepository.findAll(BookSpecifications.authorLike(author)
-                    .and(BookSpecifications.nameLike(name))); // <2>
+                    .and(BookSpecifications.nameLike(name))); // <4>
         }
     }
     //end::search[]
