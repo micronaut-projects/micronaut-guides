@@ -125,23 +125,32 @@
 <ul class="sectlevel1">
 <li><a href="#getting-started">1. Getting Started</a></li>
 <li><a href="#what-you-will-need">2. What you will need</a></li>
-<li><a href="#solution">3. Solution</a></li>
-<li><a href="#writing-the-application">4. Writing the Application</a>
+<li><a href="#amazon-web-services-aws">3. Amazon Web Services (AWS)</a>
 <ul class="sectlevel2">
-<li><a href="#enable-annotation-processing">4.1. Enable annotation Processing</a></li>
-<li><a href="#views">4.2. Views</a></li>
-<li><a href="#oauth-2-0">4.3. OAuth 2.0</a></li>
-<li><a href="#home">4.4. Home</a></li>
+<li><a href="#aws-cli">3.1. AWS CLI</a></li>
+<li><a href="#administrator-iam-user">3.2. Administrator IAM user</a></li>
 </ul>
 </li>
-<li><a href="#running-the-application">5. Running the Application</a></li>
-<li><a href="#generate-a-micronaut-application-native-image-with-graalvm">6. Generate a Micronaut Application Native Image with GraalVM</a>
+<li><a href="#solution">4. Solution</a></li>
+<li><a href="#writing-the-application">5. Writing the Application</a>
 <ul class="sectlevel2">
-<li><a href="#native-image-generation">6.1. Native image generation</a></li>
+<li><a href="#enable-annotation-processing">5.1. Enable annotation Processing</a></li>
+<li><a href="#views">5.2. Views</a></li>
+<li><a href="#oauth-2-0">5.3. OAuth 2.0</a></li>
+<li><a href="#add-a-domain">5.4. Add a domain</a></li>
+<li><a href="#using-the-aws-cli">5.5. Using the AWS CLI</a></li>
+<li><a href="#home">5.6. Home</a></li>
 </ul>
 </li>
-<li><a href="#next-steps">7. Next steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">8. Help with the Micronaut Framework</a></li>
+<li><a href="#running-the-application">6. Running the Application</a></li>
+<li><a href="#generate-a-micronaut-application-native-image-with-graalvm">7. Generate a Micronaut Application Native Image with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#native-image-generation">7.1. Native image generation</a></li>
+<li><a href="#cleanup">7.2. Cleanup</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">8. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -157,7 +166,7 @@
 <p>Learn how to create a Micronaut application and secure it with an Authorization Server provided by Cognito.</p>
 </div>
 <div class="paragraph">
-<p>Authors: Sergio del Amo</p>
+<p>Authors: Sergio del Amo, Álvaro Sánchez-Mariscal</p>
 </div>
 <div class="paragraph">
 <p>Micronaut Version: 3.4.1</p>
@@ -194,7 +203,39 @@
 </div>
 </div>
 </div></div><div class="row"><div class="col-md-12"><div class="sect1">
-<h2 id="solution">3. Solution</h2>
+<h2 id="amazon-web-services-aws">3. Amazon Web Services (AWS)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don&#8217;t have one already, <a href="https://portal.aws.amazon.com/billing/signup">create an AWS Account</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="aws-cli">3.1. AWS CLI</h3>
+<div class="paragraph">
+<p>Follow the <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">AWS documentation</a> for installing or updating the latest version of the AWS CLI.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="administrator-iam-user">3.2. Administrator IAM user</h3>
+<div class="paragraph">
+<p>Instead of using your AWS root account, it is recommended that you use an IAM administrative user. If you don&#8217;t have one already, follow the steps below to create one:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">aws iam create-group --group-name Administrators
+aws iam create-user --user-name Administrator
+aws iam add-user-to-group --user-name Administrator --group-name Administrators
+aws iam attach-group-policy --group-name Administrators --policy-arn $(aws iam list-policies --query 'Policies[?PolicyName==`AdministratorAccess`].{ARN:Arn}' --output text)
+aws iam create-access-key --user-name Administrator</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, run <code>aws configure</code> to configure your AWS CLI to use the Administrator IAM user just created.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">4. Solution</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
@@ -209,7 +250,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="writing-the-application">4. Writing the Application</h2>
+<h2 id="writing-the-application">5. Writing the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
@@ -235,7 +276,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="sect2">
-<h3 id="enable-annotation-processing">4.1. Enable annotation Processing</h3>
+<h3 id="enable-annotation-processing">5.1. Enable annotation Processing</h3>
 <div class="paragraph">
 <p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
 </div>
@@ -246,7 +287,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="views">4.2. Views</h3>
+<h3 id="views">5.2. Views</h3>
 <div class="paragraph">
 <p>Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.</p>
 </div>
@@ -265,7 +306,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="oauth-2-0">4.3. OAuth 2.0</h3>
+<h3 id="oauth-2-0">5.3. OAuth 2.0</h3>
 <div class="paragraph">
 <p>To provide authentication, sign in to your <a href="https://aws.amazon.com">AWS</a> account and go to <a href="https://aws.amazon.com/cognito">AWS Cognito</a>.</p>
 </div>
@@ -322,6 +363,40 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="imageblock">
 <div class="content">
 <img src="images/aws-cognito-4.png" alt="aws cognito 4">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-a-domain">5.4. Add a domain</h3>
+<div class="imageblock">
+<div class="content">
+<img src="images/aws-cognito-domain.png" alt="aws cognito domain">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-the-aws-cli">5.5. Using the AWS CLI</h3>
+<div class="paragraph">
+<p>Some of the following commands use <a href="https://stedolan.github.io/jq/"><code>jq</code></a></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>jq is a lightweight and flexible command-line JSON processor</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the AWS CLI to create the user pool and client (change the region to your desired value):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">export COGNITO_REGION=eu-west-1
+export COGNITO_POOL_ID=$(aws cognito-idp create-user-pool --pool-name &quot;Micronaut Guides&quot; --username-attributes &quot;email&quot; --auto-verified-attributes &quot;email&quot; | jq -r '.UserPool.Id')
+export OAUTH_CLIENT_ID=$(aws cognito-idp create-user-pool-client --generate-secret --user-pool-id $COGNITO_POOL_ID --client-name &quot;AWS Cognito Micronaut Tutorial&quot; --callback-urls &quot;http://localhost:8080/oauth/callback/cognito&quot; --logout-urls &quot;http://localhost:8080/logout&quot; --supported-identity-providers COGNITO --allowed-o-auth-flows &quot;code&quot; --allowed-o-auth-scopes &quot;phone&quot; &quot;email&quot; &quot;openid&quot; &quot;profile&quot; &quot;aws.cognito.signin.user.admin&quot; --allowed-o-auth-flows-user-pool-client | jq -r '.UserPoolClient.ClientId')
+export OAUTH_CLIENT_SECRET=$(aws cognito-idp describe-user-pool-client --user-pool-id $COGNITO_POOL_ID --client-id $OAUTH_CLIENT_ID | jq -r '.UserPoolClient.ClientSecret')
+export COGNITO_DOMAIN=&quot;micronaut-guides-$RANDOM&quot;
+aws cognito-idp create-user-pool-domain --domain $COGNITO_DOMAIN --user-pool-id $COGNITO_POOL_ID</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -408,7 +483,10 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
-<p>The previous configuration uses several placeholders. You will need to set up <code>OAUTH_CLIENT_ID</code>, <code>OAUTH_CLIENT_SECRET</code>, <code>COGNITO_REGION</code> and <code>COGNITO_POOL_ID</code> environment variables.</p>
+<p>The previous configuration uses several placeholders. If you used the AWS CLI, then you are all set.</p>
+</div>
+<div class="paragraph">
+<p>Otherwise, you will need to set up <code>OAUTH_CLIENT_ID</code>, <code>OAUTH_CLIENT_SECRET</code>, <code>COGNITO_REGION</code> and <code>COGNITO_POOL_ID</code> environment variables.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -423,7 +501,7 @@ export COGNITO_POOL_ID=eu-west-XXCCCAZZZ</pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid-configuration</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">curl https://cognito-idp.${COGNITO_REGION}.amazonaws.com/${COGNITO_POOL_ID}/.well-known/openid-configuration</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -436,7 +514,7 @@ export COGNITO_POOL_ID=eu-west-XXCCCAZZZ</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="home">4.4. Home</h3>
+<h3 id="home">5.6. Home</h3>
 <div class="paragraph">
 <p>Create a controller to handle the requests to <code>/</code>. You will display the email of the authenticated person if any. Annotate the controller endpoint with <code>@View</code> since we will use a Thymeleaf template.</p>
 </div>
@@ -523,7 +601,7 @@ injects into the model a <code>security</code> map with the authenticated user. 
 </div>
 </div>
 <div class="sect1">
-<h2 id="running-the-application">5. Running the Application</h2>
+<h2 id="running-the-application">6. Running the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To run the application, use the <code>./mvnw mn:run</code> command, which starts the application on port 8080.</p>
@@ -536,7 +614,7 @@ injects into the model a <code>security</code> map with the authenticated user. 
 </div>
 </div>
 <div class="sect1">
-<h2 id="generate-a-micronaut-application-native-image-with-graalvm">6. Generate a Micronaut Application Native Image with GraalVM</h2>
+<h2 id="generate-a-micronaut-application-native-image-with-graalvm">7. Generate a Micronaut Application Native Image with GraalVM</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native image of our Micronaut application.</p>
@@ -557,7 +635,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </table>
 </div>
 <div class="sect2">
-<h3 id="native-image-generation">6.1. Native image generation</h3>
+<h3 id="native-image-generation">7.1. Native image generation</h3>
 <div class="paragraph">
 <p>The easiest way to install GraalVM on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
 </div>
@@ -611,10 +689,23 @@ If you still use Java 8, use the JDK11 version of GraalVM.
 <p>After you execute the native image, navigate to localhost:8080 and authenticate with Cognito.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="cleanup">7.2. Cleanup</h3>
+<div class="paragraph">
+<p>Once you are done with this guide, you can stop/delete the AWS resources created to avoid incurring unnecessary charges.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">aws cognito-idp delete-user-pool-domain --domain $COGNITO_DOMAIN --user-pool-id $COGNITO_POOL_ID
+aws cognito-idp delete-user-pool-client --client-id $OAUTH_CLIENT_ID --user-pool-id $COGNITO_POOL_ID
+aws cognito-idp delete-user-pool --user-pool-id $COGNITO_POOL_ID</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">7. Next steps</h2>
+<h2 id="next-steps">8. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Read <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth">Micronaut OAuth 2.0 documentation</a> to learn more.</p>
@@ -622,7 +713,7 @@ If you still use Java 8, use the JDK11 version of GraalVM.
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">8. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a href="https://objectcomputing.com">Object Computing, Inc.</a> (OCI) sponsored the creation of this Guide. A variety of consulting and support services are available.</p>
