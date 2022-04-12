@@ -1,0 +1,173 @@
+external:micronaut-cloud-oidc-base/start.adoc[]
+
+common:oracle-cloud-cli.adoc[]
+
+common:oracle-cloud-account.adoc[]
+
+common:completesolution.adoc[]
+
+== Configure OpenID Connect at Oracle Cloud
+
+We'll use the Oracle Cloud web console to create an OAuth 2.0 "Confidential Application" with support for OpenID Connect and a federated user to demonstrate using OpenID Connect with Micronaut and Oracle Cloud.
+
+=== Create a federated user
+
+https://cloud.oracle.com/[Log in to your Oracle Cloud tenancy] as an admin (or a user with sufficient permissions to create users and applications), and from the Oracle Cloud Menu, select "Identity & Security" and then "Federation":
+
+image::cloud-oidc-oracle/federation01.png[]
+
+Click on the link for "OracleIdentityCloudService":
+
+image::cloud-oidc-oracle/federation02.png[]
+
+and then click the "Create User" button:
+
+image::cloud-oidc-oracle/federation03.png[]
+
+Enter a valid username, e.g., "mn_guide_oidc", and a valid email address, along with a first and last name, then click "Create":
+
+image::cloud-oidc-oracle/federation04.png[]
+
+Open the email sent to the email address you specified and click the link to set the password for the user:
+
+image::cloud-oidc-oracle/federation05.png[]
+
+Log in as the user to verify the password, then log out and back in as the admin user.
+
+=== Create the OAuth application
+
+Navigate again to the "OracleIdentityCloudService" federation and copy the link to the "Oracle Identity Cloud Service Console", minus the path (it will look like `\https://idcs-7084de14ec.......identity.oraclecloud.com/`).
+Save this for later when we create a Micronaut application where this value will be used as the `OAUTH_ISSUER`.
+
+Click the "Oracle Identity Cloud Service Console" link to open the console:
+
+image::cloud-oidc-oracle/federation06.png[]
+
+Click the button in the top right of the "Applications and Services" section to create a new application:
+
+image::cloud-oidc-oracle/federation07.png[]
+
+and then click "Confidential Application":
+
+image::cloud-oidc-oracle/federation08.png[]
+
+Enter a valid application name, e.g., "mn_guide_oidc_app" and optionally a description:
+
+image::cloud-oidc-oracle/federation09.png[]
+
+Click "Next" to go to step 2.
+
+Click "Configure this application as a client now", and in the `Allowed Grant Types` section, check `Authorization Code`.
+
+Check `Allow non-HTTPS URLs` for now to make testing easier and avoid having to use HTTPS locally.
+Be sure to unselect this in production applications, which should always use HTTPS.
+
+Enter the following:
+
+ - Redirect URL: `\http://localhost:8080/oauth/callback/micronaut`
+ - Logout URL: `\http://localhost:8080/logout`
+ - Post Logout Redirect URL: `\http://localhost:8080/`
+
+image::cloud-oidc-oracle/federation10.png[]
+
+Scroll down and click the "Add" button in the "Grant the client access to Identity Cloud Service Admin APIs" section:
+
+image::cloud-oidc-oracle/federation11.png[]
+
+Select `Audit Administrator` and `Me`:
+
+image::cloud-oidc-oracle/federation12.png[]
+
+Click "Next", and click "Next" to accept the defaults for steps 3, 4, and 5, then click "Finish"
+
+image::cloud-oidc-oracle/federation13.png[]
+
+Save the "Client ID" and "Client Secret" values for later, then click "Close":
+
+image::cloud-oidc-oracle/federation14.png[]
+
+Finally, click the "Activate" button to make the application available for use:
+
+image::cloud-oidc-oracle/federation15.png[]
+
+=== Enable Signing Certificate Access
+
+We need to make the signing certificate available to our Micronaut application for JWT validation without being authenticated.
+Click the image:cloud-oidc-oracle/burgermenu.png[] ("burger" menu) in the top left, then click "Settings", and then "Default Settings":
+
+image::cloud-oidc-oracle/federation16.png[]
+
+and enable unauthenticated access to the signing certificate:
+
+image::cloud-oidc-oracle/federation17.png[]
+
+common:create-app-features.adoc[]
+
+=== Configuration
+
+Replace the generated `application.yml` with this:
+
+resource:application.yml[]
+
+<1> Set `micronaut.security.authentication` as `idtoken`. The `idtoken` provided by your OAuth 2.0 application when the Authorization code flow ends (a signed JWT) will be saved in a cookie.
+callout:oauth2-client-name[number=2,arg0=micronaut]
+<3> `client-id`, `client-secret`, and the `issuer` URL will be set as environment variables
+<4> Accept GET requests to the `/logout` endpoint
+
+=== Home controller
+
+Create a `HomeController` class to test the security configuration:
+
+source:HomeController[]
+
+callout:controller[number=1,arg0=/]
+callout:secured-anonymous[number=2]
+callout:view[number=3]
+callout:get[number=4,arg0=index,arg1=/]
+callout:secured-is-authenticated[number=5]
+callout:get[number=6,arg0=secured,arg1=/secure]
+<7> This method simply returns a model map that will be rendered as JSON since there's no `@View` annotation
+
+external:micronaut-cloud-oidc-base/view.adoc[]
+
+== Running the Application
+
+Before starting the application, we need to create some environment variables.
+We used placeholders in `application.yml` for the `client-id`, `client-secret`, and the `issuer` URL properties, so we need to create `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, and `OAUTH_ISSUER` environment variables.
+Use the client ID and client secret you saved when you created the Oracle Cloud application, and the issuer URL you saved (the root of the Oracle Identity Cloud Service (OICS) console URL):
+
+[source, bash]
+----
+export OAUTH_CLIENT_ID=XXXXXXXXXX
+export OAUTH_CLIENT_SECRET=YYYYYYYYYY
+export OAUTH_ISSUER=https://idcs-7084de14ec.......identity.oraclecloud.com/
+----
+
+common:env-vars.adoc[]
+
+common:runapp-instructions.adoc[]
+
+Open http://localhost:8080/secure in a browser, and you'll be redirected to the home page because the controller method is annotated with `@Secured(IS_AUTHENTICATED)`, and you're not yet authenticated:
+
+image::cloud-oidc-oracle/run1.png[]
+
+Sign in with the username and password for the federated user you created:
+
+image::cloud-oidc-oracle/run2.png[]
+
+then click Allow on the next screen:
+
+image::cloud-oidc-oracle/run3.png[]
+
+After you're redirected to the home page, you'll see that you're authenticated and now have a `Logout` link, and several authentication details are displayed:
+
+image::cloud-oidc-oracle/run4.png[]
+
+Navigate again to http://localhost:8080/secure in a browser, and you'll see a simple JSON response:
+
+image::cloud-oidc-oracle/run5.png[]
+
+external:micronaut-cloud-oidc-base/end.adoc[]
+
+Check out https://blogs.oracle.com/developers/post/authenticating-users-with-oracle-idcs-via-openid-connect-and-micronaut[this blog post] on using OpenID Connect with Micronaut and Oracle Cloud.
+
