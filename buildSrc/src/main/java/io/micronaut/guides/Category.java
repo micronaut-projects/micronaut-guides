@@ -15,6 +15,7 @@ public enum Category {
     AWS("AWS"),
     AZURE("Micronaut + Microsoft Azure"),
     GCP("Micronaut + Google Cloud"),
+    TURBO("Turbo"),
     ORACLE_CLOUD("Micronaut + Oracle Cloud");
 
     private final String val;

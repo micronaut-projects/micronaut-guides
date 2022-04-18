@@ -1,0 +1,422 @@
+This Guide shows a chat application such as the Rails application show in the  https://www.youtube.com/watch?v=eKY-QES1XQQ[Hotwire announcement screencast]
+
+https://hotwired.dev/[Hotwire: HTML Over the wire]:
+
+____
+Welcome to Hotwire, an umbrella for trio frameworks that implement the HTML-over-the-wire approach to building modern web applications.
+
+At its heart is Turbo, which gives you techniques for bringing the speed of a single-page application without writing a lick of JavaScript.
+___
+
+This guides focus primarily on showing how https://turbo.hotwired.dev/[Turbo] works within a Micronaut application.
+
+== Getting started
+
+link:@sourceDir@.zip[Download] and unzip the source of the guide. You will find two folders:
+
+* `initial` which contains a Micronaut Application without any Turbo Integration.
+* `complete` the resulting Micronaut Application if you you follow the instructions in the next sections and apply these changes to the initial application.
+
+== Running the initial Application
+
+Execute the following command to run a MySQL container:
+
+[source,bash]
+----
+docker run -it --rm \
+	-p 3306:3306 \
+	-e MYSQL_DATABASE=db \
+	-e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+	mysql:8
+----
+
+common:docker-mysql-arm[]
+
+common:runapp-instructions.adoc[]
+
+The application will use two models, `Room` and `Message`.
+
+One `Room` has many `Message`s.
+
+The `initial` application contains a basic editing interface for Chat `Room`s. It uses https://micronaut-projects.github.io/micronaut-views/latest/guide/#thymeleaf[Micronaut Views Thymeleaf] to renders server-side HTML
+
+Moreover, the application leverages https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#fragments[Thymleaf Fragments] to encapsulate the rendering of parts of the screen.
+
+For `Message`s, we'll have just two actions. `create` to render the form to create a message, and `save` to handle the form submission.
+
+It gives us a foundation flow for an admittedly cumbersome chat application which we can then use to level up with https://hotwired.dev/[Hotwire] techniques one at a time.
+
+== Install Turbo
+
+https://turbo.hotwired.dev/handbook/installing#in-compiled-form[Install Turbo] in compiled form by referencing the Turbo distributable script directly in the `<head>` of your application:
+
+[source, html]
+----
+<!DOCTYPE html>
+...
+    <head>
+    ...
+    <script type="module">
+        import hotwiredTurbo from 'https://cdn.skypack.dev/@hotwired/turbo';
+    </script>
+...
+    </head>
+...
+----
+
+== Turbo Frames
+
+So let's introduce our first Turbo feature, Frames.
+
+Turbo Frames decompose pages into independent contexts, which can be lazy-loaded and scope interaction.
+
+So when you follow a link or submit a form, only the content of the Frame changes rather than the entire page.
+
+This allows you to keep the state of the rest of the page from changing, making the app feel more responsive.
+
+To be able to easily see how the Frames work, we'll call them out with a blue border.
+
+resource:assets/stylesheets/application.css[app=complete]
+
+Now let's wrap the Room name and the ability to edit it inside a Frame.
+
+Replace this:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script></script>
+</head>
+<body>
+    <main>
+        <p th:replace="rooms/_room :: room(${room})"></p>
+        <p>
+            <a th:href="@{|/rooms/${room.id}/edit|}" th:text="#{action.edit}"></a> |
+            <a href="/rooms" th:text="#{action.back}"></a>
+        </p>
+        <div id="messages">
+            <div th:each="message : ${room.messages}">
+                <p th:replace="messages/_message :: message(${message})"></p>
+            </div>
+        </div>
+        <a href="/messages/create" th:text="#{message.new}"></a>
+    </main>
+</body>
+</html>
+----
+
+with:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script></script>
+</head>
+<body>
+    <main>
+        <turbo-frame id="room">
+        <p th:replace="rooms/_room :: room(${room})"></p>
+        <p>
+            <a th:href="@{|/rooms/${room.id}/edit|}" th:text="#{action.edit}"></a> |
+            <a href="/rooms" th:text="#{action.back}"></a>
+        </p>
+        </turbo-frame>
+        <div id="messages">
+            <div th:each="message : ${room.messages}">
+                <p th:replace="messages/_message :: message(${message})"></p>
+            </div>
+        </div>
+        <a href="/messages/create" th:text="#{message.new}"></a>
+    </main>
+</body>
+</html>
+----
+
+Please, note the usage of `<turbo-frame id="room">` in the previous code snippet.
+
+The Turbo Frame tag goes around both the initial display, including the Edit link, and the part of the Edit page we want to appear within the Frame.
+
+Replace this:
+
+[source, html]
+.src/main/resources/views/rooms/edit.html
+----
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script></script>
+</head>
+<body>
+    <main>
+        <h1 th:text="#{room.edit}"></h1>
+<p th:replace="rooms/_edit :: edit(${room})"></p>
+        <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.show}"></a> |
+        <a href="/rooms" th:text="#{action.back}"></a>
+    </main>
+</body>
+</html>
+----
+
+with this:
+
+[source, html]
+.src/main/resources/views/rooms/edit.html
+----
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script></script>
+</head>
+<body>
+    <main>
+        <h1 th:text="#{room.edit}"></h1>
+        <turbo-frame id="room">
+        <p th:replace="rooms/_edit :: edit(${room})"></p>
+        </turbo-frame>
+        <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.show}"></a> |
+        <a href="/rooms" th:text="#{action.back}"></a>
+    </main>
+</body>
+</html>
+----
+
+
+We see our Frame wrapped in blue.
+
+And when clicking the Edit link, the form from the Edit screen is presented within.
+
+And upon submission, it's replaced again with just a display.
+
+If we go straight to the full page editing screen, we can see it has both a header and navigation links, parts we were emitting from the Frame.
+
+=== Underscore Top
+
+Note that if we try to click a link within the Frame that goes somewhere without a matching Frame, nothing happens.
+
+We can solve this by adding a Data Turbo Frame attribute that points to underscore top to break out of the Frame, just like traditional HTML frames.
+
+Replace:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+....
+<body>
+    <main>
+        ...
+        <p>
+            ...
+            <a href="/rooms" th:text="#{action.back}"></a>
+....
+----
+
+with:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+....
+<body>
+    <main>
+        ...
+        <p>
+            ...
+            <a data-turbo-frame="_top" href="/rooms" th:text="#{action.back}"></a>
+
+....
+----
+
+Now the back link works and the Frame scopes the Edit Display loop.
+
+=== Lazy Loading Frames
+
+Then let's add the New Message link into an inline but lazy-loaded Turbo Frame tag that also, just for starters, acts on the whole page.
+
+This Frame will be loaded right after the page displays, hitting the New Message Controller action we made earlier.
+
+Replace:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+...
+...
+        <a href="/messages/create" th:text="#{message.new}"></a>
+    </main>
+</body>
+</html>
+----
+
+
+with:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+....
+        <turbo-frame id="new_message"
+                     th:src="@{|/rooms/${room.id}/messages/create|}"
+                     target="_top"></turbo-frame>
+    </main>
+</body>
+</html>
+----
+
+Like with Edit, we wrap the relevant segment in a Frame tag with a matching ID, which is how Turbo knows how to plug out the right Frame.
+
+Replace:
+
+[source, html]
+.src/main/resources/views/messages/create.html
+----
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <script></script>
+    </head>
+<body>
+    <main>
+    <h1 th:text="#{message.new}"></h1>
+<form th:replace="messages/_create :: create(${room})"></form>
+    <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.back}"></a>
+    </main>
+</body>
+</html>
+----
+
+with:
+
+[source, html]
+.src/main/resources/views/messages/create.html
+----
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <script></script>
+    </head>
+<body>
+    <main>
+    <h1 th:text="#{message.new}"></h1>
+    <turbo-frame id="new_message" target="_top">
+        <form th:replace="messages/_create :: create(${room})"></form>
+    </turbo-frame>
+    <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.back}"></a>
+    </main>
+</body>
+</html>
+----
+
+You can now see two requests when we load the room: one for the page, one for the lazy-loader frame.
+
+Let's try to add a message.
+
+It works!
+
+But this only demonstrates that the Frame was lazy-loaded.
+
+Right now, we're resetting the whole page upon submission of the New Message form.
+
+Whereas with the Room Name Frame, you can edit and submit without changing the rest of the page state,
+a real independent context.
+
+You can see how the Frame replacement happens by inspecting the response to edit.
+
+Turbo will plug out just the matching Frame from the server response. As you can see here, the header and links are ignored.
+
+In a Micronaut application, we can optimize the response by using the `@TurboFrameView` annotation to only render the layout which Turbo uses
+when parsing hte response. A Request coming from a Frame includes the HTTP Header `Turbo-Frame`.
+
+TODO
+
+=== Turbo Streams
+
+They deliver page changes over WebSocket or in response to form submissions using  just HTML and a set of CRUD like action tags.
+
+The tags let you append or prepend to replace and remove any target DOM element from the existing page.
+
+They're strictly limited to DOM changes, though. No direct JavaScript invocation.
+
+If you need more than DOM change, connect a Stimulus controller.
+
+We will add a Turbo stream response to the message creation action such that we can add the new Message to the Room page without replacing
+the whole page.
+
+This template invokes the `append` action with the DOM ID of the target container, and either a full set of partial rendering options or just a record we wish to render which conforms to the naming conventions for matching to a partial.
+
+source:MessagesController[app=complete,tag=save]
+
+Now we can add Messages to the page without resetting it completely.
+
+The Edit Name form can stay open while we're doing this, because new Messages are added directly to the Messages div. The Turbo Stream HTML is rendered directly in response to the form submission, and Turbo knows from the MIME type to process it automatically. But notice the input  field isn't cleared. We can fix that by adding  a https://stimulus.hotwired.dev[Stimulus] controller.
+
+___
+Stimulus is a modest JavaScript framework for the HTML you already have.
+___
+
+Add a https://stimulus.hotwired.dev/reference/controllers[Stimulus controller]:
+
+resource:assets/javascripts/controllers/reset_form_controller.js[app=complete]
+
+and register it:
+
+resource:views/layout.html[app=complete,tag=stimulus]
+
+The Stimulus controller we're going to add will be a dead simple way to reset the form after creating a new Message.
+
+It has just one method, Reset, which we will call when Turbo is done submitting the form via Fetch.
+
+Add the `data-controller` and `data-action` attributes to the form:
+
+resource:views/messages/_create.html[app=complete]
+
+The form is reset and the `Message` added dynamically.
+
+== Turbo Streams via Web Sockets
+
+But how interesting is a chat app where you're just talking to yourself?
+
+Let's start a conversation with another window.
+
+You'll see that new Messages are only added live to the originator's window.
+
+On the other side, we have to reload to see what's been said.
+
+Let's fix that.
+
+When the message is saved raise an event:
+
+source:services.DefaultMessageService[]
+
+<1> Inject `ApplicationEventPublisher` to publish events.
+<2> Publish an event when the message is saved.
+
+Create a https://docs.micronaut.io/latest/guide/#websocketServer[WebSocket Server] which publish a Turbo Stream when a message event is received.
+
+source:ChatServerWebSocket[]
+
+Establish a WebSocket connection to the websocket server identified by the `Room` we're in.
+
+resource:views/rooms/show.html[app=complete]
+
+This method call mirrors what we're already doing in the Turbo Stream template, just over WebSocket now.
+
+Now we can add a new message and see it appear in both windows.
+
+=== Next
+
+https://hotwired.dev[Hotwire] is an alternative approach to building modern web applications without using much JavaScript by sending HTML instead of JSON over the wire.
+
+We get to keep all our template rendering on the server, which means writing more of our application in our favorite programming languages.
+
+* https://micronaut-projects.github.io/micronaut-views/latest/guide/#turbo[Micronaut Turbo]
+* https://turbo.hotwired.dev/[Turbo]
+* https://stimulus.hotwired.dev/[Stimulus]
+
+
+
