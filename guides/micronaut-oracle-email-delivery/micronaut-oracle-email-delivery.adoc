@@ -1,0 +1,309 @@
+common:header.adoc[]
+
+We'll use https://micronaut-projects.github.io/micronaut-email/latest/guide/[Micronaut Email] to send emails with the https://javaee.github.io/javamail/[JavaMail API], using the Oracle Cloud Infrastructure (OCI) https://docs.oracle.com/en-us/iaas/Content/Email/Concepts/overview.htm[Email Delivery Service].
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+common:oracle-cloud-account.adoc[]
+common:oracle-cloud-cli.adoc[]
+
+common:completesolution.adoc[]
+
+== Setup OCI Email Delivery
+
+To configure email delivery, we need to add an "Approved Sender", generate SMTP credentials, and find the SMTP Endpoint for your region.
+
+=== Approved Sender
+
+The approved sender is a regular user. The user must be granted permission to send emails via an https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/overview.htm[IAM policy statement], so we'll add the user to a new group and grant permission to the group to support future approved email senders.
+
+==== Create a new group
+
+https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/iam/group/create.html[Create a group] by running:
+
+[source,bash]
+----
+oci iam group create --description "email sender group" --name "mn-email-group"
+----
+
+The response should look like this:
+
+[source,json]
+----
+{
+  "data": {
+    "compartment-id": "ocid1.tenancy.oc1..aaaaaaaa...",
+    "description": "email sender group",
+    "id": "ocid1.group.oc1..aaaaaaaaqx...",
+    "inactive-status": null,
+    "lifecycle-state": "ACTIVE",
+    "name": "mn-email-group",
+    ...
+  }
+}
+----
+
+Save the group `id` as an environment variable:
+
+[source,bash]
+----
+export GRP_ID=ocid1.group.oc1..aaaaaaaaqx...
+----
+
+common:env-vars.adoc[]
+
+==== Create a new user
+
+https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/iam/user/create.html[Create a user] by running:
+
+[source,bash]
+----
+oci iam user create --description "email sender" --name "mn-email-user"
+----
+
+The response should look like this:
+
+[source,json]
+----
+{
+  "data": {
+    "compartment-id": "ocid1.tenancy.oc1..aaaaaaaaud4g...",
+    "description": "email sender",
+    "id": "ocid1.user.oc1..aaaaaaaaqx...",
+    "lifecycle-state": "ACTIVE",
+    "name": "mn-email-user",
+    ...
+  }
+}
+----
+
+Save the user `id` as an environment variable:
+
+[source,bash]
+----
+export USR_ID=ocid1.user.oc1..aaaaaaaaqx...
+----
+
+==== Add the user to the group
+
+https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/iam/group/add-user.html[Add the user to the group] by running:
+
+[source,bash]
+----
+oci iam group add-user --group-id $GRP_ID --user-id $USR_ID
+----
+
+==== Compartment OCID
+
+Find the https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/iam/compartment/list.html[OCID of the compartment] where the IAM policy will be created. Run this to list the compartments in your root compartment:
+
+[source,bash]
+----
+oci iam compartment list
+----
+
+and find the compartment by the name or description in the JSON output. It should look like this:
+
+[source,json]
+----
+{
+  "compartment-id": "ocid1.tenancy.oc1..aaaaaaaaud4g4e5ovjaw...",
+  "description": "Micronaut guides",
+  "id": "ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...",
+  "lifecycle-state": "ACTIVE",
+  "name": "micronaut-guides",
+  ...
+}
+----
+
+Save the compartment `id` as an environment variable:
+
+[source,bash]
+----
+export C=ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...
+----
+
+==== IAM policy
+
+https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/iam/policy/create.html[Create an IAM policy] to grant members of the group permission to send emails:
+
+For Linux or Mac, run
+[source,bash]
+----
+oci iam policy create -c $C --description "mn-email-guide-policy" \
+ --name "mn-email-guide-policy" \
+ --statements '["Allow group mn-email-group to use email-family in compartment id ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm..."]'
+----
+
+or for Windows
+[source,bash]
+----
+oci iam policy create -c %C% --description "mn-email-guide-policy" \
+ --name "mn-email-guide-policy" \
+ --statements "[\"Allow group mn-email-group to use email-family in compartment id %C%\"]"
+----
+
+=== Generate SMTP credentials
+
+https://docs.oracle.com/en-us/iaas/Content/Email/Tasks/generatesmtpcredentials.htm[Generate SMTP credentials] for the user by running:
+
+[source,bash]
+----
+oci iam smtp-credential create --description "mn-email-user smtp credentials" --user-id $USR_ID
+----
+
+The response should look like this:
+
+[source,json]
+----
+{
+  "data": {
+    "description": "mn-email-user smtp credentials",
+    "id": "ocid1.credential.oc1..aaaaaaaal...",
+    "lifecycle-state": "ACTIVE",
+    "password": "nB$O;.......",
+    "user-id": "ocid1.user.oc1..aaaaaaaaqx...",
+    "username": "ocid1.user.oc1..aaaaaaaaqx...@ocid1.tenancy.oc1..aaaaaaaa....me.com"
+  }
+}
+----
+
+Save the `username` and `password` from the response; we'll need those later.
+
+=== Add an approved sender
+
+https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.10.4/oci_cli_docs/cmdref/email/sender/create.html[Create an email sender] by running:
+
+[source,bash]
+----
+oci email sender create -c $C --email-address noreply@test.com
+----
+
+NOTE: `email-address` is the "from" address
+
+=== SMTP Endpoint
+
+Each region in Oracle Cloud has an SMTP endpoint to use as the SMTP server address. https://docs.oracle.com/en-us/iaas/Content/Email/Tasks/configuresmtpconnection.htm[Find the endpoint] for your region and save the URL, e.g., `smtp.email.us-ashburn-1.oci.oraclecloud.com`; we'll need that for the application configuration.
+
+== Writing the App
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli-command@ example.micronaut.micronautguide \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+common:annotationprocessors.adoc[]
+
+=== Add Dependencies
+
+Add these dependencies to your build to add email support. Only the first is required; if you won't be using templates for emails you can omit the other two:
+
+:dependencies:
+
+dependency:micronaut-email-javamail[groupId=io.micronaut.email]
+dependency:micronaut-email-template[groupId=io.micronaut.email]
+dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+
+:dependencies:
+
+=== Create a SessionProvider
+
+Micronaut Email requires a bean that implements the `SessionProvider` interface when using JavaMail to create a `Session`. Create the `OciSessionProvider` class:
+
+source:OciSessionProvider[]
+
+callout:singleton[1]
+<2> Inject the username and password from the configuration
+<3> Use the username and password to create the `Session`
+
+=== EmailController class
+
+Create a controller that uses the Micronaut EmailSender to send emails:
+
+source:EmailController[]
+
+=== Configuration
+
+Replace the generated `application.yml` with this:
+
+resource:application.yml[]
+
+<1> the "from" email
+<2> the "from" email name
+<3> the SMTP password
+<4> the SMTP username
+<5> the SMTP server
+
+=== Set Configuration Variables
+
+It's best to avoid hard-coding credentials and other sensitive information directly in config files. By using placeholder variables in `application.yml` like `SMTP_PASSWORD` and `SMTP_USER`, we can externalize the values via environment variables or secure storage such as OCI Vault.
+
+For simplicity, we'll use environment variables. Set the "from" email to the value you used earlier, and choose a "from" name. Set the SMTP username and password from the values you saved earlier when you generated the SMTP credentials, and set the SMTP server as the regional endpoint:
+
+[source,bash]
+----
+export FROM_EMAIL=noreply@test.com
+export FROM_NAME=noreply
+export SMTP_PASSWORD="nB$O;......."
+export SMTP_USER="ocid1.user.oc1..aaaaaaaaqx...@ocid1.tenancy.oc1..aaaaaaaa....me.com"
+export SMTP_HOST=smtp.email.us-ashburn-1.oci.oraclecloud.com
+----
+
+=== Writing Tests
+
+Create a test class to ensure emails are sent successfully:
+
+test:EmailControllerTest[]
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+Run some cURL requests to test the application:
+
+Send a simple plain-text email:
+
+[source, bash]
+----
+curl -X POST localhost:8080/email/basic
+----
+
+Send a templated email:
+
+[source, bash]
+----
+curl -X POST localhost:8080/email/template/test
+----
+
+Send an email with an attachment. If you use Mac/Linux, run
+
+[source, bash]
+----
+curl -X POST -H "Content-Type: multipart/form-data" -F "file=@ /Users/test/Pictures/demo/email.jpg" localhost:8080/email/attachment
+----
+
+and run this if using Windows:
+
+[source, bash]
+----
+curl -X POST -H "Content-Type: multipart/form-data" -F "file=@C:\Users\username\Downloads\email.png" localhost:8080/email/attachment
+----
+
+== Next steps
+
+Read more about the https://micronaut-projects.github.io/micronaut-email/latest/guide/[Micronaut Email] project.
+
+Learn about the OCI https://docs.oracle.com/en-us/iaas/Content/Email/Concepts/overview.htm[Email Delivery Service]
+
+See https://recursive.codes/blog/post/2128[this blog post] which covers much of the same material as this guide.
