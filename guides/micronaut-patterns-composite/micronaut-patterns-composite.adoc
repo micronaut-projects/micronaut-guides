@@ -1,0 +1,108 @@
+common:header-top.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Composite Pattern
+
+Imagine you want to create an API to resolve a color:
+
+source:ColorFetcher[]
+
+callout:functional-interface[1]
+callout:ordered[2]
+
+== Http Header
+
+You may write an implementation which searches for a color in an HTTP Header.
+
+source:HttpHeaderColorFetcher[]
+
+callout:singleton[1]
+callout:override-get-order[2]
+
+You could test the previous class with:
+
+test:HttpHeaderColorFetcherTest[]
+
+callout:spec-name[1]
+callout:micronaut-test[2]
+callout:http-client[3]
+
+== Path
+
+You could have another naive implementation which uses the HTTP Request's path.
+
+source:PathColorFetcher[]
+
+callout:singleton[1]
+callout:override-get-order[2]
+
+You could test the previous class with:
+
+test:PathColorFetcherTest[]
+
+callout:spec-name[1]
+callout:micronaut-test[2]
+callout:http-client[3]
+
+== Controller
+
+If you create a controller which injects via constructor injection a bean of type `ColorFetcher`,
+you will get the following exception:
+
+[source,bash]
+----
+Message: Multiple possible bean candidates found:
+[example.micronaut.PathColorFetcher,
+example.micronaut.HttpHeaderColorFetcher]
+Path Taken: new ColorController(ColorFetcher colorFetcher)
+--> new ColorController([ColorFetcher colorFetcher])
+io.micronaut.context.exceptions.DependencyInjectionException:
+Failed to inject value for parameter [colorFetcher]
+of class: example.micronaut.ColorController
+----
+
+source:ColorController[]
+
+callout:controller[number=1,arg0=/color]
+callout:constructor-di[number=2,arg0=ColorFetcher]
+callout:text-plain[3]
+callout:get[number=4,arg0=mint,arg1=/mint]
+callout:request-controller-method-parameter[5]
+
+=== Primary
+
+Create a new implementation of `ColorFetcher`. It traverses every other implementation of `ColorFetcher` in order.
+
+source:CompositeColorFetcher[]
+
+callout:primary[1]
+callout:singleton[2]
+<3> `ColorFetcher` implements `Ordered`. Because of that, you can inject an ordered list of beans of type `ColorFetcher`. You get every bean of type `ColorFetcher` but `CompositeColorFetcher`.
+
+You can test that `CompositeColorFetcher` is primary bean of type `ColorFetcher`.
+
+test:CompositeColorFetcherTest[]
+
+callout:micronaut-test-start-application-false[1]
+
+Moreover, you can test the previous controller with:
+
+test:ColorControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+
+== Next Steps
+
+- Read more about https://docs.micronaut.io/latest/guide/#_primary_and_secondary_beans[Primary and Secondary Beans].
+
+The Composite pattern is used in several places within the framework. For example:
+
+- https://docs.micronaut.io/latest/api/io/micronaut/discovery/CompositeDiscoveryClient.html[CompositeDiscoveryClient]
+- https://docs.micronaut.io/latest/api/io/micronaut/http/server/util/locale/CompositeHttpLocaleResolver.html[CompositeHttpLocaleResolver]
+- https://docs.micronaut.io/latest/api/io/micronaut/runtime/context/CompositeMessageSource.html[CompositeMessageSource]
+
+common:helpWithMicronaut.adoc[]
