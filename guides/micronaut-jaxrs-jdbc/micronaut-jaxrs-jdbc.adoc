@@ -10,13 +10,20 @@ ____
 
 This application exposes some REST endpoints using https://projects.eclipse.org/projects/ee4j.jaxrs[JAX-RS annotations] and stores data in a MySQL database using Micronaut Data JDBC.
 
-common:requirements-mysql-testcontainers.adoc[]
+:containerized: MySQL
+common:requirements-testcontainers.adoc[]
 
 common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
-common:datasource-configuration.adoc[]
+=== Data Source configuration
+
+Define the datasource in `src/main/resources/application.yml`.
+
+resource:application.yml[tag=datasource]
+
+NOTE: This way of defining datasource properties enables us to externalize the configuration, for example for a production environment, and also provide a default value for development. If the environment variables are not defined, the Micronaut framework will use the default values.
 
 common:flyway.adoc[]
 
@@ -88,9 +95,8 @@ Add a test for the resource:
 
 test:PetResourceTest[]
 
-callout:micronaut-test-transactional-false[1]
-callout:http-client[2]
-<3> Micronaut returns a 404 response if the resource method returns an empty optional.
+callout:http-client[1]
+<2> Micronaut returns a 404 response if the resource method returns an empty optional.
 
 common:testApp.adoc[]
 

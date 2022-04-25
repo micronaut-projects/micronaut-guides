@@ -22,12 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@MicronautTest(transactional = false) // <1>
 public class PetResourceTest {
 
     @Inject
     @Client("/")
-    HttpClient httpClient; // <2>
+    HttpClient httpClient; // <1>
 
     @Inject
     PetRepository repository;
@@ -79,7 +78,7 @@ public class PetResourceTest {
         Executable e = () -> httpClient.toBlocking()
                 .exchange(HttpRequest.GET(uri), Pet.class);
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, e);
-        assertEquals(HttpStatus.NOT_FOUND , thrown.getResponse().status()); // <3>
+        assertEquals(HttpStatus.NOT_FOUND , thrown.getResponse().status()); // <2>
 
         repository.deleteById(id);
     }
