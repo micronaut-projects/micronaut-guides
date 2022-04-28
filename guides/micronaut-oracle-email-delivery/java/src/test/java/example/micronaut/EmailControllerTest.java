@@ -30,13 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Property(name = "spec.name", value = "EmailControllerTest")
-@MicronautTest
+@Property(name = "spec.name", value = "EmailControllerTest") // <1>
+@MicronautTest // <2>
 class EmailControllerTest {
 
     @Inject
     @Client("/")
-    HttpClient client;
+    HttpClient client; // <3>
 
     @Inject
     BeanContext beanContext;
