@@ -1,4 +1,4 @@
-package websocket.chat
+package example.micronaut
 
 import groovy.transform.CompileStatic
 import io.micronaut.context.ApplicationContext

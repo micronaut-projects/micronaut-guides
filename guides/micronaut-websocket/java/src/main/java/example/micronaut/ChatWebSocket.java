@@ -1,4 +1,4 @@
-package websocket.chat;
+package example.micronaut;
 
 import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
@@ -10,21 +10,21 @@ import org.reactivestreams.Publisher;
 
 import java.util.function.Predicate;
 
-@ServerWebSocket("/ws/chat/{topic}/{username}")
+@ServerWebSocket("/ws/chat/{topic}/{username}") // <1>
 public class ChatWebSocket {
-    private WebSocketBroadcaster broadcaster;
+    private WebSocketBroadcaster broadcaster; // <2>
     
     public ChatWebSocket(WebSocketBroadcaster broadcaster) {
         this.broadcaster = broadcaster;
     }
 
-    @OnOpen
+    @OnOpen // <3>
     public Publisher<String> onOpen(String topic, String username, WebSocketSession session) {
         String msg = "[" + username + "] Joined!";
         return broadcaster.broadcast(msg, isValid(topic));
     }
 
-    @OnMessage
+    @OnMessage // <4>
     public Publisher<String> onMessage(
             String topic,
             String username,
@@ -34,7 +34,7 @@ public class ChatWebSocket {
         return broadcaster.broadcast(msg, isValid(topic));
     }
 
-    @OnClose
+    @OnClose // <5>
     public Publisher<String> onClose(
             String topic,
             String username,
