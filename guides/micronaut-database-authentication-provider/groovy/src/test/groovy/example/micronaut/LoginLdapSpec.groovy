@@ -35,7 +35,7 @@ class LoginLdapSpec extends Specification {
         when:
         HttpRequest request = HttpRequest.create(POST, '/login')
             .accept(APPLICATION_JSON_TYPE)
-            .body(new UsernamePasswordCredentials('euler', 'password')) // <4>
+            .body(new UsernamePasswordCredentials('sherlock', 'elementary')) // <4>
         HttpResponse<AccessRefreshToken> rsp = client.toBlocking().exchange(request, AccessRefreshToken)
 
         then:
@@ -60,7 +60,7 @@ class LoginLdapSpec extends Specification {
         when:
         HttpRequest request = HttpRequest.create(POST, '/login')
             .accept(APPLICATION_JSON_TYPE)
-            .body(new UsernamePasswordCredentials('euler', 'password')) // <4>
+            .body(new UsernamePasswordCredentials('sherlock', 'elementary')) // <4>
         HttpResponse<AccessRefreshToken> rsp = client.toBlocking().exchange(request, AccessRefreshToken)
 
         then:
