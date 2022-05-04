@@ -265,7 +265,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/i18n/messages.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">Unresolved directive in localized-message-source-gradle-kotlin.adoc - include::build/code/localized-message-source/localized-message-source-gradle-kotlin/src/main/resources/i18n/messages.properties[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties">hello.world=Hello World</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -274,7 +274,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/i18n/messages_es.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">Unresolved directive in localized-message-source-gradle-kotlin.adoc - include::build/code/localized-message-source/localized-message-source-gradle-kotlin/src/main/resources/i18n/messages_es.properties[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties">hello.world=Hola Mundo</code></pre>
 </div>
 </div>
 </div>
@@ -286,7 +286,20 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/MessageSourceFactory.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in localized-message-source-gradle-kotlin.adoc - include::build/code/localized-message-source/localized-message-source-gradle-kotlin/src/main/kotlin/example/micronaut/MessageSourceFactory.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.MessageSource
+import io.micronaut.context.annotation.Factory
+import io.micronaut.context.i18n.ResourceBundleMessageSource
+import jakarta.inject.Singleton
+
+@Factory <i class="conum" data-value="1"></i><b>(1)</b>
+class MessageSourceFactory {
+
+    @Singleton <i class="conum" data-value="2"></i><b>(2)</b>
+    fun createMessageSource(): MessageSource =
+        ResourceBundleMessageSource(&quot;i18n.messages&quot;)
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -307,7 +320,24 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/HelloWorldController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in localized-message-source-gradle-kotlin.adoc - include::build/code/localized-message-source/localized-message-source-gradle-kotlin/src/main/kotlin/example/micronaut/HelloWorldController.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.LocalizedMessageSource
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Produces
+import java.util.Optional
+
+@Controller <i class="conum" data-value="1"></i><b>(1)</b>
+class HelloWorldController(private val messageSource: LocalizedMessageSource) { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
+    @Get<i class="conum" data-value="4"></i><b>(4)</b>
+    fun index(): Optional&lt;String&gt; { <i class="conum" data-value="5"></i><b>(5)</b>
+        return messageSource.getMessage(&quot;hello.world&quot;) <i class="conum" data-value="6"></i><b>(6)</b>
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -336,7 +366,34 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/HelloWorldControllerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in localized-message-source-gradle-kotlin.adoc - include::build/code/localized-message-source/localized-message-source-gradle-kotlin/src/test/kotlin/example/micronaut/HelloWorldControllerTest.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.HttpHeaders
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+
+@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
+class HelloWorldControllerTest {
+
+    @Inject
+    @field:Client(&quot;/&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
+    lateinit var httpClient: HttpClient
+
+    @Test
+    fun useOfLocalizedMessageSource() {
+        val client = httpClient.toBlocking()
+        var request: HttpRequest&lt;*&gt;? = HttpRequest.GET&lt;Any&gt;(&quot;/&quot;)
+            .header(HttpHeaders.ACCEPT_LANGUAGE, &quot;es&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
+        assertEquals(&quot;Hola Mundo&quot;, client.retrieve(request))
+        request = HttpRequest.GET&lt;Any&gt;(&quot;/&quot;)
+        assertEquals(&quot;Hello World&quot;, client.retrieve(request))
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">

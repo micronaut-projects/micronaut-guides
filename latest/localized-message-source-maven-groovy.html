@@ -253,7 +253,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/i18n/messages.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">Unresolved directive in localized-message-source-maven-groovy.adoc - include::build/code/localized-message-source/localized-message-source-maven-groovy/src/main/resources/i18n/messages.properties[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties">hello.world=Hello World</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -262,7 +262,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/i18n/messages_es.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">Unresolved directive in localized-message-source-maven-groovy.adoc - include::build/code/localized-message-source/localized-message-source-maven-groovy/src/main/resources/i18n/messages_es.properties[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties">hello.world=Hola Mundo</code></pre>
 </div>
 </div>
 </div>
@@ -274,7 +274,22 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/MessageSourceFactory.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> localized-message-source-maven-groovy.adoc - <span class="key">include</span>::build/code/localized-message-source/localized-message-source-maven-groovy/src/main/groovy/example/micronaut/MessageSourceFactory.groovy<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.MessageSource</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Factory</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.i18n.ResourceBundleMessageSource</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Factory</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">MessageSourceFactory</span> {
+    <span class="annotation">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    MessageSource createMessageSource() {
+        <span class="keyword">return</span> <span class="keyword">new</span> ResourceBundleMessageSource(<span class="string"><span class="delimiter">'</span><span class="content">i18n.messages</span><span class="delimiter">'</span></span>)
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -295,7 +310,31 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/HelloWorldController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> localized-message-source-maven-groovy.adoc - <span class="key">include</span>::build/code/localized-message-source/localized-message-source-maven-groovy/src/main/groovy/example/micronaut/HelloWorldController.groovy<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.LocalizedMessageSource</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">HelloWorldController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> LocalizedMessageSource messageSource
+
+    HelloWorldController(LocalizedMessageSource messageSource) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.messageSource = messageSource
+    }
+
+    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Get</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    Optional&lt;<span class="predefined-type">String</span>&gt; index() { <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="keyword">return</span> messageSource.getMessage(<span class="string"><span class="delimiter">'</span><span class="content">hello.world</span><span class="delimiter">'</span></span>) <i class="conum" data-value="6"></i><b>(6)</b>
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -324,7 +363,40 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/HelloWorldControllerSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> localized-message-source-maven-groovy.adoc - <span class="key">include</span>::build/code/localized-message-source/localized-message-source-maven-groovy/src/test/groovy/example/micronaut/HelloWorldControllerSpec.groovy<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpHeaders</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">HelloWorldControllerSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+    HttpClient httpClient
+
+    <span class="type">void</span> useOfLocalizedMessageSource() {
+        <span class="key">when</span>:
+        BlockingHttpClient client = httpClient.toBlocking()
+        HttpRequest&lt;?&gt; request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
+                .header(HttpHeaders.ACCEPT_LANGUAGE, <span class="string"><span class="delimiter">'</span><span class="content">es</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+
+        <span class="key">then</span>:
+        <span class="string"><span class="delimiter">'</span><span class="content">Hola Mundo</span><span class="delimiter">'</span></span> == client.retrieve(request)
+
+        <span class="key">when</span>:
+        request = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
+
+        <span class="key">then</span>:
+        <span class="string"><span class="delimiter">'</span><span class="content">Hello World</span><span class="delimiter">'</span></span> == client.retrieve(request)
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
