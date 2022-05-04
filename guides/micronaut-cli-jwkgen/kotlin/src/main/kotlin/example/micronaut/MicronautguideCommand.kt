@@ -10,7 +10,7 @@ import picocli.CommandLine.Option
          mixinStandardHelpOptions = true) // <1>
 class MicronautguideCommand : Runnable {
 
-    @Option(names = ["-kid"],
+    @Option(names = ["-kid"], // <2>
             required = false,
             description = ["Key ID. Parameter is used to match a specific key. If not specified a random Key ID is generated."])
     private var kid: String? = null
