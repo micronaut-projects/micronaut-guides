@@ -22,7 +22,7 @@ class Fruit {
     @Nullable
     String description
 
-    Fruit(@NonNull @NotBlank String name, @Nullable String description) {
+    Fruit(@NonNull String name, @Nullable String description) {
         this.name = name
         this.description = description
     }
