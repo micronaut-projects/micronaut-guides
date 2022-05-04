@@ -29,3 +29,24 @@ image::aws-cognito-3.png[]
 Save the client id and client secret:
 
 image::aws-cognito-4.png[]
+
+=== Add a domain
+
+image::aws-cognito-domain.png[]
+
+=== Using the AWS CLI
+
+common:jq[]
+
+Alternatively, you can use the AWS CLI to create the user pool and client (change the region to your desired value):
+
+[source,bash]
+----
+export COGNITO_REGION=eu-west-1
+export COGNITO_POOL_ID=$(aws cognito-idp create-user-pool --pool-name "Micronaut Guides" --username-attributes "email" --auto-verified-attributes "email" | jq -r '.UserPool.Id')
+export OAUTH_CLIENT_ID=$(aws cognito-idp create-user-pool-client --generate-secret --user-pool-id $COGNITO_POOL_ID --client-name "AWS Cognito Micronaut Tutorial" --callback-urls "http://localhost:8080/oauth/callback/cognito" --logout-urls "http://localhost:8080/logout" --supported-identity-providers COGNITO --allowed-o-auth-flows "code" --allowed-o-auth-scopes "phone" "email" "openid" "profile" "aws.cognito.signin.user.admin" --allowed-o-auth-flows-user-pool-client | jq -r '.UserPoolClient.ClientId')
+export OAUTH_CLIENT_SECRET=$(aws cognito-idp describe-user-pool-client --user-pool-id $COGNITO_POOL_ID --client-id $OAUTH_CLIENT_ID | jq -r '.UserPoolClient.ClientSecret')
+export COGNITO_DOMAIN="micronaut-guides-$RANDOM"
+aws cognito-idp create-user-pool-domain --domain $COGNITO_DOMAIN --user-pool-id $COGNITO_POOL_ID
+----
+
