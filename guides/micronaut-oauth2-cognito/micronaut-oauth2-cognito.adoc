@@ -2,6 +2,8 @@ common:header.adoc[]
 
 common:requirements.adoc[]
 
+common:aws.adoc[]
+
 common:completesolution.adoc[]
 
 common:create-app.adoc[]
@@ -41,7 +43,9 @@ callout:oauth2-client-name[number=2,arg0=cognito]
 <5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server. Note: we will use the pool id and region mentioned previously.
 <6> Accept GET request to the `/logout` endpoint.
 
-The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `COGNITO_REGION` and `COGNITO_POOL_ID` environment variables.
+The previous configuration uses several placeholders. If you used the AWS CLI, then you are all set.
+
+Otherwise, you will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `COGNITO_REGION` and `COGNITO_POOL_ID` environment variables.
 
 [soruce, bash]
 ----
@@ -55,7 +59,7 @@ Although undocumented in the https://docs.aws.amazon.com/cognito/latest/develope
 
 [source, bash]
 ----
-https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid-configuration
+curl https://cognito-idp.${COGNITO_REGION}.amazonaws.com/${COGNITO_POOL_ID}/.well-known/openid-configuration
 ----
 
 We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
@@ -93,6 +97,17 @@ common:graal-with-plugins.adoc[]
 After you execute the native image, navigate to localhost:8080 and authenticate with Cognito.
 
 :exclude-for-languages:
+
+=== Cleanup
+
+Once you are done with this guide, you can stop/delete the AWS resources created to avoid incurring unnecessary charges.
+
+[source,bash]
+----
+aws cognito-idp delete-user-pool-domain --domain $COGNITO_DOMAIN --user-pool-id $COGNITO_POOL_ID
+aws cognito-idp delete-user-pool-client --client-id $OAUTH_CLIENT_ID --user-pool-id $COGNITO_POOL_ID
+aws cognito-idp delete-user-pool --user-pool-id $COGNITO_POOL_ID
+----
 
 == Next steps
 
