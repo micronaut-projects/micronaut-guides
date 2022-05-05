@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Introspected
-public class PetSaveCommand {
+public class PetSave {
     @NonNull
     @NotBlank
     private final String name;
@@ -16,8 +16,7 @@ public class PetSaveCommand {
     @NotNull
     private final PetType type;
 
-    public PetSaveCommand(@NonNull String name,
-                          @NonNull PetType type) {
+    public PetSave(@NonNull String name, @NonNull PetType type) {
         this.name = name;
         this.type = type;
     }
