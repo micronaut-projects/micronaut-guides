@@ -10,7 +10,6 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
-
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.function.Executable;
 
@@ -22,11 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@MicronautTest(transactional = false) // <1>
 public class PetResourceTest {
 
     @Inject
     @Client("/")
-    HttpClient httpClient; // <1>
+    HttpClient httpClient; // <2>
 
     @Inject
     PetRepository repository;
