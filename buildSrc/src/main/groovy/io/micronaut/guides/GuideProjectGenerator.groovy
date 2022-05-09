@@ -112,7 +112,8 @@ class GuideProjectGenerator implements AutoCloseable {
                         openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
                             definitionFile: it.openAPIGeneratorConfig.definitionFile,
                             generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
-                            properties: it.openAPIGeneratorConfig.properties ?: [:]
+                            properties: it.openAPIGeneratorConfig.properties ?: [:],
+                            globalProperties: it.openAPIGeneratorConfig.globalProperties ?: [:]
                         ) : null)
                 }
         ))
