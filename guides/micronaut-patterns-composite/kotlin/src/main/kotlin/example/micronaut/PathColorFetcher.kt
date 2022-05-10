@@ -1,16 +1,25 @@
-package example.micronaut;
+package example.micronaut
 
-import io.micronaut.http.HttpRequest;
-import jakarta.inject.Singleton;
-
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Stream;
+import io.micronaut.http.HttpRequest
+import jakarta.inject.Singleton
+import java.util.Locale
+import java.util.Optional
+import java.util.stream.Stream
 
 @Singleton // <1>
-public class PathColorFetcher implements ColorFetcher {
+class PathColorFetcher : ColorFetcher {
 
-    private static final String[] COLORS = {
+    override fun favouriteColor(request: HttpRequest<*>): Optional<String> {
+        return Stream.of(*COLORS)
+            .filter { request.path.contains(it.lowercase()) }
+            .map { it.lowercase(Locale.getDefault()) }
+            .findFirst()
+    }
+
+    override fun getOrder(): Int = 20 // <2>
+
+    companion object {
+        private val COLORS = arrayOf(
             "Red",
             "Blue",
             "Green",
@@ -50,18 +59,6 @@ public class PathColorFetcher implements ColorFetcher {
             "Turquoise",
             "Amber",
             "Mint"
-    };
-
-    @Override
-    public Optional<String> favouriteColor(HttpRequest<?> request) {
-        return Stream.of(COLORS)
-                .filter(c -> request.getPath().contains(c.toLowerCase(Locale.ROOT)))
-                .map(String::toLowerCase)
-                .findFirst();
-    }
-
-    @Override
-    public int getOrder() { // <2>
-        return 20;
+        )
     }
 }

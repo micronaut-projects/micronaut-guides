@@ -3,6 +3,7 @@ package example.micronaut;
 import io.micronaut.context.annotation.Primary;
 import io.micronaut.http.HttpRequest;
 import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.Optional;
 
