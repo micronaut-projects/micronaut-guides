@@ -1,0 +1,183 @@
+common:header.adoc[]
+
+You will use https://microstream.one/[MicroStream] for persistence.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Dependencies
+
+The `microstream` features adds the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-microstream-annotations[groupId=io.micronaut.microstream,scope=annotationProcessor]
+dependency:micronaut-microstream-annotations[groupId=io.micronaut.microstream]
+dependency:micronaut-microstream[groupId=io.micronaut.microstream]
+
+:dependencies:
+
+=== Root Object
+
+:exclude-for-languages:groovy
+
+Create a `FruitContainer` POJO which we will be used as the root of our object graph.
+
+:exclude-for-languages:
+
+:exclude-for-languages:java
+
+Create a `FruitContainer` POGO which will be used as the root of our object graph.
+
+:exclude-for-languages:
+
+source:FruitContainer[]
+
+callout:introspected[1]
+
+=== Domain object
+
+Create a `Fruit` class which will be used as the domain object.
+
+source:Fruit[]
+
+callout:introspected[1]
+callout:constraints[2]
+<3> The description is allowed to be null.
+
+=== Command object
+
+And a `FruitCommand` class which will be used as the command object over HTTP.
+
+source:FruitCommand[]
+
+callout:introspected[1]
+callout:constraints[2]
+<3> The description is allowed to be null.
+
+=== Repository
+
+Create a repository interface to encapsulate the CRUD actions for `Fruit`.
+
+source:FruitRepository[]
+
+=== Error handling
+
+In the event an attempt is made to create a duplicate fruit, we will catch the exception with a custom class.
+
+source:FruitDuplicateException[]
+
+This exception will be handled by a custom ExceptionHandler to return a 400 error with a sensible message.
+
+source:FruitDuplicateExceptionHandler[]
+
+callout:produces-json[number=1]
+callout:singleton[number=2]
+
+=== Repository implementation
+
+Implement the `FruitRepository` interface.
+
+When an object in your graph changes, you need to persist the object that contains the change.
+This can be achieved through the `StoreParams` and `StoreReturn` annotations
+
+source:FruitRepositoryImpl[]
+
+callout:singleton[number=1]
+callout:constructor-di[number=2,arg0=RootProvider]
+<3> Return all the values in the `FruitContainer`.
+<4> With `@StoreParams`, on successful completion of this method, the Map argument `fruits` will be persisted in MicroStream.
+<5> With `@StoreReturn`, on successful completion of this method, the return value will be persisted in MicroStream.
+
+=== Controller
+
+Create `FruitController`:
+
+source:FruitController[]
+
+callout:controller[number=1,arg0=/fruits]
+callout:constructor-di[number=2,arg0=FruitRepository]
+callout:get[number=3,arg0=list,arg1=/fruits]
+callout:post[number=4,arg0=save,arg1=/fruits]
+<5> You can specify the HTTP status code via the `@Status` annotation.
+callout:valid[6]
+callout:get[number=7,arg0=find,arg1=/fruits/\{name\}]
+
+=== Test
+
+Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
+
+test:FruitClient[]
+
+We will use temporary directories to persist our data under test.
+
+To facilitate this, create a base test class that handles the creation of a temporary folder, and configuring the application.
+
+test:BaseMicroStreamTest[]
+
+When the application was created, a test was created for you that tests the application can be started.
+Change this test to extend the above base class:
+
+test:MicronautguideTest[]
+
+Then create a test that verifies the validation of the `Fruit` POJO when we create a new entity via `POST`:
+
+test:FruitValidationControllerTest[]
+
+And finally, create a test that checks our controller works against MicroStream correctly:
+
+test:FruitControllerTest[]
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+[source, bash]
+.Create a new fruit
+----
+curl -i -d '{"name":"Pear"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/fruits
+----
+
+[source]
+.Output
+----
+HTTP/1.1 201 Created
+date: Thu, 12 May 2022 13:45:56 GMT
+Content-Type: application/json
+content-length: 16
+connection: keep-alive
+
+{"name":"Pear"}
+----
+
+[source, bash]
+.Get a list of all fruits
+----
+curl -i localhost:8080/fruits
+----
+
+[source]
+.Output
+----
+HTTP/1.1 200 OK
+date: Thu, 12 May 2022 13:46:54 GMT
+Content-Type: application/json
+content-length: 70
+connection: keep-alive
+
+[{"name":"Pear"}]
+----
+
+common:next.adoc[]
+
+Read more about the https://micronaut-projects.github.io/micronaut-microstream/latest/guide[Micronaut MicroStream integration].
+Read more about https://microstream.one/platforms/microstream-for-java/[MicroStream for Java].
+
+== Sponsors
+
+https://microstream.one/[MicroStream] sponsored the creation of this Guide.
