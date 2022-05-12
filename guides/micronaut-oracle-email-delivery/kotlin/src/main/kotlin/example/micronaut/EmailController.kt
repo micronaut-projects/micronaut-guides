@@ -12,9 +12,12 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.multipart.CompletedFileUpload
 import io.micronaut.views.ModelAndView
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
 import java.io.IOException
 import java.time.LocalDateTime
 
+@ExecuteOn(TaskExecutors.IO)
 @Controller("/email")
 class EmailController(private val emailSender: EmailSender<*, *>) {
 

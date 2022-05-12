@@ -1,9 +1,8 @@
 package example.micronaut
 
-import io.micronaut.context.BeanContext
-import io.micronaut.context.annotation.Property
 import io.micronaut.email.BodyType
 import io.micronaut.email.BodyType.TEXT
+import io.micronaut.email.Email
 import io.micronaut.email.TransactionalEmailSender
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
@@ -15,35 +14,33 @@ import io.micronaut.http.MediaType.TEXT_PLAIN_TYPE
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.multipart.MultipartBody
+import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
+import jakarta.inject.Named
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets.UTF_8
+import java.util.function.Consumer
+import javax.mail.Message
+import javax.validation.Valid
 
-@Property(name = "spec.name", value = "EmailControllerTest")
-@MicronautTest
+@MicronautTest // <1>
 class EmailControllerTest {
 
     @Inject
     @field:Client("/")
-    lateinit var client: HttpClient
+    lateinit var client: HttpClient // <2>
 
-    @Inject
-    lateinit var beanContext: BeanContext
+    var emails: MutableList<Email> = mutableListOf()
 
-    private lateinit var sender: EmailSenderReplacement
-
-    @BeforeEach
-    fun setup() {
-        val sender: TransactionalEmailSender<*, *> = beanContext.getBean(TransactionalEmailSender::class.java)
-        assertTrue(sender is EmailSenderReplacement)
-        this.sender = sender as EmailSenderReplacement
-        this.sender.emails.clear()
+    @AfterEach
+    fun cleanup() {
+        emails.clear()
     }
 
     @Test
@@ -54,8 +51,8 @@ class EmailControllerTest {
         )
         assertEquals(response.status(), OK)
 
-        assertEquals(1, sender.emails.size)
-        val email = sender.emails[0]
+        assertEquals(1, emails.size)
+        val email = emails[0]
 
         assertEquals("test@test.com", email.from.email)
 
@@ -87,8 +84,8 @@ class EmailControllerTest {
         )
         assertEquals(response.status(), OK)
 
-        assertEquals(1, sender.emails.size)
-        val email = sender.emails[0]
+        assertEquals(1, emails.size)
+        val email = emails[0]
 
         assertEquals("test@test.com", email.from.email)
 
@@ -117,16 +114,16 @@ class EmailControllerTest {
 
         val response: HttpResponse<*> = client.toBlocking().exchange(
             HttpRequest.POST("/email/attachment", MultipartBody.builder()
-                    .addPart("file", "test.csv", TEXT_CSV_TYPE, "test,email".toByteArray(UTF_8))
-                    .build())
+                .addPart("file", "test.csv", TEXT_CSV_TYPE, "test,email".toByteArray(UTF_8))
+                .build())
                 .contentType(MULTIPART_FORM_DATA_TYPE)
                 .accept(TEXT_PLAIN_TYPE),
             String::class.java
         )
         assertEquals(response.status(), OK)
 
-        assertEquals(1, sender.emails.size)
-        val email = sender.emails[0]
+        assertEquals(1, emails.size)
+        val email = emails[0]
 
         assertEquals("test@test.com", email.from.email)
 
@@ -153,5 +150,16 @@ class EmailControllerTest {
         assertNotNull(email.body)
         val body = email.body[TEXT]
         assertEquals("Attachment email", body.orElseThrow())
+    }
+
+    @MockBean(TransactionalEmailSender::class)
+    @Named("mock")
+    fun mockSender(): TransactionalEmailSender<Message, Unit> = object : TransactionalEmailSender<Message, Unit> {
+
+        override fun getName() = "test"
+
+        override fun send(@Valid email: Email, emailRequest: Consumer<Message>) {
+            emails.add(email)
+        }
     }
 }

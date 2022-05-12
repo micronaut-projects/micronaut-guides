@@ -9,6 +9,8 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.multipart.CompletedFileUpload
 import io.micronaut.views.ModelAndView
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
 
 import java.time.LocalDateTime
 
@@ -18,6 +20,7 @@ import static io.micronaut.http.MediaType.MULTIPART_FORM_DATA
 import static io.micronaut.http.MediaType.TEXT_PLAIN
 
 @CompileStatic
+@ExecuteOn(TaskExecutors.IO)
 @Controller('/email')
 class EmailController {
 

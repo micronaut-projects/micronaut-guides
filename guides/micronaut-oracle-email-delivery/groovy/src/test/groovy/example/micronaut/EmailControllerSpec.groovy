@@ -1,7 +1,5 @@
 package example.micronaut
 
-import io.micronaut.context.BeanContext
-import io.micronaut.context.annotation.Property
 import io.micronaut.email.Attachment
 import io.micronaut.email.Email
 import io.micronaut.email.TransactionalEmailSender
@@ -10,9 +8,14 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.multipart.MultipartBody
+import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
+import jakarta.inject.Named
 import spock.lang.Specification
+
+import javax.mail.Message
+import java.util.function.Consumer
 
 import static io.micronaut.email.BodyType.HTML
 import static io.micronaut.email.BodyType.TEXT
@@ -23,40 +26,33 @@ import static io.micronaut.http.MediaType.TEXT_CSV_TYPE
 import static io.micronaut.http.MediaType.TEXT_PLAIN_TYPE
 import static java.nio.charset.StandardCharsets.UTF_8
 
-@Property(name = 'spec.name', value = 'EmailControllerTest')
-@MicronautTest
+@MicronautTest // <1>
 class EmailControllerSpec extends Specification {
 
     @Inject
-    @Client('/')
-    HttpClient client
+    @Client("/")
+    HttpClient client // <2>
 
-    @Inject
-    BeanContext beanContext
+    List<Email> emails = []
 
-    private EmailSenderReplacement sender
-
-    void setup() {
-        TransactionalEmailSender<?, ?> sender = beanContext.getBean(TransactionalEmailSender)
-        assert sender instanceof EmailSenderReplacement
-        this.sender = (EmailSenderReplacement) sender
-        this.sender.emails.clear()
+    void cleanup() {
+        emails.clear()
     }
 
     void testBasic() {
 
         when:
         HttpResponse<?> response = client.toBlocking().exchange(
-                HttpRequest.POST('/email/basic', null))
+                HttpRequest.POST("/email/basic", null))
 
         then:
         response.status() == OK
 
         and:
-        1 == sender.emails.size()
+        1 == emails.size()
 
         when:
-        Email email = sender.emails[0]
+        Email email = emails[0]
 
         then:
         'test@test.com' == email.from.email
@@ -66,7 +62,6 @@ class EmailControllerSpec extends Specification {
         1 == email.to.size()
         'basic@domain.com' == email.to[0].email
         email.to[0].name == null
-
         email.cc == null
 
         email.bcc == null
@@ -92,10 +87,10 @@ class EmailControllerSpec extends Specification {
         response.status() == OK
 
         and:
-        1 == sender.emails.size()
+        1 == emails.size()
 
         when:
-        Email email = sender.emails[0]
+        Email email = emails[0]
 
         then:
         'test@test.com' == email.from.email
@@ -133,10 +128,10 @@ class EmailControllerSpec extends Specification {
         response.status() == OK
 
         and:
-        1 == sender.emails.size()
+        1 == emails.size()
 
         when:
-        Email email = sender.emails[0]
+        Email email = emails[0]
 
         then:
         'test@test.com' == email.from.email
@@ -168,5 +163,20 @@ class EmailControllerSpec extends Specification {
 
         then:
         'Attachment email' == body.orElseThrow()
+    }
+
+    @MockBean(TransactionalEmailSender)
+    @Named('mock')
+    TransactionalEmailSender<Message, Void> mockSender() {
+
+        return new TransactionalEmailSender() {
+
+            String getName() { 'test' }
+
+            def send(Email email, Consumer emailRequest) {
+                emails << email
+                return null
+            }
+        }
     }
 }
