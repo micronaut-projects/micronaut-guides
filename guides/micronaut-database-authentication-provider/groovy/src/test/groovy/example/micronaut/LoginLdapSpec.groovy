@@ -12,7 +12,6 @@ import io.micronaut.security.token.jwt.validator.JwtTokenValidator
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import reactor.core.publisher.Flux
 import org.reactivestreams.Publisher
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -45,7 +44,6 @@ class LoginLdapSpec extends Specification {
         rsp.body.get().accessToken
     }
 
-    @Ignore('TODO fix the timeout issue')
     void '/login with invalid credentials returns UNAUTHORIZED'() {
         when:
         HttpRequest request = HttpRequest.create(POST, '/login')
