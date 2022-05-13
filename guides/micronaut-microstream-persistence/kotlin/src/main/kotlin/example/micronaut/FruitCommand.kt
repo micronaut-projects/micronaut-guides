@@ -8,5 +8,5 @@ import javax.validation.constraints.NotEmpty
 @Introspected // <1>
 data class FruitCommand(
     val name: @NotEmpty String, // <2>
-    var description: String? // <3>
+    val description: String? // <3>
 )
