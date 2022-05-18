@@ -3,19 +3,24 @@ package example.micronaut
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 
+import javax.validation.Valid
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
+
 interface FruitRepository {
 
     @NonNull
     Collection<Fruit> list()
 
     @NonNull
-    Fruit create(@NonNull FruitCommand fruit)
+    Fruit create(@NonNull @NotNull @Valid FruitCommand fruit) // <1>
+            throws FruitDuplicateException
 
     @Nullable
-    Fruit update(@NonNull FruitCommand fruit)
+    Fruit update(@NonNull @NotNull @Valid FruitCommand fruit) // <1>
 
     @Nullable
-    Fruit find(@NonNull String name)
+    Fruit find(@NonNull @NotBlank String name)
 
-    void delete(@NonNull FruitCommand fruit)
+    void delete(@NonNull @NotNull @Valid FruitCommand fruit) // <1>
 }
