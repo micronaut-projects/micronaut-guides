@@ -14,6 +14,7 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Property(name = "spec.name", value = "HttpHeaderColorFetcherTest") // <1>
 @MicronautTest // <2>
 class HttpHeaderColorFetcherTest {
+
     @Inject
     @Client("/")
     HttpClient httpClient; // <3>
@@ -48,6 +50,4 @@ class HttpHeaderColorFetcherTest {
             return colorFetcher.favouriteColor(request);
         }
     }
-
-
 }

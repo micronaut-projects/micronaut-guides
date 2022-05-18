@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 @Singleton // <1>
 public class PathColorFetcher implements ColorFetcher {
 
-    private final String[] COLORS = {
+    private static final String[] COLORS = {
             "Red",
             "Blue",
             "Green",

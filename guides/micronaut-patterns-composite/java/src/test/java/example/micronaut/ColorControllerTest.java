@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MicronautTest // <1>
 class ColorControllerTest {
+
     @Inject
     @Client("/")
     HttpClient httpClient; // <2>
