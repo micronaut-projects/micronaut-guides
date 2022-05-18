@@ -1,0 +1,131 @@
+common:header.adoc[]
+
+In this guide, you will use Micronaut caching annotations to speed up your application.
+
+You are going to use a cache powered by https://docs.microstream.one/manual/cache/index.html[MicroStream].
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app \
+   example.micronaut.micronautguide \
+   --features=microstream-cache \
+   --build=@build@ \
+   --lang=@lang@ \
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add `microstream-cache` feature.
+
+common:annotationprocessors.adoc[]
+
+=== Configure the Application
+
+In this sample application, we cache news headlines. Add the https://micronaut-projects.github.io/micronaut-microstream/snapshot/guide/#cache[Micronaut Microstream Cache] dependency, which adds support for cache using https://docs.microstream.one/manual/cache/index.html[MicroStream].
+
+dependency:micronaut-microstream-cache[groupId=io.micronaut.microstream]
+
+Configure your caches in `application.yml`:
+
+resource:application.yml[tag=config]
+
+<1> Configure a cache called `headlines`.
+
+TIP: Check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/configurationreference.html#io.micronaut.cache.caffeine.DefaultCacheConfiguration[properties (`maximum-size`, `expire-after-write` and `expire-after-access`)] to configure the size and expiration of your caches. It is important to keep the caches' size under control.
+
+=== Micronaut Cache API
+
+Imagine a service that retrieves headlines for a given month. Depending on the exact retrieval operation (e.g., accessing a database or making an HTTP call), it may be expensive, and you would want to cache it.
+
+source:NewsService[]
+
+callout:singleton[1]
+<2> Specifies the cache name `headlines` to store cache operation values in.
+<3> Indicates a method is cacheable. The cache name `headlines` specified in `@CacheConfig` is used. Since the method has a single parameter, you don't need to specify the `month` parameters attribute of the annotation.
+<4> Emulate an expensive operation by sleeping for several seconds.
+<5> The return value is cached with name `headlines` for the supplied `month`. The method invocation is never skipped, even if the cache `headlines` for the supplied `month` already exists.
+<6> Method invocation causes the invalidation of the cache `headlines` for the supplied `month`.
+
+TIP: If you don't annotate the class with `@CacheConfig`, specify the cache name in the cache annotations. E.g., `@Cacheable(value = "headlines", parameters = {"month"})`
+
+=== Test the Cache
+
+We can verify that the cache works as expected:
+
+test:NewsServiceTest[]
+
+:exclude-for-languages:groovy
+callout:test-method-order[1]
+callout:micronaut-test-start-application-false[2]
+//callout:test-instance-per-class[3]
+//callout:test-property-provider[4]
+<5> Inject `NewsService` bean.
+callout:timeout[6]
+callout:order[7]
+:exclude-for-languages:
+
+:exclude-for-languages:java,kotlin
+callout:stepwise[1]
+//callout:micronaut-test-start-application-false[2]
+//callout:test-property-provider[3]
+<4> Inject `NewsService` bean.
+callout:timeout[5]
+:exclude-for-languages:
+
+=== Controller
+
+Create a controller that engages the previous service:
+
+source:News[]
+
+callout:introspected[1]
+
+source:NewsController[]
+
+callout:controller[number=1,arg0=/]
+
+Add a test. We call the endpoint twice and verify with the `@Timeout` annotation that the cache is being used.
+
+test:NewsControllerTest[]
+
+:exclude-for-languages:groovy
+callout:test-method-order[1]
+callout:micronaut-test[2]
+//callout:test-instance-per-class[3]
+//callout:test-property-provider[4]
+callout:http-client[5]
+callout:timeout[6]
+callout:order[7]
+:exclude-for-languages:
+
+:exclude-for-languages:java,kotlin
+callout:stepwise[1]
+//callout:micronaut-test[2]
+//callout:test-property-provider[3]
+callout:http-client[4]
+callout:timeout[5]
+:exclude-for-languages:
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+You should be able to execute `curl localhost:8080/NOVEMBER` and see results
+
+== Next steps
+
+Learn more about https://microstream.one[MicroStream] and https://micronaut-projects.github.io/micronaut-microstream/snapshot/guide/[Micronaut Microstream]
+
+Read also about Micronaut https://docs.micronaut.io/latest/guide/#caching[Cache Advice] and check the https://micronaut-projects.github.io/micronaut-cache/latest/guide/[Micronaut Cache] project for more information.
+
+
+
+common:helpWithMicronaut.adoc[]
