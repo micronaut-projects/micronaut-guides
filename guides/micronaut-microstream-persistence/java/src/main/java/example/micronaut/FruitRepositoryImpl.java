@@ -7,6 +7,9 @@ import io.micronaut.microstream.annotations.StoreParams;
 import io.micronaut.microstream.annotations.StoreReturn;
 import jakarta.inject.Singleton;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Map;
 
@@ -27,7 +30,7 @@ public class FruitRepositoryImpl implements FruitRepository {
 
     @Override
     @NonNull
-    public Fruit create(@NonNull FruitCommand fruit) {
+    public Fruit create(@NonNull @NotNull @Valid FruitCommand fruit) throws FruitDuplicateException {
         Map<String, Fruit> fruits = rootProvider.root().getFruits();
         if (fruits.containsKey(fruit.getName())) {
             throw new FruitDuplicateException(fruit.getName());
@@ -43,7 +46,7 @@ public class FruitRepositoryImpl implements FruitRepository {
     }
 
     @Nullable
-    public Fruit update(@NonNull FruitCommand fruit) {
+    public Fruit update(@NonNull @NotNull @Valid FruitCommand fruit) {
         Map<String, Fruit> fruits = rootProvider.root().getFruits();
         Fruit foundFruit = fruits.get(fruit.getName());
         if (foundFruit != null) {
@@ -60,12 +63,12 @@ public class FruitRepositoryImpl implements FruitRepository {
 
     @Override
     @Nullable
-    public Fruit find(@NonNull String name) {
+    public Fruit find(@NonNull @NotBlank String name) {
         return rootProvider.root().getFruits().get(name);
     }
 
     @Override
-    public void delete(@NonNull FruitCommand fruit) {
+    public void delete(@NonNull @NotNull @Valid FruitCommand fruit) {
         performDelete(fruit);
     }
 

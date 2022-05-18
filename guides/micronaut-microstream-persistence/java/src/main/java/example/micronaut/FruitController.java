@@ -2,6 +2,7 @@ package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.Get;
@@ -30,12 +31,12 @@ class FruitController {
 
     @Post // <4>
     @Status(HttpStatus.CREATED) // <5>
-    Fruit create(@NonNull @NotNull @Valid FruitCommand fruit) { // <6>
+    Fruit create(@NonNull @NotNull @Valid @Body FruitCommand fruit) { // <6>
         return fruitRepository.create(fruit);
     }
 
     @Put
-    Fruit update(@NonNull @NotNull @Valid FruitCommand fruit) {
+    Fruit update(@NonNull @NotNull @Valid @Body FruitCommand fruit) {
         return fruitRepository.update(fruit);
     }
 
@@ -45,7 +46,8 @@ class FruitController {
     }
 
     @Delete
-    void delete(@NonNull @Valid FruitCommand fruit) {
+    @Status(HttpStatus.NO_CONTENT)
+    void delete(@NonNull @Valid @Body FruitCommand fruit) {
         fruitRepository.delete(fruit);
     }
 }

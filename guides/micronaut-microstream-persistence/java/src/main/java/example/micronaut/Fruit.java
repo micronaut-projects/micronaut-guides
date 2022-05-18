@@ -4,19 +4,20 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 @Introspected // <1>
 public class Fruit {
 
     @NonNull
-    @NotEmpty // <2>
+    @NotBlank // <2>
     private final String name;
 
     @Nullable // <3>
     private String description;
 
-    public Fruit(@NonNull @NotEmpty String name, @Nullable String description) {
+    public Fruit(@NonNull String name,
+                 @Nullable String description) {
         this.name = name;
         this.description = description;
     }

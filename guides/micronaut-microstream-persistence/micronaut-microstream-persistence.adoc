@@ -40,6 +40,12 @@ source:FruitContainer[]
 
 callout:introspected[1]
 
+=== Configuration
+
+Add the following snippet to `application.yml` to configure MicroStream.
+
+resource:application.yml[tag=microstream]
+
 === Domain object
 
 Create a `Fruit` class which will be used as the domain object.
@@ -65,6 +71,8 @@ callout:constraints[2]
 Create a repository interface to encapsulate the CRUD actions for `Fruit`.
 
 source:FruitRepository[]
+
+callout:valid[1]
 
 === Error handling
 
@@ -110,28 +118,42 @@ callout:get[number=7,arg0=find,arg1=/fruits/\{name\}]
 
 === Test
 
-Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
+Create a test that verifies the validation of the `FruitCommand` POJO when we invoke the `FruitRepository` interface:
 
-test:FruitClient[]
+test:FruitRepositoryTest[]
+
+callout:micronaut-test-transactional-false[1]
+
+Create a test that verifies the validation of the `FruitCommand` POJO when we create a new entity via `POST`:
+
+test:FruitValidationControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
 
 We will use temporary directories to persist our data under test.
 
 To facilitate this, create a base test class that handles the creation of a temporary folder, and configuring the application.
 
-test:BaseMicroStreamTest[]
+test:BaseTest[]
 
-When the application was created, a test was created for you that tests the application can be started.
-Change this test to extend the above base class:
+Create a test which validate `FruitDuplicateExceptionHandler`.
 
-test:MicronautguideTest[]
+test:FruitDuplicationExceptionHandlerTest[]
 
-Then create a test that verifies the validation of the `Fruit` POJO when we create a new entity via `POST`:
+callout:micronaut-test[1]
+callout:test-instance-per-class[2]
+callout:http-client[3]
 
-test:FruitValidationControllerTest[]
+Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
+
+test:FruitClient[]
 
 And finally, create a test that checks our controller works against MicroStream correctly:
 
 test:FruitControllerTest[]
+
+<1> Start and stop application to verify the data is persisted to disk by MicroStream and can be retrieved after application restart.
 
 common:testApp.adoc[]
 
@@ -174,6 +196,28 @@ connection: keep-alive
 
 [{"name":"Pear"}]
 ----
+
+== MicroStream REST and GUI
+
+Often, during development is useful to see the data being saved by MicroStream. Micronaut Microstream integration helps to do that.
+
+Add the following dependency:
+
+dependency:micronaut-microstream-rest[groupId=io.micronaut.microstream,scope=developmentOnly]
+
+The above dependency provides several JSON endpoints which expose the contents of the MicroStream storage.
+
+=== MicroStream Client GUI
+
+https://docs.microstream.one/manual/storage/rest-interface/client-gui.html[Download MicroStream client GUI].
+
+Run the client and connect to the MicroStream REST API exposed by the Micronaut application:
+
+image::microstream-rest-1.png[]
+
+You can visualize the data you saved via cURL.
+
+image::microstream-rest-2.png[]
 
 common:next.adoc[]
 

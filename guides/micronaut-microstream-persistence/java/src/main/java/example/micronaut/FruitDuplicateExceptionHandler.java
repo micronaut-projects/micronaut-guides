@@ -24,6 +24,6 @@ public class FruitDuplicateExceptionHandler implements ExceptionHandler<FruitDup
                 .cause(exception)
                 .errorMessage(exception.getMessage())
                 .build();
-        return errorResponseProcessor.processResponse(errorContext, HttpResponse.badRequest());
+        return errorResponseProcessor.processResponse(errorContext, HttpResponse.unprocessableEntity());
     }
 }

@@ -1,15 +1,19 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
-import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.client.annotation.Client;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Optional;
 
 @Client("/fruits")
@@ -19,11 +23,15 @@ interface FruitClient {
     Iterable<Fruit> list();
 
     @Get("/{name}")
-    Optional<Fruit> find(@PathVariable String name);
+    Optional<Fruit> find(@NonNull @NotBlank @PathVariable String name);
 
     @Post
-    HttpResponse<Fruit> create(FruitCommand fruit);
+    HttpResponse<Fruit> create(@NonNull @NotNull @Valid @Body FruitCommand fruit);
 
     @Put
-    Fruit update(FruitCommand fruit);
+    Optional<Fruit> update(@NonNull @NotNull @Valid @Body FruitCommand fruit);
+
+    @NonNull
+    @Delete
+    HttpStatus delete(@NonNull @Valid @Body FruitCommand fruit);
 }
