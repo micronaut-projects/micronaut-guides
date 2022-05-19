@@ -1,14 +1,16 @@
 package example.micronaut
 
-internal interface FruitRepository {
+import javax.validation.Valid
+
+interface FruitRepository {
 
     fun list(): Collection<Fruit>
 
-    fun create(fruit: FruitCommand): Fruit
+    fun create(@Valid fruit: FruitCommand): Fruit // <1>
 
-    fun update(fruit: FruitCommand): Fruit?
+    fun update(@Valid fruit: FruitCommand): Fruit? // <1>
 
     fun find(name: String): Fruit?
 
-    fun delete(fruit: FruitCommand)
+    fun delete(@Valid fruit: FruitCommand) // <1>
 }

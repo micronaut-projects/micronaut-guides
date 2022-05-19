@@ -10,10 +10,13 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.http.annotation.Status;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
+
+import static io.micronaut.scheduling.TaskExecutors.IO;
 
 @Controller("/fruits") // <1>
 class FruitController {
@@ -29,6 +32,7 @@ class FruitController {
         return fruitRepository.list();
     }
 
+    @ExecuteOn(IO)
     @Post // <4>
     @Status(HttpStatus.CREATED) // <5>
     Fruit create(@NonNull @NotNull @Valid @Body FruitCommand fruit) { // <6>
@@ -45,6 +49,7 @@ class FruitController {
         return fruitRepository.find(name);
     }
 
+    @ExecuteOn(IO)
     @Delete
     @Status(HttpStatus.NO_CONTENT)
     void delete(@NonNull @Valid @Body FruitCommand fruit) {

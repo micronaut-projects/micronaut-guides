@@ -1,43 +1,82 @@
 package example.micronaut
 
-import io.micronaut.http.HttpResponse
+import io.micronaut.context.ApplicationContext
 import io.micronaut.http.HttpStatus
+import io.micronaut.runtime.server.EmbeddedServer
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.util.stream.Collectors
+import java.util.stream.Stream
+import java.util.stream.StreamSupport
+import kotlin.streams.toList
 
-class FruitControllerTest : BaseMicroStreamTest() {
-
-    @Test
-    fun emptyDatabaseContainsNoFruit() {
-        Assertions.assertEquals(0, fruitClient.list().toList().size)
-    }
+class FruitControllerTest : BaseTest() {
 
     @Test
     fun testInteractionWithTheController() {
-        var response: HttpResponse<Fruit> = fruitClient.create(FruitCommand("banana", null))
+        val apple = FruitCommand("apple", "Keeps the doctor away")
+        val bananaName = "banana"
+        val bananaDescription = "Yellow and curved"
+        val properties: Map<String, Any> = super.getProperties()
+        ApplicationContext.run(EmbeddedServer::class.java, properties).use { embeddedServer ->  // <1>
+            val fruitClient = embeddedServer.applicationContext.getBean(FruitClient::class.java)
+            var response = fruitClient.create(FruitCommand(bananaName))
+            assertEquals(HttpStatus.CREATED, response.status)
+            assertTrue(response.body.isPresent)
+            val banana = response.body.get()
 
-        Assertions.assertEquals(HttpStatus.CREATED, response.status)
+            val fruitList = fruitsList(fruitClient)
+            assertEquals(1, fruitList.size)
+            assertEquals(banana.name, fruitList[0].name)
+            assertNull(fruitList[0].description)
 
-        val (name) = response.body.get()
-        var fruitList = fruitClient.list().toList()
+            var bananaOptional: Fruit? = fruitClient.update(apple)
+            assertNull(bananaOptional)
 
-        Assertions.assertEquals(1, fruitList.size)
-        Assertions.assertEquals(name, fruitList[0].name)
-        Assertions.assertNull(fruitList[0].description)
+            response = fruitClient.create(apple)
+            assertEquals(HttpStatus.CREATED, response.status)
 
-        response = fruitClient.create(FruitCommand("apple", "Keeps the doctor away"))
-
-        Assertions.assertEquals(HttpStatus.CREATED, response.status)
-
-        fruitList = fruitClient.list().toList()
-        Assertions.assertTrue(fruitList.any { "Keeps the doctor away" == it.description })
-
-        fruitClient.update(FruitCommand("banana", "Yellow and curved"))
-        fruitList = fruitClient.list().toList()
-
-        Assertions.assertEquals(
-            setOf("Keeps the doctor away", "Yellow and curved"),
-            fruitList.map { it.description }.toSet()
-        )
+            assertTrue(
+                fruitsStream(fruitClient)
+                    .anyMatch { (_, description): Fruit -> "Keeps the doctor away" == description }
+            )
+            bananaOptional = fruitClient.update(FruitCommand(bananaName, bananaDescription))
+            Assertions.assertNotNull(bananaOptional)
+            assertEquals(
+                Stream.of("Keeps the doctor away", "Yellow and curved")
+                    .collect(Collectors.toSet()),
+                fruitsStream(fruitClient).map { it.description }.toList().toSet()
+            )
+        }
+        ApplicationContext.run(EmbeddedServer::class.java, properties).use { embeddedServer ->  // <1>
+            val fruitClient =
+                embeddedServer.applicationContext.getBean(FruitClient::class.java)
+            assertEquals(2, numberOfFruits(fruitClient))
+            fruitClient.delete(apple)
+            fruitClient.delete(FruitCommand(bananaName, bananaDescription))
+        }
+        ApplicationContext.run(EmbeddedServer::class.java, properties).use { embeddedServer ->  // <1>
+            val fruitClient =
+                embeddedServer.applicationContext.getBean(FruitClient::class.java)
+            assertEquals(0, numberOfFruits(fruitClient))
+        }
     }
+
+    private fun numberOfFruits(fruitClient: FruitClient): Int {
+        return fruitsList(fruitClient).size
+    }
+
+    private fun fruitsList(fruitClient: FruitClient): List<Fruit> {
+        return fruitsStream(fruitClient)
+            .collect(Collectors.toList())
+    }
+
+    private fun fruitsStream(fruitClient: FruitClient): Stream<Fruit> {
+        val fruits: Iterable<Fruit> = fruitClient.list()
+        return StreamSupport.stream(fruits.spliterator(), false)
+    }
+
 }

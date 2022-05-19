@@ -16,8 +16,8 @@ class FruitDuplicateExceptionHandler(private val errorResponseProcessor: ErrorRe
     override fun handle(request: HttpRequest<*>, exception: FruitDuplicateException): HttpResponse<*> {
         val errorContext = ErrorContext.builder(request)
             .cause(exception)
-            .errorMessage(exception.message!!)
+            .errorMessage(exception.message ?: "No message")
             .build()
-        return errorResponseProcessor.processResponse(errorContext, HttpResponse.badRequest<Any>())
+        return errorResponseProcessor.processResponse(errorContext, HttpResponse.unprocessableEntity<Any>())
     }
 }
