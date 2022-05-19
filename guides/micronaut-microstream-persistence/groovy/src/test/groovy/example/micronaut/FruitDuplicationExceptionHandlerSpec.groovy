@@ -11,9 +11,10 @@ import jakarta.inject.Inject
 
 @MicronautTest // <1>
 class FruitDuplicationExceptionHandlerSpec extends BaseSpec {
+
     @Inject
     @Client("/")
-    HttpClient httpClient // <3>
+    HttpClient httpClient // <2>
 
     void "duplicated fruit returns 422"() {
         when:

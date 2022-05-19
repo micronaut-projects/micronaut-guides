@@ -9,11 +9,12 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
 
-@MicronautTest
+@MicronautTest // <1>
 class FruitValidationControllerSpec extends Specification {
+
     @Inject
     @Client("/")
-    HttpClient httpClient
+    HttpClient httpClient // <2>
 
     void "fruit validation works as expected"() {
         when:
