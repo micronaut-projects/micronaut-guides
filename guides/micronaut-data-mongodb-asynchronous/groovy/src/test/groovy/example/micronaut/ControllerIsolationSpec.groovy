@@ -9,12 +9,14 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Singleton
 import org.jetbrains.annotations.NotNull
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
+@MicronautTest
 @Property(name = "spec.name", value = "controller-isolation")
 class ControllerIsolationSpec extends BaseMongoDataSpec {
 
