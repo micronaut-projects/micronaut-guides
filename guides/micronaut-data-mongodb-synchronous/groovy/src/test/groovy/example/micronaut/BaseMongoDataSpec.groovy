@@ -3,6 +3,7 @@ package example.micronaut
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.runtime.EmbeddedApplication
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import org.testcontainers.containers.MongoDBContainer
@@ -12,6 +13,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
 
+@MicronautTest
 abstract class BaseMongoDataSpec extends Specification implements TestPropertyProvider {
 
     @Shared

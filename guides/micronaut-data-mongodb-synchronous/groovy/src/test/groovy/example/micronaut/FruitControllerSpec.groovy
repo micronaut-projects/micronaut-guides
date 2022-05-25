@@ -2,9 +2,7 @@ package example.micronaut
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.test.extensions.spock.annotation.MicronautTest
 
-@MicronautTest
 class FruitControllerSpec extends BaseMongoDataSpec {
 
     def "empty database contains no fruit"() {
