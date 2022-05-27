@@ -1,7 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.core.beans.BeanMap;
-import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.retry.annotation.Retryable;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -32,12 +30,12 @@ class ChatWebSocketTest {
 
     @BeforeEach
     public void setup() { // <4>
-        UriBuilder uriBuilder = UriBuilder.of("ws://localhost").port(server.getPort()).path("/ws/chat/{topic}/{username}");
-        adam = webSocketConnect.connect(uriBuilder.expand(BeanMap.of(new ChatRequest("adam", "Cats & Recreation"))));
-        anna = webSocketConnect.connect(uriBuilder.expand(BeanMap.of(new ChatRequest("anna", "Cats & Recreation"))));
-        ben = webSocketConnect.connect(uriBuilder.expand(BeanMap.of(new ChatRequest("ben", "Fortran Tips & Tricks"))));
-        zach = webSocketConnect.connect(uriBuilder.expand(BeanMap.of(new ChatRequest("zach", "all"))));
-        cienna = webSocketConnect.connect(uriBuilder.expand(BeanMap.of(new ChatRequest("cienna", "Fortran Tips & Tricks"))));
+        int port = server.getPort();
+        adam = webSocketConnect.connect(new ChatUri(port, "adam", "Cats & Recreation"));
+        anna = webSocketConnect.connect(new ChatUri(port, "anna", "Cats & Recreation"));
+        ben = webSocketConnect.connect(new ChatUri(port, "ben", "Fortran Tips & Tricks"));
+        zach = webSocketConnect.connect(new ChatUri(port, "zach", "all"));
+        cienna = webSocketConnect.connect(new ChatUri(port, "cienna", "Fortran Tips & Tricks"));
     }
 
     @Test
