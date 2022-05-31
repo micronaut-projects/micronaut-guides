@@ -54,5 +54,6 @@ class GuideMetadata {
         String definitionFile
         String generatorName
         Map<String, String> properties
+        Map<String, String> globalProperties
     }
 }
