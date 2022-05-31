@@ -1,6 +1,7 @@
 package example.micronaut;
 
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.websocket.WebSocketClient;
 import jakarta.inject.Singleton;
 import org.reactivestreams.Publisher;
@@ -14,7 +15,7 @@ public class ChatClientConnect {
         this.appContext = appContext;
     }
 
-    public ChatClientEndpoint connect(ChatUri uri) { // <3>
+    public ChatClientEndpoint connect(@NonNull ChatUri uri) { // <3>
         WebSocketClient webSocketClient = appContext.getBean(WebSocketClient.class);
         Publisher<ChatClientEndpoint> client = webSocketClient.connect(ChatClientEndpoint.class, uri.delegate());
 

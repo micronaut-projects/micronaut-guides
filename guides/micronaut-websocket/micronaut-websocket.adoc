@@ -20,7 +20,10 @@ source:ChatServer[]
 <6> Event for when a client closes a WebSocket connection
 <7> A predicate to keep messages within topics yet also enable the special "all" topic
 
-=== Chat client
+We'll also add a main class so that we can later try the chat app via a web browser rather than just Java integration tests:
+source:Application[]
+
+=== Java chat client
 
 source:ChatClientEndpoint[]
 <1> This annotation is required for the client WebSocket
@@ -43,6 +46,20 @@ source:ChatUri[]
 <2> Username of the chat client
 <3> Topic of the chat client
 
+=== Web browser chat client
+
+resource:application.yml[]
+<1> Serve the static resources
+
+Add the HTML page to be the user interface for the chat client in the browser:
+resource:public/index.html[]
+
+Write JavaScript to parse the URL for the chat topic and username, handle the message body, broadcast the chat, and keep the DOM updated with the latest messages:
+resource:public/websocketDemo.js[]
+
+Style the page so that the messages are properly displayed:
+resource:public/style.css[]
+
 === Tests
 
 test:ChatWebSocketTest[]
@@ -53,6 +70,10 @@ test:ChatWebSocketTest[]
 <5> Test that the correct messages are automatically sent when users join topics
 <6> Test that chats are sent within a topic and not ouside of it except to the special "all" topic
 <5> Test that the correct messages are automatically sent when users leave topics
+
+=== Trying the user interface
+
+Run the Java main class called "Application" which starts the server on port 8080 by default. Then in the web browser visit a URL such as http://localhost:8080/&num;/java/Joe[http://localhost:8080/\#/java/Joe] and also in another browser tab open http://localhost:8080/&num;/java/Moka[http://localhost:8080/\#/java/Moka]. You can then try sending chats as Joe and Moka.
 
 == Next steps
 

@@ -9,12 +9,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_METHOD) // <1>
 class ChatWebSocketTest {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatWebSocketTest.class);
 
     @Inject
     ChatClientConnect webSocketConnect; // <2>
@@ -133,11 +137,11 @@ class ChatWebSocketTest {
     }
 
     private void log(String test) {
-        System.out.println(test + "...");
-        System.out.println(adam.getMessagesChronologically());
-        System.out.println(anna.getMessagesChronologically());
-        System.out.println(ben.getMessagesChronologically());
-        System.out.println(zach.getMessagesChronologically());
-        System.out.println(cienna.getMessagesChronologically());
+        log.info("{}...", test);
+        log.info(adam.getMessagesChronologically().toString());
+        log.info(anna.getMessagesChronologically().toString());
+        log.info(ben.getMessagesChronologically().toString());
+        log.info(zach.getMessagesChronologically().toString());
+        log.info(cienna.getMessagesChronologically().toString());
     }
 }

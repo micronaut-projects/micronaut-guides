@@ -7,11 +7,16 @@ import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Predicate;
 
 @ServerWebSocket("/ws/chat/{topic}/{username}") // <1>
 public class ChatServer {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatServer.class);
+
     private final WebSocketBroadcaster broadcaster;
 
     public ChatServer(WebSocketBroadcaster broadcaster) { // <2>
@@ -50,9 +55,8 @@ public class ChatServer {
     }
 
     private void log(String event, WebSocketSession session, String username, String topic) {
-        System.out.println(String.format(
-                "* WebSocket: %s received for session %s from '%s' regarding '%s'",
-                event, session.getId(), username, topic));
+        log.info("* WebSocket: {} received for session {} from '{}' regarding '{}'",
+                event, session.getId(), username, topic);
     }
 
     private Predicate<WebSocketSession> isValid(String topic) { // <7>
