@@ -53,10 +53,10 @@ class OpenAPIGenerator {
         } catch (GeneratorNotFoundException e) {
             throw new GradleException("OpenAPI couldn't find specified generator: \"" +
                     e.message + "\". Check 'generatorName' property. ")
-        } catch( NoSuchMethodError e ) {
-            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"");
+        } catch(NoSuchMethodError e) {
+            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"")
         } catch (Exception e) {
-            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"");
+            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"")
         }
     }
 
