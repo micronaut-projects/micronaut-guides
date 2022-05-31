@@ -11,7 +11,7 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -70,8 +70,8 @@ public class TweetsApiTest {
     public void tweetsRecentSearchTest() {
         // GIVEN
         String query = "nyc"; // <1>
-        LocalDateTime startTime = null;
-        LocalDateTime endTime = null;
+        OffsetDateTime startTime = null;
+        OffsetDateTime endTime = null;
         String sinceId = null;
         String untilId = null;
         Integer maxResults = 10;
