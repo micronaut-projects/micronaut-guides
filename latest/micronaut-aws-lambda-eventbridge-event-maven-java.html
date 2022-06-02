@@ -129,9 +129,8 @@
 <li><a href="#writing-the-app">4. Writing the App</a>
 <ul class="sectlevel2">
 <li><a href="#enable-annotation-processing">4.1. Enable annotation Processing</a></li>
-<li><a href="#delete-sample-code">4.2. Delete Sample Code</a></li>
-<li><a href="#handler">4.3. Handler</a></li>
-<li><a href="#logback">4.4. Logback</a></li>
+<li><a href="#handler">4.2. Handler</a></li>
+<li><a href="#logback">4.3. Logback</a></li>
 </ul>
 </li>
 <li><a href="#lambda">5. Lambda</a>
@@ -217,7 +216,10 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app example.micronaut.micronautguide --features=aws-lambda --build=maven --lang=java</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app example.micronaut.micronautguide \
+    --features=aws-lambda-scheduled-event \
+    --build=maven \
+    --lang=java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -233,7 +235,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
-<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select serverless function as application type and add <code>aws-lambda</code> feature.</p>
+<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select serverless function as application type and add <code>aws-lambda-scheduled-event</code> feature.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
@@ -250,61 +252,33 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="delete-sample-code">4.2. Delete Sample Code</h3>
+<h3 id="handler">4.2. Handler</h3>
 <div class="paragraph">
-<p>The Micronaut framework generates some sample code by default. Delete the following files:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>src/main/java/example/micronaut/Book.java</code></p>
-</li>
-<li>
-<p><code>src/main/java/example/micronaut/BookRequest.java</code></p>
-</li>
-<li>
-<p><code>src/main/java/example/micronaut/BookSaved.java</code></p>
-</li>
-<li>
-<p><code>src/test/java/example/micronaut/BookRequestHandlerTest.java</code></p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="handler">4.3. Handler</h3>
-<div class="paragraph">
-<p>Create a Handler which receives a Event Bridge (Cloud Watch Events) notification event and log the notification:</p>
+<p>Micronaut Launch/Micronaut CLI generates the following Handler when you select the feature <code>aws-lambda-scheduled-event</code>.
+The handler receives a Event Bridge (Cloud Watch Events) notification event. Add a log statement.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/java/example/micronaut/Handler.java</div>
+<div class="title">src/main/java/example/micronaut/FunctionRequestHandler.java</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.function.aws.MicronautRequestHandler</span>;
+<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.ScheduledEvent</span>;
 <span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
 <span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
 
-<span class="annotation">@Introspected</span>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">Handler</span> <span class="directive">extends</span> MicronautRequestHandler&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;, <span class="predefined-type">Void</span>&gt; {
-
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(<span class="predefined-type">Handler</span>.class);
-
+<span class="directive">public</span> <span class="type">class</span> <span class="class">FunctionRequestHandler</span> <span class="directive">extends</span> MicronautRequestHandler&lt;ScheduledEvent, <span class="predefined-type">Void</span>&gt; {
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(FunctionRequestHandler.class);
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="predefined-type">Void</span> execute(<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; input) {
-        LOG.trace(<span class="string"><span class="delimiter">&quot;</span><span class="content">{}</span><span class="delimiter">&quot;</span></span>, input);
+    <span class="directive">public</span> <span class="predefined-type">Void</span> execute(ScheduledEvent input) {
+        LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">input: {}</span><span class="delimiter">&quot;</span></span>, input);
         <span class="keyword">return</span> <span class="predefined-constant">null</span>;
     }
-
-
 }</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="logback">4.4. Logback</h3>
+<h3 id="logback">4.3. Logback</h3>
 <div class="paragraph">
 <p>Replace <code>src/main/resources/logback.xml</code> with the following content to get a more verbose output:</p>
 </div>
@@ -374,7 +348,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>In the AWS console, as Handler, set:</p>
 </div>
 <div class="paragraph">
-<p><code>example.micronaut.Handler</code></p>
+<p><code>example.micronaut.FunctionHandler</code></p>
 </div>
 </div>
 <div class="sect2">
