@@ -13,9 +13,9 @@ import jakarta.inject.Inject;
 import java.util.Locale;
 
 @Introspected
-public class Handler
+public class FunctionRequestHandler
         extends MicronautRequestHandler<S3EventNotification, Void> { // <1>
-    private static final Logger LOG = LoggerFactory.getLogger(Handler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FunctionRequestHandler.class);
     private static final String SLASH = "/";
     private static final String THUMBNAILS = "thumbnails";
     public static final String OBJECT_CREATED = "ObjectCreated";
