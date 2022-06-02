@@ -129,10 +129,9 @@
 <li><a href="#writing-the-app">4. Writing the App</a>
 <ul class="sectlevel2">
 <li><a href="#enable-annotation-processing">4.1. Enable annotation Processing</a></li>
-<li><a href="#delete-sample-code">4.2. Delete Sample Code</a></li>
-<li><a href="#thumbnail-configuration">4.3. Thumbnail Configuration</a></li>
-<li><a href="#thumbnail-generation">4.4. Thumbnail Generation</a></li>
-<li><a href="#handler">4.5. Handler</a></li>
+<li><a href="#thumbnail-configuration">4.2. Thumbnail Configuration</a></li>
+<li><a href="#thumbnail-generation">4.3. Thumbnail Generation</a></li>
+<li><a href="#handler">4.4. Handler</a></li>
 </ul>
 </li>
 <li><a href="#s3">5. S3</a></li>
@@ -236,7 +235,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
-<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select serverless function as application type and add <code>aws-lambda</code> feature.</p>
+<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select serverless function as application type and add the <code>aws-lambda-s3-event-notification</code> feature.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
@@ -253,29 +252,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="delete-sample-code">4.2. Delete Sample Code</h3>
-<div class="paragraph">
-<p>The Micronaut framework generates some sample code by default. Delete the following files:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>src/main/java/example/micronaut/Book.java</code></p>
-</li>
-<li>
-<p><code>src/main/java/example/micronaut/BookRequest.java</code></p>
-</li>
-<li>
-<p><code>src/main/java/example/micronaut/BookSaved.java</code></p>
-</li>
-<li>
-<p><code>src/test/java/example/micronaut/BookRequestHandlerTest.java</code></p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="thumbnail-configuration">4.3. Thumbnail Configuration</h3>
+<h3 id="thumbnail-configuration">4.2. Thumbnail Configuration</h3>
 <div class="paragraph">
 <p>Add the following configuration:</p>
 </div>
@@ -365,7 +342,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="thumbnail-generation">4.4. Thumbnail Generation</h3>
+<h3 id="thumbnail-generation">4.3. Thumbnail Generation</h3>
 <div class="paragraph">
 <p>Create a contract for thumbnail generation. We leverage the <code>@Pattern</code> annotation to accept only <code>jpg</code> and <code>png</code> files.</p>
 </div>
@@ -461,9 +438,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect2">
-<h3 id="handler">4.5. Handler</h3>
+<h3 id="handler">4.4. Handler</h3>
 <div class="paragraph">
-<p>Add the following dependency to subscribe to <code>S3NotificationEvent</code>:</p>
+<p>When you select the feature <code>aws-lambda-s3-event-notification</code>, the application build includes the following dependency:</p>
 </div>
 <div class="listingblock">
 <div class="title">build.gradle</div>
@@ -482,10 +459,10 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 </div>
 <div class="paragraph">
-<p>Create a Handler which receives an S3 notification event and for each S3 event of type <code>ObjectCreated</code> creates a thumbnail if the S3 object is a PNG or JPG in the <code>thumbnails</code> folder of the same S3 bucket which triggered the event.</p>
+<p>The handler receives an S3 notification event and for each S3 event of type <code>ObjectCreated</code> creates a thumbnail if the S3 object is a PNG or JPG in the <code>thumbnails</code> folder of the same S3 bucket which triggered the event.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/java/example/micronaut/Handler.java</div>
+<div class="title">src/main/java/example/micronaut/FunctionRequestHandler.java</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
@@ -502,9 +479,9 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <span class="keyword">import</span> <span class="include">java.util.Locale</span>;
 
 <span class="annotation">@Introspected</span>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">Handler</span>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">FunctionRequestHandler</span>
         <span class="directive">extends</span> MicronautRequestHandler&lt;S3EventNotification, <span class="predefined-type">Void</span>&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(<span class="predefined-type">Handler</span>.class);
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(FunctionRequestHandler.class);
     <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> SLASH = <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>;
     <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> THUMBNAILS = <span class="string"><span class="delimiter">&quot;</span><span class="content">thumbnails</span><span class="delimiter">&quot;</span></span>;
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> OBJECT_CREATED = <span class="string"><span class="delimiter">&quot;</span><span class="content">ObjectCreated</span><span class="delimiter">&quot;</span></span>;
@@ -657,7 +634,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <p>In the AWS Console, as Handler, set:</p>
 </div>
 <div class="paragraph">
-<p><code>example.micronaut.Handler</code></p>
+<p><code>example.micronaut.FunctionRequestHandler</code></p>
 </div>
 </div>
 <div class="sect2">
