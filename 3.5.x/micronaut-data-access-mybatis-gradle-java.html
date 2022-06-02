@@ -300,7 +300,7 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <p>As there is no out-of-the-box support yet in the Micronaut framework for MyBatis, it is necessary to manually wire <code>SqlSessionFactory</code>.</p>
 </div>
 <div class="paragraph">
-<p>Create the following <a href="https://docs.micronaut.io/latest/guide/#factories">@Factory</a> class in  <code>src/main/java/example/micronaut/MybatisFactory.java</code>:</p>
+<p>Create the following <a href="https://docs.micronaut.io/latest/guide/#factories">@Factory</a> class:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/MybatisFactory.java</div>
@@ -439,6 +439,88 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
                 <span class="string"><span class="delimiter">&quot;</span><span class="content">id=</span><span class="delimiter">&quot;</span></span> + id +
                 <span class="string"><span class="delimiter">&quot;</span><span class="content">, name='</span><span class="delimiter">&quot;</span></span> + name + <span class="string"><span class="delimiter">'</span><span class="char">\'</span><span class="delimiter">'</span></span> +
                 <span class="string"><span class="delimiter">&quot;</span><span class="content">, books=</span><span class="delimiter">&quot;</span></span> + books +
+                <span class="string"><span class="delimiter">'</span><span class="content">}</span><span class="delimiter">'</span></span>;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/domain/Book.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
+
+<span class="annotation">@Introspected</span>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">Book</span> {
+
+    <span class="annotation">@Nullable</span>
+    <span class="directive">private</span> <span class="predefined-type">Long</span> id;
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotNull</span>
+    <span class="directive">private</span> <span class="predefined-type">String</span> name;
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotNull</span>
+    <span class="directive">private</span> <span class="predefined-type">String</span> isbn;
+
+    <span class="directive">private</span> Genre genre;
+
+    <span class="directive">public</span> <span class="predefined-type">Book</span>(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">String</span> isbn,
+                <span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">String</span> name,
+                Genre genre) {
+        <span class="local-variable">this</span>.isbn = isbn;
+        <span class="local-variable">this</span>.name = name;
+        <span class="local-variable">this</span>.genre = genre;
+    }
+
+    <span class="annotation">@Nullable</span>
+    <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
+        <span class="keyword">return</span> id;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setId(<span class="annotation">@Nullable</span> <span class="predefined-type">Long</span> id) {
+        <span class="local-variable">this</span>.id = id;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
+        <span class="keyword">return</span> name;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setName(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getIsbn() {
+        <span class="keyword">return</span> isbn;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setIsbn(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> isbn) {
+        <span class="local-variable">this</span>.isbn = isbn;
+    }
+
+    <span class="directive">public</span> Genre getGenre() {
+        <span class="keyword">return</span> genre;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setGenre(Genre genre) {
+        <span class="local-variable">this</span>.genre = genre;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> toString() {
+        <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Book{</span><span class="delimiter">&quot;</span></span> +
+                <span class="string"><span class="delimiter">&quot;</span><span class="content">id=</span><span class="delimiter">&quot;</span></span> + id +
+                <span class="string"><span class="delimiter">&quot;</span><span class="content">, name='</span><span class="delimiter">&quot;</span></span> + name + <span class="string"><span class="delimiter">'</span><span class="char">\'</span><span class="delimiter">'</span></span> +
+                <span class="string"><span class="delimiter">&quot;</span><span class="content">, isbn='</span><span class="delimiter">&quot;</span></span> + isbn + <span class="string"><span class="delimiter">'</span><span class="char">\'</span><span class="delimiter">'</span></span> +
+                <span class="string"><span class="delimiter">&quot;</span><span class="content">, genre=</span><span class="delimiter">&quot;</span></span> + genre +
                 <span class="string"><span class="delimiter">'</span><span class="content">}</span><span class="delimiter">'</span></span>;
     }
 }</code></pre>
