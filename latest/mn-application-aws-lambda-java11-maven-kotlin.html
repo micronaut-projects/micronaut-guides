@@ -216,7 +216,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=aws-lambda \
+    --features=aws-lambda,amazon-api-gateway \
     --build=maven --lang=kotlin</code></pre>
 </div>
 </div>
@@ -236,7 +236,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>aws-lambda</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>aws-lambda</code> and <code>amazon-api-gateway</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -245,7 +245,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=aws-lambda&amp;lang=KOTLIN&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=aws-lambda&amp;features=amazon-api-gateway&amp;lang=KOTLIN&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -261,12 +261,21 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 </div>
 <div class="paragraph">
-<p>The generated application contains a <code>BookController</code>. It responds to POST requests to <code>/</code>.</p>
+<p>The generated application contains a <code>HomeController</code>. It responds to POST requests to <code>/</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookController.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/HomeController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-application-aws-lambda-java11-maven-kotlin.adoc - include::build/code/mn-application-aws-lambda-java11/mn-application-aws-lambda-java11-maven-kotlin/src/main/kotlin/example/micronaut/BookController.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+
+@Controller
+open class HomeController {
+
+    @Get
+    fun index() = mapOf(&quot;message&quot; to &quot;Hello World&quot;)
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -275,42 +284,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/</code></p>
 </li>
 <li>
-<p>The <code>@Post</code> annotation maps HTTP requests to <code>/</code> to the <code>save</code> method.</p>
-</li>
-<li>
-<p>Add the <code>@Valid</code> annotation to any method parameter which requires validation.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The controller method parameter is a <code>Book</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/Book.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-application-aws-lambda-java11-maven-kotlin.adoc - include::build/code/mn-application-aws-lambda-java11/mn-application-aws-lambda-java11-maven-kotlin/src/main/kotlin/example/micronaut/Book.kt[]</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>It returns a <code>BookSaved</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookSaved.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-application-aws-lambda-java11-maven-kotlin.adoc - include::build/code/mn-application-aws-lambda-java11/mn-application-aws-lambda-java11-maven-kotlin/src/main/kotlin/example/micronaut/BookSaved.kt[]</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
+<p>The <code>@Get</code> annotation maps HTTP requests to <code>/</code> to the <code>index</code> method.</p>
 </li>
 </ul>
 </div>
@@ -318,9 +292,31 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The generated tests illustrates how the code works when the lambda gets invoked:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/kotlin/example/micronaut/BookControllerTest.kt</div>
+<div class="title">src/test/kotlin/example/micronaut/HomeControllerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-application-aws-lambda-java11-maven-kotlin.adoc - include::build/code/mn-application-aws-lambda-java11/mn-application-aws-lambda-java11-maven-kotlin/src/test/kotlin/example/micronaut/BookControllerTest.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut;
+import com.amazonaws.serverless.proxy.internal.testutils.MockLambdaContext
+import com.amazonaws.serverless.proxy.model.AwsProxyRequest
+import com.amazonaws.services.lambda.runtime.Context
+import io.micronaut.function.aws.proxy.MicronautLambdaHandler
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+
+class FunctionRequestHandlerTest {
+
+    @Test
+    fun testFunctionRequestHandler() {
+        val handler = MicronautLambdaHandler()
+        val lambdaContext: Context = MockLambdaContext()
+        val request = AwsProxyRequest()
+        request.httpMethod = &quot;GET&quot;
+        request.path = &quot;/&quot;
+        var  response = handler.handleRequest(request, lambdaContext)
+        assertEquals(200, response.statusCode)
+        assertEquals(&quot;{\&quot;message\&quot;:\&quot;Hello World\&quot;}&quot;, response.body)
+        handler.applicationContext.close()
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -399,27 +395,25 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="sect2">
 <h3 id="test">6.3. Test</h3>
 <div class="paragraph">
-<p>You can test it easily. As <code>Event Template</code> use <code>apigateway-aws-proxy</code> to get started:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/test-event.png" alt="test event">
-</div>
+<p>You can test it easily with a JSON Event:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="json">{
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">body</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">name</span><span class="char">\&quot;</span><span class="content">: </span><span class="char">\&quot;</span><span class="content">Building Microservices</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span>,
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">resource</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>,
   <span class="key"><span class="delimiter">&quot;</span><span class="content">path</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>,
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">httpMethod</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">POST</span><span class="delimiter">&quot;</span></span>,
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">isBase64Encoded</span><span class="delimiter">&quot;</span></span>: <span class="value">false</span>,
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">queryStringParameters</span><span class="delimiter">&quot;</span></span>: {},
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">multiValueQueryStringParameters</span><span class="delimiter">&quot;</span></span>: {},
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">pathParameters</span><span class="delimiter">&quot;</span></span>: {},
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">stageVariables</span><span class="delimiter">&quot;</span></span>: {},
-  <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">httpMethod</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">GET</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">headers</span><span class="delimiter">&quot;</span></span>: {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">Accept</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">application/json</span><span class="delimiter">&quot;</span></span>
+  }
 }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When working with Amazon API Gateway, it&#8217;s easy to use <code>apigateway-aws-proxy</code> as an <code>Event Template</code> to get started:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/test-event.png" alt="test event">
 </div>
 </div>
 <div class="paragraph">
