@@ -281,47 +281,34 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <p>The generated project contains sample code. Let&#8217;s explore it.</p>
 </div>
 <div class="paragraph">
-<p>We want to support a JavaBean as input and output types.</p>
-</div>
-<div class="paragraph">
-<p>The input is a <code>Book</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/Book.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-graalvm-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda-graalvm/mn-serverless-function-aws-lambda-graalvm-gradle-kotlin/src/main/kotlin/example/micronaut/Book.kt[]</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The output is a <code>BookSaved</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookSaved.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-graalvm-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda-graalvm/mn-serverless-function-aws-lambda-graalvm-gradle-kotlin/src/main/kotlin/example/micronaut/BookSaved.kt[]</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
 <p>The application contains a class extending <a href="https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html">MicronautRequestHandler</a></p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookRequestHandler.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/FunctionRequestHandler.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-graalvm-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda-graalvm/mn-serverless-function-aws-lambda-graalvm-gradle-kotlin/src/main/kotlin/example/micronaut/BookRequestHandler.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+import io.micronaut.function.aws.MicronautRequestHandler
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
+import jakarta.inject.Inject
+class FunctionRequestHandler : MicronautRequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt;() {
+    @Inject
+    lateinit var objectMapper: ObjectMapper
+
+    override fun execute(input: APIGatewayProxyRequestEvent): APIGatewayProxyResponseEvent {
+        val response = APIGatewayProxyResponseEvent()
+        try {
+            val json = objectMapper.writeValueAsString(mapOf(&quot;message&quot; to &quot;Hello World&quot;))
+            response.statusCode = 200
+            response.body = json
+        } catch (e: JsonProcessingException) {
+            response.statusCode = 500
+        }
+        return response
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -335,9 +322,27 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <p>The generated test shows how to verify the function behaviour:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/kotlin/example/micronaut/BookRequestHandlerTest.kt</div>
+<div class="title">src/test/kotlin/example/micronaut/FunctionRequestHandlerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-graalvm-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda-graalvm/mn-serverless-function-aws-lambda-graalvm-gradle-kotlin/src/test/kotlin/example/micronaut/BookRequestHandlerTest.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+
+class FunctionRequestHandlerTest {
+
+    @Test
+    fun testHandler() {
+        val handler = FunctionRequestHandler()
+        val request = APIGatewayProxyRequestEvent()
+        request.httpMethod = &quot;GET&quot;
+        request.path = &quot;/&quot;
+        val response = handler.execute(request)
+        assertEquals(200, response.statusCode.toInt())
+        assertEquals(&quot;{\&quot;message\&quot;:\&quot;Hello World\&quot;}&quot;, response.body)
+        handler.close()
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -395,9 +400,32 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <p>The generated project contains such a class:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookLambdaRuntime.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/FunctionLambdaRuntime.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-graalvm-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda-graalvm/mn-serverless-function-aws-lambda-graalvm-gradle-kotlin/src/main/kotlin/example/micronaut/BookLambdaRuntime.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+import com.amazonaws.services.lambda.runtime.RequestHandler
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
+import io.micronaut.function.aws.runtime.AbstractMicronautLambdaRuntime
+import java.net.MalformedURLException
+
+class FunctionLambdaRuntime : AbstractMicronautLambdaRuntime&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent, APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt;()
+{
+
+    override fun createRequestHandler(vararg args: String?): RequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt;? {
+        return FunctionRequestHandler()
+    }
+    companion object {
+        @JvmStatic
+        fun main(vararg args: String) {
+            try {
+                FunctionLambdaRuntime().run(*args)
+            } catch (e: MalformedURLException) {
+                e.printStackTrace()
+            }
+        }
+    }
+}</code></pre>
 </div>
 </div>
 <div class="listingblock">
@@ -420,7 +448,7 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <div class="sect2">
 <h3 id="handler">8.2. Handler</h3>
 <div class="paragraph">
-<p>The handler used is the one created at <code>BookLambdaRuntime</code>.</p>
+<p>The handler used is the one created at <code>FunctionLambdaRuntime</code>.</p>
 </div>
 <div class="paragraph">
 <p>Thus, you don&#8217;t need to specify the handler in the AWS Lambda console.</p>
@@ -429,7 +457,7 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <p>However, I like to specify it in the console as well:</p>
 </div>
 <div class="paragraph">
-<p><code>example.micronaut.BookRequestHandler</code></p>
+<p><code>example.micronaut.FunctionRequestHandler</code></p>
 </div>
 <div class="imageblock">
 <div class="content">

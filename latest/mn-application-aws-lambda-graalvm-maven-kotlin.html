@@ -270,12 +270,21 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 </div>
 <div class="paragraph">
-<p>The generated application contains a <code>BookController</code>. It responds to POST request to <code>/</code>.</p>
+<p>The generated application contains a <code>HomeController</code>. It responds to POST request to <code>/</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookController.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/HomeController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-application-aws-lambda-graalvm-maven-kotlin.adoc - include::build/code/mn-application-aws-lambda-graalvm/mn-application-aws-lambda-graalvm-maven-kotlin/src/main/kotlin/example/micronaut/BookController.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+
+@Controller
+open class HomeController {
+
+    @Get
+    fun index() = mapOf(&quot;message&quot; to &quot;Hello World&quot;)
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -284,42 +293,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/</code></p>
 </li>
 <li>
-<p>The <code>@Post</code> annotation maps HTTP requests to <code>/</code> to the <code>save</code> method.</p>
-</li>
-<li>
-<p>Add the <code>@Valid</code> annotation to any method parameter that requires validation.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The controller method parameter is a <code>Book</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/Book.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-application-aws-lambda-graalvm-maven-kotlin.adoc - include::build/code/mn-application-aws-lambda-graalvm/mn-application-aws-lambda-graalvm-maven-kotlin/src/main/kotlin/example/micronaut/Book.kt[]</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>It returns a <code>BookSaved</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookSaved.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-application-aws-lambda-graalvm-maven-kotlin.adoc - include::build/code/mn-application-aws-lambda-graalvm/mn-application-aws-lambda-graalvm-maven-kotlin/src/main/kotlin/example/micronaut/BookSaved.kt[]</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
+<p>The <code>@Get</code> annotation maps HTTP requests to <code>/</code> to the <code>index</code> method.</p>
 </li>
 </ul>
 </div>
@@ -327,9 +301,31 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The generated tests illustrates how the code works when the lambda gets invoked:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/kotlin/example/micronaut/BookControllerTest.kt</div>
+<div class="title">src/test/kotlin/example/micronaut/HomeControllerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-application-aws-lambda-graalvm-maven-kotlin.adoc - include::build/code/mn-application-aws-lambda-graalvm/mn-application-aws-lambda-graalvm-maven-kotlin/src/test/kotlin/example/micronaut/BookControllerTest.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut;
+import com.amazonaws.serverless.proxy.internal.testutils.MockLambdaContext
+import com.amazonaws.serverless.proxy.model.AwsProxyRequest
+import com.amazonaws.services.lambda.runtime.Context
+import io.micronaut.function.aws.proxy.MicronautLambdaHandler
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+
+class FunctionRequestHandlerTest {
+
+    @Test
+    fun testFunctionRequestHandler() {
+        val handler = MicronautLambdaHandler()
+        val lambdaContext: Context = MockLambdaContext()
+        val request = AwsProxyRequest()
+        request.httpMethod = &quot;GET&quot;
+        request.path = &quot;/&quot;
+        var  response = handler.handleRequest(request, lambdaContext)
+        assertEquals(200, response.statusCode)
+        assertEquals(&quot;{\&quot;message\&quot;:\&quot;Hello World\&quot;}&quot;, response.body)
+        handler.applicationContext.close()
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">

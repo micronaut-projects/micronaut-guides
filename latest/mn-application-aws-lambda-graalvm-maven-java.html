@@ -270,12 +270,25 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 </div>
 <div class="paragraph">
-<p>The generated application contains a <code>BookController</code>. It responds to POST request to <code>/</code>.</p>
+<p>The generated application contains a <code>HomeController</code>. It responds to POST request to <code>/</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/java/example/micronaut/BookController.java</div>
+<div class="title">src/main/java/example/micronaut/HomeController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in mn-application-aws-lambda-graalvm-maven-java.adoc - include::build/code/mn-application-aws-lambda-graalvm/mn-application-aws-lambda-graalvm-maven-java/src/main/java/example/micronaut/BookController.java<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+
+<span class="annotation">@Controller</span>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">HomeController</span> {
+
+    <span class="annotation">@Get</span>
+    <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; index() {
+        <span class="keyword">return</span> <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>);
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -284,42 +297,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/</code></p>
 </li>
 <li>
-<p>The <code>@Post</code> annotation maps HTTP requests to <code>/</code> to the <code>save</code> method.</p>
-</li>
-<li>
-<p>Add the <code>@Valid</code> annotation to any method parameter that requires validation.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The controller method parameter is a <code>Book</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/java/example/micronaut/Book.java</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in mn-application-aws-lambda-graalvm-maven-java.adoc - include::build/code/mn-application-aws-lambda-graalvm/mn-application-aws-lambda-graalvm-maven-java/src/main/java/example/micronaut/<span class="predefined-type">Book</span>.java<span class="type">[]</span></code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>It returns a <code>BookSaved</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/java/example/micronaut/BookSaved.java</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in mn-application-aws-lambda-graalvm-maven-java.adoc - include::build/code/mn-application-aws-lambda-graalvm/mn-application-aws-lambda-graalvm-maven-java/src/main/java/example/micronaut/BookSaved.java<span class="type">[]</span></code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
+<p>The <code>@Get</code> annotation maps HTTP requests to <code>/</code> to the <code>index</code> method.</p>
 </li>
 </ul>
 </div>
@@ -327,9 +305,51 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The generated tests illustrates how the code works when the lambda gets invoked:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/java/example/micronaut/BookControllerTest.java</div>
+<div class="title">src/test/java/example/micronaut/HomeControllerTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in mn-application-aws-lambda-graalvm-maven-java.adoc - include::build/code/mn-application-aws-lambda-graalvm/mn-application-aws-lambda-graalvm-maven-java/src/test/java/example/micronaut/BookControllerTest.java<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<span class="keyword">import</span> <span class="include">com.amazonaws.serverless.exceptions.ContainerInitializationException</span>;
+<span class="keyword">import</span> <span class="include">com.amazonaws.serverless.proxy.internal.testutils.MockLambdaContext</span>;
+<span class="keyword">import</span> <span class="include">com.amazonaws.serverless.proxy.model.AwsProxyRequest</span>;
+<span class="keyword">import</span> <span class="include">com.amazonaws.serverless.proxy.model.AwsProxyResponse</span>;
+<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.Context</span>;
+<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.core.JsonProcessingException</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.function.aws.proxy.MicronautLambdaHandler</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.AfterAll</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.BeforeAll</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+
+<span class="directive">public</span> <span class="type">class</span> <span class="class">HomeControllerTest</span> {
+
+    <span class="directive">private</span> <span class="directive">static</span> MicronautLambdaHandler handler;
+    <span class="directive">private</span> <span class="directive">static</span> <span class="predefined-type">Context</span> lambdaContext = <span class="keyword">new</span> MockLambdaContext();
+
+    <span class="annotation">@BeforeAll</span>
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> setupSpec() {
+        <span class="keyword">try</span> {
+            handler = <span class="keyword">new</span> MicronautLambdaHandler();
+        } <span class="keyword">catch</span> (ContainerInitializationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    <span class="annotation">@AfterAll</span>
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> cleanupSpec() {
+        handler.getApplicationContext().close();
+    }
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> testHandler() <span class="directive">throws</span> JsonProcessingException {
+        AwsProxyRequest request = <span class="keyword">new</span> AwsProxyRequest();
+        request.setHttpMethod(<span class="string"><span class="delimiter">&quot;</span><span class="content">GET</span><span class="delimiter">&quot;</span></span>);
+        request.setPath(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>);
+        AwsProxyResponse response = handler.handleRequest(request, lambdaContext);
+        assertEquals(<span class="integer">200</span>, response.getStatusCode());
+        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">message</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">Hello World</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span>,  response.getBody());
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
