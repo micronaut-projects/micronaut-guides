@@ -18,10 +18,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Introspected
-public class Handler
+public class FunctionRequestHandler
         extends MicronautRequestHandler<SecretsManagerRotationEvent, Void> { // <1>
 
-    private static final Logger LOG = LoggerFactory.getLogger(Handler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FunctionRequestHandler.class);
 
     private static final String JWK_PRIMARY = "jwk.primary";
     private static final String JWK_SECONDARY = "jwk.secondary";
