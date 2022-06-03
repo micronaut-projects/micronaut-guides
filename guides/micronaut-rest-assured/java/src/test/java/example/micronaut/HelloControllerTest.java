@@ -15,13 +15,13 @@ public class HelloControllerTest {
 
     @Test
     public void testHelloEndpoint() {
-        given()
-                .port(embeddedServer.getPort()) // <3>
-                .when()
-                .get("/hello")
-                .then()
-                .statusCode(200)
-                .body(is("Hello World"));
+        given().
+                port(embeddedServer.getPort()). // <3>
+        when().
+                get("/hello").
+        then().
+                statusCode(200).
+                body(is("Hello World"));
     }
 
 }
