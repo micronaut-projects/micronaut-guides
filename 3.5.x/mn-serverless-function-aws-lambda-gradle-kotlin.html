@@ -161,7 +161,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 3.5.0</p>
+<p>Micronaut Version: 3.5.1</p>
 </div>
 <div class="paragraph">
 <p>Please read about <a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda">Micronaut AWS Lambda Support</a> to learn more about different Lambda runtime, Triggers, and Handlers, and how to integrate with a Micronaut application.</p>
@@ -258,47 +258,34 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="paragraph">
-<p>We want to support a JavaBean as input and output types.</p>
-</div>
-<div class="paragraph">
-<p>The input is a  <code>Book</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/Book.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda/mn-serverless-function-aws-lambda-gradle-kotlin/src/main/kotlin/example/micronaut/Book.kt[]</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The output is a <code>BookSaved</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookSaved.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda/mn-serverless-function-aws-lambda-gradle-kotlin/src/main/kotlin/example/micronaut/BookSaved.kt[]</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
 <p>The application contains a class extending <a href="https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html">MicronautRequestHandler</a></p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/BookRequestHandler.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/FunctionRequestHandler.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda/mn-serverless-function-aws-lambda-gradle-kotlin/src/main/kotlin/example/micronaut/BookRequestHandler.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+import io.micronaut.function.aws.MicronautRequestHandler
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
+import jakarta.inject.Inject
+class FunctionRequestHandler : MicronautRequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt;() {
+    @Inject
+    lateinit var objectMapper: ObjectMapper
+
+    override fun execute(input: APIGatewayProxyRequestEvent): APIGatewayProxyResponseEvent {
+        val response = APIGatewayProxyResponseEvent()
+        try {
+            val json = objectMapper.writeValueAsString(mapOf(&quot;message&quot; to &quot;Hello World&quot;))
+            response.statusCode = 200
+            response.body = json
+        } catch (e: JsonProcessingException) {
+            response.statusCode = 500
+        }
+        return response
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -309,12 +296,30 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </ul>
 </div>
 <div class="paragraph">
-<p>The generated test shows how to verify the function behaviour:</p>
+<p>An included test shows how to verify the function behaviour:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/kotlin/example/micronaut/BookRequestHandlerTest.kt</div>
+<div class="title">src/test/kotlin/example/micronaut/FunctionRequestHandlerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in mn-serverless-function-aws-lambda-gradle-kotlin.adoc - include::build/code/mn-serverless-function-aws-lambda/mn-serverless-function-aws-lambda-gradle-kotlin/src/test/kotlin/example/micronaut/BookRequestHandlerTest.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+
+class FunctionRequestHandlerTest {
+
+    @Test
+    fun testHandler() {
+        val handler = FunctionRequestHandler()
+        val request = APIGatewayProxyRequestEvent()
+        request.httpMethod = &quot;GET&quot;
+        request.path = &quot;/&quot;
+        val response = handler.execute(request)
+        assertEquals(200, response.statusCode.toInt())
+        assertEquals(&quot;{\&quot;message\&quot;:\&quot;Hello World\&quot;}&quot;, response.body)
+        handler.close()
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -385,7 +390,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>As Handler, set:</p>
 </div>
 <div class="paragraph">
-<p><code>example.micronaut.BookRequestHandler</code></p>
+<p><code>example.micronaut.FunctionRequestHandler</code></p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -396,18 +401,25 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="sect2">
 <h3 id="test">6.3. Test</h3>
 <div class="paragraph">
-<p>You can test it easily.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/test-event-2.png" alt="test event 2">
-</div>
+<p>You can test it easily with a JSON Event:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="json">{
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">path</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">httpMethod</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">GET</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">headers</span><span class="delimiter">&quot;</span></span>: {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">Accept</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">application/json</span><span class="delimiter">&quot;</span></span>
+  }
 }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When working with Amazon API Gateway, it&#8217;s easy to use <code>apigateway-aws-proxy</code> as an <code>Event Template</code> to get started:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/test-event.png" alt="test event">
 </div>
 </div>
 <div class="paragraph">
@@ -415,7 +427,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/test-result-2.png" alt="test result 2">
+<img src="images/test-result.png" alt="test result">
 </div>
 </div>
 </div>

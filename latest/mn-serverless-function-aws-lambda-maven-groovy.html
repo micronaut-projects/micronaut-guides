@@ -157,7 +157,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 3.5.0</p>
+<p>Micronaut Version: 3.5.1</p>
 </div>
 <div class="paragraph">
 <p>Please read about <a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda">Micronaut AWS Lambda Support</a> to learn more about different Lambda runtime, Triggers, and Handlers, and how to integrate with a Micronaut application.</p>
@@ -244,47 +244,37 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>We want to support a JavaBean as input and output types.</p>
-</div>
-<div class="paragraph">
-<p>The input is a  <code>Book</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/Book.groovy</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> mn-serverless-function-aws-lambda-maven-groovy.adoc - <span class="key">include</span>::build/code/mn-serverless-function-aws-lambda/mn-serverless-function-aws-lambda-maven-groovy/src/main/groovy/example/micronaut/<span class="predefined-type">Book</span>.groovy<span class="type">[]</span></code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The output is a <code>BookSaved</code> object:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/BookSaved.groovy</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> mn-serverless-function-aws-lambda-maven-groovy.adoc - <span class="key">include</span>::build/code/mn-serverless-function-aws-lambda/mn-serverless-function-aws-lambda-maven-groovy/src/main/groovy/example/micronaut/BookSaved.groovy<span class="type">[]</span></code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotate the class with <code>@Introspected</code> to generate the Bean Metainformation at compile time.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
 <p>The application contains a class extending <a href="https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html">MicronautRequestHandler</a></p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/BookRequestHandler.groovy</div>
+<div class="title">src/main/groovy/example/micronaut/FunctionRequestHandler.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> mn-serverless-function-aws-lambda-maven-groovy.adoc - <span class="key">include</span>::build/code/mn-serverless-function-aws-lambda/mn-serverless-function-aws-lambda-maven-groovy/src/main/groovy/example/micronaut/BookRequestHandler.groovy<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.function.aws.MicronautRequestHandler</span>
+<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.core.JsonProcessingException</span>
+<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.databind.ObjectMapper</span>
+<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>
+<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+
+<span class="type">class</span> <span class="class">FunctionRequestHandler</span> <span class="directive">extends</span> MicronautRequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt; {
+    <span class="annotation">@Inject</span>
+    ObjectMapper objectMapper
+
+    <span class="annotation">@Override</span>
+    APIGatewayProxyResponseEvent execute(APIGatewayProxyRequestEvent input) {
+        APIGatewayProxyResponseEvent response = <span class="keyword">new</span> APIGatewayProxyResponseEvent()
+        <span class="keyword">try</span> {
+            <span class="predefined-type">String</span> json = objectMapper.writeValueAsString([<span class="key">message</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>])
+            response.statusCode = <span class="integer">200</span>
+            response.body = json
+        } <span class="keyword">catch</span> (JsonProcessingException e) {
+            response.statusCode = <span class="integer">500</span>
+        }
+        response
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -295,12 +285,38 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </ul>
 </div>
 <div class="paragraph">
-<p>The generated test shows how to verify the function behaviour:</p>
+<p>An included test shows how to verify the function behaviour:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/groovy/example/micronaut/BookRequestHandlerSpec.groovy</div>
+<div class="title">src/test/groovy/example/micronaut/FunctionRequestHandlerSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> mn-serverless-function-aws-lambda-maven-groovy.adoc - <span class="key">include</span>::build/code/mn-serverless-function-aws-lambda/mn-serverless-function-aws-lambda-maven-groovy/src/test/groovy/example/micronaut/BookRequestHandlerSpec.groovy<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>
+<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>
+<span class="keyword">import</span> <span class="include">spock.lang.AutoCleanup</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Shared</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="type">class</span> <span class="class">FunctionRequestHandlerSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@AutoCleanup</span>
+    <span class="annotation">@Shared</span>
+    FunctionRequestHandler handler = <span class="keyword">new</span> FunctionRequestHandler()
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">test Handler</span><span class="delimiter">&quot;</span></span>() {
+        <span class="key">given</span>:
+        APIGatewayProxyRequestEvent request = <span class="keyword">new</span> APIGatewayProxyRequestEvent()
+        request.setHttpMethod(<span class="string"><span class="delimiter">&quot;</span><span class="content">GET</span><span class="delimiter">&quot;</span></span>)
+        request.setPath(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
+
+        <span class="key">when</span>:
+        APIGatewayProxyResponseEvent response = handler.execute(request)
+
+        <span class="key">then</span>:
+        <span class="integer">200</span> == response.getStatusCode().intValue()
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">message</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">Hello World</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span> == response.body
+    }
+}</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -367,7 +383,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>As Handler, set:</p>
 </div>
 <div class="paragraph">
-<p><code>example.micronaut.BookRequestHandler</code></p>
+<p><code>example.micronaut.FunctionRequestHandler</code></p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -378,18 +394,25 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="sect2">
 <h3 id="test">6.3. Test</h3>
 <div class="paragraph">
-<p>You can test it easily.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="images/test-event-2.png" alt="test event 2">
-</div>
+<p>You can test it easily with a JSON Event:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="json">{
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">path</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">httpMethod</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">GET</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">headers</span><span class="delimiter">&quot;</span></span>: {
+    <span class="key"><span class="delimiter">&quot;</span><span class="content">Accept</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">application/json</span><span class="delimiter">&quot;</span></span>
+  }
 }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When working with Amazon API Gateway, it&#8217;s easy to use <code>apigateway-aws-proxy</code> as an <code>Event Template</code> to get started:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/test-event.png" alt="test event">
 </div>
 </div>
 <div class="paragraph">
@@ -397,7 +420,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/test-result-2.png" alt="test result 2">
+<img src="images/test-result.png" alt="test result">
 </div>
 </div>
 </div>
