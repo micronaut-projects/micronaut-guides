@@ -20,7 +20,7 @@ class GithubControllerSpec extends Specification {
     HttpClient client // <2>
 
     @Shared
-    Pattern MICRONAUT_RELEASE = Pattern.compile("Micronaut [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?");
+    Pattern MICRONAUT_RELEASE = Pattern.compile("[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?");
 
 
     void 'verify github releases can be fetched with low level HttpClient'() {
