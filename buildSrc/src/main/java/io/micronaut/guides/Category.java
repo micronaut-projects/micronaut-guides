@@ -13,6 +13,7 @@ public enum Category {
     GRAPHQL("GraphQL"),
     KOTLIN("Kotlin"),
     MESSAGING("Messaging"),
+    METRICS("Metrics"),
     ORACLE_CLOUD("Micronaut + Oracle Cloud"),
     PATTERNS("Patterns"),
     SECURITY("Micronaut Security"),
