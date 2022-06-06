@@ -8,7 +8,6 @@ public enum Category {
     CACHE("Cache"),
     GRAPHQL("GraphQL"),
     MESSAGING("Messaging"),
-    NETWORK_COMMUNICATION("Network Communication"),
     SECURITY("Micronaut Security"),
     SERVICE_DISCOVERY("Service Discovery"),
     DISTRIBUTED_TRACING("Distributed Tracing"),
