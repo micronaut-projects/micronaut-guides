@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 @ServerWebSocket("/ws/chat/{topic}/{username}") // <1>
 public class ChatServer {
 
-    private static final Logger log = LoggerFactory.getLogger(ChatServer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ChatServer.class);
 
     private final WebSocketBroadcaster broadcaster;
 
@@ -25,7 +25,6 @@ public class ChatServer {
 
     @OnOpen // <3>
     public Publisher<String> onOpen(String topic, String username, WebSocketSession session) {
-
         log("onOpen", session, username, topic);
         if (topic.equals("all")) { // <4>
             return broadcaster.broadcast(String.format("[%s] Now making announcements!", username), isValid(topic));
@@ -55,7 +54,7 @@ public class ChatServer {
     }
 
     private void log(String event, WebSocketSession session, String username, String topic) {
-        log.info("* WebSocket: {} received for session {} from '{}' regarding '{}'",
+        LOG.info("* WebSocket: {} received for session {} from '{}' regarding '{}'",
                 event, session.getId(), username, topic);
     }
 

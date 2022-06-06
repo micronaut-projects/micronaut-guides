@@ -18,7 +18,7 @@ import java.util.Arrays;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD) // <1>
 class ChatWebSocketTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ChatWebSocketTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ChatWebSocketTest.class);
 
     @Inject
     ChatClientConnect webSocketConnect; // <2>
@@ -137,11 +137,11 @@ class ChatWebSocketTest {
     }
 
     private void log(String test) {
-        log.info("{}...", test);
-        log.info(adam.getMessagesChronologically().toString());
-        log.info(anna.getMessagesChronologically().toString());
-        log.info(ben.getMessagesChronologically().toString());
-        log.info(zach.getMessagesChronologically().toString());
-        log.info(cienna.getMessagesChronologically().toString());
+        LOG.info("{}...", test);
+        LOG.info(adam.getMessagesChronologically().toString());
+        LOG.info(anna.getMessagesChronologically().toString());
+        LOG.info(ben.getMessagesChronologically().toString());
+        LOG.info(zach.getMessagesChronologically().toString());
+        LOG.info(cienna.getMessagesChronologically().toString());
     }
 }

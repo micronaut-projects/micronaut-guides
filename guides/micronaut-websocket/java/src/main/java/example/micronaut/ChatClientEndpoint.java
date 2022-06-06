@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @ClientWebSocket // <1>
 public abstract class ChatClientEndpoint implements AutoCloseable {
 
-    private static final Logger log = LoggerFactory.getLogger(ChatClientEndpoint.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ChatClientEndpoint.class);
 
     private final Deque<String> messageHistory = new ConcurrentLinkedDeque<>(); // <2>
 
@@ -34,7 +34,7 @@ public abstract class ChatClientEndpoint implements AutoCloseable {
 
     @OnMessage // <4>
     public void onMessage(String message) {
-        log.info("* Storing message in client: {}", message);
+        LOG.info("* Storing message in client: {}", message);
         messageHistory.add(message); // <5>
     }
 
