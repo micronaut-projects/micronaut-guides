@@ -1,0 +1,64 @@
+common:completesolution.adoc[]
+
+== Writing the Application
+
+The Micronaut framework provides three annotations to create or continue an existing span and include additional information to the span.
+
+@NewSpan:: Used on methods to creates a new span using a given name or defaults to the method name.
+
+@ContinueSpan:: Used on methods continues the existing span.
+
+@SpanTag:: Used on method parameter to include the value to the span with a given name or defaults to the parameter name. To use the `@SpanTag` on a method argument, the method must be annotated with either `@NewSpan` or `@ContinueSpan`.
+
+The `@NewSpan` and `@ContinueSpan` can be used on non-private methods.
+
+If the annotations are not enough, or you want to add tracing to a private method, Micronaut’s tracing integration registers a `io.opentracing.Tracer` bean which exposes the Open Tracing API and can be dependency-injected as needed.
+
+=== Create the Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli-command@ example.micronaut.micronautguide \
+    --features=@features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @features-words@ features.
+
+diffLink:[]
+
+common:annotationprocessors.adoc[]
+
+=== Store Controller
+
+source:StoreController[]
+<1> Creates a new span called `inventory-all`
+<2> Continues the existing span `/store/order`
+<3> Adds a tag, or label, called `order.item` that will contain the value contained in `item`
+<4> Similar to the above, but the tag will called `count`
+<5> Span called `/store/inventory/{item}` created automatically
+
+=== Inventory Service
+
+source:InventoryService[]
+<1> Inject Tracing bean into class
+<2> Same as `@SpanTag("inventory.store.count")`
+<3> `@NewSpan` and `@ContinueSpan` can be used on non-private methods
+<4> Can be used in conjunction with `@NewSpan` and `@ContinueSpan`
+<5> Same as `@NewSpan("warehouse-order")` with `@SpanTags` for item and count
+
+=== Warehouse Client
+
+source:WarehouseClient[]
+<1> Some external service without Tracing
+<2> Can add tracing data like any other method
+
+
+
+

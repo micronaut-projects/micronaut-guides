@@ -1,0 +1,77 @@
+external:micronaut-cloud-trace-base/start.adoc[]
+* A https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account and a GCP project.
+
+common:costs-gcloud.adoc[]
+
+common:gcp.adoc[]
+
+external:micronaut-cloud-trace-base/create-app.adoc[]
+
+=== Configure Tracer
+
+Add the following to the `application.yml` file:
+
+resource:application.yml[tag=tracing]
+<1> Tracing is disabled by default
+<2> Set the sampling to 100%, so that every trace is collected
+
+== Run the Application
+
+The application can be deployed to Google Cloud Run, Cloud Function, Cloud Compute or App Engine.
+
+Traces can be sent to Google Cloud Trace outside the Google Cloud.
+
+This allows us to run the application locally and see the traces in Google Cloud Trace.
+
+common:runapp-instructions.adoc[]
+
+[NOTE]
+====
+You might get this error message: +
+"Message: The Application Default Credentials are not available. They are available if running in Google Compute Engine. Otherwise, the environment variable GOOGLE_APPLICATION_CREDENTIALS must be defined pointing to a file defining the credentials. See https://developers.google.com/accounts/docs/application-default-credentials for more information."
+
+Login with developer credentials:
+[,bash]
+----
+gcloud auth application-default login
+----
+====
+
+== Traces
+
+Open the https://console.cloud.google.com/traces[GCP Tracing Console].
+
+It does take a few seconds for the traces to show up in the console.
+
+=== Get Item Counts
+
+[source, bash]
+----
+curl http://localhost:8080/store/inventory/laptop
+----
+
+=== Order Item
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/store/order" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{"item":"laptop", "count":5}'
+----
+
+=== Get Inventory
+
+[source, bash]
+----
+curl http://localhost:8080/store/inventory
+----
+
+Looking at the trace, retrieving the items sequentially might not be the best design choice.
+
+common:gcp-project-cleanup.adoc[]
+
+== Next Steps
+
+Read more about https://micronaut-projects.github.io/micronaut-gcp/latest/guide/[Micronaut GCP] integration.
+
+
