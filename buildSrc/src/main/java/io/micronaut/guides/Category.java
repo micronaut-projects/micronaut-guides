@@ -16,7 +16,9 @@ public enum Category {
     AWS("AWS"),
     AZURE("Micronaut + Microsoft Azure"),
     GCP("Micronaut + Google Cloud"),
-    ORACLE_CLOUD("Micronaut + Oracle Cloud");
+    TEST("Testing"),
+    ORACLE_CLOUD("Micronaut + Oracle Cloud"),
+    PATTERNS("Patterns");
 
     private final String val;
 

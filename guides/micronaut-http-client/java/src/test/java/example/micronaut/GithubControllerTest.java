@@ -22,7 +22,7 @@ class GithubControllerTest {
     @Client("/")
     HttpClient client; // <2>
 
-    private static Pattern MICRONAUT_RELEASE = Pattern.compile("Micronaut [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?");
+    private static Pattern MICRONAUT_RELEASE = Pattern.compile("[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?");
 
     @Test
     public void verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {

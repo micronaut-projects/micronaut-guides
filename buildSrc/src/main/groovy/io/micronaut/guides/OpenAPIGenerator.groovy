@@ -28,7 +28,6 @@ class OpenAPIGenerator {
     public static final String PACKAGE_CONTROLLER = ".controller"
     public static final String PACKAGE_API = ".api"
     public static final String PACKAGE_MODEL = ".model"
-    public static final String PROPERTY_GENERATOR_NAME = "generatorName"
 
     static void generate(File inputDir,
                          File destination,
@@ -54,8 +53,10 @@ class OpenAPIGenerator {
         } catch (GeneratorNotFoundException e) {
             throw new GradleException("OpenAPI couldn't find specified generator: \"" +
                     e.message + "\". Check 'generatorName' property. ")
+        } catch(NoSuchMethodError e) {
+            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"")
         } catch (Exception e) {
-            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"");
+            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"")
         }
     }
 
@@ -65,12 +66,13 @@ class OpenAPIGenerator {
                                                            TestFramework testFramework,
                                                            BuildTool buildTool,
                                                            String destinationPackage) {
-        CodegenConfigurator configurator = new CodegenConfigurator();
-        configurator.setInputSpec(definitionFilePath.getPath());
+        CodegenConfigurator configurator = new CodegenConfigurator()
+        configurator.setInputSpec(definitionFilePath.getPath())
         configurator.setGeneratorName(config.generatorName)
         configurator.setOutputDir(destination.getPath())
+        config.globalProperties?.each { k, v -> configurator.addGlobalProperty(k, v) }
         configurationAdditionalProperties(config, testFramework, buildTool, destinationPackage).each { k, v ->
-            configurator.addAdditionalProperty(k, v);
+            configurator.addAdditionalProperty(k, v)
         }
         configurator
     }
