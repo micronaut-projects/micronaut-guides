@@ -32,55 +32,44 @@ resource:public/style.css[]
 === Chat server
 
 Our chat server is very simple. It merely allows you to connect and broadcast messages to subscribers of the topic. There's also a special topic called "all" that can make announcements and receive messages from all topics.
-source:ChatServer[]
-<1> Create the WebSocket along with path parameters for the topic and username
-<2> The WebSocket broadcaster which is set from the contructor where the broadcaster is injected
-<3> Event for when a client opens a WebSocket connection
+
+source:ChatServerWebSocket[]
+
+callout:websocket-server[number=1]
+callout:constructor-di[number=2,arg0=ChatServerWebSocket]
+callout:websocket-on-open[number=3]
 <4> Our chat server will have a special topic called "all" that can make announcements and receive messages from all topics
-<5> Event for when a client sends a message using WebSocket
-<6> Event for when a client closes a WebSocket connection
+callout:websocket-on-message[number=5]
+callout:websocket-on-close[number=6]
 <7> A predicate to keep messages within topics yet also enable the special "all" topic
 
+=== Test
+
+common:awaitility.adoc[]
+
+Micronaut Frameworks ease the creation of Websocket servers and clients. Write a test which uses `ClientWebSocket` to test the application.
+
+test:ChatServerWebSocketTest[]
+
+callout:spec-name[1]
+callout:micronaut-test[2]
+callout:websocket-client[3]
+callout:websocket-client-autocloseable[4]
+callout:websocket-on-message[5]
+<6> Any method name that start with (or equals) "broadcast" or "send" will be used to broadcast messages as long as the parameter is a String or a bean
+callout:websocket-client-connect[7]
+<8> Set up WebSocket clients for multiple users
+callout:awaitility[7]
+<10> Test that the correct messages are automatically sent when users join topics
+<11> Test that chats are sent within a topic and not ouside of it except to the special "all" topic
+<12> Test that the correct messages are automatically sent when users leave topics
 
 
-=== Java chat client
+common:testApp.adoc[]
 
-source:ChatClientEndpoint[]
-<1> This annotation is required for the client WebSocket
-<2> Store all the chat messages chronologically
-<3> Binds to the WebSocket "onOpen" event
-<4> Binds to the WebSocket "onMessage" event
-<5> Add messages to our history
-<6> Binds to the WebSocket "onClose" event
-<7> Any method name that start with (or equals) "broadcast" or "send" will be used to broadcast messages as long as the parameter is a String or a bean
+common:runapp.adoc[]
 
-Next, we'll create a connection factory to instantiate chat clients:
-source:ChatClientConnect[]
-<1> This factory is a singleton
-<2> We'll need the application context, which will be injected into this contructor
-<3> Create the WebSocket client for the given URI specifying the username and topic
-
-This bean will help in constructing URIs with parameters:
-source:ChatUri[]
-<1> We will create maps from this bean so it needs to be @Introspected
-<2> Username of the chat client
-<3> Topic of the chat client
-
-
-=== Tests
-
-test:ChatWebSocketTest[]
-<1> We're dealing with chronological messages and the tests will be run potentially concurrently or out-of-order, so ensure that each tests starts with the same state.
-<2> Inject our factory to create WebSocket clients
-<3> Start the WebSocket server
-<4> Set up WebSocket clients for multiple users
-<5> Test that the correct messages are automatically sent when users join topics
-<6> Test that chats are sent within a topic and not ouside of it except to the special "all" topic
-<5> Test that the correct messages are automatically sent when users leave topics
-
-=== Trying the user interface
-
-Run the Java main class called "Application" which starts the server on port 8080 by default. Then in the web browser visit a URL such as http://localhost:8080/&num;/java/Joe[http://localhost:8080/\#/java/Joe] and also in another browser tab open http://localhost:8080/&num;/java/Moka[http://localhost:8080/\#/java/Moka]. You can then try sending chats as Joe and Moka.
+Open a browser and visit a URL such as http://localhost:8080/&num;/java/Joe[http://localhost:8080/\#/java/Joe] and also in another browser tab open http://localhost:8080/&num;/java/Moka[http://localhost:8080/\#/java/Moka]. You can then try sending chats as Joe and Moka.
 
 == Next steps
 

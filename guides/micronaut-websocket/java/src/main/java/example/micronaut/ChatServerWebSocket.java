@@ -13,13 +13,13 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Predicate;
 
 @ServerWebSocket("/ws/chat/{topic}/{username}") // <1>
-public class ChatServer {
+public class ChatServerWebSocket {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ChatServer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ChatServerWebSocket.class);
 
     private final WebSocketBroadcaster broadcaster;
 
-    public ChatServer(WebSocketBroadcaster broadcaster) { // <2>
+    public ChatServerWebSocket(WebSocketBroadcaster broadcaster) { // <2>
         this.broadcaster = broadcaster;
     }
 
