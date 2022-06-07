@@ -10,9 +10,7 @@ import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.websocket.WebSocketClient;
 import io.micronaut.websocket.annotation.ClientWebSocket;
-import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
-import io.micronaut.websocket.annotation.OnOpen;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
@@ -22,9 +20,11 @@ import javax.validation.constraints.NotBlank;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
+
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -77,52 +77,53 @@ class ChatServerWebSocketTest {
     @Test
     void testWebsockerServer() throws Exception {
         TestWebSocketClient adam = createWebSocketClient(embeddedServer.getPort(), "adam", "Cats & Recreation"); // <8>
-        TestWebSocketClient anna = createWebSocketClient(embeddedServer.getPort(), "anna", "Cats & Recreation");
-        TestWebSocketClient ben = createWebSocketClient(embeddedServer.getPort(), "ben", "Fortran Tips & Tricks");
-        TestWebSocketClient zach = createWebSocketClient(embeddedServer.getPort(), "zach", "all");
-        TestWebSocketClient cienna = createWebSocketClient(embeddedServer.getPort(), "cienna", "Fortran Tips & Tricks");
-
         await().until(() -> // <9>
-                Arrays.asList("[adam] Joined Cats & Recreation!", "[anna] Joined Cats & Recreation!", "[zach] Now making announcements!")
+                Collections.singletonList("[adam] Joined Cats & Recreation!")
                         .equals(adam.getMessagesChronologically()));
-        // <10>
-        assertEquals(
-                Arrays.asList("[adam] Joined Cats & Recreation!", "[anna] Joined Cats & Recreation!", "[zach] Now making announcements!"),
-                adam.getMessagesChronologically());
 
-        assertEquals(
-                Arrays.asList("[anna] Joined Cats & Recreation!", "[zach] Now making announcements!"),
-                anna.getMessagesChronologically());
+        TestWebSocketClient anna = createWebSocketClient(embeddedServer.getPort(), "anna", "Cats & Recreation");
+        await().until(() -> // <9>
+                Collections.singletonList("[anna] Joined Cats & Recreation!")
+                        .equals(anna.getMessagesChronologically()));
+        await().until(() -> // <9>
+                Arrays.asList("[adam] Joined Cats & Recreation!", "[anna] Joined Cats & Recreation!")
+                        .equals(adam.getMessagesChronologically()));
 
-        assertEquals(
-                Arrays.asList("[ben] Joined Fortran Tips & Tricks!", "[zach] Now making announcements!", "[cienna] Joined Fortran Tips & Tricks!"),
-                ben.getMessagesChronologically());
-        assertEquals(
-                Arrays.asList("[zach] Now making announcements!", "[cienna] Joined Fortran Tips & Tricks!"),
-                zach.getMessagesChronologically());
-        assertEquals(
-                Arrays.asList("[cienna] Joined Fortran Tips & Tricks!"),
-                cienna.getMessagesChronologically());
+        TestWebSocketClient ben = createWebSocketClient(embeddedServer.getPort(), "ben", "Fortran Tips & Tricks");
+        await().until(() -> // <9>
+                Collections.singletonList("[ben] Joined Fortran Tips & Tricks!")
+                        .equals(ben.getMessagesChronologically()));
+        TestWebSocketClient zach = createWebSocketClient(embeddedServer.getPort(), "zach", "all");
+        await().until(() -> // <9>
+                Collections.singletonList("[zach] Now making announcements!")
+                        .equals(zach.getMessagesChronologically()));
+        TestWebSocketClient cienna = createWebSocketClient(embeddedServer.getPort(), "cienna", "Fortran Tips & Tricks");
+        await().until(() -> // <9>
+                Collections.singletonList("[cienna] Joined Fortran Tips & Tricks!")
+                        .equals(cienna.getMessagesChronologically()));
+        await().until(() -> // <9>
+                Arrays.asList("[ben] Joined Fortran Tips & Tricks!", "[zach] Now making announcements!", "[cienna] Joined Fortran Tips & Tricks!") // <10>
+                        .equals(ben.getMessagesChronologically()));
 
         // should broadcast message to all users inside the topic // <11>
         final String adamsGreeting = "Hello, everyone. It's another purrrfect day :-)";
         final String expectedGreeting = "[adam] " + adamsGreeting;
         adam.send(adamsGreeting);
 
+        //subscribed to "Cats & Recreation"
         await().until(() ->  // <9>
                 expectedGreeting.equals(adam.getLatestMessage()));
 
         //subscribed to "Cats & Recreation"
-        assertEquals(expectedGreeting, adam.getLatestMessage());
-
-        //subscribed to "Cats & Recreation"
-        assertEquals(expectedGreeting, anna.getLatestMessage());
+        await().until(() ->  // <9>
+                expectedGreeting.equals(anna.getLatestMessage()));
 
         //NOT subscribed to "Cats & Recreation"
         assertNotEquals(expectedGreeting, ben.getLatestMessage());
 
         //subscribed to the special "all" topic
-        assertEquals(expectedGreeting, zach.getLatestMessage());
+        await().until(() ->  // <9>
+                expectedGreeting.equals(zach.getLatestMessage()));
 
         //NOT subscribed to "Cats & Recreation"
         assertNotEquals(expectedGreeting, cienna.getLatestMessage());
