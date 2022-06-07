@@ -3,8 +3,8 @@ package example.micronaut;
 import io.micronaut.tracing.annotation.ContinueSpan;
 import io.micronaut.tracing.annotation.NewSpan;
 import io.micronaut.tracing.annotation.SpanTag;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Singleton;
 
 import java.util.Collection;
@@ -51,7 +51,7 @@ public class InventoryService {
 
     private int inStore(String item) {
         int count = inventory.get(item);
-        tracer.activeSpan().setTag("inventory.store.count", count); // <2>
+        Span.current().setAttribute("inventory.store.count", count); // <2>
         return count;
     }
 
@@ -59,7 +59,7 @@ public class InventoryService {
     protected int inWarehouse(@SpanTag String store, String item) {
         int count = warehouse.getItemCount(store, getUPC(item));
 
-        tracer.activeSpan().setTag("inventory.warehouse.count", count); // <4>
+        Span.current().setAttribute("inventory.warehouse.count", count); // <4>
 
         return count;
     }
@@ -73,10 +73,10 @@ public class InventoryService {
     }
 
     private void orderFromWarehouse(String item, int count) {
-        Span span = tracer.buildSpan("warehouse-order") // <5>
-                .withTag("item", item)
-                .withTag("count", count)
-                .start();
+        Span span = tracer.spanBuilder("warehouse-order") // <5>
+                          .setAttribute("item", item)
+                          .setAttribute("count", count)
+                          .startSpan();
 
         Map<String, Object> json = new HashMap<>(4);
         json.put("store", storeName);
@@ -86,7 +86,7 @@ public class InventoryService {
 
         warehouse.order(json);
 
-        span.finish();
+        span.end();
     }
 
     private int getUPC(String item) {
