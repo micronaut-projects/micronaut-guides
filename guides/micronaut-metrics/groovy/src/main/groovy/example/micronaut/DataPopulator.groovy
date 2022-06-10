@@ -11,8 +11,8 @@ import javax.transaction.Transactional
 import static io.micronaut.context.env.Environment.TEST
 
 @CompileStatic
-@Singleton
 @Requires(notEnv = TEST)
+@Singleton // <1>
 class DataPopulator {
 
     private final BookRepository bookRepository
