@@ -17,7 +17,7 @@ class DataPopulator {
 
     private final BookRepository bookRepository
 
-    DataPopulator(BookRepository bookRepository) {
+    DataPopulator(BookRepository bookRepository) { // <3>
         this.bookRepository = bookRepository
     }
 
