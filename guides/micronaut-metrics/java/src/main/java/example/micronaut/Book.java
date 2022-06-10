@@ -10,7 +10,7 @@ import static io.micronaut.data.annotation.GeneratedValue.Type.AUTO;
 public class Book {
 
     @Id // <2>
-    @GeneratedValue(AUTO)
+    @GeneratedValue(AUTO) // <3>
     private Long id;
 
     private String name;

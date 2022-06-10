@@ -8,6 +8,6 @@ import io.micronaut.data.annotation.MappedEntity
 @MappedEntity // <1>
 class Book(var isbn: String, var name: String) {
     @Id // <2>
-    @GeneratedValue(AUTO)
+    @GeneratedValue(AUTO) // <3>
     var id: Long? = null
 }
