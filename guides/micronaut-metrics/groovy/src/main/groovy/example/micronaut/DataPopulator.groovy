@@ -21,7 +21,7 @@ class DataPopulator {
         this.bookRepository = bookRepository
     }
 
-    @EventListener
+    @EventListener // <4>
     @Transactional
     void init(StartupEvent event) {
         if (bookRepository.count() == 0) {

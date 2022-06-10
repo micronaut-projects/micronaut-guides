@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 @Requires(notEnv = [TEST]) // <2>
 open class DataPopulator(private val bookRepository: BookRepository) { // <3>
 
-    @EventListener
+    @EventListener // <4>
     @Transactional
     open fun init(event: StartupEvent) {
         if (bookRepository.count() == 0L) {
