@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.Introspected
 
 @CompileStatic
-@Introspected
+@Introspected // <1>
 class BitcoinPrice {
 
     private final Data data
@@ -18,7 +18,7 @@ class BitcoinPrice {
     }
 
     @CompileStatic
-    @Introspected
+    @Introspected // <1>
     static class Data {
 
         final float price
