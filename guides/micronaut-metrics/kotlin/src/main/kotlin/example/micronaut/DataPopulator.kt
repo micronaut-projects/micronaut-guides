@@ -7,9 +7,9 @@ import io.micronaut.runtime.event.annotation.EventListener
 import jakarta.inject.Singleton
 import javax.transaction.Transactional
 
-@Requires(notEnv = [TEST])
 open class DataPopulator(private val bookRepository: BookRepository) {
 @Singleton // <1>
+@Requires(notEnv = [TEST]) // <2>
 
     @EventListener
     @Transactional

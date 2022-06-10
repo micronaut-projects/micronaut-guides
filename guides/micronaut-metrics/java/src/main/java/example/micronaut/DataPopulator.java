@@ -9,8 +9,8 @@ import javax.transaction.Transactional;
 
 import static io.micronaut.context.env.Environment.TEST;
 
-@Requires(notEnv = TEST)
 @Singleton // <1>
+@Requires(notEnv = TEST) // <2>
 class DataPopulator {
 
     private final BookRepository bookRepository;
