@@ -35,7 +35,7 @@ public class CryptoService {
         time.record(() -> { // <7>
             try {
                 checks.increment(); // <8>
-                latestPriceUsd.set((int) priceClient.latest().getPrice()); // <9>
+                latestPriceUsd.set((int) priceClient.latestInUSD().getPrice()); // <9>
             } catch (Exception e) {
                 LOG.error("Problem checking price", e);
             }

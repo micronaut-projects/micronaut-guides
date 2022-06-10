@@ -31,7 +31,7 @@ class CryptoService constructor(
         time.record { // <7>
             try {
                 checks.increment() // <8>
-                latestPriceUsd.set(priceClient.latest().price.toInt()) // <9>
+                latestPriceUsd.set(priceClient.latestInUSD().price.toInt()) // <9>
             } catch (e: Exception) {
                 LOG.error("Problem checking price", e)
             }

@@ -2,10 +2,15 @@ package example.micronaut.crypto;
 
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.annotation.QueryValue;
 
-@Client("https://api.kucoin.com/api/v1")
+@Client(id = "kucoin")
 public interface PriceClient {
 
-    @Get("/market/orderbook/level1?symbol=BTC-USDT")
-    BitcoinPrice latest();
+    @Get("/api/v1/market/orderbook/level1")
+    BitcoinPrice latest(@QueryValue String symbol);
+
+    default BitcoinPrice latestInUSD() {
+        return latest("BTC-USDT");
+    }
 }
