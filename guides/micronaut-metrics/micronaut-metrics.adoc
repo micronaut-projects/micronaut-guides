@@ -49,9 +49,27 @@ resource:application.yml[tag=metrics]
 <4> Metrics are initially configured to update every minute. See https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html#parse-java.lang.CharSequence-[java.time.Duration#parse(CharSequence)]
 <5> These default to `true` and are only here for convenience, to be able to disable a subset of metrics
 
-=== Database Access
+=== Data Source Metrics
 
-`DataSource` metrics are enabled by default if you use the HikariCP (the default), Tomcat JDBC, or Commons DBCP connection pool. Create a `Book` domain class that uses https://micronaut-projects.github.io/micronaut-data/latest/guide/#sql[Micronaut Data JDBC]:
+`DataSource` metrics are enabled by default if you use the HikariCP (the default), Tomcat JDBC, or Commons DBCP connection pool.
+
+=== Data Source configuration
+
+Define the datasource in `src/main/resources/application.yml`.
+
+resource:application.yml[tag=datasource]
+
+NOTE: This way of defining the datasource properties enables us to externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined, the Micronaut framework will use the default values.
+
+common:flyway.adoc[]
+
+resource:db/migration/V1__schema.sql[]
+
+During application startup, Flyway will execute the SQL file and create the schema needed for the application.
+
+=== Domain
+
+Create a `Book` domain class that uses https://micronaut-projects.github.io/micronaut-data/latest/guide/#sql[Micronaut Data JDBC]:
 
 source:Book[]
 callout:mapped-entity[1]
@@ -88,9 +106,10 @@ callout:constructor-di[number=3,arg0=BookRepository]
 <4> Maps a `GET` request to `/books`, which returns a list of `Book`
 <5> Maps a `GET` request to `/books/{isbn}`, which attempts to show a `Book`. This illustrates the use of a URL path variable.
 
-=== CryptoService
-
+=== Custom Metric
 To see custom metrics in action, create a service that periodically retrieves the current Bitcoin price in USD using REST.
+
+==== Model
 
 We'll need a data class to represent the REST response. Create the `BitcoinPrice` class:
 
@@ -98,11 +117,15 @@ source:crypto/BitcoinPrice[]
 
 callout:introspected[1]
 
-=== Kucoin HTTP Client
+==== Kucoin Declarative HTTP Client
 
 Create declarative Micronaut HTTP Client interface that will be implemented at compile time:
 
 source:crypto/PriceClient[]
+
+callout:client[1]
+
+==== HTTP Service Configuration
 
 Configure the URLs for the Service ID `kucoin`.
 Modify `application.yml`
@@ -111,6 +134,8 @@ resource:application.yml[tag=http-services]
 
 <1> Same ID we used with `@Client`
 <2> URL where the `books` service will reside.
+
+==== Service
 
 Create the `CryptoService` class which uses `PriceClient` and updates three custom meters:
 
@@ -124,19 +149,6 @@ callout:singleton[1]
 <7> Update the `Timer`
 <8> Increment the `Counter`
 <9> Update the `Gauge` with the latest price
-
-=== Database Migration with Flyway
-
-To keep things simple, we're using an in-memory https://www.h2database.com/html/main.html[H2] database.
-
-https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway] will manage database migrations; enable Flyway migrations by adding this to your `application.yml`:
-
-resource:application.yml[tag=flyway]
-<1> Enable Flyway for the `default` datasource.
-
-At startup, any migration scripts in the `resources/db/migration` directory that haven't run yet will be run. Create the following migration file to create the `book` database table:
-
-resource:db/migration/V1__schema.sql[]
 
 == Testing the Application
 
@@ -283,5 +295,7 @@ Start the native image and run the cURL commands above to see that the applicati
 :exclude-for-languages:
 
 == Next steps
+
+
 
 See the https://micronaut-projects.github.io/micronaut-micrometer/latest/guide/[Micronaut Micrometer documentation] to learn about the various metrics, configuration options, and supported registries.
