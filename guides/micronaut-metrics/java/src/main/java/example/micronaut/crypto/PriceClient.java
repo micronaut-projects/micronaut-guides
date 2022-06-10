@@ -4,13 +4,13 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.annotation.QueryValue;
 
-@Client(id = "kucoin")
-public interface PriceClient {
+@Client(id = "kucoin") // <1>
+public abstract class PriceClient {
 
     @Get("/api/v1/market/orderbook/level1")
-    BitcoinPrice latest(@QueryValue String symbol);
+    abstract BitcoinPrice latest(@QueryValue String symbol);
 
-    default BitcoinPrice latestInUSD() {
+    public BitcoinPrice latestInUSD() {
         return latest("BTC-USDT");
     }
 }

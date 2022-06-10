@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import example.micronaut.crypto.CryptoService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
@@ -22,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.micronaut.logging.LogLevel.ALL;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,9 +33,6 @@ class MetricsTest {
 
     @Inject
     LoggingSystem loggingSystem; // <3>
-
-    @Inject
-    CryptoService cryptoService;
 
     @Inject
     @Client("/")
@@ -134,24 +129,5 @@ class MetricsTest {
 
         double value = (double) measurements.get(0).get("value");
         assertTrue(value > 0);
-    }
-
-    @Test
-    void testCryptoUpdates() {
-
-        Counter counter = meterRegistry.counter("bitcoin.price.checks");
-        Timer timer = meterRegistry.timer("bitcoin.price.time");
-
-        assertEquals(0, counter.count(), 0.000001);
-        assertEquals(0, timer.totalTime(MILLISECONDS));
-
-        int checks = 3;
-
-        for (int i = 0; i < checks; i++) {
-            cryptoService.updatePrice();
-        }
-
-        assertEquals(checks, counter.count(), 0.000001);
-        assertTrue(timer.totalTime(MILLISECONDS) > 0);
     }
 }

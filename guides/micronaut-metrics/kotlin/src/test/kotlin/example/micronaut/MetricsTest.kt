@@ -127,23 +127,4 @@ class MetricsTest {
         val value = measurements[0]["value"] as Double
         assertTrue(value > 0)
     }
-
-    @Test
-    fun testCryptoUpdates() {
-
-        val counter = meterRegistry.counter("bitcoin.price.checks")
-        val timer = meterRegistry.timer("bitcoin.price.time")
-
-        assertEquals(0.0, counter.count(), 0.000001)
-        assertEquals(0.0, timer.totalTime(MILLISECONDS))
-
-        val checks = 3
-
-        for (i in 0 until checks) {
-            cryptoService.updatePrice()
-        }
-
-        assertEquals(checks.toDouble(), counter.count(), 0.000001)
-        assertTrue(timer.totalTime(MILLISECONDS) > 0)
-    }
 }

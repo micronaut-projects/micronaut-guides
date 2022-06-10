@@ -142,26 +142,4 @@ class MetricsSpec extends Specification {
         then:
         value > 0
     }
-
-    void testCryptoUpdates() {
-
-        when:
-        Counter counter = meterRegistry.counter('bitcoin.price.checks')
-        Timer timer = meterRegistry.timer('bitcoin.price.time')
-
-        then:
-        0 == counter.count()
-        0 == timer.totalTime(MILLISECONDS)
-
-        when:
-        int checks = 3
-
-        checks.times {
-            cryptoService.updatePrice()
-        }
-
-        then:
-        checks == counter.count()
-        timer.totalTime(MILLISECONDS) > 0
-    }
 }
