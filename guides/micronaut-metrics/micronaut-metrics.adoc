@@ -4,9 +4,6 @@ We'll use https://micronaut-projects.github.io/micronaut-micrometer/latest/guide
 
 common:requirements.adoc[]
 
-:containerized: MySQL
-common:requirements-testcontainers.adoc[]
-
 common:completesolution.adoc[]
 
 == Writing the Application
@@ -52,14 +49,6 @@ resource:application.yml[tag=metrics]
 === Data Source Metrics
 
 `DataSource` metrics are enabled by default if you use the HikariCP (the default), Tomcat JDBC, or Commons DBCP connection pool.
-
-=== Data Source configuration
-
-Define the datasource in `src/main/resources/application.yml`.
-
-resource:application.yml[tag=datasource]
-
-NOTE: This way of defining the datasource properties enables us to externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined, the Micronaut framework will use the default values.
 
 common:flyway.adoc[]
 
@@ -156,9 +145,8 @@ Create a configuration file for tests `src/test/resources/application-test.yml`.
 
 testResource:application-test.yml[]
 
-<1> Configure the default datasource to use the MySQL database provided by TestContainers for the test environment. By using a specially modified JDBC URL, Testcontainers provides a disposable stand-in database that can be used without requiring modification to your application code. See https://www.testcontainers.org/modules/databases/jdbc/[Test Containers JDBC URL].
-<2> Disable crypto price lookups with a long initial delay
-<3> Disable sending metrics to Atlas (if you enabled it).
+<1> Disable crypto price lookups with a long initial delay
+<2> Disable sending metrics to Atlas (if you enabled it).
 
 
 Create the `MetricsTest` class to test metrics functionality:
@@ -181,8 +169,6 @@ We used an identifier with `@Client`. Because of that, it is easy to point our H
 common:testApp-noheader.adoc[]
 
 == Running the Application
-
-common:run-mysql-container.adoc[]
 
 Before starting the application, if you're exporting metrics to an external registry be sure the registry is available.
 
