@@ -34,7 +34,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
 class GuideProjectGenerator implements AutoCloseable {
+
     public static final String DEFAULT_APP_NAME = 'default'
+
     private static final Pattern GROOVY_JAVA_OR_KOTLIN = ~/.*\.java|.*\.groovy|.*\.kt/
     private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
