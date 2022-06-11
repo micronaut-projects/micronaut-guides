@@ -12,7 +12,7 @@ import javax.transaction.Transactional
 open class DataPopulator(private val bookRepository: BookRepository) { // <3>
 
     @EventListener // <4>
-    @Transactional
+    @Transactional // <5>
     open fun init(event: StartupEvent) {
         if (bookRepository.count() == 0L) {
             bookRepository.save(Book("1491950358", "Building Microservices"))
