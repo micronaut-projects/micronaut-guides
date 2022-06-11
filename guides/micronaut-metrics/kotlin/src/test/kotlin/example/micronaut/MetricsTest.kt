@@ -16,7 +16,9 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
-import java.util.concurrent.TimeUnit.MILLISECONDS
+
+import io.micronaut.core.util.StringUtils
+import io.micronaut.context.annotation.Property
 
 @MicronautTest // <1>
 class MetricsTest {
@@ -26,9 +28,6 @@ class MetricsTest {
 
     @Inject
     lateinit var loggingSystem: LoggingSystem // <3>
-
-    @Inject
-    lateinit var cryptoService: CryptoService
 
     @Inject
     @field:Client("/")

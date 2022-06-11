@@ -15,9 +15,9 @@ import jakarta.inject.Inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
-
 import static io.micronaut.logging.LogLevel.ALL
-import static java.util.concurrent.TimeUnit.MILLISECONDS
+import io.micronaut.core.util.StringUtils
+import io.micronaut.context.annotation.Property
 
 @MicronautTest // <1>
 class MetricsSpec extends Specification {
@@ -27,9 +27,6 @@ class MetricsSpec extends Specification {
 
     @Inject
     LoggingSystem loggingSystem // <3>
-
-    @Inject
-    CryptoService cryptoService
 
     @Inject
     @Client('/')

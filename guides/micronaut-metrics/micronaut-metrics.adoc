@@ -135,13 +135,22 @@ resource:application.yml[tag=http-services]
 <1> Same ID we used with `@Client`
 <2> URL where the `books` service will reside.
 
+==== Immutable Configuration
+
+Create immutable configuration with an interface annotated with `@ConfigurationProperties`. You can use it to disable `@Scheduled` logic programmatically.
+
+source:ScheduledConfiguration[]
+
+callout:configuration-properties[1]
+callout:bindable[2]
+
 ==== Service
 
 Create the `CryptoService` class which uses `PriceClient` and updates three custom meters:
 
 source:crypto/CryptoService[]
 callout:singleton[1]
-<2> Use constructor injection to inject `PriceClient`, `MeterRegistry`, and `ObjectMapper` beans
+<2> Use constructor injection to inject `PriceClient`, `MeterRegistry`, and `ScheduledConfiguration` beans
 <3> Create a `Counter` to track the total number of updates
 <4> Create a `Timer` to track the total time performing updates
 <5> Create a `Gauge` to track the most recent update
@@ -156,14 +165,16 @@ Create a configuration file for tests `src/test/resources/application-test.yml`.
 
 testResource:application-test.yml[]
 
-<1> Configure the default datasource to use the MySQL database provided by TestContainers for the test environment. By using a specially modified JDBC URL, Testcontainers provides a disposable stand-in database that can be used without requiring modification to your application code. See https://www.testcontainers.org/modules/databases/jdbc/[Test Containers JDBC URL].
-<2> Disable crypto price lookups with a long initial delay
+<1> Disable `@Scheduled` logic for tests.
+<2> Configure the default datasource to use the MySQL database provided by TestContainers for the test environment. By using a specially modified JDBC URL, Testcontainers provides a disposable stand-in database that can be used without requiring modification to your application code. See https://www.testcontainers.org/modules/databases/jdbc/[Test Containers JDBC URL].
 <3> Disable sending metrics to Atlas (if you enabled it).
 
+=== Metrics Test
 
 Create the `MetricsTest` class to test metrics functionality:
 
 test:MetricsTest[]
+
 callout:micronaut-test[1]
 <2> Inject the `MeterRegistry` bean
 <3> Inject the `LoggingSystem` bean
@@ -171,7 +182,13 @@ callout:http-client[4]
 
 Create an additional test to verify the custom metric:
 
+=== Mocking an API
+
 test:CryptoUpdatesTest[]
+
+callout:spec-name[1]
+<2> Disable crypto price lookups with a long initial delay
+<3> Point the `kucoin` HTTP client to the Mock Server.
 
 The previous test creates two Micronaut embedded servers. One mocks the `kucoin` API, the other is our app. The test uses `@Requires` to conditionally load a Controller only for `kucoin` bean context.
 We used an identifier with `@Client`. Because of that, it is easy to point our HTTP Client to the Mock Server.

@@ -14,30 +14,34 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-
+import io.micronaut.core.util.CollectionUtils;
 import java.util.Collections;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.micronaut.core.util.StringUtils;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CryptoUpdatesTest {
 
-    EmbeddedServer embeddedServer;
+    public static EmbeddedServer embeddedServer;
 
-    EmbeddedServer kucoinEmbeddedServer;
+    public static EmbeddedServer kucoinEmbeddedServer;
 
     @BeforeAll
-    void beforeAll() {
+    public static void beforeAll() {
         kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer.class,
-                Collections.singletonMap("spec.name", "MetricsTestKucoin"));
+                CollectionUtils.mapOf(
+                        "spec.name", "MetricsTestKucoin")); // <1>
         embeddedServer = ApplicationContext.run(EmbeddedServer.class,
-                Collections.singletonMap("micronaut.http.services.kucoin.url", "http://localhost:" + kucoinEmbeddedServer.getPort()));
+                CollectionUtils.mapOf(
+                        "crypto.initial-delay", "10h", // <2>
+                        "micronaut.http.services.kucoin.url", "http://localhost:" + kucoinEmbeddedServer.getPort(), // <3>
+                        "app.scheduled.enabled", StringUtils.TRUE));
     }
 
     @AfterAll
-    void afterAll() {
+    public static void afterAll() {
         embeddedServer.close();
         kucoinEmbeddedServer.close();
     }
@@ -63,7 +67,7 @@ public class CryptoUpdatesTest {
         assertTrue(timer.totalTime(MILLISECONDS) > 0);
     }
 
-    @Requires(property = "spec.name", value = "MetricsTestKucoin")
+    @Requires(property = "spec.name", value = "MetricsTestKucoin") // <1>
     @Controller
     static class MockKucoinController {
         @Get("/api/v1/market/orderbook/level1")

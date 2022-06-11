@@ -11,6 +11,7 @@ import io.micronaut.runtime.server.EmbeddedServer
 import org.junit.jupiter.api.*
 import java.util.*
 import java.util.concurrent.TimeUnit
+import io.micronaut.core.util.StringUtils
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CryptoUpdatesTest {
@@ -19,9 +20,13 @@ class CryptoUpdatesTest {
     @BeforeAll
     fun beforeAll() {
         kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer::class.java,
-                Collections.singletonMap<String, Any>("spec.name", "MetricsTestKucoin"))
+            mapOf(
+                "spec.name" to "MetricsTestKucoin")) // <1>
         embeddedServer = ApplicationContext.run(EmbeddedServer::class.java,
-                Collections.singletonMap<String, Any>("micronaut.http.services.kucoin.url", "http://localhost:" + kucoinEmbeddedServer.getPort()))
+            mapOf(
+                "crypto.initial-delay" to "10h", // <2>
+                "micronaut.http.services.kucoin.url" to "http://localhost:" + kucoinEmbeddedServer.getPort(), // <3>
+                "app.scheduled.enabled" to StringUtils.TRUE))
     }
 
     @AfterAll
@@ -50,7 +55,7 @@ class CryptoUpdatesTest {
         Assertions.assertTrue(timer.totalTime(TimeUnit.MILLISECONDS) > 0)
     }
 
-    @Requires(property = "spec.name", value = "MetricsTestKucoin")
+    @Requires(property = "spec.name", value = "MetricsTestKucoin") // <1>
     @Controller
     internal class MockKucoinController {
         @Get("/api/v1/market/orderbook/level1")

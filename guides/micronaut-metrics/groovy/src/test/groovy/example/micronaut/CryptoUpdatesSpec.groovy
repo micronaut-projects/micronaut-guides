@@ -13,7 +13,7 @@ import io.micronaut.runtime.server.EmbeddedServer
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
-
+import io.micronaut.core.util.StringUtils;
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 
 class CryptoUpdatesSpec extends Specification {
@@ -21,12 +21,14 @@ class CryptoUpdatesSpec extends Specification {
     @Shared
     @AutoCleanup
     EmbeddedServer kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer.class,
-            ["spec.name": "MetricsTestKucoin"])
+            ["spec.name": "MetricsTestKucoin"]) // <1>
 
     @Shared
     @AutoCleanup
     EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer.class,
-            ["micronaut.http.services.kocoin.url": "http://localhost:${kucoinEmbeddedServer.port}"])
+            ["crypto.initial-delay": "10h", // <2>
+             "micronaut.http.services.kocoin.url": "http://localhost:${kucoinEmbeddedServer.port}", // <3>
+             "app.scheduled.enabled": StringUtils.TRUE])
 
     void "test crypto updates"() {
         given:
@@ -52,7 +54,7 @@ class CryptoUpdatesSpec extends Specification {
         timer.totalTime(MILLISECONDS) > 0
     }
 
-    @Requires(property = "spec.name", value = "MetricsTestKucoin")
+    @Requires(property = "spec.name", value = "MetricsTestKucoin") // <1>
     @Controller
     static class MockKucoinController {
         @Get("/api/v1/market/orderbook/level1")

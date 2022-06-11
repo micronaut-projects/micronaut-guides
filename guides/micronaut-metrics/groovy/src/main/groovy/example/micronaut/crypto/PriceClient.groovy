@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.QueryValue
 @Client(id = 'kucoin') // <1>
 abstract class PriceClient {
 
-    @Get("/api/v1/market/orderbook/level1")
+    @Get("/api/v1/market/orderbook/level1{?symbol}")
     abstract BitcoinPrice latest(@QueryValue String symbol)
 
     BitcoinPrice latestInUSD() {

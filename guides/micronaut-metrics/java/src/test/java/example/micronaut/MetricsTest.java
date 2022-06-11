@@ -24,6 +24,8 @@ import static io.micronaut.logging.LogLevel.ALL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.context.annotation.Property;
 
 @MicronautTest // <1>
 class MetricsTest {

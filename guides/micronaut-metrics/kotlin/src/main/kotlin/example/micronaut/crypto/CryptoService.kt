@@ -1,5 +1,6 @@
 package example.micronaut.crypto
 
+import example.micronaut.ScheduledConfiguration
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
@@ -11,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @Singleton // <1>
 class CryptoService constructor(
     private val priceClient: PriceClient, // <2>
+    private val scheduledConfiguration: ScheduledConfiguration,
     meterRegistry: MeterRegistry) {
 
     private val LOG = LoggerFactory.getLogger(javaClass.name)
@@ -25,15 +27,17 @@ class CryptoService constructor(
         meterRegistry.gauge("bitcoin.price.latest", latestPriceUsd) // <5>
     }
 
-    @Scheduled(fixedRate = "\${crypto.updateFrequency:1h}",
-            initialDelay = "\${crypto.initialDelay:0s}") // <6>
+    @Scheduled(fixedRate = "\${crypto.update-frequency:1h}",
+            initialDelay = "\${crypto.initial-delay:0s}") // <6>
     fun updatePrice() {
-        time.record { // <7>
-            try {
-                checks.increment() // <8>
-                latestPriceUsd.set(priceClient.latestInUSD().price.toInt()) // <9>
-            } catch (e: Exception) {
-                LOG.error("Problem checking price", e)
+        if (scheduledConfiguration.isEnabled()) {
+            time.record { // <7>
+                try {
+                    checks.increment() // <8>
+                    latestPriceUsd.set(priceClient.latestInUSD().price.toInt()) // <9>
+                } catch (e: Exception) {
+                    LOG.error("Problem checking price", e)
+                }
             }
         }
     }
