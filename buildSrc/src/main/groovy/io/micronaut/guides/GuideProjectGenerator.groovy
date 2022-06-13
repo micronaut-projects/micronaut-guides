@@ -34,7 +34,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
 class GuideProjectGenerator implements AutoCloseable {
+
     public static final String DEFAULT_APP_NAME = 'default'
+
     private static final Pattern GROOVY_JAVA_OR_KOTLIN = ~/.*\.java|.*\.groovy|.*\.kt/
     private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
@@ -112,7 +114,8 @@ class GuideProjectGenerator implements AutoCloseable {
                         openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
                             definitionFile: it.openAPIGeneratorConfig.definitionFile,
                             generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
-                            properties: it.openAPIGeneratorConfig.properties ?: [:]
+                            properties: it.openAPIGeneratorConfig.properties ?: [:],
+                            globalProperties: it.openAPIGeneratorConfig.globalProperties ?: [:]
                         ) : null)
                 }
         ))

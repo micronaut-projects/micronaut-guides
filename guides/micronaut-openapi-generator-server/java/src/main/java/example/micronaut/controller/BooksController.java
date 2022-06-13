@@ -16,38 +16,33 @@ package example.micronaut.controller;
 import example.micronaut.BookEntity;
 import example.micronaut.BookRepository;
 import example.micronaut.BookSpecifications;
-import example.micronaut.model.BookAvailability;
-import example.micronaut.model.BookInfo;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Consumes;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Produces;
-import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import reactor.core.publisher.Mono;
-import static io.micronaut.http.HttpStatus.OK;
+import example.micronaut.model.BookInfo;
 import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
-import io.micronaut.http.annotation.Status;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static io.micronaut.http.HttpStatus.OK;
 //end::import[]
 
-@Generated(value="org.openapitools.codegen.languages.JavaMicronautServerCodegen", date="2022-01-31T13:21:29.860-05:00[America/Toronto]")
-@Controller("${context-path}")
+@Generated(value="org.openapitools.codegen.languages.JavaMicronautServerCodegen", date="2022-05-31T15:41:31.404-04:00[America/New_York]")
+@Controller
+@Tag(name = "Books", description = "The Books API")
 public class BooksController {
 
     //tag::inject[]
@@ -63,23 +58,26 @@ public class BooksController {
      *
      * @param bookInfo  (required)
      */
-    @ApiOperation(
-            value = "Add a new book",
-            nickname = "addBook",
-            authorizations = {},
-            tags={})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 400, message = "Bad Request")})
+    @Operation(
+        operationId = "addBook",
+        summary = "Add a new book",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+        },
+        parameters = {
+            @Parameter(name = "bookInfo", required = true)
+        }
+    )
     @Post(uri="/add")
     @Produces(value = {})
     @Consumes(value = {"application/json"})
-    @Secured(SecurityRule.IS_ANONYMOUS)
+    @Secured({SecurityRule.IS_ANONYMOUS})
     //tag::addBook[]
     @ExecuteOn(TaskExecutors.IO) // <1>
     @Status(OK) // <2>
     public void addBook(@Body @NotNull @Valid BookInfo bookInfo) {
-        bookRepository.save(bookInfo.getName(),
+        bookRepository.save(bookInfo.getName(), // <3>
                 bookInfo.getAvailability(),
                 bookInfo.getAuthor(),
                 bookInfo.getISBN());
@@ -93,19 +91,23 @@ public class BooksController {
      * @param authorName  (optional)
      * @return List&lt;BookInfo&gt;
      */
-    @ApiOperation(
-            value = "Search for a book",
-            nickname = "search",
-            response = BookInfo.class,
-            responseContainer = "array",
-            authorizations = {},
-            tags={})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success", response = BookInfo.class, responseContainer = "array"),
-            @ApiResponse(code = 400, message = "Bad Request")})
+    @Operation(
+        operationId = "search",
+        summary = "Search for a book",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Success", content = {
+                @Content(mediaType = "applicaton/json", schema = @Schema(implementation = BookInfo.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+        },
+        parameters = {
+            @Parameter(name = "bookName"),
+            @Parameter(name = "authorName")
+        }
+    )
     @Get(uri="/search")
     @Produces(value = {"applicaton/json"})
-    @Secured(SecurityRule.IS_ANONYMOUS)
+    @Secured({SecurityRule.IS_ANONYMOUS})
     //tag::search[]
     @ExecuteOn(TaskExecutors.IO) // <1>
     public List<BookInfo> search(
@@ -113,7 +115,7 @@ public class BooksController {
             @QueryValue(value="author-name") @Nullable String authorName) {
         return searchEntities(bookName, authorName)
                 .stream()
-                .map(this::map)
+                .map(this::map) // <5>
                 .collect(Collectors.toList());
     }
 
@@ -125,17 +127,17 @@ public class BooksController {
     }
 
     @NonNull
-    private List<BookEntity> searchEntities(@Nullable String name, @Nullable String author) {
+    private List<BookEntity> searchEntities(@Nullable String name, @Nullable String author) { // <2>
         if (StringUtils.isEmpty(name) && StringUtils.isEmpty(author)) {
             return bookRepository.findAll();
         } else if (StringUtils.isEmpty(name)) {
-            return bookRepository.findAll(BookSpecifications.authorLike(author));
+            return bookRepository.findAll(BookSpecifications.authorLike(author)); // <3>
 
         } else  if (StringUtils.isEmpty(author)) {
             return bookRepository.findAll(BookSpecifications.nameLike(name));
         } else {
             return bookRepository.findAll(BookSpecifications.authorLike(author)
-                    .and(BookSpecifications.nameLike(name))); // <2>
+                    .and(BookSpecifications.nameLike(name))); // <4>
         }
     }
     //end::search[]

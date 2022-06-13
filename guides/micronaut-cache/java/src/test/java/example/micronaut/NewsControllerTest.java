@@ -25,7 +25,7 @@ public class NewsControllerTest {
     @Client("/")
     HttpClient client;
 
-    @Timeout(4) // <1>
+    @Timeout(5) // <1>
     @Test
     void fetchingOctoberHeadlinesUsesCache() {
         HttpRequest request = HttpRequest.GET(UriBuilder.of("/").path(Month.OCTOBER.name()).build());

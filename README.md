@@ -341,6 +341,20 @@ When working on a new guide, generate it as explained before. The guide will be 
 
 In the `build/code` directory a file `test.sh` is created to run all the tests for the guides generated. Run it locally to make sure it passes before submitting a new pull request.
 
+You can run this test with a gradle task
+
+```bash
+./gradlew :____RunTestScript
+```
+
+where `____` is the camel-case name of your guide.  eg:
+
+```bash
+./gradlew micronautFlywayRunTestScript
+```
+
+to run all the tests for the `micronaut-flyway` guide.
+
 ## Upgrade Micronaut version
 
 When a new Micronaut version is released, update the [version.txt](https://github.com/micronaut-projects/micronaut-guides/blob/master/version.txt) file in the root directory. Submit a new pull request and if the build passes, merge it. A few minutes later all the guides will be upgraded to the new version.

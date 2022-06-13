@@ -1,0 +1,90 @@
+common:header.adoc[]
+
+The https://datatracker.ietf.org/doc/html/rfc6455[WebSocket Protocol] allows for web browsers to establish interactive sessions with a server that are event-driven. This technology is ideal for applications that need state changes without the overhead and latency of polling the server. The article https://www.linode.com/docs/guides/introduction-to-websockets/["Introduction to WebSockets"] explains the benefits of WebSocket in more depth, along with a discussion of the client-side WebSocket API.
+
+This guide will take you through the creation of an event-driven chat application utilizing Micronaut WebSocket.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:static-resources.adoc[]
+
+=== Front End
+
+==== HTML
+
+Add the HTML page to be the user interface for the chat client in the browser:
+resource:public/index.html[]
+
+==== Javascript
+
+Write JavaScript to parse the URL for the chat topic and username, handle the message body, broadcast the chat, and keep the DOM updated with the latest messages:
+resource:public/websocketDemo.js[]
+
+==== CSS
+
+Style the page so that the messages are properly displayed:
+resource:public/style.css[]
+
+=== Chat server
+
+Our chat server is very simple. It merely allows you to connect and broadcast messages to subscribers of the topic. There's also a special topic called "all" that can make announcements and receive messages from all topics.
+
+source:ChatServerWebSocket[]
+
+callout:websocket-server[number=1]
+callout:constructor-di[number=2,arg0=ChatServerWebSocket]
+callout:websocket-on-open[number=3]
+<4> Our chat server has a special topic called "all" that can make announcements and receive messages from all topics
+callout:websocket-on-message[number=5]
+callout:websocket-on-close[number=6]
+<7> A predicate to keep messages within topics yet also enable the special "all" topic
+
+=== Test
+
+common:awaitility.adoc[]
+
+The Micronaut frameworks eases the creation of Websocket servers and clients. 
+
+Write a test that uses `ClientWebSocket` to test the application.
+
+test:ChatServerWebSocketTest[]
+
+callout:spec-name[1]
+callout:micronaut-test[2]
+callout:websocket-client[3]
+callout:websocket-client-autocloseable[4]
+callout:websocket-on-message[5]
+<6> Any method name that starts with (or equals) "broadcast" or "send" will be used to broadcast messages, as long as the parameter is a String or a bean
+callout:websocket-client-connect[7]
+<8> Set up WebSocket clients for multiple users
+callout:awaitility[7]
+<10> Test that the correct messages are automatically sent when users join topics
+<11> Test that chats are sent within a topic and not outside of it, with the exception of those sent using the special "all" topic
+<12> Test that the correct messages are automatically sent when users leave topics
+
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+Open a browser and visit a URL such as http://localhost:8080/&num;/java/Joe[http://localhost:8080/\#/java/Joe]. Then in another browser tab, open http://localhost:8080/&num;/java/Moka[http://localhost:8080/\#/java/Moka]. You can then try sending chats as Joe and Moka.
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+open your browser and visit http://localhost:8080/&num;/java/Joe[http://localhost:8080/\#/java/Joe]
+
+:exclude-for-languages:
+
+== Next steps
+
+Read more about:
+
+- https://docs.micronaut.io/latest/guide/#websocket[Micronaut WebSocket support]
+
+- https://jakarta.ee/specifications/websocket/[Jakarta WebSocket Specifications]
