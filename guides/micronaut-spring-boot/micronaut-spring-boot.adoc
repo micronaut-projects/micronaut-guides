@@ -1,0 +1,163 @@
+common:header.adoc[]
+
+You will write an application that includes no dependencies on Micronaut itself in the source code (only Spring dependencies) but is computed into a Micronaut application at compilation time.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Dependencies
+
+https://micronaut-projects.github.io/micronaut-spring/latest/guide/[Micronaut for Spring] allows you to use traditional Spring annotations, which are mapped to Micronaut annotations at compilation time. This allows you to write an application that can be imported to another Spring or Micronaut application without change.
+
+To use Spring Framework Annotations, write Spring MVC controllers, and support Spring Boot features, add both features `spring-web` and `spring-boot` when you create the application with Micronaut CLI and/or https://launch.micronaut.io[Micronaut Launch]. These features include the following dependencies:
+
+:dependencies:
+dependency:micronaut-spring-annotation[groupId=io.micronaut.spring,scope=annotationProcessor]
+dependency:micronaut-spring-web-annotation[groupId=io.micronaut.spring,scope=annotationProcessor]
+dependency:micronaut-spring-boot-annotation[groupId=io.micronaut.spring,scope=annotationProcessor]
+dependency:spring-boot-starter[groupId=org.springframework.boot]
+dependency:spring-boot-starter-web[groupId=org.springframework.boot]
+dependency:micronaut-spring-web[groupId=io.micronaut.spring,scope=runtimeOnly]
+dependency:micronaut-spring-boot[groupId=io.micronaut.spring,scope=runtimeOnly]
+:dependencies:
+
+=== Application
+
+Create an `Application` class:
+
+source:Application[]
+
+<1> In a Spring Boot Application, the https://docs.spring.io/spring-boot/docs/2.0.x/reference/html/using-boot-using-springbootapplication-annotation.html#using-boot-using-springbootapplication-annotation[@SpringBootApplication] enables Spring Boot’s auto-configuration mechanism, enables `@Component` scan on the package where the application is located, and allows to register extra beans in the context or import additional configuration classes.
+
+=== @ConfigurationProperties
+
+source:GreetingConfiguration[]
+
+callout:spring-ann-component[1]
+callout:spring-ann-configuration-properties[2]
+
+common:bean-prototype[]
+
+=== POJO
+
+Create a POJO which uses https://github.com/FasterXML/jackson-annotations[Jackson Annotations].
+
+source:Greeting[]
+
+=== Service
+
+Add a service that showcases configuration injection and validation.
+
+source:GreetingService[]
+
+callout:spring-ann-service[1]
+callout:spring-at-validated[2]
+callout:constructor-di[number=3,arg0=GreetingConfiguration]
+callout:constraints[4]
+
+==== Service Test
+
+Create a test to verify validation works as expected.
+
+test:GreetingServiceTest[]
+
+callout:micronaut-test-start-application-false[1]
+
+=== @RestController
+
+Micronaut Spring only supports `@RestController` semantics. A `@RestController` request handling method serializes return objects into an HTTP Response. Create a controller which uses several Spring annotations.
+
+source:GreetingController[]
+
+callout:spring-ann-restcontroller[1]
+callout:constructor-di[number=2,arg0=GreetingService]
+callout:spring-ann-getmapping[3]
+callout:spring-ann-requestparam[4]
+callout:spring-ann-postmapping[5]
+callout:spring-ann-requestbody[6]
+callout:spring-ann-deletemapping[7]
+callout:spring-response-entity[8]
+callout:spring-ann-responsestatus[9]
+
+
+=== Tests
+
+==== Declarative HTTP Client
+
+You can use Spring annotations with a declarative Micronaut HTTP Client.
+
+test:GreetingClient[]
+
+callout:client-value-slash[1]
+callout:spring-ann-getmapping[2]
+callout:spring-ann-postmapping[3]
+callout:spring-ann-requestbody[4]
+callout:spring-ann-deletemapping[5]
+callout:spring-ann-requestparam[6]
+
+and use it in a test:
+
+test:GreetingControllerTest[]
+
+=== @Scheduled
+
+You can use `@Scheduled` annotation to schedule a re-occurring task. Create a Job:
+
+source:GreetingJob[]
+
+callout:spring-ann-component[1]
+callout:constructor-di[number=1,arg0=GreetingService]
+callout:spring-ann-scheduled[3]
+
+=== Server side HTML Rendering
+
+==== Thymeleaf view
+
+common:micronaut-views-thymeleaf.adoc[]
+
+Create a Thymeleaf view to render the UI for the controller:
+
+resource:views/home.html[]
+
+==== Controller
+
+source:HomeController[]
+
+callout:spring-ann-restcontroller[1]
+callout:spring-ann-getmapping[2]
+callout:spring-model[3]
+<4> the View's name
+
+==== Controller Test
+
+Add a test which shows, you can use `org.springframework.ui.Model` and render server-side HTML.
+
+test:HomeControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+
+common:runapp.adoc[]
+
+You can execute the API:
+
+[source, bash]
+----
+ curl "http://localhost:8080/greeting?name=Sergio"
+----
+
+[source]
+----
+{"id":1,"content":"Hola, Sergio!"}
+----
+
+If you wait 30 seconds, you will see a log statement from `GreetingJob`.
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-spring/latest/guide/[Micronaut Spring].
+
+common:helpWithMicronaut.adoc[]
