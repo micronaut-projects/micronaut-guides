@@ -1,19 +1,24 @@
 package io.micronaut.guides;
 
 public enum Category {
-    GETTING_STARTED("Getting Started"),
-    EMAIL("Email"),
-    DATA_ACCESS("Data Access"),
-    CACHE("Cache"),
-    MESSAGING("Messaging"),
-    SECURITY("Micronaut Security"),
-    SERVICE_DISCOVERY("Service Discovery"),
-    DISTRIBUTED_TRACING("Distributed Tracing"),
-    KOTLIN("Kotlin"),
+    API("API"),
     AWS("AWS"),
     AZURE("Micronaut + Microsoft Azure"),
+    CACHE("Cache"),
+    DATA_ACCESS("Data Access"),
+    DISTRIBUTED_TRACING("Distributed Tracing"),
+    EMAIL("Email"),
     GCP("Micronaut + Google Cloud"),
-    ORACLE_CLOUD("Micronaut + Oracle Cloud");
+    GETTING_STARTED("Getting Started"),
+    GRAPHQL("GraphQL"),
+    KOTLIN("Kotlin"),
+    MESSAGING("Messaging"),
+    METRICS("Metrics"),
+    ORACLE_CLOUD("Micronaut + Oracle Cloud"),
+    PATTERNS("Patterns"),
+    SECURITY("Micronaut Security"),
+    SERVICE_DISCOVERY("Service Discovery"),
+    TEST("Testing");
 
     private final String val;
 

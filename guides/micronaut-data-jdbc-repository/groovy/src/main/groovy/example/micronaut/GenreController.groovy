@@ -1,13 +1,12 @@
 package example.micronaut
 
-import io.micronaut.data.exceptions.DataAccessException
-import io.micronaut.scheduling.annotation.ExecuteOn
-import javax.validation.Valid
-import javax.validation.constraints.NotBlank
-import groovy.transform.CompileStatic
 import example.micronaut.domain.Genre
+import groovy.transform.CompileStatic
+import io.micronaut.data.exceptions.DataAccessException
 import io.micronaut.data.model.Pageable
+import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Delete
@@ -15,9 +14,11 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import io.micronaut.http.annotation.Status
-import io.micronaut.http.HttpHeaders
-import io.micronaut.http.HttpStatus
 import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
+
+import javax.validation.Valid
+import javax.validation.constraints.NotBlank
 
 @CompileStatic
 @ExecuteOn(TaskExecutors.IO) // <1>

@@ -1,5 +1,6 @@
 package io.micronaut.guides
 
+import groovy.io.FileType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -7,17 +8,21 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.GuideMetadata.OpenAPIGeneratorConfig
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.options.Language
 import org.gradle.api.GradleException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
+import java.util.regex.Pattern
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
@@ -32,6 +37,8 @@ class GuideProjectGenerator implements AutoCloseable {
 
     public static final String DEFAULT_APP_NAME = 'default'
 
+    private static final Pattern GROOVY_JAVA_OR_KOTLIN = ~/.*\.java|.*\.groovy|.*\.kt/
+    private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
     private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
@@ -55,7 +62,7 @@ class GuideProjectGenerator implements AutoCloseable {
         List<GuideMetadata> metadatas = []
 
         guidesDir.eachDir { dir ->
-            metadatas << parseGuideMetadata(dir, metadataConfigName)
+            parseGuideMetadata(dir, metadataConfigName).ifPresent(metadatas::add)
         }
 
         mergeMetadataList(metadatas)
@@ -64,13 +71,14 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    static GuideMetadata parseGuideMetadata(File dir, String metadataConfigName) {
+    static Optional<GuideMetadata> parseGuideMetadata(File dir, String metadataConfigName) {
         File configFile = new File(dir, metadataConfigName)
         if (!configFile.exists()) {
-            throw new GradleException("metadata file not found for " + dir.name)
+            LOG.warn('metadata file not found for {}', dir.name)
+            return Optional.empty()
         }
 
-        Map config = new JsonSlurper().parse(configFile)
+        Map config = new JsonSlurper().parse(configFile) as Map
         boolean publish = config.publish == null ? true : config.publish
 
         Category cat = Category.values().find {it.toString() == config.category }
@@ -78,7 +86,7 @@ class GuideProjectGenerator implements AutoCloseable {
             throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
         }
 
-        new GuideMetadata(
+        Optional.ofNullable(new GuideMetadata(
                 asciidoctor: publish ? dir.name + '.adoc' : null,
                 slug: dir.name,
                 title: config.title,
@@ -102,9 +110,15 @@ class GuideProjectGenerator implements AutoCloseable {
                         features: it.features ?: [],
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                         excludeSource:  it.excludeSource,
-                        excludeTest:  it.excludeTest)
+                        excludeTest:  it.excludeTest,
+                        openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
+                            definitionFile: it.openAPIGeneratorConfig.definitionFile,
+                            generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
+                            properties: it.openAPIGeneratorConfig.properties ?: [:],
+                            globalProperties: it.openAPIGeneratorConfig.globalProperties ?: [:]
+                        ) : null)
                 }
-        )
+        ))
     }
 
     @CompileDynamic
@@ -142,6 +156,9 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     void generateOne(GuideMetadata metadata, File inputDir, File outputDir) {
+        if (!outputDir.exists()) {
+            assert outputDir.mkdir()
+        }
 
         String packageAndName = BASE_PACKAGE + '.' + APP_NAME
 
@@ -183,6 +200,11 @@ class GuideProjectGenerator implements AutoCloseable {
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
                 destination.mkdir()
+
+                if (app.openAPIGeneratorConfig) {
+                    OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig, testFramework, buildTool)
+                    deleteEveryFileButSources(destination)
+                }
 
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)
@@ -375,5 +397,38 @@ class GuideProjectGenerator implements AutoCloseable {
             merged.addAll others
         }
         merged
+    }
+
+    static void deleteEveryFileButSources(File dir) {
+        dir.eachFileRecurse(FileType.FILES) { file ->
+            if (!(file ==~ GROOVY_JAVA_OR_KOTLIN)) {
+                file.delete()
+            }
+        }
+        deleteEmptySubDirectories(dir)
+    }
+
+    static void deleteEmptySubDirectories(File dir) {
+        for (;;) {
+            if (deleteSubDirectories(dir) == 0) {
+                break
+            }
+        }
+    }
+    static int deleteSubDirectories(File dir) {
+        int deleted = 0
+
+        List<File> emptyDirs = []
+        dir.eachDirRecurse { f ->
+            if (f.listFiles().length == 0) {
+                emptyDirs.add(f)
+            }
+        }
+        emptyDirs.each { f ->
+            if (f.delete()) {
+                deleted++
+            }
+        }
+        deleted
     }
 }

@@ -2,6 +2,7 @@ package example.micronaut
 
 import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.Introspected
+
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
