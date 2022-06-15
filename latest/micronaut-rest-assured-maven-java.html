@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
-    <title>Using REST-Assured in a Micronaut application</title>
+    <title>Using Micronaut Test REST-Assured in a Micronaut application</title>
     <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
     <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
     <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
@@ -18,8 +18,8 @@
     <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-rest-assured.png"/>
     <meta name="twitter:creator" content="@micronautfw"/>
     <meta name="twitter:site" content="@micronautfw"/>
-    <meta name="twitter:title" content="Using REST-Assured in a Micronaut application"/>
-    <meta name="twitter:description" content="Learn how to use use REST-Assured to test the REST API of your Micronaut Application."/>
+    <meta name="twitter:title" content="Using Micronaut Test REST-Assured in a Micronaut application"/>
+    <meta name="twitter:description" content="Learn how to use use Micronaut Test REST-Assured to test the REST API of your Micronaut application."/>
 </head>
 <body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
 
@@ -111,7 +111,7 @@
 
     </div>
 </header>
-<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-rest-assured.html">Using REST-Assured in a Micronaut application</a> » <span class="breadcrumb_last" aria-current="page">maven | java</span></div></div><!-- .breadcrumbs -->
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="https://micronaut.io/guides/">Guides</a> » <a href="micronaut-rest-assured.html">Using Micronaut Test REST-Assured in a Micronaut application</a> » <span class="breadcrumb_last" aria-current="page">maven | java</span></div></div><!-- .breadcrumbs -->
 <main id="main">
     <div class="container">
         <div class="row">
@@ -144,16 +144,16 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <h1>Using REST-Assured in a Micronaut application</h1>
+                <h1>Using Micronaut Test REST-Assured in a Micronaut application</h1>
                 <div class="underline"></div>
 <div class="sect1">
 <div class="sectionbody">
 
 <div class="paragraph">
-<p>Learn how to use use REST-Assured to test the REST API of your Micronaut Application.</p>
+<p>Learn how to use use Micronaut Test REST-Assured to test the REST API of your Micronaut application.</p>
 </div>
 <div class="paragraph">
-<p>Authors: Sergio del Amo</p>
+<p>Authors: Sergio del Amo, Dean Wette</p>
 </div>
 <div class="paragraph">
 <p>Micronaut Version: 3.5.1</p>
@@ -180,6 +180,9 @@
 <p>Testing and validating REST services in Java is harder than in dynamic languages such as Ruby and Groovy. REST Assured brings the simplicity of using these languages into the Java domain.</p>
 </div>
 </blockquote>
+</div>
+<div class="paragraph">
+<p>The Micronaut Test REST Assured module makes it easier to integrate the <a href="https://rest-assured.io">REST-assured</a> library. Using it eliminates the need to hard code the version, and simplifies test fixtures by supporting injection of <code>RequestSpecification</code> into test fields or method parameters (parameters are only supported with JUnit 5):</p>
 </div>
 </div>
 </div>
@@ -311,15 +314,15 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <h2 id="dependencies">6. Dependencies</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To use <a href="https://rest-assured.io">REST-assured</a>, add the following dependency:</p>
+<p>To use <a href="https://rest-assured.io">REST-assured</a>, add the following dependency on the Micronaut Test REST-assured module:</p>
 </div>
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.rest-assured<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>rest-assured<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>5.1.0<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut.test<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-test-rest-assured<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;version&gt;</span>3.4.0<span class="tag">&lt;/version&gt;</span>
     <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
@@ -334,30 +337,24 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">io.restassured.specification.RequestSpecification</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.restassured.RestAssured.given</span>;
+
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.hamcrest.CoreMatchers.is</span>;
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">HelloControllerTest</span> {
 
-    <span class="annotation">@Inject</span>
-    EmbeddedServer embeddedServer; <i class="conum" data-value="2"></i><b>(2)</b>
-
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testHelloEndpoint() {
-        given().
-                port(embeddedServer.getPort()). <i class="conum" data-value="3"></i><b>(3)</b>
-        when().
-                get(<span class="string"><span class="delimiter">&quot;</span><span class="content">/hello</span><span class="delimiter">&quot;</span></span>).
-        then().
-                statusCode(<span class="integer">200</span>).
-                body(is(<span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>));
+    <span class="directive">public</span> <span class="type">void</span> testHelloEndpoint(RequestSpecification spec) { <i class="conum" data-value="2"></i><b>(2)</b>
+        spec    <i class="conum" data-value="3"></i><b>(3)</b>
+            .when()
+                .get(<span class="string"><span class="delimiter">&quot;</span><span class="content">/hello</span><span class="delimiter">&quot;</span></span>)
+            .then()
+                .statusCode(<span class="integer">200</span>)
+                .body(is(<span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>));
     }
-
 }</code></pre>
 </div>
 </div>
@@ -369,11 +366,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+<td>Inject an instance of <code>RequestSpecification</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Retrieve the embedded server port.</td>
+<td>Micronaut Test sets the embedded server port on <code>spec</code>, so it&#8217;s unnecessary to inject <code>EmbeddedServer</code> and retrieve it explicitly.</td>
 </tr>
 </table>
 </div>
