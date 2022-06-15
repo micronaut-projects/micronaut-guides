@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
-public class GreetingConfigurationTest {
+class GreetingConfigurationTest {
     @Inject
     BeanContext beanContext;
 

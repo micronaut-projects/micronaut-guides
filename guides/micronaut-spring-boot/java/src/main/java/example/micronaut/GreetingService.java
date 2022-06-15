@@ -16,7 +16,7 @@ public class GreetingService {
 
     private final GreetingConfiguration greetingConfiguration;
 
-    private AtomicReference<Greeting> lastGreeting = new AtomicReference<>();
+    private final AtomicReference<Greeting> lastGreeting = new AtomicReference<>();
 
     public GreetingService(GreetingConfiguration greetingConfiguration) { // <3>
         this.greetingConfiguration = greetingConfiguration;
