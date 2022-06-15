@@ -26,32 +26,31 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-@ExecuteOn(TaskExecutors.IO)
-@Controller("/rooms")
+@ExecuteOn(TaskExecutors.IO) // <1>
+@Controller("/rooms") // <2>
 class MessagesController extends ApplicationController {
     private static final Logger LOG = LoggerFactory.getLogger(MessagesController.class);
     private final MessageService messageService;
     private final RoomRepository roomRepository;
 
-    public MessagesController(MessageService messageService,
+    public MessagesController(MessageService messageService,  // <3>
                               RoomRepository roomRepository) {
         this.messageService = messageService;
         this.roomRepository = roomRepository;
     }
 
-    @View("/messages/create")
-    @Produces(MediaType.TEXT_HTML)
-    @Get("/{id}/messages/create")
-    HttpResponse<?> create(@PathVariable Long id) {
+    @View("/messages/create") // <4>
+    @Produces(MediaType.TEXT_HTML) // <5>
+    @Get("/{id}/messages/create") // <6>
+    HttpResponse<?> create(@PathVariable Long id) { // <7>
         return modelResponse(id);
     }
 
-    @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Post("/{id}/messages")
-    @Status(HttpStatus.OK)
-    HttpResponse<?> save(@PathVariable Long id,
-                         @Body("content") String content) {
+    @Produces(MediaType.TEXT_HTML) // <5>
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) // <8>
+    @Post("/{id}/messages") // <9>
+    HttpResponse<?> save(@PathVariable Long id, // <7>
+                         @Body("content") String content) { // <10>
         Optional<RoomMessage> roomMessageOptional = messageService.save(new MessageForm(id, content));
         return roomMessageOptional.map(roomMessage -> {
             return redirectTo("/rooms", id);

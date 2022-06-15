@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.Get;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-@Controller
+@Controller // <1>
 public class HomeController {
     @Get
     HttpResponse<?> index() throws URISyntaxException {

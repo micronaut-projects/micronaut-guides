@@ -23,71 +23,72 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-@Controller("/rooms")
+@Controller("/rooms") // <1>
 public class RoomsController extends ApplicationController {
 
     public static final String ROOM = "room";
     public static final String ROOMS = "rooms";
     private final RoomRepository roomRepository;
 
-    public RoomsController(RoomRepository roomRepository) {
+    public RoomsController(RoomRepository roomRepository) { // <2>
         this.roomRepository = roomRepository;
     }
 
-    @ExecuteOn(TaskExecutors.IO)
-    @View("/rooms/index")
-    @Get
-    @Produces(MediaType.TEXT_HTML)
+    @ExecuteOn(TaskExecutors.IO) // <3>
+    @View("/rooms/index") // <4>
+    @Get // <5>
+    @Produces(MediaType.TEXT_HTML) // <6>
     Map<String, Object> index() {
         return Collections.singletonMap(ROOMS, roomRepository.findAll());
     }
 
-    @View("/rooms/create")
-    @Get("/create")
-    @Produces(MediaType.TEXT_HTML)
+    @View("/rooms/create") // <4>
+    @Get("/create") // <7>
+    @Produces(MediaType.TEXT_HTML) // <6>
     Map<String, Object> create() {
         return Collections.emptyMap();
     }
 
-    @ExecuteOn(TaskExecutors.IO)
-    @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Post
-    HttpResponse<?> save(@Body("name") String name) {
+    @ExecuteOn(TaskExecutors.IO) // <3>
+    @Produces(MediaType.TEXT_HTML) // <6>
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) // <7>
+    @Post // <8>
+    HttpResponse<?> save(@Body("name") String name) { // <9>
         return redirectTo("/rooms", roomRepository.save(name).getId());
     }
 
-    @ExecuteOn(TaskExecutors.IO)
-    @View("/rooms/edit")
-    @Get("/{id}/edit")
-    @Produces(MediaType.TEXT_HTML)
-    HttpResponse<?> edit(@PathVariable Long id) {
+    @ExecuteOn(TaskExecutors.IO) // <3>
+    @View("/rooms/edit") // <4>
+    @Get("/{id}/edit") // <5>
+    @Produces(MediaType.TEXT_HTML) // <6>
+    HttpResponse<?> edit(@PathVariable Long id) { // <10>
         return modelResponse(id);
     }
 
-    @ExecuteOn(TaskExecutors.IO)
-    @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Post("/update")
-    HttpResponse<?> update(@Body("id") Long id, @Body("name") String name) {
+    @ExecuteOn(TaskExecutors.IO) // <3>
+    @Produces(MediaType.TEXT_HTML) // <4>
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) // <7>
+    @Post("/update") // <8>
+    HttpResponse<?> update(@Body("id") Long id,  // <9>
+                           @Body("name") String name) { // <9>
         roomRepository.update(id, name);
         return redirectTo("/rooms", id);
     }
 
-    @ExecuteOn(TaskExecutors.IO)
-    @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Post("/{id}/delete")
-    HttpResponse<?> delete(@PathVariable Long id) throws URISyntaxException {
+    @ExecuteOn(TaskExecutors.IO) // <3>
+    @Produces(MediaType.TEXT_HTML) // <4>
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) // <7>
+    @Post("/{id}/delete") // <8>
+    HttpResponse<?> delete(@PathVariable Long id) throws URISyntaxException { // <10>
         roomRepository.deleteById(id);
         return HttpResponse.seeOther(new URI("/rooms"));
     }
 
-    @ExecuteOn(TaskExecutors.IO)
-    @View("/rooms/show")
-    @Get("/{id}")
-    @Produces(MediaType.TEXT_HTML)
-    HttpResponse<?> show(@PathVariable Long id) {
+    @ExecuteOn(TaskExecutors.IO) // <3>
+    @View("/rooms/show") // <4>
+    @Get("/{id}") // <5>
+    @Produces(MediaType.TEXT_HTML) // <4>
+    HttpResponse<?> show(@PathVariable Long id) { // <10>
         return modelResponse(roomRepository.getById(id).orElse(null));
     }
 
