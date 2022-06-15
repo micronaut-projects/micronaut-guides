@@ -9,16 +9,16 @@ import io.micronaut.data.annotation.Relation;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@MappedEntity
+@MappedEntity // <1>
 public class Room {
-    @Id
-    @GeneratedValue(GeneratedValue.Type.AUTO)
+    @Id // <2>
+    @GeneratedValue(GeneratedValue.Type.AUTO) // <3>
     private Long id;
 
     @NotNull
     private String name;
 
-    @Relation(value = Relation.Kind.ONE_TO_MANY, mappedBy = "room")
+    @Relation(value = Relation.Kind.ONE_TO_MANY, mappedBy = "room") // <4>
     @Nullable
     private List<Message> messages;
 

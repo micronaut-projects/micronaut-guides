@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-@Introspected
+@Introspected // <1>
 public class RoomMessage {
 
     private static final String PATTERN = "MMM:dd HH:mm:ss";

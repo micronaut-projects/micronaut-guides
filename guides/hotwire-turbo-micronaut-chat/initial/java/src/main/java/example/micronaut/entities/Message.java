@@ -14,10 +14,10 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-@MappedEntity
+@MappedEntity // <1>
 public class Message {
-    @Id
-    @GeneratedValue(GeneratedValue.Type.AUTO)
+    @Id // <2>
+    @GeneratedValue(GeneratedValue.Type.AUTO) // <3>
     private Long id;
 
     @NonNull
@@ -25,14 +25,14 @@ public class Message {
     private String content;
 
     @Nullable
-    @Relation(value = Relation.Kind.MANY_TO_ONE)
+    @Relation(value = Relation.Kind.MANY_TO_ONE) // <4>
     private Room room;
 
-    @DateCreated
+    @DateCreated // <5>
     @Nullable
     private Instant dateCreated;
 
-    @Creator
+    @Creator // <6>
     public Message() {
     }
 

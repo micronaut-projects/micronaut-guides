@@ -8,8 +8,8 @@ import io.micronaut.core.annotation.NonNull;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
-@DefaultImplementation(DefaultMessageService.class)
+@DefaultImplementation(DefaultMessageService.class) // <1>
 public interface MessageService {
     @NonNull
-    Optional<RoomMessage> save(@NonNull @NotNull @Valid MessageForm form);
+    Optional<RoomMessage> save(@NonNull @NotNull @Valid MessageForm form); // <2>
 }

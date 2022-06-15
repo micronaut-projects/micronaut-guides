@@ -1,21 +1,113 @@
+common:header-top.adoc[]
+
+common:requirements.adoc[]
+
+== Getting started
+
 This Guide shows a chat application such as the Rails application show in the  https://www.youtube.com/watch?v=eKY-QES1XQQ[Hotwire announcement screencast]
+
+== What is Hotwire?
 
 https://hotwired.dev/[Hotwire: HTML Over the wire]:
 
 ____
-Welcome to Hotwire, an umbrella for trio frameworks that implement the HTML-over-the-wire approach to building modern web applications.
-
+Hotwire is an umbrella for trio frameworks that implement the HTML-over-the-wire approach to building modern web applications.
 At its heart is Turbo, which gives you techniques for bringing the speed of a single-page application without writing a lick of JavaScript.
-___
+____
 
 This guides focus primarily on showing how https://turbo.hotwired.dev/[Turbo] works within a Micronaut application.
 
-== Getting started
+== Download Solution
 
 link:@sourceDir@.zip[Download] and unzip the source of the guide. You will find two folders:
 
 * `initial` which contains a Micronaut Application without any Turbo Integration.
 * `complete` the resulting Micronaut Application if you you follow the instructions in the next sections and apply these changes to the initial application.
+
+== Initial Application
+
+The next sections introduces you the initial application.
+
+common:datasource-header.adoc[]
+
+resource:application.yml[tag=datasource,app=initial]
+
+common:datasource-footer.adoc[]
+
+=== Database Schema
+
+// Define the database variable that will be used in the snippet
+:database: mysql
+common:flyway-header.adoc[]
+
+resource:application.yml[tag=flyway,app=initial]
+
+common:flyway-footer.adoc[]
+
+resource:db/migration/V1__schema.sql[app=initial]
+
+=== Entities
+
+The application contains two entities with a one-to-many relationship.
+
+source:entities/Room[app=initial]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:relation[4]
+
+source:entities/Message[app=initial]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:relation[4]
+callout:date-created[5]
+callout:creator[6]
+
+=== Models
+
+The application includes a POJO to map the form submission when the user submits a message to a room.
+
+source:models/MessageForm[app=initial]
+
+callout:introspected[1]
+
+The application includes a POJO which represents a room's message.
+
+source:models/RoomMessage[app=initial]
+
+callout:introspected[1]
+
+=== Repositories
+
+The application includes a repository per entity.
+
+source:repositories/MessageRepository[app=initial]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+source:repositories/RoomRepository[app=initial]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:join-left-fetch[number=3,arg0=messages]
+
+=== Services
+
+The application contains a service which publishes an event when a message is saved.
+
+source:services/MessageService[app=initial]
+
+callout:default-implementation[1]
+callout:valid[2]
+
+source:services/DefaultMessageService[app=initial]
+
+callout:singleton[1]
+callout:application-event-publisher[number=2,arg0=RoomMessage]
 
 == Running the initial Application
 

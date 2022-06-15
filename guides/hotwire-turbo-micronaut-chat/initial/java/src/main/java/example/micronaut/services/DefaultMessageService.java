@@ -13,7 +13,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
-@Singleton
+@Singleton // <1>
 public class DefaultMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final RoomRepository roomRepository;
@@ -21,7 +21,7 @@ public class DefaultMessageService implements MessageService {
 
     public DefaultMessageService(MessageRepository messageRepository,
                                  RoomRepository roomRepository,
-                                 ApplicationEventPublisher<RoomMessage> eventPublisher) {
+                                 ApplicationEventPublisher<RoomMessage> eventPublisher) {  // <2>
         this.messageRepository = messageRepository;
         this.roomRepository = roomRepository;
         this.eventPublisher = eventPublisher;
@@ -37,7 +37,7 @@ public class DefaultMessageService implements MessageService {
                             form.getRoom(),
                             form.getContent(),
                             message.getDateCreated());
-                    eventPublisher.publishEvent(roomMessage);
+                    eventPublisher.publishEvent(roomMessage); // <2>
                     return roomMessage;
                 });
     }

@@ -12,14 +12,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
-@JdbcRepository(dialect = Dialect.MYSQL)
-public interface RoomRepository extends CrudRepository<Room, Long> {
+@JdbcRepository(dialect = Dialect.MYSQL) // <1>
+public interface RoomRepository extends CrudRepository<Room, Long> { // <2>
 
     @NonNull
     Room save(@NonNull @NotBlank String name);
 
     void update(@Id Long id, @NonNull @NotBlank String name);
 
-    @Join(value = "messages", type = Join.Type.LEFT_FETCH)
+    @Join(value = "messages", type = Join.Type.LEFT_FETCH) // <3>
     Optional<Room> getById(@NonNull @NotNull Long id);
 }
