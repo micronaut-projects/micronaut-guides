@@ -21,7 +21,7 @@ public class JavascriptControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "/assets/javascripts/controllers/reset_form_controller.js"
+            "/assets/javascripts/controllers/reset_form_controller.mjs"
     })
     void javascriptControllersAreSeveredAsStaticResources(String resource) {
         BlockingHttpClient client = httpClient.toBlocking();

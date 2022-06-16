@@ -37,7 +37,7 @@ public class DefaultMessageService implements MessageService {
                             form.getRoom(),
                             form.getContent(),
                             message.getDateCreated());
-                    eventPublisher.publishEvent(roomMessage); // <2>
+                    eventPublisher.publishEvent(roomMessage); // <1>
                     return roomMessage;
                 });
     }
