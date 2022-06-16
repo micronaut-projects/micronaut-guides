@@ -6,7 +6,7 @@ common:requirements.adoc[]
 
 This Guide shows a chat application such as the Rails application demonstrated in the  https://www.youtube.com/watch?v=eKY-QES1XQQ[Hotwire announcement screencast]
 
-== What is Hotwire?
+=== What is Hotwire?
 
 https://hotwired.dev/[Hotwire: HTML Over the wire]:
 
@@ -68,9 +68,13 @@ So when you follow a link or submit a form, only the content of the Frame change
 
 This allows you to keep the state of the rest of the page from changing, making the app feel more responsive.
 
+=== Highlight Frames
+
 To be able to easily see how the Frames work, we'll call them out with a blue border.
 
 resource:assets/stylesheets/application.css[app=complete]
+
+=== Turbo Frame Show View
 
 Now let's wrap the Room name, and the ability to edit it inside a Frame.
 
@@ -91,11 +95,11 @@ with:
 <body>
     <main>
         <turbo-frame id="room">
-        <p th:replace="rooms/_room :: room(${room})"></p>
-        <p>
-            <a th:href="@{|/rooms/${room.id}/edit|}" th:text="#{action.edit}"></a> |
-            <a href="/rooms" th:text="#{action.back}"></a>
-        </p>
+            <p th:replace="rooms/_room :: room(${room})"></p>
+            <p>
+                <a th:href="@{|/rooms/${room.id}/edit|}" th:text="#{action.edit}"></a> |
+                <a href="/rooms" th:text="#{action.back}"></a>
+           </p>
         </turbo-frame>
         <div id="messages">
             <div th:each="message : ${room.messages}">
@@ -111,6 +115,8 @@ with:
 Please, note the usage of `<turbo-frame id="room">` in the previous code snippet.
 
 The Turbo Frame tag goes around both the initial display, including the Edit link, and the part of the Edit page we want to appear within the Frame.
+
+=== Turbo Frame Edit View
 
 Replace this:
 
@@ -130,7 +136,7 @@ with this:
     <main>
         <h1 th:text="#{room.edit}"></h1>
         <turbo-frame id="room">
-        <p th:replace="rooms/_edit :: edit(${room})"></p>
+            <p th:replace="rooms/_edit :: edit(${room})"></p>
         </turbo-frame>
         <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.show}"></a> |
         <a href="/rooms" th:text="#{action.back}"></a>
@@ -163,9 +169,11 @@ Replace:
 <body>
     <main>
         ...
-        <p>
+        <turbo-frame id="room">
             ...
-            <a href="/rooms" th:text="#{action.back}"></a>
+                <a href="/rooms" th:text="#{action.back}"></a>
+           </p>
+        </turbo-frame>
 ....
 ----
 
@@ -178,18 +186,19 @@ with:
 <body>
     <main>
         ...
-        <p>
+        <turbo-frame id="room">
             ...
-            <a data-turbo-frame="_top" href="/rooms" th:text="#{action.back}"></a>
-
+               <a data-turbo-frame="_top" href="/rooms" th:text="#{action.back}"></a>
+           </p>
+        </turbo-frame>
 ....
 ----
 
-Now the back link works, and the Frame scopes the Edit Display loop.
+Now the back link works, and the frame scopes the edit display loop.
 
 === Lazy Loading Frames
 
-Then let's add the New Message link into an inline but lazy-loaded Turbo Frame tag that also, just for starters, acts on the whole page.
+Then, let's add the New Message link into an inline but lazy-loaded Turbo Frame tag that also, just for starters, acts on the whole page.
 
 This Frame will be loaded right after the page displays, hitting the New Message Controller action we made earlier.
 
@@ -205,7 +214,6 @@ Replace:
 </body>
 </html>
 ----
-
 
 with:
 
@@ -252,31 +260,95 @@ Turbo will plug out just the matching Frame from the server response. As you can
 
 === TurboFrameView Annotation
 
-In a Micronaut application, we can optimize the response by using the `@TurboFrameView` annotation to only render the layout which Turbo uses
-when parsing hte response. A Request coming from a Frame includes the HTTP Header `Turbo-Frame`.
+In a Micronaut application, we can optimize the response by using the `@TurboFrameView` annotation to only render the layout which Turbo uses when parsing hte response. A Request coming from a Frame includes the HTTP Header `Turbo-Frame`. Annotate `RoomsControllerEdit::edit` method with `@TurboFrameView("/rooms/_edit")`
 
-TODO
+source:controllers/RoomsControllerEdit[app=complete]
+
+callout:turbo-frame-view[1]
+
+For a request without HTTP Header `Turbo-Frame` the above controller returns the following HTML.
+
+[source,html]
+----
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" media="all" href="/assets/stylesheets/application.css" />
+        <link rel="stylesheet" media="all" href="/assets/stylesheets/scaffolds.css" />
+        <script type="module">
+            import hotwiredTurbo from 'https://cdn.skypack.dev/@hotwired/turbo';
+        </script>
+    </head>
+    <body>
+        <main>
+            <h1>Editing Room</h1>
+            <turbo-frame id="room">
+                <form action="/rooms/update"
+                      accept-charset="UTF-8"
+                      method="post">
+                     <input type="hidden" value="1" name="id">
+                     <div class="field">
+                         <label for="room_name">Name</label>
+                         <input type="text" value="Micronaut Questions" name="name" id="room_name" />
+                     </div>
+                     <div class="actions">
+                         <input type="submit" name="commit" value="Update Room"/>
+                     </div>
+                </form>
+            </turbo-frame>
+            <a href="/rooms/1">Show</a> |
+            <a href="/rooms">Back</a>
+        </main>
+    </body>
+</html>
+----
+
+For a request including an HTTP Header `Turbo-Frame` with value `rooms` the above controller returns the following HTML.
+
+[source,html]
+----
+<turbo-frame id="room">
+    <form action="/rooms/update"
+          accept-charset="UTF-8"
+          method="post">
+        <input type="hidden" value="1" name="id">
+        <div class="field">
+            <label for="room_name">Name</label>
+            <input type="text" value="Micronaut Questions" name="name" id="room_name" />
+        </div>
+        <div class="actions">
+            <input type="submit" name="commit" value="Update Room"/>
+        </div>
+    </form>
+</turbo-frame>
+----
 
 === Turbo Streams
 
-They deliver page changes over WebSocket or in response to form submissions using  just HTML and a set of CRUD like action tags.
+Turbo Streams deliver page changes over WebSocket or in response to form submissions using  just HTML and a set of CRUD like action tags.
 
-The tags let you append or prepend to replace and remove any target DOM element from the existing page.
+Turbo Streams let you append or prepend to replace and remove any target DOM element from the existing page.
 
 They're strictly limited to DOM changes, though. No direct JavaScript invocation.
 
 If you need more than DOM change, connect a Stimulus controller.
 
-We will add a Turbo stream response to the message creation action such that we can add the new Message to the Room page without replacing
-the whole page.
+We will add a Turbo stream response to the message creation action such that we can add the new Message to the Room page without replacing the whole page.
 
 This template invokes the `append` action with the DOM ID of the target container, and either a full set of partial rendering options or just a record we wish to render which conforms to the naming conventions for matching to a partial.
 
-source:MessagesController[app=complete,tag=save]
+source:controllers/MessagesControllerSave[app=complete]
+
+<1> `TurboMediaType::acceptsTurboStream` is a convenient method to verify if the request accepts a turbo stream response.
+<2> You can build a Turbo Stream with fluid API. Micronaut Views templates are supported.
 
 Now we can add Messages to the page without resetting it completely.
 
-The Edit Name form can stay open while we're doing this, because new Messages are added directly to the Messages div. The Turbo Stream HTML is rendered directly in response to the form submission, and Turbo knows from the MIME type to process it automatically. But notice the input  field isn't cleared. We can fix that by adding  a https://stimulus.hotwired.dev[Stimulus] controller.
+=== Stimulus Controller
+
+The Edit Name form can stay open while we're doing this, because new Messages are added directly to the Messages div. The Turbo Stream HTML is rendered directly in response to the form submission, and Turbo knows from the MIME type to process it automatically. But notice the input field isn't cleared. We can fix that by adding  a https://stimulus.hotwired.dev[Stimulus] controller.
 
 ___
 Stimulus is a modest JavaScript framework for the HTML you already have.
