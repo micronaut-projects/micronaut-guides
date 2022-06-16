@@ -5,10 +5,10 @@ import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
 import jakarta.inject.Singleton;
 
-@Factory
+@Factory // <1>
 class MessageSourceFactory {
 
-    @Singleton
+    @Singleton // <2>
     MessageSource createMessageSource() {
         return new ResourceBundleMessageSource("i18n.messages");
     }

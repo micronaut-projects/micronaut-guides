@@ -4,7 +4,7 @@ common:requirements.adoc[]
 
 == Getting started
 
-This Guide shows a chat application such as the Rails application show in the  https://www.youtube.com/watch?v=eKY-QES1XQQ[Hotwire announcement screencast]
+This Guide shows a chat application such as the Rails application demonstrated in the  https://www.youtube.com/watch?v=eKY-QES1XQQ[Hotwire announcement screencast]
 
 == What is Hotwire?
 
@@ -15,7 +15,7 @@ Hotwire is an umbrella for trio frameworks that implement the HTML-over-the-wire
 At its heart is Turbo, which gives you techniques for bringing the speed of a single-page application without writing a lick of JavaScript.
 ____
 
-This guides focus primarily on showing how https://turbo.hotwired.dev/[Turbo] works within a Micronaut application.
+This guide focus primarily on showing how https://turbo.hotwired.dev/[Turbo] works within a Micronaut application.
 
 == Download Solution
 
@@ -24,193 +24,9 @@ link:@sourceDir@.zip[Download] and unzip the source of the guide. You will find 
 * `initial` which contains a Micronaut Application without any Turbo Integration.
 * `complete` the resulting Micronaut Application if you you follow the instructions in the next sections and apply these changes to the initial application.
 
-== Initial Application
+== Initial Application Introduction
 
-The next sections introduces you the initial application.
-
-common:datasource-header.adoc[]
-
-resource:application.yml[tag=datasource,app=initial]
-
-common:datasource-footer.adoc[]
-
-=== Database Schema
-
-// Define the database variable that will be used in the snippet
-:database: mysql
-common:flyway-header.adoc[]
-
-resource:application.yml[tag=flyway,app=initial]
-
-common:flyway-footer.adoc[]
-
-resource:db/migration/V1__schema.sql[app=initial]
-
-=== Entities
-
-The application contains two entities with a one-to-many relationship.
-
-source:entities/Room[app=initial]
-
-callout:mapped-entity[1]
-callout:mapped-entity-id[2]
-callout:generated-value[3]
-callout:relation[4]
-
-source:entities/Message[app=initial]
-
-callout:mapped-entity[1]
-callout:mapped-entity-id[2]
-callout:generated-value[3]
-callout:relation[4]
-callout:date-created[5]
-callout:creator[6]
-
-=== Models
-
-The application includes a POJO to map the form submission when the user submits a message to a room.
-
-source:models/MessageForm[app=initial]
-
-callout:introspected[1]
-
-The application includes a POJO which represents a room's message.
-
-source:models/RoomMessage[app=initial]
-
-callout:introspected[1]
-
-=== Repositories
-
-The application includes a repository per entity.
-
-source:repositories/MessageRepository[app=initial]
-
-callout:jdbcrepository[1]
-callout:crudrepository[2]
-
-source:repositories/RoomRepository[app=initial]
-
-callout:jdbcrepository[1]
-callout:crudrepository[2]
-callout:join-left-fetch[number=3,arg0=messages]
-
-=== Services
-
-The application contains a service which publishes an event when a message is saved.
-
-source:services/MessageService[app=initial]
-
-callout:default-implementation[1]
-callout:valid[2]
-
-source:services/DefaultMessageService[app=initial]
-
-callout:singleton[1]
-callout:application-event-publisher[number=2,arg0=RoomMessage]
-
-=== Controllers
-
-The apex url is redirected to `/rooms`.
-
-source:controllers/HomeController[app=initial]
-
-We have an abstract class to simplify redirection:
-
-source:controllers/ApplicationController[app=initial]
-
-The application has one controller for `Room`:
-
-source:controllers/RoomsController[app=initial]
-
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=2,arg0=RoomRepository]
-callout:executes-on[3]
-callout:view[4]
-callout:get-generic[number=5]
-callout:produces-html[6]
-callout:consumes[7]
-callout:post-generic[8]
-callout:body-qualifier[9]
-callout:pathvariable[10]
-
-and one controller for `Message`:
-
-source:controllers/MessagesController[app=initial]
-
-callout:executes-on[1]
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=3,arg0=MessageService]
-callout:view[4]
-callout:produces-html[5]
-callout:get-generic[number=6]
-callout:pathvariable[7]
-callout:consumes[8]
-callout:post-generic[9]
-callout:body-qualifier[10]
-
-common:micronaut-views-thymeleaf.adoc[]
-
-The initial application uses Thymleaf Fragments to organize the views.
-
-It uses a root layout:
-
-resource:views/layout.html[app=initial]
-
-==== Message Create Views
-
-resource:views/messages/_create.html[app=initial]
-
-resource:views/messages/_message.html[app=initial]
-
-resource:views/messages/create.html[app=initial]
-
-==== Rooms Create Views
-
-resource:views/rooms/create.html[app=initial]
-
-resource:views/rooms/_create.html[app=initial]
-
-==== Rooms Edit Views
-
-resource:views/rooms/edit.html[app=initial]
-
-resource:views/rooms/_edit.html[app=initial]
-
-==== Rooms Show Views
-
-resource:views/rooms/show.html[app=initial]
-
-resource:views/rooms/_room.html[app=initial]
-
-==== Rooms List Views
-
-resource:views/rooms/index.html[app=initial]
-
-resource:views/rooms/_table.html[app=initial]
-
-resource:views/rooms/_tr.html[app=initial]
-
-== Running the initial Application
-
-Execute the following command to run a MySQL container:
-
-[source,bash]
-----
-docker run -it --rm \
-	-p 3306:3306 \
-	-e MYSQL_DATABASE=db \
-	-e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
-	mysql:8
-----
-
-common:docker-mysql-arm[]
-
-common:runapp-instructions.adoc[]
-
-The application will use two models, `Room` and `Message`.
-
-One `Room` has many `Message`s.
+The initial application uses two models, `Room` and `Message`. One `Room` has many `Message`s.
 
 The `initial` application contains a basic editing interface for Chat `Room`s. It uses https://micronaut-projects.github.io/micronaut-views/latest/guide/#thymeleaf[Micronaut Views Thymeleaf] to renders server-side HTML
 
@@ -220,9 +36,13 @@ For `Message`s, we'll have just two actions. `create` to render the form to crea
 
 It gives us a foundation flow for an admittedly cumbersome chat application which we can then use to level up with https://hotwired.dev/[Hotwire] techniques one at a time.
 
+`Appendix A: Initial Application` describes the initial application if you want to learn more.
+
 == Install Turbo
 
-https://turbo.hotwired.dev/handbook/installing#in-compiled-form[Install Turbo] in compiled form by referencing the Turbo distributable script directly in the `<head>` of your application:
+https://turbo.hotwired.dev/handbook/installing#in-compiled-form[Install Turbo] in compiled form by referencing the Turbo distributable script directly in the `<head>` of your application.
+
+Modify the `initial` application, replace `src/main/resources/views/layout.html`.
 
 [source, html]
 ----
@@ -252,35 +72,11 @@ To be able to easily see how the Frames work, we'll call them out with a blue bo
 
 resource:assets/stylesheets/application.css[app=complete]
 
-Now let's wrap the Room name and the ability to edit it inside a Frame.
+Now let's wrap the Room name, and the ability to edit it inside a Frame.
 
 Replace this:
 
-[source, html]
-.src/main/resources/views/rooms/show.html
-----
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <script></script>
-</head>
-<body>
-    <main>
-        <p th:replace="rooms/_room :: room(${room})"></p>
-        <p>
-            <a th:href="@{|/rooms/${room.id}/edit|}" th:text="#{action.edit}"></a> |
-            <a href="/rooms" th:text="#{action.back}"></a>
-        </p>
-        <div id="messages">
-            <div th:each="message : ${room.messages}">
-                <p th:replace="messages/_message :: message(${message})"></p>
-            </div>
-        </div>
-        <a href="/messages/create" th:text="#{message.new}"></a>
-    </main>
-</body>
-</html>
-----
+resource:views/rooms/show.html[app=initial]
 
 with:
 
@@ -306,7 +102,7 @@ with:
                 <p th:replace="messages/_message :: message(${message})"></p>
             </div>
         </div>
-        <a href="/messages/create" th:text="#{message.new}"></a>
+        <a th:href="@{|/rooms/${room.id}/messages/create|}" th:text="#{message.new}"></a>
     </main>
 </body>
 </html>
@@ -318,24 +114,7 @@ The Turbo Frame tag goes around both the initial display, including the Edit lin
 
 Replace this:
 
-[source, html]
-.src/main/resources/views/rooms/edit.html
-----
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <script></script>
-</head>
-<body>
-    <main>
-        <h1 th:text="#{room.edit}"></h1>
-<p th:replace="rooms/_edit :: edit(${room})"></p>
-        <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.show}"></a> |
-        <a href="/rooms" th:text="#{action.back}"></a>
-    </main>
-</body>
-</html>
-----
+resource:views/rooms/edit.html[app=initial]
 
 with this:
 
@@ -406,7 +185,7 @@ with:
 ....
 ----
 
-Now the back link works and the Frame scopes the Edit Display loop.
+Now the back link works, and the Frame scopes the Edit Display loop.
 
 === Lazy Loading Frames
 
@@ -442,49 +221,17 @@ with:
 </html>
 ----
 
+==== Plug out the Frame
+
 Like with Edit, we wrap the relevant segment in a Frame tag with a matching ID, which is how Turbo knows how to plug out the right Frame.
 
 Replace:
 
-[source, html]
-.src/main/resources/views/messages/create.html
-----
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <script></script>
-    </head>
-<body>
-    <main>
-    <h1 th:text="#{message.new}"></h1>
-<form th:replace="messages/_create :: create(${room})"></form>
-    <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.back}"></a>
-    </main>
-</body>
-</html>
-----
+resource:views/messages/create.html[app=initial]
 
 with:
 
-[source, html]
-.src/main/resources/views/messages/create.html
-----
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <script></script>
-    </head>
-<body>
-    <main>
-    <h1 th:text="#{message.new}"></h1>
-    <turbo-frame id="new_message" target="_top">
-        <form th:replace="messages/_create :: create(${room})"></form>
-    </turbo-frame>
-    <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.back}"></a>
-    </main>
-</body>
-</html>
-----
+resource:views/messages/create.html[app=complete]
 
 You can now see two requests when we load the room: one for the page, one for the lazy-loader frame.
 
@@ -502,6 +249,8 @@ a real independent context.
 You can see how the Frame replacement happens by inspecting the response to edit.
 
 Turbo will plug out just the matching Frame from the server response. As you can see here, the header and links are ignored.
+
+=== TurboFrameView Annotation
 
 In a Micronaut application, we can optimize the response by using the `@TurboFrameView` annotation to only render the layout which Turbo uses
 when parsing hte response. A Request coming from a Frame includes the HTTP Header `Turbo-Frame`.
@@ -593,4 +342,323 @@ We get to keep all our template rendering on the server, which means writing mor
 * https://stimulus.hotwired.dev/[Stimulus]
 
 
+== Appendix A: Initial Application
 
+The next sections introduces you the initial application.
+
+common:datasource-header.adoc[]
+
+resource:application.yml[tag=datasource,app=initial]
+
+common:datasource-footer.adoc[]
+
+=== Database Schema
+
+// Define the database variable that will be used in the snippet
+:database: mysql
+common:flyway-header.adoc[]
+
+resource:application.yml[tag=flyway,app=initial]
+
+common:flyway-footer.adoc[]
+
+resource:db/migration/V1__schema.sql[app=initial]
+
+=== Entities
+
+The application contains two entities with a one-to-many relationship.
+
+source:entities/Room[app=initial]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:relation[4]
+
+source:entities/Message[app=initial]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:relation[4]
+callout:date-created[5]
+callout:creator[6]
+
+=== Models
+
+The application includes a POJO to map the form submission when the user submits a message to a room.
+
+source:models/MessageForm[app=initial]
+
+callout:introspected[1]
+
+The application includes a POJO which represents a room's message.
+
+source:models/RoomMessage[app=initial]
+
+callout:introspected[1]
+
+=== Repositories
+
+The application includes a repository per entity.
+
+source:repositories/MessageRepository[app=initial]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+source:repositories/RoomRepository[app=initial]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:join-left-fetch[number=3,arg0=messages]
+
+=== Services
+
+The application contains a service which publishes an event when a message is saved.
+
+source:services/MessageService[app=initial]
+
+callout:default-implementation[1]
+callout:valid[2]
+
+source:services/DefaultMessageService[app=initial]
+
+callout:singleton[1]
+callout:application-event-publisher[number=2,arg0=RoomMessage]
+
+==== Static Resources
+
+Update `application.yml` to add static resource configuration:
+
+resource:application.yml[tag=static-resources,app=initial]
+
+callout:static-resources[1]
+
+common:micronaut-views-thymeleaf.adoc[]
+
+The initial application uses Thymleaf Fragments to organize the views.
+
+It uses a root layout:
+
+resource:views/layout.html[app=initial]
+
+=== Properties
+
+Create a default `messages.properties` file:
+
+resource:i18n/messages.properties[app=initial]
+
+Create a `messages_es.properties` file for Spanish locale:
+
+resource:i18n/messages_es.properties[app=initial]
+
+=== Message Source
+
+Create a `MessageSource` that uses the previous properties files:
+
+source:i18n/MessageSourceFactory[app=initial]
+
+callout:factory[1]
+callout:singleton[2]
+
+=== Controllers
+
+The apex url is redirected to `/rooms`.
+
+source:controllers/HomeController[app=initial]
+
+callout:controller[number=1,arg0=/]
+callout:get-generic[number=2]
+
+We have an abstract class to simplify redirection:
+
+source:controllers/ApplicationController[app=initial]
+
+Create CRUD controllers for `Room`.
+
+==== Rooms Index Controller
+
+Create a controller which displays a list of rooms.
+
+source:controllers/RoomsControllerIndex[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:view[4]
+callout:get-generic[number=5]
+callout:produces-html[6]
+
+===== Rooms Index Views
+
+The controller uses Thymeleaf to render server-side HTML.
+
+resource:views/rooms/index.html[app=initial]
+
+resource:views/rooms/_table.html[app=initial]
+
+resource:views/rooms/_tr.html[app=initial]
+
+==== Rooms Show Controller
+
+Create a controller which displays room.
+
+source:controllers/RoomsControllerShow[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:view[4]
+callout:get-generic[number=5]
+callout:produces-html[6]
+callout:pathvariable[7]
+
+===== Rooms Show Views
+
+Add Thymeleaf templates to render server-side HTML.
+
+resource:views/rooms/show.html[app=initial]
+
+resource:views/rooms/_room.html[app=initial]
+
+==== Rooms Create Controller
+
+Create a controller which displays a form to create a room.
+
+source:controllers/RoomsControllerCreate[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:view[3]
+callout:get-generic[number=4]
+callout:produces-html[5]
+
+===== Rooms Create Views
+
+Add Thymeleaf templates to render a form.
+
+resource:views/rooms/create.html[app=initial]
+
+resource:views/rooms/_create.html[app=initial]
+
+==== Rooms Save Controller
+
+Creates a controller which handles the room creation form submission.
+
+source:controllers/RoomsControllerSave[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:produces-html[4]
+callout:consumes[5]
+callout:post-generic[6]
+callout:body-qualifier[7]
+
+==== Rooms Edit Controller
+
+Create a controller which shows a form to edit a room.
+
+source:controllers/RoomsControllerEdit[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:view[4]
+callout:get-generic[number=5]
+callout:produces-html[6]
+callout:pathvariable[7]
+
+===== Rooms Edit Views
+
+Add Thymeleaf templates to render an edit form.
+
+resource:views/rooms/edit.html[app=initial]
+
+resource:views/rooms/_edit.html[app=initial]
+
+==== Rooms Update Controller
+
+Creates a controller which handles the room update form submission.
+
+source:controllers/RoomsControllerUpdate[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:produces-html[4]
+callout:consumes[5]
+callout:post-generic[6]
+callout:body-qualifier[7]
+
+==== Rooms Delete Controller
+
+Creates a controller which handles the room deletion form submission.
+
+source:controllers/RoomsControllerDelete[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:produces-html[4]
+callout:consumes[5]
+callout:post-generic[6]
+callout:pathvariable[7]
+
+==== Message Create Controller
+
+Create a controller to display a form to create a message within a room.
+
+source:controllers/MessagesControllerCreate[app=initial]
+
+callout:executes-on[1]
+callout:controller[number=2,arg0=/rooms]
+callout:constructor-di[number=3,arg0=MessageService]
+callout:view[4]
+callout:produces-html[5]
+callout:get-generic[number=6]
+callout:pathvariable[7]
+
+===== Message Create Views
+
+The controller uses Thymeleaf views.
+
+resource:views/messages/_create.html[app=initial]
+
+resource:views/messages/_message.html[app=initial]
+
+resource:views/messages/create.html[app=initial]
+
+==== Message Save Controller
+
+Creates a controller which handles the message creation form submission.
+
+source:controllers/MessagesControllerSave[app=initial]
+
+callout:executes-on[1]
+callout:controller[number=2,arg0=/rooms]
+callout:constructor-di[number=3,arg0=MessageService]
+callout:view[4]
+callout:consumes[5]
+callout:produces-html[5]
+callout:post-generic[6]
+callout:pathvariable[7]
+callout:body-qualifier[8]
+
+=== Running the initial Application
+
+Execute the following command to run a MySQL container:
+
+[source,bash]
+----
+docker run -it --rm \
+	-p 3306:3306 \
+	-e MYSQL_DATABASE=db \
+	-e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+	mysql:8
+----
+
+common:docker-mysql-arm[]
+
+common:runapp-instructions.adoc[]

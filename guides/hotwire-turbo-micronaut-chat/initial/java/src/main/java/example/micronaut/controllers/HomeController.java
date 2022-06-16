@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 
 @Controller // <1>
 public class HomeController {
-    @Get
+    @Get // <2>
     HttpResponse<?> index() throws URISyntaxException {
         return HttpResponse.seeOther(new URI("/rooms"));
     }
