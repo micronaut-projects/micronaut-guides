@@ -30,7 +30,7 @@ public interface TestUtils {
     default String toString(InputStream inputStream) throws IOException {
         StringBuilder textBuilder = new StringBuilder();
         try (Reader reader = new BufferedReader(new InputStreamReader
-                (inputStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
+                (inputStream, StandardCharsets.UTF_8))) {
             int c = 0;
             while ((c = reader.read()) != -1) {
                 textBuilder.append((char) c);
