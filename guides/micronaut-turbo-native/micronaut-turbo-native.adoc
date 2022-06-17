@@ -20,15 +20,41 @@ To run the iOS application, install https://developer.apple.com/xcode/[XCode]
 
 common:runapp.adoc[]
 
-== Android client
+== Android Demo App
 
-An example Android client can be found https://github.com/hotwired/turbo-android/tree/main/demo[Hotwired's GitHub repository].
+https://github.com/hotwired/turbo-android/tree/main/demo[Clone or Download the Android Turbo repository].
 
-In order that it points to your Micronaut version for the backend (instead of the one provided by Hotwire), you will need to https://github.com/hotwired/turbo-android/blob/190607907e814282e97c2d3c3f5fe75ee65c48ba/demo/src/main/kotlin/dev/hotwire/turbo/demo/util/Constants.kt#L3[modify the `BASE_URL` in `Constants.kt`] to point to your Micronaut instance.
+Once the Micronaut application is running, then you just need to change `demo/src/main/kotlin/dev/hotwire/turbo/demo/util/Constants.kt`. Set the BASE_URL to the url of the Micronaut Application.
 
-NOTE: Ensure the URL does not end with a slash.
+NOTE: If you're running your Micronaut application locally without HTTPS, you'll need to adjust your `android:usesCleartextTraffic` settings in the `AndroidManifest.xml` (or use an Android Network security configuration), and target https://developer.android.com/studio/run/emulator-networking[10.0.2.2 instead of localhost].
 
-You will then be able to run this app locally (or on a real device), and see the results:
+[source, kotlin]
+.demo/src/main/kotlin/dev/hotwire/turbo/demo/util/Constants.kt
+----
+package dev.hotwire.turbo.demo.util
+
+const val BASE_URL = "http://10.0.2.2:8080"
+const val HOME_URL = BASE_URL
+const val SIGN_IN_URL = "$BASE_URL/signin"
+const val NUMBERS_URL = "$BASE_URL/numbers"
+----
+
+[source, xml]
+.demo/src/main/AndroidManifest.xml
+----
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    package="dev.hotwire.turbo.demo"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:usesCleartextTraffic="true"
+...
+----
+
+Once you run the app on an emulator or on a real device, you will see the results:
 
 image::android-turbo-demo-app.png[Android demo app, 800]
 
