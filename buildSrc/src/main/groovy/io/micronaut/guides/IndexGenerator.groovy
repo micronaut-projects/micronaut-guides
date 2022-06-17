@@ -89,7 +89,7 @@ class IndexGenerator {
         String index = ''
         if (!singleGuide && tags) {
             index += '<div class="categorygrid" style="padding-bottom: 20px;margin-bottom: 0;border-bottom: 0;">'
-            index += '<div class="grid">'
+            index += '<div class="grid" style="align-items: stretch">'
             index += '  <div class="grid-item grid-item_primary grid-item_one-third grid-item_dynamic-height">'
             index += '    <div class="inner">'
             index += '      <h1 class="title title_large first-word-bold first-word-break"><strong>Micronaut</strong> Guides</h1>'
@@ -103,7 +103,7 @@ class IndexGenerator {
             index += '</div>'
             index += '</div>'
             index += '<div class="categorygrid">'
-            index += '<div class="row">'
+            index += '<div>'
             index += '    <div class="inner" style="padding: 0">'
             index += TagCloud.tagCloud(tags)
             index += '    </div>'
@@ -239,7 +239,7 @@ class IndexGenerator {
             if (displayPublicationDate) {
                 index += "<td class='meta'>${metadata.publicationDate.format(DateTimeFormatter.ofPattern("MMM dd"))}</td>"
             }
-            index += "<td><a href=\"${metadata.slug}.html\">${metadata.title}</a></td>"
+            index += """<td><h4 class="title title_small"><a href="${metadata.slug}.html">${metadata.title}</a></h4>${metadata.intro}</td>"""
             index += "</tr>"
         }
         index += "</tbody></table>"
