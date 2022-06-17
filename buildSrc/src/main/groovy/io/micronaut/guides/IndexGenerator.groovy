@@ -3,10 +3,14 @@ package io.micronaut.guides
 import groovy.json.JsonOutput
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import io.micronaut.core.order.OrderUtil
+import io.micronaut.core.order.Ordered
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
+import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
+import java.util.stream.Collectors
 
 @CompileStatic
 class IndexGenerator {
@@ -19,6 +23,7 @@ class IndexGenerator {
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
     private static final Pattern CONTENT_REGEX = ~/(?s)(<main id="main">)(.*)(<\/main>)/
+    public static final int NUMBER_OF_LATEST_GUIDES = 4
 
     static void generateGuidesIndex(File template, File guidesFolder, File distDir, String metadataConfigName) {
 
@@ -31,19 +36,39 @@ class IndexGenerator {
         String templateText = template.text.replaceFirst(CONTENT_REGEX) { List<String> it ->
             "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
         }
-        save(templateText, 'index.html', distDir, metadatas)
+        Collection<Tag> tags = collectTags(metadatas)
+        for (Tag tag :  tags) {
+            List<GuideMetadata> tagMetadatas = metadatas.stream()
+                    .filter(m -> (m.tags ?: []).contains(tag.slug) )
+                    .collect(Collectors.toList())
+            save(templateText,
+                    "tag-" + tag.slug.toLowerCase() + '.html',
+                    distDir,
+                    [new GuidesSection(category: tag.title, metadatas: tagMetadatas)],
+                    tag.title)
+        }
+        Ordered[] categories = Category.values()
+        OrderUtil.sort(categories)
+        List<GuidesSection> sections = []
+        for (Ordered obj : categories) {
+            Category cat = (Category) obj
+            sections << new GuidesSection(category: cat,
+                    metadatas: metadatas.stream().filter(m -> cat == m.getCategory()).collect(Collectors.toList()))
+        }
+        save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', tags)
 
         for (GuideMetadata metadata :  metadatas) {
-            save(templateText, metadata.slug + '.html', distDir, [metadata], metadata.title)
+            save(templateText, metadata.slug + '.html', distDir, [new GuidesSection(category: metadata.category, metadatas: [metadata])],  metadata.title)
         }
     }
 
     private static void save(String templateText,
                              String filename,
                              File distDir,
-                             List<GuideMetadata> metadatas,
-                             String title = 'Micronaut Guides') {
-        String text = indexText(distDir, templateText, metadatas, title)
+                             List<GuidesSection> sections,
+                             String title,
+                             Collection<Tag> tags = []) {
+        String text = indexText(distDir, templateText, sections, tags, title)
         File output = new File(distDir, filename)
         output.createNewFile()
         output.setText(text, 'UTF-8')
@@ -51,38 +76,88 @@ class IndexGenerator {
 
     private static String indexText(File distDir,
                                     String templateText,
-                                    List<GuideMetadata> metadatas,
+                                    List<GuidesSection> sections,
+                                    Collection<Tag> tags,
                                     String title) {
-        boolean singleGuide = metadatas.size() == 1
+        boolean singleGuide = sections && sections.size() == 1 && sections.get(0).metadatas.size() == 1
+        List<GuideMetadata> metadatas = []
+        for (GuidesSection section : sections) {
+            metadatas.addAll(section.metadatas)
+        }
 
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
         String index = ''
-
-        for (Category cat : Category.values()) {
-            if (metadatas.findAll { it.category == cat }) {
-                index += renderMetadatas(baseURL, cat, metadatas.findAll { it.category == cat }, singleGuide)
-            }
+        if (!singleGuide && tags) {
+            index += '<div class="categorygrid" style="padding-bottom: 20px;margin-bottom: 0;border-bottom: 0;">'
+            index += '<div class="grid">'
+            index += '  <div class="grid-item grid-item_primary grid-item_one-third grid-item_dynamic-height">'
+            index += '    <div class="inner">'
+            index += '      <h1 class="title title_large first-word-bold first-word-break"><strong>Micronaut</strong> Guides</h1>'
+            index += '    </div>'
+            index += '  </div>'
+            index += '  <div class="grid-item grid-item_white grid-item_two-third grid-item_dynamic-height">'
+            index += '    <div class="inner" style="padding: 0">'
+            index += guidesTable(latestGuides(metadatas), "Latest Guides", true)
+            index += '    </div>'
+            index += '  </div>'
+            index += '</div>'
+            index += '</div>'
+            index += '<div class="categorygrid">'
+            index += '<div class="row">'
+            index += '    <div class="inner" style="padding: 0">'
+            index += TagCloud.tagCloud(tags)
+            index += '    </div>'
+            index += '</div>'
+            index += '</div>'
         }
+
+        for (GuidesSection section : sections) {
+            index += renderMetadatas(baseURL, section.category, section.metadatas, singleGuide)
+        }
+
         String text = templateText
         if (!singleGuide) {
             text = text.substring(0, text.indexOf('<div id="breadcrumbs">')) +
                     text.substring(text.indexOf('<main id="main">'))
         }
 
-        String breadcrumb = '<span class="breadcrumb_last" aria-current="page">' + metadatas.get(0).title + '</span>'
         if (singleGuide) {
+            String breadcrumb = '<span class="breadcrumb_last" aria-current="page">' + sections.get(0).metadatas.get(0).title + '</span>'
             text = text.replace("@breadcrumb@", breadcrumb)
         }
         text = text.replace("@title@", title)
         String twittercard = ''
         if (singleGuide) {
-            twittercard = twitterCardHtml(distDir, metadatas.get(0))
+            twittercard = twitterCardHtml(distDir, sections.get(0).metadatas.get(0))
         }
         text = text.replace("@twittercard@", twittercard)
         text = text.replace("@bodyclass@", 'guideindex')
         text = text.replace("@toccontent@", '')
         text = text.replace("@content@", index)
         text
+    }
+
+    private static Collection<Tag> collectTags(List<GuideMetadata> metadatas) {
+        Map<String, Tag> tagMap = new HashMap<>()
+        for (GuideMetadata metadata : metadatas) {
+            for (String slug : metadata.getTags() ?: []) {
+                if (tagMap.containsKey(slug)) {
+                    tagMap[slug].ocurrence++
+                } else {
+                    tagMap[slug] = new Tag(title: slug, ocurrence: 1)
+                }
+            }
+        }
+        tagMap.values()
+    }
+
+    private static List<GuideMetadata> latestGuides(List<GuideMetadata> metadatas) {
+        metadatas.stream()
+                .sorted((o1, o2) -> {
+                    o2.publicationDate <=> o1.publicationDate
+                })
+                .limit(NUMBER_OF_LATEST_GUIDES)
+                .collect(Collectors.toList())
     }
 
     static String rootUrl() {
@@ -101,7 +176,7 @@ class IndexGenerator {
     <meta name="twitter:description" content="${guideMetadata.intro?.replaceAll('"', "&quot;") ?: DEFAULT_INTRO}"/>"""
     }
 
-    private static String renderMetadatas(String baseURL, Category cat, List<GuideMetadata> metadatas, boolean singleGuide) {
+    private static String renderMetadatas(String baseURL, Object cat, List<GuideMetadata> metadatas, boolean singleGuide) {
         String index = ''
         int count = 0
         List<GuideMetadata> filteredMetadatas = Utils.singleGuide() ?
@@ -117,34 +192,57 @@ class IndexGenerator {
         index += "</div>"
         count++
 
-        for (GuideMetadata metadata : filteredMetadatas) {
-            if ((count % 3) == 0) {
-                index += "</div>"
-                index += "<div class='row'>"
-            }
-
-            if (singleGuide) {
+        if (singleGuide) {
+            for (GuideMetadata metadata : filteredMetadatas) {
+                if ((count % 3) == 0) {
+                    index += "</div>"
+                    index += "<div class='row'>"
+                }
                 index += "<div class='col-sm-8'>"
-            } else {
-                index += "<div class='col-sm-4'>"
-            }
 
-            index += "<div class='inner'>"
-            if (singleGuide) {
-                index += "<h2>${metadata.title}</h2>"
-            } else {
-                index += "<h2><a href=\"${metadata.slug}.html\">${metadata.title}</a></h2>"
+                index += "<div class='inner'>"
+                if (singleGuide) {
+                    index += "<h2>${metadata.title}</h2>"
+                } else {
+                    index += "<h2><a href=\"${metadata.slug}.html\">${metadata.title}</a></h2>"
+                }
+                index += "<p>${metadata.intro}</p>"
+                index += table(baseURL, metadata)
+                index += "</div>"
+                count++
             }
-            index += "<p>${metadata.intro}</p>"
-            index += table(baseURL, metadata)
+        } else {
+            index += "<div class='col-sm-8'>"
+            index += guidesTable(filteredMetadatas, cat.toString() + " Guides", false)
             index += "</div>"
-            index += "</div>"
-
-            count ++
         }
 
         index += "</div>"
         index += '</div>'
+        index
+    }
+
+    private static String guidesTable(List<GuideMetadata> metadatas,
+                                      String header = null,
+                                      boolean displayPublicationDate = false) {
+        String index = '<table class="table table_striped table_dark-head">'
+        if (header) {
+            if (displayPublicationDate) {
+                index += "<thead><tr><th colspan='2'>${header}</th></tr></thead>"
+            } else {
+                index += "<thead><tr><th>${header}</th></tr></thead>"
+            }
+        }
+        index += '<tbody>'
+        for (GuideMetadata metadata : metadatas) {
+            index += "<tr>"
+            if (displayPublicationDate) {
+                index += "<td class='meta'>${metadata.publicationDate.format(DateTimeFormatter.ofPattern("MMM dd"))}</td>"
+            }
+            index += "<td><a href=\"${metadata.slug}.html\">${metadata.title}</a></td>"
+            index += "</tr>"
+        }
+        index += "</tbody></table>"
         index
     }
 
@@ -223,48 +321,60 @@ class IndexGenerator {
         tableHtml
     }
 
-    private static String imageForCategory(Category cat) {
-        switch (cat) {
-            case Category.GCP:
-                return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
+    private static String imageForCategory(Object obj) {
+        if (obj instanceof Category) {
+            Category cat = (Category)  obj
+            switch (cat) {
+                case Category.GCP:
+                    return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
 
-            case Category.AWS:
-                return 'https://micronaut.io/wp-content/uploads/2020/12/aws.svg'
+                case Category.AWS:
+                    return 'https://micronaut.io/wp-content/uploads/2020/12/aws.svg'
 
-            case Category.AZURE:
-                return 'https://micronaut.io/wp-content/uploads/2020/12/Azure.svg'
+                case Category.AZURE:
+                    return 'https://micronaut.io/wp-content/uploads/2020/12/Azure.svg'
 
-            case Category.CACHE:
-                return 'https://micronaut.io/wp-content/uploads/2020/12/cache.svg'
+                case Category.CACHE:
+                    return 'https://micronaut.io/wp-content/uploads/2020/12/cache.svg'
 
-            case Category.DATA_ACCESS:
-                return 'https://micronaut.io/wp-content/uploads/2020/11/dataaccess.svg'
+                case Category.DATA_ACCESS:
+                    return 'https://micronaut.io/wp-content/uploads/2020/11/dataaccess.svg'
 
-            case Category.SERVICE_DISCOVERY:
-                return 'https://micronaut.io/wp-content/uploads/2020/12/Service_Discovery.svg'
+                case Category.SERVICE_DISCOVERY:
+                    return 'https://micronaut.io/wp-content/uploads/2020/12/Service_Discovery.svg'
 
-            case Category.SECURITY:
-                return 'https://micronaut.io/wp-content/uploads/2020/12/Security.svg'
+                case Category.SECURITY:
+                    return 'https://micronaut.io/wp-content/uploads/2020/12/Security.svg'
 
-            case Category.MESSAGING:
-                return  'https://micronaut.io/wp-content/uploads/2020/11/Messaging.svg'
+                case Category.MESSAGING:
+                    return  'https://micronaut.io/wp-content/uploads/2020/11/Messaging.svg'
 
-            case Category.DISTRIBUTED_TRACING:
-                return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
+                case Category.DISTRIBUTED_TRACING:
+                    return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
 
-            case Category.GETTING_STARTED:
-                return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
+                case Category.GETTING_STARTED:
+                    return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
-            case Category.ORACLE_CLOUD:
-                return 'https://micronaut.io/wp-content/uploads/2021/05/Oracle-1.svg'
+                case Category.ORACLE_CLOUD:
+                    return 'https://micronaut.io/wp-content/uploads/2021/05/Oracle-1.svg'
 
-            default:
-                return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
+                case Category.API: 
+                    return 'https://micronaut.io/wp-content/uploads/2020/11/API.svg'
+
+                case Category.TEST:
+                    return 'https://micronaut.io/wp-content/uploads/2020/11/Build.svg'
+                
+                case Category.KOTLIN:
+                    return 'https://micronaut.io/wp-content/uploads/2020/11/Languages.svg'
+
+                default:
+                    return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
+            }
         }
-
+        return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
     }
 
-    private static String category(Category cat) {
+    private static String category(Object cat) {
         String html = "<div class='category'>"
         html += '<div class="inner">'
         html += '<img width="100" style="margin-bottom: 30px" src="' + imageForCategory(cat) + '"/>'
