@@ -15,7 +15,7 @@ class TagCloud {
 
         StringWriter writer = new StringWriter()
         MarkupBuilder html = new MarkupBuilder(writer)
-        html.div(class: 'tagcloud', style: 'justify-content: space-around; align-items: center;') {
+        html.div(class: 'tagcloud justify-content-around align-items-center') {
             tags.sort { Tag a, Tag b -> a.slug <=> b.slug }.each { Tag t ->
                 a class: "tag-cloud-link ${cssClass(max, t)}", href: "./tag-${t.slug.toLowerCase()}.html", t.title
             }

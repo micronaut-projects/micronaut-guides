@@ -89,7 +89,7 @@ class IndexGenerator {
         String index = ''
         if (!singleGuide && tags) {
             index += '<div class="categorygrid" style="padding-bottom: 20px;margin-bottom: 0;border-bottom: 0;">'
-            index += '<div class="grid" style="align-items: stretch">'
+            index += '<div class="grid align-items-stretch">'
             index += '  <div class="grid-item grid-item_primary grid-item_one-third grid-item_dynamic-height">'
             index += '    <div class="inner">'
             index += '      <h1 class="title title_large first-word-bold first-word-break"><strong>Micronaut</strong> Guides</h1>'
