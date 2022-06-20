@@ -1,8 +1,7 @@
 package example.micronaut;
 
-import io.micronaut.tracing.annotation.ContinueSpan;
-import io.micronaut.tracing.annotation.NewSpan;
-import io.micronaut.tracing.annotation.SpanTag;
+import io.opentelemetry.extension.annotations.SpanAttribute;
+import io.opentelemetry.extension.annotations.WithSpan;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Singleton;
@@ -34,11 +33,11 @@ public class InventoryService {
         return inventory.keySet();
     }
 
-    @NewSpan
-    public Map<String, Integer> getStockCounts(@SpanTag("inventory.item") String item) {
+    @WithSpan("stock-counts") // <2>
+    public Map<String, Integer> getStockCounts(@SpanAttribute("inventory.item") String item) { // <3>
         HashMap<String, Integer> counts = new HashMap<>();
         if(inventory.containsKey(item)) {
-            int count = inStore(item);
+            int count = inventory.get(item);
             counts.put("store", count);
 
             if(count < 10) {
@@ -49,19 +48,10 @@ public class InventoryService {
         return counts;
     }
 
-    private int inStore(String item) {
-        int count = inventory.get(item);
-        Span.current().setAttribute("inventory.store.count", count); // <2>
-        return count;
-    }
+    private int inWarehouse(String store, String item) {
+        Span.current().setAttribute("inventory.store-name", store); // <4>
 
-    @ContinueSpan // <3>
-    protected int inWarehouse(@SpanTag String store, String item) {
-        int count = warehouse.getItemCount(store, getUPC(item));
-
-        Span.current().setAttribute("inventory.warehouse.count", count); // <4>
-
-        return count;
+        return warehouse.getItemCount(store, getUPC(item));
     }
 
     public void order(String item, int count) {

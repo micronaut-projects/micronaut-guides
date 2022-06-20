@@ -1,8 +1,10 @@
 package example.micronaut;
 
-import io.micronaut.context.annotation.Property;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Status;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.tracing.annotation.ContinueSpan;
@@ -10,7 +12,6 @@ import io.micronaut.tracing.annotation.NewSpan;
 import io.micronaut.tracing.annotation.SpanTag;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,14 @@ public class StoreController {
         this.inventory = inventory;
     }
 
-    @Get("/inventory")
-    @NewSpan("inventory-all") // <1>
+    @Post("/order")
+    @Status(HttpStatus.CREATED)
+    @NewSpan("store.order") // <1>
+    public void order(@SpanTag("order.item") String item, @SpanTag int count) { // <2>
+        inventory.order(item, count);
+    }
+
+    @Get("/inventory") // <3>
     public List<Map<String, Object>> getInventory() {
         List<Map<String, Object>> currentInventory = new ArrayList<>();
         for (String product: inventory.getProductNames()) {
@@ -34,15 +41,9 @@ public class StoreController {
         return currentInventory;
     }
 
-    @Post("/order")
-    @Status(HttpStatus.CREATED)
-    @ContinueSpan // <2>
-    public void order(@SpanTag("order.item") String item, @SpanTag int count) { // <3> <4>
-        inventory.order(item, count);
-    }
-
     @Get("/inventory/{item}")
-    public Map<String, Object> getInventory(String item) { // <5>
+    @ContinueSpan // <4>
+    public Map<String, Object> getInventory(@SpanTag("item") String item) { // <5>
         Map<String, Object> counts = new HashMap<>(inventory.getStockCounts(item));
         if(counts.isEmpty()) {
             counts.put("note", "Not available at store");

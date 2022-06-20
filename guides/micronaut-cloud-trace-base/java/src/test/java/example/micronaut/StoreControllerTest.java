@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest
-class StoreControllerTest {
+public class StoreControllerTest {
 
     @Inject
     @Client("/store")

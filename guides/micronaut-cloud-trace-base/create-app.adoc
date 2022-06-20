@@ -2,19 +2,29 @@ common:completesolution.adoc[]
 
 == Writing the Application
 
-The Micronaut framework provides three annotations to create or continue an existing span and include additional information to the span.
+The Micronaut framework uses https://opentelemetry.io/[OpenTelemetry] to generate and export tracing data.
 
-@NewSpan:: Used on methods to creates a new span using a given name or defaults to the method name.
+OpenTelemetry provides two annotations one to create a span and another to include additional information to the span.
 
-@ContinueSpan:: Used on methods continues the existing span.
+@WithSpan:: Used on methods to creates a new span using a given name or defaults to the method name.
 
-@SpanTag:: Used on method parameter to include the value to the span with a given name or defaults to the parameter name. To use the `@SpanTag` on a method argument, the method must be annotated with either `@NewSpan` or `@ContinueSpan`.
+@SpanAttribute:: Used on method parameter to include the value to the span with a given name or defaults to the parameter name.
 
-The `@NewSpan` and `@ContinueSpan` can be used on non-private methods.
-
-TODO: Introduce @WithSpan and @SpanAttribute?
+The `@WithSpan` and `@SpanAttribute` can be used on non-private methods.
 
 If the annotations are not enough, or you want to add tracing to a private method, Micronaut’s tracing integration registers a `io.opentelemetry.api.trace.Tracer` bean which exposes the OpenTelemetry API and can be dependency-injected as needed.
+
+[NOTE]
+====
+The `io.micronaut.tracing.annotation` are available if you prefer or have an existing Micronaut Application using them.
+
+- `@NewSpan` : Maps to `@WithSpan`
+- `@SpanTag` : Identical to `@SpanAttribute`
+- `@ContinueSpan` : this annotation is ignored
+
+TODO: Add link to blog/documentation on migrating from
+OpenTracing to OpenTelemetry
+====
 
 === Create the Application
 
@@ -36,29 +46,45 @@ diffLink:[]
 
 common:annotationprocessors.adoc[]
 
-=== Store Controller
-
-source:StoreController[]
-<1> Creates a new span called `inventory-all`
-<2> Continues the existing span `/store/order`
-<3> Adds a tag, or label, called `order.item` that will contain the value contained in `item`
-<4> Similar to the above, but the tag will called `count`
-<5> Span called `/store/inventory/{item}` created automatically
-
 === Inventory Service
 
 source:InventoryService[]
 <1> Inject Tracing bean into class
-<2> Same as `@SpanTag("inventory.store.count")`
-<3> `@NewSpan` and `@ContinueSpan` can be used on non-private methods
-<4> Can be used in conjunction with `@NewSpan` and `@ContinueSpan`
-<5> Same as `@NewSpan("warehouse-order")` with `@SpanTags` for item and count
+<2> Creates a new span called "stock-counts"
+<3> Adds a label, or tag, called "inventory.item" that will contain the value contained in `item`
+<4> Same as `@SpanAttribute("inventory.store-name")`
+<5> Same as `@WithSpan("warehouse-order")` with `@SpanAttributes` for item and count
+
+=== Store Controller
+
+This class demonstrates using the `io.micronaut.tracing.annotation` instead of the OpenTelemetry annotations.
+
+[NOTE]
+====
+If you have the following dependency declared, all HTTP Server methods (those annotated with `@Get`, `@Post` and etc.) will create spans automatically.
+dependency:micronaut-tracing-opentelemetry-http[groupId=io.micronaut.tracing]
+====
+
+source:StoreController[]
+<1> Equivalent to `@WithSpan("store.order")`
+<2> Same as `@SpanAttribute("order.item")`and `@SpanAttribute`
+<3> Span created automatically if `micronaut-tracing-opentelemetry-http` is declared
+<4> Annotation is ignored
+<5> Tag is only added to the span if `micronaut-tracing-opentelemetry-http` is declared; otherwise ignored
 
 === Warehouse Client
 
+You can also mix OpenTelemetry and Micronaut Tracing annotations in the same class.
+
+[NOTE]
+====
+If you have the following dependency declared, all HTTP Client methods (those annotated with `@Get`, `@Post` and etc.) will create spans automatically.
+dependency:micronaut-tracing-opentelemetry-http[groupId=io.micronaut.tracing]
+====
+
 source:WarehouseClient[]
 <1> Some external service without Tracing
-<2> Can add tracing data like any other method
+
 
 
 
