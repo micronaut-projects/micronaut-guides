@@ -361,6 +361,9 @@ class IndexGenerator {
                 case Category.API: 
                     return 'https://micronaut.io/wp-content/uploads/2020/11/API.svg'
 
+                case Category.EMAIL: 
+                    return 'https://micronaut.io/wp-content/uploads/2022/02/email.svg'
+
                 case Category.TEST:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/Build.svg'
                 
