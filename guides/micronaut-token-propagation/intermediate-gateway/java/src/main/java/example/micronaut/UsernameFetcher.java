@@ -1,8 +1,8 @@
 package example.micronaut;
 
 import io.micronaut.http.annotation.Header;
-import io.reactivex.Single;
+import reactor.core.publisher.Mono;
 
 public interface UsernameFetcher {
-    Single<String> findUsername(@Header("Authorization") String authorization);
+    Mono<String> findUsername(@Header("Authorization") String authorization);
 }

@@ -3,7 +3,7 @@ package example.micronaut
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import java.text.SimpleDateFormat
 
 @Slf4j

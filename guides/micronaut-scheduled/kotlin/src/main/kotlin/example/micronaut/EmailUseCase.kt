@@ -3,7 +3,7 @@ package example.micronaut
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.util.Date
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class EmailUseCase {

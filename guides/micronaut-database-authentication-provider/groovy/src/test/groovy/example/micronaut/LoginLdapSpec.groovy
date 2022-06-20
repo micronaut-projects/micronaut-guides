@@ -1,9 +1,7 @@
 package example.micronaut
 
-import io.micronaut.http.HttpMethod
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.MediaType
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
@@ -12,15 +10,17 @@ import io.micronaut.security.token.jwt.generator.claims.JwtClaims
 import io.micronaut.security.token.jwt.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.validator.JwtTokenValidator
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import io.reactivex.Flowable
+import reactor.core.publisher.Flux
 import org.reactivestreams.Publisher
 import spock.lang.Shared
 import spock.lang.Specification
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
-@MicronautTest
-// <1>
+import static io.micronaut.http.HttpMethod.POST
+import static io.micronaut.http.MediaType.APPLICATION_JSON_TYPE
+
+@MicronautTest // <1>
 class LoginLdapSpec extends Specification {
 
     @Inject
@@ -33,39 +33,39 @@ class LoginLdapSpec extends Specification {
 
     void '/login with valid credentials returns 200 and access token and refresh token'() {
         when:
-        HttpRequest request = HttpRequest.create(HttpMethod.POST, '/login')
-            .accept(MediaType.APPLICATION_JSON_TYPE)
-            .body(new UsernamePasswordCredentials('euler', 'password')) // <4>
+        HttpRequest request = HttpRequest.create(POST, '/login')
+            .accept(APPLICATION_JSON_TYPE)
+            .body(new UsernamePasswordCredentials('sherlock', 'elementary')) // <4>
         HttpResponse<AccessRefreshToken> rsp = client.toBlocking().exchange(request, AccessRefreshToken)
 
         then:
         rsp.status.code == 200
-        rsp.body.isPresent()
+        rsp.body.present
         rsp.body.get().accessToken
     }
 
     void '/login with invalid credentials returns UNAUTHORIZED'() {
         when:
-        HttpRequest request = HttpRequest.create(HttpMethod.POST, '/login')
-            .accept(MediaType.APPLICATION_JSON_TYPE)
-            .body(new UsernamePasswordCredentials('euler', 'bogus'))  // <4>
+        HttpRequest request = HttpRequest.create(POST, '/login')
+            .accept(APPLICATION_JSON_TYPE)
+            .body(new UsernamePasswordCredentials('euler', 'bogus')) // <4>
         client.toBlocking().exchange(request)
 
         then:
-        HttpClientResponseException e = thrown(HttpClientResponseException)
+        HttpClientResponseException e = thrown()
         e.status.code == 401 // <5>
     }
 
     void 'access token contains expiration date'() {
         when:
-        HttpRequest request = HttpRequest.create(HttpMethod.POST, '/login')
-            .accept(MediaType.APPLICATION_JSON_TYPE)
-            .body(new UsernamePasswordCredentials('euler', 'password')) // <4>
+        HttpRequest request = HttpRequest.create(POST, '/login')
+            .accept(APPLICATION_JSON_TYPE)
+            .body(new UsernamePasswordCredentials('sherlock', 'elementary')) // <4>
         HttpResponse<AccessRefreshToken> rsp = client.toBlocking().exchange(request, AccessRefreshToken)
 
         then:
         rsp.status.code == 200
-        rsp.body.isPresent()
+        rsp.body.present
 
         when:
         String accessToken = rsp.body.get().accessToken
@@ -74,12 +74,12 @@ class LoginLdapSpec extends Specification {
         accessToken
 
         when:
-        Publisher authentication = tokenValidator.validateToken(accessToken) // <6>
+        Publisher authentication = tokenValidator.validateToken(accessToken, request) // <6>
 
         then:
-        Flowable.fromPublisher(authentication).blockingFirst()
+        Flux.from(authentication).blockFirst()
 
         and: 'access token contains an expiration date'
-        Flowable.fromPublisher(authentication).blockingFirst().getAttributes().get(JwtClaims.EXPIRATION_TIME)
+        Flux.from(authentication).blockFirst().attributes.get(JwtClaims.EXPIRATION_TIME)
     }
 }

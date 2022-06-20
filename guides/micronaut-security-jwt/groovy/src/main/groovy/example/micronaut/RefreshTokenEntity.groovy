@@ -1,6 +1,7 @@
 //tag::clazzwithoutsettersandgetters[]
 package example.micronaut
 
+import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.GeneratedValue
@@ -11,8 +12,10 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 import java.time.Instant
 
+@CompileStatic
 @MappedEntity // <1>
 class RefreshTokenEntity {
+
     @Id // <2>
     @GeneratedValue // <3>
     @NonNull

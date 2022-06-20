@@ -1,20 +1,14 @@
-= @guideTitle@
-
-@guideIntro@
-
-Authors: @authors@
-
-Micronaut Version: @micronaut@
+common:header-top.adoc[]
 
 == Getting Started
 
-In this guide, you are going to use AWS Parameter Store in Micronaut Application to drive configuration.
+In this guide, you will use AWS Parameter Store in a Micronaut Application to drive configuration.
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+common:create-app.adoc[]
 
 === Controller
 
@@ -22,20 +16,20 @@ First, create an interface to encapsulate the Value-added Tax rate of a country.
 
 source:Vat[]
 
-Create a GET endpoint `/vat`. It returns the Value-added Tax rate configured in our app.
+Create a GET endpoint `/vat`. It returns the Value-added Tax rate configured in our application.
 
 source:VatController[]
 
-<1> The class is defined as a controller with the @Controller annotation.
-<2> Use constructor injection to inject a bean of type `Vat`
-<3> Since it does not return JSON, set the media type to `text/plain`
-<4> The @Get annotation is used to map the index method to all requests that use an HTTP GET to `/vat`
+callout:controller[number=1,arg0=/]
+callout:constructor-di[number=2,arg0=Vat]
+callout:text-plain[3]
+callout:get[number=4,arg0=index,arg1=/vat]
 
 === Configuration
 
 source:VatConfiguration[]
 
-<1> The `@ConfigurationProperties` annotation takes the configuration prefix
+callout:configuration-properties[1]
 <2> By implementing the interface, we can inject a bean of type `Vat` in the previous Controller's constructor.
 
 === Test
@@ -44,8 +38,8 @@ Write a test which verifies a GET `/vat` endpoint returns the value set via conf
 
 test:VatControllerTest[]
 
-<1> Annotate the class with `@MicronautTest` so Micronaut will initialize the application context and the embedded server.
-<2> Annotate the class with `@Property` to supply configuration to the test.
+callout:micronaut-test[1]
+callout:property[2]
 
 === Dependency
 
@@ -56,12 +50,12 @@ dependency:micronaut-aws-parameter-store[groupId=io.micronaut.aws]
 
 === Bootstrap.yml
 
-To enable distributed configuration a src/main/resources/bootstrap.yml configuration file must be created and configured to use Parameter Store:
+To enable distributed configuration, create a `src/main/resources/bootstrap.yml` configuration file and configure it to use Parameter Store:
 
 resource:bootstrap.yml[]
 
 - `micronaut.application.name` name will be part of the parameter name in AWS Parameter Store.
-- Set `microanut.config-client.enabled: true` which is used read and resolve configuration from distributed sources.  
+- Set `microanut.config-client.enabled: true` which is used to read and resolve configuration from distributed sources.
 - With `aws.client.system-manager.parameterstore.enabled` enable distributed configuration with AWS Parameter Store.
 
 === Logging
@@ -94,13 +88,13 @@ Set the environment to use `ec2`, the programmatic access and region:
 
 [source, bash]
 ----
-$ export MICRONAUT_ENVIRONMENTS=ec2
-$ export AWS_ACCESS_KEY_ID=xxx
-$ export AWS_SECRET_ACCESS_KEY=xxx
-$ export AWS_REGION=us-east-1
+export MICRONAUT_ENVIRONMENTS=ec2
+export AWS_ACCESS_KEY_ID=xxx
+export AWS_SECRET_ACCESS_KEY=xxx
+export AWS_REGION=us-east-1
 ----
 
-include::{commondir}/common-runapp-instructions.adoc[]
+common:runapp-instructions.adoc[]
 
 You will get an output such as:
 
@@ -133,7 +127,12 @@ You will get an output such as:
 06:41:49.083 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 4874ms. Server Running: http://localhost:8080
 ----
 
-You should be able to execute `curl -i localhost:8080/vat` and see `21`.
+You should be able to execute this curl request and see `21` as the output:
+
+[source, bash]
+----
+curl -i localhost:8080/vat
+----
 
 === Set Parameters via AWS CLI
 
@@ -145,20 +144,20 @@ Run the following commands to
 
 [source, bash]
 ----
-$ aws ssm put-parameter --name /config/micronautguide/vat/country --value=Spain --type String
-$ aws ssm put-parameter --name /config/micronautguide/vat/rate --value=21.0 --type String
+aws ssm put-parameter --name /config/micronautguide/vat/country --value=Spain --type String
+aws ssm put-parameter --name /config/micronautguide/vat/rate --value=21.0 --type String
 ----
 
 Set the environment to use `ec2`.
 
 [source, bash]
 ----
-$ export MICRONAUT_ENVIRONMENTS=ec2
+export MICRONAUT_ENVIRONMENTS=ec2
 ----
 
 The AWS region and programmatic access set via the CLI will be used.
 
-include::{commondir}/common-runapp-instructions.adoc[]
+common:runapp-instructions.adoc[]
 
 You will get an output such as:
 
@@ -191,34 +190,41 @@ You will get an output such as:
 06:41:49.083 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 4874ms. Server Running: http://localhost:8080
 ----
 
-You should be able to execute `curl -i localhost:8080/vat` and see `21`.
+You should be able to execute this curl request and see `21` as the output:
 
+[source, bash]
+----
+curl -i localhost:8080/vat
+----
 
 === Leverage environments
 
-AWS Parameter Store is specially powerful in combination with https://docs.micronaut.io/latest/guide/index.html#environments[Micronaut environments]. Imagine we deploy our application also for Switzerland. We can have an environment named `ch` and load different configuration based on the environment. Create two parameters:
+AWS Parameter Store is specially powerful in combination with https://docs.micronaut.io/latest/guide/#environments[Micronaut environments]. Imagine we deploy our application also for Switzerland. We can have an environment named `ch` and load different configuration based on the environment. Create two parameters:
 
 [source,bash]
 ----
-$ aws ssm put-parameter --name /config/micronautguide_ch/vat/country --value=Switzerland --type String
-$ aws ssm put-parameter --name /config/micronautguide_ch/vat/rate --value=7.7 --type String
+aws ssm put-parameter --name /config/micronautguide_ch/vat/country --value=Switzerland --type String
+aws ssm put-parameter --name /config/micronautguide_ch/vat/rate --value=7.7 --type String
 ----
 
 Set the environment to use `ec2` and `ch`.
 
 [source, bash]
 ----
-$ export MICRONAUT_ENVIRONMENTS=ec2,ch
+export MICRONAUT_ENVIRONMENTS=ec2,ch
 ----
 
-Run the app and you should be able to execute `curl -i localhost:8080/vat` and see `7.7`.
+Run the application, and you should be able to execute this curl request and see `7.7` as the output:
+
+[source, bash]
+----
+curl -i localhost:8080/vat
+----
 
 == Next steps
 
-Read about Micronaut's https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#parametersStore[AWS Parameter Store] integration.
+Read about Micronaut https://micronaut-projects.github.io/micronaut-aws/latest/guide/#parametersStore[AWS Parameter Store] integration.
 
 Read about https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html[AWS System Manager Parameter Store]
 
-
-include::{commondir}/common-helpWithMicronaut.adoc[]
-
+common:helpWithMicronaut.adoc[]

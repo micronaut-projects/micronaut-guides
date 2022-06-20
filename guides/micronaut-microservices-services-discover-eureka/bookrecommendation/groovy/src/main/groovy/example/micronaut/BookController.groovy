@@ -3,7 +3,8 @@ package example.micronaut
 import groovy.transform.CompileStatic
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.reactivex.Flowable
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
 
 @CompileStatic
 @Controller("/books") // <1>
@@ -18,13 +19,12 @@ class BookController {
         this.bookInventoryOperations = bookInventoryOperations
     }
 
-    @Get("/") // <3>
-    Flowable<BookRecommendation> index() {
-        return bookCatalogueOperations.findAll()
-            .flatMapMaybe { b ->
-                bookInventoryOperations.stock(b.isbn)
-                    .filter { hasStock -> hasStock == Boolean.TRUE }
-                    .map { rsp -> b }
-            }.map { book -> new BookRecommendation(book.name) }
+    @Get // <3>
+    Publisher<BookRecommendation> index() {
+        Flux.from(bookCatalogueOperations.findAll())
+                .flatMap(b -> Flux.from(bookInventoryOperations.stock(b.isbn))
+                        .filter(Boolean::booleanValue)
+                        .map(rsp -> b)
+                ).map(book -> new BookRecommendation(book.name))
     }
 }

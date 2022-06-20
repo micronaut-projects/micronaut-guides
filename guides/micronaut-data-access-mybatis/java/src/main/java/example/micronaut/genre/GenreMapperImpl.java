@@ -1,10 +1,10 @@
 package example.micronaut.genre;
 
 import example.micronaut.domain.Genre;
+import jakarta.inject.Singleton;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
-import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
@@ -26,11 +26,6 @@ public class GenreMapperImpl implements GenreMapper {
             return getGenreMapper(sqlSession).findById(id); // <5>
         }
     }
-
-    private GenreMapper getGenreMapper(SqlSession sqlSession) {
-        return sqlSession.getMapper(GenreMapper.class); // <4>
-    }
-
 
     @Override
     public void save(Genre genre) {
@@ -72,8 +67,8 @@ public class GenreMapperImpl implements GenreMapper {
     }
 
     @Override
-    public List<Genre> findAllByOffsetAndMaxAndSortAndOrder(@NotNull @PositiveOrZero Integer offset,
-                                                            @Positive @NotNull Integer max,
+    public List<Genre> findAllByOffsetAndMaxAndSortAndOrder(@PositiveOrZero int offset,
+                                                            @Positive int max,
                                                             @NotNull @Pattern(regexp = "id|name") String sort,
                                                             @NotNull @Pattern(regexp = "asc|ASC|desc|DESC") String order) {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
@@ -82,10 +77,14 @@ public class GenreMapperImpl implements GenreMapper {
     }
 
     @Override
-    public List<Genre> findAllByOffsetAndMax(@NotNull @PositiveOrZero Integer offset,
-                                             @Positive @NotNull Integer max) {
+    public List<Genre> findAllByOffsetAndMax(@PositiveOrZero int offset,
+                                             @Positive int max) {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             return getGenreMapper(sqlSession).findAllByOffsetAndMax(offset, max);
         }
+    }
+
+    private GenreMapper getGenreMapper(SqlSession sqlSession) {
+        return sqlSession.getMapper(GenreMapper.class); // <4>
     }
 }

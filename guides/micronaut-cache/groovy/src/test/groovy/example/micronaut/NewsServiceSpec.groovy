@@ -5,11 +5,11 @@ import spock.lang.Specification
 import spock.lang.Stepwise
 import spock.lang.Timeout
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 import java.time.Month
 
 @Stepwise // <1>
-@MicronautTest // <2>
+@MicronautTest(startApplication = false)  // <2>
 class NewsServiceSpec extends Specification {
 
     @Inject // <3>

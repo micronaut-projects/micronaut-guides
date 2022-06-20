@@ -1,17 +1,17 @@
 package example.micronaut;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.env.Environment;
-import io.reactivex.Single;
+import jakarta.inject.Singleton;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Singleton;
+import static io.micronaut.context.env.Environment.TEST;
 
-@Requires(env = Environment.TEST)
+@Requires(env = TEST)
 @Singleton
 public class UserEchoClientReplacement implements UsernameFetcher {
 
     @Override
-    public Single<String> findUsername() {
-        return Single.just("sherlock");
+    public Mono<String> findUsername() {
+        return Mono.just("sherlock");
     }
 }

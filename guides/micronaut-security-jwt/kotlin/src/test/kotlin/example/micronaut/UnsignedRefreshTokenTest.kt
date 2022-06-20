@@ -2,44 +2,45 @@ package example.micronaut
 
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.HttpStatus.BAD_REQUEST
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Optional
-import javax.inject.Inject
 
 @MicronautTest
 internal class UnsignedRefreshTokenTest {
 
     @Inject
     @field:Client("/")
-    var client: RxHttpClient? = null
+    lateinit var client: HttpClient
 
     @Test
     fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
         val unsignedRefreshedToken = "foo" // <1>
         val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
         val errorArgument = Argument.of(Map::class.java)
-        val e = Assertions.assertThrows(HttpClientResponseException::class.java) {
-            client!!.toBlocking().exchange(
+        val e = assertThrows(HttpClientResponseException::class.java) {
+            client.toBlocking().exchange(
                 HttpRequest.POST("/oauth/access_token", TokenRefreshRequest(unsignedRefreshedToken)),
                 bodyArgument,
-                errorArgument
-            )
+                errorArgument)
         }
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.status)
+        assertEquals(BAD_REQUEST, e.status)
 
         val mapOptional: Optional<Map<*, *>> = e.response.getBody(Map::class.java)
-        Assertions.assertTrue(mapOptional.isPresent)
+        assertTrue(mapOptional.isPresent)
 
         val m = mapOptional.get()
-        Assertions.assertEquals("invalid_grant", m["error"])
-        Assertions.assertEquals("Refresh token is invalid", m["error_description"])
+        assertEquals("invalid_grant", m["error"])
+        assertEquals("Refresh token is invalid", m["error_description"])
     }
 }

@@ -1,40 +1,39 @@
 package example.micronaut;
 
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.RxHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.security.authentication.UsernamePasswordCredentials;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-
+import static io.micronaut.http.HttpStatus.UNAUTHORIZED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MicronautTest // <1>
-public class UserControllerTest {
+class UserControllerTest {
 
     @Inject
     @Client("/")
-    RxHttpClient client; // <2>
+    HttpClient client; // <2>
 
     @Test
-    public void testUserEndpointIsSecured() { // <3>
+    void testUserEndpointIsSecured() { // <3>
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -> {
             client.toBlocking().exchange(HttpRequest.GET("/user"));
         });
 
-        assertEquals(HttpStatus.UNAUTHORIZED, thrown.getResponse().getStatus());
+        assertEquals(UNAUTHORIZED, thrown.getResponse().getStatus());
     }
 
     @Test
-    public void testAuthenticatedCanFetchUsername() {
+    void testAuthenticatedCanFetchUsername() {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("sherlock", "password");
-        HttpRequest request = HttpRequest.POST("/login", credentials);
+        HttpRequest<?> request = HttpRequest.POST("/login", credentials);
 
         BearerAccessRefreshToken bearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken.class);
 

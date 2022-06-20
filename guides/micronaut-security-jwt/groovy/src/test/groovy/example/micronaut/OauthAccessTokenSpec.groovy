@@ -1,31 +1,30 @@
 package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
 import io.micronaut.security.token.jwt.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
-
-import javax.inject.Inject
 
 @MicronautTest(rollback = false) // <1>
 class OauthAccessTokenSpec extends Specification {
 
     @Inject
     @Client("/")
-    RxHttpClient client // <2>
+    HttpClient client // <2>
 
     @Shared
     @Inject
     RefreshTokenRepository refreshTokenRepository
 
-    def "Verify JWT access token refresh works"() {
+    void "Verify JWT access token refresh works"() {
         given:
         String username = 'sherlock'
 

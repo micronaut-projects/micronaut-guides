@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -13,18 +12,14 @@ import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
+import static javax.persistence.GenerationType.AUTO;
+
 @Entity
 @Table(name = "genre")
 public class Genre {
 
-    public Genre() {}
-
-    public Genre(@NotNull String name) {
-        this.name = name;
-    }
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = AUTO)
     private Long id;
 
     @NotNull
@@ -34,6 +29,12 @@ public class Genre {
     @JsonIgnore
     @OneToMany(mappedBy = "genre")
     private Set<Book> books = new HashSet<>();
+
+    public Genre() {}
+
+    public Genre(@NotNull String name) {
+        this.name = name;
+    }
 
     public Long getId() {
         return id;

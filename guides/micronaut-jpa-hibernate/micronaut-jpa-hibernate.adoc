@@ -1,24 +1,12 @@
-= @guideTitle@
+common:header.adoc[]
 
-@guideIntro@
+In this guide, we will write a Micronaut application that exposes some REST endpoints and stores data in a database using JPA and Hibernate.
 
-Authors: @authors@
+common:requirements.adoc[]
 
-Micronaut Version: @micronaut@
+common:completesolution.adoc[]
 
-include::{commondir}/common-gettingStarted.adoc[]
-
-
-In this guide, we are going to write a Micronaut application that exposes some REST endpoints and store data in a
-database using JPA and Hibernate.
-
-
-include::{commondir}/common-requirements.adoc[]
-
-include::{commondir}/common-completesolution.adoc[]
-
-include::{commondir}/common-create-app.adoc[]
-
+common:create-app.adoc[]
 
 === Data Source configuration
 
@@ -29,28 +17,27 @@ Add the following dependencies:
 dependency:micronaut-hibernate-jpa[groupId=io.micronaut.sql,callout=1]
 dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=2]
 dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=3]
+dependency:jakarta.persistence-api[groupId=jakarta.persistence,version=2.2.3,callout=4]
 
 :dependencies:
 
 <1> Configures Hibernate/JPA EntityManagerFactory beans.
 <2> Configures SQL DataSource instances using Hikari Connection Pool.
 <3> Add dependency to in-memory H2 Database.
+<4> Add dependency to Jakarta Persistence API.
 
 Define the data source in `src/main/resources/application.yml`.
 
 resource:application.yml[tag=datasource]
 
-NOTE: This way of defining the datasource properties means that we can externalize the configuration, for example for
-production environment, and also provide a default value for development. If the environment variables are not defined
-Micronaut will use the default values. +
-Also keep in mind that it is necessary to escape the `:` in the connection url using back ticks ```.
+NOTE: This way of defining the datasource properties means that we can externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined the Micronaut framework will use the default values. +
+Also keep in mind that it is necessary to escape the `:` in the connection URL using backticks ```.
 
 === JPA configuration
 
 Add the next snippet to `src/main/resources/application.yml` to configure JPA:
 
 resource:application.yml[tag=jpa]
-
 
 === Domain
 
@@ -62,27 +49,23 @@ The previous domain has a `OneToMany` relationship with the domain `Book`.
 
 source:domain/Book[]
 
-
 === Application Configuration
 
 Create an interface to encapsulate the application configuration settings:
 
 source:ApplicationConfiguration[]
 
-In Micronaut, like Spring Boot and Grails, you can create type safe configuration by creating classes that are annotated
-with https://docs.micronaut.io/latest/guide/index.html#configurationProperties[@ConfigurationProperties].
+Like Spring Boot and Grails, in Micronaut applications you can create typesafe configuration by creating classes that are annotated with https://docs.micronaut.io/latest/guide/#configurationProperties[@ConfigurationProperties].
 
 Create a `ApplicationConfigurationProperties` class:
 
 source:ApplicationConfigurationProperties[]
 
-<1> @ConfigurationProperties` annotation takes a configuration prefix.
-
+callout:configuration-properties[1]
 
 You can override `max` if you add to your `src/main/resources/application.yml`:
 
 resource:application.yml[tag=application]
-
 
 === Repository Access
 
@@ -92,7 +75,7 @@ To use it, you have to include the `micronaut-data-processor` dependency in your
 
 dependency:micronaut-data-hibernate-jpa[groupId=io.micronaut.data,scope=annotationProcessor]
 
-Next, create an interface to define the operations to access the database:
+Next, create a repository interface to define the operations to access the database:
 
 source:GenreRepository[]
 
@@ -100,21 +83,20 @@ The implementation:
 
 source:GenreRepositoryImpl[]
 
-<1> Use `javax.inject.Singleton` to designate a class as a singleton.
-<2> Inject easily an `EntityManager`.
-<3> All database access needs to be wrapped inside a transaction. As the method
-only reads data from the database, annotate it with `@ReadOnly`.
-<4> This method modifies the database, thus it is annoated with `@Transactional`.
+callout:singleton[1]
+<2> Easily inject an `EntityManager`.
+<3> All database access needs to be wrapped inside a transaction. As the method only reads data from the database, annotate it with `@ReadOnly`.
+<4> This method modifies the database, thus it is annotated with `@Transactional`.
 
 === Controller
 
-include::{commondir}/common-validation.adoc[]
+common:validation.adoc[]
 
 Create two classes to encapsulate Save and Update operations:
 
 source:GenreSaveCommand[]
 
-<1> Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+callout:introspected[1]
 
 source:GenreUpdateCommand[]
 
@@ -128,11 +110,11 @@ Create `GenreController`, a controller which exposes a resource with the common 
 
 source:GenreController[]
 
-<1> It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.
-<2> The class is defined as a controller with the `@Controller` annotation mapped to the path `/genres`.
+callout:executes-on[1]
+callout:controller[number=2,arg0=/genres]
 <3> Constructor injection.
 <4> Maps a `GET` request to `/genres/{id}` which attempts to show a genre. This illustrates the use of a URL path variable.
-<5> Returning `null` when the genre doesn't exist makes Micronaut to response with 404 (not found).
+<5> Returning `null` when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
 <6> Maps a `PUT` request to `/genres` which attempts to update a genre.
 <7> Add `@Valid` to any method parameter which requires validation. Use a POJO supplied as a JSON payload in the request to populate command.
 <8> It is easy to add custom headers to the response.
@@ -141,32 +123,27 @@ source:GenreController[]
 <11> Maps a `POST` request to `/ex` which generates an exception.
 <12> Maps a `DELETE` request to `/genres/{id}` which attempts to remove a genre. This illustrates the use of a URL path variable.
 
-
 === Writing Tests
 
-Create a test which verifies the CRUD operations:
+Create a test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 
-<1> Annotate the class with `@MicronautTest` to let Micronaut starts the embedded server and inject the beans. More info: https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html[https://micronaut-projects.github.io/micronaut-test/latest/guide/index.html].
-<2> Inject the `HttpClient` bean in the application context.
-<3> Creating HTTP Requests is easy thanks to Micronaut's fluid API.
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-request[3]
 <4> If you care just about the object in the response use `retrieve`.
 <5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
+common:testApp.adoc[]
 
-include::{commondir}/common-testApp.adoc[]
+common:runapp.adoc[]
 
+== Using PostgreSQL
 
-include::{commondir}/common-runapp.adoc[]
+When running on production you want to use a real database instead of using H2. Let's explain how to use PostgreSQL.
 
-
-
-== Using Postgresql
-
-When running on production you want to use a real database instead of using H2. Let's explain how to use Postgres.
-
-After installing Docker, execute the following command to run a postgresql container:
+After installing Docker, execute the following command to run a PostgreSQL container:
 
 [source,bash]
 ----
@@ -178,21 +155,21 @@ docker run -it --rm \
     postgres:11.5-alpine
 ----
 
-Add Postgresql driver dependency:
+Add PostgreSQL driver dependency:
 
 dependency:postgresql[groupId=org.postgresql,scope=runtimeOnly]
 
-To use postgresql, setup several environment variables which match those defined in `application.yml`:
+To use PostgreSQL, set up several environment variables which match those defined in `application.yml`:
 
 [source,bash]
 ----
-$ export JDBC_URL=jdbc:postgresql://localhost:5432/micronaut
-$ export JDBC_USER=dbuser
-$ export JDBC_PASSWORD=theSecretPassword
-$ export JDBC_DRIVER=org.postgresql.Driver
+export JDBC_URL=jdbc:postgresql://localhost:5432/micronaut
+export JDBC_USER=dbuser
+export JDBC_PASSWORD=theSecretPassword
+export JDBC_DRIVER=org.postgresql.Driver
 ----
 
-Run the app again. If you take a close look to the output, you can see that the app uses postgresql:
+Run the application again. If you look at the output you can see that the application uses PostgreSQL:
 
 [source, bash]
 ----
@@ -202,7 +179,7 @@ Run the app again. If you take a close look to the output, you can see that the 
 ....
 ----
 
-Connect to your postgresql database, and you will see both `genre` and `book` tables.
+Connect to your PostgreSQL database, and you will see both `genre` and `book` tables.
 
 image::datagrip.png[]
 
@@ -215,9 +192,8 @@ curl -X "POST" "http://localhost:8080/genres" \
      -d $'{ "name": "music" }'
 ----
 
-
 == Next steps
 
-Read more about https://docs.micronaut.io/latest/guide/index.html#dataAccess[Configurations for Data Access] section in the Micronaut documentation.
+Read more about https://docs.micronaut.io/latest/guide/#dataAccess[Configurations for Data Access] section in the Micronaut documentation.
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

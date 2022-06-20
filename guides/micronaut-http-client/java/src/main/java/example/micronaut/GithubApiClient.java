@@ -3,7 +3,7 @@ package example.micronaut;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.client.annotation.Client;
-import io.reactivex.Flowable;
+import org.reactivestreams.Publisher;
 
 import static io.micronaut.http.HttpHeaders.ACCEPT;
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
@@ -14,5 +14,5 @@ import static io.micronaut.http.HttpHeaders.USER_AGENT;
 public interface GithubApiClient {
 
     @Get("/repos/${github.organization}/${github.repo}/releases") // <4>
-    Flowable<GithubRelease> fetchReleases(); // <5>
+    Publisher<GithubRelease> fetchReleases(); // <5>
 }

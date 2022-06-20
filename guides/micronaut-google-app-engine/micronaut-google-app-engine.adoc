@@ -1,0 +1,205 @@
+common:header.adoc[]
+
+You will deploy a Micronaut application
+to https://cloud.google.com/appengine/docs/flexible/[Google App Engine flexible environment].
+
+common:costs-gcloud.adoc[]
+
+common:gcp-deploy-requirements2content.adoc[]
+
+== Google App Engine
+
+We are going to deploy the Micronaut application developed in this guide to the
+https://cloud.google.com/appengine/docs/flexible/[Google App Engine flexible environment]
+
+> App Engine allows developers to focus on doing what they do best: writing code. Based on Google Compute Engine, the App Engine flexible environment automatically scales your app up and down while balancing the load. Microservices, authorization, SQL and NoSQL databases, traffic splitting, logging, versioning, security scanning, and content delivery networks are all supported natively.
+
+Run the command:
+
+`gcloud app create`
+
+to initialize an App Engine application within the current Google Cloud project.
+
+NOTE: You will need to choose the region where you want your App Engine Application located.
+
+== App Engine Build Plugins
+
+:exclude-for-build:gradle
+
+To deploy to App Engine, add the https://github.com/GoogleCloudPlatform/app-maven-plugin[Google App Engine Maven plugin] to your project.
+
+> In your Maven App Engine Java app, add the following plugin to your pom.xml:
+
+dependency:appengine-maven-plugin[groupId=com.google.cloud.tools,version=@appengine-maven-pluginVersion@]
+
+:exclude-for-build:
+
+:exclude-for-build:maven
+
+To deploy to App Engine, add the https://github.com/GoogleCloudPlatform/app-gradle-plugin[Google App Engine Gradle Plugin] to your project.
+
+> Since the appengine-gradle-plugin is not published to the gradle plugin portal, you must refrence it from the Central Maven repository. Add the maven central resolution to your `settings.gradle`
+
+[source, groovy]
+.build.gradle
+----
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    // add mavenLocal() if you are using a locally built version of the plugin
+  }
+  resolutionStrategy {
+    eachPlugin {
+      if (requested.id.id.startsWith('com.google.cloud.tools.appengine')) {
+        useModule("com.google.cloud.tools:appengine-gradle-plugin:${requested.version}")
+      }
+    }
+  }
+}
+----
+
+> Apply the plugin in your plugins block in your build.gradle
+
+[source, groovy]
+.build.gradle
+----
+plugins {
+  id 'com.google.cloud.tools.appengine' version '2.4.2'
+  ....
+}
+----
+Configure the deployment properties:
+
+[source,groovy]
+----
+appengine {
+    stage.artifact = "${buildDir}/libs/${project.name}-${project.version}-all.jar"
+    deploy {
+        projectId = "changethis" // Project ID from Google Cloud Dashboard
+        version = "1"
+    }
+}
+----
+
+:exclude-for-build:
+
+== Application Deployment Configuration
+
+To deploy to Google App Engine, add the file `src/main/appengine/app.yaml`
+
+Then configure the https://cloud.google.com/appengine/docs/flexible/java/dev-java-only[Java 8 runtime] in the flexible environment
+
+____
+The Java 8 runtime does not include any web-serving framework. The only requirement is that your app should listen and respond on port 8080. The sample code here shows how you can add your own framework, such as Spring Boot, to the Java 8 runtime.
+____
+
+This describes the application’s deployment configuration:
+
+resource:../appengine/app.yaml[]
+
+== App Engine Deploy
+
+common:jdk8.adoc[]
+
+To deploy the app to Google App Engine run:
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+./gradlew appengineDeploy
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+./mvnw package appengine:deploy -Dapp.deploy.projectId=PROJECT_ID -Dapp.deploy.version=1
+----
+
+Replace PROJECT_ID with the ID of your Cloud project.
+
+:exclude-for-build:
+
+Initial deployment may take a while. When finished, you will be able to
+access your app:
+
+[source,bash]
+----
+....
+...
+..
+.
+Deployed service [default] to [ https://micronaut-guides.ue.r.appspot.com]
+
+You can stream logs from the command line by running:
+  $ gcloud app logs tail -s default
+
+To view your application in the web browser, run:
+  $ gcloud app browse
+....
+...
+..
+.
+----
+
+If you go to the https://console.cloud.google.com/appengine/versions[Versions] section
+in the App Engine administration panel, you will see the deployed app.
+
+== Running the App
+
+[source,bash]
+----
+curl -i https://micronaut-guides.ue.r.appspot.com/hello
+----
+
+[source]
+----
+HTTP/2 200
+date: Mon, 04 Oct 2021 05:29:04 GMT
+content-type: text/plain
+content-length: 11
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
+
+Hello World
+----
+
+== Logging
+
+For the version you would like to inspect, select Logs in the diagnose dropdown:
+
+image::google-cloud-logs.png[]
+
+Application log messages written to stdout and stderr are automatically collected and can be
+viewed in the Logs Viewer.
+
+Check https://cloud.google.com/appengine/docs/flexible/java/writing-application-logs[Writing Application Logs]
+documentation to read more about logs in the flexible environment.
+
+common:gcp-project-cleanup.adoc[]
+
+=== Deleting app versions
+
+To delete an app version:
+
+In the Cloud Platform Console, go to the App Engine Versions page.
+
+https://console.cloud.google.com/appengine/versions[GO TO THE VERSIONS PAGE]
+
+Click the checkbox next to the non-default app version you want to delete.
+
+NOTE: The only way you can delete the default version of your App Engine app is by deleting your project. However, you can stop the default version in the Cloud Platform Console. This action shuts down all instances associated with the version. You can restart these instances later if needed.
+
+In the App Engine standard environment, you can stop the default version only if your app has manual or basic scaling.
+
+Click the Delete button at the top of the page to delete the app version.
+
+== Next Steps
+
+If you want to learn more about Google Cloud and Micronaut integration, check out the codelab https://codelabs.developers.google.com/codelabs/cloud-micronaut-kubernetes/[Deploy a Micronaut Application Containerized with Jib to Google Kubernetes Engine].
+
+common:helpWithMicronaut.adoc[]

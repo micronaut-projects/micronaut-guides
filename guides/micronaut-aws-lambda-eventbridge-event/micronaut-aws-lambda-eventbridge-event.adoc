@@ -1,0 +1,82 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Writing the App
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app example.micronaut.micronautguide \
+    --features=aws-lambda-scheduled-event \
+    --build=@build@ \
+    --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add `aws-lambda-scheduled-event` feature.
+
+common:default-package.adoc[]
+
+common:annotationprocessors.adoc[]
+
+=== Handler
+
+Micronaut Launch/Micronaut CLI generates the following Handler when you select the feature `aws-lambda-scheduled-event`.
+The handler receives a Event Bridge (Cloud Watch Events) notification event. Add a log statement.
+
+source:FunctionRequestHandler[]
+
+=== Logback
+
+Replace `src/main/resources/logback.xml` with the following content to get a more verbose output:
+
+resource:logback.xml[]
+
+== Lambda
+
+Create a Lambda Function. As a runtime, select Java 11 (Correto).
+
+image::create-function.png[]
+
+=== Triggers
+
+Create trigger which fires every 5 minutes:
+
+image::eventbridgetrigger.png[]
+
+=== Upload Code
+
+common:executable-jar.adoc[]
+
+Upload it:
+
+image::upload-function-code.png[]
+
+=== Handler
+
+In the AWS console, as Handler, set:
+
+`example.micronaut.FunctionHandler`
+
+=== Test
+
+After you upload the code, wait for 5 minutes and you should see in Cloud Watch logs such as:
+
+[source, bash]
+----
+TRACE c.s.e.f.d.Handler - {version=0, id=ed9bd6b2-0429-9b03-742b-fe294946f272, detail-type=Scheduled Event, source=aws.events, account=1234567899, time=2021-05-19T09:03:02Z, region=us-east-1, resources=[arn:aws:events:us-east-1:1234567899:rule/5minutes], detail={}}
+2021-05-19 09:03:31 b4e05b4e-ae9f-4844-b7fb-5e70016b41fd eurorates-daily-java11 $LATEST arn:aws:lambda:us-east-1:1234567899:function:micronautguide-java11 512 14990 1-60a4d463-1fa098426b0ff44e24a69bf8 TRACE c.s.e.f.d.Handler - {version=0, id=ed9bd6b2-0429-9b03-742b-fe294946f272, detail-type=Scheduled Event, source=aws.events, account=1234567899, time=2021-05-19T09:03:02Z, region=us-east-1, resources=[arn:aws:events:us-east-1:1234567899:rule/5minutes], detail={}}
+----
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support]
+
+* https://aws.amazon.com/lambda/[AWS Lambda]
+
+common:helpWithMicronaut.adoc[]

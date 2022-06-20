@@ -3,7 +3,8 @@ import io.micronaut.runtime.EmbeddedApplication
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import javax.inject.Inject
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertTrue
 
 @MicronautTest
 class CompleteTest {
@@ -13,7 +14,7 @@ class CompleteTest {
 
     @Test
     fun testItWorks() {
-        Assertions.assertTrue(application.isRunning)
+        assertTrue(application.isRunning)
     }
 
 }

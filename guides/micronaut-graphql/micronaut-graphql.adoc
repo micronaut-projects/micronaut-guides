@@ -1,0 +1,192 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will create a Micronaut application written in @language@ that uses https://graphql.org/[GraphQL] to expose some data.
+
+____
+GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides
+a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they
+need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools.
+____
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+== GraphQL
+
+Add the following dependency:
+
+dependency:micronaut-graphql[groupId=io.micronaut.graphql]
+
+By default GraphQL endpoint `/graphql` is enabled so you don't need to add any extra configuration.
+
+=== Describe your schema
+
+Create the file `schema.graphqls` in `src/main/resources` directory:
+
+resource:schema.graphqls[]
+
+<1> Declare a `bookById` query
+<2> Declare a `Book` type
+<3> Declare an `Author` type
+
+=== Book and Author classes
+
+Create `Book` and `Author` classes that will mimic the data we want to expose:
+
+source:Book[]
+
+source:Author[]
+
+=== Data repository
+
+To keep this example simple, instead of retrieving the information from a database we will keep it in memory and just return it from there. In a real-world example you will use any external storage: relational database, SQL database, etc.
+
+Create `DbRepository`
+
+source:DbRepository[]
+
+<1> These are the only books we have in our system.
+
+=== Data Fetchers
+
+With a Data Fetcher we bind the GraphQL schema, and our domain model and execute the appropiate queries in our datastore
+to retrieve the requested data.
+
+Create class `GraphQLDataFetchers`
+
+source:GraphQLDataFetchers[]
+
+<1> Constructor injection for the `DbRepository` bean
+<2> Return a GraphQL `dataFetchingEnvironment` with the information about the query
+<3> Get the `id` parameter from the query
+<4> Access the repository to find the book. Remember that this should be backed by a real datastore
+<5> Get the Book related to a specific author
+<6> Get the Author
+<7> Access the repository to find the Author.
+
+=== Factory
+
+Create the following factory that will bind the GraphQL schema to the code and types.
+
+source:GraphQLFactory[]
+
+<1> Annotate the class with `@Factory` so the Micronaut framework knows that this class will create beans
+<2> Create a new `SchemaParser`
+<3> Get the previously created `schema.graphqls` file from the classpath
+<4> Parse the schema
+<5> Create the runtime wiring
+<6> Bind a data fetcher for the `bookById` query
+<7> Bind a data fetcher to retrieve the author related to a book
+<8> Create the executable schema
+<9> Return the GraphQL bean
+
+common:runapp.adoc[]
+
+We want to execute a GraphQL query to retrieve a book by its id:
+
+[source,json]
+----
+query {
+  bookById(id:"book-1") {
+    name,
+    pageCount,
+    author {
+      firstName
+      lastName
+    },
+  }
+}
+----
+
+Run the  following curl request:
+
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ bookById(id:\"book-1\") { name, pageCount, author { firstName, lastName} } }"}'
+----
+
+[source,json]
+----
+{"data":{"bookById":{"name":"Harry Potter and the Philosopher's Stone","pageCount":223,"author":{"firstName":"Joanne","lastName":"Rowling"}}}}
+----
+
+One of the nice features about GraphQL is that the client can decide the fields, and the order they want to retrieve. Now we send the following request:
+
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ bookById(id:\"book-1\") { pageCount, name, id } }"}'
+----
+
+[source,json]
+----
+{"data":{"bookById":{"pageCount":223,"name":"Harry Potter and the Philosopher's Stone","id":"book-1"}}}
+----
+
+Notice that now the application only responds with `pageCount`, `name` and `id` fields, in that order.
+
+== Test the application
+
+For testing the application we will use Micronaut HTTP Client to send a `POST` request to the `/graphql` endpoint.
+Create the following class:
+
+test:GraphQLControllerTest[]
+
+To run the tests:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew test
+----
+
+Then open `build/reports/tests/test/index.html` in a browser to see the results.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw test
+----
+
+:exclude-for-build:
+
+== GraphiQL
+
+As an extra feature that will help you during development, you can enable https://github.com/graphql/graphiql[GraphiQL].
+GraphiQL is the GraphQL integrated development environment, and it helps to execute GraphQL queries.
+
+It should only be used for development, so it's not enabled by default. Add the following configuration to enable it:
+
+resource:application.yml[tag=graphiql]
+
+Start the application again and open http://localhost:8080/graphiql in your browser. You can write your GraphQL queries
+with integrated auto-completion and execute them to get the results in an easier and nicer way:
+
+image:graphiql-01.png[]
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Start the native image and execute the same curl request as before. You can also use the included GraphiQL browser to
+execute the queries.
+
+:exclude-for-languages:
+
+== Next steps
+
+Take a look at the https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL documentation].
+
+common:helpWithMicronaut.adoc[]

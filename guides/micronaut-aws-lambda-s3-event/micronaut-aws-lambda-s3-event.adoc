@@ -1,0 +1,133 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Writing the App
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app example.micronaut.micronautguide --features=aws-lambda --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add the `aws-lambda-s3-event-notification` feature.
+
+common:default-package.adoc[]
+
+common:annotationprocessors.adoc[]
+
+=== Thumbnail Configuration
+
+Add the following configuration:
+
+resource:application.yml[tag=thumbnail]
+
+Create an interface to encapsulate configuration:
+
+source:ThumbnailConfiguration[]
+
+source:ThumbnailConfigurationProperties[]
+
+callout:configuration-properties[1]
+callout:configuration-properties-constraints[2]
+
+=== Thumbnail Generation
+
+Create a contract for thumbnail generation. We leverage the `@Pattern` annotation to accept only `jpg` and `png` files.
+
+source:ThumbnailGenerator[]
+
+Add a dependency to https://github.com/coobird/thumbnailator[Thumbnailator] - a thumbnail generation library for Java.
+
+dependency:thumbnailator[groupId=net.coobird,version=@thumbnailatorVersion@]
+
+Create an implementation of `ThumbnailGenerator` which uses `Thumbnailator`.
+
+source:ThumbnailatorThumbnailGenerator[]
+
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=ThumbnailConfiguration]
+
+=== Handler
+
+When you select the feature `aws-lambda-s3-event-notification`, the application build includes the following dependency:
+
+dependency:aws-lambda-java-events[groupId=com.amazonaws,version=@aws-lambda-java-eventsVersion@]
+
+To be able to inject an `S3Client` Add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-aws-sdk-v2[groupId=io.micronaut.aws]
+
+dependency:s3[groupId=software.amazon.awssdk]
+
+:dependencies:
+
+The handler receives an S3 notification event and for each S3 event of type `ObjectCreated` creates a thumbnail if the S3 object is a PNG or JPG in the `thumbnails` folder of the same S3 bucket which triggered the event.
+
+source:FunctionRequestHandler[]
+
+<1> We want to handle `S3EventNotification` events.
+callout:injection[number=2,arg0=S3Client]
+callout:injection[number=3,arg0=ThumbnailGenerator]
+<4> Extra verification that the event is a `ObjectCreated` event.
+
+== S3
+
+Create an https://aws.amazon.com/s3/[S3] bucket.
+
+Inside the bucket create two folders `thumbnails` and `images`.
+
+== Lambda
+
+Create a Lambda Function. As a runtime, select Java 11 (Correto).
+
+image::create-function.png[]
+
+=== IAM Role
+
+Grant permissions to access the S3 bucket to the IAM role associated with the Lambda.
+
+=== Triggers
+
+Create two S3 trigger one for PNGs and one for JPGs:
+
+image::s3trigger.png[]
+
+Configure the trigger to:
+
+- Listen only to PUT events.
+- Only for files uploaded to the `images` folder
+- Only for file suffixed `jpg`
+
+=== Upload Code
+
+common:executable-jar.adoc[]
+
+Upload it:
+
+image::upload-function-code.png[]
+
+=== Handler
+
+In the AWS Console, as Handler, set:
+
+`example.micronaut.FunctionRequestHandler`
+
+=== Test
+
+You can test it easily; upload a JPG file to the images folder of the S3 bucket you created. You can do this directly in the AWS Console. In a few seconds, you will see a thumbnail saved in the `thumbnails` folder of the bucket.
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support]
+
+* https://aws.amazon.com/lambda/[AWS Lambda]
+
+common:helpWithMicronaut.adoc[]

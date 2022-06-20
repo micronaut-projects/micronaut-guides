@@ -9,7 +9,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Month;
 import java.util.Arrays;
 
@@ -25,7 +25,7 @@ public class NewsControllerTest {
     @Client("/")
     HttpClient client;
 
-    @Timeout(4) // <1>
+    @Timeout(5) // <1>
     @Test
     void fetchingOctoberHeadlinesUsesCache() {
         HttpRequest request = HttpRequest.GET(UriBuilder.of("/").path(Month.OCTOBER.name()).build());

@@ -1,0 +1,170 @@
+common:header.adoc[]
+
+You use https://flywaydb.org/documentation/[Flyway]:
+
+____
+Flyway is an open-source database migration tool. It strongly favors simplicity and convention over configuration.
+____
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide \
+   --features=data-jdbc,postgres,flyway \
+   --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add `postgres`, `data-jdbc`, and `flyway` as features.
+
+common:annotationprocessors.adoc[]
+
+=== Create Entity
+
+Create a `@MappedEntity` to save persons. Initially, consider name and age required. Use `int` primitive for the age.
+
+source:Person[tags=clazz1|ageint|clazz2]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:version-optimistic-locking[4]
+
+common:flyway.adoc[]
+
+resource:db/migration/V1__create-person.sql[]
+
+During application startup, http://www.flyway.org[Flyway] executes the SQL file and creates the schema needed for the application.
+
+If you check the database schema, there are two tables:
+
+- `person`
+- `flyway_scheme_history`
+
+Flyway uses the table `flyway_scheme_history` to keep track of database migrations.
+
+The `person` table looks like:
+
+|===
+|Column | Nullable
+
+|`id`
+|NO
+
+|`version`
+|NO
+
+|`name`
+|NO
+
+|`age`
+|NO
+|===
+
+=== Drop Not Null Constraint
+
+Applications change. Make `age` optional:
+
+source:Person[tags=nullableage]
+
+Add a new migration to drop the null constraint:
+
+resource:db/migration/V2__nullable-age.sql[]
+
+After the migration, the `person` table looks like:
+
+|===
+|Column | Nullable
+
+|`id`
+|NO
+
+|`version`
+|NO
+
+|`name`
+|NO
+
+|`age`
+|YES
+|===
+
+== Flyway endpoint
+
+To enable the Flyway endpoint, add the `management` dependency on your classpath.
+
+dependency:micronaut-management[]
+
+Enable the Flyway endpoint:
+
+resource:application.yml[tag=endpoints]
+
+common:testcontainers-postgres.adoc[]
+
+=== Test
+
+Create a test that invokes the Flyway endpoint.
+
+test:FlywayEndpointTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+
+=== Running the application
+
+common:run-postgres-with-docker.adoc[]
+
+Set up the following environment variables to connect to the PostgreSQL database you started with Docker.
+
+resource:application.yml[tag=datasource]
+
+<1> The JDBC URL matches the database name you used in the previous command.
+<2> Use PostgreSQL driver.
+<3> Configure the PostgreSQL dialect.
+<4> You handle database migrations via Flyway.
+
+[source,bash]
+----
+export DATASOURCES_DEFAULT_USERNAME=dbuser
+export DATASOURCES_DEFAULT_PASSWORD=theSecretPassword
+----
+
+Configure your default datasource to use the PostgreSQL database you started with Docker:
+
+common:runapp-instructions.adoc[]
+
+You can run a cURL command to test the application:
+
+[source, bash]
+----
+curl http://localhost:8080/flyway
+----
+
+You will see information about migrations.
+
+common:graal-with-plugins.adoc[]
+
+You can run a cURL command to test the application:
+
+[source, bash]
+----
+curl http://localhost:8080/flyway
+----
+
+You will see information about migrations.
+
+common:next.adoc[]
+
+Check https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway] integration.
+
+Learn more about https://flywaydb.org[Flyway].
+
+common:helpWithMicronaut.adoc[]

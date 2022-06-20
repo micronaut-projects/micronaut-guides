@@ -4,9 +4,9 @@ package example.micronaut
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
-import io.reactivex.Flowable
-
+import org.reactivestreams.Publisher
 //end::packageandimports[]
+
 /*
 //tag::harcoded[]
 @Client("http://localhost:8081") // <1>
@@ -21,6 +21,6 @@ import io.reactivex.Flowable
 interface BookCatalogueClient : BookCatalogueOperations {
 
     @Get("/books")
-    override fun findAll(): Flowable<Book>
+    override fun findAll(): Publisher<Book>
 }
 //end::clazz[]

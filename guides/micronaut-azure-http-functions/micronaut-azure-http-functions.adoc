@@ -1,34 +1,10 @@
-= @guideTitle@
+common:header.adoc[]
 
-@guideIntro@
+common:requirements.adoc[]
 
-Authors: @authors@
+common:completesolution.adoc[]
 
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
-
-include::{commondir}/common-requirements.adoc[]
-
-include::{commondir}/common-completesolution.adoc[]
-
-== Writing the App
-
-include::{commondir}/common-cli-or-launch.adoc[]
-
-[source,bash]
-----
-mn create-app example.micronaut.micronautguide --feature=azure-function --build=@build@ --lang=@lang@
-----
-
-include::{commondir}/common-build-lang-arguments.adoc[]
-
-include::{commondir}/common-default-package.adoc[]
-
-NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add the `azure-function` feature.
-
-include::{commondir}/common-annotationprocessors.adoc[]
-
+common:create-app-features.adoc[]
 
 == Azure CLI
 
@@ -48,7 +24,7 @@ The created application contains class which extends `AzureHttpFunction`
 
 source:Function[]
 
-When you write a Micronaut Azure HTTP function, you will write your application as you will normally do when developing outside of Azure functions. That it is to say, you will create routes with classes annotated with `@Controller`. The above class bridges both worlds. It adapts from an Azure to a Micronaut HTTP Request, and based on the route, it delegates to the appropriate Micronaut's controller.
+When you write a Micronaut Azure HTTP function, you will write your application as you will normally do when developing outside of Azure functions. That it is to say, you will create routes with classes annotated with `@Controller`. The above class bridges both worlds. It adapts from an Azure to a Micronaut HTTP Request, and based on the route, it delegates to the appropriate Micronaut controller.
 
 == Controller
 
@@ -56,11 +32,11 @@ The generated application contains a `Controller` which exposes two routes (`GET
 
 source:MicronautguideController[]
 
-* The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/micronautguide`
-* The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the `index` method to all requests that use an HTTP GET.
-* By default a Micronaut's response uses `application/json` as `Content-Type`. `index` method returns a String not a JSON object. Because of that, we set the response content-type to `text/plain` with the `@Produces` annotation.
-* The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html[@Post] annotation is used to map the `postMethod` method to all requests that use an HTTP GET.
-* `@Introspected` annotation generates bean meta-information at compile time.
+callout:controller[arg0=/micronautguide]
+* The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to all requests that use an HTTP GET.
+* By default, a Micronaut response uses `application/json` as `Content-Type`. `index` method returns a String not a JSON object. Because of that, we set the response content-type to `text/plain` with the `@Produces` annotation.
+* The @api@/io/micronaut/http/annotation/Post.html[@Post] annotation maps the `postMethod` method to all requests that use an HTTP GET.
+callout:introspected[]
 
 == Tests
 
@@ -68,9 +44,9 @@ The generated application contains a test which shows how to write a Micronaut A
 
 test:MicronautguideFunctionTest[]
 
-* Instantiating the function starts the Micronaut's application context.
+* Instantiating the function starts the Micronaut application context.
 
-include::{commondir}/common-testApp.adoc[]
+common:testApp.adoc[]
 
 == Running the Application
 
@@ -93,6 +69,10 @@ You can invoke the GET route:
 [source,bash]
 ----
 curl -i localhost:7071/api/micronautguide
+----
+
+[source]
+----
 HTTP/1.1 200 OK
 Date: Sat, 08 May 2021 03:55:11 GMT
 Content-Type: text/plain
@@ -107,6 +87,10 @@ or the POST route:
 [source,bash]
 ----
 curl -i -d '{"name":"John Snow"}' -H "Content-Type: application/json" -X POST http://localhost:7071/api/micronautguide
+----
+
+[source]
+----
 HTTP/1.1 200 OK
 Date: Sat, 08 May 2021 03:57:56 GMT
 Content-Type: application/json
@@ -176,29 +160,37 @@ Use `./gradlew azureFunctionsDeploy` to deploy your Azure Function App.
 
 [source, bash]
 ----
-% ./gradlew azureFunctionsDeploy
-...
+./gradlew azureFunctionsDeploy
+----
+
+[source]
+----
 Successfully updated the function app testmicronaut.
 Trying to deploy the function app...
 Trying to deploy artifact to testmicronaut...
 Successfully deployed the artifact to https://storageaccountexamp9ec5.blob.core.windows.net/java-functions-run-from-packages/subscriptions-9825e0b9-244a-4eeb-9194-d3e8123fe1a0-resourceGroups-examplemicronaut-providers-Microsoft.Web-sites-testmicronaut-testmicronaut.zip
 Successfully deployed the function app at https://testmicronaut.azurewebsites.net
 ----
+
 :exclude-for-build:
 
 :exclude-for-build:gradle
 
-Run `./mvnw package azure-functions:deploy`  to deploy your Azure Function App.
+Run `./mvnw package azure-functions:deploy` to deploy your Azure Function App.
 
 :exclude-for-build:
 
-If you visit `https://testmicronaut.azurewebsites.net/` you will get an HTML page informing you that the function is up and running.
+If you visit `\https://testmicronaut.azurewebsites.net/` you will get an HTML page informing you that the function is up and running.
 
 You can invoke the GET route:
 
 [source,bash]
 ----
 curl -i https://testmicronaut.azurewebsites.net/api/micronautguide
+----
+
+[source]
+----
 HTTP/1.1 200 OK
 ...
 ..
@@ -214,4 +206,4 @@ Read more about:
 * https://github.com/Azure/azure-functions-java-library[Library for Azure Java Functions]
 * https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-java[Azure functions for Java developers]
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest // <1>
 class HealthTest {

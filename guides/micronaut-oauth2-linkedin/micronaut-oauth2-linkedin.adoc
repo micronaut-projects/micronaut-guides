@@ -1,22 +1,14 @@
-= @guideTitle@
+common:header.adoc[]
 
-@guideIntro@
+common:requirements.adoc[]
 
-Authors: @authors@
-
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
-
-include::{commondir}/common-requirements.adoc[]
-
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
 == OAuth 2.0
 
 To provide https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin[Sign in with LinkedIn]
 with https://docs.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow[Authorization Code Flow],
-you need visit https://www.linkedin.com/developers/[linkedin.com/developers/] and:
+you need to visit https://www.linkedin.com/developers/[linkedin.com/developers/] and:
 
 === Create a LinkedIn App
 
@@ -35,67 +27,62 @@ Go to the `Auth` tab.
 image::linked-in-auth.png[]
 
 - Save your client id and client secret. You will need them to configure your Micronaut applications.
-- Register `http://localhost:8080/oauth/callback/linkedin`. By creating a client named `linkedin` in the Micronaut Application, route `/oauth/callback/linkedin` is registered.
+- Register `\http://localhost:8080/oauth/callback/linkedin`. By creating a client named `linkedin` in the Micronaut application, route `/oauth/callback/linkedin` is registered.
 - After you add `Add Sign in with LinkedIn` the scopes `r_liteprofile` and `r_emailaddress` will appear. We will configure the Micronaut application to request scope `r_liteprofile`.
 
-include::{commondir}/common-create-app.adoc[]
+common:create-app-features.adoc[]
 
 === Views
 
-Although Micronaut is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
+Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
 
-To use https://www.thymeleaf.org/[Thymeleaf] Java template engine to render views in a Micronaut application add the following dependency on your classpath.
-
-dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+We'll use the https://www.thymeleaf.org/[Thymeleaf^] Java template engine to render views.
 
 === Home
 
-Create a controller to handle the requests to `/`. You are going to display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we are going to use a Thymeleaf template.
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
 
 source:HomeController[]
 
-<1> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/`.
-<2> Annotate with `io.micronaut.security.Secured` to configure secured access. The `SecurityRule.IS_ANONYMOUS` expression will allow access without authentication.
-<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template would you like to render the response against.
-<4> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation is used to map the `index` method to GET `/` requests.
+callout:controller[number=1,arg0=/]
+callout:secured-anonymous[number=2]
+<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View^] annotation to specify which template to use to render the response.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get^] annotation maps the `index` method to GET `/` requests.
 
-Create a thymeleaf template:
+Create a Thymeleaf template:
 
 resource:views/home.html[]
 
-Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the Thymeleaf template.
 
-- The https://docs.micronaut.io/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
+- The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor^]
 injects into the model a `security` map with the authenticated user.  See
-https://micronaut-projects.github.io/micronaut-views/latest/guide/index.html#views-security[User in a view] documentation.
+https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view^] documentation.
+
+=== OAuth 2.0 authorization code grant flow
+
+Here is a high level diagram of how the authorization code grant flow works with an OAuth 2.0 provider such as LinkedIn.
+
+image::standard-oauth.svg[]
 
 === OAuth 2.0 Configuration
 
-To use OAuth 2.0 integration, add the next dependency:
-
-dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
-
-Add the following Oauth2 Configuration:
-Add also JWT https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwt[Micronaut’s JWT support] dependencies:
-
-dependency:micronaut-security-jwt[groupId=io.micronaut.security]
-
-Add the following Oauth2 Configuration:
+Add the following OAuth2 Configuration:
 
 resource:application.yml[tag=oauth2]
 
 <1> Set `micronaut.security.authentication` to `cookie` to generate a signed JWT once the user is authenticated. The token is saved in a Cookie and read in subsequent requests.
-<2> You can create a https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/jwt/signature/secret/SecretSignatureConfiguration.html[SecretSignatureConfiguration] named `generator` via configuration as illustrated above. The `generator` signature is used to sign the issued JWT claims.
+<2> You can create a https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/jwt/signature/secret/SecretSignatureConfiguration.html[SecretSignatureConfiguration^] named `generator` via configuration as illustrated above. The `generator` signature is used to sign the issued JWT claims.
 <3> Change this value to your own secret and keep it safe (do not store this in your VCS).
-<4> The provider identifier should match the last part of the url you entered as a redirect url `/oauth/callback/linkedin`
+callout:oauth2-client-name[number=4,arg0=linkedin]
 <5> Client Secret. See previous screenshot.
 <6> Client ID. See previous screenshot.
-<7> Specify the scopes you want to request. https://docs.microsoft.com/en-us/linkedin/shared/authentication/authentication?context=linkedin%2Fcontext#permission-types[Linked Permission Types] let you specify exactly what type of access you need.
-<8> Map manually the LinkedIn's https://tools.ietf.org/html/rfc6749#section-3.1[Authorization endpoint].
-<9> Map manually the LinkedIn's https://tools.ietf.org/html/rfc6749#section-3.2[Token endpoint].
+<7> Specify the scopes you want to request. https://docs.microsoft.com/en-us/linkedin/shared/authentication/authentication?context=linkedin%2Fcontext#permission-types[Linked Permission Types^] let you specify exactly what type of access you need.
+<8> Map manually the LinkedIn's https://tools.ietf.org/html/rfc6749#section-3.1[Authorization endpoint^].
+<9> Map manually the LinkedIn's https://tools.ietf.org/html/rfc6749#section-3.2[Token endpoint^].
 <10> Accept GET request to the `/logout` endpoint.
 
-The previous configuration uses several placeholders. You will need to setup `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
 
 [soruce, bash]
 ----
@@ -103,34 +90,38 @@ export OAUTH_CLIENT_ID=XXXXXXXXXX
 export OAUTH_CLIENT_SECRET=YYYYYYYYYY
 ----
 
-=== User Details Mapper
-
-Here is a high level diagram of how the authorization code grant flow works with an OAuth 2.0 provider such as LinkedIn.
-
-image::standard-oauth.svg[]
+=== OAuth 2.0 Details Mapper
 
 We need an HTTP Client to retrieve the user info. Create a POJO to represent a LinkedIn user:
 
 source:LinkedInMe[]
 
-Then, create a Micronaut Declarative HTTP Client to consume https://docs.microsoft.com/en-us/linkedin/shared/integrations/people/profile-api[LinkedIn Profile endpoint]
+Then, create a Micronaut Declarative HTTP Client to consume https://docs.microsoft.com/en-us/linkedin/shared/integrations/people/profile-api[LinkedIn Profile endpoint^]
 
 source:LinkedInApiClient[]
 
-<1> Add the id `linkedin` to the `@Client` annotation. Later, you will provide url for this client id.
+<1> Add the id `linkedin` to the `@Client` annotation. Later, you will provide URL for this client id.
 <2> Define a HTTP GET request to `/v2/me` endpoint.
 <3> You can return reactive types in a Micronaut declarative HTTP client.
 <4> You can specify that a parameter binds to a HTTP Header such as the *Authorization* header.
 
-Specify the url for the `linkedin` service.
+Specify the URL for the `linkedin` service.
 
 resource:application.yml[tag=micronaut-http-services]
 
-include::{commondir}/common-runapp.adoc[]
+Create an implementation of https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/oauth2/endpoint/token/response/OauthAuthenticationMapper.html[OauthAuthenticationMapper]. The implementation must be qualified by a name that matches the name present in the client configuration. The value specified in the client configuration is `linkedin`.
+
+source:LinkedInOauthAuthenticationMapper[]
+
+callout:at-named[1]
+callout:singleton[2]
+callout:constructor-di[number=3,arg0=LinkedInApiClient]
+
+common:runapp.adoc[]
 
 image::linkedIn.gif[]
 
-include::{commondir}/common-graal-with-plugins.adoc[]
+common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
@@ -140,6 +131,6 @@ Visit localhost:8080 and authenticate with LinkedIn
 
 == Next steps
 
-Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
+Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation^] to learn more.
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

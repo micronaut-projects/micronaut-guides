@@ -1,0 +1,155 @@
+common:header.adoc[]
+
+You will deploy a Micronaut application to https://cloud.google.com/compute/docs[Google Cloud Compute Engine], a computing and hosting service.
+
+common:costs-gcloud.adoc[]
+
+common:gcp-deploy-requirements2content.adoc[]
+
+== Google Cloud Compute
+
+=== Create the VM Instance
+
+You can create the Google Cloud Compute VM via the https://cloud.google.com/sdk/docs/install-sdk[CLI].
+
+[source, bash]
+----
+gcloud compute instances create \
+  guide-micronaut-jdbc-compute \
+  --machine-type=e2-micro \
+  --zone=us-east1-b
+----
+
+NOTE: If you've omitted the default zone in the setup steps, the command will respond requesting a zone for your instance.
+
+You will see the following output:
+
+[source, bash, options="nowrap"]
+----
+Created [https://www.googleapis.com/compute/v1/projects/micronaut-guides-jdbc/zones/us-east1-b/instances/guide-micronaut-jdbc-compute].
+NAME                          ZONE        MACHINE_TYPE  PREEMPTIBLE  INTERNAL_IP    EXTERNAL_IP     STATUS
+guide-micronaut-jdbc-compute  us-east1-b  e2-micro                   10.xxx.xxx.4   34.xxx.xxx.200  RUNNING
+----
+
+Make note of your external IP address; you will need this later.
+
+=== Open Port 8080
+
+[source, bash]
+----
+gcloud compute firewall-rules create allow-8080 --allow tcp:8080
+----
+
+You will see the following output:
+
+[source, bash, options="nowrap"]
+----
+NAME        NETWORK  DIRECTION  PRIORITY  ALLOW     DENY  DISABLED
+allow-8080  default  INGRESS    1000      tcp:8080        False
+----
+
+=== Generate JAR
+
+common:shade[]
+
+=== Copy the JAR to the Instance
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+gcloud compute scp build/libs/micronautguide-0.1-all.jar \
+    guide-micronaut-jdbc-compute:.
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+gcloud compute scp target/micronautguide-0.1.jar \
+    guide-micronaut-jdbc-compute:.
+----
+
+:exclude-for-build:
+
+NOTE: If you do not have an SSH key file for `gcloud`, you will be prompted to set a passphrase to create a public/private RSA key pair.
+
+=== Start Micronaut Application
+
+Before we can start the application, we need to access our newly created instance.
+
+[source,bash]
+----
+gcloud compute ssh guide-micronaut-jdbc-compute
+----
+
+Now we are connected to our instance.
+
+Let's make sure it is up-to-date and install the Java JRE.
+
+[,bash]
+----
+sudo apt update
+apt install default-jre
+----
+
+Now we can run our Micronaut application.
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+java -jar micronautguide-0.1-all.jar
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+java -jar micronautguide-0.1.jar
+----
+
+:exclude-for-build:
+
+
+=== Running Application
+
+Verify that the application is running either by invoking the controller at http://[VM IP Address]:8080 in a browser or by using cURL:
+
+[source,bash]
+----
+curl -i http://34.xxx.xxx.200:8080/hello
+----
+
+[source,bash]
+----
+HTTP/1.1 200 OK
+date: Tue, 8 Feb 2022 23:41:33 GMT
+Content-Type: text/plain
+content-length: 11
+connection: keep-alive
+
+Hello World
+----
+
+=== Stopping the Instance
+
+[source, bash]
+----
+gcloud compute instances stop guide-micronaut-jdbc-compute
+----
+
+common:gcp-project-cleanup.adoc[]
+
+== Next steps
+
+Read more about:
+
+- https://cloud.google.com/compute/docs[Google Cloud Compute Engine]
+- https://micronaut-projects.github.io/micronaut-gcp/latest/guide/[Micronaut Google Cloud Platform (GCP)] integration.
+
+common:helpWithMicronaut.adoc[]

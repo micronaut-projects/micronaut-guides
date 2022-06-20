@@ -1,15 +1,13 @@
 package example.micronaut
 
-import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
+import io.micronaut.core.type.Argument
+import spock.lang.IgnoreIf
 import spock.lang.Specification
-
-import javax.inject.Inject
 
 @MicronautTest
 class BookControllerSpec extends Specification {
@@ -18,13 +16,13 @@ class BookControllerSpec extends Specification {
     @Client("/")
     HttpClient client
 
+    @IgnoreIf({env['CI'] as boolean})
     void "retrieve books"() {
         when:
-        HttpResponse response = client.toBlocking().exchange(HttpRequest.GET("/books"), Argument.listOf(BookRecommendation))
+        List<BookRecommendation> books = client.toBlocking().retrieve(HttpRequest.GET("/books"), Argument.listOf(BookRecommendation))
 
         then:
-        response.status() == HttpStatus.OK
-        response.body().size() == 1
-        response.body().get(0).name == "Building Microservices"
+        books.size() == 1
+        books[0].name == "Building Microservices"
     }
 }

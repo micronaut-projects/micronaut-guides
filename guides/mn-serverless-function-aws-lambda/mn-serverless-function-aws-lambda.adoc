@@ -1,69 +1,49 @@
-= @guideTitle@
+common:header-top.adoc[]
 
-@guideIntro@
+Please read about https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support] to learn more about different Lambda runtime, Triggers, and Handlers, and how to integrate with a Micronaut application.
 
-Authors: @authors@
+If you want to respond to triggers such as queue events, S3 events, or single endpoints, you should opt to code your Micronaut functions as Serverless functions.
 
-Micronaut Version: @micronaut@
+In this guide, we will deploy a Micronaut serverless function to AWS Lambda.
 
-Please, read about https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support] to learn more about different Lambda runtime, Triggers and Handlers and how to integrate with a Micronaut application.
+common:gettingStarted.adoc[]
 
-If you want to respond to triggers such as queue events, s3 events or single endpoints you should opt to code your Micronaut functions as Serverless functions.
+common:requirements.adoc[]
 
-In this guide, we are going to deploy a Micronaut serverless function to AWS Lambda.
+common:completesolution.adoc[]
 
-include::{commondir}/common-gettingStarted.adoc[]
+== Writing the Application
 
-include::{commondir}/common-requirements.adoc[]
-
-include::{commondir}/common-completesolution.adoc[]
-
-== Writing the App
-
-include::{commondir}/common-cli-or-launch.adoc[]
+common:cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-function-app example.micronaut.micronautguide --feature=aws-lambda --build=@build@ --lang=@lang@
+mn create-function-app example.micronaut.micronautguide --features=aws-lambda --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
-If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add `aws-lambda` feature.
+If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add the `aws-lambda` feature.
 
-include::{commondir}/common-default-package.adoc[]
+common:default-package.adoc[]
 
-include::{commondir}/common-annotationprocessors.adoc[]
-
-We want to support a JavaBean as input and output types.
-
-The input is a  `Book` object:
-
-source:Book[]
-
-* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
-
-The output is a `BookSaved` object:
-
-source:BookSaved[]
-
-* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+common:annotationprocessors.adoc[]
 
 The application contains a class extending https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler]
 
-source:BookRequestHandler[]
+source:FunctionRequestHandler[]
 
 * The class extends https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler] and defines input and output types.
 
-The generated test shows how the verify the function behaviour:
+An included test shows how to verify the function behaviour:
 
-test:BookRequestHandlerTest[]
+test:FunctionRequestHandlerTest[]
 
 * When you instantiate the Handler, the application context starts.
 * Remember to close your application context when you end your test. You can use your handler to obtain it.
 * Invoke the `execute` method of the handler.
 
-include::{commondir}/common-testApp.adoc[]
+common:testApp.adoc[]
 
 == Lambda
 
@@ -73,7 +53,7 @@ image::create-function.png[]
 
 === Upload Code
 
-include::{commondir}/common-executable-jar.adoc[]
+common:executable-jar.adoc[]
 
 Upload it:
 
@@ -83,33 +63,18 @@ image::upload-function-code.png[]
 
 As Handler, set:
 
-`example.micronaut.BookRequestHandler`
+`example.micronaut.FunctionRequestHandler`
 
 image::handler-2.png[]
 
-=== Test
+common:lambda-test.adoc[]
 
-You can test it easily.
-
-image::test-event-2.png[]
-
-[source, json]
-----
-{
-  "name": "Building Microservices"
-}
-----
-
-You should see a 200 response:
-
-image::test-result-2.png[]
-
-include::{commondir}/common-next.adoc[]
+common:next.adoc[]
 
 Read more about:
 
-* https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda[Micronaut AWS Lambda Support]
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support]
 
 * https://aws.amazon.com/lambda/[AWS Lambda]
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

@@ -1,0 +1,49 @@
+plugins {
+    id("groovy")
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("io.micronaut.application") version "3.2.2"
+}
+
+version = "0.1"
+group = "com.example"
+
+ext {
+    micronautVersion = new File(projectDir.parentFile, 'version.txt').text.trim()
+}
+
+repositories {
+    mavenCentral()
+}
+
+micronaut {
+    testRuntime("spock2")
+    processing {
+        incremental(true)
+        annotations("io.micronaut.guides.*")
+    }
+}
+
+dependencies {
+    compileOnly("info.picocli:picocli-codegen")
+
+    implementation("info.picocli:picocli")
+    implementation("io.micronaut.groovy:micronaut-runtime-groovy")
+    implementation("io.micronaut.picocli:micronaut-picocli")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-validation")
+    implementation("io.projectreactor:reactor-core")
+    implementation("javax.annotation:javax.annotation-api")
+
+    runtimeOnly("ch.qos.logback:logback-classic")
+
+    testImplementation("io.micronaut:micronaut-http-client")
+}
+
+application {
+    mainClass.set("io.micronaut.guides.TweetsCommand")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

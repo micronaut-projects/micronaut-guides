@@ -4,29 +4,25 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.RxStreamingHttpClient;
+import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.reactivex.Flowable;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-
-import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.StreamSupport;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.regex.Pattern;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest // <1>
 class GithubControllerTest {
 
     @Inject
     @Client("/")
-    RxStreamingHttpClient client; // <2>
+    HttpClient client; // <2>
 
-    private static final List<String> expectedReleases = Arrays.asList("Micronaut 2.5.0", "Micronaut 2.4.4", "Micronaut 2.4.3");
+    private static Pattern MICRONAUT_RELEASE = Pattern.compile("[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?");
 
     @Test
     public void verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {
@@ -44,9 +40,11 @@ class GithubControllerTest {
         List<GithubRelease> releases = rsp.body();
 
         //then:
-        for (String name : expectedReleases) {
-            assertTrue(releases.stream().map(GithubRelease::getName).anyMatch(name::equals));
-        }
+        assertNotNull(releases);
+        assertTrue(releases.stream()
+                .map(GithubRelease::getName)
+                .allMatch(name -> MICRONAUT_RELEASE.matcher(name)
+                        .find()));
     }
 
     @Test
@@ -54,14 +52,12 @@ class GithubControllerTest {
         //when:
         HttpRequest<Object> request = HttpRequest.GET("/github/releases-lowlevel");
 
-        Flowable<GithubRelease> githubReleaseStream = client.jsonStream(request, GithubRelease.class); // <7>
-        Iterable<GithubRelease> githubReleases = githubReleaseStream.blockingIterable();
+        List<GithubRelease> githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease.class)); // <7>
 
         //then:
-        for (String name : expectedReleases) {
-            assertTrue(StreamSupport.stream(githubReleases.spliterator(), false)
-                    .map(GithubRelease::getName)
-                    .anyMatch(name::equals));
-        }
+        assertTrue(githubReleases.stream()
+                .map(GithubRelease::getName)
+                .allMatch(name -> MICRONAUT_RELEASE.matcher(name)
+                        .find()));
     }
 }

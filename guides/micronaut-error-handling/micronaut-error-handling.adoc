@@ -1,22 +1,14 @@
-= @guideTitle@
+common:header.adoc[]
 
-@guideIntro@
+common:requirements.adoc[]
 
-Authors: @authors@
+common:completesolution.adoc[]
 
-Micronaut Version: @micronaut@
-
-include::{commondir}/common-gettingStarted.adoc[]
-
-include::{commondir}/common-requirements.adoc[]
-
-include::{commondir}/common-completesolution.adoc[]
-
-include::{commondir}/common-create-app.adoc[]
+common:create-app.adoc[]
 
 === Global @Error
 
-We want to display a custom `Not Found` page when the user attempts to access a uri for which we have not any route defined for.
+We want to display a custom `Not Found` page when the user attempts to access a URI that has no defined routes.
 
 image::notfound.png[]
 
@@ -26,7 +18,7 @@ To use the view rendering features described in this section, add the following 
 
 dependency:micronaut-views-velocity[groupId=io.micronaut.views]
 
-Micronaut ships out-of-the-box with support for https://velocity.apache.org/[Apache Velocity], https://www.thymeleaf.org/[Thymeleaf] or https://jknack.github.io/handlebars.java/[Handlebars]. In this guide, we use Apache Velocity.
+The Micronaut framework ships out-of-the-box with support for https://velocity.apache.org/[Apache Velocity], https://www.thymeleaf.org/[Thymeleaf] or https://jknack.github.io/handlebars.java/[Handlebars]. In this guide, we use Apache Velocity.
 
 Create a `notFound.vm` view:
 
@@ -36,15 +28,15 @@ Create a `NotFoundController`:
 
 source:NotFoundController[]
 
-<1> The class is defined as a controller with the `@Controller` annotation.
-<2> Inject an available https://micronaut-projects.github.io/micronaut-views/latest/api/index.html[ViewRenderer] bean to render an HTML view.
+callout:controller[number=1,arg0=/notfound]
+<2> Inject an available https://micronaut-projects.github.io/micronaut-views/latest/api/[ViewRenderer] bean to render an HTML view.
 <3> The Error declares which `HttpStatus` error code to handle (in this case 404). We declare the method as a global error handler due to `global = true`.
 <4> If the request `Accept` HTTP Header contains `text/html`, we respond an HTML View.
 <5> By default, we respond JSON.
 
 === Local @Error
 
-include::{commondir}/common-validation.adoc[]
+common:validation.adoc[]
 
 Then create a view to display a form:
 
@@ -56,21 +48,20 @@ Create a controller to map the form submission:
 
 source:BookController[tags=package|imports|clazz|create|save|createModelWithBlankValues]
 
-<1> The class is defined as a controller with the `@Controller` annotation mapped to the path `/books`
+callout:controller[number=1,arg0=/books]
 <2> Use `@View` annotation to indicate the view name which should be used to render a view for the route.
-<3> You can specify the HTTP verb that a controller’s action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<3> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
 <4> `@Consumes` annotation takes a `String[]` of supported media types for an incoming request.
-<5> The `@Post` annotation is used to map the index method to all requests that use an HTTP POST
+<5> The `@Post` annotation maps the index method to all requests that use an HTTP POST
 <6> Add `@Valid` to any method parameter which requires validation. We use a POJO to encapsulate the form submission.
 
 Create the POJO encapsulating the submission:
 
 source:CommandBookSave[]
 
-<1> Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+callout:introspected[1]
 <2> `title` is required and must be not blank.
-<3> `pages` is required.
-<4> `pages` must be greater than 0.
+<3> `pages` must be greater than 0.
 
 When the form submission fails, we want to display the errors in the UI as the next image illustrates:
 
@@ -85,12 +76,12 @@ An easy way to achieve it is to capture the `javax.validation.ConstraintViolatio
 class BookController {
 ...
 ..
-include::{sourceDir}/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=di]
+include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=di]
 ...
 .
-include::{sourceDir}/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=onSavedFailed]
+include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=onSavedFailed]
 
-include::{sourceDir}/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=createModelWithBlankValues]
+include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=createModelWithBlankValues]
 ..
 ...
 }
@@ -100,10 +91,9 @@ include::{sourceDir}/@sourceDir@/src/main/@lang@/example/micronaut/BookControlle
 <2> By default `@Error` annotations are local. We specify the exception which we want to handle.
 <3> You can access the original `HttpRequest` which triggered the exception.
 
-Create a `javax.inject.Singleton` to encapsulate the generation of a list of messages from a `Set` of `ConstraintViolation`:
+Create a `jakarta.inject.Singleton` to encapsulate the generation of a list of messages from a `Set` of `ConstraintViolation`:
 
 source:MessageSource[]
-
 
 == ExceptionHandler
 
@@ -114,14 +104,15 @@ Modify the controller and add a method to throw an exception:
 [source,@lang@]
 .src/main/@lang@/example/micronaut/BookController.@languageextension@
 ----
-include::{sourceDir}/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=clazz]
+include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=clazz]
 ...
 ..
 .
-include::{sourceDir}/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=stock]
+include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/example/micronaut/BookController.@languageextension@[tag=stock]
 }
 ----
-<1> The class is defined as a controller with the `@Controller` annotation mapped to the path `/books`
+
+callout:controller[number=1,arg0=/books]
 
 source:OutOfStockException[]
 
@@ -129,12 +120,12 @@ Implement a ExceptionHandler; a generic hook for handling exceptions that occurs
 
 source:OutOfStockExceptionHandler[]
 
-<1> To register a Singleton in Micronaut’s application context, annotate your class with `javax.inject.Singleton`.
+callout:singleton[1]
 <2> This bean loads if `OutOfStockException`, `ExceptionHandler` are available.
 <3> Specify the `Throwable` to handle.
 <4> Return 200 OK with a body of 0; no stock.
 
-include::{commondir}/common-graal-with-plugins.adoc[]
+common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 After you run the native image, execute a curl request:
@@ -148,7 +139,6 @@ You should get successful response.
 
 [source, bash]
 ----
- % curl -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8' localhost:8080/foo
 <!DOCTYPE html>
 <html>
 <head>
@@ -162,6 +152,6 @@ You should get successful response.
 
 :exclude-for-languages:
 
-include::{commondir}/common-next.adoc[]
+common:next.adoc[]
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

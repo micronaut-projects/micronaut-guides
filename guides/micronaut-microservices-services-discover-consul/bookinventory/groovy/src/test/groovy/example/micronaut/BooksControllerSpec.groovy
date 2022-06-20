@@ -1,46 +1,40 @@
 package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
+import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
 import spock.lang.Specification
 
-import javax.inject.Inject
+import static io.micronaut.http.HttpStatus.NOT_FOUND
+import static io.micronaut.http.HttpStatus.OK
 
 @MicronautTest
 class BooksControllerSpec extends Specification {
 
     @Inject
     @Client("/")
-    HttpClient client
+    HttpClient httpClient
 
     void "for a book with inventory true is returned"() {
         when:
-        Boolean hasStock = client.toBlocking().retrieve(HttpRequest.GET("/books/stock/1491950358"), Boolean)
+        HttpResponse<Boolean> rsp = httpClient.toBlocking().exchange(
+                HttpRequest.GET("/books/stock/1491950358"), Boolean)
 
         then:
-        noExceptionThrown()
-        hasStock
-    }
-
-    void "for a book without inventory false is returned"() {
-        when:
-        Boolean hasStock = client.toBlocking().retrieve(HttpRequest.GET("/books/stock/1680502395"), Boolean)
-
-        then:
-        noExceptionThrown()
-        hasStock == Boolean.FALSE
+        rsp.status() == OK
+        rsp.body()
     }
 
     void "for an invalid ISBN 404 is returned"() {
         when:
-        client.toBlocking().retrieve(HttpRequest.GET("/books/stock/XXXXX"))
+        httpClient.toBlocking().exchange(HttpRequest.GET("/books/stock/XXXXX"), Boolean)
 
         then:
-        def e = thrown(HttpClientResponseException)
-        e.response.status == HttpStatus.NOT_FOUND
+        HttpClientResponseException e = thrown()
+        e.response.status == NOT_FOUND
     }
 }

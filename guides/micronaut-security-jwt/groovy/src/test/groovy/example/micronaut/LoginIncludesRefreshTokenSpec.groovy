@@ -3,19 +3,20 @@ package example.micronaut
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.RxHttpClient
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.security.authentication.UsernamePasswordCredentials
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
 import spock.lang.Specification
-import javax.inject.Inject
 
 @MicronautTest
 class LoginIncludesRefreshTokenSpec extends Specification {
+
     @Inject
     @Client("/")
-    RxHttpClient client
+    HttpClient client
 
     void "upon successful authentication, the user gets an access token and a refresh token"() {
         when: 'Login endpoint is called with valid credentials'

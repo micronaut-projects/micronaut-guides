@@ -4,9 +4,8 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.TaskScheduler
-
-import javax.inject.Named
-import javax.inject.Singleton
+import jakarta.inject.Named
+import jakarta.inject.Singleton
 import java.text.SimpleDateFormat
 import java.time.Duration
 
@@ -26,7 +25,7 @@ class RegisterUseCase {
 
     void register(String email) {
         log.info("saving {} at {}", email, new SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(new Date()))
-        scheduleFollowupEmail(email, "Welcome to Micronaut")
+        scheduleFollowupEmail(email, "Welcome to the Micronaut framework")
     }
 
     private void scheduleFollowupEmail(String email, String message) {

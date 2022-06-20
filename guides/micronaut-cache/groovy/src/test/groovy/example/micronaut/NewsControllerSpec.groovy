@@ -9,7 +9,7 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
 import spock.lang.Timeout
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 import java.time.Month
 
 @MicronautTest
@@ -22,7 +22,7 @@ class NewsControllerSpec extends Specification {
     @Client("/")
     HttpClient client
 
-    @Timeout(4) // <1>
+    @Timeout(5) // <1>
     void "fetching october headlines uses cache"() {
         given:
         String expected = "Micronaut AOP: Awesome flexibility without the complexity"

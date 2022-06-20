@@ -6,10 +6,8 @@ import java.util.Objects;
 
 @Introspected
 public class BookRecommendation {
-    private String name;
 
-    public BookRecommendation() {
-    }
+    private final String name;
 
     public BookRecommendation(String name) {
         this.name = name;
@@ -17,10 +15,6 @@ public class BookRecommendation {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
