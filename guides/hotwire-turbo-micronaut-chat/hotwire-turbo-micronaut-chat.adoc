@@ -1,0 +1,740 @@
+common:header-top.adoc[]
+
+common:requirements.adoc[]
+
+== Getting started
+
+This guide shows a chat application such as the Rails application demonstrated in the  https://www.youtube.com/watch?v=eKY-QES1XQQ[Hotwire announcement screencast]
+
+=== What is Hotwire?
+
+https://hotwired.dev/[Hotwire: HTML Over the wire]:
+
+____
+Hotwire is an umbrella for trio frameworks that implement the HTML-over-the-wire approach to building modern web applications.
+At its heart is Turbo, which gives you techniques for bringing the speed of a single-page application without writing a lick of JavaScript.
+____
+
+This guide primarily focuses on how https://turbo.hotwired.dev/[Turbo] works within a Micronaut application.
+
+== Download Solution
+
+link:@sourceDir@.zip[Download] and unzip the source of the guide. You will find two folders:
+
+* `initial.` It contains a Micronaut application without any Turbo Integration.
+* `complete`. The resulting Micronaut application if you follow the instructions in the next sections and apply these changes to the initial application.
+
+== Initial application introduction
+
+The initial application uses two models, `Room` and `Message`. One `Room` has many ``Message``s.
+
+The `initial` application contains a basic editing interface for Chat ``Room``s. It uses https://micronaut-projects.github.io/micronaut-views/latest/guide/#thymeleaf[Micronaut Views Thymeleaf] to render server-side HTML
+
+Moreover, the application leverages https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#fragments[Thymleaf Fragments] to encapsulate the rendering of parts of the screen.
+
+For ``Message``s, we will have just two actions. `create` to render the form to create a message and `save` to handle the form submission.
+
+It gives us a foundation flow for an admittedly cumbersome chat application which we can then use to level up with https://hotwired.dev/[Hotwire] techniques one at a time.
+
+<<Appendix A: Initial application>> describes the initial application if you want to learn more.
+
+== Install Turbo
+
+https://turbo.hotwired.dev/handbook/installing#in-compiled-form[Install Turbo] in compiled form by referencing the Turbo distributable script directly in the `<head>` of your application.
+
+Modify the `initial` application, replace `src/main/resources/views/layout.html`.
+
+[source, html]
+----
+<!DOCTYPE html>
+...
+    <head>
+    ...
+    <script type="module">
+        import hotwiredTurbo from 'https://cdn.skypack.dev/@hotwired/turbo';
+    </script>
+...
+    </head>
+...
+----
+
+== Turbo Frames
+
+So let's introduce our first Turbo feature, Frames.
+
+Turbo Frames decompose pages into independent contexts, which can be lazy-loaded and scope interaction.
+
+So when you follow a link or submit a form, only the content of the Frame changes rather than the entire page.
+
+This allows you to keep the state of the rest of the page from changing, making the app feel more responsive.
+
+=== Highlight Frames
+
+To see how the Frames work easily, we'll call them out with a blue border.
+
+resource:assets/stylesheets/application.css[app=complete]
+
+=== Turbo Frame Show View
+
+Now let's wrap the Room name and the ability to edit it inside a Frame.
+
+Replace this:
+
+resource:views/rooms/show.html[app=initial]
+
+with:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script></script>
+</head>
+<body>
+    <main>
+        <turbo-frame id="room">
+            <p th:replace="rooms/_room :: room(${room})"></p>
+            <p>
+                <a th:href="@{|/rooms/${room.id}/edit|}" th:text="#{action.edit}"></a> |
+                <a href="/rooms" th:text="#{action.back}"></a>
+           </p>
+        </turbo-frame>
+        <div id="messages">
+            <div th:each="message : ${room.messages}">
+                <p th:replace="messages/_message :: message(${message})"></p>
+            </div>
+        </div>
+        <a th:href="@{|/rooms/${room.id}/messages/create|}" th:text="#{message.new}"></a>
+    </main>
+</body>
+</html>
+----
+
+Please, note the usage of `<turbo-frame id=" room">` in the previous code snippet.
+
+The Turbo Frame tag goes around the initial display, including the edit link and the part of the edit page we want to appear within the frame.
+
+=== Turbo Frame Edit View
+
+Replace this:
+
+resource:views/rooms/edit.html[app=initial]
+
+with this:
+
+[source, html]
+.src/main/resources/views/rooms/edit.html
+----
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::script},~{::main})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script></script>
+</head>
+<body>
+    <main>
+        <h1 th:text="#{room.edit}"></h1>
+        <turbo-frame id="room">
+            <p th:replace="rooms/_edit :: edit(${room})"></p>
+        </turbo-frame>
+        <a th:href="@{|/rooms/${room.id}|}" th:text="#{action.show}"></a> |
+        <a href="/rooms" th:text="#{action.back}"></a>
+    </main>
+</body>
+</html>
+----
+
+
+We see our frame wrapped in blue.
+
+And when clicking the Edit link, the form from the Edit screen is presented.
+
+And upon submission, it's replaced again with just a display.
+
+If we go straight to the full page editing screen, we can see it has both a header and navigation links, parts we were emitting from the frame.
+
+=== Underscore Top
+
+Note that if we try to click a link within the frame that goes somewhere without a matching Frame, nothing happens.
+
+We can solve this by adding a Data Turbo Frame attribute that points to `_top` to break out of the frame, just like traditional HTML frames.
+
+Replace:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+....
+<body>
+    <main>
+        ...
+        <turbo-frame id="room">
+            ...
+                <a href="/rooms" th:text="#{action.back}"></a>
+           </p>
+        </turbo-frame>
+....
+----
+
+with:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+....
+<body>
+    <main>
+        ...
+        <turbo-frame id="room">
+            ...
+               <a data-turbo-frame="_top" href="/rooms" th:text="#{action.back}"></a>
+           </p>
+        </turbo-frame>
+....
+----
+
+Now the backlink works, and the frame scopes the edit display loop.
+
+=== Lazy Loading Frames
+
+Then, let's add the New Message link into an inline but lazy-loaded Turbo Frame tag that also, just for starters, acts on the whole page.
+
+This frame will be loaded right after the page displays, hitting the New Message Controller action we made earlier.
+
+Replace:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+...
+...
+        <a href="/messages/create" th:text="#{message.new}"></a>
+    </main>
+</body>
+</html>
+----
+
+with:
+
+[source, html]
+.src/main/resources/views/rooms/show.html
+----
+....
+        <turbo-frame id="new_message"
+                     th:src="@{|/rooms/${room.id}/messages/create|}"
+                     target="_top"></turbo-frame>
+    </main>
+</body>
+</html>
+----
+
+==== Plug out the Frame
+
+Like with edit, we wrap the relevant segment in a Frame tag with a matching ID, which is how Turbo knows how to plug out the right frame.
+
+Replace:
+
+resource:views/messages/create.html[app=initial]
+
+with:
+
+resource:views/messages/create.html[app=complete]
+
+You can now see two requests when we load the room: one for the page, and one for the lazy-loader frame.
+
+Let's try to add a message.
+
+It works!
+
+But this only demonstrates that the frame was lazy-loaded.
+
+Right now, we're resetting the whole page upon submission of the New Message form.
+
+Whereas with the Room Name Frame, you can edit and submit without changing the rest of the page state,
+a real independent context.
+
+You can see how the Frame replacement happens by inspecting the response to edit.
+
+Turbo will plug out just the matching frame from the server response. As you can see here, the header and links are ignored.
+
+=== TurboFrameView Annotation
+
+In a Micronaut application, we can optimize the response by using the `@TurboFrameView` annotation only to render the layout Turbo uses when parsing the response. A Request coming from a Frame includes the HTTP Header `Turbo-Frame`. Annotate `RoomsControllerEdit::edit` method with `@TurboFrameView("/rooms/_edit")`
+
+source:controllers/RoomsControllerEdit[app=complete]
+
+callout:turbo-frame-view[1]
+
+The above controller returns the following HTML for a request without HTTP Header `Turbo-Frame`.
+
+[source,html]
+----
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" media="all" href="/assets/stylesheets/application.css" />
+        <link rel="stylesheet" media="all" href="/assets/stylesheets/scaffolds.css" />
+        <script type="module">
+            import hotwiredTurbo from 'https://cdn.skypack.dev/@hotwired/turbo';
+        </script>
+    </head>
+    <body>
+        <main>
+            <h1>Editing Room</h1>
+            <turbo-frame id="room">
+                <form action="/rooms/update"
+                      accept-charset="UTF-8"
+                      method="post">
+                     <input type="hidden" value="1" name="id">
+                     <div class="field">
+                         <label for="room_name">Name</label>
+                         <input type="text" value="Micronaut Questions" name="name" id="room_name" />
+                     </div>
+                     <div class="actions">
+                         <input type="submit" name="commit" value="Update Room"/>
+                     </div>
+                </form>
+            </turbo-frame>
+            <a href="/rooms/1">Show</a> |
+            <a href="/rooms">Back</a>
+        </main>
+    </body>
+</html>
+----
+
+For a request including an HTTP Header `Turbo-Frame` with value `rooms`, the above controller returns the following HTML.
+
+[source,html]
+----
+<turbo-frame id="room">
+    <form action="/rooms/update"
+          accept-charset="UTF-8"
+          method="post">
+        <input type="hidden" value="1" name="id">
+        <div class="field">
+            <label for="room_name">Name</label>
+            <input type="text" value="Micronaut Questions" name="name" id="room_name" />
+        </div>
+        <div class="actions">
+            <input type="submit" name="commit" value="Update Room"/>
+        </div>
+    </form>
+</turbo-frame>
+----
+
+=== Turbo Streams
+
+Turbo Streams deliver page changes over WebSocket or in response to form submissions using just HTML and a set of CRUD-like action tags.
+
+Turbo Streams let you append or prepend to replace and remove any target DOM element from the existing page.
+
+They're strictly limited to DOM changes, though. No direct JavaScript invocation.
+
+If you need more than a DOM change, connect a Stimulus controller.
+
+We will add a Turbo stream response to the message creation action such that we can add the new message to the Room page without replacing the whole page.
+
+This template invokes the `append` action with the DOM ID of the target container and either a full set of partial rendering options or just a record we wish to render which conforms to the naming conventions for matching to a partial.
+
+source:controllers/MessagesControllerSave[app=complete]
+
+<1> `TurboMediaType::acceptsTurboStream` is a convenient method to verify if the request accepts a turbo stream response.
+callout:turbostream-fluid-api[2]
+
+Now we can add Messages to the page without resetting it completely.
+
+=== Stimulus Controller
+
+The Edit Name form can stay open while we're doing this because new Messages are added directly to the Messages div. The Turbo Stream HTML is rendered directly in response to the form submission, and Turbo knows from the MIME type to process it automatically. But notice the input field isn't cleared. We can fix that by adding a https://stimulus.hotwired.dev[Stimulus] controller.
+
+___
+Stimulus is a modest JavaScript framework for the HTML you already have.
+___
+
+Add a https://stimulus.hotwired.dev/reference/controllers[Stimulus controller]:
+
+resource:assets/javascripts/controllers/reset_form_controller.mjs[app=complete]
+
+and register it:
+
+resource:views/layout.html[app=complete,tag=stimulus]
+
+The Stimulus controller we're going to add will be a dead-simple way to reset the form after creating a new Message.
+
+It has just one method, Reset, which we will call when Turbo is done submitting the form via Fetch.
+
+Add the `data-controller` and `data-action` attributes to the form:
+
+resource:views/messages/_create.html[app=complete]
+
+The form is reset, and the `Message` is added dynamically.
+
+== Turbo Streams via Web Sockets
+
+But how interesting is a chat app where you're just talking to yourself?. Let's start a conversation with another window.
+You'll see that new Messages are only added live to the originator's window.
+On the other side, we have to reload to see what's been said.
+
+Let's fix that.
+
+=== Events
+
+When the message is saved, raise an event:
+
+source:services/DefaultMessageService[app=complete]
+
+callout:application-event-publisher[number=1,arg0=RoomMessage]
+
+=== WebSocket Server
+
+Create a https://docs.micronaut.io/latest/guide/#websocketServer[WebSocket Server], which publishes a Turbo Stream when a message event is received.
+
+source:ChatServerWebSocket[app=complete]
+
+callout:websocket-server[1]
+callout:websocket-broadcaster[2]
+callout:websocket-on-open[3]
+callout:websocket-on-message[4]
+callout:websocket-on-close[5]
+callout:turbostream-fluid-api[6]
+
+Establish a WebSocket connection to the WebSocket server identified by the `Room` we're in.
+
+resource:views/rooms/show.html[app=complete]
+
+Now we can add a new message and see it appear in both windows.
+
+== Next
+
+https://hotwired.dev[Hotwire] is an alternative approach to building modern web applications without using much JavaScript by sending HTML instead of JSON over the wire.
+
+We get to keep all our template rendering on the server, which means writing more of our applications in our favorite programming languages.
+
+* https://micronaut-projects.github.io/micronaut-views/latest/guide/#turbo[Micronaut Turbo]
+* https://turbo.hotwired.dev/[Turbo]
+* https://stimulus.hotwired.dev/[Stimulus]
+
+
+== Appendix A: Initial application
+
+The following sections introduce you to the initial application.
+
+common:datasource-header.adoc[]
+
+resource:application.yml[tag=datasource,app=initial]
+
+common:datasource-footer.adoc[]
+
+=== Database Schema
+
+// Define the database variable used in the snippet
+:database: mysql
+common:flyway-header.adoc[]
+
+resource:application.yml[tag=flyway,app=initial]
+
+common:flyway-footer.adoc[]
+
+resource:db/migration/V1__schema.sql[app=initial]
+
+=== Entities
+
+The application contains two entities with a one-to-many relationship.
+
+source:entities/Room[app=initial]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:relation[4]
+
+source:entities/Message[app=initial]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:relation[4]
+callout:date-created[5]
+callout:creator[6]
+
+=== Models
+
+The application includes a POJO to map the form submission when the user submits a message to a room.
+
+source:models/MessageForm[app=initial]
+
+callout:introspected[1]
+
+The application includes a POJO which represents a room's message.
+
+source:models/RoomMessage[app=initial]
+
+callout:introspected[1]
+
+=== Repositories
+
+The application includes a repository per entity.
+
+source:repositories/MessageRepository[app=initial]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+source:repositories/RoomRepository[app=initial]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:join-left-fetch[number=3,arg0=messages]
+
+=== Services
+
+The application contains a service that publishes an event when a message is saved.
+
+source:services/MessageService[app=initial]
+
+callout:default-implementation[1]
+callout:valid[2]
+
+source:services/DefaultMessageService[app=initial]
+
+callout:singleton[1]
+callout:application-event-publisher[number=2,arg0=RoomMessage]
+
+==== Static Resources
+
+Update `application.yml` to add static resource configuration:
+
+resource:application.yml[tag=static-resources,app=initial]
+
+callout:static-resources[1]
+
+common:micronaut-views-thymeleaf.adoc[]
+
+The initial application uses Thymleaf Fragments to organize the views.
+
+It uses a root layout:
+
+resource:views/layout.html[app=initial]
+
+=== Properties
+
+Create a default `messages.properties` file:
+
+resource:i18n/messages.properties[app=initial]
+
+Create a `messages_es.properties` file for the Spanish locale:
+
+resource:i18n/messages_es.properties[app=initial]
+
+=== Message Source
+
+Create a `MessageSource` that uses the previous properties files:
+
+source:i18n/MessageSourceFactory[app=initial]
+
+callout:factory[1]
+callout:singleton[2]
+
+=== Controllers
+
+The apex url is redirected to `/rooms`.
+
+source:controllers/HomeController[app=initial]
+
+callout:controller[number=1,arg0=/]
+callout:get-generic[number=2]
+
+We have an abstract class to simplify redirection:
+
+source:controllers/ApplicationController[app=initial]
+
+Create CRUD controllers for `Room`.
+
+==== Rooms Index Controller
+
+Create a controller which displays a list of rooms.
+
+source:controllers/RoomsControllerIndex[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:view[4]
+callout:get-generic[number=5]
+callout:produces-html[6]
+
+===== Rooms Index Views
+
+The controller uses Thymeleaf to render server-side HTML.
+
+resource:views/rooms/index.html[app=initial]
+
+resource:views/rooms/_table.html[app=initial]
+
+resource:views/rooms/_tr.html[app=initial]
+
+==== Rooms Show Controller
+
+Create a controller which displays room.
+
+source:controllers/RoomsControllerShow[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:view[4]
+callout:get-generic[number=5]
+callout:produces-html[6]
+callout:pathvariable[7]
+
+===== Rooms Show Views
+
+Add Thymeleaf templates to render server-side HTML.
+
+resource:views/rooms/show.html[app=initial]
+
+resource:views/rooms/_room.html[app=initial]
+
+==== Rooms Create Controller
+
+Create a controller which displays a form to create a room.
+
+source:controllers/RoomsControllerCreate[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:view[3]
+callout:get-generic[number=4]
+callout:produces-html[5]
+
+===== Rooms Create Views
+
+Add Thymeleaf templates to render a form.
+
+resource:views/rooms/create.html[app=initial]
+
+resource:views/rooms/_create.html[app=initial]
+
+==== Rooms Save Controller
+
+Creates a controller which handles the room creation form submission.
+
+source:controllers/RoomsControllerSave[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:produces-html[4]
+callout:consumes[5]
+callout:post-generic[6]
+callout:body-qualifier[7]
+
+==== Rooms Edit Controller
+
+Create a controller which shows a form to edit a room.
+
+source:controllers/RoomsControllerEdit[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:view[4]
+callout:get-generic[number=5]
+callout:produces-html[6]
+callout:pathvariable[7]
+
+===== Rooms Edit Views
+
+Add Thymeleaf templates to render an edit form.
+
+resource:views/rooms/edit.html[app=initial]
+
+resource:views/rooms/_edit.html[app=initial]
+
+==== Rooms Update Controller
+
+Creates a controller which handles the room update form submission.
+
+source:controllers/RoomsControllerUpdate[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:produces-html[4]
+callout:consumes[5]
+callout:post-generic[6]
+callout:body-qualifier[7]
+
+==== Rooms Delete Controller
+
+Creates a controller which handles the room deletion form submission.
+
+source:controllers/RoomsControllerDelete[app=initial]
+
+callout:controller[number=1,arg0=/rooms]
+callout:constructor-di[number=2,arg0=RoomRepository]
+callout:executes-on[3]
+callout:produces-html[4]
+callout:consumes[5]
+callout:post-generic[6]
+callout:pathvariable[7]
+
+==== Message Create Controller
+
+Create a controller to display a form to create a message within a room.
+
+source:controllers/MessagesControllerCreate[app=initial]
+
+callout:executes-on[1]
+callout:controller[number=2,arg0=/rooms]
+callout:constructor-di[number=3,arg0=MessageService]
+callout:view[4]
+callout:produces-html[5]
+callout:get-generic[number=6]
+callout:pathvariable[7]
+
+===== Message Create Views
+
+The controller uses Thymeleaf views.
+
+resource:views/messages/_create.html[app=initial]
+
+resource:views/messages/_message.html[app=initial]
+
+resource:views/messages/create.html[app=initial]
+
+==== Message Save Controller
+
+Creates a controller which handles the message creation form submission.
+
+source:controllers/MessagesControllerSave[app=initial]
+
+callout:executes-on[1]
+callout:controller[number=2,arg0=/rooms]
+callout:constructor-di[number=3,arg0=MessageService]
+callout:view[4]
+callout:consumes[5]
+callout:produces-html[5]
+callout:post-generic[6]
+callout:pathvariable[7]
+callout:body-qualifier[8]
+
+=== Running the initial application
+
+Execute the following command to run a MySQL container:
+
+[source,bash]
+----
+docker run -it --rm \
+   -p 3306:3306 \
+   -e MYSQL_DATABASE=db \
+   -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+   mysql:8
+----
+
+common:docker-mysql-arm[]
+
+common:runapp-instructions.adoc[]
