@@ -365,7 +365,7 @@ class IndexGenerator {
                     return 'https://micronaut.io/wp-content/uploads/2020/11/Build.svg'
                 
                 case Category.KOTLIN:
-                    return 'https://micronaut.io/wp-content/uploads/2020/11/Languages.svg'
+                    return 'https://micronaut.io/wp-content/uploads/2021/05/Kotlin.svg'
 
                 default:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
