@@ -213,7 +213,7 @@ class IndexGenerator {
             }
         } else {
             index += "<div class='col-sm-8'>"
-            index += guidesTable(filteredMetadatas, cat.toString() + " Guides", false)
+            index += guidesTable(filteredMetadatas)
             index += "</div>"
         }
 
