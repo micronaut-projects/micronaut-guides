@@ -16,7 +16,7 @@ class GuideMetadata {
     String intro
     Set<String> authors
     List<String> tags
-    Category category
+    List<Category> categories
     LocalDate publicationDate
 
     boolean publish
