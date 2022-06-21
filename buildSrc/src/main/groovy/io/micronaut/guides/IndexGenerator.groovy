@@ -53,12 +53,12 @@ class IndexGenerator {
         for (Ordered obj : categories) {
             Category cat = (Category) obj
             sections << new GuidesSection(category: cat,
-                    metadatas: metadatas.stream().filter(m -> cat == m.getCategory()).collect(Collectors.toList()))
+                    metadatas: metadatas.stream().filter(m -> m.getCategories().stream().anyMatch(c -> c == cat)).collect(Collectors.toList()))
         }
         save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', tags)
 
         for (GuideMetadata metadata :  metadatas) {
-            save(templateText, metadata.slug + '.html', distDir, [new GuidesSection(category: metadata.category, metadatas: [metadata])],  metadata.title)
+            save(templateText, metadata.slug + '.html', distDir, [new GuidesSection(category: metadata.categories ? metadata.categories.first() : null, metadatas: [metadata])],  metadata.title)
         }
     }
 
@@ -116,16 +116,17 @@ class IndexGenerator {
         }
 
         String text = templateText
-        if (!singleGuide) {
+        if (!singleGuide && tags) {
             text = text.substring(0, text.indexOf('<div id="breadcrumbs">')) +
                     text.substring(text.indexOf('<main id="main">'))
-        }
-
-        if (singleGuide) {
+        } else if (singleGuide) {
             String breadcrumb = '<span class="breadcrumb_last" aria-current="page">' + sections.get(0).metadatas.get(0).title + '</span>'
             text = text.replace("@breadcrumb@", breadcrumb)
+        } else if (!singleGuide && !tags) {
+            String breadcrumb = '<span class="breadcrumb_last" aria-current="page">' + sections.get(0).category.toString() + '</span>'
+            text = text.replace("@breadcrumb@", breadcrumb)
         }
-        text = text.replace("@title@", title)
+        text = text.replace("@title@", title.charAt(0).toUpperCase().toString() + title.substring(1) + " | Micronaut Guides | Micronaut Framework")
         String twittercard = ''
         if (singleGuide) {
             twittercard = twitterCardHtml(distDir, sections.get(0).metadatas.get(0))
@@ -344,6 +345,9 @@ class IndexGenerator {
                     return 'https://micronaut.io/wp-content/uploads/2020/12/Service_Discovery.svg'
 
                 case Category.SECURITY:
+                case Category.AUTHORIZATION_CODE:
+                case Category.CLIENT_CREDENTIALS:
+                case Category.SECRETS_MANAGER:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/Security.svg'
 
                 case Category.MESSAGING:
@@ -400,7 +404,8 @@ class IndexGenerator {
                 intro: guide.intro,
                 authors: guide.authors,
                 tags: generateTags(guide),
-                category: guide.category.toString(),
+                category: guide.categories ? guide.categories.first().toString() : null, // Deprecated
+                categories: guide.categories.collect { it.toString() },
                 publicationDate: guide.publicationDate.toString(),
                 slug: guide.slug,
                 url: "${baseURL}${guide.slug}.html",
