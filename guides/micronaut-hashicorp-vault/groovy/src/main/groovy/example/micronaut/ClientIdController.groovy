@@ -12,7 +12,7 @@ import jakarta.inject.Named
 @Controller
 class ClientIdController {
 
-    private final OauthClientConfiguration oauthClientConfiguration;
+    private final OauthClientConfiguration oauthClientConfiguration
 
     ClientIdController(
             @Named("companyauthserver") OauthClientConfiguration oauthClientConfiguration // <1>

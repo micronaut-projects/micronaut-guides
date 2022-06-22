@@ -18,6 +18,6 @@ class ClientIdController(
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Produces(MediaType.TEXT_PLAIN)
     fun index(): String {
-        return oauthClientConfiguration.getClientId()
+        return oauthClientConfiguration.clientId
     }
 }
