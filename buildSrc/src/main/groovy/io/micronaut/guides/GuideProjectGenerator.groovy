@@ -81,9 +81,14 @@ class GuideProjectGenerator implements AutoCloseable {
         Map config = new JsonSlurper().parse(configFile) as Map
         boolean publish = config.publish == null ? true : config.publish
 
-        Category cat = Category.values().find {it.toString() == config.category }
-        if (publish && !cat) {
-            throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
+        List<Category> categories = []
+        for (String c : config.categories) {
+            Category cat = Category.values().find {it.toString() == c }
+            if (cat) {
+                categories.add(cat)
+            } else if (publish && !cat) {
+                throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
+            }
         }
 
         Optional.ofNullable(new GuideMetadata(
@@ -93,7 +98,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 intro: config.intro,
                 authors: config.authors,
                 tags: config.tags,
-                category: cat,
+                categories: categories,
                 publicationDate: publish ? LocalDate.parse(config.publicationDate) : null,
                 publish: publish,
                 base: config.base,
@@ -349,7 +354,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.intro = metadata.intro ?: base.intro
         merged.authors = mergeLists(metadata.authors, base.authors) as Set<String>
         merged.tags = mergeLists(base.tags, metadata.tags)
-        merged.category = metadata.category ?: base.category
+        merged.categories = metadata.categories ?: base.categories
         merged.publicationDate = metadata.publicationDate
         merged.publish = metadata.publish
         merged.buildTools = metadata.buildTools ?: base.buildTools
