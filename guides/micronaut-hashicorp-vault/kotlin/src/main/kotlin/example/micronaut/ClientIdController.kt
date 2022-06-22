@@ -10,17 +10,14 @@ import io.micronaut.http.annotation.Produces
 import jakarta.inject.Named
 
 @Controller
-class ClientIdController(@Named("companyauthserver") oauthClientConfiguration: OauthClientConfiguration) {
-    private val oauthClientConfiguration: OauthClientConfiguration
+class ClientIdController(
+    @Named("companyauthserver") val oauthClientConfiguration: OauthClientConfiguration // <1>
+) {
 
+    @Get
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Produces(MediaType.TEXT_PLAIN)
-    @Get
     fun index(): String {
         return oauthClientConfiguration.getClientId()
-    }
-
-    init {
-        this.oauthClientConfiguration = oauthClientConfiguration
     }
 }

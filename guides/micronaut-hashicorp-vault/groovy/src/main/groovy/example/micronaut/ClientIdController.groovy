@@ -14,7 +14,9 @@ class ClientIdController {
 
     private final OauthClientConfiguration oauthClientConfiguration;
 
-    ClientIdController(@Named("companyauthserver") OauthClientConfiguration oauthClientConfiguration) {
+    ClientIdController(
+            @Named("companyauthserver") OauthClientConfiguration oauthClientConfiguration // <1>
+    ) {
         this.oauthClientConfiguration = oauthClientConfiguration
     }
 

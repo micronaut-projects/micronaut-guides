@@ -14,13 +14,15 @@ public class ClientIdController {
 
     private final OauthClientConfiguration oauthClientConfiguration;
 
-    public ClientIdController(@Named("companyauthserver") OauthClientConfiguration oauthClientConfiguration) {
+    public ClientIdController(
+            @Named("companyauthserver") OauthClientConfiguration oauthClientConfiguration // <1>
+    ) {
         this.oauthClientConfiguration = oauthClientConfiguration;
     }
 
+    @Get
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Produces(MediaType.TEXT_PLAIN)
-    @Get
     public String index() {
         return oauthClientConfiguration.getClientId();
     }
