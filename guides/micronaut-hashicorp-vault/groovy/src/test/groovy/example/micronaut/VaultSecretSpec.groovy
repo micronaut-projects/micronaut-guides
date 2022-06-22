@@ -34,6 +34,9 @@ class VaultSecretSpec extends Specification {
             clientId == "hello"
             clientSecret == "world"
         }
+
+        cleanup:
+        ctx.close()
     }
 
     def addSecret(String key, String id, String secret) {
