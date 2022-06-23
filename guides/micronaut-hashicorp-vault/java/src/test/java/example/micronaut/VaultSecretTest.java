@@ -3,12 +3,14 @@ package example.micronaut;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.security.oauth2.configuration.OauthClientConfiguration;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.containers.GenericContainer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VaultSecretTest {
 
     private static final String ROOT_KEY = "root";
@@ -19,7 +21,7 @@ class VaultSecretTest {
             .withEnv("VAULT_DEV_ROOT_TOKEN_ID", ROOT_KEY)
             .withEnv("VAULT_TOKEN", ROOT_KEY);
 
-    @Before
+    @BeforeAll
     public void setup() throws Exception {
         vaultContainer.start();
         addSecret("micronautguide", "hello", "world");
