@@ -234,6 +234,8 @@ curl http://localhost:8081/analytics
 
 Note that getting the analytics returns an empty list because the applications are not communicating with each other (yet).
 
+common:test-resources-kafka.adoc[]
+
 == Kafka and the Micronaut Framework
 
 === Install Kafka
@@ -256,9 +258,7 @@ Alternatively you can https://kafka.apache.org/quickstart[install and run a loca
 
 === Books Microservice
 
-The generated code includes configuration to connect to a Kafka broker running on `localhost:9092`. In case you want to change the configuration, update the following:
-
-resource:application.yml[app=books,tag=kafka]
+The generated code will use the Test Resources plugin to start a local Kafka broker inside Docker, and configure the connection URL.
 
 ==== Create Kafka client (producer)
 
@@ -277,17 +277,13 @@ Write a test for `BookController` to verify the interaction with `AnalyticsServi
 
 test:BookControllerTest[app=books]
 
-<1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-callout:test-instance-per-class[2]
-<3> Implementing `TestPropertyProvider` allows the test class to provide Micronaut configuration properties, in this case the dynamically allocated Kafka broker port
-<4> The Testcontainer instance for Kafka
-<5> Dependency injection for the `AnalyticsListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `analytics` microservice
-<6> Dependency injection for an HTTP client that the Micronaut framework will implement at compile to make calls to `BookController`
-<7> Use the `HttpClient` to retrieve a `Book`, which will trigger sending a message with Kafka
-<8> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
-<9> Verify that the message was received and has the correct data
-<10> Wait a few seconds to make sure no message is sent
-<11> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
+callout:test-instance-per-class[1]
+<2> Dependency injection for the `AnalyticsListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `analytics` microservice
+<3> Dependency injection for an HTTP client that the Micronaut framework will implement at compile to make calls to `BookController`
+<4> Use the `HttpClient` to retrieve a `Book`, which will trigger sending a message with Kafka
+<5> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<6> Verify that the message was received and has the correct data
+<7> Wait a few seconds to make sure no message is sent
 
 ==== Send Analytics information automatically
 
@@ -424,3 +420,5 @@ Start the native images for the two microservices and run the same `curl` reques
 == Next steps
 
 Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut framework.
+
+Read more about https://micronaut-projects.github.io/micronaut-test-resources/snapshot/guide/[Test Resources] in Micronaut.
