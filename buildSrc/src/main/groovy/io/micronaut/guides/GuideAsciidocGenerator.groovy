@@ -42,6 +42,7 @@ class GuideAsciidocGenerator {
     private static final String CLI_GRPC = 'create-grpc-app'
     private static final String CLI_FUNCTION = 'create-function-app'
     private static final String CLI_CLI = 'create-cli-app'
+    public static final String DEFAULT_APP_NAME = "default"
 
     static void generate(GuideMetadata metadata, File inputDir,
                          File asciidocDir, File projectDir) {
@@ -387,6 +388,9 @@ class GuideAsciidocGenerator {
     private static List<String> sourceIncludeLines(String slug, String line, TestFramework testFramework, String macro) {
         String name = extractName(line, macro)
         String appName = extractAppName(line)
+        if (appName == DEFAULT_APP_NAME) {
+            appName == ""
+        }
         List<String> tagNames = extractTags(line)
 
         List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
