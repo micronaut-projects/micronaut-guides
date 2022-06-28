@@ -12,7 +12,7 @@ ____
 
 You will be using:
 
-* A PostgreSQL instance running in Docker.
+* A PostgreSQL instance provided by <<Test Resources>> and running in Docker.
 * https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data] to persist our ToDos to this database.
 * https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Flyway] to handle our database migrations.
 * https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL] to expose our data.
@@ -167,38 +167,9 @@ callout:singleton[2]
 <4> Wire up each mutators.
 <5> Wire up how to populate a ToDo with authors if they are requested.
 
-== Running the application
+common:test-resources-postgres.adoc[]
 
-Run the following Docker command to get an instance of PostgreSQL running with a database named `todo`:
-
-[source,bash]
-----
-docker run -d --rm \
-     -p 5432:5432 \
-     -e POSTGRES_USER=dbuser \
-     -e POSTGRES_PASSWORD=theSecretPassword \
-     -e POSTGRES_DB=todo \
-     postgres:12-alpine
-----
-
-Configure the default datasource to use the PostgreSQL database running in Docker:
-
-resource:application.yml[tag=datasource]
-
-<1> The JDBC URL matches the database name you used in the previous command (`todo`).
-<2> Use PostgreSQL driver.
-<3> Configure the PostgreSQL dialect.
-<4> Schema migrations are handled by Flyway.
-
-In a shell, set up the following environment variables to set the credentials to connect to the PostgreSQL database you started with Docker.
-
-[source,bash]
-----
-export DATASOURCES_DEFAULT_USERNAME=dbuser
-export DATASOURCES_DEFAULT_PASSWORD=theSecretPassword
-----
-
-common:runapp-instructions.adoc[]
+common:runapp.adoc[]
 
 When the application first runs, you will see in the logs that the migrations have been performed.
 
@@ -327,15 +298,6 @@ test:GraphQLControllerTest[]
 
 callout:micronaut-test[1]
 callout:http-client[2]
-
-When this test is executed, Testcontainers will start a fresh copy of Postgres in a container and apply the migrations.
-The tests then run "as in production" with real data in a real database.
-
-To enable the tests to use this Dockerized database, create `application-test.yml` to overwrite the runtime datasource configuration.
-
-testResource:application-test.yml[tag=testcontainers]
-
-<1> Specify a https://www.testcontainers.org/modules/databases/jdbc/[TestContainers JDBC URL] to run our tests in a real but temporary PostgreSQL database
 
 common:testApp-noheader.adoc[]
 
