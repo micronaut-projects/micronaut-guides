@@ -6,21 +6,32 @@ import io.micronaut.core.annotation.NonNull;
 import javax.validation.constraints.NotBlank;
 
 @Introspected
-public class Book {
+public class Book implements Identified {
 
     @NonNull
     @NotBlank
-    private String isbn;
+    private final String id;
+
     @NonNull
     @NotBlank
+    private final String isbn;
 
-    private String name;
+    @NonNull
+    @NotBlank
+    private final String name;
 
-    public Book() {}
-
-    public Book(@NonNull @NotBlank String isbn, @NonNull @NotBlank String name) {
+    public Book(@NonNull String id,
+                @NonNull String isbn,
+                @NonNull String name) {
+        this.id = id;
         this.isbn = isbn;
         this.name = name;
+    }
+
+    @Override
+    @NonNull
+    public String getId() {
+        return id;
     }
 
     @NonNull
@@ -28,34 +39,8 @@ public class Book {
         return isbn;
     }
 
-    public void setIsbn(@NonNull String isbn) {
-        this.isbn = isbn;
-    }
-
     @NonNull
     public String getName() {
         return name;
-    }
-
-    public void setName(@NonNull String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Book book = (Book) o;
-
-        if (!isbn.equals(book.isbn)) return false;
-        return name.equals(book.name);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = isbn.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
     }
 }

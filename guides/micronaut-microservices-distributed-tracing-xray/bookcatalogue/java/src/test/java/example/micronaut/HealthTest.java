@@ -12,14 +12,14 @@ import jakarta.inject.Inject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest
-public class HealthTest {
+class HealthTest {
 
     @Inject
     @Client("/")
     HttpClient client;
 
     @Test
-    public void healthEndpointExposed() {
+    void healthEndpointExposed() {
         HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus.class);
         assertEquals(HttpStatus.OK, status);
     }
