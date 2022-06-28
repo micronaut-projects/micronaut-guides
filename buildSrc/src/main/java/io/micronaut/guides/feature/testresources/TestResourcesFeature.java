@@ -19,8 +19,6 @@ public abstract class TestResourcesFeature implements Feature  {
         if (!featureContext.isPresent(TestResources.class) && testResources != null) {
             featureContext.addFeature(testResources);
         }
-
-
     }
 }
 

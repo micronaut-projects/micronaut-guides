@@ -3,17 +3,27 @@ package example.micronaut
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.context.annotation.Requires
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import org.jetbrains.annotations.NotNull
+import spock.lang.Specification
 
+@MicronautTest
 @Property(name = "spec.name", value = "controller-isolation")
-class ControllerIsolationSpec extends BaseMongoDataSpec {
+class ControllerIsolationSpec extends Specification {
+
+    @Inject
+    @Client("/")
+    HttpClient httpClient
 
     void checkSerialization() {
         when:
@@ -47,7 +57,7 @@ class ControllerIsolationSpec extends BaseMongoDataSpec {
         }
 
         @Override
-        Optional<Fruit> find(@NotNull String id) {
+        Optional<Fruit> find(@NonNull String id) {
             Optional.empty()
         }
 
