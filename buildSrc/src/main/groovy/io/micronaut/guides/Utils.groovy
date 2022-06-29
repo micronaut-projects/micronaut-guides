@@ -10,6 +10,7 @@ class Utils {
 
     private static final String SYS_PROP_MICRONAUT_GUIDE = 'micronaut.guide'
     private static final String ENV_JDK_VERSION = 'JDK_VERSION'
+    private static final JdkVersion DEFAULT_JAVA_VERSION = JdkVersion.JDK_11
 
     static String singleGuide() {
         System.getProperty(SYS_PROP_MICRONAUT_GUIDE)
@@ -54,7 +55,12 @@ class Utils {
                 throw new GradleException("Could not parse env " + ENV_JDK_VERSION + " to JdkVersion")
             }
         } else {
-            javaVersion = JdkVersion.valueOf(JavaVersion.current().majorVersion as Integer)
+            try {
+                javaVersion = JdkVersion.valueOf(JavaVersion.current().majorVersion as Integer)
+            } catch (IllegalArgumentException ex) {
+                println "WARNING: $ex.message: Defaulting to $DEFAULT_JAVA_VERSION"
+                javaVersion = DEFAULT_JAVA_VERSION
+            }
         }
         javaVersion
     }
