@@ -5,7 +5,6 @@ import io.micronaut.core.annotation.NonNull;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 @Introspected
 public class BookInventory {

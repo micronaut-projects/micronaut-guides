@@ -1,17 +1,12 @@
 package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
-import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
-import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
+import software.amazon.awssdk.services.dynamodb.model.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -53,6 +48,28 @@ public class DefaultBookRepository extends DynamoRepository<Book> implements Boo
     @Override
     public void delete(@NonNull @NotBlank String id) {
         delete(Book.class, id);
+    }
+
+    @Override
+    @NonNull
+    public Optional<Book> findByIsbn(@NonNull @NotBlank String isbn) {
+        QueryRequest request = QueryRequest.builder()
+                .tableName(dynamoConfiguration.getTableName())
+                .indexName(INDEX_GSI_2)
+                .limit(1)
+                .keyConditionExpression("#pk = :pk")
+                .expressionAttributeNames(Collections.singletonMap("#pk", ATTRIBUTE_GSI_2_PK))
+                .expressionAttributeValues(Collections.singletonMap(":pk",
+                        AttributeValue.builder().s(PREFIX_ISBN + HASH + isbn).build()))
+                .build();
+        QueryResponse response = dynamoDbClient.query(request);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace(response.toString());
+        }
+        List<Book> result = parseInResponse(response);
+        return CollectionUtils.isEmpty(result) ?
+                Optional.empty() :
+                Optional.of(result.get(0));
     }
 
     @Override
