@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotBlank;
 
-@Client("http://localhost:8082")
+@Client(id = "bookinventory")
 @Recoverable(api = BookInventoryOperations.class)
 public interface BookInventoryClient extends BookInventoryOperations {
 

@@ -1,6 +1,6 @@
 common:header-top.adoc[]
 
-== Getting Starter
+== Getting Started
 
 In this guide, we are going to use https://opentelemetry.io[OpenTelemetry] to collect distributed
 tracing information of a Micronaut application composed of three microservices and publish it to https://aws.amazon.com/xray/[AWS X-Ray]
@@ -21,11 +21,11 @@ The application contains three microservices.
 
 * `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and ISBN.
 
-* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and ISBN.
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and ISBN.
 
-* `bookrecommendation` - It consumes previous services and exposes and endpoint which recommends book names which are in stock.
+* `bookrecommendation` - It consumes previous services and exposes an endpoint recommending book names in stock.
 
-The `bookcatalogue` service consumes endpoints exposed by the other services. The following image illustrates the application flow:
+The `bookrecommendation` service consumes endpoints exposed by the other services. The following image illustrates the application flow:
 
 image::flow-dynamodb.svg[]
 
@@ -33,34 +33,78 @@ A request to `bookrecommendation` (`http://localhost:8080/books[http://localhost
 
 common:annotationprocessors.adoc[]
 
-== Running the AWS X-Ray daemon locally
+== Run AWS OTel Collector locally
 
-https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon-local.html[Run the AWS X-Ray daemon locally] on your operating system of choice.
+See https://github.com/aws-observability/aws-otel-collector/blob/main/docs/developers/docker-demo.md[aws-otel-collector/blob/main/docs/developers/docker-demo.md]
 
-For example, in MacOS:
+* Clone https://github.com/aws-observability/aws-otel-collector
+* `vi examples/docker/config-test.yaml` and set the region
+* `docker run --rm -p 4317:4317 -p 55680:55680 -p 8889:8888 -e AWS_REGION=us-east-1 -e AWS_PROFILE=default -v ~/.aws:/root/.aws -v "${PWD}/examples/docker/config-test.yaml":/otel-local-config.yaml --name awscollector public.ecr.aws/aws-observability/aws-otel-collector:latest --config otel-local-config.yaml`
 
-[source, bash]
-----
-./xray_mac -o -n us-east-1
-----
+== AWS Command Line Interface
 
-=== Book catalogue
+Install the https://aws.amazon.com/cli/[AWS Command Line Interface] and run `aws configure`.
+Set the same region you used in the previous section.
 
-Add Micronaut X-Ray dependency:
+== OpenTelemetry dependencies
 
-dependency:micronaut-aws-xray[groupId=io.micronaut.aws,scope=runtimeOnly]
+=== OpenTelemetry annotations
 
-=== Book inventory
+To enable OpenTelemetry annotations, every service includes the next annotation processor:
 
-Add Micronaut X-Ray dependency:
+dependency:micronaut-tracing-opentelemetry-annotation[groupId=io.micronaut.tracing,scope=annotationProcessor]
 
-dependency:micronaut-aws-xray[groupId=io.micronaut.aws,scope=runtimeOnly]
+=== Micronaut OpenTelemetry HTTP
 
-=== Book recommendation
+To enable creating span objects on the every HTTP server request, client request, server response and client response
+each service includes the next dependency:
 
-Add Micronaut X-Ray dependency:
+dependency:micronaut-tracing-opentelemetry-http[groupId=io.micronaut.tracing,scope=compile]
 
-dependency:micronaut-aws-xray[groupId=io.micronaut.aws,scope=runtimeOnly]
+=== OpenTelemetry Protocol Exporter
+
+An exporter is a component in the OpenTelemetry Collector configured to send data to different systems/back-ends.
+
+Each service adds the OpenTelemetry Protocol exporter dependency.
+
+dependency:opentelemetry-exporter-otlp[groupId=io.opentelemetry,scope=compile]
+
+=== OpenTelemetry Propagator
+
+To use AWS X-Ray propagator each service adds the following dependency:
+
+dependency:opentelemetry-extension-aws[groupId=io.opentelemetry,scope=compile]
+
+and the following configuration:
+
+resource:application.yml[app=bookrecommendation,tag=otel]
+
+The previous configuration excludes health checks from being traced.
+
+===  Using AWS resource detector
+
+Each service includes the following dependency:
+
+dependency:opentelemetry-aws-xray[groupId=io.opentelemetry.contrib,scope=compile]
+
+They allow you to enable https://aws-otel.github.io/docs/getting-started/java-sdk/trace-manual-instr#using-the-aws-resource-detectors[AWS resource detectors for enriching traces
+ with AWS infrastructure information].
+
+=== Instrumenting the AWS SDK
+
+`inventory` and `catalogue` include the following dependencies to instrument the https://aws-otel.github.io/docs/getting-started/java-sdk/trace-manual-instr#instrumenting-the-aws-sdk[AWS SDK]:
+
+dependency:opentelemetry-aws-sdk-2.2[groupId=io.opentelemetry.instrumentation,scope=compile]
+
+Both services use DynamoDB and include the following dependencies:
+
+:dependencies:
+dependency:micronaut-aws-sdk-v2[groupId=io.micronaut.aws,scope=compile]
+dependency:dynamodb[groupId=software.amazon.awssdk]
+:dependencies:
+
+`micronaut-aws-sdk-v2` dependency creates a bean of type `SdkClientBuilder`. To instrument the AWS SDK,
+Micronaut OpenTelemetry registers a tracing interceptor by creating a bean creation listener for the bean of type `SdkClientBuilder`.
 
 == Running the application
 
@@ -68,13 +112,13 @@ Run `bookcatalogue` microservice:
 
 :exclude-for-build:maven
 
-To run the application execute `./gradlew run`.
+To run the application, execute `./gradlew run`.
 
 :exclude-for-build:
 
 :exclude-for-build:gradle
 
-To run the application execute `./mvnw mn:run`.
+To run the application, execute `./mvnw mn:run`.
 
 :exclude-for-build:
 
@@ -88,13 +132,13 @@ Run `bookinventory` microservice:
 
 :exclude-for-build:maven
 
-To run the application execute `./gradlew run`.
+To run the application, execute `./gradlew run`.
 
 :exclude-for-build:
 
 :exclude-for-build:gradle
 
-To run the application execute `./mvnw mn:run`.
+To run the application, execute `./mvnw mn:run`.
 
 :exclude-for-build:
 
@@ -108,13 +152,13 @@ Run `bookrecommendation` microservice:
 
 :exclude-for-build:maven
 
-To run the application execute `./gradlew run`.
+To run the application, execute `./gradlew run`.
 
 :exclude-for-build:
 
 :exclude-for-build:gradle
 
-To run the application execute `./mvnw mn:run`.
+To run the application, execute `./mvnw mn:run`.
 
 :exclude-for-build:
 
@@ -136,6 +180,7 @@ You can then navigate to AWS Console and access the X-Ray UI
 
 The previous request generates such a trace:
 
+image::xraytrace-map.png[]
 image::xraytrace.png[]
 
 In the previous image, you can see that:
@@ -143,11 +188,11 @@ In the previous image, you can see that:
 - Whenever a Micronaut HTTP client executes a new network request, it creates a new subsegment.
 - Whenever a Micronaut server receives a request, it creates a new segment.
 
-Moreover, you can see the requests to `bookinventory` are done in parallel.
+Moreover, you can see the requests to `bookinventory` are made in parallel.
 
 == Next steps
 
-As you have seen in this guide, without any annotations you get distributing tracing up-and-running fast with the Micronaut framework.
+As you have seen in this guide, you get distributing tracing up-and-running fast with the Micronaut framework without any annotations.
 
 The Micronaut framework includes several annotations to give you more flexibility.
 

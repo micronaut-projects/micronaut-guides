@@ -8,7 +8,7 @@ import org.reactivestreams.Publisher;
 //end::packageandimports[]
 
 //tag::harcoded[]
-@Client("http://localhost:8081") // <1>
+@Client(id = "bookcatalogue") // <1>
 @Recoverable(api = BookCatalogueOperations.class)
 //end::harcoded[]
 //tag::clazz[]
