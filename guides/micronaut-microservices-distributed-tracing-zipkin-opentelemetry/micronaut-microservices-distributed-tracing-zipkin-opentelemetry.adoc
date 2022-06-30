@@ -1,0 +1,182 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will integrate https://zipkin.io[Zipkin] in a Micronaut application composed of three microservices.
+
+____
+Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data.
+____
+
+You will discover how the Micronaut framework eases Zipkin integration.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Writing the Application
+
+To learn more about this sample application, read the guideLink:micronaut-microservices-services-discover-consul[Consul and the Micronaut Framework - Microservices Service Discovery] guide. The application contains three microservices.
+
+* `bookcatalogue` - This returns a list of books. It uses a domain consisting of a book name and an ISBN.
+
+* `bookinventory` - This exposes an endpoint to check whether a book has sufficient stock to fulfil an order. It uses a domain consisting of a stock level and an ISBN.
+
+* `bookrecommendation` - This consumes previous services and exposes an endpoint that recommends book names that are in stock.
+
+The `bookrecommendation` service consumes endpoints exposed by the other services. The following image illustrates the application flow:
+
+image::flow.svg[]
+
+A request to `bookrecommendation` (http://localhost:8080/books) triggers several requests through our microservices mesh.
+
+common:annotationprocessors.adoc[]
+
+== Zipkin and the Micronaut Framework
+
+=== Install Zipkin via Docker
+
+The quickest way to start https://zipkin.io[Zipkin] is via Docker:
+
+[source,bash]
+----
+docker run -d -p 9411:9411 openzipkin/zipkin
+----
+
+
+== OpenTelemetry dependencies
+
+common:opentelemetry-annotations.adoc[]
+
+common:opentelemetry-http.adoc[]
+
+common:opentelemetry-exporter.adoc[]
+
+Each service adds the OpenTelemetry Zipkin exporter dependency.
+
+dependency:opentelemetry-exporter-zipkin[groupId=io.opentelemetry,scope=compile]
+
+Each service sets `zipkin` as exporter in configuration:
+
+resource:application.yml[app=bookcatalogue,tag=zipkin]
+
+common:opentelemetry-disable.adoc[]
+
+=== Changes Book inventory
+
+Annotate `BookController` method with `@ContinueSpan` and the method parameter with `@SpanTag`:
+
+source:BooksController[app=bookinventory]
+
+callout:continue-span[1]
+callout:span-tag[2]
+
+== Running the Application
+
+Run `bookcatalogue` microservice:
+
+:exclude-for-build:maven
+
+To run the application, execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:28:34.034 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 499ms. Server Running: http://localhost:8081
+----
+
+Run `bookinventory` microservice:
+
+:exclude-for-build:maven
+
+To run the application, execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:13.104 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 506ms. Server Running: http://localhost:8082
+----
+
+Run `bookrecommendation` microservice:
+
+:exclude-for-build:maven
+
+To run the application, execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:57.389 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 523ms. Server Running: http://localhost:8080
+----
+
+You can run a cURL command to test the whole application:
+
+[source, bash]
+----
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
+[{"name":"Building Microservices"}]
+----
+
+You can then navigate to http://localhost:9411 to access the Zipkin UI.
+
+The previous request generates a trace composed by 5 spans.
+
+image::zipkinui-opentelemetry.png[]
+
+In the previous image, you can see the requests to `bookinventory` are done in parallel.
+
+In the previous image, you can see that:
+
+- Whenever a Micronaut HTTP client executes a new network request, a span is involved.
+- Whenever a Micronaut server receives a request, a span is involved.
+
+The `stock.isbn` tags that we configured with `@SpanTag` is present as shown in the next image:
+
+image::zipkintag-opentelemetry.png[]
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Start the native images for the three microservices and run the same `curl` request as before to check that everything works with GraalVM.
+
+:exclude-for-languages:
+
+== Next Steps
+
+As you have seen in this guide, without any annotations, you get distributed tracing up and running fast with the Micronaut framework.
+
+The Micronaut framework includes several annotations to give you more flexibility. We introduced the `@ContinueSpan` and `@SpanTag` annotations.
+Also, you have at your disposal the `@NewSpan` annotation, which will create a new span, wrapping the method call or reactive type.
+
+Make sure to read more about https://micronaut-projects.github.io/micronaut-tracing/latest/guide/#zipkin[Tracing with Zipkin] in the Micronaut framework.
+
+common:helpWithMicronaut.adoc[]
