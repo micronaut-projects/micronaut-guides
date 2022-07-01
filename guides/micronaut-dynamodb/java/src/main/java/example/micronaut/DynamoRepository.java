@@ -39,7 +39,7 @@ import java.util.Optional;
 @Requires(condition = CIAwsCredentialsProviderChainCondition.class)
 @Requires(beans = { DynamoConfiguration.class, DynamoDbClient.class })
 @Singleton
-public abstract class DynamoRepository<T extends Identified> {
+public class DynamoRepository<T extends Identified> {
     private static final Logger LOG = LoggerFactory.getLogger(DynamoRepository.class);
     protected static final String HASH = "#";
     protected static final String ATTRIBUTE_PK = "pk";
@@ -51,7 +51,7 @@ public abstract class DynamoRepository<T extends Identified> {
     protected final DynamoDbClient dynamoDbClient;
     protected final DynamoConfiguration dynamoConfiguration;
 
-    protected DynamoRepository(DynamoDbClient dynamoDbClient,
+    public DynamoRepository(DynamoDbClient dynamoDbClient,
                             DynamoConfiguration dynamoConfiguration) {
         this.dynamoDbClient = dynamoDbClient;
         this.dynamoConfiguration = dynamoConfiguration;

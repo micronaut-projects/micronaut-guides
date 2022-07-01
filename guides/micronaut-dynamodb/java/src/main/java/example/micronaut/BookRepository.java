@@ -9,17 +9,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookRepository {
-    boolean existsTable();
-
-    void createTable();
-
     @NonNull
     List<Book> findAll();
-
-    void save(@NonNull @NotNull @Valid Book book);
 
     @NonNull
     Optional<Book> findById(@NonNull @NotBlank String id);
 
     void delete(@NonNull @NotBlank String id);
+
+    @NonNull
+    String save(@NonNull @NotBlank String isbn,
+                @NonNull @NotBlank String name);
 }

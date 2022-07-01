@@ -21,20 +21,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Singleton
+@Singleton // <1>
 public class DefaultBookRepository extends DynamoRepository<Book> implements BookRepository {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultBookRepository.class);
     private static final String ATTRIBUTE_ID = "id";
     private static final String ATTRIBUTE_ISBN = "isbn";
     private static final String ATTRIBUTE_NAME = "name";
 
+    private final IdGenerator idGenerator;
     public DefaultBookRepository(DynamoDbClient dynamoDbClient,
-                                 DynamoConfiguration dynamoConfiguration) {
+                                 DynamoConfiguration dynamoConfiguration,
+                                 IdGenerator idGenerator) {
         super(dynamoDbClient, dynamoConfiguration);
+        this.idGenerator = idGenerator;
     }
 
     @Override
-    public void save(@NonNull @NotNull @Valid Book book) {
+    @NonNull
+    public String save(@NonNull @NotBlank String isbn,
+                @NonNull @NotBlank String name) {
+        String id = idGenerator.generate();
+        save(new Book(id, isbn, name));
+        return id;
+    }
+
+    protected void save(@NonNull @NotNull @Valid Book book) {
         PutItemResponse itemResponse = dynamoDbClient.putItem(PutItemRequest.builder()
                 .tableName(dynamoConfiguration.getTableName())
                 .item(item(book))
@@ -69,8 +80,7 @@ public class DefaultBookRepository extends DynamoRepository<Book> implements Boo
             }
             result.addAll(parseInResponse(response));
             beforeId = lastEvaluatedId(response, Book.class).orElse(null);
-            LOG.trace("Before ID {}", beforeId);
-        } while(beforeId != null);
+        } while(beforeId != null); // <2>
         return result;
     }
 

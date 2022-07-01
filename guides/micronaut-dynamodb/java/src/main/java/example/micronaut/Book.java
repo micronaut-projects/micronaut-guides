@@ -5,19 +5,19 @@ import io.micronaut.core.annotation.NonNull;
 
 import javax.validation.constraints.NotBlank;
 
-@Introspected
+@Introspected // <1>
 public class Book implements Identified {
 
     @NonNull
-    @NotBlank
+    @NotBlank // <2>
     private final String id;
 
     @NonNull
-    @NotBlank
+    @NotBlank // <3>
     private final String isbn;
 
     @NonNull
-    @NotBlank
+    @NotBlank // <3>
     private final String name;
 
     public Book(@NonNull String id,

@@ -12,16 +12,17 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-@Requires(property = "dynamodb-local.host")
-@Requires(property = "dynamodb-local.port")
-@Singleton
-public class DynamoDbClientBuilderListener implements BeanCreatedEventListener<DynamoDbClientBuilder> {
+@Requires(property = "dynamodb-local.host") // <1>
+@Requires(property = "dynamodb-local.port") // <1>
+@Singleton // <2>
+class DynamoDbClientBuilderListener
+        implements BeanCreatedEventListener<DynamoDbClientBuilder> { // <3>
     private final URI endpoint;
     private final String accessKeyId;
     private final String secretAccessKey;
 
-    public DynamoDbClientBuilderListener(@Value("${dynamodb-local.host}") String host,
-                                         @Value("${dynamodb-local.port}") String port) {
+    DynamoDbClientBuilderListener(@Value("${dynamodb-local.host}") String host, // <4>
+                                  @Value("${dynamodb-local.port}") String port) { // <4>
         try {
             this.endpoint = new URI("http://" + host + ":" + port);
         } catch (URISyntaxException e) {

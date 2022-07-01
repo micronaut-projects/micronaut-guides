@@ -1,0 +1,210 @@
+common:header.adoc[]
+
+== DynamoDB
+
+https://aws.amazon.com/dynamodb/[DynamoDB]
+
+____
+DynamoDB is a fast, flexible NoSQL database service for single-digit millisecond performance at any scale
+____
+
+
+common:completesolution.adoc[]
+
+== Writing the Application
+
+=== Create application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli-command@ example.micronaut.micronautguide \
+              --features=@features@ \
+              --build=@build@ \
+              --lang=@lang@ \
+              --jdk=11
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+diffLink:[]
+
+=== Dynamo DB Dependencies
+
+To use DynamoDB with Micronaut, you application should have the following dependencies:
+
+:dependencies:
+dependency:micronaut-aws-sdk-v2[groupId=io.micronaut.aws,scope=compile]
+dependency:dynamodb[groupId=software.amazon.awssdk,scope=compile]
+:dependencies:
+
+=== Id Generation
+
+Create an interface to encapsulate id generation.
+
+source:IdGenerator[]
+
+callout:functional-interface[1]
+
+common:ksuid.adoc[]
+
+An identifier with a time component is useful when you work with a NoSQL solution such as DynamoDB.
+
+Create a singleton implementation of `IdGenerator`.
+
+source:KsuidGenerator[]
+
+callout:requires-classes[1]
+callout:singleton[2]
+
+=== POJOs
+
+The application contains an interface to mark classes with a unique identifier.
+
+source:Identified[]
+
+Create a POJO to save books to DynamoDB.
+
+source:Book[]
+
+callout:introspected[1]
+callout:constraints[2]
+
+=== Configuration
+
+Define the name of the DynamoDB table in configuration:
+
+resource:application.yml[tag=dynamodb]
+
+Inject the configuration into the application via a `@ConfigurationProperties` bean.
+
+source:DynamoConfiguration[]
+
+callout:requires-property[1]
+callout:configuration-properties-interface[2]
+
+=== Repository
+
+Create an interface to encapsulate `Book` persistence.
+
+source:BookRepository[]
+
+Create a singleton class to handle common operation with DynamoDB.
+
+source:DynamoRepository[]
+
+And an implementation of `BookRepository`.
+
+source:DefaultBookRepository[]
+
+callout:singleton[1]
+<2> Paginate instead of using a scan operation.
+
+== Controllers
+
+Create a CRUD controller for `Book`.
+
+source:BooksController[]
+
+callout:executes-on[1]
+callout:controller[number=2,arg0=/books]
+callout:constructor-di[number=3,arg0=BookRepository]
+callout:get[number=4,arg0=index,arg1=/]
+callout:post[number=5,arg0=save,arg1=/]
+callout:body-qualifier[6]
+callout:get[number=7,arg0=show,arg1=/{id}]
+callout:pathvariable[8]
+callout:post[number=9,arg0=delete,arg1=/]
+callout:at-status[10]
+
+=== Running the application
+
+common:run-dynamodb-with-docker.adoc[]
+
+==== Dev default environment
+
+Modify `Application` to use `dev` as a https://docs.micronaut.io/latest/guide/index.html#_default_environment[default environment].
+
+source:Application[]
+
+==== Dev specific configuration
+
+Create an environment specific configuration class for the `dev` environment which defines the host and port of the DynamoDB Local instance.
+
+resource:application-dev.yml[]
+
+==== Dev Bootstrap
+
+Create a `StartupEventListener` only loaded for the `dev` environment which creates the dynamodb table if it does not exists.
+
+source:DevBootstrap[]
+
+callout:requires-property[1]
+callout:requires-env[2]
+callout:singleton[3]
+
+==== Pointing to DynamoDB Local
+
+Create a bean created listener which points the DynamoDB client to the URL of the Dynamodb local instance.
+
+source:DynamoDbClientBuilderListener[]
+
+callout:requires-property[1]
+callout:singleton[2]
+callout:bean-created-event-listener[3]
+callout:value[4]
+
+common:runApp.adoc[]
+
+You should be able to execute the following cURL requests.
+
+[source,bash]
+----
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
+[]
+----
+
+[source,bash]
+----
+curl -X POST -d '{"isbn":"1680502395","name":"Release It!"}' -H "Content-Type: application/json" http://localhost:8080/books
+----
+
+[source,bash]
+----
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
+[{"id":"2BLCWltdt3gGgSw1qsomXIfXBiX","isbn":"1680502395","name":"Release It!"}]
+----
+
+=== Tests
+
+Create a `StartupEventListener` only loaded for the `test` environment which creates the dynamodb table if it does not exists.
+
+test:TestBootstrap[]
+
+Create a test which verifies the CRUD functionality.
+
+test:BooksControllerTest[]
+
+callout:micronaut-test[1]
+callout:testcontainers-container[2]
+callout:test-instance-per-class[3]
+callout:http-client[4]
+
+common:testApp.adoc[]
+
+common:next.adoc[]
+
+Check https://micronaut-projects.github.io/micronaut-aws/latest/guide/[Micronaut AWS] integration.
+
+common:helpWithMicronaut.adoc[]
