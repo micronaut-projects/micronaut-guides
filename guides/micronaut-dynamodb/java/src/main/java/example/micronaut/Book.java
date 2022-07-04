@@ -13,11 +13,11 @@ public class Book implements Identified {
     private final String id;
 
     @NonNull
-    @NotBlank // <3>
+    @NotBlank // <2>
     private final String isbn;
 
     @NonNull
-    @NotBlank // <3>
+    @NotBlank // <2>
     private final String name;
 
     public Book(@NonNull String id,
