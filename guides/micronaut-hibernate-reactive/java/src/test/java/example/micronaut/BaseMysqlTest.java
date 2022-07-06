@@ -16,9 +16,9 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.Map;
 
-@MicronautTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class BaseMysqlTest implements TestPropertyProvider {
+@MicronautTest // <1>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
+public class BaseMysqlTest implements TestPropertyProvider { // <3>
 
     static GenericContainer<?> mysqlContainer;
 
@@ -27,7 +27,7 @@ public class BaseMysqlTest implements TestPropertyProvider {
 
     @Inject
     @Client("/")
-    HttpClient httpClient;
+    HttpClient httpClient; // <4>
 
     void startMySQL() {
         if (mysqlContainer == null) {
@@ -50,7 +50,7 @@ public class BaseMysqlTest implements TestPropertyProvider {
 
     @Override
     @NonNull
-    public Map<String, String> getProperties() {
+    public Map<String, String> getProperties() { // <5>
         return CollectionUtils.mapOf(
                 "jpa.default.properties.hibernate.connection.url", getMySQLDbUri(),
                 "jpa.default.properties.hibernate.hbm2ddl.auto", "create-drop");

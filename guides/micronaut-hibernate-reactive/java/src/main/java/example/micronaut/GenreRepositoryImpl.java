@@ -14,21 +14,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
-@Singleton
+@Singleton // <1>
 public class GenreRepositoryImpl implements GenreRepository {
 
     private static final List<String> VALID_PROPERTY_NAMES = Arrays.asList("id", "name");
     private final ApplicationConfiguration applicationConfiguration;
     private final Stage.SessionFactory sessionFactory;
 
-    public GenreRepositoryImpl(ApplicationConfiguration applicationConfiguration, SessionFactory sessionFactory) {
+    public GenreRepositoryImpl(
+            ApplicationConfiguration applicationConfiguration, // <2>
+            SessionFactory sessionFactory // <3>
+    ) {
         this.applicationConfiguration = applicationConfiguration;
         this.sessionFactory = sessionFactory.unwrap(Stage.SessionFactory.class);
     }
 
     @Override
     public Publisher<Optional<Genre>> findById(long id) {
-        return Mono.fromCompletionStage(sessionFactory.withTransaction(session ->
+        return Mono.fromCompletionStage(sessionFactory.withTransaction(session -> // <4>
             find(session, id)
         ));
     }

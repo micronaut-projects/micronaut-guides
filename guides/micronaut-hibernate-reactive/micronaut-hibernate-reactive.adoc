@@ -1,6 +1,12 @@
-# INSTRUCTIONS
+common:header.adoc[]
 
-## Add the following to a clean micronaut gradle build:
+In this guide, we will write a Micronaut application that exposes some REST endpoints and stores data in a database using JPA and Hibernate.
+
+## SETUP INSTRUCTIONS
+
+Until we can use a feature for hibernate-reactive, and the micronaut-data release 3.5.0, we need to manually set up some things.
+
+### Add the following to a clean micronaut gradle build:
 
 
 [source,groovy]
@@ -32,22 +38,23 @@ configurations.all {
 }
 ----
 
+Project should compile, and tests should pass
 
-## Run MySql in docker
+### Run MySql in docker (for running)
 
 [source,bash]
 ----
 docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=pass mysql:oracle
 ----
 
-## Run the app
+### Run the app
 
 [source,bash]
 ----
 ./gradlew run
 ----
 
-## Test the app
+### Test the app
 
 [source,bash]
 ----
@@ -64,10 +71,6 @@ $ curl http://localhost:8080
 [{"id":1,"name":"A genre"}]%
 ----
 
-common:header.adoc[]
-
-In this guide, we will write a Micronaut application that exposes some REST endpoints and stores data in a database using JPA and Hibernate.
-
 common:requirements.adoc[]
 
 common:completesolution.adoc[]
@@ -80,17 +83,17 @@ Add the following dependencies:
 
 :dependencies:
 
-dependency:micronaut-hibernate-jpa[groupId=io.micronaut.sql,callout=1]
-dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=2]
-dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=3]
-dependency:jakarta.persistence-api[groupId=jakarta.persistence,version=2.2.3,callout=4]
+dependency:micronaut-reactor[groupId=io.micronaut.reactor,callout=1]
+dependency:micronaut-hibernate-reactive[groupId=io.micronaut.sql,callout=2]
+dependency:vertx-mysql-client[groupId=io.vertx,callout=3]
+dependency:testcontainers[groupId=org.testcontainers,callout=4]
 
 :dependencies:
 
-<1> Configures Hibernate/JPA EntityManagerFactory beans.
-<2> Configures SQL DataSource instances using Hikari Connection Pool.
-<3> Add dependency to in-memory H2 Database.
-<4> Add dependency to Jakarta Persistence API.
+<1> Add a dependency to the Micronaut Framework Project Reactor support
+<2> Configures Hibernate Reactive/JPA beans.
+<3> Adds a dependency to the Vert.x MySQL client.
+<4> Adds a dependency to the Testcontainers library which will be uses for testing the application.
 
 === JPA configuration
 
@@ -128,24 +131,18 @@ resource:application.yml[tag=application]
 
 === Repository Access
 
-To mark the transaction demarcations, we use the https://docs.oracle.com/javaee/7/api/javax/transaction/Transactional.html[Java EE 7 javax.transaction.Transactional annotation].
-
-To use it, you have to include the `micronaut-data-processor` dependency in your annotation processor configuration:
-
-dependency:micronaut-data-hibernate-jpa[groupId=io.micronaut.data,scope=annotationProcessor]
-
 Next, create a repository interface to define the operations to access the database:
 
 source:GenreRepository[]
 
-The implementation:
+And the implementation:
 
 source:GenreRepositoryImpl[]
 
 callout:singleton[1]
-<2> Easily inject an `EntityManager`.
-<3> All database access needs to be wrapped inside a transaction. As the method only reads data from the database, annotate it with `@ReadOnly`.
-<4> This method modifies the database, thus it is annotated with `@Transactional`.
+<2> Inject the `ApplicationConfiguration`.
+<3> Inject the Hibernate `SessionFactory`.
+<4> Grab a transactional session from the `SessionFactory` to run our query.
 
 === Controller
 
@@ -169,36 +166,45 @@ Create `GenreController`, a controller which exposes a resource with the common 
 
 source:GenreController[]
 
-callout:executes-on[1]
-callout:controller[number=2,arg0=/genres]
-<3> Constructor injection.
-<4> Maps a `GET` request to `/genres/{id}` which attempts to show a genre. This illustrates the use of a URL path variable.
-<5> Returning `null` when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
-<6> Maps a `PUT` request to `/genres` which attempts to update a genre.
-<7> Add `@Valid` to any method parameter which requires validation. Use a POJO supplied as a JSON payload in the request to populate command.
-<8> It is easy to add custom headers to the response.
-<9> Maps a `GET` request to `/genres` which returns a list of genres. This mapping illustrates URL parameters being mapped to a single POJO.
-<10> Maps a `POST` request to `/genres` which attempts to save a genre.
-<11> Maps a `POST` request to `/ex` which generates an exception.
-<12> Maps a `DELETE` request to `/genres/{id}` which attempts to remove a genre. This illustrates the use of a URL path variable.
+callout:controller[number=1,arg0=/genres]
+callout:constructor-di[number=2,arg0=GenreRepository]
+callout:get[number=3,arg0=show,arg1=/{id}]
+<4> Returning an empty Publisher when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
+<5> Maps a `PUT` request to `/genres` which attempts to update a genre.
+callout:valid[number=6]
+<7> Add custom headers to the response.
+<8> Maps a `GET` request to `/genres` which returns a list of genres.
+<9> Maps a `POST` request to `/genres` which attempts to save a genre.
+<10> Maps a `POST` request to `/ex` which generates an exception.
+callout:delete[number=11,arg0=delete,arg1=/genres/{id}]
+callout:at-status[number=12]
 
 === Writing Tests
+
+To allow us to run a MySQL instance in a Docker container for testing, create a base class that sets this up.
+
+test:BaseMysqlTest[]
+
+callout:micronaut-test[1]
+callout:test-instance-per-class[2]
+callout:test-property-provider[3]
+callout:http-client[4]
+<5> Configure the application properties to that of the MySQL instance.
 
 Create a test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 
-callout:micronaut-test[1]
-callout:http-client[2]
-callout:http-request[3]
-<4> If you care just about the object in the response use `retrieve`.
-<5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
+<1> Extend the `BaseMysqlTest` class.
+callout:http-request[2]
+<2> If you care just about the object in the response use `retrieve`.
+<3> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
 common:testApp.adoc[]
 
 common:runapp.adoc[]
 
-== Using PostgreSQL
+== Using MySQL
 
 When running on production you want to use a real database instead of using H2. Let's explain how to use PostgreSQL.
 

@@ -25,13 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class GenreControllerTest extends BaseMysqlTest {
+class GenreControllerTest extends BaseMysqlTest { // <1>
 
     private BlockingHttpClient blockingClient;
-
-    @Inject
-    @Client("/")
-    HttpClient client; // <2>
 
     @BeforeEach
     void setup() {
@@ -63,13 +59,13 @@ class GenreControllerTest extends BaseMysqlTest {
 
         List<Long> genreIds = new ArrayList<>();
 
-        HttpRequest<?> request = HttpRequest.POST("/genres", new GenreSaveCommand("DevOps")); // <3>
+        HttpRequest<?> request = HttpRequest.POST("/genres", new GenreSaveCommand("DevOps")); // <2>
         HttpResponse<?> response = blockingClient.exchange(request);
         genreIds.add(entityId(response));
 
         assertEquals(CREATED, response.getStatus());
 
-        request = HttpRequest.POST("/genres", new GenreSaveCommand("Microservices")); // <3>
+        request = HttpRequest.POST("/genres", new GenreSaveCommand("Microservices")); // <2>
         response = blockingClient.exchange(request);
 
         assertEquals(CREATED, response.getStatus());
@@ -78,12 +74,12 @@ class GenreControllerTest extends BaseMysqlTest {
         genreIds.add(id);
         request = HttpRequest.GET("/genres/" + id);
 
-        Genre genre = blockingClient.retrieve(request, Genre.class); // <4>
+        Genre genre = blockingClient.retrieve(request, Genre.class); // <3>
 
         assertEquals("Microservices", genre.getName());
 
         request = HttpRequest.PUT("/genres", new GenreUpdateCommand(id, "Micro-services"));
-        response = blockingClient.exchange(request);  // <5>
+        response = blockingClient.exchange(request);  // <4>
 
         assertEquals(NO_CONTENT, response.getStatus());
 
@@ -96,7 +92,7 @@ class GenreControllerTest extends BaseMysqlTest {
 
         assertEquals(2, genres.size());
 
-        request = HttpRequest.POST("/genres/ex", new GenreSaveCommand("Microservices")); // <3>
+        request = HttpRequest.POST("/genres/ex", new GenreSaveCommand("Microservices")); // <2>
         response = blockingClient.exchange(request);
 
         assertEquals(NO_CONTENT, response.getStatus());

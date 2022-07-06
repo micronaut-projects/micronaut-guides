@@ -26,31 +26,31 @@ class GenreController {
 
     private final GenreRepository genreRepository;
 
-    GenreController(GenreRepository genreRepository) { // <3>
+    GenreController(GenreRepository genreRepository) { // <2>
         this.genreRepository = genreRepository;
     }
 
-    @Get("/{id}") // <4>
+    @Get("/{id}") // <3>
     @SingleResult
     Publisher<Genre> show(Long id) {
         return Mono.from(genreRepository.findById(id))
-                .flatMap(g -> g.map(Mono::just).orElseGet(Mono::empty));
+                .flatMap(g -> g.map(Mono::just).orElseGet(Mono::empty)); // <4>
     }
 
-    @Put // <6>
-    Publisher<HttpResponse<?>> update(@Body @Valid GenreUpdateCommand command) { // <7>
+    @Put // <5>
+    Publisher<HttpResponse<?>> update(@Body @Valid GenreUpdateCommand command) { // <6>
         return Mono.from(genreRepository.update(command.getId(), command.getName()))
                 .map(i -> HttpResponse
                         .noContent()
-                        .header(LOCATION, location(command.getId()).getPath())); // <8>
+                        .header(LOCATION, location(command.getId()).getPath())); // <7>
     }
 
-    @Get(value = "/list{?args*}") // <9>
+    @Get(value = "/list{?args*}") // <8>
     Publisher<Genre> list(@Valid SortingAndOrderArguments args) {
         return genreRepository.findAll(args);
     }
 
-    @Post // <10>
+    @Post // <9>
     @SingleResult
     Publisher<HttpResponse<Genre>> save(@Body @Valid GenreSaveCommand cmd) {
         return Mono.from(genreRepository.save(cmd.getName()))
@@ -60,7 +60,7 @@ class GenreController {
                 );
     }
 
-    @Post("/ex") // <11>
+    @Post("/ex") // <10>
     @SingleResult
     Publisher<MutableHttpResponse<Genre>> saveExceptions(@Body @Valid GenreSaveCommand cmd) {
         return Mono.from(genreRepository.saveWithException(cmd.getName()))
@@ -70,8 +70,8 @@ class GenreController {
                 .onErrorReturn(PersistenceException.class, HttpResponse.noContent());
     }
 
-    @Delete("/{id}") // <12>
-    @Status(HttpStatus.NO_CONTENT)
+    @Delete("/{id}") // <11>
+    @Status(HttpStatus.NO_CONTENT) // <12>
     <T> HttpResponse<T> delete(Long id) {
         genreRepository.deleteById(id);
         return HttpResponse.noContent();
