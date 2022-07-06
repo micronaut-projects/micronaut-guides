@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 import javax.persistence.PersistenceException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 @Singleton
@@ -26,12 +27,14 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
-    public Publisher<Genre> findById(long id) {
-        return Mono.fromCompletionStage(sessionFactory.withTransaction(session -> find(id, session)));
+    public Publisher<Optional<Genre>> findById(long id) {
+        return Mono.fromCompletionStage(sessionFactory.withTransaction(session ->
+            find(session, id)
+        ));
     }
 
-    private CompletionStage<Genre> find(long id, Stage.Session session) {
-        return session.find(Genre.class, id);
+    CompletionStage<Optional<Genre>> find(Stage.Session session, Long id) {
+        return session.find(Genre.class, id).thenApply(Optional::ofNullable);
     }
 
     @Override
@@ -44,14 +47,17 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     public Publisher<Genre> saveWithException(String name) {
-        return Mono.from(save(name)).map(v -> {
-            throw new PersistenceException();
-        });
+        return Mono.fromCompletionStage(sessionFactory.withTransaction(session -> {
+            Genre entity = new Genre(name);
+            return session.persist(entity).thenApply(v -> {
+                throw new PersistenceException();
+            });
+        }));
     }
 
     @Override
     public void deleteById(long id) {
-        sessionFactory.withTransaction(session -> find(id, session).thenApply(session::remove));
+        sessionFactory.withTransaction(session -> session.find(Genre.class, id).thenApply(session::remove));
     }
 
     @Override
@@ -76,11 +82,9 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     public Publisher<Integer> update(long id, String name) {
-        return Mono.fromCompletionStage(sessionFactory.withTransaction(session -> {
-            return session.createQuery("UPDATE Genre g SET name = :name where id = :id")
-                            .setParameter("name", name)
-                            .setParameter("id", id)
-                            .executeUpdate();
-        }));
+        return Mono.fromCompletionStage(sessionFactory.withTransaction(session -> session.createQuery("UPDATE Genre g SET name = :name where id = :id")
+                        .setParameter("name", name)
+                        .setParameter("id", id)
+                        .executeUpdate()));
     }
 }

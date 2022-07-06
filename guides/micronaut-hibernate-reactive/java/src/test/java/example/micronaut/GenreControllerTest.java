@@ -25,8 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@MicronautTest // <1>
-class GenreControllerTest {
+class GenreControllerTest extends BaseMysqlTest {
 
     private BlockingHttpClient blockingClient;
 

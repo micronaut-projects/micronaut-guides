@@ -1,15 +1,37 @@
 # INSTRUCTIONS
 
-## Add the following dependencies to a clean micronaut project
+## Add the following to a clean micronaut gradle build:
+
 
 [source,groovy]
-.dependencies
+.in repositories
+----
+   maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+----
+
+[source,groovy]
+.in dependencies
 ----
     implementation("io.micronaut.reactor:micronaut-reactor")
     implementation(platform("io.micronaut.sql:micronaut-sql-bom:4.5.0"))
     implementation("io.micronaut.sql:micronaut-hibernate-reactive")
-    implementation("io.vertx:vertx-pg-client")
+    implementation("io.vertx:vertx-mysql-client")
+    testImplementation("org.testcontainers:testcontainers")
 ----
+
+[source,groovy]
+.resolution
+----
+// Pull the snapshot to fix a bug in transaction management under test
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'io.micronaut.data') {
+            details.useVersion "3.5.0-SNAPSHOT"
+        }
+    }
+}
+----
+
 
 ## Run MySql in docker
 
