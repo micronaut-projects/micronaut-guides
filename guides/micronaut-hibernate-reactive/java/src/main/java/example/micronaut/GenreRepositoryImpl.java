@@ -1,4 +1,4 @@
-package com.bloidonia;
+package example.micronaut;
 
 import jakarta.inject.Singleton;
 import org.hibernate.SessionFactory;

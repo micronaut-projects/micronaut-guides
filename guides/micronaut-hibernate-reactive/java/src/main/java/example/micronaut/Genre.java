@@ -1,4 +1,4 @@
-package com.bloidonia;
+package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
 

@@ -1,4 +1,4 @@
-package com.bloidonia;
+package example.micronaut;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
