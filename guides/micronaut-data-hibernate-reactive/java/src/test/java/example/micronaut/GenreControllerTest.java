@@ -10,19 +10,42 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+@Testcontainers
+@TestInstance(PER_CLASS)
 @MicronautTest // <1>
-public class GenreControllerTest {
+public class GenreControllerTest implements TestPropertyProvider {
+
+    @Container
+    MySQLContainer<?> mysql = new MySQLContainer<>(DockerImageName.parse("mysql:oracle"));
+
+    @Override
+    public Map<String, String> getProperties() {
+        mysql.start();
+        return Map.of(
+                "jpa.default.properties.hibernate.connection.url", mysql.getJdbcUrl(),
+                "jpa.default.properties.hibernate.connection.username", mysql.getUsername(),
+                "jpa.default.properties.hibernate.connection.password", mysql.getPassword()
+        );
+    }
 
     @Inject
     @Client("/")
