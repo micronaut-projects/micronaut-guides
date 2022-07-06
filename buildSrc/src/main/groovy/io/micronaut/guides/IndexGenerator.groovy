@@ -88,25 +88,18 @@ class IndexGenerator {
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
         String index = ''
         if (!singleGuide && tags) {
-            index += '<div class="categorygrid" style="padding-bottom: 20px;margin-bottom: 0;border-bottom: 0;">'
-            index += '<div class="grid align-items-stretch">'
-            index += '  <div class="grid-item grid-item_primary grid-item_one-third grid-item_dynamic-height">'
+            index += '<div class="categorygrid">'
+            index += '<div class="grid">'
+            index += '  <div class="grid-item grid-item_primary grid-item_one-third">'
             index += '    <div class="inner">'
             index += '      <h1 class="title title_large first-word-bold first-word-break"><strong>Micronaut</strong> Guides</h1>'
             index += '    </div>'
             index += '  </div>'
-            index += '  <div class="grid-item grid-item_white grid-item_two-third grid-item_dynamic-height">'
+            index += '  <div class="grid-item grid-item_white grid-item_two-third grid-item_dynamic-height latest-guides">'
             index += '    <div class="inner" style="padding: 0">'
             index += guidesTable(latestGuides(metadatas), "Latest Guides", true)
             index += '    </div>'
             index += '  </div>'
-            index += '</div>'
-            index += '</div>'
-            index += '<div class="categorygrid">'
-            index += '<div>'
-            index += '    <div class="inner" style="padding: 0">'
-            index += TagCloud.tagCloud(tags)
-            index += '    </div>'
             index += '</div>'
             index += '</div>'
         }
@@ -226,24 +219,33 @@ class IndexGenerator {
     private static String guidesTable(List<GuideMetadata> metadatas,
                                       String header = null,
                                       boolean displayPublicationDate = false) {
-        String index = '<table class="table table_striped table_dark-head">'
+        String index = '<div class="guide-list">'
+
         if (header) {
-            if (displayPublicationDate) {
-                index += "<thead><tr><th colspan='2'>${header}</th></tr></thead>"
-            } else {
-                index += "<thead><tr><th>${header}</th></tr></thead>"
-            }
+            index += "<h3 class='guide-list-header'>${header}</h3>"
         }
-        index += '<tbody>'
         for (GuideMetadata metadata : metadatas) {
-            index += "<tr>"
+            index += '<div class="guide">'
+            index += "<div class='guide-title'><a href='${metadata.slug}.html'>${metadata.title}</a></div>"
             if (displayPublicationDate) {
-                index += "<td class='meta'>${metadata.publicationDate.format(DateTimeFormatter.ofPattern("MMM dd"))}</td>"
+                index += "<div class='guide-date'>${metadata.publicationDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}</div>"
             }
-            index += """<td><h4 class="title title_small"><a href="${metadata.slug}.html">${metadata.title}</a></h4>${metadata.intro}</td>"""
-            index += "</tr>"
+            index += "<div class='guide-intro'>${metadata.intro}</div>"
+            if (metadata.tags?.size() > 0) {
+                index += "<div class='guide-tag-list'>"
+                index += "<span class='guide-tag-title'>Tags: </span>"
+                metadata.tags.collect { new Tag(title: it) }.eachWithIndex { tag, i ->
+                    boolean isNotLast = i != metadata.tags.size() - 1
+                    index += "<span class='guide-tag'><a href='./tag-${tag.slug.toLowerCase()}.html'>${tag.title}</a></span>"
+                    if (isNotLast) {
+                        index += "<span class='guide-split'>, </span>"
+                    }
+                }
+                index += '</div>'
+            }
+            index += "</div>"
         }
-        index += "</tbody></table>"
+        index += "</div>"
         index
     }
 
@@ -362,15 +364,15 @@ class IndexGenerator {
                 case Category.ORACLE_CLOUD:
                     return 'https://micronaut.io/wp-content/uploads/2021/05/Oracle-1.svg'
 
-                case Category.API: 
+                case Category.API:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/API.svg'
 
-                case Category.EMAIL: 
+                case Category.EMAIL:
                     return 'https://micronaut.io/wp-content/uploads/2022/02/email.svg'
 
                 case Category.TEST:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/Build.svg'
-                
+
                 case Category.KOTLIN:
                     return 'https://micronaut.io/wp-content/uploads/2021/05/Kotlin.svg'
 
