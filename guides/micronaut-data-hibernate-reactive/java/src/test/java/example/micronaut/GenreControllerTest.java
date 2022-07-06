@@ -6,55 +6,22 @@ import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.HttpClient;
-import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.micronaut.test.support.TestPropertyProvider;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-@Testcontainers
-@TestInstance(PER_CLASS)
-@MicronautTest // <1>
-public class GenreControllerTest implements TestPropertyProvider {
-
-    @Container
-    MySQLContainer<?> mysql = new MySQLContainer<>(DockerImageName.parse("mysql:oracle"));
-
-    @Override
-    public Map<String, String> getProperties() {
-        mysql.start();
-        return Map.of(
-                "jpa.default.properties.hibernate.connection.url", mysql.getJdbcUrl(),
-                "jpa.default.properties.hibernate.connection.username", mysql.getUsername(),
-                "jpa.default.properties.hibernate.connection.password", mysql.getPassword()
-        );
-    }
-
-    @Inject
-    @Client("/")
-    HttpClient client; // <2>
-
+public class GenreControllerTest extends BaseMysqlTest {
     @Test
     public void testFindNonExistingGenreReturns404() {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -> {
-            client.toBlocking().exchange(HttpRequest.GET("/genres/99"));
+            httpClient.toBlocking().exchange(HttpRequest.GET("/genres/99"));
         });
 
         assertNotNull(thrown.getResponse());
@@ -67,13 +34,13 @@ public class GenreControllerTest implements TestPropertyProvider {
         List<Long> genreIds = new ArrayList<>();
 
         HttpRequest<?> request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <3>
-        HttpResponse<?> response = client.toBlocking().exchange(request);
+        HttpResponse<?> response = httpClient.toBlocking().exchange(request);
         genreIds.add(entityId(response));
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
 
         request = HttpRequest.POST("/genres", Collections.singletonMap("name", "Microservices")); // <3>
-        response = client.toBlocking().exchange(request);
+        response = httpClient.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
 
@@ -81,55 +48,55 @@ public class GenreControllerTest implements TestPropertyProvider {
         genreIds.add(id);
         request = HttpRequest.GET("/genres/" + id);
 
-        Genre genre = client.toBlocking().retrieve(request, Genre.class); // <4>
+        Genre genre = httpClient.toBlocking().retrieve(request, Genre.class); // <4>
 
         assertEquals("Microservices", genre.getName());
 
         request = HttpRequest.PUT("/genres", new GenreUpdateCommand(id, "Micro-services"));
-        response = client.toBlocking().exchange(request);  // <5>
+        response = httpClient.toBlocking().exchange(request);  // <5>
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
         request = HttpRequest.GET("/genres/" + id);
-        genre = client.toBlocking().retrieve(request, Genre.class);
+        genre = httpClient.toBlocking().retrieve(request, Genre.class);
         assertEquals("Micro-services", genre.getName());
 
         request = HttpRequest.GET("/genres/list");
-        List<Genre> genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        List<Genre> genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(2, genres.size());
 
         request = HttpRequest.POST("/genres/ex", Collections.singletonMap("name", "Microservices")); // <3>
-        response = client.toBlocking().exchange(request);
+        response = httpClient.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
         request = HttpRequest.GET("/genres/list");
-        genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(2, genres.size());
 
         request = HttpRequest.GET("/genres/list?size=1");
-        genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(1, genres.size());
         assertEquals("DevOps", genres.get(0).getName());
 
         request = HttpRequest.GET("/genres/list?size=1&sort=name,desc");
-        genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(1, genres.size());
         assertEquals("Micro-services", genres.get(0).getName());
 
         request = HttpRequest.GET("/genres/list?size=1&page=2");
-        genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(0, genres.size());
 
         // cleanup:
         for (Long genreId : genreIds) {
             request = HttpRequest.DELETE("/genres/" + genreId);
-            response = client.toBlocking().exchange(request);
+            response = httpClient.toBlocking().exchange(request);
             assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
         }
     }
