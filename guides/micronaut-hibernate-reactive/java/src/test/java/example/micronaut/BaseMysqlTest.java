@@ -1,7 +1,6 @@
 package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.runtime.EmbeddedApplication;
@@ -51,9 +50,7 @@ public class BaseMysqlTest implements TestPropertyProvider { // <3>
     @Override
     @NonNull
     public Map<String, String> getProperties() { // <5>
-        return CollectionUtils.mapOf(
-                "jpa.default.properties.hibernate.connection.url", getMySQLDbUri(),
-                "jpa.default.properties.hibernate.hbm2ddl.auto", "create-drop");
+        return Collections.singletonMap("jpa.default.properties.hibernate.connection.url", getMySQLDbUri());
     }
 
     @AfterAll

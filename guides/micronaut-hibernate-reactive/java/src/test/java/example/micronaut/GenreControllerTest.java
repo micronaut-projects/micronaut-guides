@@ -5,11 +5,7 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.client.BlockingHttpClient;
-import io.micronaut.http.client.HttpClient;
-import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +27,7 @@ class GenreControllerTest extends BaseMysqlTest { // <1>
 
     @BeforeEach
     void setup() {
-        blockingClient = client.toBlocking();
+        blockingClient = httpClient.toBlocking();
     }
 
     @Test

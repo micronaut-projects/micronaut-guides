@@ -202,51 +202,52 @@ callout:http-request[2]
 
 common:testApp.adoc[]
 
-common:runapp.adoc[]
+To define the username and password for our Testcontainers MySQL instance, create a `application-test.yml` file in `src/test/resources`:
+
+testResource:application-test.yml[]
 
 == Using MySQL
 
-When running on production you want to use a real database instead of using H2. Let's explain how to use PostgreSQL.
+To run the application, we will use a real database instance running in Docker.
 
-After installing Docker, execute the following command to run a PostgreSQL container:
-
-[source,bash]
-----
-docker run -it --rm \
-    -p 5432:5432 \
-    -e POSTGRES_USER=dbuser \
-    -e POSTGRES_PASSWORD=theSecretPassword \
-    -e POSTGRES_DB=micronaut \
-    postgres:11.5-alpine
-----
-
-Add PostgreSQL driver dependency:
-
-dependency:postgresql[groupId=org.postgresql,scope=runtimeOnly]
-
-To use PostgreSQL, set up several environment variables which match those defined in `application.yml`:
+Start it with:
 
 [source,bash]
 ----
-export JDBC_URL=jdbc:postgresql://localhost:5432/micronaut
-export JDBC_USER=dbuser
-export JDBC_PASSWORD=theSecretPassword
-export JDBC_DRIVER=org.postgresql.Driver
+docker run \
+    -p 3306:3306 \
+    -e MYSQL_ROOT_PASSWORD=pass \
+    mysql:oracle
 ----
 
-Run the application again. If you look at the output you can see that the application uses PostgreSQL:
+For configuration with local development, create an `application-dev.yml` file in the `src/main/resources` directory:
+
+resource:application-dev.yml[]
+
+When you move to production, you will need to configure these properties to point at your real production database.
+This can be done via environment variables like so:
+
+[source,bash]
+----
+export JPA_DEFAULT_PROPERTIES_HIBERNATE_CONNECTION_URL=jdbc:mysql://localhost:5432/micronaut
+export JPA_DEFAULT_PROPERTIES_HIBERNATE_CONNECTION_USERNAME=dbuser
+export JPA_DEFAULT_PROPERTIES_HIBERNATE_CONNECTION_PASSWORD=theSecretPassword
+----
+
+Run the application.
+If you look at the output you can see that the application uses MySQL:
+
+common:runapp.adoc[]
 
 [source, bash]
 ----
 ..
 ...
-08:40:02.746 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+16:31:01.155 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
 ....
 ----
 
-Connect to your PostgreSQL database, and you will see both `genre` and `book` tables.
-
-image::datagrip.png[]
+Connect to your MySQL database, and you will see both `genre` and `book` tables.
 
 Save one genre, and your `genre` table will now contain an entry.
 
