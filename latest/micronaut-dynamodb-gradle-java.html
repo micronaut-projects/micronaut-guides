@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Using DynamoDB in a Micronaut Application</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-dynamodb.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Using DynamoDB in a Micronaut Application"/>
+    <meta name="twitter:description" content="Learn how to use DynamoDB as your persistence solution in a Micronaut Application."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="./index.html" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="./index.html" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-dynamodb.html">Using DynamoDB in a Micronaut Application</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#dynamodb">2. DynamoDB</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#create-application">4.1. Create application</a></li>
+<li><a href="#dynamo-db-dependencies">4.2. Dynamo DB Dependencies</a></li>
+<li><a href="#id-generation">4.3. Id Generation</a></li>
+<li><a href="#ksuid">4.4. Ksuid</a></li>
+<li><a href="#pojos">4.5. POJOs</a></li>
+<li><a href="#configuration">4.6. Configuration</a></li>
+<li><a href="#repository">4.7. Repository</a></li>
+</ul>
+</li>
+<li><a href="#controllers">5. Controllers</a>
+<ul class="sectlevel2">
+<li><a href="#running-the-application">5.1. Running the application</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application-2">6. Running the Application</a>
+<ul class="sectlevel2">
+<li><a href="#tests">6.1. Tests</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">7. Testing the Application</a></li>
+<li><a href="#next-steps">8. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Using DynamoDB in a Micronaut Application</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to use DynamoDB as your persistence solution in a Micronaut Application.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.5.2</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dynamodb">2. DynamoDB</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://aws.amazon.com/dynamodb/">DynamoDB</a></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>DynamoDB is a fast, flexible NoSQL database service for single-digit millisecond performance at any scale</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-dynamodb-gradle-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="create-application">4.1. Create application</h3>
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+              --features=dynamodb \
+              --build=gradle \
+              --lang=java \
+              --jdk=11</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=dynamodb&amp;features=testcontainers&amp;features=ksuid&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dynamo-db-dependencies">4.2. Dynamo DB Dependencies</h3>
+<div class="paragraph">
+<p>To use DynamoDB with the Micronaut framework, your application should have the following dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.aws:micronaut-aws-sdk-v2</span><span class="delimiter">&quot;</span></span>)
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">software.amazon.awssdk:dynamodb</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="id-generation">4.3. Id Generation</h3>
+<div class="paragraph">
+<p>Create an interface to encapsulate id generation.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/IdGenerator.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+
+<span class="annotation">@FunctionalInterface</span>
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">IdGenerator</span> {
+
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> generate();
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>An interface with one abstract method declaration is known as a functional interface. The compiler verifies that all interfaces annotated with <code>@FunctionInterface</code> really contain one and only one abstract method.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ksuid">4.4. Ksuid</h3>
+<div class="paragraph">
+<p>Add the following dependency to generate KSUIDs (K-Sortable Globally Unique IDs).</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>KSUID is for K-Sortable Unique IDentifier. It&#8217;s a way to generate globally unique IDs similar to RFC 4122 UUIDs, but contain a time component so they can be "roughly" sorted by time of creation. The remainder of the KSUID is randomly generated bytes.</p>
+</div>
+</blockquote>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.github.ksuid:ksuid</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An identifier with a time component is useful when you work with a NoSQL solution such as DynamoDB.</p>
+</div>
+<div class="paragraph">
+<p>Create a singleton implementation of <code>IdGenerator</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/KsuidGenerator.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">com.github.ksuid.Ksuid</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
+<span class="annotation">@Requires</span>(classes = Ksuid.class) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">KsuidGenerator</span> <span class="directive">implements</span> IdGenerator {
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> generate() {
+        <span class="keyword">return</span> Ksuid.newKsuid().toString();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This bean loads only if the specified classes are available. <code>@Requires(classes</code> allows you to provide libraries with</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="pojos">4.5. POJOs</h3>
+<div class="paragraph">
+<p>The application contains an interface to mark classes with a unique identifier.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Identified.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">Identified</span> {
+
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> getId();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a POJO to save books to DynamoDB.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Book.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+
+<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">Book</span> <span class="directive">implements</span> Identified {
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> id;
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> isbn;
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
+
+    <span class="directive">public</span> <span class="predefined-type">Book</span>(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> id,
+                <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> isbn,
+                <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.id = id;
+        <span class="local-variable">this</span>.isbn = isbn;
+        <span class="local-variable">this</span>.name = name;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getId() {
+        <span class="keyword">return</span> id;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getIsbn() {
+        <span class="keyword">return</span> isbn;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
+        <span class="keyword">return</span> name;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to the render the POJO as JSON using Jackson without using reflection.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>javax.validation.constraints</code> Constraints to ensure the data matches your expectations.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration">4.6. Configuration</h3>
+<div class="paragraph">
+<p>Define the name of the DynamoDB table in configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">dynamodb</span>:
+  <span class="key">table-name</span>: <span class="string"><span class="content">'bookcatalogue'</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Inject the configuration into the application via a <code>@ConfigurationProperties</code> bean.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DynamoConfiguration.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb.table-name</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">DynamoConfiguration</span> {
+    <span class="annotation">@NotBlank</span>
+    <span class="predefined-type">String</span> getTableName();
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This bean loads only if the specified property is defined.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>You can annotate an interface with <code>@ConfigurationProperties</code> to create an immutable configuration.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repository">4.7. Repository</h3>
+<div class="paragraph">
+<p>Create an interface to encapsulate <code>Book</code> persistence.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/BookRepository.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">BookRepository</span> {
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; findAll();
+
+    <span class="annotation">@NonNull</span>
+    Optional&lt;<span class="predefined-type">Book</span>&gt; findById(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> id);
+
+    <span class="type">void</span> delete(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> id);
+
+    <span class="annotation">@NonNull</span>
+    <span class="predefined-type">String</span> save(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,
+                <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a singleton class to handle common operations with DynamoDB.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DynamoRepository.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.util.CollectionUtils</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
+<span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.DynamoDbClient</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.AttributeDefinition</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.AttributeValue</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.BillingMode</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.CreateTableRequest</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.GetItemRequest</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.GetItemResponse</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.GlobalSecondaryIndex</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.KeySchemaElement</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.KeyType</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.Projection</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.ProjectionType</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.QueryRequest</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.QueryResponse</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
+<span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="keyword">import</span> <span class="include">java.util.HashMap</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+
+<span class="annotation">@Requires</span>(condition = CIAwsRegionProviderChainCondition.class)
+<span class="annotation">@Requires</span>(condition = CIAwsCredentialsProviderChainCondition.class)
+<span class="annotation">@Requires</span>(beans = { DynamoConfiguration.class, DynamoDbClient.class })
+<span class="annotation">@Singleton</span>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">DynamoRepository</span>&lt;T <span class="directive">extends</span> Identified&gt; {
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(DynamoRepository.class);
+    <span class="directive">protected</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> HASH = <span class="string"><span class="delimiter">&quot;</span><span class="content">#</span><span class="delimiter">&quot;</span></span>;
+    <span class="directive">protected</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> ATTRIBUTE_PK = <span class="string"><span class="delimiter">&quot;</span><span class="content">pk</span><span class="delimiter">&quot;</span></span>;
+    <span class="directive">protected</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> ATTRIBUTE_SK = <span class="string"><span class="delimiter">&quot;</span><span class="content">sk</span><span class="delimiter">&quot;</span></span>;
+    <span class="directive">protected</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> ATTRIBUTE_GSI_1_PK = <span class="string"><span class="delimiter">&quot;</span><span class="content">GSI1PK</span><span class="delimiter">&quot;</span></span>;
+    <span class="directive">protected</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> ATTRIBUTE_GSI_1_SK = <span class="string"><span class="delimiter">&quot;</span><span class="content">GSI1SK</span><span class="delimiter">&quot;</span></span>;
+    <span class="directive">protected</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> INDEX_GSI_1 = <span class="string"><span class="delimiter">&quot;</span><span class="content">GSI1</span><span class="delimiter">&quot;</span></span>;
+
+    <span class="directive">protected</span> <span class="directive">final</span> DynamoDbClient dynamoDbClient;
+    <span class="directive">protected</span> <span class="directive">final</span> DynamoConfiguration dynamoConfiguration;
+
+    <span class="directive">public</span> DynamoRepository(DynamoDbClient dynamoDbClient,
+                            DynamoConfiguration dynamoConfiguration) {
+        <span class="local-variable">this</span>.dynamoDbClient = dynamoDbClient;
+        <span class="local-variable">this</span>.dynamoConfiguration = dynamoConfiguration;
+    }
+
+    <span class="directive">public</span> <span class="type">boolean</span> existsTable() {
+        <span class="keyword">try</span> {
+            dynamoDbClient.describeTable(DescribeTableRequest.builder()
+                    .tableName(dynamoConfiguration.getTableName())
+                    .build());
+            <span class="keyword">return</span> <span class="predefined-constant">true</span>;
+        } <span class="keyword">catch</span> (ResourceNotFoundException e) {
+            <span class="keyword">return</span> <span class="predefined-constant">false</span>;
+        }
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> createTable() {
+        dynamoDbClient.createTable(CreateTableRequest.builder()
+                        .attributeDefinitions(AttributeDefinition.builder()
+                                .attributeName(ATTRIBUTE_PK)
+                                .attributeType(ScalarAttributeType.S)
+                                .build(),
+                                AttributeDefinition.builder()
+                                        .attributeName(ATTRIBUTE_SK)
+                                        .attributeType(ScalarAttributeType.S)
+                                        .build(),
+                                AttributeDefinition.builder()
+                                        .attributeName(ATTRIBUTE_GSI_1_PK)
+                                        .attributeType(ScalarAttributeType.S)
+                                        .build(),
+                                AttributeDefinition.builder()
+                                        .attributeName(ATTRIBUTE_GSI_1_SK)
+                                        .attributeType(ScalarAttributeType.S)
+                                        .build())
+                        .keySchema(<span class="predefined-type">Arrays</span>.asList(KeySchemaElement.builder()
+                                .attributeName(ATTRIBUTE_PK)
+                                .keyType(KeyType.HASH)
+                                .build(),
+                                KeySchemaElement.builder()
+                                        .attributeName(ATTRIBUTE_SK)
+                                        .keyType(KeyType.RANGE)
+                                        .build()))
+                        .billingMode(BillingMode.PAY_PER_REQUEST)
+                        .tableName(dynamoConfiguration.getTableName())
+                        .globalSecondaryIndexes(gsi1())
+                .build());
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> QueryRequest findAllQueryRequest(<span class="annotation">@NonNull</span> <span class="predefined-type">Class</span>&lt;?&gt; cls,
+                                            <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> beforeId,
+                                            <span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> limit) {
+        QueryRequest.Builder builder = QueryRequest.builder()
+                .tableName(dynamoConfiguration.getTableName())
+                .indexName(INDEX_GSI_1)
+                .scanIndexForward(<span class="predefined-constant">false</span>);
+        <span class="keyword">if</span> (limit != <span class="predefined-constant">null</span>) {
+            builder.limit(limit);
+        }
+        <span class="keyword">if</span> (beforeId == <span class="predefined-constant">null</span>) {
+            <span class="keyword">return</span>  builder.keyConditionExpression(<span class="string"><span class="delimiter">&quot;</span><span class="content">#pk = :pk</span><span class="delimiter">&quot;</span></span>)
+                    .expressionAttributeNames(<span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">#pk</span><span class="delimiter">&quot;</span></span>, ATTRIBUTE_GSI_1_PK))
+                    .expressionAttributeValues(<span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">:pk</span><span class="delimiter">&quot;</span></span>,
+                            classAttributeValue(cls)))
+                    .build();
+        } <span class="keyword">else</span> {
+            <span class="keyword">return</span> builder.keyConditionExpression(<span class="string"><span class="delimiter">&quot;</span><span class="content">#pk = :pk and #sk &lt; :sk</span><span class="delimiter">&quot;</span></span>)
+                    .expressionAttributeNames(CollectionUtils.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">#pk</span><span class="delimiter">&quot;</span></span>, ATTRIBUTE_GSI_1_PK, <span class="string"><span class="delimiter">&quot;</span><span class="content">#sk</span><span class="delimiter">&quot;</span></span>, ATTRIBUTE_GSI_1_SK))
+                    .expressionAttributeValues(CollectionUtils.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">:pk</span><span class="delimiter">&quot;</span></span>,
+                            classAttributeValue(cls),
+                            <span class="string"><span class="delimiter">&quot;</span><span class="content">:sk</span><span class="delimiter">&quot;</span></span>,
+                            id(cls, beforeId)
+                    ))
+                    .build();
+        }
+    }
+
+    <span class="directive">protected</span> <span class="type">void</span> delete(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Class</span>&lt;?&gt; cls, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> id) {
+        AttributeValue pk = id(cls, id);
+        DeleteItemResponse deleteItemResponse = dynamoDbClient.deleteItem(DeleteItemRequest.builder()
+                .tableName(dynamoConfiguration.getTableName())
+                .key(CollectionUtils.mapOf(ATTRIBUTE_PK, pk, ATTRIBUTE_SK, pk))
+                .build());
+        <span class="keyword">if</span> (LOG.isDebugEnabled()) {
+            LOG.debug(deleteItemResponse.toString());
+        }
+    }
+
+    <span class="directive">protected</span> Optional&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt;&gt; findById(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Class</span>&lt;?&gt; cls, <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> id) {
+        AttributeValue pk = id(cls, id);
+        GetItemResponse getItemResponse = dynamoDbClient.getItem(GetItemRequest.builder()
+                .tableName(dynamoConfiguration.getTableName())
+                .key(CollectionUtils.mapOf(ATTRIBUTE_PK, pk, ATTRIBUTE_SK, pk))
+                .build());
+        <span class="keyword">return</span> !getItemResponse.hasItem() ? Optional.empty() : Optional.of(getItemResponse.item());
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="directive">static</span> Optional&lt;<span class="predefined-type">String</span>&gt; lastEvaluatedId(<span class="annotation">@NonNull</span> QueryResponse response,
+                                          <span class="annotation">@NonNull</span> <span class="predefined-type">Class</span>&lt;?&gt; cls) {
+        <span class="keyword">if</span> (response.hasLastEvaluatedKey()) {
+            <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt; item = response.lastEvaluatedKey();
+            <span class="keyword">if</span> (item != <span class="predefined-constant">null</span> &amp;&amp; item.containsKey(ATTRIBUTE_PK)) {
+                <span class="keyword">return</span> id(cls, item.get(ATTRIBUTE_PK));
+            }
+        }
+        <span class="keyword">return</span> Optional.empty();
+    }
+
+    <span class="directive">private</span> <span class="directive">static</span> GlobalSecondaryIndex gsi1() {
+        <span class="keyword">return</span> GlobalSecondaryIndex.builder()
+                .indexName(INDEX_GSI_1)
+                .keySchema(KeySchemaElement.builder()
+                        .attributeName(ATTRIBUTE_GSI_1_PK)
+                        .keyType(KeyType.HASH)
+                        .build(), KeySchemaElement.builder()
+                        .attributeName(ATTRIBUTE_GSI_1_SK)
+                        .keyType(KeyType.RANGE)
+                        .build())
+                .projection(Projection.builder()
+                        .projectionType(ProjectionType.ALL)
+                        .build())
+                .build();
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">protected</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt; item(<span class="annotation">@NonNull</span> T entity) {
+        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt; item = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;();
+        AttributeValue pk = id(entity.getClass(), entity.getId());
+        item.put(ATTRIBUTE_PK, pk);
+        item.put(ATTRIBUTE_SK, pk);
+        item.put(ATTRIBUTE_GSI_1_PK, classAttributeValue(entity.getClass()));
+        item.put(ATTRIBUTE_GSI_1_SK, pk);
+        <span class="keyword">return</span> item;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">protected</span> <span class="directive">static</span> AttributeValue classAttributeValue(<span class="annotation">@NonNull</span> <span class="predefined-type">Class</span>&lt;?&gt; cls) {
+        <span class="keyword">return</span> AttributeValue.builder()
+                .s(cls.getSimpleName())
+                .build();
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">protected</span> <span class="directive">static</span> AttributeValue id(<span class="annotation">@NonNull</span> <span class="predefined-type">Class</span>&lt;?&gt; cls,
+                                     <span class="annotation">@NonNull</span> <span class="predefined-type">String</span> id) {
+        <span class="keyword">return</span> AttributeValue.builder()
+                .s(<span class="predefined-type">String</span>.join(HASH, cls.getSimpleName().toUpperCase(), id))
+                .build();
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">protected</span> <span class="directive">static</span> Optional&lt;<span class="predefined-type">String</span>&gt; id(<span class="annotation">@NonNull</span> <span class="predefined-type">Class</span>&lt;?&gt; cls,
+                                       <span class="annotation">@NonNull</span> AttributeValue attributeValue) {
+        <span class="predefined-type">String</span> str = attributeValue.s();
+        <span class="predefined-type">String</span> substring = cls.getSimpleName().toUpperCase() + HASH;
+        <span class="keyword">return</span> str.startsWith(substring) ? Optional.of(str.substring(substring.length())) : Optional.empty();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And an implementation of <code>BookRepository</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DefaultBookRepository.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.util.CollectionUtils</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
+<span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.DynamoDbClient</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.AttributeValue</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.PutItemRequest</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.PutItemResponse</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.QueryRequest</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.model.QueryResponse</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.Valid</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
+<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">DefaultBookRepository</span> <span class="directive">extends</span> DynamoRepository&lt;<span class="predefined-type">Book</span>&gt; <span class="directive">implements</span> BookRepository {
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(DefaultBookRepository.class);
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> ATTRIBUTE_ID = <span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>;
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> ATTRIBUTE_ISBN = <span class="string"><span class="delimiter">&quot;</span><span class="content">isbn</span><span class="delimiter">&quot;</span></span>;
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> ATTRIBUTE_NAME = <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>;
+
+    <span class="directive">private</span> <span class="directive">final</span> IdGenerator idGenerator;
+    <span class="directive">public</span> DefaultBookRepository(DynamoDbClient dynamoDbClient,
+                                 DynamoConfiguration dynamoConfiguration,
+                                 IdGenerator idGenerator) {
+        <span class="local-variable">super</span>(dynamoDbClient, dynamoConfiguration);
+        <span class="local-variable">this</span>.idGenerator = idGenerator;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> save(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn,
+                <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        <span class="predefined-type">String</span> id = idGenerator.generate();
+        save(<span class="keyword">new</span> <span class="predefined-type">Book</span>(id, isbn, name));
+        <span class="keyword">return</span> id;
+    }
+
+    <span class="directive">protected</span> <span class="type">void</span> save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> <span class="predefined-type">Book</span> book) {
+        PutItemResponse itemResponse = dynamoDbClient.putItem(PutItemRequest.builder()
+                .tableName(dynamoConfiguration.getTableName())
+                .item(item(book))
+                .build());
+        <span class="keyword">if</span> (LOG.isDebugEnabled()) {
+            LOG.debug(itemResponse.toString());
+        }
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> Optional&lt;<span class="predefined-type">Book</span>&gt; findById(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> id) {
+        <span class="keyword">return</span> findById(<span class="predefined-type">Book</span>.class, id)
+                .map(<span class="local-variable">this</span>::bookOf);
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="type">void</span> delete(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> id) {
+        delete(<span class="predefined-type">Book</span>.class, id);
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; findAll() {
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; result = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
+        <span class="predefined-type">String</span> beforeId = <span class="predefined-constant">null</span>;
+        <span class="keyword">do</span> {
+            QueryRequest request = findAllQueryRequest(<span class="predefined-type">Book</span>.class, beforeId, <span class="predefined-constant">null</span>);
+            QueryResponse response = dynamoDbClient.query(request);
+            <span class="keyword">if</span> (LOG.isTraceEnabled()) {
+                LOG.trace(response.toString());
+            }
+            result.addAll(parseInResponse(response));
+            beforeId = lastEvaluatedId(response, <span class="predefined-type">Book</span>.class).orElse(<span class="predefined-constant">null</span>);
+        } <span class="keyword">while</span>(beforeId != <span class="predefined-constant">null</span>); <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="keyword">return</span> result;
+    }
+
+    <span class="directive">private</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; parseInResponse(QueryResponse response) {
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt;&gt; items = response.items();
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; result = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
+        <span class="keyword">if</span> (CollectionUtils.isNotEmpty(items)) {
+            <span class="keyword">for</span> (<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt; item : items) {
+                result.add(bookOf(item));
+            }
+        }
+        <span class="keyword">return</span> result;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">private</span> <span class="predefined-type">Book</span> bookOf(<span class="annotation">@NonNull</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt; item) {
+        <span class="keyword">return</span> <span class="keyword">new</span> <span class="predefined-type">Book</span>(item.get(ATTRIBUTE_ID).s(),
+                item.get(ATTRIBUTE_ISBN).s(),
+                item.get(ATTRIBUTE_NAME).s());
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="annotation">@NonNull</span>
+    <span class="directive">protected</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt; item(<span class="annotation">@NonNull</span> <span class="predefined-type">Book</span> book) {
+        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, AttributeValue&gt; result = <span class="local-variable">super</span>.item(book);
+        result.put(ATTRIBUTE_ID, AttributeValue.builder().s(book.getId()).build());
+        result.put(ATTRIBUTE_ISBN, AttributeValue.builder().s(book.getIsbn()).build());
+        result.put(ATTRIBUTE_NAME, AttributeValue.builder().s(book.getName()).build());
+        <span class="keyword">return</span> result;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Paginate instead of using a scan operation.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="controllers">5. Controllers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a CRUD controller for <code>Book</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/BooksController.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation</span>.*;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>;
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+
+<span class="annotation">@ExecuteOn</span>(TaskExecutors.IO) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">BooksController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> BookRepository bookRepository;
+
+    <span class="directive">public</span> BooksController(BookRepository bookRepository) { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.bookRepository = bookRepository;
+    }
+
+    <span class="annotation">@Get</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; index() {
+        <span class="keyword">return</span> bookRepository.findAll();
+    }
+
+    <span class="annotation">@Post</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="directive">public</span> HttpResponse&lt;?&gt; save(<span class="annotation">@Body</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">isbn</span><span class="delimiter">&quot;</span></span>) <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn, <i class="conum" data-value="6"></i><b>(6)</b>
+                             <span class="annotation">@Body</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>) <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> name) {
+        <span class="predefined-type">String</span> id = bookRepository.save(isbn, name);
+        <span class="keyword">return</span> HttpResponse.created(UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>).path(id).build());
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/{id}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="7"></i><b>(7)</b>
+    <span class="directive">public</span> Optional&lt;<span class="predefined-type">Book</span>&gt; show(<span class="annotation">@PathVariable</span> <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> id) { <i class="conum" data-value="8"></i><b>(8)</b>
+        <span class="keyword">return</span> bookRepository.findById(id);
+    }
+
+    <span class="annotation">@Delete</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/{id}</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="9"></i><b>(9)</b>
+    <span class="annotation">@Status</span>(HttpStatus.NO_CONTENT) <i class="conum" data-value="10"></i><b>(10)</b>
+    <span class="directive">public</span> <span class="type">void</span> delete(<span class="annotation">@PathVariable</span> <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> id) {
+        bookRepository.delete(id);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/books</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use constructor injection to inject a bean of type <code>BookRepository</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>index</code> method to an HTTP GET request on <code>/</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html">@Post</a> annotation maps the <code>save</code> method to an HTTP POST request on <code>/</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>You can use a qualifier within the HTTP request body. For example, you can use a reference to a nested JSON attribute.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>show</code> method to an HTTP GET request on <code>/{id}</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>You can define path variables with a RFC-6570 URI template in the HTTP Method annotation value. The method argument can optionally be annotated with <code>@PathVariable</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html">@Post</a> annotation maps the <code>delete</code> method to an HTTP POST request on <code>/</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>You can return <code>void</code> in your controller&#8217;s method and specify the HTTP status code via the <code>@Status</code> annotation.</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="running-the-application">5.1. Running the application</h3>
+<div class="paragraph">
+<p>For local development, we can <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html">set up DynamoDB locally</a>.</p>
+</div>
+<div class="paragraph">
+<p>An easy option is to run it via Docker.
+After installing Docker, execute the following command to run a DynamoDB local container:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run -it --rm \
+     -p 8000:8000 \
+     amazon/dynamodb-local</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dev-default-environment">5.1.1. Dev default environment</h4>
+<div class="paragraph">
+<p>Modify <code>Application</code> to use <code>dev</code> as a <a href="https://docs.micronaut.io/latest/guide/index.html#_default_environment">default environment</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Application.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContextBuilder</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContextConfigurer</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ContextConfigurer</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>;
+
+<span class="directive">public</span> <span class="type">class</span> <span class="class">Application</span> {
+    <span class="annotation">@ContextConfigurer</span>
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">class</span> <span class="class">DefaultEnvironmentConfigurer</span> <span class="directive">implements</span> ApplicationContextConfigurer {
+        <span class="annotation">@Override</span>
+        <span class="directive">public</span> <span class="type">void</span> configure(<span class="annotation">@NonNull</span> ApplicationContextBuilder builder) {
+            builder.defaultEnvironments(Environment.DEVELOPMENT);
+        }
+    }
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
+        Micronaut.run(Application.class, args);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dev-specific-configuration">5.1.2. Dev specific configuration</h4>
+<div class="paragraph">
+<p>Create an environment-specific configuration class for the <code>dev</code> environment that defines the host and port of the DynamoDB local instance.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application-dev.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">dynamodb-local</span>:
+  <span class="key">host</span>: <span class="string"><span class="content">localhost</span></span>
+  <span class="key">port</span>: <span class="string"><span class="content">8000</span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dev-bootstrap">5.1.3. Dev Bootstrap</h4>
+<div class="paragraph">
+<p>Create a <code>StartupEventListener</code> that is loaded only for the <code>dev</code> environment that creates a dynamodb table if one does not already exist.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DevBootstrap.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.ApplicationEventListener</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.StartupEvent</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb-local.host</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb-local.port</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Requires</span>(env = Environment.DEVELOPMENT) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">DevBootstrap</span> <span class="directive">implements</span> ApplicationEventListener&lt;StartupEvent&gt; {
+
+    <span class="directive">private</span> <span class="directive">final</span> DynamoRepository&lt;? <span class="directive">extends</span> Identified&gt; dynamoRepository;
+
+    <span class="directive">public</span> DevBootstrap(DynamoRepository&lt;? <span class="directive">extends</span> Identified&gt; dynamoRepository) {
+        <span class="local-variable">this</span>.dynamoRepository = dynamoRepository;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="type">void</span> onApplicationEvent(StartupEvent event) {
+        <span class="keyword">if</span> (!dynamoRepository.existsTable()) {
+            dynamoRepository.createTable();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This bean loads only if the specified property is defined.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>This bean loads only if the specified environment is detected.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="pointing-to-dynamodb-local">5.1.4. Pointing to DynamoDB Local</h4>
+<div class="paragraph">
+<p>Add a bean-created listener that points the DynamoDB client to the URL of the Dynamodb local instance.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DynamoDbClientBuilderListener.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Value</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.BeanCreatedEvent</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.BeanCreatedEventListener</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.exceptions.ConfigurationException</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.auth.credentials.AwsCredentials</span>;
+<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder</span>;
+
+<span class="keyword">import</span> <span class="include">java.net.URI</span>;
+<span class="keyword">import</span> <span class="include">java.net.URISyntaxException</span>;
+
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb-local.host</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb-local.port</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">DynamoDbClientBuilderListener</span>
+        <span class="directive">implements</span> BeanCreatedEventListener&lt;DynamoDbClientBuilder&gt; { <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">URI</span> endpoint;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> accessKeyId;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> secretAccessKey;
+
+    DynamoDbClientBuilderListener(<span class="annotation">@Value</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">${dynamodb-local.host}</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> host, <i class="conum" data-value="4"></i><b>(4)</b>
+                                  <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">${dynamodb-local.port}</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> port) { <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="keyword">try</span> {
+            <span class="local-variable">this</span>.endpoint = <span class="keyword">new</span> <span class="predefined-type">URI</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">http://</span><span class="delimiter">&quot;</span></span> + host + <span class="string"><span class="delimiter">&quot;</span><span class="content">:</span><span class="delimiter">&quot;</span></span> + port);
+        } <span class="keyword">catch</span> (<span class="exception">URISyntaxException</span> e) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="exception">ConfigurationException</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb.endpoint not a valid URI</span><span class="delimiter">&quot;</span></span>);
+        }
+        <span class="local-variable">this</span>.accessKeyId = <span class="string"><span class="delimiter">&quot;</span><span class="content">fakeMyKeyId</span><span class="delimiter">&quot;</span></span>;
+        <span class="local-variable">this</span>.secretAccessKey = <span class="string"><span class="delimiter">&quot;</span><span class="content">fakeSecretAccessKey</span><span class="delimiter">&quot;</span></span>;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> DynamoDbClientBuilder onCreated(BeanCreatedEvent&lt;DynamoDbClientBuilder&gt; event) {
+        <span class="keyword">return</span> event.getBean().endpointOverride(endpoint)
+                .credentialsProvider(() -&gt; <span class="keyword">new</span> AwsCredentials() {
+                    <span class="annotation">@Override</span>
+                    <span class="directive">public</span> <span class="predefined-type">String</span> accessKeyId() {
+                        <span class="keyword">return</span> accessKeyId;
+                    }
+
+                    <span class="annotation">@Override</span>
+                    <span class="directive">public</span> <span class="predefined-type">String</span> secretAccessKey() {
+                        <span class="keyword">return</span> secretAccessKey;
+                    }
+                });
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This bean loads only if the specified property is defined.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Creating a <code>@Singleton</code> that implements <code>BeanCreatedEventListener</code> allows you to provide extra configuration to</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can inject configuration values into beans using the <code>@Value</code> annotation. The <code>@Value</code> annotation accepts a string that can have embedded placeholder values (the default value can be provided by specifying a value after the colon : character).</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application-2">6. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command, which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>You should be able to execute the following cURL requests.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/books</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">[]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X POST -d '{&quot;isbn&quot;:&quot;1680502395&quot;,&quot;name&quot;:&quot;Release It!&quot;}' -H &quot;Content-Type: application/json&quot; http://localhost:8080/books</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/books</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">[{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">2BLCWltdt3gGgSw1qsomXIfXBiX</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">isbn</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Release It!</span><span class="delimiter">&quot;</span></span>}]</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tests">6.1. Tests</h3>
+<div class="paragraph">
+<p>Create a <code>StartupEventListener</code> only loaded for the <code>test</code> environment which creates the dynamodb table if it does not exists.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/TestBootstrap.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.ApplicationEventListener</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.StartupEvent</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb-local.host</span><span class="delimiter">&quot;</span></span>)
+<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb-local.port</span><span class="delimiter">&quot;</span></span>)
+<span class="annotation">@Requires</span>(env = Environment.TEST)
+<span class="annotation">@Singleton</span>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">TestBootstrap</span> <span class="directive">implements</span> ApplicationEventListener&lt;StartupEvent&gt; {
+
+    <span class="directive">private</span> <span class="directive">final</span> DynamoRepository dynamoRepository;
+
+    <span class="directive">public</span> TestBootstrap(DynamoRepository dynamoRepository) {
+        <span class="local-variable">this</span>.dynamoRepository = dynamoRepository;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="type">void</span> onApplicationEvent(StartupEvent event) {
+        <span class="keyword">if</span> (!dynamoRepository.existsTable()) {
+            dynamoRepository.createTable();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a test which verifies the CRUD functionality.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/BooksControllerTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.util.CollectionUtils</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpHeaders</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.support.TestPropertyProvider</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
+<span class="keyword">import</span> <span class="include">org.testcontainers.containers.GenericContainer</span>;
+<span class="keyword">import</span> <span class="include">org.testcontainers.junit.jupiter.Container</span>;
+<span class="keyword">import</span> <span class="include">org.testcontainers.junit.jupiter.Testcontainers</span>;
+
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions</span>.*;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS</span>;
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Testcontainers</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@TestInstance</span>(PER_CLASS) <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="type">class</span> <span class="class">BooksControllerTest</span> <span class="directive">implements</span> TestPropertyProvider { <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
+    HttpClient httpClient; <i class="conum" data-value="4"></i><b>(4)</b>
+
+    <span class="annotation">@Container</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">static</span> GenericContainer dynamoDBLocal =
+            <span class="keyword">new</span> GenericContainer(<span class="string"><span class="delimiter">&quot;</span><span class="content">amazon/dynamodb-local</span><span class="delimiter">&quot;</span></span>)
+                    .withExposedPorts(<span class="integer">8000</span>);
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="keyword">if</span> (!dynamoDBLocal.isRunning()) {
+            dynamoDBLocal.start();
+        }
+        <span class="keyword">return</span> CollectionUtils.mapOf(
+                <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb-local.host</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">localhost</span><span class="delimiter">&quot;</span></span>,
+                        <span class="string"><span class="delimiter">&quot;</span><span class="content">dynamodb-local.port</span><span class="delimiter">&quot;</span></span>, dynamoDBLocal.getFirstMappedPort());
+    }
+
+    <span class="directive">private</span> <span class="directive">static</span> HttpRequest&lt;?&gt; saveRequest(<span class="predefined-type">String</span> isbn, <span class="predefined-type">String</span> name) {
+        <span class="keyword">return</span> HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>,
+                CollectionUtils.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">isbn</span><span class="delimiter">&quot;</span></span>, isbn, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, name));
+    }
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> testRetrieveBooks() {
+        BlockingHttpClient client = httpClient.toBlocking();
+
+        <span class="predefined-type">String</span> releaseItIsbn = <span class="string"><span class="delimiter">&quot;</span><span class="content">1680502395</span><span class="delimiter">&quot;</span></span>;
+        <span class="predefined-type">String</span> releaseItName = <span class="string"><span class="delimiter">&quot;</span><span class="content">Release It!</span><span class="delimiter">&quot;</span></span>;
+        HttpResponse&lt;?&gt; saveResponse = client.exchange(
+                saveRequest(releaseItIsbn, releaseItName));
+        assertEquals(HttpStatus.CREATED, saveResponse.status());
+        <span class="predefined-type">String</span> location = saveResponse.getHeaders().get(HttpHeaders.LOCATION);
+        assertNotNull(location);
+        assertTrue(location.startsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/</span><span class="delimiter">&quot;</span></span>));
+        <span class="predefined-type">String</span> releaseItId = location.substring(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/</span><span class="delimiter">&quot;</span></span>.length());
+
+        <span class="predefined-type">String</span> continuousDeliveryIsbn = <span class="string"><span class="delimiter">&quot;</span><span class="content">0321601912</span><span class="delimiter">&quot;</span></span>;
+        <span class="predefined-type">String</span> continuousDeliveryName = <span class="string"><span class="delimiter">&quot;</span><span class="content">Continuous Delivery</span><span class="delimiter">&quot;</span></span>;
+        saveResponse = client.exchange(
+                saveRequest(continuousDeliveryIsbn, continuousDeliveryName));
+        assertEquals(HttpStatus.CREATED, saveResponse.status());
+        location = saveResponse.getHeaders().get(HttpHeaders.LOCATION);
+        assertNotNull(location);
+        assertTrue(location.startsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/</span><span class="delimiter">&quot;</span></span>));
+        <span class="predefined-type">String</span> continuousDeliveryId = location.substring(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/</span><span class="delimiter">&quot;</span></span>.length());
+
+        <span class="predefined-type">String</span> buildingMicroservicesIsbn = <span class="string"><span class="delimiter">&quot;</span><span class="content">1491950358</span><span class="delimiter">&quot;</span></span>;
+        <span class="predefined-type">String</span> buildingMicroservicesName = <span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>;
+        saveResponse = client.exchange(
+                saveRequest(buildingMicroservicesIsbn, buildingMicroservicesName));
+        assertEquals(HttpStatus.CREATED, saveResponse.status());
+        location = saveResponse.getHeaders().get(HttpHeaders.LOCATION);
+        assertNotNull(location);
+        assertTrue(location.startsWith(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/</span><span class="delimiter">&quot;</span></span>));
+        <span class="predefined-type">String</span> buildingMicroservicesId = location.substring(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/</span><span class="delimiter">&quot;</span></span>.length());
+
+        <span class="predefined-type">Book</span> result = client.retrieve(
+                HttpRequest.GET(UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>)
+                        .path(continuousDeliveryId)
+                        .build()), <span class="predefined-type">Book</span>.class);
+        assertEquals(continuousDeliveryName, result.getName());
+
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; books = client.retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>),
+                Argument.listOf(<span class="predefined-type">Book</span>.class));
+        assertEquals(<span class="integer">3</span>, books.size());
+        
+        assertTrue(books.stream().anyMatch(it -&gt;
+                it.getIsbn().equals(continuousDeliveryIsbn) &amp;&amp;
+                        it.getName().equals(continuousDeliveryName)));
+        assertTrue(books.stream().anyMatch(it -&gt;
+                it.getIsbn().equals(releaseItIsbn) &amp;&amp;
+                        it.getName().equals(releaseItName)));
+        assertTrue(books.stream().anyMatch(it -&gt;
+                it.getIsbn().equals(buildingMicroservicesIsbn) &amp;&amp;
+                        it.getName().equals(buildingMicroservicesName)));
+
+        HttpResponse&lt;?&gt; deleteResponse = client.exchange(
+                HttpRequest.DELETE(UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>)
+                        .path(continuousDeliveryId)
+                        .build().toString()));
+        assertEquals(HttpStatus.NO_CONTENT, deleteResponse.getStatus());
+        deleteResponse = client.exchange(HttpRequest.DELETE(UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>)
+                .path(releaseItId)
+                .build().toString()));
+        assertEquals(HttpStatus.NO_CONTENT, deleteResponse.getStatus());
+        deleteResponse = client.exchange(HttpRequest.DELETE(UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books</span><span class="delimiter">&quot;</span></span>)
+                .path(buildingMicroservicesId)
+                .build().toString()));
+        assertEquals(HttpStatus.NO_CONTENT, deleteResponse.getStatus());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Container will be started before and stopped after each test method. Containers declared as static fields will be shared between test methods. They will be started only once before any test method is executed and stopped after the last test method has executed.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Classes that implement <code>TestPropertyProvider</code> must use this annotation to create a single class instance for all tests (not necessary in Spock tests).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">7. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Check <a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/">Micronaut AWS</a> integration.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
