@@ -7,6 +7,7 @@ import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
@@ -37,10 +38,10 @@ public class GenreController {
     }
 
     @Put // <6>
-    public Mono<HttpResponse<?>> update(@Body @Valid GenreUpdateCommand command) { // <7>
+    public Mono<HttpResponse<Genre>> update(@Body @Valid GenreUpdateCommand command) { // <7>
         return genreRepository.update(command.getId(), command.getName())
                 .map(e -> HttpResponse
-                        .noContent()
+                        .<Genre>noContent()
                         .header(HttpHeaders.LOCATION, location(command.getId()).getPath())); // <8>
 
     }
@@ -52,18 +53,21 @@ public class GenreController {
     }
 
     @Post // <11>
-    public Mono<HttpResponse<?>> save(@Body("name") @NotBlank String name) {
+    public Mono<HttpResponse<Genre>> save(@Body("name") @NotBlank String name) {
         return genreRepository.save(name)
                 .map(genre -> HttpResponse.created(genre)
                         .headers(headers -> headers.location(location(genre.getId()))));
     }
 
     @Post("/ex") // <12>
-    public Mono<HttpResponse<?>> saveExceptions(@Body @NotBlank String name) {
-        Mono<HttpResponse<?>> result =  genreRepository.save(name)
-                .map(genre -> HttpResponse.created(genre)
-                        .headers(headers -> headers.location(location(genre.getId()))));
-        return result.onErrorReturn(throwable -> throwable instanceof DataAccessException, HttpResponse.noContent());
+    public Mono<MutableHttpResponse<Genre>> saveExceptions(@Body @NotBlank String name) {
+        return genreRepository
+                .saveWithException(name)
+                .map(genre -> HttpResponse
+                        .created(genre)
+                        .headers(headers -> headers.location(location(genre.getId())))
+                )
+                .onErrorReturn(DataAccessException.class, HttpResponse.noContent());
     }
 
     @Delete("/{id}") // <13>

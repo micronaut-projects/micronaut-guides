@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 
 @Introspected // <1>
 public class GenreUpdateCommand {
+
     @NotNull
     private final Long id;
 
@@ -25,5 +26,4 @@ public class GenreUpdateCommand {
     public String getName() {
         return name;
     }
-
 }
