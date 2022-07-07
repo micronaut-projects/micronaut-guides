@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class GenreControllerTest extends BaseMysqlTest {
+public class GenreControllerTest extends BaseMysqlTest { // <1>
     @Test
     public void testFindNonExistingGenreReturns404() {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -> {
@@ -33,7 +33,7 @@ public class GenreControllerTest extends BaseMysqlTest {
 
         List<Long> genreIds = new ArrayList<>();
 
-        HttpRequest<?> request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <3>
+        HttpRequest<?> request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <2>
         HttpResponse<?> response = httpClient.toBlocking().exchange(request);
         genreIds.add(entityId(response));
 
@@ -53,7 +53,7 @@ public class GenreControllerTest extends BaseMysqlTest {
         assertEquals("Microservices", genre.getName());
 
         request = HttpRequest.PUT("/genres", new GenreUpdateCommand(id, "Micro-services"));
-        response = httpClient.toBlocking().exchange(request);  // <5>
+        response = httpClient.toBlocking().exchange(request);  // <4>
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
@@ -66,7 +66,7 @@ public class GenreControllerTest extends BaseMysqlTest {
 
         assertEquals(2, genres.size());
 
-        request = HttpRequest.POST("/genres/ex", Collections.singletonMap("name", "Microservices")); // <3>
+        request = HttpRequest.POST("/genres/ex", Collections.singletonMap("name", "Microservices")); // <2>
         response = httpClient.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());

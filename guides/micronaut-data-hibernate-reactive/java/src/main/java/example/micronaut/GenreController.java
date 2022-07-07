@@ -21,45 +21,45 @@ import javax.validation.constraints.NotBlank;
 import java.net.URI;
 import java.util.List;
 
-@Controller("/genres")  // <2>
+@Controller("/genres")  // <1>
 public class GenreController {
 
     protected final GenreRepository genreRepository;
 
-    public GenreController(GenreRepository genreRepository) { // <3>
+    public GenreController(GenreRepository genreRepository) { // <2>
         this.genreRepository = genreRepository;
     }
 
-    @Get("/{id}") // <4>
+    @Get("/{id}") // <3>
     @SingleResult
     public Mono<Genre> show(Long id) {
         return genreRepository
-                .findById(id); // <5>
+                .findById(id); // <4>
     }
 
-    @Put // <6>
-    public Mono<HttpResponse<Genre>> update(@Body @Valid GenreUpdateCommand command) { // <7>
+    @Put // <5>
+    public Mono<HttpResponse<Genre>> update(@Body @Valid GenreUpdateCommand command) { // <6>
         return genreRepository.update(command.getId(), command.getName())
                 .map(e -> HttpResponse
                         .<Genre>noContent()
-                        .header(HttpHeaders.LOCATION, location(command.getId()).getPath())); // <8>
+                        .header(HttpHeaders.LOCATION, location(command.getId()).getPath())); // <7>
 
     }
 
-    @Get("/list") // <9>
-    public Mono<List<Genre>> list(@Valid Pageable pageable) { // <10>
+    @Get("/list") // <8>
+    public Mono<List<Genre>> list(@Valid Pageable pageable) { // <9>
         return genreRepository.findAll(pageable)
                 .map(Page::getContent);
     }
 
-    @Post // <11>
+    @Post // <10>
     public Mono<HttpResponse<Genre>> save(@Body("name") @NotBlank String name) {
         return genreRepository.save(name)
                 .map(genre -> HttpResponse.created(genre)
                         .headers(headers -> headers.location(location(genre.getId()))));
     }
 
-    @Post("/ex") // <12>
+    @Post("/ex") // <11>
     public Mono<MutableHttpResponse<Genre>> saveExceptions(@Body @NotBlank String name) {
         return genreRepository
                 .saveWithException(name)
@@ -70,7 +70,7 @@ public class GenreController {
                 .onErrorReturn(DataAccessException.class, HttpResponse.noContent());
     }
 
-    @Delete("/{id}") // <13>
+    @Delete("/{id}") // <12>
     public Mono<HttpResponse<?>> delete(Long id) {
         return genreRepository.deleteById(id)
                 .map(deleteId -> HttpResponse.noContent());
