@@ -1,5 +1,6 @@
 package example.micronaut.domain;
 
+import javax.persistence.GenerationType;
 import javax.validation.constraints.NotNull;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -11,7 +12,7 @@ import javax.persistence.Id;
 public class Genre {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
