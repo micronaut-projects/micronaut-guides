@@ -33,7 +33,38 @@ resource:application.yml[tag=jpa]
 
 Use `none` for the hbm2ddl option to prevent Hibernate from creating the database schema, as we will be using Flyway to manage the database.
 
-common:flyway.adoc[]
+common:flyway-header.adoc[]
+
+We also will need to define a JDBC datasource for the migration (as it cannot use the reactive JPA datasource <<JPA configuration,configured above>>)
+So first add these dependencies:
+
+:dependencies:
+
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=1]
+dependency:mysql-connector-java[groupId=mysql,callout=2,scope=runtime]
+
+:dependencies:
+
+<1> A dependency on micronaut-jdbc's Hikari datasource.
+<2> Adds a dependency to the MySQL Connector/J driver.
+
+Then add the following configuration for both Flyway and the Datasource
+
+resource:application.yml[tag=flyway]
+
+<1> Define the JDBC URL for your database.
+<2> Define the username and password for your database.
+<3> Define the driver class name for your database.
+<4> Enable Flyway for the `migration` datasource.
+
+NOTE: Configuring multiple data sources is as simple as enabling Flyway for each one.
+You can also specify folders that will be used for migrating each data source.
+Review the https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway documentation] for additional details.
+
+Flyway migration will be automatically triggered before your Micronaut application starts.
+Flyway will read migration commands in the `resources/db/migration/` directory, execute them if necessary, and verify that the configured data source is consistent with them.
+
+Create the following migration files with the database schema creation:
 
 resource:db/migration/V1__schema.sql[]
 
@@ -133,9 +164,12 @@ Start it with:
 [source,bash]
 ----
 docker run \
+    --rm \
+    -d \
     -p 3306:3306 \
-    -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
-    mysql:oracle
+    -e MYSQL_ROOT_PASSWORD=my-secret-pw \
+    -e MYSQL_DATABASE=db \
+    mysql:latest
 ----
 
 When you move to production, you will need to configure these properties to point at your real production database.
@@ -143,7 +177,7 @@ This can be done via environment variables like so:
 
 [source,bash]
 ----
-export JDBC_URL=jdbc:mysql://localhost:5432/micronaut
+export JDBC_URL=jdbc:mysql://production-server:5432/micronaut
 export JDBC_USER=dbuser
 export JDBC_PASSWORD=theSecretPassword
 ----
