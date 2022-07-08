@@ -52,7 +52,8 @@ public class BaseMysqlTest implements TestPropertyProvider { // <3>
     public Map<String, String> getProperties() { // <5>
         return CollectionUtils.mapOf(
                 "jpa.default.properties.hibernate.connection.url", getMySQLDbUri(),
-                "datasources.default.url", getMySQLDbUri()
+                "datasources.migration.url", getMySQLDbUri(),
+                "datasources.migration.driverClassName", "com.mysql.cj.jdbc.Driver"
         );
     }
 
