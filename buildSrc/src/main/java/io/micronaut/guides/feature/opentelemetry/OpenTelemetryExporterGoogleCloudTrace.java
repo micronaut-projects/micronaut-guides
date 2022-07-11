@@ -18,10 +18,26 @@ package io.micronaut.guides.feature.opentelemetry;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
+import io.micronaut.starter.feature.build.maven.Profile;
+import io.micronaut.starter.feature.build.maven.Property;
+import io.micronaut.starter.feature.graalvm.GraalVM;
+import io.micronaut.starter.options.BuildTool;
 import jakarta.inject.Singleton;
+
+import java.util.Optional;
 
 @Singleton
 public class OpenTelemetryExporterGoogleCloudTrace extends OpenTelemetryExporterFeature {
+
+    private static final Dependency.Builder DEPENDENCY_NATIVE_IMAGE_SUPPORT = Dependency.builder()
+            .groupId("com.google.cloud")
+            .artifactId("native-image-support");
+
+    private static final Profile PROFILE_GRAALVM = Profile.builder()
+            .id("graalVM")
+            .activationProperty(Property.builder().name("packaging").value("native-image").build())
+            .dependency(DEPENDENCY_NATIVE_IMAGE_SUPPORT.build())
+            .build();
 
     private static final Dependency DEPENDENCY_OTEL_EXPORTER_GOOGLE_CLOUD_TRACE =
             Dependency.builder()
@@ -35,8 +51,12 @@ public class OpenTelemetryExporterGoogleCloudTrace extends OpenTelemetryExporter
     @Override
     public void apply(GeneratorContext generatorContext) {
         super.apply(generatorContext);
-        //GcpFeature.getGraalVMDependencyIfNecessary(generatorContext).ifPresent(generatorContext::addDependency);
-        //GcpFeature.getGraalVMProfileIfNecessary(generatorContext).ifPresent(generatorContext::addProfile);
+        if (generatorContext.getFeatures().isFeaturePresent(GraalVM.class) && generatorContext.getBuildTool().isGradle()) {
+            generatorContext.addDependency(DEPENDENCY_NATIVE_IMAGE_SUPPORT.nativeImageCompileOnly().build());
+        }
+        if (generatorContext.getFeatures().isFeaturePresent(GraalVM.class) && generatorContext.getBuildTool() == BuildTool.MAVEN) {
+            generatorContext.addProfile(PROFILE_GRAALVM);
+        }
     }
 
     @NonNull
