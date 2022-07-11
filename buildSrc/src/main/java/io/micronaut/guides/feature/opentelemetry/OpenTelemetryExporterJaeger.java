@@ -19,7 +19,7 @@ import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class OpenTelemetryExporterJaeger implements OpenTelemetryExporterFeature {
+public class OpenTelemetryExporterJaeger extends OpenTelemetryExporterFeature {
     private static final String EXPORTER_JAEGER = "Jaeger";
 
     @NonNull

@@ -18,16 +18,13 @@ package io.micronaut.guides.feature.opentelemetry;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
-import io.micronaut.starter.feature.other.Management;
-import io.micronaut.starter.feature.server.MicronautServerDependent;
-import io.micronaut.starter.feature.tracing.TracingFeature;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class OpenTelemetryHttp implements TracingFeature, MicronautServerDependent {
+public class OpenTelemetry implements OpenTelemetryFeature {
 
-    private static final Dependency MICRONAUT_OPEN_TELEMETRY_HTTP = Dependency.builder().groupId("io.micronaut.tracing")
-            .artifactId("micronaut-tracing-opentelemetry-http")
+    private static final Dependency MICRONAUT_OPEN_TELEMETRY = Dependency.builder().groupId("io.micronaut.tracing")
+            .artifactId("micronaut-tracing-opentelemetry")
             .compile()
             .build();
 
@@ -39,31 +36,23 @@ public class OpenTelemetryHttp implements TracingFeature, MicronautServerDepende
     @NonNull
     @Override
     public String getName() {
-        return "tracing-opentelemetry-http";
+        return "tracing-opentelemetry";
     }
 
     @NonNull
     @Override
     public String getTitle() {
-        return "OpenTelemetry HTTP";
+        return "Micronaut Integration with OpenTelemetry";
     }
 
     @Override
     @NonNull
     public String getDescription() {
-        return "Enables the creation of span objects HTTP server request, client request, server response and client response";
+        return "Enables the integration with OpenTelemetry";
     }
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(MICRONAUT_OPEN_TELEMETRY_HTTP);
-        if (generatorContext.getFeatures().hasFeature(Management.class)) {
-            generatorContext.getConfiguration().put("otel.exclusions", "/health");
-        }
-    }
-
-    @Override
-    public String getMicronautDocumentation() {
-        return "http://localhost/micronaut-tracing/guide/index.html#opentelemetry";
+        generatorContext.addDependency(MICRONAUT_OPEN_TELEMETRY);
     }
 }

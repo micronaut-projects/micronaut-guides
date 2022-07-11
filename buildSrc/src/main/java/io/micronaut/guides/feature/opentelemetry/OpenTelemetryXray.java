@@ -22,7 +22,8 @@ import io.micronaut.starter.feature.aws.AwsV2Sdk;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class OpenTelemetryXray implements OpenTelemetryFeature {
+public class OpenTelemetryXray extends AbstractOpenTelemetry {
+
     private static final Dependency.Builder OPEN_TELEMETRY_EXTENSION_AWS =
             OpenTelemetryDependencyUtils.openTelemetryDependency()
                     .artifactId("opentelemetry-extension-aws")
@@ -41,6 +42,14 @@ public class OpenTelemetryXray implements OpenTelemetryFeature {
     private static final Dependency.Builder OPEN_TELEMETRY_BOM_ALPHA = Dependency.builder()
             .lookupArtifactId("opentelemetry-instrumentation-bom-alpha")
             .compile();
+    
+    public OpenTelemetryXray(OpenTelemetry otel,
+                             OpenTelemetryHttp otelHttp,
+                             OpenTelemetryAnnotations otelAnnotations,
+                             OpenTelemetryGrpc openTelemetryGrpc,
+                             OpenTelemetryExporterOtlp otelExporter) {
+        super(otel, otelHttp, otelAnnotations, openTelemetryGrpc, otelExporter);
+    }
 
     @NonNull
     @Override
@@ -61,13 +70,13 @@ public class OpenTelemetryXray implements OpenTelemetryFeature {
 
     @Override
     public void apply(GeneratorContext generatorContext) {
+        super.apply(generatorContext);
         generatorContext.addDependency(OPEN_TELEMETRY_EXTENSION_AWS);
         generatorContext.addDependency(OPEN_TELEMETRY_CONTRIB_XRAY);
         if (generatorContext.getFeatures().isFeaturePresent(AwsV2Sdk.class)) {
             generatorContext.addDependency(OPEN_TELEMETRY_BOM_ALPHA);
             generatorContext.addDependency(OPEN_TELEMETRY_INSTRUMENTATION_AWS_SDK);
         }
-        generatorContext.getConfiguration().put("otel.traces.exporter", "otlp");
         generatorContext.getConfiguration().put("otel.traces.propagator", "tracecontext, baggage, xray");
     }
 

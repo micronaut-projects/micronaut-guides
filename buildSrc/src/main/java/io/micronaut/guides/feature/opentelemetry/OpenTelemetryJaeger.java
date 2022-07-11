@@ -16,43 +16,32 @@
 package io.micronaut.guides.feature.opentelemetry;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.starter.application.generator.GeneratorContext;
-import io.micronaut.starter.build.dependencies.Dependency;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class OpenTelemetryAnnotations implements OpenTelemetryFeature {
-
-    private static final Dependency.Builder MICRONAUT_OPEN_TELEMETRY_ANNOTATION_PROCESSOR = Dependency.builder().groupId("io.micronaut.tracing")
-            .artifactId("micronaut-tracing-opentelemetry-annotation")
-            .versionProperty("micronaut.tracing.version")
-            .annotationProcessor();
-    
-    @Override
-    public boolean isVisible() {
-        return false;
+public class OpenTelemetryJaeger extends AbstractOpenTelemetry {
+    public OpenTelemetryJaeger(OpenTelemetry otel,
+                               OpenTelemetryHttp otelHttp,
+                               OpenTelemetryAnnotations otelAnnotations,
+                               OpenTelemetryGrpc openTelemetryGrpc,
+                               OpenTelemetryExporterJaeger otelExporterJaeger) {
+        super(otel, otelHttp, otelAnnotations, openTelemetryGrpc, otelExporterJaeger);
     }
-    
-    @NonNull
+
     @Override
+    @NonNull
     public String getName() {
-        return "tracing-opentelemetry-annotations";
+        return super.getName() + "jaeger";
     }
 
-    @NonNull
     @Override
     public String getTitle() {
-        return "OpenTelemetry Annotations";
+        return "OpenTelemetry Jaeger";
     }
 
     @Override
     @NonNull
     public String getDescription() {
-        return "Enables usage of Open Telemetry annotations.";
-    }
-
-    @Override
-    public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(MICRONAUT_OPEN_TELEMETRY_ANNOTATION_PROCESSOR);
+        return "It adds Micronaut integration with OpenTelemetry and sets Jaeger as the exporter.";
     }
 }

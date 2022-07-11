@@ -16,54 +16,54 @@
 package io.micronaut.guides.feature.opentelemetry;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
-import io.micronaut.starter.feature.other.Management;
-import io.micronaut.starter.feature.server.MicronautServerDependent;
-import io.micronaut.starter.feature.tracing.TracingFeature;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class OpenTelemetryHttp implements TracingFeature, MicronautServerDependent {
+public class OpenTelemetryGrpc implements OpenTelemetryFeature {
 
-    private static final Dependency MICRONAUT_OPEN_TELEMETRY_HTTP = Dependency.builder().groupId("io.micronaut.tracing")
-            .artifactId("micronaut-tracing-opentelemetry-http")
+    private static final Dependency MICRONAUT_OPEN_TELEMETRY_GRPC = Dependency.builder().groupId("io.micronaut.tracing")
+            .artifactId("micronaut-tracing-opentelemetry-grpc")
             .compile()
             .build();
-
-    @Override
-    public boolean isVisible() {
-        return false;
-    }
 
     @NonNull
     @Override
     public String getName() {
-        return "tracing-opentelemetry-http";
+        return "tracing-opentelemetry-grpc";
     }
 
     @NonNull
     @Override
     public String getTitle() {
-        return "OpenTelemetry HTTP";
+        return "Micronaut Integration with OpenTelemetry and gRPC";
     }
 
     @Override
     @NonNull
     public String getDescription() {
-        return "Enables the creation of span objects HTTP server request, client request, server response and client response";
+        return "Adds Micronaut OpenTelemetry gRPC related dependencies.";
     }
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(MICRONAUT_OPEN_TELEMETRY_HTTP);
-        if (generatorContext.getFeatures().hasFeature(Management.class)) {
-            generatorContext.getConfiguration().put("otel.exclusions", "/health");
-        }
+        generatorContext.addDependency(MICRONAUT_OPEN_TELEMETRY_GRPC);
+    }
+
+    @Override
+    public boolean supports(ApplicationType applicationType) {
+        return applicationType == ApplicationType.GRPC;
     }
 
     @Override
     public String getMicronautDocumentation() {
-        return "http://localhost/micronaut-tracing/guide/index.html#opentelemetry";
+        return "https://micronaut-projects.github.io/micronaut-tracing/latest/guide/#grpc";
+    }
+
+    @Override
+    public boolean isVisible() {
+        return false;
     }
 }

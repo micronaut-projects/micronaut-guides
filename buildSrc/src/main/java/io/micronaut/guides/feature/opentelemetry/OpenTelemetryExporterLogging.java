@@ -19,11 +19,16 @@ import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class OpenTelemetryExporterLogging implements OpenTelemetryExporterFeature {
+public class OpenTelemetryExporterLogging extends OpenTelemetryExporterFeature {
     private static final String EXPORTER_LOGGING = "Logging";
 
     @NonNull
     public String exporterName() {
         return EXPORTER_LOGGING;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return true;
     }
 }
