@@ -6,6 +6,8 @@ import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.context.event.StartupEvent;
 import jakarta.inject.Singleton;
 
+@Requires(property = "dynamodb-local.host")
+@Requires(property = "dynamodb-local.port")
 @Requires(env = Environment.DEVELOPMENT)
 @Singleton
 public class DevBootstrap implements ApplicationEventListener<StartupEvent> {
