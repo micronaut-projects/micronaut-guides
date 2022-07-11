@@ -1,4 +1,4 @@
-include::{commondir}/common-header-top.adoc[]
+common:header-top.adoc[]
 
 == Getting Started
 
@@ -11,9 +11,9 @@ and has since been extended with a plug-in architecture to support Streaming Tex
 Message Queuing Telemetry Transport (MQTT), and other protocols.
 ____
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
 == Writing the Application
 
@@ -25,7 +25,7 @@ Let's describe the microservices you will build through the guide.
 
 * `bookrecommendation` - This consumes previous services and exposes an endpoint that recommends book names that are in stock.
 
-include::{commondir}/common-annotationprocessors.adoc[]
+common:annotationprocessors.adoc[]
 
 === Catalogue microservice
 
@@ -33,10 +33,10 @@ Create the `bookcatalogue` microservice using the https://docs.micronaut.io/late
 
 [source,bash]
 ----
-mn create-app --features=rabbitmq,graalvm example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
+mn @cli-command@ --features=rabbitmq,graalvm example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq` and `graalvm` features.
 
@@ -51,7 +51,7 @@ resource:application.yml[app=bookcatalogue,tag=rabbitmq]
 ==== Create RabbitMQ exchange, queue, and binding
 
 Before being able to send and receive messages using RabbitMQ, it is necessary to define the exchange, queue, and binding.
-One option is to create them directly in the RabbitMQ Admin UI available on `http://localhost:15672[http://localhost:15672]`.
+One option is to create them directly in the RabbitMQ Admin UI available on http://localhost:15672.
 Use `guest` for both username and password.
 
 Another option is to create them programmatically. Create the class `ChannelPoolListener.java`:
@@ -87,10 +87,10 @@ Create the `bookinventory` microservice using the https://docs.micronaut.io/late
 
 [source,bash]
 ----
-mn create-app --features=rabbitmq,graalvm example.micronaut.bookinventory --build=@build@ --lang=@lang@
+mn @cli-command@ --features=rabbitmq,graalvm example.micronaut.bookinventory --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq` and `graalvm` features.
 
@@ -123,10 +123,10 @@ Create the `bookrecommendation` microservice using the https://docs.micronaut.io
 
 [source,bash]
 ----
-mn create-app --features=rabbitmq,reactor,graalvm example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
+mn @cli-command@ --features=rabbitmq,reactor,graalvm example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq`, `reactor`, and `graalvm` features.
 
@@ -141,7 +141,7 @@ Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microser
 ==== Create clients
 
 Let's create two interfaces to send messages to RabbitMQ. The Micronaut framework will implement the interfaces at compilation time.
-Create `CatalogueClient.java`:
+Create `CatalogueClient`:
 
 source:CatalogueClient[app=bookrecommendation]
 
@@ -206,9 +206,13 @@ Run `bookinventory` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.bookinventory
 ----
-bookinventory $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 13:30:22.426 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 742ms. Server Running: 1 active message listeners.
 ----
 
@@ -217,9 +221,13 @@ bookinventory $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.bookinventory
 ----
-bookinventory $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 13:30:22.426 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 742ms. Server Running: 1 active message listeners.
 ----
 
@@ -234,9 +242,13 @@ Run `bookcatalogue` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.bookcatalogue
 ----
-bookcatalogue $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 13:31:19.887 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 949ms. Server Running: 1 active message listeners.
 ----
 
@@ -245,9 +257,13 @@ bookcatalogue $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.bookcatalogue
 ----
-bookcatalogue $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 13:31:19.887 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 949ms. Server Running: 1 active message listeners.
 ----
 
@@ -264,9 +280,13 @@ Run `bookrecommendation` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.bookrecommendation
 ----
-bookcatalogue $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 13:32:06.045 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 959ms. Server Running: http://localhost:8080
 ----
 
@@ -275,9 +295,13 @@ bookcatalogue $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.bookrecommendation
 ----
-bookcatalogue $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 13:32:06.045 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 959ms. Server Running: http://localhost:8080
 ----
 
@@ -287,11 +311,15 @@ You can run a `curl` command to test the whole application:
 
 [source, bash]
 ----
-$ curl http://localhost:8080/books
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
 [{"name":"Building Microservices"}]
 ----
 
-include::{commondir}/common-graal-with-plugins.adoc[]
+common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 

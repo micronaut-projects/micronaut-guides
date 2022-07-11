@@ -2,6 +2,9 @@ package io.micronaut.guides.feature;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.guides.feature.template.appengineGradle;
+import io.micronaut.guides.feature.template.appengineGradleSettings;
+import io.micronaut.guides.feature.template.appengineMaven;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.BuildProperties;
@@ -13,10 +16,6 @@ import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.template.RockerWritable;
 import jakarta.inject.Singleton;
-import io.micronaut.guides.feature.template.appengineGradleSettings;
-import io.micronaut.guides.feature.template.appengineGradle;
-import io.micronaut.guides.feature.template.appengineMaven;
-
 
 @Singleton
 public class GoogleAppEngine implements Feature {

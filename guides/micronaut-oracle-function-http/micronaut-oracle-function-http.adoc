@@ -1,4 +1,4 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
 == What you will need
 
@@ -8,29 +8,29 @@ To complete this guide, you will need the following:
 * A decent text editor or IDE
 * JDK 11 or greater installed with `JAVA_HOME` configured appropriately
 * Docker installed
-* A paid or free trial Oracle Cloud account (create an account at https://signup.oraclecloud.com[signup.oraclecloud.com])
-* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed, with local access to Oracle Cloud configured by running `oci setup config`
+common:oracle-cloud-account-paid.adoc[]
+common:oracle-cloud-cli.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
 == Writing the Application
 
-include::{commondir}/common-cli-or-launch.adoc[]
+common:cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-app --features=oracle-function,oracle-cloud-sdk,graalvm example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
+mn @cli-command@ --features=oracle-function,oracle-cloud-sdk,graalvm example.micronaut.micronautguide --build=@build@ --lang=@lang@ --jdk=11
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type, JDK version 11 or higher, and add the `oracle-function`, `oracle-cloud-sdk`, and `graalvm` features.
 
-include::{commondir}/common-default-package.adoc[]
+common:default-package.adoc[]
 
 diffLink:[featureExcludes=oci-java-sdk-core]
 
-include::{commondir}/common-annotationprocessors.adoc[]
+common:annotationprocessors.adoc[]
 
 === Dependencies
 
@@ -102,9 +102,10 @@ To run the tests:
 
 [source, bash]
 ----
-$ ./gradlew test
-$ open build/reports/tests/test/index.html
+./gradlew test
 ----
+
+Then open `build/reports/tests/test/index.html` in a browser to see the results.
 
 :exclude-for-build:
 
@@ -112,7 +113,7 @@ $ open build/reports/tests/test/index.html
 
 [source, bash]
 ----
-$ ./mvnw test
+./mvnw test
 ----
 
 :exclude-for-build:
@@ -121,7 +122,7 @@ $ ./mvnw test
 
 We need to configure some cloud infrastructure to support deploying functions.
 
-Initially, do all the configuration steps described in the https://guides.micronaut.io/latest/micronaut-oracle-function.html[Deploy a Micronaut Function (Serverless) application to Oracle Cloud] guide's "Configuring Oracle Cloud Resources" section since they're the same as for HTTP Gateway functions. To summarize, do the following (unless a resource exists and can be used):
+Initially, do all the configuration steps described in the guideLink:micronaut-oracle-function[Deploy a Micronaut Function (Serverless) application to Oracle Cloud] guide's "Configuring Oracle Cloud Resources" section since they're the same as for HTTP Gateway functions. To summarize, do the following (unless a resource exists and can be used):
 
 - create a compartment
 - create a function user and group
@@ -142,7 +143,7 @@ There is some more infrastructure configuration to do, but we'll need to create 
 
 First, build the function as a Docker image and push it to the OCIR repository by running:
 
-include::{commondir}/common-docker-push.adoc[]
+common:docker-push.adoc[]
 
 Once you've pushed the Docker container, create the function in the console. First, log out from your administrator account and log in as the user created above.
 
@@ -168,7 +169,7 @@ image::oraclefnhttp/function5.png[]
 
 == Configuring Oracle Cloud Resources (continued)
 
-Like earlier, do all the configuration steps described in the https://guides.micronaut.io/latest/micronaut-oracle-function.html[Deploy a Micronaut Function (Serverless) application to Oracle Cloud] guide's "Enable Tracing and Logs" section since they're the same as for HTTP Gateway functions. To summarize, do the following (unless a resource exists and can be used):
+Like earlier, do all the configuration steps described in the guideLink:micronaut-oracle-function[Deploy a Micronaut Function (Serverless) application to Oracle Cloud] guide's "Enable Tracing and Logs" section since they're the same as for HTTP Gateway functions. To summarize, do the following (unless a resource exists and can be used):
 
 - create an APM domain
 - enable logs for your HTTP function
@@ -278,7 +279,7 @@ image::oraclefnhttp/policy5.png[]
 
 == Invoking the function
 
-Since the function works with Compute Instances, make sure you have at least one running. If you don't have any, one easy option is with the https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[Deploy a Micronaut application to Oracle Cloud] guide.
+Since the function works with Compute Instances, make sure you have at least one running. If you don't have any, one easy option is with the guideLink:micronaut-oracle-cloud[Deploy a Micronaut application to Oracle Cloud] guide.
 
 Now is when you need the base controller URL that you copied when creating the API Gateway; it should look something like `\https://cjrgh5e3lfqz....apigateway.us-ashburn-1.oci.customer-oci.com/compute` and end in `/compute` since that's the root URI of the controller.
 
@@ -356,7 +357,7 @@ and the output should look something like this (it should be the same as before 
 
 === Install GraalVM
 
-include::{commondir}/common-install-graal-function.adoc[]
+common:install-graal-function.adoc[]
 
 === Building and deploying the native image
 
@@ -463,7 +464,7 @@ In the "configuration" block of the "micronaut-maven-plugin" plugin in your `pom
 
 Then from the demo project directory, run:
 
-include::{commondir}/common-docker-push-native.adoc[]
+common:docker-push-native.adoc[]
 
 Once you've pushed the Docker container, edit the function in the console to use the new container, and to reduce the memory to 128MB:
 
@@ -473,10 +474,8 @@ Use the same OCI command as before to invoke the function. No changes are needed
 
 :exclude-for-languages:
 
-include::{commondir}/common-next.adoc[]
+common:next.adoc[]
 
 Read more about the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud] integration.
 
 Also check out the https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm[Oracle Cloud Function documentation] for more information on the available functionality.
-
-include::{commondir}/common-helpWithMicronaut.adoc[]

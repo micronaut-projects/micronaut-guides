@@ -19,16 +19,13 @@ public class Genre {
     @NonNull
     private String name;
 
-    public Genre() {
-    }
+    @NonNull
+    @JsonIgnore
+    private Set<Book> books = new HashSet<>();
 
     public Genre(@NonNull @NotNull String name) {
         this.name = name;
     }
-
-    @NonNull
-    @JsonIgnore
-    private Set<Book> books = new HashSet<>();
 
     @Nullable
     public Long getId() {

@@ -38,6 +38,7 @@ class DownloadExcelTest {
                     sheetCriterion.row(rowCriterion ->
                             rowCriterion.cell(cellCriterion -> cellCriterion.value("Building Microservices"))));
         });
-        assertEquals(result.getCells().size(), 1);
+
+        assertEquals(1, result.getCells().size());
     }
 }

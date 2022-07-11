@@ -1,55 +1,27 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
-== Writing the Application
+common:create-app-features.adoc[]
 
-include::{commondir}/common-cli-or-launch.adoc[]
+The generated application contains a `HomeController`. It responds to POST requests to `/`.
 
-[source,bash]
-----
-mn create-app example.micronaut.micronautguide --features=aws-lambda --build=@build@ --lang=@lang@
-----
-
-include::{commondir}/common-build-lang-arguments.adoc[]
-
-If you use https://launch.micronaut.io[Micronaut Launch], add the `aws-lambda` feature.
-
-include::{commondir}/common-default-package.adoc[]
-
-include::{commondir}/common-annotationprocessors.adoc[]
-
-The generated application contains a `BookController`. It responds to POST requests to `/`.
-
-source:BookController[]
+source:HomeController[]
 
 callout:controller[arg0=/]
-* The `@Post` annotation maps HTTP requests to `/` to the `save` method.
-* Add the `@Valid` annotation to any method parameter which requires validation.
-
-The controller method parameter is a `Book` object:
-
-source:Book[]
-
-* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
-
-It returns a `BookSaved` object:
-
-source:BookSaved[]
-
-* Annotate the class with `@Introspected` to generate the Bean Metainformation at compile time.
+* The `@Get` annotation maps HTTP requests to `/` to the `index` method.
 
 The generated tests illustrates how the code works when the lambda gets invoked:
 
-test:BookControllerTest[]
+test:HomeControllerTest[]
 
 * When you instantiate the Handler, the application context starts.
 * Remember to close your application context when you end your test. You can use your handler to obtain it.
 * You don't invoke the controller directly. Instead, your handler receives an AWS Proxy Request event which it is routed transparently to your controller.
 
-include::{commondir}/common-testApp.adoc[]
+common:testApp.adoc[]
 
 == Lambda
 
@@ -59,7 +31,7 @@ image::create-function.png[]
 
 === Upload Code
 
-include::{commondir}/common-executable-jar.adoc[]
+common:executable-jar.adoc[]
 
 Upload it:
 
@@ -73,33 +45,9 @@ As Handler, set:
 
 image::handler.png[]
 
-=== Test
+common:lambda-test.adoc[]
 
-You can test it easily. As `Event Template` use `apigateway-aws-proxy` to get started:
-
-image::test-event.png[]
-
-[source, json]
-----
-{
-  "body": "{\"name\": \"Building Microservices\"}",
-  "resource": "/",
-  "path": "/",
-  "httpMethod": "POST",
-  "isBase64Encoded": false,
-  "queryStringParameters": {},
-  "multiValueQueryStringParameters": {},
-  "pathParameters": {},
-  "stageVariables": {},
-  ...
-}
-----
-
-You should see a 200 response:
-
-image::test-result.png[]
-
-include::{commondir}/common-next.adoc[]
+common:next.adoc[]
 
 Read more about:
 
@@ -107,4 +55,4 @@ Read more about:
 
 * https://aws.amazon.com/lambda/[AWS Lambda]
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

@@ -6,6 +6,7 @@ import io.micronaut.core.naming.Named;
 
 @ConfigurationProperties("db") // <1>
 public interface MongoDbConfiguration extends Named {
+
     @NonNull
     String getCollection();
 }

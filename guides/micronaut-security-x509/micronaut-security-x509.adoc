@@ -1,0 +1,444 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will create a Micronaut application with X.509 authentication written in @language@.
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+* JDK 1.8 or greater installed with `JAVA_HOME` configured appropriately
+* https://www.openssl.org/[OpenSSL] installed
+
+common:completesolution.adoc[]
+
+== X.509 Mutual Authentication
+
+As of Micronaut Security version 3.3, applications can use https://en.wikipedia.org/wiki/X.509[X.509] client certificates when using SSL to enable https://en.wikipedia.org/wiki/Mutual_authentication[mutual authentication], i.e., in addition to the client verifying the server identity with its SSL certificate, the server can verify the client identity with a client certificate.
+
+== Create certificates for testing
+
+First, we'll need a Certificate Authority (CA), an SSL certificate for the server, and an X.509 certificate for each application user who will be using mutual authentication. You can use an existing CA, server certificate, and/or client certificate if you already have them; otherwise create your own as described below.
+
+=== Create a Certificate Authority (CA)
+
+Start by creating a self-signed CA with OpenSSL:
+
+[source,bash]
+----
+openssl req -x509 -sha256 -days 365 -newkey rsa:4096 \
+        -keyout cacert.key -out cacert.pem
+----
+
+You will be asked for a CA password ("PEM pass phrase") and a few values for the CA. Most are optional and are useful for identifying a particular certificate; for our needs only the Common Name (CN) is important though - enter a domain name or other identifying value, e.g., "micronaut.guide.x509":
+
+image::x509/certs1.png[]
+
+This will create two files, `cacert.pem` (the CA in PEM format) and `cacert.key` (the private key).
+
+You can verify and inspect the CA with
+
+[source,bash]
+----
+openssl x509 -in cacert.pem -text
+openssl x509 -purpose -in cacert.pem -inform PEM
+----
+
+=== Create a Server SSL Certificate
+
+Next we'll create an SSL certificate for the server. This involves creating a certificate signing request (CSR) and creating the certificate by signing the CSR with the CA we created.
+
+==== Create a Certificate Signing Request (CSR)
+
+[source,bash]
+----
+openssl req -newkey rsa:4096 -keyout server.key -out server.csr
+----
+
+You will be asked for a password ("PEM pass phrase") and a few values for the certificate. Enter "localhost" for the Common Name (CN); the rest are optional:
+
+image::x509/certs2.png[]
+
+This will create two files, `server.csr` (the CSR) and `server.key` (the private key).
+
+You can verify and inspect the CSR with
+
+[source,bash]
+----
+openssl req -noout -text -in server.csr
+----
+
+==== Sign the Server CSR with the CA
+
+Next, sign the CSR with the CA to create the server certificate. Create a configuration file `server.conf` with this content:
+
+[source]
+.server.conf
+----
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost
+----
+
+and generate the certificate:
+
+[source,bash]
+----
+openssl x509 -req -CA cacert.pem -CAkey cacert.key \
+        -in server.csr -out server.pem -days 365 \
+        -CAcreateserial -extfile server.conf
+----
+
+You will be asked for the CA password that you chose earlier. Everything else is provided via the command line or `server.conf`:
+
+image::x509/certs3.png[]
+
+This will create `server.pem` (the server certificate).
+
+You can verify and inspect the certificate with
+
+[source,bash]
+----
+openssl x509 -in server.pem -text
+openssl x509 -purpose -in server.pem -inform PEM
+----
+
+=== Create a Keystore Containing the Server Certificate
+
+==== Create server.p12
+
+Bundle the server certificate and private key in https://en.wikipedia.org/wiki/PKCS_12[PKCS #12] format:
+
+[source,bash]
+----
+openssl pkcs12 -export -out server.p12 -name "localhost" \
+        -inkey server.key -in server.pem
+----
+
+You will be asked for the server certificate password that you chose earlier and a new password ("Export Password") for the PKCS #12 archive:
+
+image::x509/certs4.png[]
+
+This will create `server.p12`. You can verify and inspect the archive with
+
+[source,bash]
+----
+openssl pkcs12 -in server.p12 -noout -info
+----
+
+==== Create keystore.p12
+
+Create `keystore.p12` containing `server.p12` using the https://docs.oracle.com/en/java/javase/11/tools/keytool.html[keytool] utility from your JDK:
+
+[source,bash]
+----
+keytool -importkeystore -srckeystore server.p12 \
+        -srcstoretype pkcs12 -destkeystore keystore.p12 \
+        -deststoretype pkcs12
+----
+
+You will be asked for the `server.p12` password that you chose earlier and a new password for the keystore:
+
+image::x509/certs5.png[]
+
+This will create `keystore.p12`. You can verify and inspect the archive with
+
+[source,bash]
+----
+openssl pkcs12 -in keystore.p12 -noout -info
+----
+
+=== Create a Truststore Containing the CA
+
+Create `truststore.jks` containing the CA:
+
+[source,bash]
+----
+keytool -import -trustcacerts -noprompt -alias ca \
+        -ext san=dns:localhost,ip:127.0.0.1 \
+        -file cacert.pem -keystore truststore.jks
+----
+
+You will be asked for a new password ("keystore password") for the truststore:
+
+image::x509/certs6.png[]
+
+=== Create a Client X.509 Certificate
+
+==== Create a Certificate Signing Request (CSR)
+
+Similar to what we did earlier for the server certificate, create a CSR for the client certificate:
+
+[source,bash]
+----
+openssl req -newkey rsa:4096 -nodes -keyout client.key -out client.csr
+----
+
+For this certificate we'll skip the password (via the `-nodes` command line flag), but you can omit the flag and enter a password if you prefer.
+
+Enter a username (e.g., "myusername") for the Common Name (CN); the rest are optional:
+
+image::x509/certs7.png[]
+
+This will create two files, `client.csr` (the CSR) and `client.key` (the private key).
+
+You can verify and inspect the CSR with
+
+[source,bash]
+----
+openssl req -noout -text -in client.csr
+----
+
+==== Sign the Client CSR with the CA
+
+Sign the client CSR with the CA:
+
+[source,bash]
+----
+openssl x509 -req -CA cacert.pem -CAkey cacert.key \
+        -in client.csr -out client.pem -days 365 -CAcreateserial
+----
+
+You will be asked for the CA password that you chose earlier.
+
+image::x509/certs8.png[]
+
+This will create `client.pem` (the client certificate).
+
+You can verify and inspect the client certificate with
+
+[source,bash]
+----
+openssl x509 -in client.pem -text
+----
+
+==== Create client.p12
+
+Bundle the client certificate and private key in PKCS #12 format:
+
+[source,bash]
+----
+openssl pkcs12 -export -out client.p12 -name "client" \
+        -inkey client.key -in client.pem
+----
+
+You will be asked for a new password for the PKCS #12 archive:
+
+image::x509/certs9.png[]
+
+This will create `client.p12`. You can verify and inspect the archive with
+
+[source,bash]
+----
+openssl pkcs12 -in client.p12 -noout -info
+----
+
+== Writing the Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli-command@ example.micronaut.micronautguide \
+   --features=@features@ \
+   --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+diffLink:[]
+
+common:annotationprocessors.adoc[]
+
+=== Copy Certificates
+
+Create the `src/main/resources/ssl` directory and copy the keystore (`keystore.p12`) and truststore (`truststore.jks`) that you created earlier into it.
+
+=== Configuration
+
+Replace the generated `application.yml` with this:
+
+resource:application.yml[]
+
+<1> Enable X.509 support
+<2> Enable SSL/TLS at the server
+<3> Set `client-authentication` to `want`, i.e., accept a client certificate if available, but don't block access without one. To require a client certificate for all requests, change to `need`
+<4> Specify the location of the keystore
+<5> Set this value with the password you used when creating the keystore
+<6> Specify the keystore type as PKCS #12
+<7> Specify the location of the truststore
+<8> Set this value with the password you used when creating the truststore
+<9> Specify the truststore type as JKS (Java Key Store)
+
+=== HelloController
+
+Create `HelloController` to test using client X.509 certificates:
+
+source:HelloController[]
+
+<1> Allow authenticated and non-authenticated requests
+callout:text-plain[2]
+<3> Bind the `X509Authentication` if present, but allow null when not authenticated
+<4> Redundantly bind the `Authentication` to verify that it's the same instance as the `X509Authentication`
+<5> Default the username for non-authenticated requests
+<6> Sanity check that there's no `Authentication` if there's no `X509Authentication`
+<7> Sanity check that the `Authentication` is the `X509Authentication`
+<8> Build the response as the username plus info about the certificate CA for the authenticated user
+
+=== Writing Tests
+
+Create a test to verify that X.509 authentication works:
+
+test:X509Test[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+<3> Make a request to the controller
+<4> Verify the response is correct
+
+Create `application-test.yml` in `src/test/resources` with this content:
+
+testResource:application-test.yml[tag=client]
+
+<1> Start the server on a random unused SSL port
+<2> Specify the location of the client keystore
+<3> Change this value to the password you used when creating the client keystore
+<4> Specify the keystore type as PKCS #12
+
+common:testApp.adoc[]
+
+== Running the Application
+
+:exclude-for-build:maven
+
+To run the application, use the `./gradlew run` command, which starts the application on port 8443.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, use the `./mvnw mn:run` command, which starts the application on port 8443.
+
+:exclude-for-build:
+
+=== Testing with cURL
+
+You can run some cURL requests to test the application. First, make a request without presenting a client certificate:
+
+[source,bash]
+----
+curl -i --cacert cacert.pem https://localhost:8443/
+----
+
+The output should look similar to this:
+
+[source]
+----
+HTTP/1.1 200 OK
+date: Thu, 28 Oct 2021 01:03:40 GMT
+Content-Type: text/plain
+content-length: 14
+connection: keep-alive
+
+Hello unknown!
+----
+
+Next, make a request with a client certificate:
+
+[source,bash]
+----
+curl -i --cert client.pem --key client.key \
+     --cacert cacert.pem https://localhost:8443/
+----
+
+The output should look similar to this:
+
+[source]
+----
+HTTP/1.1 200 OK
+date: Thu, 28 Oct 2021 01:05:25 GMT
+Content-Type: text/plain
+content-length: 63
+connection: keep-alive
+
+Hello myusername (X.509 cert issued by CN=micronaut.guide.x509)
+----
+
+=== Testing with a Web Browser
+
+To make requests in a web browser, you must import the CA and the client certificate into the browser.
+
+==== Import Certificates Into Firefox
+
+To do this in Firefox, navigate to `about:preferences#privacy` and scroll down to the Certificates section, then click "View Certificates":
+
+image::x509/browser1.png[]
+
+Go to the "Authorities" tab and click "Import...":
+
+image::x509/browser2.png[]
+
+Navigate to the `cacert.pem` CA certificate you created earlier and import it. Check the "Trust this CA to identify websites" checkbox and click OK:
+
+image::x509/browser3.png[]
+
+The CA will appear as a "Software Security Device" under "micronaut.guide.x509":
+
+image::x509/browser4.png[]
+
+Go to the "Your Certificates" tab and click "Import...":
+
+image::x509/browser5.png[]
+
+Navigate to the `client.p12` archive you created earlier and import it. The certificate will appear as a "Software Security Device" under "myusername":
+
+image::x509/browser6.png[]
+
+==== Import Certificates Into Chrome
+
+To do this in Chrome, navigate to `chrome://settings/certificates` and go to the "Authorities" tab, then click "Import":
+
+image::x509/browser7.png[]
+
+Navigate to the `cacert.pem` CA certificate you created earlier and import it. Check the "Trust this certificate for identifying websites" checkbox and click OK:
+
+image::x509/browser8.png[]
+
+The CA will appear under "org-micronaut.guide.x509":
+
+image::x509/browser9.png[]
+
+Go to the "Your certificates" tab and click "Import...":
+
+image::x509/browser10.png[]
+
+Navigate to the `client.p12` archive you created earlier and import it. The certificate will appear under "org-myusername":
+
+image::x509/browser11.png[]
+
+==== Make a secure request
+
+Navigate to https://localhost:8443 and choose the client certificate you imported earlier when prompted. The response should look like this:
+
+image::x509/browser12.png[]
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Run the native image and repeat the cURL calls and browser request that you made earlier.
+
+:exclude-for-languages:
+
+common:next.adoc[]
+
+See the https://docs.micronaut.io/latest/guide/#https[Micronaut documentation on using HTTPS].
+
+Also check out https://micronaut-projects.github.io/micronaut-acme/latest/guide/[Micronaut Acme], a convenient way to configure and refresh SSL certificates using https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment[Automatic Certificate Management Environment (ACME)]

@@ -1,11 +1,11 @@
 plugins {
     id "java-gradle-plugin"
     id 'groovy'
-    id 'nu.studer.rocker' version '3.0.2'
+    id 'nu.studer.rocker' version '3.0.4'
 }
 
 ext {
-    micronautVersion = new File(projectDir, "../version.txt").text.trim()
+    micronautVersion = new File(projectDir.parentFile, 'version.txt').text.trim()
     micronautDocsVersion = '1.0.25'
 }
 
@@ -25,6 +25,11 @@ dependencies {
     implementation("org.apache.commons:commons-compress:1.20")
     implementation "io.micronaut.docs:micronaut-docs-asciidoc-extensions:$micronautDocsVersion", {
         exclude group: "org.codehaus.groovy"
+    }
+    implementation("org.openapitools:openapi-generator:$openapiGeneratorVersion")
+    // Explicitly specify the version for swagger-models to be used by the openapi generator
+    implementation("io.swagger.core.v3:swagger-models") {
+        version { strictly "$swaggerModelsVersion" }
     }
 }
 

@@ -4,33 +4,26 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Introspected
 public class GenreUpdateCommand {
 
-    @NotNull
-    @NonNull
-    private Long id;
+    private long id;
 
     @NotBlank
     @NonNull
     private String name;
 
-    public GenreUpdateCommand() {
-    }
-
-    public GenreUpdateCommand(@NonNull @NotNull Long id, @NonNull @NotBlank String name) {
+    public GenreUpdateCommand(long id, @NonNull @NotBlank String name) {
         this.id = id;
         this.name = name;
     }
 
-    @NonNull
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(@NonNull Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

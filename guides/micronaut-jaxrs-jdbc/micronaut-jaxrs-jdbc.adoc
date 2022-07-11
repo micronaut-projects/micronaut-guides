@@ -1,0 +1,165 @@
+common:header.adoc[]
+
+By default, Micronaut users define their https://docs.micronaut.io/latest/guide/#routing[HTTP Routing] using the Micronaut `@Controller` annotation and other built-in https://docs.micronaut.io/latest/guide/#_routing_annotations[Routing Annotations]. However, https://micronaut-projects.github.io/micronaut-jaxrs/latest/guide/[Micronaut JAX-RS] allows you to define your Micronaut endpoints with JAX-RS annotations.
+
+____
+What exactly is JAX-RS? JAX-RS is a POJO-based, annotation-driven framework for building web services that comply with RESTful principles. Imagine writing all the low level code to parse an HTTP request and the logic just to wire these requests to appropriate Java classes/methods. The beauty of the JAX-RS API is that it insulates developers from that complexity and allows them to concentrate on business logic. That’s precisely where the use of POJOs and annotations come into play! JAX-RS has annotations to bind specific URI patterns and HTTP operations to individual methods of your Java class.
+
+Gupta, Abhishek. https://abhishek-gupta.gitbook.io/rest-assured-with-jaxrs/[REST assured with JAX-RS: speak HTTP using Java]
+____
+
+This application exposes some REST endpoints using https://projects.eclipse.org/projects/ee4j.jaxrs[JAX-RS annotations] and stores data in a MySQL database using Micronaut Data JDBC.
+
+:containerized: MySQL
+common:requirements-testcontainers.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:datasource.adoc[]
+
+common:flyway.adoc[]
+
+resource:db/migration/V1__schema.sql[]
+
+During application startup, Flyway will execute the SQL file and create the schema needed for the application.
+
+=== Domain
+
+Add an enum:
+
+source:PetType[]
+
+Create an entity:
+
+source:Pet[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+
+=== Service
+
+Create a POJO `NameDto`:
+
+source:NameDto[]
+
+callout:introspected[1]
+
+Create a https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcRepositories[Repository]:
+
+source:PetRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:dto-projection[3]
+
+=== JAX-RS
+
+==== Dependencies
+
+When you add a `jax-rs` feature, the generated application includes the following dependencies:
+
+:dependencies:
+dependency:micronaut-jaxrs-processor[groupId=io.micronaut.jaxrs,scope=annotationProcessor]
+dependency:micronaut-jaxrs-server[groupId=io.micronaut.jaxrs]
+:dependencies:
+
+==== Resource
+
+Create a POJO to encapsulate the HTTP Request body for a save request:
+
+source:PetSave[]
+
+Define an endpoint using JAX-RS.
+
+source:PetResource[]
+
+<1> A JAX-RS annotation to define the base URI for methods in this class.
+callout:constructor-di[number=2,arg0=PetRepository]
+<3> A JAX-RS annotation to define an endpoint for HTTP Get requests. Mapped to the base URI `/pets`, since no `@Path` is provided.
+<4> The response is converted to a JSON array automatically.
+<5> Paths can be templated for path parameters, such as the pet's name, here.
+<6> Associate the template placeholder name with the Java variable.
+
+=== Tests
+
+Add a test for the resource:
+
+test:PetResourceTest[]
+
+callout:micronaut-test-transactional-false[1]
+callout:http-client[2]
+<3> Micronaut returns a 404 response if the resource method returns an empty optional.
+
+common:testApp.adoc[]
+
+common:runapp-mysql-with-docker.adoc[]
+
+You can execute the endpoints exposed by the application:
+
+[source, bash]
+----
+curl -id '{"name":"Chase", "type":"DOG"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/pets
+----
+
+[source]
+----
+HTTP/1.1 201 Created
+...
+----
+
+[source, bash]
+----
+curl -i localhost:8080/pets
+----
+
+[source]
+----
+HTTP/1.1 200 OK
+...
+[{"name":"Chase"}]
+----
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You can execute the endpoints exposed by the native image:
+
+[source, bash]
+----
+curl -id '{"name":"Chase", "type":"DOG"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/pets
+----
+
+[source]
+----
+HTTP/1.1 201 Created
+...
+----
+
+[source, bash]
+----
+curl -i localhost:8080/pets
+----
+
+[source]
+----
+HTTP/1.1 200 OK
+...
+[{"name":"Chase"}]
+----
+
+:exclude-for-languages:
+
+== Next steps
+
+Read more about:
+
+- https://micronaut-projects.github.io/micronaut-jaxrs/latest/guide/[Micronaut JAX-RS].
+- https://jakarta.ee/specifications/restful-ws/[Jakarta RESTful Web Services]

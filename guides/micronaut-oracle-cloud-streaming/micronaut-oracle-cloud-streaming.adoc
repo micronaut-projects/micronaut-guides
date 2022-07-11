@@ -1,4 +1,4 @@
-include::{commondir}/common-header-top.adoc[]
+common:header-top.adoc[]
 
 == Getting Started
 
@@ -11,11 +11,11 @@ To complete this guide, you will need the following:
 * Some time on your hands
 * A decent text editor or IDE
 * JDK 11 or greater installed with `JAVA_HOME` configured appropriately
-* An Oracle Cloud account (create a free trial account at https://signup.oraclecloud.com[signup.oraclecloud.com])
-* https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] installed with local access to Oracle Cloud configured by running `oci setup config`
+common:oracle-cloud-account.adoc[]
+common:oracle-cloud-cli.adoc[]
 * https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker and for running tests.
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
 == Writing the Application
 
@@ -27,7 +27,7 @@ The microservices are:
 
 * `chess-listener` - Receives the chess event messages and persists them to a database
 
-include::{commondir}/common-annotationprocessors.adoc[]
+common:annotationprocessors.adoc[]
 
 === chess-game Microservice
 
@@ -35,10 +35,10 @@ Create the `chess-game` microservice using the https://docs.micronaut.io/latest/
 
 [source,bash]
 ----
-mn create-app --features=kafka,graalvm,reactor,testcontainers example.micronaut.chess-game --build=@build@ --lang=@lang@
+mn @cli-command@ --features=kafka,graalvm,reactor,testcontainers example.micronaut.chess-game --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `reactor`, and `testcontainers` features.
 
@@ -115,25 +115,27 @@ callout:executes-on[2]
 
 ==== Development environment
 
-include::{commondir}/common-default-dev-environment-application.adoc[]
+common:default-dev-environment-application.adoc[]
 
 source:Application[app=chess-game]
 
 Delete the `kafka.bootstrap.servers` config option from `application.yml` and move it to `application-dev.yml`.
 
-include::{commondir}/common-default-dev-environment-application-dev-yaml.adoc[]
+common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.yml[app=chess-game]
 
 <1> Use local Kafka in the development environment
 
-==== UI Resources
+==== Static Resources
 
 Update `application.yml` to add static resource configuration:
 
 resource:application.yml[app=chess-game,tag=router]
 
-<1> Configure the Framework to look for static resources in `src/main/resources/public`
+callout:static-resources[1]
+
+==== UI Resources
 
 Create `index.html` with the simple chess game UI:
 
@@ -159,10 +161,10 @@ Create the `chess-listener` microservice using the https://docs.micronaut.io/lat
 
 [source,bash]
 ----
-mn create-app --features=kafka,graalvm,data-jdbc,flyway,reactor,testcontainers example.micronaut.chess-listener --build=@build@ --lang=@lang@
+mn @cli-command@ --features=kafka,graalvm,data-jdbc,flyway,reactor,testcontainers example.micronaut.chess-listener --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `data-jdbc`, `flyway`, `reactor`, and `testcontainers` features.
 
@@ -241,11 +243,11 @@ source:chess/ChessListener[app=chess-listener]
 
 ==== Development environment
 
-include::{commondir}/common-default-dev-environment-application.adoc[]
+common:default-dev-environment-application.adoc[]
 
 source:Application[app=chess-listener]
 
-include::{commondir}/common-default-dev-environment-application-dev-yaml.adoc[]
+common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.yml[app=chess-listener]
 
@@ -277,7 +279,7 @@ Start Zookeeper and Kafka (use CTRL-C to stop both):
 
 [source,bash]
 ----
-$ docker-compose up
+docker-compose up
 ----
 
 Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance].
@@ -289,18 +291,26 @@ Start the `chess-game` microservice:
 :exclude-for-build:maven
 
 [source,bash]
+.chess-game
 ----
-chess-game $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
 Start the `chess-listener` microservice:
 
 [source,bash]
+.chess-listener
 ----
-chess-listener $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
@@ -309,24 +319,32 @@ chess-listener $ ./gradlew run
 :exclude-for-build:gradle
 
 [source,bash]
+.chess-game
 ----
-chess-game $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080
 ----
 
 Start the `chess-listener` microservice:
 
 [source,bash]
+.chess-listener
 ----
-chess-listener $ ./mvnw mn:run
+./mvnw mn:run
+----
 
+[source]
+----
 16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081
 ----
 
 :exclude-for-build:
 
-Test the app functionality by opening http://localhost:8080/[http://localhost:8080/] in a browser. The UI lets you choose one or more chess games that will auto-play with the specified delay between plays. Events (game start and end, player moves) are sent to the server via Ajax and then sent to the `chess-listener` microservice for processing, analysis, etc.
+Test the app functionality by opening http://localhost:8080/ in a browser. The UI lets you choose one or more chess games that will auto-play with the specified delay between plays. Events (game start and end, player moves) are sent to the server via Ajax and then sent to the `chess-listener` microservice for processing, analysis, etc.
 
 You can, for example, start a single game with a moderately large delay between plays:
 
@@ -350,7 +368,7 @@ image::oraclecloudstream/ui4.png[]
 
 Update the `chess-listener` microservice to support Oracle in addition to the in-memory H2 database.
 
-Use the https://guides.micronaut.io/latest/micronaut-oracle-autonomous-db.html[Oracle Autonomous Database guide] to provision an Oracle database at OCI.
+Use the guideLink:micronaut-oracle-autonomous-db[Oracle Autonomous Database guide] to provision an Oracle database at OCI.
 
 ==== Dependencies
 
@@ -504,14 +522,14 @@ To run each application use:
 
 [source, bash]
 ----
-$ MICRONAUT_ENVIRONMENTS=oraclecloud ./gradlew run
+MICRONAUT_ENVIRONMENTS=oraclecloud ./gradlew run
 ----
 
 or if you use Windows:
 
 [source, bash]
 ----
-> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
+cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
 ----
 
 :exclude-for-build:
@@ -522,14 +540,14 @@ To run each application use:
 
 [source, bash]
 ----
-$ MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run
+MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run
 ----
 
 or if you use Windows:
 
 [source, bash]
 ----
-> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
+cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
 ----
 
 :exclude-for-build:
@@ -545,7 +563,7 @@ Create a test in the `chess-game` microservice to verify that Kafka message proc
 test:GameReporterTest[app=chess-game]
 
 <1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+callout:test-instance-per-class[2]
 <3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainer instance for Kafka
 <5> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
@@ -564,7 +582,7 @@ Create a test in the `chess-listener` microservice to verify that Kafka message 
 test:GameServiceTest[app=chess-listener]
 
 <1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+callout:test-instance-per-class[2]
 <3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainer instance for Kafka
 <5> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice
@@ -581,13 +599,13 @@ testResource:application-test.yml[app=chess-listener]
 
 === Running the tests
 
-include::{commondir}/common-testApp-noheader.adoc[]
+common:testApp-noheader.adoc[]
 
 == Deploy to OCI
 
 Once you've verified that the microservices work with the configured cloud resources, you can deploy the microservices to Compute instances and run everything in Oracle Cloud.
 
-Follow the steps in https://guides.micronaut.io/latest/micronaut-oracle-cloud.html[this guide] for each service.
+Follow the steps in guideLink:micronaut-oracle-cloud[this guide] for each service.
 
 === Instance Principal authentication
 
@@ -638,7 +656,7 @@ oci:
       enabled: true
 ----
 
-include::{commondir}/common-graal-with-plugins-multi.adoc[]
+common:graal-with-plugins-multi.adoc[]
 
 :exclude-for-languages:groovy
 
@@ -654,7 +672,7 @@ To generate deployable native images for each application using Gradle, run:
 
 [source, bash]
 ----
-$ ./gradlew dockerBuildNative
+./gradlew dockerBuildNative
 ----
 
 :exclude-for-build:
@@ -665,7 +683,7 @@ To generate deployable native images for each application using Maven, run:
 
 [source, bash]
 ----
-$ ./mvnw package -Dpackaging=docker-native
+./mvnw package -Dpackaging=docker-native
 ----
 
 :exclude-for-build:
@@ -676,7 +694,7 @@ You'll need the Docker image IDs, so run:
 
 [source, bash]
 ----
-$ docker image ls
+docker image ls
 ----
 
 The output should look like this:
@@ -700,9 +718,9 @@ Then run this for each image, replacing `image_id` with the Docker image ID, e.g
 
 [source, bash]
 ----
-$ docker create --name container_temp <image_id>
-$ docker cp container_temp:/app/application .
-$ docker rm container_temp
+docker create --name container_temp <image_id>
+docker cp container_temp:/app/application .
+docker rm container_temp
 ----
 
 Now you can scp each native image to a Compute instance with no Java installed and see the startup time and resource usage reduction you expect when running applications as native images.
@@ -713,4 +731,4 @@ Now you can scp each native image to a Compute instance with no Java installed a
 
 Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in the Micronaut framework.
 
-Also see https://guides.micronaut.io/latest/micronaut-kafka.html[this guide on the Micronaut framework + Kafka].
+Also see guideLink:micronaut-kafka[this guide on the Micronaut framework + Kafka].

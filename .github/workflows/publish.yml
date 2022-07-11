@@ -1,0 +1,44 @@
+name: Publish
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      JDK_VERSION:  '11'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Build with Gradle
+        run: ./gradlew build
+        env:
+          GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+          GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+          GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
+      - name: Calculate version of the guides
+        id: guides_version
+        run: |
+          current_version=`cat version.txt`
+          tmp_version=( ${current_version//./ } )
+          version=`echo "${tmp_version[0]}.${tmp_version[1]}.x"`
+          echo ::set-output name=guides_version::${version}
+      - name: Publish to Github Pages
+        uses: micronaut-projects/github-pages-deploy-action@master
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: build/dist
+          VERSION: ${{ steps.guides_version.outputs.guides_version }}

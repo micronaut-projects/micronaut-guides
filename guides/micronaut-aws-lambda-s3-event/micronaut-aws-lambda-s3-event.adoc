@@ -1,34 +1,25 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
 == Writing the App
 
-include::{commondir}/common-cli-or-launch.adoc[]
+common:cli-or-launch.adoc[]
 
 [source,bash]
 ----
 mn create-function-app example.micronaut.micronautguide --features=aws-lambda --build=@build@ --lang=@lang@
 ----
 
-include::{commondir}/common-build-lang-arguments.adoc[]
+common:build-lang-arguments.adoc[]
 
-If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add `aws-lambda` feature.
+If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add the `aws-lambda-s3-event-notification` feature.
 
-include::{commondir}/common-default-package.adoc[]
+common:default-package.adoc[]
 
-include::{commondir}/common-annotationprocessors.adoc[]
-
-=== Delete Sample Code
-
-The Micronaut framework generates some sample code by default. Delete the following files:
-
-* `src/main/java/example/micronaut/Book.java`
-* `src/main/java/example/micronaut/BookRequest.java`
-* `src/main/java/example/micronaut/BookSaved.java`
-* `src/test/java/example/micronaut/BookRequestHandlerTest.java`
+common:annotationprocessors.adoc[]
 
 === Thumbnail Configuration
 
@@ -64,7 +55,7 @@ callout:constructor-di[number=2,arg0=ThumbnailConfiguration]
 
 === Handler
 
-Add the following dependency to subscribe to `S3NotificationEvent`:
+When you select the feature `aws-lambda-s3-event-notification`, the application build includes the following dependency:
 
 dependency:aws-lambda-java-events[groupId=com.amazonaws,version=@aws-lambda-java-eventsVersion@]
 
@@ -78,9 +69,9 @@ dependency:s3[groupId=software.amazon.awssdk]
 
 :dependencies:
 
-Create a Handler which receives an S3 notification event and for each S3 event of type `ObjectCreated` creates a thumbnail if the S3 object is a PNG or JPG in the `thumbnails` folder of the same S3 bucket which triggered the event.
+The handler receives an S3 notification event and for each S3 event of type `ObjectCreated` creates a thumbnail if the S3 object is a PNG or JPG in the `thumbnails` folder of the same S3 bucket which triggered the event.
 
-source:Handler[]
+source:FunctionRequestHandler[]
 
 <1> We want to handle `S3EventNotification` events.
 callout:injection[number=2,arg0=S3Client]
@@ -117,7 +108,7 @@ Configure the trigger to:
 
 === Upload Code
 
-include::{commondir}/common-executable-jar.adoc[]
+common:executable-jar.adoc[]
 
 Upload it:
 
@@ -127,7 +118,7 @@ image::upload-function-code.png[]
 
 In the AWS Console, as Handler, set:
 
-`example.micronaut.Handler`
+`example.micronaut.FunctionRequestHandler`
 
 === Test
 
@@ -139,4 +130,4 @@ Read more about:
 
 * https://aws.amazon.com/lambda/[AWS Lambda]
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

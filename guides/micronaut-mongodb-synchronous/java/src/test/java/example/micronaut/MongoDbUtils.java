@@ -4,6 +4,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
 public class MongoDbUtils {
+
     static MongoDBContainer mongoDBContainer;
 
     public static void startMongoDb() {

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @MicronautTest
@@ -51,7 +51,7 @@ public class BookControllerTest {
             assertFalse(result.isPresent());
         });
 
-        verifyZeroInteractions(analyticsClient);
+        verifyNoInteractions(analyticsClient);
     }
 
     @Primary

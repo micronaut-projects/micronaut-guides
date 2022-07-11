@@ -9,36 +9,58 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
+import io.micronaut.starter.options.JdkVersion
 import org.gradle.api.GradleException
 
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Map.Entry
+import java.util.regex.Pattern
 
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
+import static io.micronaut.starter.api.TestFramework.SPOCK
+import static io.micronaut.starter.application.ApplicationType.CLI
+import static io.micronaut.starter.application.ApplicationType.DEFAULT
+import static io.micronaut.starter.application.ApplicationType.FUNCTION
+import static io.micronaut.starter.application.ApplicationType.GRPC
+import static io.micronaut.starter.application.ApplicationType.MESSAGING
+import static io.micronaut.starter.options.Language.GROOVY
 
 @CompileStatic
 class GuideAsciidocGenerator {
 
-    private static final String INCLUDE_COMMONDIR = 'include::{commondir}/'
+    private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
+    private static final String EXTERNAL = 'external:'
+    private static final Pattern GUIDE_LINK_REGEX = ~/(.*)guideLink:(.*)\[(.*)](.*)/
+
     public static final int DEFAULT_MIN_JDK = 8
     public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
     public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
+    private static final String CLI_MESSAGING = 'create-messaging-app'
+    private static final String CLI_DEFAULT = 'create-app'
+    private static final String CLI_GRPC = 'create-grpc-app'
+    private static final String CLI_FUNCTION = 'create-function-app'
+    private static final String CLI_CLI = 'create-cli-app'
+    public static final String DEFAULT_APP_NAME = "default"
 
-    static void generate(GuideMetadata metadata, File inputDir, File destinationFolder) {
-        Path asciidocPath = Paths.get(inputDir.absolutePath, metadata.asciidoctor)
-        File asciidocFile = asciidocPath.toFile()
-        assert asciidocFile.exists()
-        if (!destinationFolder.exists()) {
-            destinationFolder.mkdir()
+    static void generate(GuideMetadata metadata, File inputDir,
+                         File asciidocDir, File projectDir) {
+
+        JdkVersion javaVersion = Utils.parseJdkVersion()
+        if (metadata.maximumJavaVersion != null && javaVersion.majorVersion() > metadata.maximumJavaVersion) {
+            println "not generating asciidoc for $metadata.slug, JDK ${javaVersion.majorVersion()} > $metadata.maximumJavaVersion"
+            return
         }
+
+        File asciidocFile = new File(inputDir, metadata.asciidoctor)
+        assert asciidocFile.exists()
+
+        List<String> rawLinesExpanded = expandMacros(asciidocFile.readLines(), projectDir)
+
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
-            String projectName = "${metadata.slug}-${guidesOption.buildTool.toString()}-${guidesOption.language}"
-
-            List<String> rawLinesExpanded = expandAllCommonIncludes(asciidocFile.readLines(), destinationFolder)
+            String projectName = "${metadata.slug}-${guidesOption.buildTool}-${guidesOption.language}"
 
             List<String> lines = []
             boolean excludeLineForLanguage = false
@@ -60,22 +82,22 @@ class GuideAsciidocGenerator {
                 }
 
                 if (shouldProcessLine(line, 'source:')) {
-                    lines.addAll(sourceIncludeLines(line))
+                    lines.addAll(sourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'test:')) {
-                    lines.addAll(testIncludeLines(line, guidesOption.testFramework))
+                    lines.addAll(testIncludeLines(metadata.slug, line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'rawTest:')) {
-                    lines.addAll(rawTestIncludeLines(line, guidesOption.testFramework))
+                    lines.addAll(rawTestIncludeLines(metadata.slug, line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'resource:')) {
-                    lines.addAll(resourceIncludeLines(line))
+                    lines.addAll(resourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'testResource:')) {
-                    lines.addAll(testResourceIncludeLines(line))
+                    lines.addAll(testResourceIncludeLines(metadata.slug, line))
 
                 } else if (shouldProcessLine(line, 'zipInclude:')) {
-                    lines.addAll(zipIncludeLines(line))
+                    lines.addAll(zipIncludeLines(metadata.slug, line))
 
                 } else if (line == ':dependencies:') {
                     groupDependencies = !groupDependencies
@@ -87,7 +109,7 @@ class GuideAsciidocGenerator {
 
                 } else if (shouldProcessLine(line, 'dependency:')) {
                     if (groupDependencies) {
-                        groupedDependencies.add(line)
+                        groupedDependencies << line
                     } else {
                         lines.addAll(DependencyLines.asciidoc(line, guidesOption.buildTool, guidesOption.language))
                     }
@@ -104,15 +126,14 @@ class GuideAsciidocGenerator {
                     }
                 } else if (line.startsWith(EXCLUDE_FOR_JDK_LOWER_THAN)) {
                     try {
-                        String str = line.substring(EXCLUDE_FOR_JDK_LOWER_THAN.length());
+                        String str = line.substring(EXCLUDE_FOR_JDK_LOWER_THAN.length())
                         if (StringUtils.isNotEmpty(str)) {
                             Integer minJdk = Integer.valueOf(str)
                             if ((metadata.minimumJavaVersion ?: DEFAULT_MIN_JDK) >= minJdk) {
                                 excludeLineForMinJdk = true
                             }
                         }
-                    } catch(NumberFormatException e) {
-
+                    } catch (NumberFormatException ignored) {
                     }
                 } else if (shouldProcessLine(line, 'rocker:')) {
                     lines.addAll(includeRocker(line))
@@ -123,23 +144,39 @@ class GuideAsciidocGenerator {
                 }
             }
 
-            File versionFile = Paths.get(destinationFolder.absolutePath, "../../../version.txt").toFile()
+            String version = new File(projectDir, 'version.txt').text.trim()
 
             String text = lines.join('\n')
             text = text.replace("{githubSlug}", metadata.slug)
             text = text.replace("@language@", StringUtils.capitalize(guidesOption.language.toString()))
             text = text.replace("@guideTitle@", metadata.title)
             text = text.replace("@guideIntro@", metadata.intro)
-            text = text.replace("@micronaut@", versionFile.text)
+            text = text.replace("@micronaut@", version)
             text = text.replace("@lang@", guidesOption.language.toString())
             text = text.replace("@build@", guidesOption.buildTool.toString())
             text = text.replace("@testFramework@", guidesOption.testFramework.toString())
             text = text.replace("@authors@", metadata.authors.join(', '))
             text = text.replace("@languageextension@", guidesOption.language.extension)
-            text = text.replace("@testsuffix@", guidesOption.testFramework == TestFramework.SPOCK ? 'Spec' : 'Test')
+            text = text.replace("@testsuffix@", guidesOption.testFramework == SPOCK ? 'Spec' : 'Test')
             text = text.replace("@sourceDir@", projectName)
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
+
+            text = text.replaceAll(~/@(\w*):?cli-command@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                cliCommandForApp(metadata, app).orElse('')
+            }
+
+            text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                List<String> features = featuresForApp(metadata, guidesOption, app)
+                features.join(',')
+            }
+
+            text = text.replaceAll(~/@(\w*):?features-words@/) { List<String> matches ->
+                String app = matches[1] ?: 'default'
+                featuresWordsForApp(metadata, guidesOption, app)
+            }
 
             for (Entry<String, Coordinate> entry : getCoordinates().entrySet()) {
                 if (entry.value.version) {
@@ -147,37 +184,72 @@ class GuideAsciidocGenerator {
                 }
             }
 
-            Path destinationPath = Paths.get(destinationFolder.absolutePath, projectName + ".adoc")
-            File destination = destinationPath.toFile()
-            destination.createNewFile()
-            destination.text = text
+            File renderedAsciidocFile = new File(asciidocDir, projectName + '.adoc')
+            renderedAsciidocFile.createNewFile()
+            renderedAsciidocFile.setText(text, 'UTF-8')
         }
     }
 
-    private static List<String> expandAllCommonIncludes(List<String> lines, File destinationFolder) {
+    private static Optional<String> cliCommandForApp(GuideMetadata metadata,
+                                                     String appName) {
+        App app = metadata.apps.find { it.name == appName }
+        if (app) {
+            return Optional.of(cliCommandForApp(app))
+        }
+        Optional.empty()
+    }
+
+    private static String cliCommandForApp(App app) {
+        switch (app.getApplicationType()) {
+            case CLI:
+                return CLI_CLI
+            case FUNCTION:
+                return CLI_FUNCTION
+            case GRPC:
+                return CLI_GRPC
+            case MESSAGING:
+                return CLI_MESSAGING
+            case DEFAULT:
+                return CLI_DEFAULT
+        }
+    }
+
+    private static String featuresWordsForApp(GuideMetadata metadata,
+                                              GuidesOption guidesOption,
+                                              String app) {
+        List<String> features = featuresForApp(metadata, guidesOption, app)
+                .collect { '`' + it + '`' }
+        if (features.size() > 1) {
+            return "${features[0..-2].join(', ')}, and ${features[-1]}"
+        }
+        features[0]
+    }
+
+    private static List<String> featuresForApp(GuideMetadata metadata,
+                                               GuidesOption guidesOption,
+                                               String app) {
+        List<String> features = metadata.apps.find { it.name == app }.features
+        if (guidesOption.language == GROOVY) {
+            features.remove 'graalvm'
+        }
+        features
+    }
+
+    private static List<String> expandMacros(List<String> lines, File projectDir) {
         List<String> rawLines = []
 
         for (String rawLine : lines) {
+
+            if (findInlineMacro(rawLine, 'guideLink:')) {
+                rawLine = processGuideLink(rawLine)
+            }
+
             if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
-                String commonFileName = parseFileName(rawLine, CALLOUT)
-                        .map(str -> 'callout-' + str)
-                        .orElseThrow(() -> new GradleException("could not parse filename from callout for line" + rawLine))
-                Optional<Integer> number = parseNumber(rawLine)
-                List<String> newLines = commonLines(destinationFolder, commonFileName)
-                String line = "${number.map(num -> '<' + num + '>').orElse('*')} ${newLines.first()}".toString()
-                for (int i = 0; i < 10; i++) {
-                    String value = extractFromParametersLine(rawLine, "arg" + i)
-                    if (value) {
-                        line = line.replace("{" + i + "}", value)
-                    }
-                }
-                rawLines.add(line)
+                rawLines << callout(rawLine, projectDir)
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
-                String commonFileName = parseFileName(rawLine, INCLUDE_COMMONDIR)
-                        .orElseThrow(() -> new GradleException("could not parse filename from commondir line" + rawLine))
-                rawLines.add("// Start: ${commonFileName}".toString())
-                rawLines.addAll(commonLines(destinationFolder, commonFileName))
-                rawLines.add("// End: ${commonFileName}".toString())
+                include rawLine, rawLines, projectDir, true
+            } else if (rawLine.startsWith(EXTERNAL) && rawLine.endsWith(']')) {
+                include rawLine, rawLines, projectDir, false
             } else {
                 rawLines << rawLine
             }
@@ -185,9 +257,52 @@ class GuideAsciidocGenerator {
         return rawLines
     }
 
-    private static Optional<String> parseFileName(String line, String preffix, String suffix = '.adoc') {
-        if (line.contains(preffix) && line.contains('[')) {
-            String name = line.substring(line.indexOf(preffix) + preffix.length(), line.indexOf('['))
+    private static String callout(String rawLine, File projectDir) {
+        String relativePath = parseFileName(rawLine, CALLOUT)
+                .orElseThrow(() -> new GradleException("could not parse filename from callout for line: " + rawLine))
+        relativePath = 'src/docs/common/callouts/callout-' + relativePath
+
+        File file = new File(projectDir, relativePath)
+
+        List<String> newLines = commonLines(file, projectDir)
+
+        Optional<Integer> number = parseNumber(rawLine)
+        String line = number.map(num -> '<' + num + '>').orElse('*') + ' ' + newLines.first()
+
+        for (int i = 0; i < 10; i++) {
+            String value = extractFromParametersLine(rawLine, "arg" + i)
+            if (value) {
+                line = line.replace("{" + i + "}", value)
+            }
+        }
+
+        line
+    }
+
+    private static void include(String rawLine, List<String> rawLines, File projectDir,
+                                boolean snippet) {
+
+        String prefix = snippet ? INCLUDE_COMMONDIR : EXTERNAL
+
+        String relativePath = parseFileName(rawLine, prefix)
+                .orElseThrow(() -> new GradleException("could not parse filename from include line: " + rawLine))
+
+        if (snippet) {
+            relativePath = 'src/docs/common/snippets/common-' + relativePath
+        } else {
+            relativePath = 'guides/' + relativePath
+        }
+
+        File file = new File(projectDir, relativePath)
+
+        rawLines << '// Start: ' + relativePath
+        rawLines.addAll commonLines(file, projectDir)
+        rawLines << '// End: ' + relativePath
+    }
+
+    private static Optional<String> parseFileName(String line, String prefix, String suffix = '.adoc') {
+        if (line.contains(prefix) && line.contains('[')) {
+            String name = line.substring(line.indexOf(prefix) + prefix.length(), line.indexOf('['))
             if (!name.endsWith(suffix)) {
                 name += suffix
             }
@@ -204,42 +319,51 @@ class GuideAsciidocGenerator {
                     return Optional.of(Integer.valueOf(number))
                 }
                 return Optional.of(Integer.valueOf(rawLine.substring(rawLine.indexOf('[') + '['.length(), rawLine.indexOf(']'))))
-            } catch(NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
         }
         Optional.empty()
     }
 
-    private static List<String> commonLines(File destinationFolder, String commonFileName) {
-        File commonFile = Paths.get(destinationFolder.absolutePath, "../common/$commonFileName").toFile()
-        assert commonFile.exists()
-        return expandAllCommonIncludes(commonFile.readLines(), destinationFolder)
+    private static List<String> commonLines(File file, File projectDir) {
+        assert file.exists()
+        return expandMacros(file.readLines(), projectDir)
     }
 
     private static boolean shouldProcessLine(String line, String macro) {
         line.startsWith(macro) && line.contains('[') && line.endsWith(']')
     }
 
+    private static boolean findInlineMacro(String line, String macro) {
+        if (line.contains(macro)) {
+            int indexBracket = line.indexOf('[')
+            indexBracket > -1 && line.indexOf(']') > indexBracket
+        } else {
+            false
+        }
+    }
+
     private static String extractName(String line, String macro) {
         line.substring(macro.length(), line.indexOf('['))
     }
 
-    private static List<String> sourceIncludeLines(String line) {
-        sourceIncludeLines(line, null, 'source:')
+    private static List<String> sourceIncludeLines(String slug, String line) {
+        sourceIncludeLines(slug, line, null, 'source:')
     }
 
-    private static List<String> testIncludeLines(String line, TestFramework testFramework) {
-        sourceIncludeLines(line, testFramework, 'test:')
+    private static List<String> testIncludeLines(String slug, String line, TestFramework testFramework) {
+        sourceIncludeLines(slug, line, testFramework, 'test:')
     }
 
-    private static List<String> resourceIncludeLines(String line) {
-        resourceIncludeLines(line, 'main', 'resource:')
+    private static List<String> resourceIncludeLines(String slug, String line) {
+        resourceIncludeLines(slug, line, 'main', 'resource:')
     }
 
-    private static List<String> testResourceIncludeLines(String line) {
-        resourceIncludeLines(line, 'test', 'testResource:')
+    private static List<String> testResourceIncludeLines(String slug, String line) {
+        resourceIncludeLines(slug, line, 'test', 'testResource:')
     }
 
-    private static List<String> zipIncludeLines(String line) {
+    private static List<String> zipIncludeLines(String slug, String line) {
         String fileName = extractName(line, 'zipInclude:')
         List<String> tagNames = extractTags(line)
 
@@ -252,37 +376,41 @@ class GuideAsciidocGenerator {
                 '----']
         if (tags) {
             for (String tag : tags) {
-                lines << "include::{sourceDir}/@sourceDir@/${fileName}[${tag}]\n".toString()
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${fileName}[${tag}]\n".toString()
             }
         } else {
-            lines << "include::{sourceDir}/@sourceDir@/${fileName}[]".toString()
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${fileName}[]".toString()
         }
         lines << '----'
         lines
     }
 
-    private static List<String> sourceIncludeLines(String line, TestFramework testFramework, String macro) {
+    private static List<String> sourceIncludeLines(String slug, String line, TestFramework testFramework, String macro) {
         String name = extractName(line, macro)
         String appName = extractAppName(line)
+        if (appName == DEFAULT_APP_NAME) {
+            appName == ""
+        }
         List<String> tagNames = extractTags(line)
 
         List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
 
         String sourcePath = testFramework ? testPath(appName, name, testFramework) : mainPath(appName, name)
+        String normalizedSourcePath = (Paths.get(sourcePath)).normalize().toString();
         List<String> lines = [
-            '[source,@lang@]',
-            ".${sourcePath}".toString(),
-            '----',
+                '[source,@lang@]',
+                '.' + normalizedSourcePath,
+                '----',
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${sourcePath}[${tag}]\n".toString())
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${tag}]\n".toString()
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${sourcePath}[]".toString())
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[]".toString()
         }
 
-        lines.add('----')
+        lines << '----'
         lines
     }
 
@@ -300,7 +428,7 @@ class GuideAsciidocGenerator {
         if (testFramework) {
             if (name.endsWith('Test')) {
                 fileName = name.substring(0, name.indexOf('Test'))
-                fileName += testFramework == TestFramework.SPOCK ? 'Spec' : 'Test'
+                fileName += testFramework == SPOCK ? 'Spec' : 'Test'
             }
         }
 
@@ -311,61 +439,60 @@ class GuideAsciidocGenerator {
     private static String pathByFolder(@NonNull String appName,
                                        @NonNull String fileName,
                                        String folder) {
-
-        String module = appName ? "${appName}/" : ""
-        "${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@".toString()
+        String module = appName ? appName + '/' : ''
+        "${module}src/${folder}/@lang@/example/micronaut/${fileName}.@languageextension@"
     }
 
-    private static List<String> rawTestIncludeLines(String line, TestFramework testFramework) {
+    private static List<String> rawTestIncludeLines(String slug, String line, TestFramework testFramework) {
         String fileName = extractName(line, 'rawTest:')
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
 
-        String module = appName ? "${appName}/" : ""
+        String module = appName ? appName + '/' : ""
         List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
 
         String fileExtension = testFramework.toTestFramework().defaultLanguage.getExtension()
         String langTestFolder = testFramework.toTestFramework().defaultLanguage.getTestSrcDir()
 
         List<String> lines = [
-            "[source,${fileExtension}]".toString(),
-            ".${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}".toString(),
-            '----',
+                "[source,${fileExtension}]".toString(),
+                ".${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}".toString(),
+                '----',
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
+                lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[${tag}]\n".toString())
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
+            lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}${langTestFolder}/example/micronaut/${fileName}.${fileExtension}[]".toString())
         }
 
         lines.add('----')
         lines
     }
 
-    private static List<String> resourceIncludeLines(String line, String resourceDir, String macro) {
+    private static List<String> resourceIncludeLines(String slug, String line, String resourceDir, String macro) {
         String fileName = extractName(line, macro)
         String appName = extractAppName(line)
         List<String> tagNames = extractTags(line)
 
-        String module = appName ? "${appName}/" : ""
+        String module = appName ? appName + '/' : ""
         List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
         String asciidoctorLang = resolveAsciidoctorLanguage(fileName)
 
         String pathcallout = fileName.startsWith('../') ? ".${module}src/${resourceDir}/${fileName.substring('../'.length())}" :
                 ".${module}src/${resourceDir}/resources/${fileName}"
         List<String> lines = [
-            "[source,${asciidoctorLang}]".toString(),
-            pathcallout,
-            "----",
+                "[source,${asciidoctorLang}]".toString(),
+                pathcallout,
+                "----",
         ]
         if (tags) {
             for (String tag : tags) {
-                lines.add("include::{sourceDir}/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[${tag}]\n".toString())
+                lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[${tag}]\n".toString())
             }
         } else {
-            lines.add("include::{sourceDir}/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[]".toString())
+            lines.add("include::{sourceDir}/$slug/@sourceDir@/${module}src/${resourceDir}/resources/${fileName}[]".toString())
         }
         lines << '----'
         lines
@@ -377,32 +504,39 @@ class GuideAsciidocGenerator {
         return rendered.split("\\r?\\n|\\r") as List
     }
 
-    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
-
-        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
-        App app = metadata.apps.find { it.name == appName }
-
+    @NonNull
+    private static List<String> featureNames(@NonNull String line,
+                                             @NonNull App app,
+                                             @NonNull GuidesOption guidesOption) {
         String features = extractFromParametersLine(line, 'features')
         List<String> featureNames
         if (features) {
             featureNames = features.tokenize('|')
-        }
-        else {
-            featureNames = app.features
+        } else {
+            featureNames = [] + app.features
         }
 
         String featureExcludes = extractFromParametersLine(line, 'featureExcludes')
         List<String> excludedFeatureNames
         if (featureExcludes) {
             excludedFeatureNames = featureExcludes.tokenize('|')
-        }
-        else {
+        } else {
             excludedFeatureNames = []
         }
         featureNames.removeAll excludedFeatureNames
 
+        if (guidesOption.language == GROOVY) {
+            featureNames.remove 'graalvm'
+        }
+        featureNames
+    }
+
+    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
+
+        String appName = extractAppName(line) ?: DEFAULT_APP_NAME
+        App app = metadata.apps.find { it.name == appName }
         String link = 'https://micronaut.io/launch?' +
-                featureNames.collect {'features=' + it }.join('&') +
+                featureNames(line, app, guidesOption).collect { 'features=' + it }.join('&') +
                 '&lang=' + guidesOption.language.name() +
                 '&build=' + guidesOption.buildTool.name() +
                 '&test=' + guidesOption.testFramework.name() +
@@ -413,7 +547,13 @@ class GuideAsciidocGenerator {
                 '[view the dependency and configuration changes from the specified features, window="_blank"]'
 
         "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can " +
-        link + " and apply those changes to your application."
+                link + " and apply those changes to your application."
+    }
+
+    private static String processGuideLink(String line) {
+        line.find(GUIDE_LINK_REGEX) { String match, String before, String slug, String text, String after ->
+            "${before}link:${slug}.html[$text]$after"
+        }
     }
 
     private static String extractAppName(String line) {
@@ -448,7 +588,7 @@ class GuideAsciidocGenerator {
 
     private static String resolveAsciidoctorLanguage(String fileName) {
         String extension = fileName.indexOf(".") > 0 ?
-            fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()) : ''
+                fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()) : ''
 
         switch (extension.toLowerCase()) {
             case 'yml':

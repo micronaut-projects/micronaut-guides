@@ -17,17 +17,31 @@ class Utils {
 
     static boolean process(GuideMetadata metadata, boolean checkJdk = true) {
 
+        if (!metadata.publish) {
+            return false
+        }
+
         boolean processGuide = singleGuide() == null || singleGuide() == metadata.slug
         if (!processGuide) {
             return false
         }
 
-        if (checkJdk) {
-            return metadata.minimumJavaVersion == null ||
-                    parseJdkVersion().majorVersion() >= metadata.minimumJavaVersion
+        if (checkJdk && skipBecauseOfJavaVersion(metadata)) {
+            println "not processing $metadata.slug, JDK not between $metadata.minimumJavaVersion and $metadata.maximumJavaVersion"
+            return false
         }
 
         return true
+    }
+
+    static boolean skipBecauseOfJavaVersion(GuideMetadata metadata) {
+        int jdkVersion = parseJdkVersion().majorVersion()
+        if ((metadata.minimumJavaVersion != null && jdkVersion < metadata.minimumJavaVersion) ||
+                (metadata.maximumJavaVersion != null && jdkVersion > metadata.maximumJavaVersion)) {
+            return true
+        } else {
+            return false
+        }
     }
 
     static JdkVersion parseJdkVersion() {

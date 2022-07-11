@@ -1,12 +1,12 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
 In this guide, we will write a Micronaut application that exposes some REST endpoints and stores data in a database using JPA and Hibernate.
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+common:create-app.adoc[]
 
 === Data Source configuration
 
@@ -17,12 +17,14 @@ Add the following dependencies:
 dependency:micronaut-hibernate-jpa[groupId=io.micronaut.sql,callout=1]
 dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=2]
 dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=3]
+dependency:jakarta.persistence-api[groupId=jakarta.persistence,version=2.2.3,callout=4]
 
 :dependencies:
 
 <1> Configures Hibernate/JPA EntityManagerFactory beans.
 <2> Configures SQL DataSource instances using Hikari Connection Pool.
 <3> Add dependency to in-memory H2 Database.
+<4> Add dependency to Jakarta Persistence API.
 
 Define the data source in `src/main/resources/application.yml`.
 
@@ -73,7 +75,7 @@ To use it, you have to include the `micronaut-data-processor` dependency in your
 
 dependency:micronaut-data-hibernate-jpa[groupId=io.micronaut.data,scope=annotationProcessor]
 
-Next, create an interface to define the operations to access the database:
+Next, create a repository interface to define the operations to access the database:
 
 source:GenreRepository[]
 
@@ -82,14 +84,13 @@ The implementation:
 source:GenreRepositoryImpl[]
 
 callout:singleton[1]
-<2> Inject easily an `EntityManager`.
-<3> All database access needs to be wrapped inside a transaction. As the method
-only reads data from the database, annotate it with `@ReadOnly`.
-<4> This method modifies the database, thus it is annoated with `@Transactional`.
+<2> Easily inject an `EntityManager`.
+<3> All database access needs to be wrapped inside a transaction. As the method only reads data from the database, annotate it with `@ReadOnly`.
+<4> This method modifies the database, thus it is annotated with `@Transactional`.
 
 === Controller
 
-include::{commondir}/common-validation.adoc[]
+common:validation.adoc[]
 
 Create two classes to encapsulate Save and Update operations:
 
@@ -134,13 +135,13 @@ callout:http-request[3]
 <4> If you care just about the object in the response use `retrieve`.
 <5> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
-include::{commondir}/common-testApp.adoc[]
+common:testApp.adoc[]
 
-include::{commondir}/common-runapp.adoc[]
+common:runapp.adoc[]
 
 == Using PostgreSQL
 
-When running on production you want to use a real database instead of using H2. Let's explain how to use Postgres.
+When running on production you want to use a real database instead of using H2. Let's explain how to use PostgreSQL.
 
 After installing Docker, execute the following command to run a PostgreSQL container:
 
@@ -162,10 +163,10 @@ To use PostgreSQL, set up several environment variables which match those define
 
 [source,bash]
 ----
-$ export JDBC_URL=jdbc:postgresql://localhost:5432/micronaut
-$ export JDBC_USER=dbuser
-$ export JDBC_PASSWORD=theSecretPassword
-$ export JDBC_DRIVER=org.postgresql.Driver
+export JDBC_URL=jdbc:postgresql://localhost:5432/micronaut
+export JDBC_USER=dbuser
+export JDBC_PASSWORD=theSecretPassword
+export JDBC_DRIVER=org.postgresql.Driver
 ----
 
 Run the application again. If you look at the output you can see that the application uses PostgreSQL:
@@ -195,4 +196,4 @@ curl -X "POST" "http://localhost:8080/genres" \
 
 Read more about https://docs.micronaut.io/latest/guide/#dataAccess[Configurations for Data Access] section in the Micronaut documentation.
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

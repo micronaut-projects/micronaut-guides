@@ -1,4 +1,4 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
 In this guide, you load a primary and secondary JWK from their JSON representation. Both keys participate as token validators. Moreover, the primary participates in token generation. Also, you expose their public keys as JWKS in a `/keys` endpoint.
 
@@ -6,11 +6,11 @@ A https://tools.ietf.org/html/rfc7517[JSON Web Key (JWK)] is a JSON object that 
 
 Meanwhile, a JWK Set is a JSON object that represents a set of JWKs. The JSON object _must_ have a "keys" member, which is an array of JWKs.
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+common:create-app.adoc[]
 
 === Configuration
 
@@ -88,7 +88,7 @@ Create a test to verify that the application can generate a signed JSON Web Toke
 
 test:TokenGeneratorTest[]
 
-<1> See how to generate a JSON Web Key in the guide: https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with a Micronaut command line application]
+<1> See how to generate a JSON Web Key in the guide: guideLink:micronaut-cli-jwkgen[JWK generation with a Micronaut command line application]
 
 === Secondary signature validation
 
@@ -96,7 +96,7 @@ Create a test to verify that the application can validate a JSON Web Token signe
 
 test:ValidateSecondarySignedJwtTest[]
 
-<1> See how to generate a JSON Web Key in the guide: https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with a Micronaut command line application]
+<1> See how to generate a JSON Web Key in the guide: guideLink:micronaut-cli-jwkgen[JWK generation with a Micronaut command line application]
 
 === Keys test
 
@@ -104,7 +104,7 @@ Create a test to verify that the application exposes a `keys` endpoint:
 
 test:KeysTest[]
 
-<1> See how to generate a JSON Web Key in the guide: https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK generation with a Micronaut command line application]
+<1> See how to generate a JSON Web Key in the guide: guideLink:micronaut-cli-jwkgen[JWK generation with a Micronaut command line application]
 
 == Refresh endpoint
 
@@ -119,9 +119,9 @@ resource:application.yml[tag=endpoints]
 <1> Enable the https://docs.micronaut.io/latest/guide/#refreshEndpoint[Refresh Endpoint]
 <2> Set the endpoint as non sensitive. Learn more about https://micronaut-projects.github.io/micronaut-security/latest/guide/#builtInEndpointsAccess[Built-In Endpoints Security].
 
-include::{commondir}/common-testApp.adoc[]
+common:testApp.adoc[]
 
-include::{commondir}/common-runapp.adoc[]
+common:runapp.adoc[]
 
 == Invoke the keys endpoint
 
@@ -137,16 +137,20 @@ Invoke the `/keys` endpoint:
 [source, bash]
 ----
 curl -i localhost:8080/keys
+----
+
+[source]
+----
 HTTP/1.1 200 OK
 Date: Mon, 7 Jun 2021 14:42:42 GMT
 content-type: application/json
 content-length: 892
 connection: keep-alive
 
-{"keys":[{"kty":"RSA","e":"AQAB","use":"sig","kid":"e3be37177a7c42bcbadd7cc63715f216","alg":"RS256","n":"sa6m2i-iNvj6ZSTdSHZaBrnv6DId4AqAXhOyl0yA5fNWYe6r51h24SXqk7DsGYHHh74ii74tP1lTpmy6RD67tCK-tbN-d6yc4Z6FfM8R83v2QZUfaAixgHGtw0n2toqsiHf6EloDV-B8q4GYyKDD6cLecoaIuTmMBTY3kts59U2t9W10YoLGsmFqLSz8qNF5HkahzB6_--2DiBfVGUKAXHC-SICGZCi-8efOetv6pt9vFiWEgwU_DgjRNYzLFt1SEmbGFUU4kbjQ7tNTMkHfzfwcT6qLt4kVKy2FNYsEMk24keWtCvW_RyO_fisZc0W9smX7WtYjEXhcAjDeqHgEZw"},{"kty":"RSA","e":"AQAB","use":"sig","kid":"0794e938379540dc8eaa559508524a79","alg":"RS256","n":"qYvDpV8DRU5hx9eXpE4Ms8nUXicEwrxUUz5gb5gkXpIeY82mqfQKKCP6PSFnkKYtRFTOUSm9cgGGfOd7O4NFsIsxLwXCj34X7ORr19eXKBLvG3bZJLxqRlbYuQshDMkQOui1sDBxvYnj5p4iHne6l2btH5grHOCShUWG-bKps5Y8bKNHod1pIOOBabVCmn3sUVUkZw8nyXkQqZbv-c8x6z0TEfhNOPOIt2AmmlNgrE_8g7-dnCvqfJnhv0c7qkOJzsb7OMmvVwsQNiM59D6uaWZr-vdANo6NggiZmCKUS3tpUvdXW7ec9WMPJWhrVEkRcbWXQnZ_C7pXFrz7rLeNKw"}]}%
+{"keys":[{"kty":"RSA","e":"AQAB","use":"sig","kid":"e3be37177a7c42bcbadd7cc63715f216","alg":"RS256","n":"sa6m2i-iNvj6ZSTdSHZaBrnv6DId4AqAXhOyl0yA5fNWYe6r51h24SXqk7DsGYHHh74ii74tP1lTpmy6RD67tCK-tbN-d6yc4Z6FfM8R83v2QZUfaAixgHGtw0n2toqsiHf6EloDV-B8q4GYyKDD6cLecoaIuTmMBTY3kts59U2t9W10YoLGsmFqLSz8qNF5HkahzB6_--2DiBfVGUKAXHC-SICGZCi-8efOetv6pt9vFiWEgwU_DgjRNYzLFt1SEmbGFUU4kbjQ7tNTMkHfzfwcT6qLt4kVKy2FNYsEMk24keWtCvW_RyO_fisZc0W9smX7WtYjEXhcAjDeqHgEZw"},{"kty":"RSA","e":"AQAB","use":"sig","kid":"0794e938379540dc8eaa559508524a79","alg":"RS256","n":"qYvDpV8DRU5hx9eXpE4Ms8nUXicEwrxUUz5gb5gkXpIeY82mqfQKKCP6PSFnkKYtRFTOUSm9cgGGfOd7O4NFsIsxLwXCj34X7ORr19eXKBLvG3bZJLxqRlbYuQshDMkQOui1sDBxvYnj5p4iHne6l2btH5grHOCShUWG-bKps5Y8bKNHod1pIOOBabVCmn3sUVUkZw8nyXkQqZbv-c8x6z0TEfhNOPOIt2AmmlNgrE_8g7-dnCvqfJnhv0c7qkOJzsb7OMmvVwsQNiM59D6uaWZr-vdANo6NggiZmCKUS3tpUvdXW7ec9WMPJWhrVEkRcbWXQnZ_C7pXFrz7rLeNKw"}]}
 ----
 
-include::{commondir}/common-graal-with-plugins.adoc[]
+common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
@@ -154,10 +158,10 @@ Invoke the `keys` endpoint as described in the previous section
 
 :exclude-for-languages:
 
-include::{commondir}/common-next.adoc[]
+common:next.adoc[]
 
 Read more about https://micronaut-projects.github.io/micronaut-security/latest/guide/[Micronaut Security].
 
-Check out the guide https://guides.micronaut.io/latest/micronaut-cli-jwkgen.html[JWK Generation with a Micronaut Command Line Application].
+Check out the guide guideLink:micronaut-cli-jwkgen[JWK Generation with a Micronaut Command Line Application].
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]

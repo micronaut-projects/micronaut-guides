@@ -1,20 +1,21 @@
-name: Java CI
+name: Test Guides
 on:
   push:
     branches:
       - master
+      - '[1-9]+.[0-9]+.x'
   pull_request:
     branches:
       - master
-      - 2.5.x
+      - '[1-9]+.[0-9]+.x'
 jobs:
-  build:
+  alltests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: ['8', '11']
+        java: ["11","17"]
     env:
-      JDK_VERSION:  ${{ matrix.java }}
+      JDK_VERSION: ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -29,28 +30,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-      - name: Build with Gradle
-        run: ./gradlew build
-      - name: Execute tests
-        run: 'export AWS_ACCESS_KEY_ID=XXX;export AWS_SECRET_ACCESS_KEY=YYY;export AWS_REGION=us-east-1;cd build/code && ./test.sh;cd ../..'
-      - name: Archive test reports
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: test-reports-${{ matrix.java }}
-          path: /home/runner/work/micronaut-guides/micronaut-guides/build/code/
-      - name: Calculate version of the guides
-        id: guides_version
-        run: |
-          current_version=`cat version.txt`
-          tmp_version=( ${current_version//./ } )
-          version=`echo "${tmp_version[0]}.${tmp_version[1]}.x"`
-          echo ::set-output name=guides_version::${version}
-      - name: Publish to Github Pages
-        if: success() && github.event_name == 'push' && matrix.java == '11'
-        uses: micronaut-projects/github-pages-deploy-action@master
+      - name: Run All Guide Tests
+        run: './gradlew runAllGuideTests'
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: build/dist
-          VERSION: ${{ steps.guides_version.outputs.guides_version }}
+          AWS_ACCESS_KEY_ID: XXX
+          AWS_SECRET_ACCESS_KEY: YYY
+          AWS_REGION: us-east-1
+          GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+          GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+          GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}

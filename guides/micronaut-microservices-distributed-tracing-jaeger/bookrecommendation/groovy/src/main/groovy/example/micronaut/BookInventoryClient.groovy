@@ -6,14 +6,13 @@ import io.micronaut.http.annotation.Consumes
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
-import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 import javax.validation.constraints.NotBlank
 //end::packageandimports[]
 
 //tag::harcoded[]
 @Client("http://localhost:8082") // <1>
-@Recoverable(api = BookInventoryOperations.class)
+@Recoverable(api = BookInventoryOperations)
 //end::harcoded[]
 //tag::clazz[]
 interface BookInventoryClient extends BookInventoryOperations {

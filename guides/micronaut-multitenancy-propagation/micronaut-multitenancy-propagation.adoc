@@ -1,4 +1,4 @@
-include::{commondir}/common-header-top.adoc[]
+common:header-top.adoc[]
 
 == Getting Started
 
@@ -13,9 +13,9 @@ The next diagram illustrates the flow:
 
 image::tokenpropagation.svg[]
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
 == Writing the App
 
@@ -27,10 +27,10 @@ Create the microservice:
 
 [source,bash]
 ----
-mn create-app example.micronaut.gateway --test=spock --lang=groovy
+mn @cli-command@ example.micronaut.gateway --test=spock --lang=groovy
 ----
 
-In the previous command, we generate a Micronaut application and tell the CLI to use https://spockframework.org[Spock] as the test framework.
+The previous command generates a Micronaut application and tells the CLI to use https://spockframework.org[Spock] as the test framework.
 
 === Multitenancy Configuration
 
@@ -164,7 +164,7 @@ Create the microservice:
 
 [source,bash]
 ----
-mn create-app example.micronaut.books --lang=groovy
+mn @cli-command@ example.micronaut.books --lang=groovy
 ----
 
 === GORM
@@ -234,7 +234,7 @@ source:Bootstrap[app=books]
 <1> This bean will not be loaded for the test environment.
 callout:singleton[2]
 <3> Listen to `StartupEvent`.
-<4> Field injection
+callout:field-injection[4]
 <5> You can specify the Tenant ID with the `Tenants.withId` method.
 
 === Book Tests
@@ -248,21 +248,29 @@ test:BookControllerSpec[app=books]
 Run both microservices:
 
 [source,bash]
+.books
 ----
-books $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 18:29:26.500 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 671ms. Server Running: http://localhost:8081
 <=========----> 75% EXECUTING [10s]
 ----
 
 [source,bash]
+.gateway
 ----
-gateway $ ./gradlew run
+./gradlew run
+----
 
+[source]
+----
 18:28:35.723 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 707ms. Server Running: http://localhost:8080
 ----
 
-You can visit `http://localhost:8080[http://localhost:8080]` and change the tenant and see the book list change:
+You can visit http://localhost:8080 and change the tenant and see the book list change:
 
 image:multitenancy.gif[]
 
@@ -270,4 +278,4 @@ image:multitenancy.gif[]
 
 Read more about https://docs.micronaut.io/latest/guide/#multitenancy[Multitenancy] support in the Micronaut framework and https://gorm.grails.org/latest/hibernate/manual/#multiTenancy[GORM Multitenancy Support].
 
-include::{commondir}/common-helpWithMicronaut.adoc[]
+common:helpWithMicronaut.adoc[]
