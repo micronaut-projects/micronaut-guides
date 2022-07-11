@@ -18,7 +18,7 @@ class BookController {
     }
 
     @Get// <4>
-    List<Book> index() {
+    Iterable<Book> index() {
         return bookRepository.findAll()
     }
 

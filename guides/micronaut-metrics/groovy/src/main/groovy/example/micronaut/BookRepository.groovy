@@ -12,8 +12,5 @@ import static io.micronaut.data.model.query.builder.sql.Dialect.H2
 interface BookRepository extends CrudRepository<Book, Long> { // <2>
 
     @NonNull
-    List<Book> findAll()
-
-    @NonNull
     Optional<Book> findByIsbn(@NotBlank String isbn)
 }

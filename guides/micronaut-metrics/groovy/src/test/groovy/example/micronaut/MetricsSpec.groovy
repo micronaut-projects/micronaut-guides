@@ -1,6 +1,5 @@
 package example.micronaut
 
-import example.micronaut.crypto.CryptoService
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 import static io.micronaut.logging.LogLevel.ALL
-import static java.util.concurrent.TimeUnit.MILLISECONDS
 
 @MicronautTest // <1>
 class MetricsSpec extends Specification {
@@ -27,9 +25,6 @@ class MetricsSpec extends Specification {
 
     @Inject
     LoggingSystem loggingSystem // <3>
-
-    @Inject
-    CryptoService cryptoService
 
     @Inject
     @Client('/')
@@ -99,7 +94,7 @@ class MetricsSpec extends Specification {
         when:
         Map<String, Object> response = httpClient.toBlocking().retrieve(
                 HttpRequest.GET('/metrics'),
-                Argument.mapOf(String.class, Object.class))
+                Argument.mapOf(String, Object))
 
         then:
         response.containsKey 'names'

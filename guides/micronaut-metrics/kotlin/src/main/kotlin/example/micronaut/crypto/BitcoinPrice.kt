@@ -4,6 +4,7 @@ import io.micronaut.core.annotation.Introspected
 
 @Introspected // <1>
 class BitcoinPrice(private val data: Data) {
+
     val price: Float
         get() = data.price
 

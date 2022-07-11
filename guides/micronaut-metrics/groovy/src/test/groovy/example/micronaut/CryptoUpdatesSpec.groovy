@@ -20,31 +20,31 @@ class CryptoUpdatesSpec extends Specification {
 
     @Shared
     @AutoCleanup
-    EmbeddedServer kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer.class,
-            ["spec.name": "MetricsTestKucoin"])
+    EmbeddedServer kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer,
+            ['spec.name': 'MetricsTestKucoin'])
 
     @Shared
     @AutoCleanup
-    EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer.class,
-            ["micronaut.http.services.kocoin.url": "http://localhost:${kucoinEmbeddedServer.port}"])
+    EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer,
+            ['micronaut.http.services.kocoin.url': 'http://localhost:' + kucoinEmbeddedServer.port])
 
-    void "test crypto updates"() {
+    void 'test crypto updates'() {
         given:
-        CryptoService cryptoService = embeddedServer.getApplicationContext().getBean(CryptoService.class);
-        MeterRegistry meterRegistry = embeddedServer.getApplicationContext().getBean(MeterRegistry.class);
+        CryptoService cryptoService = embeddedServer.applicationContext.getBean(CryptoService)
+        MeterRegistry meterRegistry = embeddedServer.applicationContext.getBean(MeterRegistry)
 
         when:
-        Counter counter = meterRegistry.counter("bitcoin.price.checks");
-        Timer timer = meterRegistry.timer("bitcoin.price.time");
+        Counter counter = meterRegistry.counter('bitcoin.price.checks')
+        Timer timer = meterRegistry.timer('bitcoin.price.time')
 
         then:
         0 == counter.count()
         0 == timer.totalTime(MILLISECONDS)
 
         when:
-        int checks = 3;
+        int checks = 3
         for (int i = 0; i < checks; i++) {
-            cryptoService.updatePrice();
+            cryptoService.updatePrice()
         }
 
         then:
@@ -52,12 +52,29 @@ class CryptoUpdatesSpec extends Specification {
         timer.totalTime(MILLISECONDS) > 0
     }
 
-    @Requires(property = "spec.name", value = "MetricsTestKucoin")
+    @Requires(property = 'spec.name', value = 'MetricsTestKucoin')
     @Controller
     static class MockKucoinController {
-        @Get("/api/v1/market/orderbook/level1")
+
+        private static final String RESPONSE = '''\
+{
+   "code":"200000",
+   "data":{
+      "time":1654865889872,
+      "sequence":"1630823934334",
+      "price":"29670.4",
+      "size":"0.00008436",
+      "bestBid":"29666.4",
+      "bestBidSize":"0.16848947",
+      "bestAsk":"29666.5",
+      "bestAskSize":"2.37840044"
+   }
+}
+'''
+
+        @Get('/api/v1/market/orderbook/level1')
         String latest(@QueryValue String symbol) {
-            '{"code":"200000","data":{"time":1654865889872,"sequence":"1630823934334","price":"29670.4","size":"0.00008436","bestBid":"29666.4","bestBidSize":"0.16848947","bestAsk":"29666.5","bestAskSize":"2.37840044"}}'
+            RESPONSE
         }
     }
 }

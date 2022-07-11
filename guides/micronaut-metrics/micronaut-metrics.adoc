@@ -94,7 +94,8 @@ callout:constructor-di[number=3,arg0=BookRepository]
 <4> Maps a `GET` request to `/books`, which returns a list of `Book`
 <5> Maps a `GET` request to `/books/{isbn}`, which attempts to show a `Book`. This illustrates the use of a URL path variable.
 
-=== Custom Metric
+=== Custom Metrics
+
 To see custom metrics in action, create a service that periodically retrieves the current Bitcoin price in USD using REST.
 
 ==== Model
@@ -115,13 +116,12 @@ callout:client[1]
 
 ==== HTTP Service Configuration
 
-Configure the URLs for the Service ID `kucoin`.
-Modify `application.yml`
+Modify `application.yml` to configure the URL for the `kucoin` Service ID:
 
 resource:application.yml[tag=http-services]
 
-<1> Same ID we used with `@Client`
-<2> URL where the `books` service will reside.
+<1> The ID we used with `@Client`
+<2> The URL for the `kucoin` service
 
 ==== Service
 
@@ -140,13 +140,13 @@ callout:singleton[1]
 
 == Testing the Application
 
-Create a configuration file for tests `src/test/resources/application-test.yml`.
+Create the `src/test/resources/application-test.yml` configuration file for tests.
 
 testResource:application-test.yml[]
 
 <1> Disable crypto price lookups with a long initial delay
 
-Create the `MetricsTest` class to test metrics functionality:
+Create a test class to verify metrics functionality:
 
 test:MetricsTest[]
 callout:micronaut-test[1]
@@ -154,12 +154,12 @@ callout:micronaut-test[1]
 <3> Inject the `LoggingSystem` bean
 callout:http-client[4]
 
-Create an additional test to verify the custom metric:
+Create an additional test class to verify the custom metrics:
 
 test:CryptoUpdatesTest[]
 
-The previous test creates two Micronaut embedded servers. One mocks the `kucoin` API, the other is our app. The test uses `@Requires` to conditionally load a Controller only for `kucoin` bean context.
-We used an identifier with `@Client`. Because of that, it is easy to point our HTTP Client to the Mock Server.
+The previous test creates two Micronaut embedded servers. One mocks the `kucoin` API, the other is our application. The test uses `@Requires` to conditionally load a controller only for the `kucoin` bean context.
+We used an identifier with `@Client`, which makes it easy to point our HTTP client to the mock server.
 
 === Running the tests
 
@@ -288,5 +288,3 @@ Start the native image and run the cURL commands above to see that the applicati
 == Next steps
 
 In combination with the `/metrics` endpoint, you often want to register a specific type of reporter. See the https://micronaut-projects.github.io/micronaut-micrometer/latest/guide/[Micronaut Micrometer documentation] to learn about the supported libraries for reporting metrics.
-
-

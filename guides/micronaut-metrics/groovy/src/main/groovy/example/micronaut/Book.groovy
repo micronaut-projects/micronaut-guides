@@ -16,7 +16,6 @@ class Book {
     Long id
 
     String name
-
     String isbn
 
     Book(String isbn, String name) {

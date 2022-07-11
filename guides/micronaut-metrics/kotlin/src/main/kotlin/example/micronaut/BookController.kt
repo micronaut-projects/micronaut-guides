@@ -11,7 +11,7 @@ import java.util.Optional
 class BookController(private val bookRepository: BookRepository) { // <3>
 
     @Get// <4>
-    fun index(): List<Book> = bookRepository.findAll()
+    fun index(): Iterable<Book> = bookRepository.findAll()
 
     @Get("/{isbn}") // <5>
     fun findBook(isbn: String): Optional<Book> = bookRepository.findByIsbn(isbn)

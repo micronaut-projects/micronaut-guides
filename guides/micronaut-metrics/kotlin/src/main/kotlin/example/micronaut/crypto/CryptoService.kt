@@ -13,7 +13,7 @@ class CryptoService constructor(
     private val priceClient: PriceClient, // <2>
     meterRegistry: MeterRegistry) {
 
-    private val LOG = LoggerFactory.getLogger(javaClass.name)
+    private val log = LoggerFactory.getLogger(javaClass.name)
 
     private val checks: Counter
     private val time: Timer
@@ -33,7 +33,7 @@ class CryptoService constructor(
                 checks.increment() // <8>
                 latestPriceUsd.set(priceClient.latestInUSD().price.toInt()) // <9>
             } catch (e: Exception) {
-                LOG.error("Problem checking price", e)
+                log.error("Problem checking price", e)
             }
         }
     }

@@ -14,7 +14,6 @@ public class Book {
     private Long id;
 
     private String name;
-
     private String isbn;
 
     public Book(String isbn, String name) {

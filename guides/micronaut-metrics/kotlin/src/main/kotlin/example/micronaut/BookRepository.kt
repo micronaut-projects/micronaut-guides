@@ -9,7 +9,5 @@ import javax.validation.constraints.NotBlank
 @JdbcRepository(dialect = H2) // <1>
 interface BookRepository : CrudRepository<Book, Long> { // <2>
 
-    override fun findAll(): List<Book>
-
     fun findByIsbn(isbn: @NotBlank String): Optional<Book>
 }

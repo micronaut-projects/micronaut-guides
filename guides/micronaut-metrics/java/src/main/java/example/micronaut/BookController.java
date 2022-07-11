@@ -5,7 +5,6 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 
-import java.util.List;
 import java.util.Optional;
 
 @Controller("/books") // <1>
@@ -19,7 +18,7 @@ class BookController {
     }
 
     @Get// <4>
-    List<Book> index() {
+    Iterable<Book> index() {
         return bookRepository.findAll();
     }
 

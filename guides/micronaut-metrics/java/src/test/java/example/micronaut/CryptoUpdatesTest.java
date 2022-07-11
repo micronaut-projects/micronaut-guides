@@ -20,18 +20,20 @@ import java.util.Collections;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(PER_CLASS)
 public class CryptoUpdatesTest {
 
     EmbeddedServer embeddedServer;
-
     EmbeddedServer kucoinEmbeddedServer;
 
     @BeforeAll
     void beforeAll() {
+
         kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer.class,
                 Collections.singletonMap("spec.name", "MetricsTestKucoin"));
+
         embeddedServer = ApplicationContext.run(EmbeddedServer.class,
                 Collections.singletonMap("micronaut.http.services.kucoin.url", "http://localhost:" + kucoinEmbeddedServer.getPort()));
     }
@@ -66,9 +68,24 @@ public class CryptoUpdatesTest {
     @Requires(property = "spec.name", value = "MetricsTestKucoin")
     @Controller
     static class MockKucoinController {
+        private static final String RESPONSE = "" +
+                "{" +
+                "   'code':'200000'," +
+                "   'data':{" +
+                "      'time':1654865889872," +
+                "      'sequence':'1630823934334'," +
+                "      'price':'29670.4'," +
+                "      'size':'0.00008436'," +
+                "      'bestBid':'29666.4'," +
+                "      'bestBidSize':'0.16848947'," +
+                "      'bestAsk':'29666.5'," +
+                "      'bestAskSize':'2.37840044'" +
+                "   }" +
+                "}".replaceAll("'", "\"");
+
         @Get("/api/v1/market/orderbook/level1")
         String latest(@QueryValue String symbol) {
-            return "{\"code\":\"200000\",\"data\":{\"time\":1654865889872,\"sequence\":\"1630823934334\",\"price\":\"29670.4\",\"size\":\"0.00008436\",\"bestBid\":\"29666.4\",\"bestBidSize\":\"0.16848947\",\"bestAsk\":\"29666.5\",\"bestAskSize\":\"2.37840044\"}}";
+            return RESPONSE;
         }
     }
 }

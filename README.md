@@ -12,7 +12,7 @@ $ ./gradlew build
 
 This will generate all the projects and guides in `build/dist` and this is what needs to be published to GitHub Pages.
 
-To build a single guide, run the dynamic task created by `GuidesPlugin`; convert the kabab case guide folder name to lowerCamelCase and add "Build", e.g. to build `micronaut-http-client`, run
+To build a single guide, run the dynamic task created by `GuidesPlugin`; convert the kabab case guide directory name to lowerCamelCase and add "Build", e.g. to build `micronaut-http-client`, run
 
 ```shell
 ./gradlew micronautHttpClientBuild

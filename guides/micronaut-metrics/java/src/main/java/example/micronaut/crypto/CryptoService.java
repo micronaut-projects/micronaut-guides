@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Singleton // <1>
 public class CryptoService {
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass().getName());
+    private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     private final PriceClient priceClient;
     private final Counter checks;
@@ -37,7 +37,7 @@ public class CryptoService {
                 checks.increment(); // <8>
                 latestPriceUsd.set((int) priceClient.latestInUSD().getPrice()); // <9>
             } catch (Exception e) {
-                LOG.error("Problem checking price", e);
+                log.error("Problem checking price", e);
             }
         });
     }

@@ -257,7 +257,7 @@ class GuideProjectGenerator implements AutoCloseable {
             // copy source/resource files for the current language
             Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
         } else if (!ignoreMissingDirectories) {
-            throw new GradleException("source folder " + sourcePath.toFile().absolutePath + " does not exist")
+            throw new GradleException("source directory ${sourcePath.toFile().absolutePath} does not exist")
         }
     }
 
