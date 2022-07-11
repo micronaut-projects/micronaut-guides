@@ -295,10 +295,10 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The Micronaut framework supports authentication with LDAP out of the box.</p>
 </div>
 <div class="paragraph">
-<p>We will use an <a href="https://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/">Online LDAP test server</a> for this guide.</p>
+<p>We will use the open Debian LDAP service for this guide.</p>
 </div>
 <div class="paragraph">
-<p>Create several configuration properties matching those of the test LDAP Server.</p>
+<p>Create the configuration properties matching those of the LDAP Server.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
@@ -308,14 +308,14 @@ If you have an existing Micronaut application and want to add the functionality 
     <span class="key">ldap</span>:
       <span class="key">default</span>: <i class="conum" data-value="1"></i><b>(1)</b>
         <span class="key">context</span>:
-          <span class="key">server</span>: <span class="string"><span class="content">'ldap://ldap.forumsys.com:389'  </span></span><i class="conum" data-value="2"></i><b>(2)</b>
-          <span class="key">managerDn</span>: <span class="string"><span class="content">'cn=read-only-admin,dc=example,dc=com'  </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+          <span class="key">server</span>: <span class="string"><span class="content">'ldaps://db.debian.org'  </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+          <span class="key">managerDn</span>: <span class="string"><span class="content">'cn=read-only-admin,dc=debian,dc=org'  </span></span><i class="conum" data-value="3"></i><b>(3)</b>
           <span class="key">managerPassword</span>: <span class="string"><span class="content">'password'  </span></span><i class="conum" data-value="4"></i><b>(4)</b>
         <span class="key">search</span>:
-          <span class="key">base</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">dc=example,dc=com</span><span class="delimiter">&quot;</span></span>  <i class="conum" data-value="5"></i><b>(5)</b>
+          <span class="key">base</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">dc=debian,dc=org</span><span class="delimiter">&quot;</span></span>  <i class="conum" data-value="5"></i><b>(5)</b>
         <span class="key">groups</span>:
           <span class="key">enabled</span>: <span class="string"><span class="content">true  </span></span><i class="conum" data-value="6"></i><b>(6)</b>
-          <span class="key">base</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">dc=example,dc=com</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
+          <span class="key">base</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">dc=debian,dc=org</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1142,7 +1142,6 @@ It is critical that any blocking I/O operations (such as fetching the user from 
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Ignore</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Shared</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 
@@ -1175,7 +1174,6 @@ It is critical that any blocking I/O operations (such as fetching the user from 
         rsp.body.get().accessToken
     }
 
-    <span class="annotation">@Ignore</span>(<span class="string"><span class="delimiter">'</span><span class="content">TODO fix the timeout issue</span><span class="delimiter">'</span></span>)
     <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">/login with invalid credentials returns UNAUTHORIZED</span><span class="delimiter">'</span></span>() {
         <span class="key">when</span>:
         HttpRequest request = HttpRequest.create(POST, <span class="string"><span class="delimiter">'</span><span class="content">/login</span><span class="delimiter">'</span></span>)
