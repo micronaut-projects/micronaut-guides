@@ -1,0 +1,59 @@
+common:header.adoc[]
+
+== Integration testing
+
+In this guide you will test Micronaut application using bean replacement.
+
+Integration testing is one of the most important steps to make sure our code works properly. This is the middle layer in pyramid of tests, which goal is to make sure that services are communicating properly with each other. Micronaut provides variety of capabilities how to replace beans. We will use that, to provide test implementation of repository bean which will help us test the application without the need to spin-up whole setup. It is really useful in cases where we have the need to connect Database. Nowadays it is fairly easy with tools like https://www.testcontainers.org[Testcontainers], although it takes some time to setup whole environment. As this is good solution for E2E tests, integration ones shall be bit simpler.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+We are going to create simple Hello service which will return greeting in passed language. To do that we need a class which will serve the result, and class which will persist the greetings. As we would like to replace persistence system fairly quick, we will also introduce interface for repository layer, which will be used by service.
+
+First we will implement the repository interface:
+
+source:HelloRepository[]
+
+<1> When we have more than one bean compatible to realise interface, we can provide default one through `@DefaultImplementation` annotation.
+
+Then we can implement the service, which will use above repository to provide the greeting:
+
+source:HelloService[]
+
+<1> Here we will inject some repository implementation through constructor. We do not care what implementation will it be, we just care about the interface.
+
+Last, but not least we will provide some default repository implementation, which will return nothing at the moment. We will replace it in tests:
+
+source:HelloRepositoryDefault[]
+
+<1> Here we are stating that this will be the bean realising `HelloInterface`.
+
+common:testApp.adoc[]
+
+When we have our application implemented, we would like to test it. As current setup does not provide us any persistence, we will implement in-memory repository used for tests. This will make our tests easy and fast.
+
+Let's start with providing another implementation of `HelloInterface`:
+
+test:HelloRepositoryInMemory[]
+
+<1> Using `@Replaces` annotation we can easily show which bean we would like to use. As we annotated `HelloRepository` with `@DefaultImplementation` this will be a clue that we would like to replace default one, with this.
+<2> Through `@Requires` we can setup some rules which needs to be fulfilled for such bean to be created. In our case, we need it for `TEST` environment.
+
+test:HelloServiceTest[]
+
+<1> `@MicronautTest` is annotation enabling setting up Micronaut context during tests.
+<2> Here we are injecting beans which will be used down during the test.
+<3> Validation which is checking if we used right bean, and if the result is correct.
+
+:exclude-for-languages:groovy
+
+:exclude-for-languages:
+
+common:next.adoc[]
+
+Learn more about https://micronaut-projects.github.io/micronaut-test/latest/guide/[Micronaut Test].
+
