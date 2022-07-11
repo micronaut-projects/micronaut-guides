@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.guides.feature;
+package io.micronaut.guides.feature.opentelemetry;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.build.dependencies.Dependency;
@@ -21,6 +21,11 @@ import io.micronaut.starter.build.dependencies.Dependency;
 public final class OpenTelemetryDependencyUtils {
     public static final String GROUP_ID_OPENTELEMETRY = "io.opentelemetry";
     public static final String GROUP_ID_OPENTELEMETRY_INSTRUMENTATION = "io.opentelemetry.instrumentation";
+
+    private OpenTelemetryDependencyUtils() {
+
+    }
+
     @NonNull
     public static Dependency.Builder openTelemetryDependency() {
         return dependency(GROUP_ID_OPENTELEMETRY);

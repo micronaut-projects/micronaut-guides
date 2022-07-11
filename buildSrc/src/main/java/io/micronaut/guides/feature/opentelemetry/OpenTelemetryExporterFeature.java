@@ -13,51 +13,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.guides.feature;
+package io.micronaut.guides.feature.opentelemetry;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.application.generator.GeneratorContext;
-
+import io.micronaut.starter.build.dependencies.Dependency;
 import java.util.Locale;
 
-public interface OpenTelemetryExporterFeature extends OpenTelemetryFeature {
+public abstract class OpenTelemetryExporterFeature implements OpenTelemetryFeature {
+
+    @Override
+    public boolean isVisible() {
+        return false;
+    }
 
     @NonNull
     @Override
-    default String getName() {
+    public String getName() {
         return "tracing-opentelemetry-exporter-" + exporterName().toLowerCase(Locale.ROOT);
     }
 
     @NonNull
     @Override
-    default String getTitle() {
+    public String getTitle() {
         return "OpenTelemetry Exporter " + exporterName();
     }
 
     @Override
     @NonNull
-    default String getDescription() {
+    public String getDescription() {
         return "Adds the open telemetry exporter depedendency for " + exporterName();
     }
 
     @Override
-    default void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(OpenTelemetryDependencyUtils.openTelemetryDependency()
+    public void apply(GeneratorContext generatorContext) {
+        generatorContext.addDependency(exporterDependency());
+        //generatorContext.getConfiguration().addCommaSeparatedValue("otel.traces.exporter", exporterValue());
+        generatorContext.getConfiguration().put("otel.traces.exporter", exporterValue());
+    }
+
+    @NonNull
+    protected String exporterValue() {
+        return exporterName().toLowerCase(Locale.ROOT);
+    }
+
+    @NonNull
+    protected Dependency exporterDependency() {
+        return OpenTelemetryDependencyUtils.openTelemetryDependency()
                 .artifactId(exporterArtifactId())
-                .compile());
-        generatorContext.getConfiguration().put("otel.traces.exporter", exporterName().toLowerCase(Locale.ROOT));
+                .compile()
+                .build();
     }
 
     @Override
-    default String getMicronautDocumentation() {
+    public String getMicronautDocumentation() {
         return "http://localhost/micronaut-tracing/guide/index.html#opentelemetry";
     }
 
     @NonNull
-    String exporterName();
+    protected abstract String exporterName();
 
     @NonNull
-    default String exporterArtifactId() {
+    protected String exporterArtifactId() {
         return "opentelemetry-exporter-"  + exporterName().toLowerCase(Locale.ROOT);
     }
 }

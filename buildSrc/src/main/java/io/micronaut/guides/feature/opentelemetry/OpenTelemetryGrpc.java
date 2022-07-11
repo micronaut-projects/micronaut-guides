@@ -13,49 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.guides.feature;
+package io.micronaut.guides.feature.opentelemetry;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
-import io.micronaut.starter.feature.Feature;
-import io.micronaut.starter.feature.server.MicronautServerDependent;
-import io.micronaut.starter.feature.tracing.TracingFeature;
+import io.micronaut.starter.build.dependencies.MicronautDependencyUtils;
 import jakarta.inject.Singleton;
 
-import static io.micronaut.starter.application.ApplicationType.CLI;
-import static io.micronaut.starter.feature.Category.TRACING;
-
 @Singleton
-public class OpenTelemetryAnnotations implements OpenTelemetryFeature {
+public class OpenTelemetryGrpc implements OpenTelemetryFeature {
 
-    private static final Dependency.Builder MICRONAUT_OPEN_TELEMETRY_ANNOTATION_PROCESSOR = Dependency.builder()
-            .groupId("io.micronaut.tracing")
-            .artifactId("micronaut-tracing-opentelemetry-annotation")
-            .versionProperty("micronaut.tracing.version")
-            .annotationProcessor();
+    private static final Dependency MICRONAUT_OPEN_TELEMETRY_GRPC = Dependency.builder().groupId("io.micronaut.tracing")
+            .artifactId("micronaut-tracing-opentelemetry-grpc")
+            .compile()
+            .build();
 
     @NonNull
     @Override
     public String getName() {
-        return "tracing-opentelemetry-annotations";
+        return "tracing-opentelemetry-grpc";
     }
 
     @NonNull
     @Override
     public String getTitle() {
-        return "OpenTelemetry Annotations";
+        return "Micronaut Integration with OpenTelemetry and gRPC";
     }
 
     @Override
     @NonNull
     public String getDescription() {
-        return "Enables usage of Open Telemetry annotations.";
+        return "Adds Micronaut OpenTelemetry gRPC related dependencies.";
     }
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(MICRONAUT_OPEN_TELEMETRY_ANNOTATION_PROCESSOR);
+        generatorContext.addDependency(MICRONAUT_OPEN_TELEMETRY_GRPC);
+    }
+
+    @Override
+    public boolean supports(ApplicationType applicationType) {
+        return applicationType == ApplicationType.GRPC;
+    }
+
+    @Override
+    public String getMicronautDocumentation() {
+        return "https://micronaut-projects.github.io/micronaut-tracing/latest/guide/#grpc";
+    }
+
+    @Override
+    public boolean isVisible() {
+        return false;
     }
 }

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.guides.feature;
+package io.micronaut.guides.feature.opentelemetry;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
+import io.micronaut.starter.build.dependencies.MicronautDependencyUtils;
 import io.micronaut.starter.feature.other.Management;
 import io.micronaut.starter.feature.server.MicronautServerDependent;
 import io.micronaut.starter.feature.tracing.TracingFeature;
@@ -26,10 +27,15 @@ import jakarta.inject.Singleton;
 @Singleton
 public class OpenTelemetryHttp implements TracingFeature, MicronautServerDependent {
 
-    private static final Dependency.Builder MICRONAUT_OPEN_TELEMETRY_HTTP = Dependency.builder()
-            .groupId("io.micronaut.tracing")
+    private static final Dependency MICRONAUT_OPEN_TELEMETRY_HTTP = Dependency.builder().groupId("io.micronaut.tracing")
             .artifactId("micronaut-tracing-opentelemetry-http")
-            .compile();
+            .compile()
+            .build();
+
+    @Override
+    public boolean isVisible() {
+        return false;
+    }
 
     @NonNull
     @Override
@@ -53,7 +59,7 @@ public class OpenTelemetryHttp implements TracingFeature, MicronautServerDepende
     public void apply(GeneratorContext generatorContext) {
         generatorContext.addDependency(MICRONAUT_OPEN_TELEMETRY_HTTP);
         if (generatorContext.getFeatures().hasFeature(Management.class)) {
-            generatorContext.getConfiguration().put("otel.traces.exclusions", "/health");
+            generatorContext.getConfiguration().put("otel.exclusions", "/health");
         }
     }
 

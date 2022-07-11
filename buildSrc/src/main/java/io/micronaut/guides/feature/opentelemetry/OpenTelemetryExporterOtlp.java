@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.guides.feature;
+package io.micronaut.guides.feature.opentelemetry;
 
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class OpenTelemetryExporterLogging implements OpenTelemetryExporterFeature {
-    private static final String EXPORTER_LOGGING = "Logging";
+public class OpenTelemetryExporterOtlp extends OpenTelemetryExporterFeature {
+    private static final String EXPORTER_OTLP = "OTLP";
 
     @NonNull
     public String exporterName() {
-        return EXPORTER_LOGGING;
+        return EXPORTER_OTLP;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return true;
     }
 }
