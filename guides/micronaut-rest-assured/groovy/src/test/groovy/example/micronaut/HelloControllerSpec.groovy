@@ -14,6 +14,7 @@ class HelloControllerSpec extends Specification {
     RequestSpecification spec // <2>
 
     void "test hello endpoint"() {
+        expect:
         spec    // <3>
             .when()
                 .get('/hello')
