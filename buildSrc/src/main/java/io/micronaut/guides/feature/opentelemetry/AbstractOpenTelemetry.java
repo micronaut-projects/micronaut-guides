@@ -19,8 +19,10 @@ import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
 import io.micronaut.starter.feature.FeatureContext;
+import io.micronaut.starter.options.BuildTool;
 
 public class AbstractOpenTelemetry implements OpenTelemetryFeature {
+    public static final String NEXT_VERSION = "4.2.0";
     private final OpenTelemetry otel;
     private final OpenTelemetryHttp otelHttp;
     private final OpenTelemetryAnnotations otelAnnotations;
@@ -41,16 +43,20 @@ public class AbstractOpenTelemetry implements OpenTelemetryFeature {
 
     @Override
     public void apply(GeneratorContext generatorContext) {
+        if (generatorContext.getBuildTool() != BuildTool.MAVEN) {
+            generatorContext.addDependency(Dependency.builder()
+                    .groupId("io.micronaut.tracing")
+                    .artifactId("micronaut-tracing-bom")
+                    .version(NEXT_VERSION)
+                    .pom()
+                    .annotationProcessor());
+        } else {
+            generatorContext.getBuildProperties().put("micronaut.tracing.version", NEXT_VERSION);
+        }
         generatorContext.addDependency(Dependency.builder()
                 .groupId("io.micronaut.tracing")
                 .artifactId("micronaut-tracing-bom")
-                .version("4.2.0")
-                .pom()
-                .annotationProcessor());
-        generatorContext.addDependency(Dependency.builder()
-                .groupId("io.micronaut.tracing")
-                .artifactId("micronaut-tracing-bom")
-                .version("4.2.0")
+                .version(NEXT_VERSION)
                 .pom()
                 .compile());
     }
