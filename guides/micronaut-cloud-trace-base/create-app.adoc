@@ -1,6 +1,8 @@
 common:completesolution.adoc[]
 
-== Writing the Application
+common:create-app-features.adoc[]
+
+=== OpenTelemetry
 
 The Micronaut framework uses https://opentelemetry.io/[OpenTelemetry] to generate and export tracing data.
 
@@ -16,35 +18,17 @@ If the annotations are not enough, or you want to add tracing to a private metho
 
 [NOTE]
 ====
-The `io.micronaut.tracing.annotation` are available if you prefer or have an existing Micronaut Application using them.
+The `io.micronaut.tracing.annotation` are available if you prefer or have an existing Micronaut Application already using them.
 
-- `@NewSpan` : Maps to `@WithSpan`
-- `@SpanTag` : Identical to `@SpanAttribute`
-- `@ContinueSpan` : this annotation is ignored
-
-TODO: Add link to blog/documentation on migrating from
-OpenTracing to OpenTelemetry
+- `@NewSpan` : Identical to `@WithSpan`, it is used on methods to creates a new span using a given name or defaults to the method name.
+- `@ContinueSpan` : Used on methods to continue the existing span. Primarily used in conjunction with `@SpanTag`.
+- `@SpanTag` : Similar to `@SpanAttribute`, it is used on method parameter to include the value to the span with a given name or defaults to the parameter name. To use the `@SpanTag` on a method argument, the method must be annotated with either `@NewSpan` or `@ContinueSpan`.
 ====
 
-=== Create the Application
+==== OpenTelemetry Trace Exporter
+If you did not use Micronaut CLI or Launch to create your application, add the OpenTelemetry exporter to your `application.yml`.
 
-common:cli-or-launch.adoc[]
-
-[source,bash]
-----
-mn @cli-command@ example.micronaut.micronautguide \
-    --build=@build@ --lang=@lang@
-----
-
-common:build-lang-arguments.adoc[]
-
-common:default-package.adoc[]
-
-If you use Micronaut Launch, select Micronaut Application as application type.
-
-diffLink:[]
-
-common:annotationprocessors.adoc[]
+resource:application.yml[]
 
 === Inventory Service
 
@@ -69,7 +53,7 @@ source:StoreController[]
 <1> Equivalent to `@WithSpan("store.order")`
 <2> Same as `@SpanAttribute("order.item")`and `@SpanAttribute`
 <3> Span created automatically if `micronaut-tracing-opentelemetry-http` is declared
-<4> Annotation is ignored
+<4> Required for `@SpanTag`
 <5> Tag is only added to the span if `micronaut-tracing-opentelemetry-http` is declared; otherwise ignored
 
 === Warehouse Client
