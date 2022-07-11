@@ -6,9 +6,9 @@ import io.micronaut.data.repository.CrudRepository
 
 import javax.validation.constraints.NotBlank
 
-import static io.micronaut.data.model.query.builder.sql.Dialect.MYSQL
+import static io.micronaut.data.model.query.builder.sql.Dialect.H2
 
-@JdbcRepository(dialect = MYSQL) // <1>
+@JdbcRepository(dialect = H2) // <1>
 interface BookRepository extends CrudRepository<Book, Long> { // <2>
 
     @NonNull
