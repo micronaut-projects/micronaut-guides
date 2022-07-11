@@ -20,7 +20,7 @@ class DataPopulator {
     }
 
     @EventListener // <4>
-    @Transactional
+    @Transactional // <5>
     void init(StartupEvent event) {
         if (bookRepository.count() == 0) {
             bookRepository.save(new Book("1491950358", "Building Microservices"));
