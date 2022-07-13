@@ -11,16 +11,16 @@ import jakarta.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@MicronautTest
+@MicronautTest  // <1>
 public class HealthTest {
 
     @Inject
-    @Client("/")
+    @Client("/") // <2>
     HttpClient client;
 
     @Test
     public void healthEndpointExposed() {
-        HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus.class);
+        HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus.class); // <3>
         assertEquals(HttpStatus.OK, status);
     }
 }
