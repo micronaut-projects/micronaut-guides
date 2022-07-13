@@ -23,7 +23,7 @@ public class HealthPathTest {
     HttpClient client;
 
     @Test
-    public void healthEndpointExposed() {
+    public void healthEndpointExposedAtNonDefaultEndpointsPath() {
         HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/endpoints/health"), HttpStatus.class); // <2>
         assertEquals(HttpStatus.OK, status);
 

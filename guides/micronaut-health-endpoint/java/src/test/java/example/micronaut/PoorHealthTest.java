@@ -24,7 +24,7 @@ public class PoorHealthTest {
     HttpClient client;
 
     @Test
-    public void healthEndpointExposed() {
+    public void healthEndpointExposesOutOfDiscSpace() {
 
         Executable e = () -> client.toBlocking().retrieve(HttpRequest.GET("/health"));
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, e);
