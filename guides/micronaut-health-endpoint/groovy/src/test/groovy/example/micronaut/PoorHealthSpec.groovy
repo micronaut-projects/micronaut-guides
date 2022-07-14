@@ -25,8 +25,8 @@ class PoorHealthSpec extends Specification {
 
         then:
         HttpClientResponseException thrown = thrown()
-        thrown.status == HttpStatus.SERVICE_UNAVAILABLE
-        thrown.response.getBody(String).orElse("").contains("DOWN")
+        thrown.status == HttpStatus.SERVICE_UNAVAILABLE // <2>
+        thrown.response.getBody(String).orElse("").contains("DOWN") // <3>
     }
 }
 

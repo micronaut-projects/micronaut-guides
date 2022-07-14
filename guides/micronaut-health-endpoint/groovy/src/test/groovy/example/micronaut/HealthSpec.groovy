@@ -8,16 +8,16 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
 
-@MicronautTest
+@MicronautTest // <1>
 class HealthSpec extends Specification {
 
     @Inject
-    @Client("/")
+    @Client("/") // <2>
     HttpClient client
 
     void "health endpoint exposed" () {
         when:
-        HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus)
+        HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus) // <3>
 
         then:
         status == HttpStatus.OK
