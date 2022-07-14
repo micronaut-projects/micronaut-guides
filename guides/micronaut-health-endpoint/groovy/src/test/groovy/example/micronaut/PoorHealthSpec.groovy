@@ -24,7 +24,7 @@ class PoorHealthSpec extends Specification {
         client.toBlocking().retrieve(HttpRequest.GET("/health"))
 
         then:
-        def thrown = thrown(HttpClientResponseException)
+        HttpClientResponseException thrown = thrown()
         thrown.status == HttpStatus.SERVICE_UNAVAILABLE
         thrown.response.getBody(String).orElse("").contains("DOWN")
     }

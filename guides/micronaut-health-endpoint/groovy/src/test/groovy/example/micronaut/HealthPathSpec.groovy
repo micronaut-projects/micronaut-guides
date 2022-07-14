@@ -20,16 +20,16 @@ class HealthPathSpec extends Specification {
 
     void "health endpoint exposed at non-default endpoints path"() {
         when:
-        HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/endpoints/health"), HttpStatus.class) // <2>
+        HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/endpoints/health"), HttpStatus) // <2>
 
         then:
         status == HttpStatus.OK
 
         when:
-        client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus.class) // <3>
+        client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus) // <3>
 
         then:
-        def thrown = thrown(HttpClientResponseException)
+        HttpClientResponseException thrown = thrown()
         thrown.status == HttpStatus.NOT_FOUND
     }
 }

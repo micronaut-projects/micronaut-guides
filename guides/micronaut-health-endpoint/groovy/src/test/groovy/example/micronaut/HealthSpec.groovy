@@ -17,7 +17,7 @@ class HealthSpec extends Specification {
 
     void "health endpoint exposed" () {
         when:
-        HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus.class)
+        HttpStatus status = client.toBlocking().retrieve(HttpRequest.GET("/health"), HttpStatus)
 
         then:
         status == HttpStatus.OK
