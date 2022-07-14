@@ -18,7 +18,7 @@ class HealthTest {
 
     @Test
     fun healthEndpointExposed() {
-        val status = client!!.toBlocking().retrieve(HttpRequest.GET<Any>("/health"), HttpStatus::class.java) // <3>
+        val status = client.toBlocking().retrieve(HttpRequest.GET<Any>("/health"), HttpStatus::class.java) // <3>
         assertEquals(HttpStatus.OK, status)
     }
 }

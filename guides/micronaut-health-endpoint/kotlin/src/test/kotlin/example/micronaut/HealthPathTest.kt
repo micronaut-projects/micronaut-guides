@@ -23,10 +23,10 @@ class HealthPathTest {
 
     @Test
     fun healthEndpointExposedAtNonDefaultEndpointsPath() {
-        val status = client!!.toBlocking().retrieve(HttpRequest.GET<Any>("/endpoints/health"), HttpStatus::class.java) // <2>
+        val status = client.toBlocking().retrieve(HttpRequest.GET<Any>("/endpoints/health"), HttpStatus::class.java) // <2>
         assertEquals(HttpStatus.OK, status)
 
-        val e = Executable { client!!.toBlocking().retrieve(HttpRequest.GET<Any>("/health"), HttpStatus::class.java) } // <3>
+        val e = Executable { client.toBlocking().retrieve(HttpRequest.GET<Any>("/health"), HttpStatus::class.java) } // <3>
         val thrown = assertThrows(HttpClientResponseException::class.java, e)
         assertEquals(HttpStatus.NOT_FOUND, thrown.status) // <3>
     }

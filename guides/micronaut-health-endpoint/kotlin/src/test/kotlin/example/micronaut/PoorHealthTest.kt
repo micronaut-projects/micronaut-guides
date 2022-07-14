@@ -22,7 +22,7 @@ class PoorHealthTest {
 
     @Test
     fun healthEndpointExposed() {
-        val e = Executable { client!!.toBlocking().retrieve(HttpRequest.GET<Any>("/health")) }
+        val e = Executable { client.toBlocking().retrieve(HttpRequest.GET<Any>("/health")) }
         val thrown = assertThrows(HttpClientResponseException::class.java, e)
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, thrown.status) // <2>
         assertTrue(thrown.response.getBody(String::class.java).orElse("").contains("DOWN")) // <3>
