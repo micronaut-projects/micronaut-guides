@@ -2,7 +2,6 @@ package example.micronaut;
 
 import io.micronaut.http.HttpStatus;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @MicronautTest
 @TestInstance(PER_CLASS)
-public class FruitControllerTest implements TestPropertyProvider {
+public class FruitControllerTest {
 
     @Inject
     FruitClient fruitClient;
@@ -45,16 +44,5 @@ public class FruitControllerTest implements TestPropertyProvider {
 
         fruits = fruitClient.findAll();
         assertTrue(fruits.stream().anyMatch(f -> "Keeps the doctor away".equals(f.getDescription())));
-    }
-
-    @AfterAll
-    static void cleanup() {
-        MongoDbUtils.closeMongoDb();
-    }
-
-    @Override
-    public Map<String, String> getProperties() {
-        MongoDbUtils.startMongoDb();
-        return Collections.singletonMap("mongodb.uri", MongoDbUtils.getMongoDbUri());
     }
 }
