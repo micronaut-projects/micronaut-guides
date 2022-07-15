@@ -147,3 +147,15 @@ task themeGuides {
     }
     mustRunAfter('copyHtmlToDist')
 }
+
+task addMavenLocal {
+    doLast {
+        for (String n : ['bookcatalogue', 'bookinventory', 'bookrecommendation']) {
+            File f = new File('build/code/micronaut-microservices-distributed-tracing-xray-gradle-java/' + n + '/build.gradle')
+            String text = f.text
+            text = text.replaceAll("mavenCentral", "mavenLocal()\nmavenCentral")
+            f.text  = text
+        }
+    }
+}
+build.finalizedBy('addMavenLocal')
