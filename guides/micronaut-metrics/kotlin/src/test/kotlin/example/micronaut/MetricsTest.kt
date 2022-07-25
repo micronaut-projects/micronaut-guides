@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeUnit
 
 @MicronautTest // <1>
 class MetricsTest {
@@ -59,11 +60,32 @@ class MetricsTest {
 
         assertEquals(0, timer.count())
 
+        val bookIndexTimer = meterRegistry.timer("books.index",
+            Tags.of("exception", "none"))
+
+        assertEquals(0, bookIndexTimer.count())
+
         httpClient.toBlocking().retrieve(
             HttpRequest.GET<Any>("/books"),
             Argument.listOf(Book::class.java))
 
         assertEquals(1, timer.count())
+        assertEquals(1, bookIndexTimer.count())
+        assertTrue(0.0 < bookIndexTimer.totalTime(TimeUnit.MILLISECONDS))
+        assertTrue(0.0 < bookIndexTimer.max(TimeUnit.MILLISECONDS))
+
+        val bookFindCounter = meterRegistry.counter("books.find",
+            Tags.of("result", "success",
+                "exception", "none"))
+
+        assertEquals(0.0, bookFindCounter.count())
+
+        httpClient.toBlocking().retrieve(
+            HttpRequest.GET<Any>("/books/1491950358"),
+            Argument.of(Book::class.java)
+        )
+
+        assertEquals(1.0, bookFindCounter.count())
     }
 
     @Test

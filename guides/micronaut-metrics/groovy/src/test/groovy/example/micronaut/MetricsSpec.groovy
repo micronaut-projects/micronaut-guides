@@ -15,6 +15,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
+import java.util.concurrent.TimeUnit
+
 import static io.micronaut.logging.LogLevel.ALL
 
 @MicronautTest // <1>
@@ -58,8 +60,12 @@ class MetricsSpec extends Specification {
                 'status', '200',
                 'uri', '/books'))
 
+        Timer bookIndexTimer = meterRegistry.timer('books.index',
+                Tags.of('exception', 'none'))
+
         then:
         0 == timer.count()
+        0 == bookIndexTimer.count()
 
         when:
         httpClient.toBlocking().retrieve(
@@ -68,6 +74,25 @@ class MetricsSpec extends Specification {
 
         then:
         1 == timer.count()
+        1 == bookIndexTimer.count()
+        0.0 < bookIndexTimer.totalTime(TimeUnit.MILLISECONDS)
+        0.0 < bookIndexTimer.max(TimeUnit.MILLISECONDS)
+
+        when:
+        Counter bookFindCounter = meterRegistry.counter('books.find',
+                Tags.of('result', 'success',
+                        'exception', 'none'))
+
+        then:
+        0 == bookFindCounter.count()
+
+        when:
+        httpClient.toBlocking().retrieve(
+                HttpRequest.GET("/books/1491950358"),
+                Argument.of(Book.class))
+
+        then:
+        1 == bookFindCounter.count()
     }
 
     void testLogback() {

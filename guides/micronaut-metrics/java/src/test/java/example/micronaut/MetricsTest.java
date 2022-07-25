@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
 import static io.micronaut.logging.LogLevel.ALL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,11 +69,30 @@ class MetricsTest {
                 "uri", "/books"));
         assertEquals(0, timer.count());
 
+        Timer bookIndexTimer = meterRegistry.timer("books.index",
+                Tags.of("exception", "none"));
+        assertEquals(0, bookIndexTimer.count());
+
         httpClient.toBlocking().retrieve(
                 HttpRequest.GET("/books"),
                 Argument.listOf(Book.class));
 
         assertEquals(1, timer.count());
+        assertEquals(1, bookIndexTimer.count());
+        assertTrue(0.0 < bookIndexTimer.totalTime(TimeUnit.MILLISECONDS));
+        assertTrue(0.0 < bookIndexTimer.max(TimeUnit.MILLISECONDS));
+
+        Counter bookFindCounter = meterRegistry.counter("books.find",
+                Tags.of("result", "success",
+                        "exception", "none"));
+        assertEquals(0, bookFindCounter.count());
+
+
+        httpClient.toBlocking().retrieve(
+                HttpRequest.GET("/books/1491950358"),
+                Argument.of(Book.class));
+
+        assertEquals(1, bookFindCounter.count());
     }
 
     @Test

@@ -5,6 +5,8 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
+import io.micrometer.core.annotation.Timed
+import io.micrometer.core.annotation.Counted
 
 @CompileStatic
 @Controller('/books') // <1>
@@ -18,11 +20,13 @@ class BookController {
     }
 
     @Get// <4>
+    @Timed("books.index") // <5>
     Iterable<Book> index() {
         return bookRepository.findAll()
     }
 
-    @Get('/{isbn}') // <5>
+    @Get('/{isbn}') // <6>
+    @Counted("books.find") // <7>
     Optional<Book> findBook(String isbn) {
         return bookRepository.findByIsbn(isbn)
     }

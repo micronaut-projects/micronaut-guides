@@ -12,17 +12,16 @@ import static io.micronaut.context.env.Environment.TEST
 
 @CompileStatic
 @Singleton // <1>
-@Requires(notEnv = TEST) // <2>
 class DataPopulator {
 
     private final BookRepository bookRepository
 
-    DataPopulator(BookRepository bookRepository) { // <3>
+    DataPopulator(BookRepository bookRepository) { // <2>
         this.bookRepository = bookRepository
     }
 
-    @EventListener // <4>
-    @Transactional // <5>
+    @EventListener // <3>
+    @Transactional // <4>
     void init(StartupEvent event) {
         if (bookRepository.count() == 0) {
             bookRepository.save(new Book('1491950358', 'Building Microservices'))

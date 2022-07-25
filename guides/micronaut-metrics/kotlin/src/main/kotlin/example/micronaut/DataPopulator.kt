@@ -8,11 +8,10 @@ import jakarta.inject.Singleton
 import javax.transaction.Transactional
 
 @Singleton // <1>
-@Requires(notEnv = [TEST]) // <2>
-open class DataPopulator(private val bookRepository: BookRepository) { // <3>
+open class DataPopulator(private val bookRepository: BookRepository) { // <2>
 
-    @EventListener // <4>
-    @Transactional // <5>
+    @EventListener // <3>
+    @Transactional // <4>
     open fun init(event: StartupEvent) {
         if (bookRepository.count() == 0L) {
             bookRepository.save(Book("1491950358", "Building Microservices"))
