@@ -319,7 +319,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-TODO describe how you consume the endpoints exposed by the native image with curl
+TODO describe how you consume the endpoints exposed by the native executable with curl
 
 :exclude-for-languages:
 
