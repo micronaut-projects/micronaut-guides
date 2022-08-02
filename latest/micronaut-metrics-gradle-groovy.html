@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Collect Metrics with Micronaut</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-metrics.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Collect Metrics with Micronaut"/>
+    <meta name="twitter:description" content="Learn how to collect standard and custom metrics with the Micronaut framework."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="./index.html" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="./index.html" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-metrics.html">Collect Metrics with Micronaut</a> » <span class="breadcrumb_last" aria-current="page">gradle | groovy</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#dependencies">4.1. Dependencies</a></li>
+<li><a href="#metrics-configuration">4.2. Metrics Configuration</a></li>
+<li><a href="#custom-metrics">4.3. Custom Metrics</a></li>
+<li><a href="#data-source-metrics">4.4. Data Source Metrics</a></li>
+<li><a href="#database-migration-with-flyway">4.5. Database Migration with Flyway</a></li>
+<li><a href="#domain">4.6. Domain</a></li>
+<li><a href="#bookrepository">4.7. BookRepository</a></li>
+<li><a href="#data-populator-class">4.8. Data populator class</a></li>
+<li><a href="#bookcontroller">4.9. BookController</a></li>
+<li><a href="#custom-metrics-2">4.10. Custom Metrics</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">5. Testing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#running-the-tests">5.1. Running the tests</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application">6. Running the Application</a></li>
+<li><a href="#next-steps">7. Next steps</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Collect Metrics with Micronaut</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to collect standard and custom metrics with the Micronaut framework.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Burt Beckwith</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.5.4</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Groovy.</p>
+</div>
+<div class="paragraph">
+<p>We&#8217;ll use <a href="https://micronaut-projects.github.io/micronaut-micrometer/latest/guide/">Micronaut Micrometer</a> to expose application metric data with <a href="https://micrometer.io/">Micrometer</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-metrics-gradle-groovy.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+    --features=data-jdbc,flyway,management,graalvm \
+    --build=gradle --lang=groovy</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>data-jdbc</code>, <code>flyway</code>, <code>management</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=data-jdbc&amp;features=flyway&amp;features=management&amp;features=micronaut-micrometer-annotation&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="dependencies">4.1. Dependencies</h3>
+<div class="paragraph">
+<p>Add a dependency for <code>micronaut-micrometer-core</code> and <code>micronaut-micrometer-annotation</code> to add Micrometer support:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.micrometer:micronaut-micrometer-core</span><span class="delimiter">&quot;</span></span>)
+compileOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.micrometer:micronaut-micrometer-annotation</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="metrics-configuration">4.2. Metrics Configuration</h3>
+<div class="paragraph">
+<p>Several groups of metrics are enabled by default; these include system metrics (JVM info, uptime, etc.), as well as metrics tracking web requests, DataSource activity, and others. Overall metrics can be enabled or disabled, and groups can be individually enabled or disabled in configuration.</p>
+</div>
+<div class="paragraph">
+<p>Add the following to <code>application.yml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">metrics</span>:
+    <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">binders</span>: <i class="conum" data-value="2"></i><b>(2)</b>
+      <span class="key">files</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+      <span class="key">jdbc</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+      <span class="key">jvm</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+      <span class="key">logback</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+      <span class="key">processor</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+      <span class="key">uptime</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
+      <span class="key">web</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Change to <code>false</code> to disable all metrics, e.g., per-environment</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>These default to <code>true</code> and are only here for convenience, to be able to disable a subset of metrics</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-metrics">4.3. Custom Metrics</h3>
+<div class="paragraph">
+<p>If the built-in metrics aren&#8217;t enough, you can easily add custom metrics with the following annotations.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">@Timed</dt>
+<dd>
+<p>Creates a <code>Timer</code> metric that contains the total time, max time and count.</p>
+</dd>
+<dt class="hdlist1">@Counted</dt>
+<dd>
+<p>Creates a <code>Counter</code> metric that only contains a count.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>If you want to create your own gauge, you can inject <code>io.micrometer.core.instrument.MeterRegistry</code> to your bean.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="data-source-metrics">4.4. Data Source Metrics</h3>
+<div class="paragraph">
+<p><code>DataSource</code> metrics are enabled by default if you use the HikariCP (the default), Tomcat JDBC, or Commons DBCP connection pool.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-migration-with-flyway">4.5. Database Migration with Flyway</h3>
+<div class="paragraph">
+<p>We need a way to create the database schema. For that, we use <a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut integration with Flyway</a>.</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.flyway.org">Flyway</a> automates schema changes, significantly simplifying schema management tasks, such as migrating, rolling back, and reproducing in multiple environments.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.flyway:micronaut-flyway</span><span class="delimiter">&quot;</span></span>)
+runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.flywaydb:flyway-mysql</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We will enable Flyway in <code>application.yml</code> and configure it to perform migrations on one of the defined data sources.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">flyway</span>:
+  <span class="key">datasources</span>:
+    <span class="key">default</span>:
+      <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Enable Flyway for the <code>default</code> datasource.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Configuring multiple data sources is as simple as enabling Flyway for each one. You can also specify directories that will be used for migrating each data source. Review the <a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut Flyway documentation</a> for additional details.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Flyway migration will be automatically triggered before your Micronaut application starts. Flyway will read migration commands in the <code>resources/db/migration/</code> directory, execute them if necessary, and verify that the configured data source is consistent with them.</p>
+</div>
+<div class="paragraph">
+<p>Create the following migration files with the database schema creation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/migration/V1__schema.sql</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">DROP</span> <span class="type">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> book;
+
+<span class="class">CREATE</span> <span class="type">TABLE</span> book (
+    id    <span class="predefined-type">BIGINT</span> GENERATED <span class="keyword">BY</span> <span class="directive">DEFAULT</span> <span class="keyword">AS</span> IDENTITY,
+    name  <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>) <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span>,
+    isbn  <span class="predefined-type">VARCHAR</span>(<span class="integer">255</span>) <span class="keyword">NOT</span> <span class="predefined-constant">NULL</span> <span class="directive">UNIQUE</span>
+);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>During application startup, Flyway will execute the SQL file and create the schema needed for the application.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain">4.6. Domain</h3>
+<div class="paragraph">
+<p>Create a <code>Book</code> domain class that uses <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#sql">Micronaut Data JDBC</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/Book.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.GeneratedValue</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Id</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.MappedEntity</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.annotation.GeneratedValue.Type.AUTO</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">Book</span> {
+
+    <span class="annotation">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@GeneratedValue</span>(AUTO) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="predefined-type">Long</span> id
+
+    <span class="predefined-type">String</span> name
+    <span class="predefined-type">String</span> isbn
+
+    <span class="predefined-type">Book</span>(<span class="predefined-type">String</span> isbn, <span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.isbn = isbn
+        <span class="local-variable">this</span>.name = name
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specifies that the property value is generated by the database and not included in inserts</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bookrepository">4.7. BookRepository</h3>
+<div class="paragraph">
+<p>Next, create the <code>BookRepository</code> interface to define database operations. Micronaut Data will implement the interface at compilation time:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/BookRepository.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.jdbc.annotation.JdbcRepository</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.data.repository.CrudRepository</span>
+
+<span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect.H2</span>
+
+<span class="annotation">@JdbcRepository</span>(dialect = H2) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">interface</span> BookRepository <span class="directive">extends</span> CrudRepository&lt;<span class="predefined-type">Book</span>, <span class="predefined-type">Long</span>&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="annotation">@NonNull</span>
+    Optional&lt;<span class="predefined-type">Book</span>&gt; findByIsbn(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> isbn)
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> with a specific dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specifies that <code>Book</code> is the root entity, and the primary key type is <code>Long</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="data-populator-class">4.8. Data populator class</h3>
+<div class="paragraph">
+<p>Create a <code>DataPopulator</code> class to create some example database entries when the application starts:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/DataPopulator.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.event.StartupEvent</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.event.annotation.EventListener</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+
+<span class="keyword">import</span> <span class="include">javax.transaction.Transactional</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">DataPopulator</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> BookRepository bookRepository
+
+    DataPopulator(BookRepository bookRepository) { <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.bookRepository = bookRepository
+    }
+
+    <span class="annotation">@EventListener</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Transactional</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="type">void</span> init(StartupEvent event) {
+        <span class="keyword">if</span> (bookRepository.count() == <span class="integer">0</span>) {
+            bookRepository.save(<span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">'</span><span class="content">1491950358</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Building Microservices</span><span class="delimiter">'</span></span>))
+            bookRepository.save(<span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">'</span><span class="content">1680502395</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Release It!</span><span class="delimiter">'</span></span>))
+            bookRepository.save(<span class="keyword">new</span> <span class="predefined-type">Book</span>(<span class="string"><span class="delimiter">'</span><span class="content">0321601912</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Continuous Delivery</span><span class="delimiter">'</span></span>))
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use constructor injection to inject a bean of type <code>BookRepository</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Annotate a method with <code>@EventListener</code> to subscribe to an event you define as the method parameter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can declare a method or class as transactional with the <code>javax.transaction.Transactional</code> annotation.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bookcontroller">4.9. BookController</h3>
+<div class="paragraph">
+<p>Create <code>BookController</code> to access <code>Book</code> instances (and trigger JDBC metric data):</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/BookController.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.annotation.Timed</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.annotation.Counted</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/books</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@ExecuteOn</span>(TaskExecutors.IO) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">BookController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> BookRepository bookRepository
+
+    BookController(BookRepository bookRepository) { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">this</span>.bookRepository = bookRepository
+    }
+
+    <span class="annotation">@Get</span><i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="annotation">@Timed</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">books.index</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="predefined-type">Iterable</span>&lt;<span class="predefined-type">Book</span>&gt; index() {
+        <span class="keyword">return</span> bookRepository.findAll()
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/{isbn}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="annotation">@Counted</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">books.find</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="7"></i><b>(7)</b>
+    Optional&lt;<span class="predefined-type">Book</span>&gt; findBook(<span class="predefined-type">String</span> isbn) {
+        <span class="keyword">return</span> bookRepository.findByIsbn(isbn)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/books</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use constructor injection to inject a bean of type <code>BookRepository</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Maps a <code>GET</code> request to <code>/books</code>, which returns a list of <code>Book</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Creates a <code>Timer</code> metric with the given name. If the name is omitted, defaults to <code>method.timed</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Maps a <code>GET</code> request to <code>/books/{isbn}</code>, which attempts to show a <code>Book</code>. This illustrates the use of a URL path variable.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Creates a <code>Counter</code> metric with the given name. If the name is omitted, defaults to the <code>method.counted</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-metrics-2">4.10. Custom Metrics</h3>
+<div class="paragraph">
+<p>To see custom metrics in action, create a service that periodically retrieves the current Bitcoin price in USD using REST.</p>
+</div>
+<div class="sect3">
+<h4 id="model">4.10.1. Model</h4>
+<div class="paragraph">
+<p>We&#8217;ll need a data class to represent the REST response. Create the <code>BitcoinPrice</code> class:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/crypto/BitcoinPrice.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.crypto
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">BitcoinPrice</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> Data data
+
+    BitcoinPrice(Data data) {
+        <span class="local-variable">this</span>.data = data
+    }
+
+    <span class="type">float</span> getPrice() {
+        <span class="keyword">return</span> data.price
+    }
+
+    <span class="annotation">@CompileStatic</span>
+    <span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="directive">static</span> <span class="type">class</span> <span class="class">Data</span> {
+
+        <span class="directive">final</span> <span class="type">float</span> price
+
+        Data(<span class="type">float</span> price) {
+            <span class="local-variable">this</span>.price = price
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="kucoin-declarative-http-client">4.10.2. Kucoin Declarative HTTP Client</h4>
+<div class="paragraph">
+<p>Create declarative Micronaut HTTP Client interface that will be implemented at compile time:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/crypto/PriceClient.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.crypto
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.QueryValue</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+
+<span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">'</span><span class="content">kucoin</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">abstract</span> <span class="type">class</span> <span class="class">PriceClient</span> {
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/api/v1/market/orderbook/level1</span><span class="delimiter">'</span></span>)
+    <span class="directive">abstract</span> BitcoinPrice latest(<span class="annotation">@QueryValue</span> <span class="predefined-type">String</span> symbol)
+
+    BitcoinPrice latestInUSD() {
+        latest(<span class="string"><span class="delimiter">'</span><span class="content">BTC-USDT</span><span class="delimiter">'</span></span>)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>@Client</code> to use <a href="https://docs.micronaut.io/latest/guide/#clientAnnotation">declarative HTTP Clients</a>. You can annotate interfaces or abstract classes. You can use the <code>id</code> member to provide a service identifier or specify the URL directly as the annotation&#8217;s value.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="http-service-configuration">4.10.3. HTTP Service Configuration</h4>
+<div class="paragraph">
+<p>Modify <code>application.yml</code> to configure the URL for the <code>kucoin</code> Service ID:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">http</span>:
+    <span class="key">services</span>:
+      <span class="key">kucoin</span>: <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="key">urls</span>:
+          - <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.kucoin.com</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The ID we used with <code>@Client</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The URL for the <code>kucoin</code> service</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="service">4.10.4. Service</h4>
+<div class="paragraph">
+<p>Create a <code>CryptoService</code> class that uses <code>PriceClient</code> and updates three custom meters:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/groovy/example/micronaut/crypto/CryptoService.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut.crypto
+
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">groovy.util.logging.Slf4j</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.Counter</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.MeterRegistry</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.Timer</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.Scheduled</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+
+<span class="keyword">import</span> <span class="include">java.util.concurrent.atomic.AtomicInteger</span>
+
+<span class="annotation">@CompileStatic</span>
+<span class="annotation">@Slf4j</span>
+<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">CryptoService</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> PriceClient priceClient
+    <span class="directive">private</span> <span class="directive">final</span> Counter checks
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">Timer</span> time
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">AtomicInteger</span> latestPriceUsd = <span class="keyword">new</span> <span class="predefined-type">AtomicInteger</span>(<span class="integer">0</span>)
+
+    CryptoService(PriceClient priceClient, <i class="conum" data-value="2"></i><b>(2)</b>
+                  MeterRegistry meterRegistry) {
+        <span class="local-variable">this</span>.priceClient = priceClient
+
+        checks = meterRegistry.counter(<span class="string"><span class="delimiter">'</span><span class="content">bitcoin.price.checks</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+        time = meterRegistry.timer(<span class="string"><span class="delimiter">'</span><span class="content">bitcoin.price.time</span><span class="delimiter">'</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
+        meterRegistry.gauge(<span class="string"><span class="delimiter">'</span><span class="content">bitcoin.price.latest</span><span class="delimiter">'</span></span>, latestPriceUsd) <i class="conum" data-value="5"></i><b>(5)</b>
+    }
+
+    <span class="annotation">@Scheduled</span>(fixedRate = <span class="string"><span class="delimiter">'</span><span class="content">${crypto.updateFrequency:1h}</span><span class="delimiter">'</span></span>,
+            initialDelay = <span class="string"><span class="delimiter">'</span><span class="content">${crypto.initialDelay:0s}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="type">void</span> updatePrice() {
+        time.record(() -&gt; { <i class="conum" data-value="7"></i><b>(7)</b>
+            <span class="keyword">try</span> {
+                checks.increment() <i class="conum" data-value="8"></i><b>(8)</b>
+                latestPriceUsd.set((<span class="type">int</span>) priceClient.latestInUSD().price) <i class="conum" data-value="9"></i><b>(9)</b>
+            } <span class="keyword">catch</span> (<span class="exception">Exception</span> e) {
+                log.error(<span class="string"><span class="delimiter">'</span><span class="content">Problem checking price</span><span class="delimiter">'</span></span>, e)
+            }
+        })
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use constructor injection to inject <code>PriceClient</code>, <code>MeterRegistry</code>, and <code>ObjectMapper</code> beans</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Create a <code>Counter</code> to track the total number of updates</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Create a <code>Timer</code> to track the total time performing updates</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Create a <code>Gauge</code> to track the most recent update</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Use the <code>Scheduled</code> annotation to configure regular updates</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Update the <code>Timer</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Increment the <code>Counter</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>Update the <code>Gauge</code> with the latest price</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create the <code>src/test/resources/application-test.yml</code> configuration file for tests.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/application-test.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">crypto</span>:
+  <span class="key">initialDelay</span>: <span class="string"><span class="content">10h </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Disable crypto price lookups with a long initial delay</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a test class to verify metrics functionality:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/MetricsSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.Counter</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.MeterRegistry</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.Tags</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.Timer</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.logging.LoggingSystem</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>
+<span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="keyword">import</span> <span class="include">java.util.concurrent.TimeUnit</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.logging.LogLevel.ALL</span>
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">MetricsSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@Inject</span>
+    MeterRegistry meterRegistry <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="annotation">@Inject</span>
+    LoggingSystem loggingSystem <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="annotation">@Inject</span>
+    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
+    HttpClient httpClient <i class="conum" data-value="4"></i><b>(4)</b>
+
+    <span class="type">void</span> testExpectedMeters() {
+
+        <span class="key">when</span>:
+        <span class="predefined-type">Set</span>&lt;<span class="predefined-type">String</span>&gt; names = meterRegistry.meters.id.name
+
+        <span class="key">then</span>:
+        <span class="comment">// check that a subset of expected meters exist</span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">jvm.memory.max</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">process.uptime</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">system.cpu.usage</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">process.files.open</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">logback.events</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">hikaricp.connections.max</span><span class="delimiter">'</span></span>
+
+        <span class="comment">// these will be lazily created</span>
+        !names.contains(<span class="string"><span class="delimiter">'</span><span class="content">http.client.requests</span><span class="delimiter">'</span></span>)
+        !names.contains(<span class="string"><span class="delimiter">'</span><span class="content">http.server.requests</span><span class="delimiter">'</span></span>)
+    }
+
+    <span class="type">void</span> testHttp() {
+
+        <span class="key">when</span>:
+        <span class="predefined-type">Timer</span> timer = meterRegistry.timer(<span class="string"><span class="delimiter">'</span><span class="content">http.server.requests</span><span class="delimiter">'</span></span>, Tags.of(
+                <span class="string"><span class="delimiter">'</span><span class="content">exception</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">none</span><span class="delimiter">'</span></span>,
+                <span class="string"><span class="delimiter">'</span><span class="content">method</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">GET</span><span class="delimiter">'</span></span>,
+                <span class="string"><span class="delimiter">'</span><span class="content">status</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">200</span><span class="delimiter">'</span></span>,
+                <span class="string"><span class="delimiter">'</span><span class="content">uri</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">/books</span><span class="delimiter">'</span></span>))
+
+        <span class="predefined-type">Timer</span> bookIndexTimer = meterRegistry.timer(<span class="string"><span class="delimiter">'</span><span class="content">books.index</span><span class="delimiter">'</span></span>,
+                Tags.of(<span class="string"><span class="delimiter">'</span><span class="content">exception</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">none</span><span class="delimiter">'</span></span>))
+
+        <span class="key">then</span>:
+        <span class="integer">0</span> == timer.count()
+        <span class="integer">0</span> == bookIndexTimer.count()
+
+        <span class="key">when</span>:
+        httpClient.toBlocking().retrieve(
+                HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/books</span><span class="delimiter">'</span></span>),
+                Argument.listOf(<span class="predefined-type">Book</span>))
+
+        <span class="key">then</span>:
+        <span class="integer">1</span> == timer.count()
+        <span class="integer">1</span> == bookIndexTimer.count()
+        <span class="float">0.0</span> &lt; bookIndexTimer.totalTime(<span class="predefined-type">TimeUnit</span>.MILLISECONDS)
+        <span class="float">0.0</span> &lt; bookIndexTimer.max(<span class="predefined-type">TimeUnit</span>.MILLISECONDS)
+
+        <span class="key">when</span>:
+        Counter bookFindCounter = meterRegistry.counter(<span class="string"><span class="delimiter">'</span><span class="content">books.find</span><span class="delimiter">'</span></span>,
+                Tags.of(<span class="string"><span class="delimiter">'</span><span class="content">result</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">success</span><span class="delimiter">'</span></span>,
+                        <span class="string"><span class="delimiter">'</span><span class="content">exception</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">none</span><span class="delimiter">'</span></span>))
+
+        <span class="key">then</span>:
+        <span class="integer">0</span> == bookFindCounter.count()
+
+        <span class="key">when</span>:
+        httpClient.toBlocking().retrieve(
+                HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/books/1491950358</span><span class="delimiter">&quot;</span></span>),
+                Argument.of(<span class="predefined-type">Book</span>.class))
+
+        <span class="key">then</span>:
+        <span class="integer">1</span> == bookFindCounter.count()
+    }
+
+    <span class="type">void</span> testLogback() {
+
+        <span class="key">when</span>:
+        Counter counter = meterRegistry.counter(<span class="string"><span class="delimiter">'</span><span class="content">logback.events</span><span class="delimiter">'</span></span>, Tags.of(<span class="string"><span class="delimiter">'</span><span class="content">level</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">info</span><span class="delimiter">'</span></span>))
+        <span class="type">double</span> initial = counter.count()
+
+        <span class="predefined-type">Logger</span> logger = LoggerFactory.getLogger(<span class="string"><span class="delimiter">'</span><span class="content">testing.testing</span><span class="delimiter">'</span></span>)
+        loggingSystem.setLogLevel(<span class="string"><span class="delimiter">'</span><span class="content">testing.testing</span><span class="delimiter">'</span></span>, ALL)
+
+        logger.trace(<span class="string"><span class="delimiter">'</span><span class="content">trace</span><span class="delimiter">'</span></span>)
+        logger.debug(<span class="string"><span class="delimiter">'</span><span class="content">debug</span><span class="delimiter">'</span></span>)
+        logger.info(<span class="string"><span class="delimiter">'</span><span class="content">info</span><span class="delimiter">'</span></span>)
+        logger.warn(<span class="string"><span class="delimiter">'</span><span class="content">warn</span><span class="delimiter">'</span></span>)
+        logger.error(<span class="string"><span class="delimiter">'</span><span class="content">error</span><span class="delimiter">'</span></span>)
+
+        <span class="key">then</span>:
+        initial + <span class="integer">1</span> == counter.count()
+    }
+
+    <span class="type">void</span> testMetricsEndpoint() {
+
+        <span class="key">when</span>:
+        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; response = httpClient.toBlocking().retrieve(
+                HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/metrics</span><span class="delimiter">'</span></span>),
+                Argument.mapOf(<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>))
+
+        <span class="key">then</span>:
+        response.containsKey <span class="string"><span class="delimiter">'</span><span class="content">names</span><span class="delimiter">'</span></span>
+        response.get(<span class="string"><span class="delimiter">'</span><span class="content">names</span><span class="delimiter">'</span></span>) <span class="keyword">in</span> <span class="predefined-type">List</span>
+
+        <span class="key">when</span>:
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; names = (<span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt;) response.get(<span class="string"><span class="delimiter">'</span><span class="content">names</span><span class="delimiter">'</span></span>)
+
+        <span class="key">then</span>:
+        <span class="comment">// check that a subset of expected meters exist</span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">jvm.memory.max</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">process.uptime</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">system.cpu.usage</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">process.files.open</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">logback.events</span><span class="delimiter">'</span></span>
+        names.contains <span class="string"><span class="delimiter">'</span><span class="content">hikaricp.connections.max</span><span class="delimiter">'</span></span>
+    }
+
+    <span class="type">void</span> testOneMetricEndpoint() {
+
+        <span class="key">when</span>:
+        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; response = httpClient.toBlocking().retrieve(
+                HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/metrics/jvm.memory.used</span><span class="delimiter">'</span></span>),
+                Argument.mapOf(<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>))
+
+        <span class="predefined-type">String</span> name = (<span class="predefined-type">String</span>) response.get(<span class="string"><span class="delimiter">'</span><span class="content">name</span><span class="delimiter">'</span></span>)
+
+        <span class="key">then</span>:
+        <span class="string"><span class="delimiter">'</span><span class="content">jvm.memory.used</span><span class="delimiter">'</span></span> == name
+
+        <span class="key">when</span>:
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;&gt; measurements = (<span class="predefined-type">List</span>&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;&gt;) response.get(<span class="string"><span class="delimiter">'</span><span class="content">measurements</span><span class="delimiter">'</span></span>)
+
+        <span class="key">then</span>:
+        <span class="integer">1</span> == measurements.size()
+
+        <span class="key">when</span>:
+        <span class="type">double</span> value = (<span class="type">double</span>) measurements.get(<span class="integer">0</span>).get(<span class="string"><span class="delimiter">'</span><span class="content">value</span><span class="delimiter">'</span></span>)
+
+        <span class="key">then</span>:
+        value &gt; <span class="integer">0</span>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>MeterRegistry</code> bean</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Inject the <code>LoggingSystem</code> bean</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create an additional test class to verify the custom metrics:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/groovy/example/micronaut/CryptoUpdatesSpec.groovy</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">example.micronaut.crypto.CryptoService</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.Counter</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.MeterRegistry</span>
+<span class="keyword">import</span> <span class="include">io.micrometer.core.instrument.Timer</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.QueryValue</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>
+<span class="keyword">import</span> <span class="include">spock.lang.AutoCleanup</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Shared</span>
+<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">java.util.concurrent.TimeUnit.MILLISECONDS</span>
+
+<span class="type">class</span> <span class="class">CryptoUpdatesSpec</span> <span class="directive">extends</span> Specification {
+
+    <span class="annotation">@Shared</span>
+    <span class="annotation">@AutoCleanup</span>
+    EmbeddedServer kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer,
+            [<span class="string"><span class="delimiter">'</span><span class="content">spec.name</span><span class="delimiter">'</span></span>: <span class="string"><span class="delimiter">'</span><span class="content">MetricsTestKucoin</span><span class="delimiter">'</span></span>])
+
+    <span class="annotation">@Shared</span>
+    <span class="annotation">@AutoCleanup</span>
+    EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer,
+            [<span class="string"><span class="delimiter">'</span><span class="content">micronaut.http.services.kocoin.url</span><span class="delimiter">'</span></span>: <span class="string"><span class="delimiter">'</span><span class="content">http://localhost:</span><span class="delimiter">'</span></span> + kucoinEmbeddedServer.port])
+
+    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test crypto updates</span><span class="delimiter">'</span></span>() {
+        <span class="key">given</span>:
+        CryptoService cryptoService = embeddedServer.applicationContext.getBean(CryptoService)
+        MeterRegistry meterRegistry = embeddedServer.applicationContext.getBean(MeterRegistry)
+
+        <span class="key">when</span>:
+        Counter counter = meterRegistry.counter(<span class="string"><span class="delimiter">'</span><span class="content">bitcoin.price.checks</span><span class="delimiter">'</span></span>)
+        <span class="predefined-type">Timer</span> timer = meterRegistry.timer(<span class="string"><span class="delimiter">'</span><span class="content">bitcoin.price.time</span><span class="delimiter">'</span></span>)
+
+        <span class="key">then</span>:
+        <span class="integer">0</span> == counter.count()
+        <span class="integer">0</span> == timer.totalTime(MILLISECONDS)
+
+        <span class="key">when</span>:
+        <span class="type">int</span> checks = <span class="integer">3</span>
+        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="integer">0</span>; i &lt; checks; i++) {
+            cryptoService.updatePrice()
+        }
+
+        <span class="key">then</span>:
+        checks == counter.count()
+        timer.totalTime(MILLISECONDS) &gt; <span class="integer">0</span>
+    }
+
+    <span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">'</span><span class="content">spec.name</span><span class="delimiter">'</span></span>, value = <span class="string"><span class="delimiter">'</span><span class="content">MetricsTestKucoin</span><span class="delimiter">'</span></span>)
+    <span class="annotation">@Controller</span>
+    <span class="directive">static</span> <span class="type">class</span> <span class="class">MockKucoinController</span> {
+
+        <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> RESPONSE = <span class="string"><span class="delimiter">'''</span><span class="content">\
+</span><span class="content">{
+   &quot;code&quot;:&quot;200000&quot;,
+   &quot;data&quot;:{
+      &quot;time&quot;:1654865889872,
+      &quot;sequence&quot;:&quot;1630823934334&quot;,
+      &quot;price&quot;:&quot;29670.4&quot;,
+      &quot;size&quot;:&quot;0.00008436&quot;,
+      &quot;bestBid&quot;:&quot;29666.4&quot;,
+      &quot;bestBidSize&quot;:&quot;0.16848947&quot;,
+      &quot;bestAsk&quot;:&quot;29666.5&quot;,
+      &quot;bestAskSize&quot;:&quot;2.37840044&quot;
+   }
+}
+</span><span class="delimiter">'''</span></span>
+
+        <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/api/v1/market/orderbook/level1</span><span class="delimiter">'</span></span>)
+        <span class="predefined-type">String</span> latest(<span class="annotation">@QueryValue</span> <span class="predefined-type">String</span> symbol) {
+            RESPONSE
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous test creates two Micronaut embedded servers. One mocks the <code>kucoin</code> API, the other is our application. The test uses <code>@Requires</code> to conditionally load a controller only for the <code>kucoin</code> bean context.
+We used an identifier with <code>@Client</code>, which makes it easy to point our HTTP client to the mock server.</p>
+</div>
+<div class="sect2">
+<h3 id="running-the-tests">5.1. Running the tests</h3>
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">6. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command, which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>Alternately, to make the Bitcoin price update occur more frequently to see the effects on metrics, start the application with a config override to update every five seconds:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew run --args=&quot;-crypto.updateFrequency=5s&quot;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can retrieve a list of known metrics using cURL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl localhost:8080/metrics</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The response should look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">names</span><span class="delimiter">&quot;</span></span>: [
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">bitcoin.price.checks</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">bitcoin.price.latest</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">bitcoin.price.time</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">executor</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">executor.active</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">executor.completed</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">executor.pool.core</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">executor.pool.max</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">executor.pool.size</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">executor.queue.remaining</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">executor.queued</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">hikaricp.connections</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">hikaricp.connections.acquire</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">hikaricp.connections.active</span><span class="delimiter">&quot;</span></span>,
+    <span class="error">.</span><span class="error">.</span><span class="error">.</span>
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">jvm.threads.peak</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">jvm.threads.states</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">logback.events</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">process.cpu.usage</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">process.files.max</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">process.files.open</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">process.start.time</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">process.uptime</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">system.cpu.count</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">system.cpu.usage</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">system.load.average.1m</span><span class="delimiter">&quot;</span></span>
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After the application has been running for a bit and has made a few Bitcoin price checks, we can view the related metric values:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl localhost:8080/metrics/bitcoin.price.latest</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">measurements</span><span class="delimiter">&quot;</span></span>: [{ <span class="key"><span class="delimiter">&quot;</span><span class="content">statistic</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">VALUE</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>: <span class="float">29659.0</span> } ],
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">bitcoin.price.latest</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl localhost:8080/metrics/bitcoin.price.checks</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">measurements</span><span class="delimiter">&quot;</span></span>: [{ <span class="key"><span class="delimiter">&quot;</span><span class="content">statistic</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">COUNT</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>: <span class="float">5.0</span> } ],
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">bitcoin.price.checks</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl localhost:8080/metrics/bitcoin.price.time</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">baseUnit</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">seconds</span><span class="delimiter">&quot;</span></span>,
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">measurements</span><span class="delimiter">&quot;</span></span>: [
+    { <span class="key"><span class="delimiter">&quot;</span><span class="content">statistic</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">COUNT</span><span class="delimiter">&quot;</span></span>,      <span class="key"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>: <span class="float">5.0</span> },
+    { <span class="key"><span class="delimiter">&quot;</span><span class="content">statistic</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">TOTAL_TIME</span><span class="delimiter">&quot;</span></span>, <span class="key"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>: <span class="float">2.525546791</span> },
+    { <span class="key"><span class="delimiter">&quot;</span><span class="content">statistic</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">MAX</span><span class="delimiter">&quot;</span></span>,        <span class="key"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>: <span class="float">0.851958216</span> }
+  ],
+  <span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">bitcoin.price.time</span><span class="delimiter">&quot;</span></span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">7. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In combination with the <code>/metrics</code> endpoint, you often want to register a specific type of reporter. See the <a href="https://micronaut-projects.github.io/micronaut-micrometer/latest/guide/">Micronaut Micrometer documentation</a> to learn about the supported libraries for reporting metrics.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
