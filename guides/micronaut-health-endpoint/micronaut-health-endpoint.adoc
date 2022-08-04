@@ -1,0 +1,80 @@
+common:header.adoc[]
+
+You will learn how to use the Micronaut Management feature to enable the "health" endpoint for your application.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Testing Health Endpoints
+
+test:HealthTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+<3> The health endpoint returns information about the "health" of the application, which is determined by any number of "health indicators".
+
+==== Base Path
+
+The base path for all endpoints is `/` by default. If you prefer the management endpoints to be available under a different base path, configure `endpoints.all.path` as in the following test.
+
+[NOTE]
+The leading and trailing `/` are required for `endpoints.all.path`, unless `micronaut.server.context-path` is set, in which case just the leading `/` isn't necessary.
+
+test:HealthPathTest[]
+
+<1> Sets the base path for all management endpoints to `/endpoints/`. This is normally specified in the application configuration (e.g. `application.yml`).
+<2> The "health" endpoint is now rooted at `/endpoints/health`
+<3> The "health" endpoint is no longer reachable at the default path and results in a "Not Found" status (HTTP 404).
+
+==== Failed Health Status
+
+Disk-space threshold is one of the build-in indicators. This test demonstrates a failed health status when free disk space drops below the specified threshold. The `endpoints.health.disk-space.threshold` configuration property can be provided as a string, like "10MB" or "200KB", or the number of bytes.
+
+test:PoorHealthTest[]
+
+<1> Sets the `endpoints.health.disk-space.threshold` property to an impossibly high value to force a service down status. This is normally specified in the application configuration (e.g. `application.yml`).
+<2> A failed heath check results in a Service Unavailable status (HTTP 503)
+<3> The response body of the error contains the json string `{"status":"DOWN"}`
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+You can execute the health endpoint exposed by the application:
+
+[source, bash]
+----
+curl localhost:8080/health
+----
+
+[source]
+----
+{"status":"UP"}
+----
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You can execute the health endpoint exposed by the native image:
+
+[source, bash]
+----
+curl localhost:8080/health
+----
+
+[source]
+----
+{"status":"UP"}
+----
+
+:exclude-for-languages:
+
+== Next steps
+
+Visit https://docs.micronaut.io/latest/guide/#management[Micronaut Management & Monitoring] to learn more.
+
+common:helpWithMicronaut.adoc[]
