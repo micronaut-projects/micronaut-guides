@@ -1,7 +1,6 @@
 package example.micronaut;
 
 import example.micronaut.domain.Genre;
-import io.micronaut.core.async.annotation.SingleResult;
 import io.micronaut.data.exceptions.DataAccessException;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
@@ -31,7 +30,6 @@ public class GenreController {
     }
 
     @Get("/{id}") // <3>
-    @SingleResult
     public Mono<Genre> show(Long id) {
         return genreRepository
                 .findById(id); // <4>
