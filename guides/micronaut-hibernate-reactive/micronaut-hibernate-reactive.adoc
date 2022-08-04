@@ -1,0 +1,196 @@
+common:header.adoc[]
+
+In this guide, we will write a Micronaut application that exposes some REST endpoints and stores data in a database using JPA and Hibernate.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+=== Data Source configuration
+
+Add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-reactor[groupId=io.micronaut.reactor,callout=1]
+dependency:micronaut-hibernate-reactive[groupId=io.micronaut.sql,callout=2]
+dependency:vertx-mysql-client[groupId=io.vertx,callout=3]
+dependency:testcontainers[groupId=org.testcontainers,callout=4]
+
+:dependencies:
+
+<1> Add a dependency to the Micronaut Framework Project Reactor support
+<2> Configures Hibernate Reactive/JPA beans.
+<3> Adds a dependency to the Vert.x MySQL client.
+<4> Adds a dependency to the Testcontainers library which will be uses for testing the application.
+
+=== JPA configuration
+
+Add the next snippet to `src/main/resources/application.yml` to configure JPA:
+
+resource:application.yml[tag=jpa]
+
+=== Domain
+
+Create the domain entities:
+
+source:domain/Genre[]
+
+The previous domain has a `OneToMany` relationship with the domain `Book`.
+
+source:domain/Book[]
+
+=== Application Configuration
+
+Create an interface to encapsulate the application configuration settings:
+
+source:ApplicationConfiguration[]
+
+Like Spring Boot and Grails, in Micronaut applications you can create typesafe configuration by creating classes that are annotated with https://docs.micronaut.io/latest/guide/#configurationProperties[@ConfigurationProperties].
+
+Create a `ApplicationConfigurationProperties` class:
+
+source:ApplicationConfigurationProperties[]
+
+callout:configuration-properties[1]
+
+You can override `max` if you add to your `src/main/resources/application.yml`:
+
+resource:application.yml[tag=application]
+
+=== Repository Access
+
+Next, create a repository interface to define the operations to access the database:
+
+source:GenreRepository[]
+
+And the implementation:
+
+source:GenreRepositoryImpl[]
+
+callout:singleton[1]
+<2> Inject the `ApplicationConfiguration`.
+<3> Inject the Hibernate `SessionFactory`.
+<4> Grab a transactional session from the `SessionFactory` to run our query.
+
+=== Controller
+
+common:validation.adoc[]
+
+Create two classes to encapsulate Save and Update operations:
+
+source:GenreSaveCommand[]
+
+callout:introspected[1]
+
+source:GenreUpdateCommand[]
+
+Create a POJO to encapsulate Sorting and Pagination:
+
+source:SortingAndOrderArguments[]
+
+<1> Use `javax.validation.constraints` Constraints to ensure the incoming data matches your expectations.
+
+Create `GenreController`, a controller which exposes a resource with the common CRUD operations:
+
+source:GenreController[]
+
+callout:controller[number=1,arg0=/genres]
+callout:constructor-di[number=2,arg0=GenreRepository]
+callout:get[number=3,arg0=show,arg1=/{id}]
+<4> Returning an empty Publisher when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
+<5> Maps a `PUT` request to `/genres` which attempts to update a genre.
+callout:valid[number=6]
+<7> Add custom headers to the response.
+<8> Maps a `GET` request to `/genres` which returns a list of genres.
+<9> Maps a `POST` request to `/genres` which attempts to save a genre.
+<10> Maps a `POST` request to `/ex` which generates an exception.
+callout:delete[number=11,arg0=delete,arg1=/genres/{id}]
+callout:at-status[number=12]
+
+=== Writing Tests
+
+To allow us to run a MySQL instance in a Docker container for testing, create a base class that sets this up.
+
+test:BaseMysqlTest[]
+
+callout:micronaut-test[1]
+callout:test-instance-per-class[2]
+callout:test-property-provider[3]
+callout:http-client[4]
+<5> Configure the application properties to that of the MySQL instance.
+
+Create a test to verify the CRUD operations:
+
+test:GenreControllerTest[]
+
+<1> Extend the `BaseMysqlTest` class.
+callout:http-request[2]
+<2> If you care just about the object in the response use `retrieve`.
+<3> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
+
+common:testApp.adoc[]
+
+To define the username and password for our Testcontainers MySQL instance, create a `application-test.yml` file in `src/test/resources`:
+
+testResource:application-test.yml[]
+
+== Using MySQL
+
+To run the application, we will use a real database instance running in Docker.
+
+Start it with:
+
+[source,bash]
+----
+docker run \
+    -p 3306:3306 \
+    -e MYSQL_ROOT_PASSWORD=pass \
+    mysql:oracle
+----
+
+For configuration with local development, create an `application-dev.yml` file in the `src/main/resources` directory:
+
+resource:application-dev.yml[]
+
+When you move to production, you will need to configure these properties to point at your real production database.
+This can be done via environment variables like so:
+
+[source,bash]
+----
+export JPA_DEFAULT_PROPERTIES_HIBERNATE_CONNECTION_URL=jdbc:mysql://localhost:5432/micronaut
+export JPA_DEFAULT_PROPERTIES_HIBERNATE_CONNECTION_USERNAME=dbuser
+export JPA_DEFAULT_PROPERTIES_HIBERNATE_CONNECTION_PASSWORD=theSecretPassword
+----
+
+Run the application.
+If you look at the output you can see that the application uses MySQL:
+
+common:runapp.adoc[]
+
+[source, bash]
+----
+..
+...
+16:31:01.155 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+....
+----
+
+Connect to your MySQL database, and you will see both `genre` and `book` tables.
+
+Save one genre, and your `genre` table will now contain an entry.
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+== Next steps
+
+Read more about https://docs.micronaut.io/latest/guide/#dataAccess[Configurations for Data Access] section in the Micronaut documentation.
+
+common:helpWithMicronaut.adoc[]
