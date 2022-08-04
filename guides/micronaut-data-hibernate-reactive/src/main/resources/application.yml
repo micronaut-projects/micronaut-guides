@@ -1,0 +1,37 @@
+micronaut:
+  application:
+    name: micronaut-guide
+netty:
+  default:
+    allocator:
+      max-order: 3
+#tag::jpa[]
+jpa:
+  default:
+    entity-scan:
+      packages:
+        - 'example.micronaut.domain' # <1>
+    properties:
+      hibernate:
+        show-sql: true
+        hbm2ddl:
+          auto: update # <2>
+        connection:
+          url: ${JDBC_URL:`jdbc:mysql://localhost:3306/db`}
+          username: ${JDBC_USER:root}
+          password: ${JDBC_PASSWORD:my-secret-pw}
+    reactive: true
+#end::jpa[]
+---
+#tag::flyway[]
+datasources:
+  default:
+    url: ${jpa.default.properties.hibernate.connection.url}  # <1>
+    username: ${jpa.default.properties.hibernate.connection.username} # <2>
+    password: ${jpa.default.properties.hibernate.connection.password}
+    driverClassName: com.mysql.cj.jdbc.Driver  # <3>
+flyway:
+  datasources:
+    migration:
+      enabled: true # <3>
+#end::flyway[]
