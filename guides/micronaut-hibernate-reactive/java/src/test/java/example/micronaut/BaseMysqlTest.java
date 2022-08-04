@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+import java.util.Collections;
 
 import java.util.Map;
 
