@@ -1,0 +1,90 @@
+external:micronaut-cloud-trace-base/start.adoc[]
+* A https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account and a GCP project.
+
+common:costs-gcloud.adoc[]
+
+common:gcp.adoc[]
+
+external:micronaut-cloud-trace-base/create-app.adoc[]
+
+=== Tracer Configuration
+
+If you used Micronaut CLI or Launch to create your application, the OpenTelemetry exporter will automatically be added to your `application.yml` configurations.
+
+resource:application.yml[tag=otel-trace]
+
+== Run the Application
+
+The application can be deployed to Google Cloud Run, Cloud Function, Cloud Compute, or App Engine.
+
+Traces can be sent to Google Cloud Trace outside the Google Cloud.
+
+This allows us to run the application locally and see the traces in Google Cloud Trace.
+
+common:runapp-instructions.adoc[]
+
+common:gcp-default-credentials.adoc[]
+
+== Traces
+
+Open the https://console.cloud.google.com/traces[GCP Tracing Console].
+
+image::gcp-tracing/trace-list-graph.png[]
+
+{empty} +
+
+If the data is not displayed, give it a minute. It takes a few seconds for the traces to show up in the console.
+
+=== Get Item Counts
+
+[source, bash]
+----
+curl http://localhost:8080/store/inventory/laptop
+----
+{empty} +
+
+image::gcp-tracing/inventory-item.png[]
+
+{empty} +
+
+Each span is represented by a blue bar.
+
+=== Order Item
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/store/order" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{"item":"laptop", "count":5}'
+----
+
+{empty} +
+
+image::gcp-tracing/order-item.png[]
+
+{empty} +
+
+Selecting a different span will show you the labels (a.k.a. attributes/tags) and other details of the span.
+
+=== Get Inventory
+
+[source, bash]
+----
+curl http://localhost:8080/store/inventory
+----
+
+{empty} +
+
+image::gcp-tracing/inventory-all.png[]
+
+{empty} +
+
+Looking at the trace, we can conclude that retrieving the items sequentially might not be the best design choice.
+
+common:gcp-project-cleanup.adoc[]
+
+external:micronaut-cloud-trace-base/end.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-gcp/latest/guide/[Micronaut GCP] integration.
+
+

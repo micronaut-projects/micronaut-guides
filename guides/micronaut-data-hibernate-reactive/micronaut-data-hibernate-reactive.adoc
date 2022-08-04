@@ -1,0 +1,213 @@
+common:header.adoc[]
+
+In this guide, we will write a Micronaut application that exposes some REST endpoints and stores data in a database using JPA and Hibernate.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+=== Data Source configuration
+
+Add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-data-hibernate-reactive[groupId=io.micronaut.data,callout=1]
+dependency:vertx-mysql-client[groupId=io.vertx,callout=2]
+
+:dependencies:
+
+<1> A dependency on micronaut-data's Reactive Hibernate support.
+<2> Adds a dependency to the Vert.x MySQL client.
+
+=== JPA configuration
+
+Add the next snippet to `src/main/resources/application.yml` to configure JPA:
+
+resource:application.yml[tag=jpa]
+
+<1> Configure the package that contains our entity classes.
+<2> Configure how Hibernate will manage the database.
+
+Use `none` for the hbm2ddl option to prevent Hibernate from creating the database schema, as we will be using Flyway to manage the database.
+
+common:flyway-header.adoc[]
+
+We also will need to define a JDBC datasource for the migration (as it cannot use the reactive JPA datasource <<JPA configuration,configured above>>)
+So first add these dependencies:
+
+:dependencies:
+
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=1]
+dependency:mysql-connector-java[groupId=mysql,callout=2,scope=runtime]
+
+:dependencies:
+
+<1> A dependency on micronaut-jdbc's Hikari datasource.
+<2> Adds a dependency to the MySQL Connector/J driver.
+
+Then add the following configuration for both Flyway and the Datasource
+
+resource:application.yml[tag=flyway]
+
+<1> Define the JDBC URL for your database.
+<2> Define the username and password for your database.
+<3> Define the driver class name for your database.
+<4> Enable Flyway for the `migration` datasource.
+
+NOTE: Configuring multiple data sources is as simple as enabling Flyway for each one.
+You can also specify folders that will be used for migrating each data source.
+Review the https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway documentation] for additional details.
+
+Flyway migration will be automatically triggered before your Micronaut application starts.
+Flyway will read migration commands in the `resources/db/migration/` directory, execute them if necessary, and verify that the configured data source is consistent with them.
+
+Create the following migration files with the database schema creation:
+
+resource:db/migration/V1__schema.sql[]
+
+During application startup, http://www.flyway.org[Flyway] executes the SQL file and creates the schema needed for the application.
+
+=== Domain
+
+Create the domain entities:
+
+source:domain/Genre[]
+
+=== Repository Access
+
+Next, create a repository interface to define the operations to access the database. Micronaut Data will implement the interface at compilation time:
+
+source:GenreRepository[]
+
+<1> Annotate with `@Repository` to allow compile time implementations to be added.
+<2> `Genre`, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the `GenericRepository` interface.
+
+The repository extends from `ReactorPageableRepository`. It inherits the hierarchy `ReactorPageableRepository` -> `ReactorCrudRepository` -> `GenericRepository`.
+
+|===
+|Repository | Description
+
+|`ReactorPageableRepository`
+| A reactive repository that supports pagination. It provides `findAll(Pageable)` and `findAll(Sort)`.
+
+|`ReactorCrudRepository`
+| A repository interface for performing reactive CRUD (Create, Read, Update, Delete). It provides methods such as `findAll()`, `save(Genre)`, `deleteById(Long)`, and `findById(Long)`.
+
+|`GenericRepository`
+| A root interface that features no methods but defines the entity type and ID type as generic arguments.
+
+|===
+
+=== Controller
+
+common:validation.adoc[]
+
+Create a class to encapsulate the Update operations:
+
+source:GenreUpdateCommand[]
+
+callout:introspected[1]
+
+Create `GenreController`, a controller that exposes a resource with the common CRUD operations:
+
+source:GenreController[]
+
+callout:controller[number=1,arg0=/genres]
+callout:constructor-di[number=2,arg0=GenreRepository]
+<3> Maps a `GET` request to `/genres/{id}`, which attempts to show a genre. This illustrates the use of a URL path variable.
+<4> Returning an empty optional when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
+<5> Maps a `PUT` request to `/genres`, which attempts to update a genre.
+<6> Adds `@Valid` to any method parameter that requires validation. Use a POJO supplied as a JSON payload in the request to populate command.
+<7> It is easy to add custom headers to the response.
+<8> Maps a `GET` request to `/genres/list`, which returns a list of genres. This mapping illustrates URL parameters being mapped to a single POJO.
+<9> You can bind `Pageable` as a controller method argument. Check the examples in the following test section and read the https://micronaut-projects.github.io/micronaut-data/latest/guide/configurationreference.html#io.micronaut.data.runtime.config.DataConfiguration.PageableConfiguration[Pageable configuration] options. For example, you can configure the default page size with the configuration property `micronaut.data.pageable.default-page-size`.
+<10> Maps a `POST` request to `/genres`, which attempts to save a genre.
+<11> Maps a `POST` request to `/ex`, which generates an exception.
+<12> Maps a `DELETE` request to `/genres/{id}`, which attempts to remove a genre. This illustrates the use of a URL path variable.
+
+=== Writing Tests
+
+To allow us to run a MySQL instance in a Docker container for testing, create a base class that sets this up.
+
+test:BaseMysqlTest[]
+
+callout:micronaut-test[1]
+callout:test-instance-per-class[2]
+callout:test-property-provider[3]
+callout:http-client[4]
+<5> Configure the application properties to that of the MySQL instance.
+
+To define the username and password for our Testcontainers MySQL instance, create a `application-test.yml` file in `src/test/resources`:
+
+testResource:application-test.yml[]
+
+Create a test to verify the CRUD operations:
+
+test:GenreControllerTest[]
+
+<1> Extend the `BaseMysqlTest` class.
+callout:http-request[2]
+<2> If you care just about the object in the response use `retrieve`.
+<3> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
+
+common:testApp.adoc[]
+
+== Using MySQL
+
+To run the application, we will use a real database instance running in Docker.
+
+Start it with:
+
+[source,bash]
+----
+docker run \
+    --rm \
+    -d \
+    -p 3306:3306 \
+    -e MYSQL_ROOT_PASSWORD=my-secret-pw \
+    -e MYSQL_DATABASE=db \
+    mysql:latest
+----
+
+When you move to production, you will need to configure these properties to point at your real production database.
+This can be done via environment variables like so:
+
+[source,bash]
+----
+export JDBC_URL=jdbc:mysql://production-server:3306/micronaut
+export JDBC_USER=dbuser
+export JDBC_PASSWORD=theSecretPassword
+----
+
+Run the application.
+If you look at the output you can see that the application uses MySQL:
+
+common:runapp.adoc[]
+
+[source, bash]
+----
+..
+...
+16:31:01.155 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+....
+----
+
+Connect to your MySQL database, and you will see both `genre` and `book` tables.
+
+Save one genre, and your `genre` table will now contain an entry.
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#hibernateReactive[Micronaut Data Hibernate Reactive].
+
+common:helpWithMicronaut.adoc[]

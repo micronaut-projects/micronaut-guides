@@ -1,0 +1,180 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will integrate https://www.jaegertracing.io[Jaeger] with a Micronaut application composed of three microservices.
+
+____
+As on-the-ground microservice practitioners are quickly realizing, the majority of operational problems that arise when moving to a distributed architecture are ultimately grounded in two areas: networking and observability. It is a much larger problem to network and debug a set of intertwined distributed services versus a single monolithic application.
+____
+
+You will discover how the Micronaut framework eases Jaeger integration.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Writing the Application
+
+To learn more about this sample application, read the guideLink:micronaut-microservices-services-discover-consul[Consul and the Micronaut Framework - Microservices Service Discovery] guide. The application contains three microservices.
+
+* `bookcatalogue` - This returns a list of books. It uses a domain consisting of a book name and an ISBN.
+
+* `bookinventory` - This exposes an endpoint to check whether a book has sufficient stock to fulfil an order. It uses a domain consisting of a stock level and an ISBN.
+
+* `bookrecommendation` - This consumes previous services and exposes an endpoint, which recommends book names that are in stock.
+
+The `bookcatalogue` service consumes endpoints exposed by the other services. The following image illustrates the application flow:
+
+image::flow.svg[]
+
+A request to `bookrecommendation` (http://localhost:8080/books) triggers several requests through our microservices mesh.
+
+common:annotationprocessors.adoc[]
+
+== Jaeger and the Micronaut Framework
+
+=== Install Jaeger via Docker
+
+The quickest way to start https://www.jaegertracing.io[Jaeger] is via Docker:
+
+[source, bash]
+----
+docker run -d --name jaeger \
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+  -p 5775:5775/udp \
+  -p 6831:6831/udp \
+  -p 6832:6832/udp \
+  -p 5778:5778 \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 14250:14250 \
+  -p 9411:9411 \
+  jaegertracing/all-in-one:latest
+----
+
+== OpenTelemetry dependencies
+
+common:opentelemetry-annotations.adoc[]
+
+common:opentelemetry-http.adoc[]
+
+common:opentelemetry-exporter.adoc[]
+
+Each service adds the OpenTelemetry Jaeger exporter dependency.
+
+dependency:opentelemetry-exporter-jaeger[groupId=io.opentelemetry,scope=compile]
+
+Each service sets `jaeger` as exporter in configuration:
+
+resource:application.yml[app=bookcatalogue,tag=jaeger]
+
+common:opentelemetry-disable.adoc[]
+
+=== Book Inventory Changes
+
+Annotate the method with `@ContinueSpan` and the parameter with `@SpanTag`:
+
+source:BooksController[app=bookinventory]
+
+callout:continue-span[1]
+callout:span-tag[2]
+
+== Running the Application
+
+Run `bookcatalogue` microservice:
+
+:exclude-for-build:maven
+
+To run the application, execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:28:34.034 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 499ms. Server Running: http://localhost:8081
+----
+
+Run `bookinventory` microservice:
+
+:exclude-for-build:maven
+
+To run the application, execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:13.104 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 506ms. Server Running: http://localhost:8082
+----
+
+Run `bookrecommendation` microservice:
+
+:exclude-for-build:maven
+
+To run the application, execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+[source,bash]
+----
+...
+14:31:57.389 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 523ms. Server Running: http://localhost:8080
+----
+
+You can run a cURL command to test the whole application:
+
+[source, bash]
+----
+curl http://localhost:8080/books
+----
+
+[source,json]
+----
+[{"name":"Building Microservices"}
+----
+
+You can then navigate to http://localhost:16686 to access the Jaeger UI.
+
+The previous request generates the following traces, composed of 9 spans.
+
+image::jaegerui-opentelemetry.png[]
+
+In the previous image, you can see that:
+
+- Whenever a Micronaut HTTP client executes a new network request, it creates a new span.
+- Whenever a Micronaut server receives a request, it creates a new span.
+
+The `stock.isbn` tags that we configured with `@SpanTag` are present.
+
+Moreover, you can see the requests to `bookinventory` are done in parallel.
+
+== Next Steps
+
+As you have seen in this guide, without any annotations, you can get distributed tracing up and running quickly with the Micronaut framework.
+
+The Micronaut framework includes several annotations to give you more flexibility. We introduced the `@ContinueSpan` and `@SpanTag` annotations. Also, you have at your disposal the `@NewSpan` annotation, which will create a new span, wrapping the method call or reactive type.
+
+Make sure to read more about https://micronaut-projects.github.io/micronaut-tracing/snapshot/guide/index.html#opentelemetry[Tracing with OpenTelemetry] in the Micronaut framework.
+
+common:helpWithMicronaut.adoc[]
