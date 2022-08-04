@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>OpenTelemetry Tracing with Google Cloud Trace and the Micronaut Framework</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-cloud-trace-google.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="OpenTelemetry Tracing with Google Cloud Trace and the Micronaut Framework"/>
+    <meta name="twitter:description" content="Use Google Cloud Trace to investigate the behavior of your Micronaut applications."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="./index.html" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="./index.html" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-cloud-trace-google.html">OpenTelemetry Tracing with Google Cloud Trace and the Micronaut Framework</a> » <span class="breadcrumb_last" aria-current="page">maven | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#costs">3. Costs</a></li>
+<li><a href="#google-cloud-platform">4. Google Cloud Platform</a>
+<ul class="sectlevel2">
+<li><a href="#google-cloud-platform-project">4.1. Google Cloud Platform Project</a></li>
+<li><a href="#cloud-sdk">4.2. Cloud SDK</a></li>
+</ul>
+</li>
+<li><a href="#solution">5. Solution</a></li>
+<li><a href="#writing-the-application">6. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#enable-annotation-processing">6.1. Enable annotation Processing</a></li>
+<li><a href="#opentelemetry">6.2. OpenTelemetry</a></li>
+<li><a href="#inventory-service">6.3. Inventory Service</a></li>
+<li><a href="#store-controller">6.4. Store Controller</a></li>
+<li><a href="#warehouse-client">6.5. Warehouse Client</a></li>
+<li><a href="#tracer-configuration">6.6. Tracer Configuration</a></li>
+</ul>
+</li>
+<li><a href="#run-the-application">7. Run the Application</a></li>
+<li><a href="#traces">8. Traces</a>
+<ul class="sectlevel2">
+<li><a href="#get-item-counts">8.1. Get Item Counts</a></li>
+<li><a href="#order-item">8.2. Order Item</a></li>
+<li><a href="#get-inventory">8.3. Get Inventory</a></li>
+</ul>
+</li>
+<li><a href="#cleaning-up">9. Cleaning Up</a>
+<ul class="sectlevel2">
+<li><a href="#deleting-the-project">9.1. Deleting the project</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">10. Next Steps</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>OpenTelemetry Tracing with Google Cloud Trace and the Micronaut Framework</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Use Google Cloud Trace to investigate the behavior of your Micronaut applications.</p>
+</div>
+<div class="paragraph">
+<p>Authors: John Shingler</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.6.0</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+<div class="paragraph">
+<p>In this guide, you will discover how simple it is to add tracing to a  Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Tracing allows you to track service requests in a single application or a distributed one. Trace data shows the path, time spent in each section (called a span), and other information collected along the way. Tracing gives you observability into what is causing bottlenecks and failures.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+<li>
+<p>A <a href="https://cloud.google.com/gcp/">Google Cloud Platform (GCP)</a> account and a GCP project.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="costs">3. Costs</h2>
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+This guide uses paid services; you may need to enable Billing in Google Cloud to complete some steps in this guide.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="google-cloud-platform">4. Google Cloud Platform</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Signup for <a href="https://console.cloud.google.com/">Google Cloud Platform</a></p>
+</div>
+<div class="sect2">
+<h3 id="google-cloud-platform-project">4.1. Google Cloud Platform Project</h3>
+<div class="paragraph">
+<p>Create a new project:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/gcp-project.png" alt="gcp project"></span></p>
+</div>
+<div class="paragraph">
+<p>We named the project <code>micronaut-guides</code></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cloud-sdk">4.2. Cloud SDK</h3>
+<div class="paragraph">
+<p>Install <a href="https://cloud.google.com/sdk">Cloud SDK</a> for your operating system.</p>
+</div>
+<div class="paragraph">
+<p>Cloud SDK includes the <code>gcloud</code> command-line tool. Run the <code>init</code> command in your terminal:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud init</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Log in to your Google Cloud Platform:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud auth login</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Change your project:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud config set project micronaut-guides</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>My Project ID is <code>micronaut-guides</code>. You can get the IDs of your projects by running the command <code>gcloud projects list</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution">5. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-cloud-trace-google-maven-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">6. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+    --features=tracing-opentelemetry-gcp,tracing-opentelemetry-http \
+    --build=maven --lang=java</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>tracing-opentelemetry-gcp</code>, and <code>tracing-opentelemetry-http</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=tracing-opentelemetry-gcp&amp;features=tracing-opentelemetry-http&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enable-annotation-processing">6.1. Enable annotation Processing</h3>
+<div class="paragraph">
+<p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="opentelemetry">6.2. OpenTelemetry</h3>
+<div class="paragraph">
+<p>The Micronaut framework uses <a href="https://opentelemetry.io/">OpenTelemetry</a> to generate and export tracing data.</p>
+</div>
+<div class="paragraph">
+<p>OpenTelemetry provides two annotations: one to create a span and another to include additional information to the span.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">@WithSpan</dt>
+<dd>
+<p>Used on methods to create a new span; defaults to the method name, but a unique name may be assigned instead.</p>
+</dd>
+<dt class="hdlist1">@SpanAttribute</dt>
+<dd>
+<p>Used on method parameters to assign a value to a span; defaults to the parameter name, but a unique name may be assigned instead.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p><code>@WithSpan</code> and <code>@SpanAttribute</code> can be used only on non-private methods.</p>
+</div>
+<div class="paragraph">
+<p>If these annotations are not enough, or if you want to add tracing to a private method, the Micronaut framework’s tracing integration registers a <code>io.opentelemetry.api.trace.Tracer</code> bean, which exposes the OpenTelemetry API and can be dependency-injected as needed.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The following `io.micronaut.tracing.annotation`s are available if you prefer to use them or if you are working on an existing Micronaut application that already uses them.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@NewSpan</code> : Identical to <code>@WithSpan</code>, it is used on methods to create a new span; defaults to the method name, but a unique name may be assigned instead.</p>
+</li>
+<li>
+<p><code>@ContinueSpan</code> : Used on methods to continue an existing span; primarily used in conjunction with <code>@SpanTag</code>.</p>
+</li>
+<li>
+<p><code>@SpanTag</code> : Similar to <code>@SpanAttribute</code>, it is used on method parameters to assign a value to a span; defaults to the parameter name, but a unique name may be assigned instead. To use the <code>@SpanTag</code> on a method argument, the method must be annotated with either <code>@NewSpan</code> or <code>@ContinueSpan</code>.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="inventory-service">6.3. Inventory Service</h3>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/InventoryService.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.opentelemetry.extension.annotations.SpanAttribute</span>;
+<span class="keyword">import</span> <span class="include">io.opentelemetry.extension.annotations.WithSpan</span>;
+<span class="keyword">import</span> <span class="include">io.opentelemetry.api.trace.Span</span>;
+<span class="keyword">import</span> <span class="include">io.opentelemetry.api.trace.Tracer</span>;
+<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+
+<span class="keyword">import</span> <span class="include">java.util.Collection</span>;
+<span class="keyword">import</span> <span class="include">java.util.HashMap</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="keyword">import</span> <span class="include">java.util.concurrent.ConcurrentHashMap</span>;
+
+<span class="annotation">@Singleton</span>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">InventoryService</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> Tracer tracer;
+    <span class="directive">private</span> <span class="directive">final</span> WarehouseClient warehouse;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Integer</span>&gt; inventory = <span class="keyword">new</span> <span class="predefined-type">ConcurrentHashMap</span>&lt;&gt;();
+
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> storeName = <span class="string"><span class="delimiter">&quot;</span><span class="content">my_store</span><span class="delimiter">&quot;</span></span>;
+
+    <span class="directive">public</span> InventoryService(Tracer tracer, WarehouseClient warehouse) { <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="local-variable">this</span>.tracer    = tracer;
+        <span class="local-variable">this</span>.warehouse = warehouse;
+
+        inventory.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">laptop</span><span class="delimiter">&quot;</span></span>,  <span class="integer">4</span>);
+        inventory.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">desktop</span><span class="delimiter">&quot;</span></span>, <span class="integer">2</span>);
+        inventory.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">monitor</span><span class="delimiter">&quot;</span></span>, <span class="integer">11</span>);
+    }
+
+    <span class="directive">public</span> <span class="predefined-type">Collection</span>&lt;<span class="predefined-type">String</span>&gt; getProductNames() {
+        <span class="keyword">return</span> inventory.keySet();
+    }
+
+    <span class="annotation">@WithSpan</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">stock-counts</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Integer</span>&gt; getStockCounts(<span class="annotation">@SpanAttribute</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">inventory.item</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> item) { <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="predefined-type">HashMap</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Integer</span>&gt; counts = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;();
+        <span class="keyword">if</span>(inventory.containsKey(item)) {
+            <span class="type">int</span> count = inventory.get(item);
+            counts.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">store</span><span class="delimiter">&quot;</span></span>, count);
+
+            <span class="keyword">if</span>(count &lt; <span class="integer">10</span>) {
+                counts.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">warehouse</span><span class="delimiter">&quot;</span></span>, inWarehouse(storeName, item));
+            }
+        }
+
+        <span class="keyword">return</span> counts;
+    }
+
+    <span class="directive">private</span> <span class="type">int</span> inWarehouse(<span class="predefined-type">String</span> store, <span class="predefined-type">String</span> item) {
+        Span.current().setAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">inventory.store-name</span><span class="delimiter">&quot;</span></span>, store); <i class="conum" data-value="4"></i><b>(4)</b>
+
+        <span class="keyword">return</span> warehouse.getItemCount(store, getUPC(item));
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> order(<span class="predefined-type">String</span> item, <span class="type">int</span> count) {
+        orderFromWarehouse(item, count);
+        <span class="keyword">if</span>(inventory.containsKey(item)) {
+            count += inventory.get(item);
+        }
+        inventory.put(item, count);
+    }
+
+    <span class="directive">private</span> <span class="type">void</span> orderFromWarehouse(<span class="predefined-type">String</span> item, <span class="type">int</span> count) {
+        Span span = tracer.spanBuilder(<span class="string"><span class="delimiter">&quot;</span><span class="content">warehouse-order</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
+                          .setAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">item</span><span class="delimiter">&quot;</span></span>, item)
+                          .setAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">count</span><span class="delimiter">&quot;</span></span>, count)
+                          .startSpan();
+
+        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; json = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;(<span class="integer">4</span>);
+        json.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">store</span><span class="delimiter">&quot;</span></span>, storeName);
+        json.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">product</span><span class="delimiter">&quot;</span></span>, item);
+        json.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">amount</span><span class="delimiter">&quot;</span></span>, count);
+        json.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">upc</span><span class="delimiter">&quot;</span></span>, getUPC(item));
+
+        warehouse.order(json);
+
+        span.end();
+    }
+
+    <span class="directive">private</span> <span class="type">int</span> getUPC(<span class="predefined-type">String</span> item) {
+        <span class="keyword">return</span> <span class="predefined-type">Math</span>.abs(item.hashCode());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Inject Tracing bean into class</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Creates a new span called "stock-counts"</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Adds a label, or tag, called "inventory.item" that will contain the value contained in <code>item</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Same as <code>@SpanAttribute("inventory.store-name")</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Same as <code>@WithSpan("warehouse-order")</code> with <code>@SpanAttributes</code> for item and count</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="store-controller">6.4. Store Controller</h3>
+<div class="paragraph">
+<p>This class demonstrates use of the <code>io.micronaut.tracing.annotation</code> instead of the OpenTelemetry annotations.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you have the following dependency declared, all HTTP Server methods (those annotated with <code>@Get</code>, <code>@Post</code>, etc.) will create spans automatically.</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut.tracing<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-tracing-opentelemetry-http<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/StoreController.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Status</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.ContinueSpan</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.NewSpan</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.SpanTag</span>;
+
+<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
+<span class="keyword">import</span> <span class="include">java.util.HashMap</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+
+<span class="annotation">@ExecuteOn</span>(TaskExecutors.IO)
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/store</span><span class="delimiter">&quot;</span></span>)
+<span class="directive">public</span> <span class="type">class</span> <span class="class">StoreController</span> {
+    <span class="directive">private</span> <span class="directive">final</span> InventoryService inventory;
+
+    <span class="directive">public</span> StoreController(InventoryService inventory) {
+        <span class="local-variable">this</span>.inventory = inventory;
+    }
+
+    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/order</span><span class="delimiter">&quot;</span></span>)
+    <span class="annotation">@Status</span>(HttpStatus.CREATED)
+    <span class="annotation">@NewSpan</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">store.order</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="directive">public</span> <span class="type">void</span> order(<span class="annotation">@SpanTag</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">order.item</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> item, <span class="annotation">@SpanTag</span> <span class="type">int</span> count) { <i class="conum" data-value="2"></i><b>(2)</b>
+        inventory.order(item, count);
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/inventory</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;&gt; getInventory() {
+        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;&gt; currentInventory = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
+        <span class="keyword">for</span> (<span class="predefined-type">String</span> product: inventory.getProductNames()) {
+            currentInventory.add(getInventory(product));
+        }
+        <span class="keyword">return</span> currentInventory;
+    }
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/inventory/{item}</span><span class="delimiter">&quot;</span></span>)
+    <span class="annotation">@ContinueSpan</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; getInventory(<span class="annotation">@SpanTag</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">item</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> item) { <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; counts = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;(inventory.getStockCounts(item));
+        <span class="keyword">if</span>(counts.isEmpty()) {
+            counts.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">note</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Not available at store</span><span class="delimiter">&quot;</span></span>);
+        }
+
+        counts.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">item</span><span class="delimiter">&quot;</span></span>, item);
+
+        <span class="keyword">return</span> counts;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Equivalent to <code>@WithSpan("store.order")</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Same as <code>@SpanAttribute("order.item")`and `@SpanAttribute</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Span created automatically if <code>micronaut-tracing-opentelemetry-http</code> is declared</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Required for <code>@SpanTag</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Tag is only added to the span if <code>micronaut-tracing-opentelemetry-http</code> is declared; otherwise ignored</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="warehouse-client">6.5. Warehouse Client</h3>
+<div class="paragraph">
+<p>You can also mix OpenTelemetry and Micronaut Tracing annotations in the same class.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you have the following dependency declared, all HTTP Client methods (those annotated with <code>@Get</code>, <code>@Post</code>, etc.) will create spans automatically.</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut.tracing<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-tracing-opentelemetry-http<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/WarehouseClient.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.QueryValue</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.ContinueSpan</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.SpanTag</span>;
+<span class="keyword">import</span> <span class="include">io.opentelemetry.extension.annotations.SpanAttribute</span>;
+<span class="keyword">import</span> <span class="include">io.opentelemetry.extension.annotations.WithSpan</span>;
+
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+
+<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/warehouse</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">WarehouseClient</span> {
+
+    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/order</span><span class="delimiter">&quot;</span></span>)
+    <span class="annotation">@WithSpan</span>
+    <span class="type">void</span> order(<span class="annotation">@SpanTag</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">warehouse.order</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, ?&gt; json);
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/count</span><span class="delimiter">&quot;</span></span>)
+    <span class="annotation">@ContinueSpan</span>
+    <span class="type">int</span> getItemCount(<span class="annotation">@QueryValue</span> <span class="predefined-type">String</span> store, <span class="annotation">@SpanAttribute</span> <span class="annotation">@QueryValue</span> <span class="type">int</span> upc);
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Some external service without tracing</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tracer-configuration">6.6. Tracer Configuration</h3>
+<div class="paragraph">
+<p>If you used Micronaut CLI or Launch to create your application, the OpenTelemetry exporter will automatically be added to your <code>application.yml</code> configurations.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">otel</span>:
+  <span class="key">traces</span>:
+    <span class="key">exporter</span>: <span class="string"><span class="content">google_cloud_trace</span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="run-the-application">7. Run the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The application can be deployed to Google Cloud Run, Cloud Function, Cloud Compute, or App Engine.</p>
+</div>
+<div class="paragraph">
+<p>Traces can be sent to Google Cloud Trace outside the Google Cloud.</p>
+</div>
+<div class="paragraph">
+<p>This allows us to run the application locally and see the traces in Google Cloud Trace.</p>
+</div>
+<div class="paragraph">
+<p>To run the application, use the <code>./mvnw mn:run</code> command, which starts the application on port 8080.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You might get this error message when running your application:<br>
+"Message: The Application Default Credentials are not available. They are available if running in Google Compute Engine. Otherwise, the environment variable GOOGLE_APPLICATION_CREDENTIALS must be defined pointing to a file defining the credentials. See <a href="https://developers.google.com/accounts/docs/application-default-credentials" class="bare">https://developers.google.com/accounts/docs/application-default-credentials</a> for more information."</p>
+</div>
+<div class="paragraph">
+<p>If you are developing locally you can do:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud auth application-default login</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However, it is strongly recommended that you set up a service account.
+Follow the instructions in the link above and <a href="https://micronaut-projects.github.io/micronaut-gcp/latest/guide/#setup">Micronaut GCP setup instructions</a> for creating and configuring the service account.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="traces">8. Traces</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Open the <a href="https://console.cloud.google.com/traces">GCP Tracing Console</a>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/gcp-tracing/trace-list-graph.png" alt="trace list graph">
+</div>
+</div>
+<div class="paragraph">
+<p><br></p>
+</div>
+<div class="paragraph">
+<p>If the data is not displayed, give it a minute. It takes a few seconds for the traces to show up in the console.</p>
+</div>
+<div class="sect2">
+<h3 id="get-item-counts">8.1. Get Item Counts</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/store/inventory/laptop</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><br></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/gcp-tracing/inventory-item.png" alt="inventory item">
+</div>
+</div>
+<div class="paragraph">
+<p><br></p>
+</div>
+<div class="paragraph">
+<p>Each span is represented by a blue bar.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="order-item">8.2. Order Item</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/store/order&quot; \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{&quot;item&quot;:&quot;laptop&quot;, &quot;count&quot;:5}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><br></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/gcp-tracing/order-item.png" alt="order item">
+</div>
+</div>
+<div class="paragraph">
+<p><br></p>
+</div>
+<div class="paragraph">
+<p>Selecting a different span will show you the labels (a.k.a. attributes/tags) and other details of the span.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="get-inventory">8.3. Get Inventory</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/store/inventory</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><br></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/gcp-tracing/inventory-all.png" alt="inventory all">
+</div>
+</div>
+<div class="paragraph">
+<p><br></p>
+</div>
+<div class="paragraph">
+<p>Looking at the trace, we can conclude that retrieving the items sequentially might not be the best design choice.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cleaning-up">9. Cleaning Up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After you&#8217;ve finished this guide, you can clean up the resources you created on
+Google Cloud Platform so you won&#8217;t be billed for them in the future. The following
+sections describe how to delete or turn off these resources.</p>
+</div>
+<div class="sect2">
+<h3 id="deleting-the-project">9.1. Deleting the project</h3>
+<div class="paragraph">
+<p>The easiest way to eliminate billing is to delete the project you created for the tutorial.</p>
+</div>
+<div class="paragraph">
+<p>To delete the project:</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Deleting a project has the following consequences:
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If you used an existing project, you&#8217;ll also delete any other work you&#8217;ve done in the project.</p>
+</li>
+<li>
+<p>You can&#8217;t reuse the project ID of a deleted project. If you created a custom project ID that you plan to use in the future, you should delete the resources inside the project instead. This ensures that URLs that use the project ID, such as an appspot.com URL, remain available.</p>
+</li>
+<li>
+<p>If you are exploring multiple tutorials and quickstarts, reusing projects instead of deleting them prevents you from exceeding project quota limits.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In the Cloud Platform Console, go to the Projects page.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://console.cloud.google.com/iam-admin/projects">GO TO THE PROJECTS PAGE</a></p>
+</div>
+<div class="paragraph">
+<p>In the project list, select the project you want to delete and click Delete project. After selecting the checkbox next to the project name, click <code>Delete project</code></p>
+</div>
+<div class="paragraph">
+<p>In the dialog, type the project ID, and then click Shut down to delete the project.</p>
+</div>
+<div class="paragraph">
+<p>Deleting or turning off specific resources</p>
+</div>
+<div class="paragraph">
+<p>You can individually delete or turn off some of the resources that you created during the tutorial.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-tracing/latest/guide/">Micronaut Tracing</a>.</p>
+</div>
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-gcp/latest/guide/">Micronaut GCP</a> integration.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Microservices Distributed Tracing with OpenTelemetry through X-Ray and the Micronaut Framework</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-microservices-distributed-tracing-xray.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Microservices Distributed Tracing with OpenTelemetry through X-Ray and the Micronaut Framework"/>
+    <meta name="twitter:description" content="Use AWS X-Ray distributed tracing to investigate the behavior of your Micronaut applications."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item">
+                        <a href="https://micronaut.io/download/" class="nav-link">Download</a>
+                    </li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-2872 active dropdown nav-item">
+                        <a href="./index.html" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2869">
+                                <a href="https://micronaut.io/docs/" class="dropdown-item">User Documentation</a>
+                            </li>
+                            <li id="menu-item-2870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2870">
+                                <a href="./index.html" class="dropdown-item">Guides</a>
+                            </li>
+                            <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896">
+                                <a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a>
+                            </li>
+                            <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897">
+                                <a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a>
+                            </li>
+                            <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871">
+                                <a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/blog/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879">
+                                <a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a>
+                            </li>
+                            <li id="menu-item-2881" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2881">
+                                <a href="https://micronaut.io/events/" class="dropdown-item">Upcoming Events</a>
+                            </li>
+                            <li id="menu-item-2880" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2880">
+                                <a href="https://micronaut.io/commercial-support/" class="dropdown-item">Commercial Support</a>
+                            </li>
+                            <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882">
+                                <a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a>
+                            </li>
+                            <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883">
+                                <a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item">
+                        <a href="https://micronaut.io/foundation/" aria-current="page" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a>
+                        <ul class="dropdown-menu">
+                            <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-22 current_page_item menu-item-2877 active">
+                                <a href="https://micronaut.io/foundation/" aria-current="page" class="dropdown-item">Overview</a>
+                            </li>
+                            <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874">
+                                <a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873">
+                                <a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a>
+                            </li>
+                            <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876">
+                                <a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item">
+                        <a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-microservices-distributed-tracing-xray.html">Microservices Distributed Tracing with OpenTelemetry through X-Ray and the Micronaut Framework</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the application</a>
+<ul class="sectlevel2">
+<li><a href="#enable-annotation-processing">4.1. Enable annotation Processing</a></li>
+</ul>
+</li>
+<li><a href="#run-aws-otel-collector-locally">5. Run AWS OTel Collector locally</a></li>
+<li><a href="#aws-command-line-interface">6. AWS Command Line Interface</a></li>
+<li><a href="#opentelemetry-dependencies">7. OpenTelemetry dependencies</a>
+<ul class="sectlevel2">
+<li><a href="#micronaut-opentelemetry-http">7.1. Micronaut OpenTelemetry HTTP</a></li>
+<li><a href="#opentelemetry-protocol-exporter">7.2. OpenTelemetry Protocol Exporter</a></li>
+<li><a href="#opentelemetry-propagator">7.3. OpenTelemetry Propagator</a></li>
+<li><a href="#using-aws-resource-detector">7.4. Using AWS resource detector</a></li>
+<li><a href="#instrumenting-the-aws-sdk">7.5. Instrumenting the AWS SDK</a></li>
+</ul>
+</li>
+<li><a href="#disable-opentelemetry-for-tests">8. Disable OpenTelemetry for tests</a></li>
+<li><a href="#running-the-application">9. Running the application</a></li>
+<li><a href="#next-steps">10. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">11. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Microservices Distributed Tracing with OpenTelemetry through X-Ray and the Micronaut Framework</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Use AWS X-Ray distributed tracing to investigate the behavior of your Micronaut applications.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 3.6.0</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we are going to use <a href="https://opentelemetry.io">OpenTelemetry</a> to collect distributed
+tracing information of a Micronaut application composed of three microservices and publish it to <a href="https://aws.amazon.com/xray/">AWS X-Ray</a></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>AWS X-Ray helps developers analyze and debug distributed applications, such as those built using a microservices architecture. With X-Ray, you can understand how your application and its underlying services are performing to identify and troubleshoot the root cause of performance issues and errors. X-Ray provides an end-to-end view of requests as they travel through your application and displays a map of your application’s underlying components. You can use X-Ray to analyze both applications in development and in production, from simple three-tier applications to complex microservices applications consisting of thousands of services.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>You will discover how the <a href="https://micronaut-projects.github.io/micronaut-tracing/latest/guide/">Micronaut framework eases AWS X-Ray integration via OpenTelemetry</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE</p>
+</li>
+<li>
+<p>JDK 1.8 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-microservices-distributed-tracing-xray-gradle-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The application contains three microservices.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>bookcatalogue</code> - Returns a list of books. It uses a domain consisting of a book name and an ISBN.</p>
+</li>
+<li>
+<p><code>bookinventory</code> - Exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and an ISBN.</p>
+</li>
+<li>
+<p><code>bookrecommendation</code> - Consumes previous services and exposes an endpoint recommending book names in stock.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>bookrecommendation</code> service consumes endpoints exposed by the other services. The following image illustrates the application flow:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/flow-dynamodb.svg" alt="flow dynamodb">
+</div>
+</div>
+<div class="paragraph">
+<p>A request to <code>bookrecommendation</code> (<code><a href="http://localhost:8080/books" target="_blank" rel="noopener">http://localhost:8080/books</a></code>) triggers several requests through our microservices mesh.</p>
+</div>
+<div class="sect2">
+<h3 id="enable-annotation-processing">4.1. Enable annotation Processing</h3>
+<div class="paragraph">
+<p>If you use Java or Kotlin and IntelliJ IDEA, make sure to enable annotation processing.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/annotationprocessorsintellij.png" alt="annotationprocessorsintellij">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="run-aws-otel-collector-locally">5. Run AWS OTel Collector locally</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See <a href="https://github.com/aws-observability/aws-otel-collector/blob/main/docs/developers/docker-demo.md">aws-otel-collector/blob/main/docs/developers/docker-demo.md</a></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Clone <a href="https://github.com/aws-observability/aws-otel-collector" class="bare">https://github.com/aws-observability/aws-otel-collector</a></p>
+</li>
+<li>
+<p><code>vi examples/docker/config-test.yaml</code> and set the region</p>
+</li>
+<li>
+<p><code>docker run --rm -p 4317:4317 -p 55680:55680 -p 8889:8888 -e AWS_REGION=us-east-1 -e AWS_PROFILE=default -v ~/.aws:/root/.aws -v "${PWD}/examples/docker/config-test.yaml":/otel-local-config.yaml --name awscollector public.ecr.aws/aws-observability/aws-otel-collector:latest --config otel-local-config.yaml</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="aws-command-line-interface">6. AWS Command Line Interface</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Install the <a href="https://aws.amazon.com/cli/">AWS Command Line Interface</a> and run <code>aws configure</code>.
+Set the same region you used in the previous section.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="opentelemetry-dependencies">7. OpenTelemetry dependencies</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="micronaut-opentelemetry-http">7.1. Micronaut OpenTelemetry HTTP</h3>
+<div class="paragraph">
+<p>To enable creation of span objects on every HTTP server request, client request, server response, and client response,
+each service includes the next dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.tracing:micronaut-tracing-opentelemetry-http</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="opentelemetry-protocol-exporter">7.2. OpenTelemetry Protocol Exporter</h3>
+<div class="paragraph">
+<p>An exporter is a component in the OpenTelemetry Collector configured to send data to different systems/back-ends.</p>
+</div>
+<div class="paragraph">
+<p>Each service adds the OpenTelemetry Protocol exporter dependency.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.opentelemetry:opentelemetry-exporter-otlp</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="opentelemetry-propagator">7.3. OpenTelemetry Propagator</h3>
+<div class="paragraph">
+<p>To use AWS X-Ray propagator, each service adds the following dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.opentelemetry:opentelemetry-extension-aws</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">otel</span>:
+  <span class="key">traces</span>:
+    <span class="key">exporter</span>: <span class="string"><span class="content">otlp</span></span>
+    <span class="key">propagator</span>: <span class="string"><span class="content">tracecontext, baggage, xray</span></span>
+    <span class="key">exclusions</span>: <span class="string"><span class="content">/health</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous configuration excludes health checks from being traced.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-aws-resource-detector">7.4. Using AWS resource detector</h3>
+<div class="paragraph">
+<p>Each service includes the following dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.opentelemetry.contrib:opentelemetry-aws-xray</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These dependencies allow you to enable <a href="https://aws-otel.github.io/docs/getting-started/java-sdk/trace-manual-instr#using-the-aws-resource-detectors">AWS resource detectors for enriching traces
+ with AWS infrastructure information</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="instrumenting-the-aws-sdk">7.5. Instrumenting the AWS SDK</h3>
+<div class="paragraph">
+<p><code>inventory</code> and <code>catalogue</code> include the following dependencies to instrument the <a href="https://aws-otel.github.io/docs/getting-started/java-sdk/trace-manual-instr#instrumenting-the-aws-sdk">AWS SDK</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both services use DynamoDB and include the following dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.aws:micronaut-aws-sdk-v2</span><span class="delimiter">&quot;</span></span>)
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">software.amazon.awssdk:dynamodb</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>micronaut-aws-sdk-v2</code> dependency creates a bean of type <code>SdkClientBuilder</code>. To instrument the AWS SDK,
+Micronaut OpenTelemetry registers a tracing interceptor by creating a bean-creation listener for the bean of type <code>SdkClientBuilder</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="disable-opentelemetry-for-tests">8. Disable OpenTelemetry for tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Each service disables OpenTelemetry for the tests classpath:</p>
+</div>
+<div class="listingblock">
+<div class="title">bookrecommendation/src/test/resources/application-test.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>: 
+  <span class="key">otel</span>:
+    <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">9. Running the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Run <code>bookcatalogue</code> microservice:</p>
+</div>
+<div class="paragraph">
+<p>To run the application, execute <code>./gradlew run</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">...
+14:28:34.034 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 499ms. Server Running: http://localhost:8081</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run <code>bookinventory</code> microservice:</p>
+</div>
+<div class="paragraph">
+<p>To run the application, execute <code>./gradlew run</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">...
+14:31:13.104 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 506ms. Server Running: http://localhost:8082</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run <code>bookrecommendation</code> microservice:</p>
+</div>
+<div class="paragraph">
+<p>To run the application, execute <code>./gradlew run</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">...
+14:31:57.389 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 523ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can run a cURL command to test the whole application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl http://localhost:8080/books
+[{&quot;name&quot;:&quot;Building Microservices&quot;}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can then navigate to AWS Console and access the X-Ray UI.</p>
+</div>
+<div class="paragraph">
+<p>The previous request generates such a trace:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/xraytrace-map.png" alt="xraytrace map">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/xraytrace.png" alt="xraytrace">
+</div>
+</div>
+<div class="paragraph">
+<p>In the previous image, you can see that:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Whenever a Micronaut HTTP client executes a new network request, it creates a new subsegment.</p>
+</li>
+<li>
+<p>Whenever a Micronaut server receives a request, it creates a new segment.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Moreover, you can see the requests to <code>bookinventory</code> are made in parallel.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As you have seen in this guide, you get distributed tracing up and running fast with the Micronaut framework without any annotations.</p>
+</div>
+<div class="paragraph">
+<p>The Micronaut framework includes several annotations to give you more flexibility.</p>
+</div>
+<div class="paragraph">
+<p>Make sure to read the documentation about <a href="https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#xray">Micronaut X-Ray</a> integration.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">11. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://gitter.im/micronautfw/"><i class="fab fa-gitter"><span class="sr-only">Gitter</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/c/Micronautfw"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2022 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
