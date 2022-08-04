@@ -27,7 +27,7 @@ public class FruitControllerTest {
     FruitClient fruitClient;
 
     @Test
-    @Timeout(30)
+    @Timeout(120)
     void fruitsEndpointInteractsWithMongo() {
 
         List<Fruit> fruits = fruitClient.findAll();

@@ -23,7 +23,7 @@ public class FruitControllerValidationTest {
     HttpClient httpClient;
 
     @Test
-    @Timeout(30)
+    @Timeout(120)
     public void testFruitIsValidated() {
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () ->
                 httpClient.toBlocking().exchange(HttpRequest.POST("/fruits", new Fruit("", "Hola"))));
