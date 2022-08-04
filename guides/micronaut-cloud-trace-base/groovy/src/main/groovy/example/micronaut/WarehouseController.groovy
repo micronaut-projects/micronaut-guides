@@ -16,7 +16,7 @@ class WarehouseController {
 
     @Get("/count")
     HttpResponse getItemCount() {
-        HttpResponse.ok(new Random().nextInt(11))
+        HttpResponse.ok(new Random().nextInt(10)+1)
     }
 
     @Post("/order")
