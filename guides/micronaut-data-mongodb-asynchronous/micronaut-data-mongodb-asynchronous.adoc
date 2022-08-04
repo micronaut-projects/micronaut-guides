@@ -95,31 +95,11 @@ callout:get[number=7,arg0=find,arg1=/fruits/\{id\}]
 callout:get[number=8,arg0=findByNameInList,arg1=/fruits/q]
 <9> Bind a list of Strings to the query parameter `names`
 
-=== Test
-
-By using the feature `mongo-reactive`, the application includes the following test dependencies:
-
-:dependencies:
-dependency:junit-jupiter[groupId=org.testcontainers,scope=test]
-dependency:mongodb[groupId=org.testcontainers,scope=test]
-dependency:testcontainers[groupId=org.testcontainers,scope=test]
-:dependencies:
+=== Test Client
 
 Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
 
 test:FruitClient[]
-
-We use https://www.testcontainers.org/modules/databases/mongodb/[Testcontainers MongoDB Module] to test the application.
-
-All of the tests will require an existing MongoDB instance for Micronaut Data to connect to.
-To facilitate this, create a base test class that handles the start-up and shutdown of MongoDb with TestContainers, and sets our application config to use it.
-
-test:BaseMongoDataTest[]
-
-When the application was created, a test was created for you that tests the application can be started.
-Change this test to extend the above base class:
-
-test:MicronautguideTest[]
 
 Then create a test that verifies the validation of the `Fruit` POJO when we create a new entity via `POST`:
 
@@ -133,20 +113,9 @@ And finally, create a test which uses a replacement `FruitService` to test the c
 
 test:ControllerIsolationTest[]
 
+common:test-resources-mongodb.adoc[]
+
 common:testApp.adoc[]
-
-== Start MongoDB via Docker
-
-You can run MongoDb via Docker:
-
-[source,bash]
-----
-docker run -ti --rm -p 27017:27017 mongo:5.0.6
-----
-
-The application connects to MongoDb, run via Docker, thanks to the following configuration:
-
-resource:application.yml[tag=mongodb]
 
 common:runapp.adoc[]
 

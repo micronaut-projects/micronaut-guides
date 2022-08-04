@@ -3,6 +3,7 @@ package io.micronaut.guides
 import groovy.transform.CompileStatic
 import io.micronaut.starter.options.JdkVersion
 import org.gradle.api.GradleException
+import org.gradle.api.JavaVersion
 
 @CompileStatic
 class Utils {
@@ -45,13 +46,20 @@ class Utils {
     }
 
     static JdkVersion parseJdkVersion() {
-        JdkVersion javaVersion = DEFAULT_JAVA_VERSION
+        JdkVersion javaVersion
         if (System.getenv(ENV_JDK_VERSION)) {
             try {
                 int majorVersion = Integer.valueOf(System.getenv(ENV_JDK_VERSION))
                 javaVersion = JdkVersion.valueOf(majorVersion)
             } catch (NumberFormatException ignored) {
                 throw new GradleException("Could not parse env " + ENV_JDK_VERSION + " to JdkVersion")
+            }
+        } else {
+            try {
+                javaVersion = JdkVersion.valueOf(JavaVersion.current().majorVersion as Integer)
+            } catch (IllegalArgumentException ex) {
+                println "WARNING: $ex.message: Defaulting to $DEFAULT_JAVA_VERSION"
+                javaVersion = DEFAULT_JAVA_VERSION
             }
         }
         javaVersion
