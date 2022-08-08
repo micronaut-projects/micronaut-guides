@@ -81,11 +81,11 @@ public class CryptoUpdatesTest {
                 "      'bestAsk':'29666.5'," +
                 "      'bestAskSize':'2.37840044'" +
                 "   }" +
-                "}".replaceAll("'", "\"");
+                "}";
 
         @Get("/api/v1/market/orderbook/level1")
         String latest(@QueryValue String symbol) {
-            return RESPONSE;
+            return RESPONSE.replaceAll("'", "\"");
         }
     }
 }
