@@ -41,7 +41,7 @@ open class GenreController(val genreRepository: GenreRepository) { // <2>
     @Post // <9>
     @SingleResult
     open fun save(@Valid @Body cmd: GenreSaveCommand): Publisher<HttpResponse<Genre>>? {
-        return Mono.from(genreRepository.save(cmd.name!!))
+        return Mono.from(genreRepository.save(cmd.name))
             .map { genre ->
                 HttpResponse
                     .created(genre)
