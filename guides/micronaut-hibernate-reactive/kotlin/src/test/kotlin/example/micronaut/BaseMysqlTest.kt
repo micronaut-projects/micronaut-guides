@@ -11,7 +11,6 @@ import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.utility.DockerImageName
-import java.util.*
 
 @MicronautTest // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
@@ -21,11 +20,9 @@ open class BaseMysqlTest: TestPropertyProvider { // <3>
     @Inject
     open var application: EmbeddedApplication<*>? = null
 
-
     @Inject
     @field:Client("/")
     lateinit var httpClient: HttpClient // <4>
-
 
     override fun getProperties(): MutableMap<String, String> { // <5>
         return mutableMapOf(Pair("jpa.default.properties.hibernate.connection.url", getMySQLDbUri()) )
@@ -38,13 +35,13 @@ open class BaseMysqlTest: TestPropertyProvider { // <3>
                 .withEnv("MYSQL_ROOT_PASSWORD", "pass")
                 .waitingFor(Wait.forLogMessage(".*/usr/sbin/mysqld: ready for connections.*\\n", 2))
         }
-        if (!mysqlContainer!!.isRunning()) {
+        if (!mysqlContainer!!.isRunning) {
             mysqlContainer!!.start()
         }
     }
 
     open fun getMySQLDbUri(): String {
-        if (mysqlContainer == null || !mysqlContainer!!.isRunning()) {
+        if (mysqlContainer == null || !mysqlContainer!!.isRunning) {
             startMySQL()
         }
         return "jdbc:mysql://localhost:" + mysqlContainer!!.getMappedPort(3306) + "/mysql"
@@ -54,6 +51,4 @@ open class BaseMysqlTest: TestPropertyProvider { // <3>
     open fun stop() {
         mysqlContainer!!.close()
     }
-
-
 }

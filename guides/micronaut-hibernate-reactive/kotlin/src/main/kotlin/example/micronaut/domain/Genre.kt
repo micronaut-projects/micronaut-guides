@@ -2,7 +2,6 @@ package example.micronaut.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
-import javax.validation.constraints.NotNull
 
 @Entity
 @Table(name = "genre")

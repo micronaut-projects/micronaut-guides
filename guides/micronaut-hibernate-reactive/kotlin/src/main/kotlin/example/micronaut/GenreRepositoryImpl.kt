@@ -13,14 +13,13 @@ import javax.persistence.PersistenceException
 @Singleton // <1>
 class GenreRepositoryImpl(
     val applicationConfiguration: ApplicationConfiguration, // <2>
-    sf: SessionFactory, // <3>
+    sessionFactory: SessionFactory, // <3>
 ) : GenreRepository {
     private val sessionFactory: Stage.SessionFactory
     private val VALID_PROPERTY_NAMES = arrayOf("id", "name")
 
-
     init {
-        sessionFactory = sf.unwrap(Stage.SessionFactory::class.java)
+        this.sessionFactory = sessionFactory.unwrap(Stage.SessionFactory::class.java)
     }
 
     override fun findById(id: Long): Publisher<Genre?> {
@@ -71,8 +70,8 @@ class GenreRepositoryImpl(
     override fun deleteById(id: Long) {
         sessionFactory.withTransaction { session ->
             session.find(Genre::class.java, id).thenApply { entity ->
-                    session.remove(entity)
-                }
+                session.remove(entity)
+            }
         }
     }
 
@@ -83,6 +82,4 @@ class GenreRepositoryImpl(
                 .thenApply<Genre> { throw PersistenceException() }
         })
     }
-
-
 }

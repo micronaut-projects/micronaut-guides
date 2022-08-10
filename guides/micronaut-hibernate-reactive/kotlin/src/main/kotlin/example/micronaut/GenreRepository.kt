@@ -2,7 +2,6 @@ package example.micronaut
 
 import example.micronaut.domain.Genre
 import org.reactivestreams.Publisher
-import java.util.*
 import javax.validation.constraints.NotBlank
 
 interface GenreRepository {

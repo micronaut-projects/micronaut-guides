@@ -51,17 +51,10 @@ open class GenreController(val genreRepository: GenreRepository) { // <2>
             }
     }
 
-    @Delete("/{id}") // <11>
-    @Status(HttpStatus.NO_CONTENT) // <12>
-    fun delete(id: Long): HttpResponse<*> {
-        genreRepository.deleteById(id)
-        return HttpResponse.noContent<Any>()
-    }
-
     @Post("/ex") // <10>
     @SingleResult
     open fun saveExceptions(@Valid @Body cmd: GenreSaveCommand): Publisher<MutableHttpResponse<Genre?>> {
-        return Mono.from(genreRepository.saveWithException(cmd!!.name!!))
+        return Mono.from(genreRepository.saveWithException(cmd.name))
             .map { genre: Genre? ->
                 HttpResponse
                     .created(genre)
@@ -76,5 +69,10 @@ open class GenreController(val genreRepository: GenreRepository) { // <2>
             .onErrorReturn(PersistenceException::class.java, HttpResponse.noContent())
     }
 
-
+    @Delete("/{id}") // <11>
+    @Status(HttpStatus.NO_CONTENT) // <12>
+    fun delete(id: Long): HttpResponse<*> {
+        genreRepository.deleteById(id)
+        return HttpResponse.noContent<Any>()
+    }
 }

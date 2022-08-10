@@ -4,4 +4,4 @@ import io.micronaut.core.annotation.Introspected
 import javax.validation.constraints.NotBlank
 
 @Introspected // <1>
-class GenreSaveCommand(@field:NotBlank var name: String?)
+class GenreSaveCommand(@field:NotBlank var name: String)
