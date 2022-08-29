@@ -8,6 +8,7 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.MutableHttpHeaders
 import io.micronaut.http.MutableHttpResponse
 import io.micronaut.http.annotation.*
+import io.micronaut.http.uri.UriBuilder
 import reactor.core.publisher.Mono
 import java.net.URI
 import javax.validation.Valid
@@ -69,6 +70,6 @@ open class GenreController(private val genreRepository: GenreRepository) { // <2
     }
 
     private fun location(id: Long): URI {
-        return URI.create("/genres/$id")
+        return UriBuilder.of("/genres").path(id.toString()).build()
     }
 }
