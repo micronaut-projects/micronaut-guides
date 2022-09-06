@@ -14,6 +14,8 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.math.BigDecimal
 import java.nio.charset.StandardCharsets.UTF_8
+import java.util.concurrent.TimeUnit
+import org.awaitility.Awaitility.await
 
 class MicronautguideCommandTest {
 
@@ -25,6 +27,10 @@ class MicronautguideCommandTest {
         ApplicationContext.run(
                 mapOf("mqtt.enabled" to false, "spec.name" to "MicronautguideCommandTest"),
                 Environment.CLI, Environment.TEST).use { ctx ->
+
+            val listener: TemperatureListener = ctx.getBean(
+                TemperatureListener::class.java
+            )
 
             val args = arrayOf("-t", "212", "-s", "Fahrenheit")
             PicocliRunner.run(MicronautguideCommand::class.java, ctx, *args)
@@ -48,5 +54,16 @@ class MicronautguideCommandTest {
 
         fun getTemperatures(): List<BigDecimal> =
                 temperatures.map { bytes: ByteArray -> BigDecimal(String(bytes, UTF_8)) }
+    }
+
+    @Requires(property = "spec.name", value = "MicronautguideCommandTest")
+    @MqttSubscriber // <1>
+    class TemperatureListener {
+        var temperature: BigDecimal? = null
+
+        @Topic("house/livingroom/temperature") // <2>
+        fun receive(data: ByteArray?) {
+            temperature = BigDecimal(String(data, java.nio.charset.StandardCharsets.UTF_8))
+        }
     }
 }

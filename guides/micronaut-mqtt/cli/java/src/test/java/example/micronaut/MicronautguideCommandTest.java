@@ -8,8 +8,6 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
 import io.micronaut.mqtt.annotation.Topic;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -48,13 +46,11 @@ class MicronautguideCommandTest {
     @MqttSubscriber // <1>
     public static class TemperatureListener {
 
-        private final Logger LOG = LoggerFactory.getLogger(TemperatureListener.class);
         private BigDecimal temperature;
 
         @Topic("house/livingroom/temperature") // <2>
         public void receive(byte[] data) {
             temperature = new BigDecimal(new String(data, UTF_8));
-            LOG.info("temperature: {}", temperature);
         }
     }
 }
