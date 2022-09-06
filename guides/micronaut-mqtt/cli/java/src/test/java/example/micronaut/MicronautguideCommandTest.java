@@ -30,36 +30,28 @@ class MicronautguideCommandTest {
         System.setOut(new PrintStream(baos));
 
         try (ApplicationContext ctx = ApplicationContext.run(
-                CollectionUtils.mapOf(
-                        "mqtt.enabled", false,
-                        "spec.name", "MicronautguideCommandTest"),
+                CollectionUtils.mapOf("spec.name", "MicronautguideCommandTest"),
                 Environment.CLI, Environment.TEST)) {
 
             String[] args = new String[] { "-t", "212", "-s", "Fahrenheit" };
             PicocliRunner.run(MicronautguideCommand.class, ctx, args);
             assertTrue(baos.toString().contains("Topic published"));
 
-            List<BigDecimal> temperatures = ctx.getBean(TemperatureClientReplacement.class).getTemperatures();
-            assertEquals(Collections.singletonList(new BigDecimal("100.00")), temperatures);
+            BigDecimal temperature = ctx.getBean(TemperatureListener.class).temperature;
+            assertEquals(Collections.singletonList(new BigDecimal("100.00")), temperature);
         }
     }
 
     @Requires(property = "spec.name", value = "MicronautguideCommandTest")
-    @Replaces(TemperatureClient.class)
-    @Singleton
-    static class TemperatureClientReplacement implements TemperatureClient {
+    @CompileStatic
+    @MqttSubscriber // <1>
+    static class TemperatureListener {
 
-        private final List<byte[]> temperatures = new ArrayList<>();
+        BigDecimal temperature = null;
 
-        @Override
-        public void publishLivingroomTemperature(byte[] data) {
-            temperatures.add(data);
-        }
-
-        List<BigDecimal> getTemperatures() {
-            return temperatures.stream()
-                    .map(bytes -> new BigDecimal(new String(bytes, UTF_8)))
-                    .collect(Collectors.toList());
+        @Topic('house/livingroom/temperature') // <2>
+        void receive(byte[] data) {
+            temperature = new BigDecimal(new String(data, UTF_8))
         }
     }
 }
