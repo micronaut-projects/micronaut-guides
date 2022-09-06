@@ -62,7 +62,10 @@ Replace the generated test with this:
 
 test:MicronautguideCommandTest[app=cli]
 
-Configure the MQTT server URI in configuration:
+callout:mqtt-subscriber[1]
+callout:mqtt-topic-listen[2]
+
+The MQTT server URI is configured by default via <<Test Resources, Test Resources>>, so we just need to set a client id:
 
 resource:application.yml[app=cli,tag=mqtt]
 
@@ -81,6 +84,8 @@ common:build-lang-arguments.adoc[]
 
 common:default-package.adoc[]
 
+Rename this `micronautguide` directory to `app`.
+
 If you use Micronaut Launch, select Micronaut Application as application type and add @app:features-words@ features.
 
 diffLink:[app=cli]
@@ -89,7 +94,7 @@ common:annotationprocessors.adoc[]
 
 ### Configuration
 
-Configure the MQTT server URI in configuration:
+The MQTT server URI is configured by default via <<Test Resources, Test Resources>>, so we just need to set a client id:
 
 resource:application.yml[app=app,tag=mqtt]
 
@@ -99,6 +104,15 @@ source:TemperatureListener[app=app]
 
 callout:mqtt-subscriber[1]
 callout:mqtt-topic[2]
+
+### Add a test
+
+test:SubscriptionTest[app=app]
+callout:micronaut-test[1]
+callout:property[2]
+callout:requires-property[3]
+callout:mqtt-publisher[4]
+callout:mqtt-topic[5]
 
 == Run both applications
 
@@ -110,19 +124,11 @@ Keep it running. Once you publish a topic with the CLI application, you will see
 
 === Run the CLI
 
-==== Generate a JAR
-
-common:shade[]
-
 Run the CLI command, which will publish a temperature at startup.
 
 [source, bash]
 ----
-java -jar build/libs/micronautguide-0.1-all.jar -t 212 -s Fahrenheit
-12:00:49.668 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [cli]
-12:00:50.557 [main] TRACE i.m.m.i.AbstractMqttIntroductionAdvice - Publishing the following message to house/livingroom/temperature
-12:00:50.558 [main] TRACE i.m.m.i.AbstractMqttIntroductionAdvice - Qos = 1, Retained = false, Payload = 100.00
-Topic published
+./gradlew run --args="-t 212 -s Fahrenheit"
 ----
 
 The subscriber receives the MQTT topics, as you will see in the logs:

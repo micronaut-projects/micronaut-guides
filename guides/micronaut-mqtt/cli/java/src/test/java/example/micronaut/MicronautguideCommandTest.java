@@ -2,25 +2,25 @@ package example.micronaut;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.util.CollectionUtils;
-import jakarta.inject.Singleton;
+import io.micronaut.mqtt.annotation.MqttSubscriber;
+import io.micronaut.mqtt.annotation.Topic;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.awaitility.Awaitility.await;
 
 class MicronautguideCommandTest {
 
@@ -33,25 +33,28 @@ class MicronautguideCommandTest {
                 CollectionUtils.mapOf("spec.name", "MicronautguideCommandTest"),
                 Environment.CLI, Environment.TEST)) {
 
+            TemperatureListener listener = ctx.getBean(TemperatureListener.class);
+
             String[] args = new String[] { "-t", "212", "-s", "Fahrenheit" };
             PicocliRunner.run(MicronautguideCommand.class, ctx, args);
             assertTrue(baos.toString().contains("Topic published"));
 
-            BigDecimal temperature = ctx.getBean(TemperatureListener.class).temperature;
-            assertEquals(Collections.singletonList(new BigDecimal("100.00")), temperature);
+            await().atMost(5, TimeUnit.SECONDS)
+                    .untilAsserted(() -> assertEquals(new BigDecimal("100.00"), listener.temperature));
         }
     }
 
     @Requires(property = "spec.name", value = "MicronautguideCommandTest")
-    @CompileStatic
     @MqttSubscriber // <1>
-    static class TemperatureListener {
+    public static class TemperatureListener {
 
-        BigDecimal temperature = null;
+        private final Logger LOG = LoggerFactory.getLogger(TemperatureListener.class);
+        private BigDecimal temperature;
 
-        @Topic('house/livingroom/temperature') // <2>
-        void receive(byte[] data) {
-            temperature = new BigDecimal(new String(data, UTF_8))
+        @Topic("house/livingroom/temperature") // <2>
+        public void receive(byte[] data) {
+            temperature = new BigDecimal(new String(data, UTF_8));
+            LOG.info("temperature: {}", temperature);
         }
     }
 }
