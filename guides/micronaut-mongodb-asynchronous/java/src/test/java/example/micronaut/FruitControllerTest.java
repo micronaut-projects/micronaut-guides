@@ -5,6 +5,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.TestInstance;
 
 import java.util.Collections;
@@ -26,6 +27,7 @@ public class FruitControllerTest {
     FruitClient fruitClient;
 
     @Test
+    @Timeout(120)
     void fruitsEndpointInteractsWithMongo() {
 
         List<Fruit> fruits = fruitClient.findAll();
