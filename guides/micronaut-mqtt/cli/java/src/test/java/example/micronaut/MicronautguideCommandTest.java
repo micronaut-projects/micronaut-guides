@@ -31,12 +31,11 @@ class MicronautguideCommandTest {
                 CollectionUtils.mapOf("spec.name", "MicronautguideCommandTest"),
                 Environment.CLI, Environment.TEST)) {
 
-            TemperatureListener listener = ctx.getBean(TemperatureListener.class);
-
             String[] args = new String[] { "-t", "212", "-s", "Fahrenheit" };
             PicocliRunner.run(MicronautguideCommand.class, ctx, args);
             assertTrue(baos.toString().contains("Topic published"));
 
+            TemperatureListener listener = ctx.getBean(TemperatureListener.class);
             await().atMost(5, TimeUnit.SECONDS)
                     .untilAsserted(() -> assertEquals(new BigDecimal("100.00"), listener.temperature));
         }

@@ -4,11 +4,14 @@ import io.micronaut.configuration.picocli.PicocliRunner
 import io.micronaut.context.ApplicationContext
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
+import io.micronaut.mqtt.annotation.MqttSubscriber
+import io.micronaut.mqtt.annotation.Topic
 import spock.lang.Specification
-import java.util.concurrent.TimeUnit;
+
+import java.util.concurrent.TimeUnit
 
 import static java.nio.charset.StandardCharsets.UTF_8
-import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.await
 
 class MicronautguideCommandSpec extends Specification {
 
@@ -30,18 +33,16 @@ class MicronautguideCommandSpec extends Specification {
         baos.toString().contains('Topic published')
 
         and:
-        await().atMost(5, TimeUnit.SECONDS)
-                .untilAsserted(() -> assertEquals(new BigDecimal("100.00"), listener.temperature));
+        await().atMost(5, TimeUnit.SECONDS).until { listener.temperature == 100.0 }
 
         cleanup:
         ctx.close()
     }
 
-    @Requires(property = "spec.name", value = "MicronautguideCommandTest")
+    @Requires(property = "spec.name", value = "MicronautguideCommandSpec")
     @MqttSubscriber // <1>
     static class TemperatureListener {
 
-        private final Logger LOG = LoggerFactory.getLogger(TemperatureListener.class)
         private BigDecimal temperature
 
         @Topic("house/livingroom/temperature") // <2>
