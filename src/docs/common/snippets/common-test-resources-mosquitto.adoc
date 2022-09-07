@@ -1,0 +1,42 @@
+== Test Resources
+
+For this guide, we will use Mosquitto via Test Resources.
+As described in the https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/#modules-mqtt[MQTT section of the Test Resources documentation], configure a mosquitto container:
+
+NOTE: This should be done in both apps for this guide.
+
+[source, yaml]
+.src/main/resources/application.yml
+----
+test-resources:
+  containers:
+    mosquitto:
+      image-name: eclipse-mosquitto
+      hostnames:
+        - mqtt.host
+      exposed-ports:
+        - mqtt.port: 1883
+      ro-fs-bind:
+        - "src/test-resources/mosquitto.conf": /mosquitto/config/mosquitto.conf
+----
+
+And then define the mosquitto configuration file:
+
+[source]
+.src/test-resources/mosquitto.conf
+----
+persistence false
+allow_anonymous true
+connection_messages true
+log_type all
+listener 1883
+----
+
+As we have defined that Test Resources are shared in the build, both applications will make use of the same instance of Mosquitto.
+
+When running under production, you should replace this property with the location of your production message broker via an environment variable.
+
+[source,shell]
+----
+MQTT_CLIENT_SERVER_URI=tcp://production-server:1183
+----

@@ -2,51 +2,53 @@ package example.micronaut
 
 import io.micronaut.configuration.picocli.PicocliRunner
 import io.micronaut.context.ApplicationContext
-import io.micronaut.context.annotation.Replaces
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
-import jakarta.inject.Singleton
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import io.micronaut.mqtt.annotation.MqttSubscriber
+import io.micronaut.mqtt.annotation.Topic
+import org.awaitility.Awaitility
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.io.PrintStream
 import java.math.BigDecimal
-import java.nio.charset.StandardCharsets.UTF_8
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
 
-class MicronautguideCommandTest {
+internal class MicronautguideCommandTest {
 
     @Test
     fun testWithCommandLineOption() {
         val baos: OutputStream = ByteArrayOutputStream()
         System.setOut(PrintStream(baos))
-
         ApplicationContext.run(
-                mapOf("mqtt.enabled" to false, "spec.name" to "MicronautguideCommandTest"),
-                Environment.CLI, Environment.TEST).use { ctx ->
-
+            mapOf("spec.name" to "MicronautguideCommandTest"),
+            Environment.CLI, Environment.TEST
+        ).use { ctx ->
+            val listener: TemperatureListener = ctx.getBean(TemperatureListener::class.java)
             val args = arrayOf("-t", "212", "-s", "Fahrenheit")
             PicocliRunner.run(MicronautguideCommand::class.java, ctx, *args)
-            assertTrue(baos.toString().contains("Topic published"))
+            Assertions.assertTrue(baos.toString().contains("Topic published"))
 
-            val temperatures = ctx.getBean(TemperatureClientReplacement::class.java).getTemperatures()
-            assertEquals(listOf(BigDecimal("100.00")), temperatures)
+            Awaitility.await().atMost(5, TimeUnit.SECONDS)
+                .untilAsserted {
+                    Assertions.assertEquals(
+                        BigDecimal("100.00"),
+                        listener.temperature
+                    )
+                }
         }
     }
 
     @Requires(property = "spec.name", value = "MicronautguideCommandTest")
-    @Replaces(TemperatureClient::class)
-    @Singleton
-    internal class TemperatureClientReplacement : TemperatureClient {
+    @MqttSubscriber // <1>
+    class TemperatureListener {
+        var temperature: BigDecimal? = null
 
-        private val temperatures = mutableListOf<ByteArray>()
-
-        override fun publishLivingroomTemperature(data: ByteArray) {
-            temperatures.add(data)
+        @Topic("house/livingroom/temperature") // <2>
+        fun receive(data: ByteArray?) {
+            temperature = BigDecimal(String(data!!, StandardCharsets.UTF_8))
         }
-
-        fun getTemperatures(): List<BigDecimal> =
-                temperatures.map { bytes: ByteArray -> BigDecimal(String(bytes, UTF_8)) }
     }
 }
