@@ -11,9 +11,6 @@ import io.micronaut.configuration.kafka.annotation.KafkaClient
 import io.micronaut.configuration.kafka.annotation.KafkaKey
 import io.micronaut.configuration.kafka.annotation.Topic
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
-import org.testcontainers.containers.KafkaContainer
-import org.testcontainers.utility.DockerImageName
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
@@ -21,12 +18,9 @@ import spock.util.concurrent.PollingConditions
 import jakarta.inject.Inject
 
 @MicronautTest // <1> <2>
-class GameServiceSpec extends Specification implements TestPropertyProvider { // <3>
+class GameServiceSpec extends Specification { // <3>
 
     private static final PollingConditions pollingConditions = new PollingConditions(timeout: 30)
-
-    static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse('confluentinc/cp-kafka:latest')) // <4>
 
     @Inject
     GameReporter gameReporter // <5>
@@ -36,6 +30,11 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
 
     @Inject
     GameStateRepository gameStateRepository
+
+    def setup() {
+        gameStateRepository.deleteAll()
+        gameRepository.deleteAll()
+    }
 
     void 'test game ending in checkmate'() {
         given:
@@ -115,7 +114,7 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
         gameReporter.game(gameIdString, gameDto).subscribe()
 
         then:
-        pollingConditions.eventually {
+        pollingConditions.within(5) { // <6>
             Game g = gameRepository.findById(gameId).orElse(null)
             if (!g) return false
             g.winner
@@ -225,17 +224,6 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
         whiteName == game.whiteName
         game.draw
         !game.winner
-    }
-
-    @Override
-    Map<String, String> getProperties() {
-        kafka.start()
-        ['kafka.bootstrap.servers': kafka.bootstrapServers] // <7>
-    }
-
-    void cleanup() {
-        gameStateRepository.deleteAll()
-        gameRepository.deleteAll()
     }
 
     @KafkaClient

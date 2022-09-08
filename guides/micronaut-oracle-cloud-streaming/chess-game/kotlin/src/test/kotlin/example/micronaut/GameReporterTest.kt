@@ -11,7 +11,6 @@ import io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED_TYPE
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,26 +20,18 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.testcontainers.containers.KafkaContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.DockerImageName
 import java.util.Optional
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.TimeUnit.SECONDS
 import jakarta.inject.Inject
 
-@Testcontainers // <1>
 @MicronautTest
 @TestInstance(PER_CLASS) // <2>
-class GameReporterTest : TestPropertyProvider { // <3>
+class GameReporterTest { // <3>
 
     companion object {
         val receivedGames: MutableCollection<GameDTO> = ConcurrentLinkedDeque()
         val receivedMoves: MutableCollection<GameStateDTO> = ConcurrentLinkedDeque()
-
-        @Container
-        val kafka = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest")) // <4>
     }
 
     @Inject
@@ -176,11 +167,6 @@ class GameReporterTest : TestPropertyProvider { // <3>
         assertNull(game.winner)
     }
 
-    override fun getProperties(): Map<String, String> {
-        kafka.start()
-        return mapOf("kafka.bootstrap.servers" to kafka.bootstrapServers) // <8>
-    }
-
     @AfterEach
     fun cleanup() {
         receivedGames.clear()
@@ -203,9 +189,9 @@ class GameReporterTest : TestPropertyProvider { // <3>
     private fun startGame(blackName: String, whiteName: String): Optional<String> {
         val body = mapOf("b" to blackName, "w" to whiteName) // <9>
         val request: HttpRequest<*> = HttpRequest.POST("/game/start", body)
-                .contentType(APPLICATION_FORM_URLENCODED_TYPE)
+            .contentType(APPLICATION_FORM_URLENCODED_TYPE)
         return client.toBlocking().retrieve(request,
-                Argument.of(Optional::class.java, String::class.java)) as Optional<String> // <10>
+            Argument.of(Optional::class.java, String::class.java)) as Optional<String> // <10>
     }
 
     private fun makeMove(gameId: String, player: String, move: String,
@@ -213,7 +199,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
 
         val body = mapOf("player" to player, "move" to move, "fen" to fen, "pgn" to pgn)
         val request = HttpRequest.POST("/game/move/$gameId", body)
-                .contentType(APPLICATION_FORM_URLENCODED_TYPE)
+            .contentType(APPLICATION_FORM_URLENCODED_TYPE)
         client.toBlocking().exchange<Map<String, String>, Any>(request) // <11>
 
     }

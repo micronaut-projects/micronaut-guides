@@ -10,9 +10,6 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
-import org.testcontainers.containers.KafkaContainer
-import org.testcontainers.utility.DockerImageName
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 import io.micronaut.http.uri.UriBuilder
@@ -22,15 +19,12 @@ import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
 import static io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED_TYPE
 
 @MicronautTest // <1> <2>
-class GameReporterSpec extends Specification implements TestPropertyProvider { // <3>
+class GameReporterSpec extends Specification { // <3>
 
     private static final Collection<GameDTO> receivedGames = new ConcurrentLinkedDeque<>()
     private static final Collection<GameStateDTO> receivedMoves = new ConcurrentLinkedDeque<>()
 
     private static final PollingConditions pollingConditions = new PollingConditions(timeout: 5)
-
-    static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse('confluentinc/cp-kafka:latest')) // <4>
 
     @Inject
     ChessListener chessListener // <5>
@@ -40,7 +34,6 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
     HttpClient client // <6>
 
     void 'test game ending in checkmate'() {
-
         given:
         String blackName = 'b_name'
         String whiteName = 'w_name'
@@ -191,12 +184,6 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         Player
     }
 
-
-    @Override
-    Map<String, String> getProperties() {
-        kafka.start()
-        ['kafka.bootstrap.servers': kafka.bootstrapServers] // <8>
-    }
 
     void cleanup() {
         receivedGames.clear()

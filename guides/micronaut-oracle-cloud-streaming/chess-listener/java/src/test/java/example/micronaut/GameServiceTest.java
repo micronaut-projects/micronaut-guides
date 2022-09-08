@@ -16,10 +16,6 @@ import io.micronaut.test.support.TestPropertyProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import reactor.core.publisher.Mono;
 
 import jakarta.inject.Inject;
@@ -37,14 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-@Testcontainers // <1>
 @MicronautTest
 @TestInstance(PER_CLASS) // <2>
-class GameServiceTest implements TestPropertyProvider { // <3>
-
-    @Container
-    static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:latest")); // <4>
+class GameServiceTest { // <3>
 
     @Inject
     GameReporter gameReporter; // <5>
@@ -224,14 +215,6 @@ class GameServiceTest implements TestPropertyProvider { // <3>
         assertEquals(whiteName, game.getWhiteName());
         assertTrue(game.isDraw());
         assertNull(game.getWinner());
-    }
-
-    @NonNull
-    @Override
-    public Map<String, String> getProperties() {
-        return Collections.singletonMap(
-                "kafka.bootstrap.servers", kafka.getBootstrapServers() // <7>
-        );
     }
 
     @AfterEach

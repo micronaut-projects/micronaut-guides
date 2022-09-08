@@ -8,9 +8,7 @@ import example.micronaut.chess.repository.GameStateRepository
 import io.micronaut.configuration.kafka.annotation.KafkaClient
 import io.micronaut.configuration.kafka.annotation.KafkaKey
 import io.micronaut.configuration.kafka.annotation.Topic
-import io.micronaut.core.annotation.NonNull
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -20,25 +18,14 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.testcontainers.containers.KafkaContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.DockerImageName
 import reactor.core.publisher.Mono
 import java.util.UUID
 import java.util.concurrent.TimeUnit.SECONDS
 import jakarta.inject.Inject
 
-@Testcontainers // <1>
 @MicronautTest
 @TestInstance(PER_CLASS) // <2>
-class GameServiceTest : TestPropertyProvider { // <3>
-
-    companion object {
-        @Container
-        var kafka = KafkaContainer(
-                DockerImageName.parse("confluentinc/cp-kafka:latest")) // <4>
-    }
+class GameServiceTest { // <3>
 
     @Inject
     lateinit var gameReporter: GameReporter // <5>
@@ -206,10 +193,6 @@ class GameServiceTest : TestPropertyProvider { // <3>
         assertNull(game.winner)
     }
 
-    @NonNull
-    override fun getProperties(): Map<String, String> =
-            mapOf("kafka.bootstrap.servers" to kafka.bootstrapServers) // <7>
-
     @AfterEach
     fun cleanup() {
         gameStateRepository.deleteAll()
@@ -229,7 +212,7 @@ class GameServiceTest : TestPropertyProvider { // <3>
                          fen: String, pgn: String): UUID {
         val gameStateId = UUID.randomUUID()
         gameReporter.gameState(gameId, GameStateDTO(gameStateId.toString(),
-                gameId, player, move, fen, pgn)).subscribe()
+            gameId, player, move, fen, pgn)).subscribe()
         return gameStateId
     }
 }
