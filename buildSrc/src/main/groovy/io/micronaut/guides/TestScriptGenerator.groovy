@@ -159,6 +159,8 @@ cd $nestedFolder
 echo "-------------------------------------------------"
 echo "Executing '$folder' tests"
 ${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
+echo "Stopping shared test resources service (if created)"
+${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} || true
 cd ..
 """
         if (stopIfFailure) {
