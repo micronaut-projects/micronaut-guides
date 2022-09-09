@@ -26,8 +26,8 @@ import java.util.concurrent.TimeUnit.SECONDS
 import jakarta.inject.Inject
 
 @MicronautTest
-@TestInstance(PER_CLASS) // <2>
-class GameReporterTest { // <3>
+@TestInstance(PER_CLASS) // <1>
+class GameReporterTest {
 
     companion object {
         val receivedGames: MutableCollection<GameDTO> = ConcurrentLinkedDeque()
@@ -35,11 +35,11 @@ class GameReporterTest { // <3>
     }
 
     @Inject
-    lateinit var chessListener: ChessListener // <5>
+    lateinit var chessListener: ChessListener // <2>
 
     @Inject
     @field:Client("/")
-    lateinit var client: HttpClient // <6>
+    lateinit var client: HttpClient // <3>
 
     @Test
     fun testGameEndingInCheckmate() {
@@ -52,7 +52,7 @@ class GameReporterTest { // <3>
         val result = startGame(blackName, whiteName)
         val gameId = result.orElseThrow { RuntimeException("Expected GameDTO id") }
 
-        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() } // <7>
+        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() } // <4>
 
         assertEquals(1, receivedGames.size)
         assertEquals(0, receivedMoves.size)
@@ -187,11 +187,11 @@ class GameReporterTest { // <3>
     }
 
     private fun startGame(blackName: String, whiteName: String): Optional<String> {
-        val body = mapOf("b" to blackName, "w" to whiteName) // <9>
+        val body = mapOf("b" to blackName, "w" to whiteName) // <5>
         val request: HttpRequest<*> = HttpRequest.POST("/game/start", body)
             .contentType(APPLICATION_FORM_URLENCODED_TYPE)
         return client.toBlocking().retrieve(request,
-            Argument.of(Optional::class.java, String::class.java)) as Optional<String> // <10>
+            Argument.of(Optional::class.java, String::class.java)) as Optional<String> // <6>
     }
 
     private fun makeMove(gameId: String, player: String, move: String,
@@ -200,13 +200,13 @@ class GameReporterTest { // <3>
         val body = mapOf("player" to player, "move" to move, "fen" to fen, "pgn" to pgn)
         val request = HttpRequest.POST("/game/move/$gameId", body)
             .contentType(APPLICATION_FORM_URLENCODED_TYPE)
-        client.toBlocking().exchange<Map<String, String>, Any>(request) // <11>
+        client.toBlocking().exchange<Map<String, String>, Any>(request) // <7>
 
     }
 
     private fun endGame(gameId: String, winner: String?) {
         val uri = if (winner == null) "/game/draw/$gameId" else "/game/checkmate/$gameId/$winner"
         val request: HttpRequest<Any?> = HttpRequest.POST(uri, null)
-        client.toBlocking().exchange<Any?, Any>(request) // <12>
+        client.toBlocking().exchange<Any?, Any>(request) // <8>
     }
 }

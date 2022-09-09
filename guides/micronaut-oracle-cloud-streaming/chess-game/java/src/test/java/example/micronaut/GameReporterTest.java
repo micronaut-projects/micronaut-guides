@@ -36,18 +36,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @MicronautTest
-@TestInstance(PER_CLASS) // <2>
-class GameReporterTest { // <3>
+@TestInstance(PER_CLASS) // <1>
+class GameReporterTest {
 
     private static final Collection<GameDTO> receivedGames = new ConcurrentLinkedDeque<>();
     private static final Collection<GameStateDTO> receivedMoves = new ConcurrentLinkedDeque<>();
 
     @Inject
-    ChessListener chessListener; // <5>
+    ChessListener chessListener; // <2>
 
     @Inject
     @Client("/")
-    HttpClient client; // <6>
+    HttpClient client; // <3>
 
     @Test
     void testGameEndingInCheckmate() {
@@ -60,7 +60,7 @@ class GameReporterTest { // <3>
         Optional<String> result = startGame(blackName, whiteName);
         String gameId = result.orElseThrow(() -> new RuntimeException("Expected GameDTO id"));
 
-        await().atMost(5, SECONDS).until(() -> !receivedGames.isEmpty()); // <7>
+        await().atMost(5, SECONDS).until(() -> !receivedGames.isEmpty()); // <4>
 
         assertEquals(1, receivedGames.size());
         assertEquals(0, receivedMoves.size());
@@ -197,14 +197,14 @@ class GameReporterTest { // <3>
     }
 
     private Optional<String> startGame(String blackName, String whiteName) {
-        Map<String, String> body = new HashMap<>(); // <9>
+        Map<String, String> body = new HashMap<>(); // <5>
         body.put(Player.BLACK.toString(), blackName);
         body.put(Player.WHITE.toString(), whiteName);
 
         HttpRequest<?> request = HttpRequest.POST("/game/start", body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE);
         return client.toBlocking().retrieve(request,
-                Argument.of(Optional.class, String.class)); // <10>
+                Argument.of(Optional.class, String.class)); // <6>
     }
 
     private void makeMove(String gameId, Player player, String move,
@@ -217,7 +217,7 @@ class GameReporterTest { // <3>
 
         HttpRequest<?> request = HttpRequest.POST("/game/move/" + gameId, body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE);
-        client.toBlocking().exchange(request); // <11>
+        client.toBlocking().exchange(request); // <7>
     }
 
     private void endGame(String gameId, Player winner) {
@@ -227,6 +227,6 @@ class GameReporterTest { // <3>
         }
         URI uri = uriBuilder.build();
         HttpRequest<?> request = HttpRequest.POST(uri, null);
-        client.toBlocking().exchange(request); // <12>
+        client.toBlocking().exchange(request); // <8>
     }
 }

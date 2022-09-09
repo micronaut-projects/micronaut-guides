@@ -24,11 +24,11 @@ import java.util.concurrent.TimeUnit.SECONDS
 import jakarta.inject.Inject
 
 @MicronautTest
-@TestInstance(PER_CLASS) // <2>
-class GameServiceTest { // <3>
+@TestInstance(PER_CLASS) // <1>
+class GameServiceTest {
 
     @Inject
-    lateinit var gameReporter: GameReporter // <5>
+    lateinit var gameReporter: GameReporter // <2>
 
     @Inject
     lateinit var gameRepository: GameRepository
@@ -49,7 +49,7 @@ class GameServiceTest { // <3>
 
         gameReporter.game(gameIdString, gameDto).subscribe()
 
-        await().atMost(5, SECONDS).until { gameRepository.count() > 0 } // <6>
+        await().atMost(5, SECONDS).until { gameRepository.count() > 0 } // <3>
 
         assertEquals(1, gameRepository.count())
         assertEquals(0, gameStateRepository.count())

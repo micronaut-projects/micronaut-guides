@@ -17,13 +17,13 @@ import spock.util.concurrent.PollingConditions
 
 import jakarta.inject.Inject
 
-@MicronautTest // <1> <2>
-class GameServiceSpec extends Specification { // <3>
+@MicronautTest // <1>
+class GameServiceSpec extends Specification {
 
     private static final PollingConditions pollingConditions = new PollingConditions(timeout: 30)
 
     @Inject
-    GameReporter gameReporter // <5>
+    GameReporter gameReporter // <2>
 
     @Inject
     GameRepository gameRepository
@@ -50,7 +50,7 @@ class GameServiceSpec extends Specification { // <3>
         gameReporter.game(gameIdString, gameDto).subscribe()
 
         then:
-        pollingConditions.eventually { // <6>
+        pollingConditions.eventually { // <3>
             gameRepository.count() > 0
         }
 

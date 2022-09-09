@@ -34,11 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @MicronautTest
-@TestInstance(PER_CLASS) // <2>
-class GameServiceTest { // <3>
+@TestInstance(PER_CLASS) // <1>
+class GameServiceTest {
 
     @Inject
-    GameReporter gameReporter; // <5>
+    GameReporter gameReporter; // <2>
 
     @Inject
     GameRepository gameRepository;
@@ -61,7 +61,7 @@ class GameServiceTest { // <3>
 
         gameReporter.game(gameIdString, gameDto).subscribe();
 
-        await().atMost(5, SECONDS).until(() -> gameRepository.count() > 0); // <6>
+        await().atMost(5, SECONDS).until(() -> gameRepository.count() > 0); // <3>
 
         assertEquals(1, gameRepository.count());
         assertEquals(0, gameStateRepository.count());

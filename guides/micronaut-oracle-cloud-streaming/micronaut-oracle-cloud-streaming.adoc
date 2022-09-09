@@ -17,6 +17,8 @@ common:oracle-cloud-cli.adoc[]
 
 common:completesolution.adoc[]
 
+common:test-resources-kafka.adoc[]
+
 == Writing the Application
 
 The microservices will use Oracle Cloud Streaming and the Kafka API to send and receive messages. The messages will represent chess gameplay events, including game start and end and each move.
@@ -131,7 +133,7 @@ resource:application-dev.yml[app=chess-game]
 
 Update `application.yml` to add static resource configuration:
 
-resource:application.yml[app=chess-game,tag=router]
+resource:application.yml[app=chess-game,tag=static-resources]
 
 callout:static-resources[1]
 
@@ -264,25 +266,7 @@ resource:db/migration/h2/V1__create-schema.sql[app=chess-listener]
 
 == Kafka
 
-We'll use Oracle Cloud Streaming in the "real" application, but for local development, we can use a local Kafka instance.
-
-=== Install Kafka
-
-A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker]. Create this `docker-compose.yml` file:
-
-zipInclude:docker/docker-compose.yml[]
-
-<1> Zookeeper uses port 2181 by default, but change the value if needed
-<2> Kafka uses port 9092 by default, but change the value if needed
-
-Start Zookeeper and Kafka (use CTRL-C to stop both):
-
-[source,bash]
-----
-docker-compose up
-----
-
-Alternatively you can https://kafka.apache.org/quickstart[install and run a local Kafka instance].
+For local development, we a local Kafka instance will be provided by <<Test Resources, Test Resources>>.
 
 == Running the application
 
@@ -535,7 +519,6 @@ cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
 :exclude-for-build:
 
 :exclude-for-build:gradle
-
 To run each application use:
 
 [source, bash]
@@ -554,7 +537,7 @@ cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
 
 == Writing Tests
 
-We'll run Kafka inside a Docker container using https://www.testcontainers.org/[Testcontainers] for both application tests and also run Oracle database inside a Docker container for testing persistence in the `chess-listener` tests.
+Kafka for local development and testing will be provided by <<Test Resources,Test Resources>>.
 
 === chess-game tests
 
@@ -562,18 +545,14 @@ Create a test in the `chess-game` microservice to verify that Kafka message proc
 
 test:GameReporterTest[app=chess-game]
 
-<1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-callout:test-instance-per-class[2]
-<3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
-<4> The Testcontainer instance for Kafka
-<5> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
-<6> Dependency injection for an HTTP client that the Micronaut framework will implement at compile to make calls to `GameController`
-<7> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
-<8> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
-<9> Use a Map to hold form parameter names and values
-<10> Use the `HttpClient` to send a POST request that indicates a game has started, which will trigger sending a message with Kafka
-<11> Use the `HttpClient` to send a POST request that indicates a game move has occurred, which will trigger sending a message with Kafka
-<12> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
+callout:test-instance-per-class[1]
+<2> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
+<3> Dependency injection for an HTTP client that the Micronaut framework will implement at compile to make calls to `GameController`
+<4> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<5> Use a Map to hold form parameter names and values
+<6> Use the `HttpClient` to send a POST request that indicates a game has started, which will trigger sending a message with Kafka
+<7> Use the `HttpClient` to send a POST request that indicates a game move has occurred, which will trigger sending a message with Kafka
+<8> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
 
 === chess-listener tests
 
@@ -581,17 +560,9 @@ Create a test in the `chess-listener` microservice to verify that Kafka message 
 
 test:GameServiceTest[app=chess-listener]
 
-<1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-callout:test-instance-per-class[2]
-<3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
-<4> The Testcontainer instance for Kafka
-<5> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice
-<6> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
-<7> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
-
-Create `testcontainers.properties` in `src/test/resources` with this content:
-
-testResource:testcontainers.properties[app=chess-listener]
+callout:test-instance-per-class[1]
+<2> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice
+<3> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
 
 Create `application-test.yml` file in `src/test/resources` with this content:
 

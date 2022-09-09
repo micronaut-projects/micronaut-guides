@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentLinkedDeque
 import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
 import static io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED_TYPE
 
-@MicronautTest // <1> <2>
-class GameReporterSpec extends Specification { // <3>
+@MicronautTest // <1>
+class GameReporterSpec extends Specification {
 
     private static final Collection<GameDTO> receivedGames = new ConcurrentLinkedDeque<>()
     private static final Collection<GameStateDTO> receivedMoves = new ConcurrentLinkedDeque<>()
@@ -27,11 +27,11 @@ class GameReporterSpec extends Specification { // <3>
     private static final PollingConditions pollingConditions = new PollingConditions(timeout: 5)
 
     @Inject
-    ChessListener chessListener // <5>
+    ChessListener chessListener // <2>
 
     @Inject
     @Client('/')
-    HttpClient client // <6>
+    HttpClient client // <3>
 
     void 'test game ending in checkmate'() {
         given:
@@ -43,7 +43,7 @@ class GameReporterSpec extends Specification { // <3>
         String gameId = result.orElseThrow(() -> new RuntimeException('Expected GameDTO id'))
 
         then:
-        pollingConditions.eventually { // <7>
+        pollingConditions.eventually { // <4>
             !receivedGames.empty
         }
 
@@ -205,12 +205,12 @@ class GameReporterSpec extends Specification { // <3>
     }
 
     private Optional<String> startGame(String blackName, String whiteName) {
-        Map body = [b: blackName, w: whiteName] // <9>
+        Map body = [b: blackName, w: whiteName] // <5>
 
         HttpRequest<?> request = HttpRequest.POST('/game/start', body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE)
         return client.toBlocking().retrieve(request,
-                Argument.of(Optional, String)) // <10>
+                Argument.of(Optional, String)) // <6>
     }
 
     private void makeMove(String gameId,
@@ -221,7 +221,7 @@ class GameReporterSpec extends Specification { // <3>
 
         HttpRequest<?> request = HttpRequest.POST('/game/move/' + gameId, body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE)
-        client.toBlocking().exchange(request) // <11>
+        client.toBlocking().exchange(request) // <7>
     }
 
     private void endGame(String gameId, Player winner) {
@@ -231,6 +231,6 @@ class GameReporterSpec extends Specification { // <3>
         }
         URI uri = uriBuilder.build()
         HttpRequest<Object> request = HttpRequest.POST(uri, null)
-        client.toBlocking().exchange(request) // <12>
+        client.toBlocking().exchange(request) // <8>
     }
 }
