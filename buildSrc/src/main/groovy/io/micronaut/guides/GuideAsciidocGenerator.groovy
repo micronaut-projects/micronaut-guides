@@ -162,18 +162,21 @@ class GuideAsciidocGenerator {
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
-            text = text.replaceAll(~/@(\w*):?cli-command@/) { List<String> matches ->
+            text = text.replaceAll(~/@([\w-]*):?cli-command@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
-                cliCommandForApp(metadata, app).orElse('')
+                cliCommandForApp(metadata, app)
+                        .orElseThrow {
+                            new GradleException("No CLI command found for app: $app -- should be one of ${metadata.apps.name.collect { "@$it:cli-command@" }.join(", ")}")
+                        }
             }
 
-            text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
+            text = text.replaceAll(~/@([\w-]):?features@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
                 List<String> features = featuresForApp(metadata, guidesOption, app)
                 features.join(',')
             }
 
-            text = text.replaceAll(~/@(\w*):?features-words@/) { List<String> matches ->
+            text = text.replaceAll(~/@([\w-]):?features-words@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
                 featuresWordsForApp(metadata, guidesOption, app)
             }
