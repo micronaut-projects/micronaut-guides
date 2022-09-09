@@ -1,0 +1,49 @@
+common:header-top.adoc[]
+
+== Sample Project
+
+You can link:@sourceDir@.zip[download a sample application] with the code examples shown in this article.
+
+== Introduction
+
+What is a dependency? Class A has a dependency on Class B when it interacts with it in any way. For example, Class A executes a method in an instance of Class B. You typically don't instantiate class dependencies when using Micronaut Framework's dependency injection engine. Instead, you rely on the framework to provide dependency instances.
+
+NOTE: In Micronaut Framework documentation, we often use the term `Bean` and `Dependency` interchangeably.
+
+== Dependency Injection Types
+
+Micronaut Framework offers three types of dependency injection:
+
+=== Constructor Injection
+
+In constructor-based injection, Micronaut Framework provides the dependencies required for the class as arguments to the constructor.
+
+source:constructor/MessageController[]
+
+=== Field Injection
+
+With field injection, Micronaut fulfills the injection endpoints for fields annotated with `jakarta.inject.Inject`.
+
+source:field/MessageController[]
+
+NOTE: You use field injection in test classes annotated with `MicronautTest`. Micronaut does not instantiate the test class. Thus, you cannot use Constructor Injection in those classes.
+
+=== Setter Injection
+
+For setter-inject, you define the required dependencies as field parameters. Micronaut Framework sets the dependencies through the setter methods of the properties. We have to annotate the setter method with the `jakarta.inject.Inject` annotation.
+
+source:setter/MessageController[]
+
+=== Recommendation
+
+When possible, we recommend you use Constructor Injection.
+
+- Constructor injection allows you to define `final` dependencies. Thus, creating immutable objects.
+- Identify Code Smells: Constructor injection helps you easily identify if your bean depends on too many other objects.
+- Easier Testing. Constructor injection simplifies writing unit tests. The constructor forces us to provide valid objects for all dependencies
+
+== Next steps
+
+Read more about https://docs.micronaut.io/latest/guide/#ioc[Micronaut Inversion of Control] capabilities.
+
+common:helpWithMicronaut.adoc[]
