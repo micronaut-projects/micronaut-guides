@@ -20,6 +20,7 @@ import io.micronaut.context.annotation.Replaces;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.guides.feature.springboot.SpringBootApplicationFeature;
 import io.micronaut.guides.feature.springboot.template.help;
+import io.micronaut.guides.feature.springboot.template.sourceCompatibility;
 import io.micronaut.guides.feature.springboot.template.springBootBuildGradle;
 import io.micronaut.guides.feature.springboot.template.springBootGitignore;
 import io.micronaut.starter.application.ApplicationType;
@@ -46,6 +47,7 @@ import io.micronaut.starter.template.URLTemplate;
 import jakarta.inject.Singleton;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,7 +58,6 @@ import static io.micronaut.starter.build.Repository.micronautRepositories;
 @Replaces(io.micronaut.starter.feature.build.gradle.Gradle.class)
 public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
     protected static final GradlePlugin GROOVY_GRADLE_PLUGIN = GradlePlugin.builder().id("groovy").build();
-    protected static final GradlePlugin JAVA_GRADLE_PLUGIN = GradlePlugin.builder().id("java").build();
 
     protected static final String WRAPPER_JAR = "gradle/wrapper/gradle-wrapper.jar";
     protected static final String WRAPPER_PROPS = "gradle/wrapper/gradle-wrapper.properties";
@@ -156,14 +157,27 @@ public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
     }
 
     protected List<GradlePlugin> extraPlugins(GeneratorContext generatorContext) {
-        List<GradlePlugin> result = new ArrayList<>();
-        if (generatorContext.getFeatures().language().isGroovy() || generatorContext.getFeatures().testFramework().isSpock()) {
-            result.add(GROOVY_GRADLE_PLUGIN);
+        if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
+            List<GradlePlugin> result = new ArrayList<>();
+            GradlePlugin.Builder builder = null;
+            if (generatorContext.getFeatures().language().isGroovy()) {
+                builder =  GradlePlugin.builder().id("groovy");
+            } else if (generatorContext.getFeatures().language().isJava()) {
+                builder =  GradlePlugin.builder().id("java");
+            }
+            if (builder != null) {
+                result.add(builder
+                        .extension(new RockerTemplate(sourceCompatibility.template(generatorContext.getFeatures().getTargetJdk())))
+                        .build());
+            }
+            return result;
+        } else {
+            if (generatorContext.getFeatures().language().isGroovy() || generatorContext.getFeatures().testFramework().isSpock()) {
+                return Collections.singletonList(GROOVY_GRADLE_PLUGIN);
+            }
+            return Collections.emptyList();
         }
-        if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext) && generatorContext.getFeatures().language().isJava()) {
-            result.add(JAVA_GRADLE_PLUGIN);
-        }
-        return result;
+
     }
 
     protected void addGradleInitFiles(GeneratorContext generatorContext) {
