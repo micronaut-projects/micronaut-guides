@@ -1,14 +1,35 @@
+/*
+ * Copyright 2017-2022 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.micronaut.guides.feature.springboot.replacements;
 
 import com.fizzed.rocker.RockerModel;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.guides.feature.springboot.SpringBootApplicationFeature;
+import io.micronaut.guides.feature.springboot.template.help;
+import io.micronaut.guides.feature.springboot.template.springBootBuildGradle;
+import io.micronaut.guides.feature.springboot.template.springBootGitignore;
+import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.Property;
 import io.micronaut.starter.build.gradle.GradleBuild;
 import io.micronaut.starter.build.gradle.GradleBuildCreator;
 import io.micronaut.starter.build.gradle.GradlePlugin;
+import io.micronaut.starter.feature.Feature;
+import io.micronaut.starter.feature.FeatureContext;
 import io.micronaut.starter.feature.MicronautRuntimeFeature;
 import io.micronaut.starter.feature.build.KotlinBuildPlugins;
 import io.micronaut.starter.feature.build.MicronautBuildPlugin;
@@ -17,18 +38,16 @@ import io.micronaut.starter.feature.build.gradle.templates.buildGradle;
 import io.micronaut.starter.feature.build.gradle.templates.gradleProperties;
 import io.micronaut.starter.feature.build.gradle.templates.settingsGradle;
 import io.micronaut.starter.options.BuildTool;
+import io.micronaut.starter.options.Options;
 import io.micronaut.starter.template.BinaryTemplate;
 import io.micronaut.starter.template.RockerTemplate;
 import io.micronaut.starter.template.Template;
 import io.micronaut.starter.template.URLTemplate;
 import jakarta.inject.Singleton;
-import io.micronaut.guides.feature.springboot.template.springBootBuildGradle;
-import io.micronaut.guides.feature.springboot.template.springBootGitignore;
-import io.micronaut.guides.feature.springboot.template.help;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.micronaut.starter.build.Repository.micronautRepositories;
@@ -36,17 +55,33 @@ import static io.micronaut.starter.build.Repository.micronautRepositories;
 @Singleton
 @Replaces(io.micronaut.starter.feature.build.gradle.Gradle.class)
 public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
+    protected static final GradlePlugin GROOVY_GRADLE_PLUGIN = GradlePlugin.builder().id("groovy").build();
+    protected static final GradlePlugin JAVA_GRADLE_PLUGIN = GradlePlugin.builder().id("java").build();
 
-    private static final String WRAPPER_JAR = "gradle/wrapper/gradle-wrapper.jar";
-    private static final String WRAPPER_PROPS = "gradle/wrapper/gradle-wrapper.properties";
+    protected static final String WRAPPER_JAR = "gradle/wrapper/gradle-wrapper.jar";
+    protected static final String WRAPPER_PROPS = "gradle/wrapper/gradle-wrapper.properties";
 
-    private GradleBuildCreator dependencyResolver;
+    protected final KotlinBuildPlugins kotlinBuildPlugins;
+    protected final GradleBuildCreator dependencyResolver;
+    protected final MicronautBuildPlugin micronautBuildPlugin;
 
     public Gradle(GradleBuildCreator dependencyResolver,
                   MicronautBuildPlugin micronautBuildPlugin,
                   KotlinBuildPlugins kotlinBuildPlugins) {
         super(dependencyResolver, micronautBuildPlugin, kotlinBuildPlugins);
         this.dependencyResolver = dependencyResolver;
+        this.micronautBuildPlugin = micronautBuildPlugin;
+        this.kotlinBuildPlugins = kotlinBuildPlugins;
+    }
+
+    @Override
+    public void processSelectedFeatures(FeatureContext featureContext) {
+        if (!SpringBootApplicationFeature.isSpringBootApplication(featureContext)) {
+            featureContext.addFeature(micronautBuildPlugin);
+            if (kotlinBuildPlugins.shouldApply(featureContext)) {
+                featureContext.addFeature(kotlinBuildPlugins);
+            }
+        }
     }
 
     @Override
@@ -56,7 +91,7 @@ public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
         GradleBuild build = createBuild(generatorContext);
         addBuildFile(generatorContext, build);
         addGitignore(generatorContext);
-        addProjectPropertiesFile(generatorContext);
+        addGradleProperties(generatorContext);
         addSettingsFile(generatorContext, build);
         if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
             generatorContext.addTemplate("help", new RockerTemplate(Template.ROOT, "HELP.md", help.template()));
@@ -66,21 +101,22 @@ public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
     protected GradleBuild createBuild(GeneratorContext generatorContext) {
         return dependencyResolver.create(generatorContext, micronautRepositories());
     }
+
     protected void addBuildFile(GeneratorContext generatorContext, GradleBuild build) {
-        generatorContext.addTemplate("build", new RockerTemplate(generatorContext.getBuildTool().getBuildFileName(), buildFile(generatorContext, build)));
+        generatorContext.addTemplate("build",
+                new RockerTemplate(generatorContext.getBuildTool().getBuildFileName(), buildFile(generatorContext, build)));
     }
 
     protected RockerModel buildFile(GeneratorContext generatorContext, GradleBuild build) {
         if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
             return springBootBuildGradle.template(generatorContext.getProject(), build, generatorContext.getFeatures());
-        } {
-            return buildGradle.template(
-                    generatorContext.getApplicationType(),
-                    generatorContext.getProject(),
-                    generatorContext.getFeatures(),
-                    build
-            );
         }
+        return buildGradle.template(
+                generatorContext.getApplicationType(),
+                generatorContext.getProject(),
+                generatorContext.getFeatures(),
+                build
+        );
     }
 
     protected void addGitignore(GeneratorContext generatorContext) {
@@ -89,39 +125,43 @@ public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
 
     protected RockerModel gitignore(GeneratorContext generatorContext) {
         if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
-            return gitignore.template();
+            return springBootGitignore.template();
         }
-        return springBootGitignore.template();
+        return gitignore.template();
     }
 
     @NonNull
-    private static List<Property> gradleProperties(@NonNull GeneratorContext generatorContext) {
+    protected static List<Property> gradleProperties(@NonNull GeneratorContext generatorContext) {
         return generatorContext.getBuildProperties().getProperties().stream()
                 .filter(p -> p.getKey() == null || !p.getKey().equals(MicronautRuntimeFeature.PROPERTY_MICRONAUT_RUNTIME)) // It is set via the DSL
                 .collect(Collectors.toList());
     }
 
-    protected void addProjectPropertiesFile(GeneratorContext generatorContext) {
+    @Override
+    public boolean shouldApply(ApplicationType applicationType,
+                               Options options,
+                               Set<Feature> selectedFeatures) {
+        return options.getBuildTool().isGradle();
+    }
+
+    protected void addGradleProperties(GeneratorContext generatorContext) {
         if (!SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
             generatorContext.addTemplate("projectProperties", new RockerTemplate(Template.ROOT, "gradle.properties", gradleProperties.template(gradleProperties(generatorContext))));
         }
     }
 
     protected void addSettingsFile(GeneratorContext generatorContext, GradleBuild build) {
-        if (generatorContext.getBuildTool().isGradle()) {
-            String settingsFile =  generatorContext.getBuildTool() == BuildTool.GRADLE ? "settings.gradle" : "settings.gradle.kts";
-            generatorContext.addTemplate("gradleSettings", new RockerTemplate(Template.ROOT, settingsFile, settingsGradle.template(generatorContext.getProject(), build, generatorContext.getModuleNames())));
-        }
+        String settingsFile =  generatorContext.getBuildTool() == BuildTool.GRADLE ? "settings.gradle" : "settings.gradle.kts";
+        generatorContext.addTemplate("gradleSettings", new RockerTemplate(Template.ROOT, settingsFile, settingsGradle.template(generatorContext.getProject(), build, generatorContext.getModuleNames())));
     }
-
 
     protected List<GradlePlugin> extraPlugins(GeneratorContext generatorContext) {
         List<GradlePlugin> result = new ArrayList<>();
         if (generatorContext.getFeatures().language().isGroovy() || generatorContext.getFeatures().testFramework().isSpock()) {
-            result.add(GradlePlugin.builder().id("groovy").build());
+            result.add(GROOVY_GRADLE_PLUGIN);
         }
         if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext) && generatorContext.getFeatures().language().isJava()) {
-            result.add(GradlePlugin.builder().id("java").build());
+            result.add(JAVA_GRADLE_PLUGIN);
         }
         return result;
     }
