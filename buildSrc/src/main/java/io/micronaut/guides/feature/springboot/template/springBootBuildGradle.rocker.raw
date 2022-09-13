@@ -1,0 +1,26 @@
+@option discardLogicWhitespace=true
+@import io.micronaut.starter.application.Project
+@import io.micronaut.starter.build.gradle.GradleBuild
+@import io.micronaut.starter.build.gradle.GradlePlugin
+@import io.micronaut.starter.build.gradle.GradleDependency
+@import io.micronaut.starter.feature.Features
+@args (Project project, GradleBuild gradleBuild, Features features)
+plugins {
+@for (GradlePlugin gradlePlugin : gradleBuild.getPlugins()) {
+    id("@gradlePlugin.getId()") @(gradlePlugin.getVersion() != null ? "version \"" + gradlePlugin.getVersion() + "\"" : "")
+}
+}
+
+version = "0.1"
+group = "@project.getPackageName()"
+
+repositories {
+@gradleBuild.renderRepositories()
+}
+
+dependencies {
+@for (GradleDependency dependency : gradleBuild.getDependencies()) {
+    @dependency.toSnippet()
+}
+}
+@gradleBuild.renderExtensions()
