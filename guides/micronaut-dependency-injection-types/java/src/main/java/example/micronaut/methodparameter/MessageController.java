@@ -1,4 +1,4 @@
-package example.micronaut.setter;
+package example.micronaut.methodparameter;
 
 import example.micronaut.MessageService;
 import io.micronaut.http.MediaType;
@@ -18,7 +18,7 @@ class MessageController {
     }
 
     @Inject
-    void setMessageService(MessageService messageService) {
+    void populateMessageService(MessageService messageService) {
         this.messageService = messageService;
     }
 }
