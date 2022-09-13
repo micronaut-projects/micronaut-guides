@@ -2,10 +2,10 @@ package io.micronaut.guides.feature.springboot;
 
 import com.fizzed.rocker.RockerModel;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.guides.feature.springboot.template.application;
-import io.micronaut.guides.feature.springboot.template.applicationtestjavajunit;
+import io.micronaut.guides.feature.springboot.template.applicationgroovy;
+import io.micronaut.guides.feature.springboot.template.applicationtestgroovyjunit;
 import io.micronaut.starter.application.generator.GeneratorContext;
-import io.micronaut.starter.feature.lang.java.JavaApplication;
+import io.micronaut.starter.feature.lang.groovy.GroovyApplication;
 import io.micronaut.starter.options.Language;
 import io.micronaut.starter.options.TestFramework;
 import io.micronaut.starter.template.RockerTemplate;
@@ -14,12 +14,11 @@ import jakarta.inject.Singleton;
 import java.util.Optional;
 
 @Singleton
-public class SpringBootJavaApplication extends JavaApplication implements SpringBootApplicationFeature {
-
+public class SpringBootGroovyApplication extends GroovyApplication implements SpringBootApplicationFeature {
     @Override
     @NonNull
     public String getName() {
-        return "spring-boot-java-application";
+        return "spring-boot-groovy-application";
     }
 
     @Override
@@ -37,8 +36,8 @@ public class SpringBootJavaApplication extends JavaApplication implements Spring
     }
 
     protected Optional<RockerModel> application(GeneratorContext generatorContext) {
-        if (generatorContext.getLanguage() == Language.JAVA) {
-            return Optional.of(application.template(generatorContext.getProject(), generatorContext.getFeatures()));
+        if (generatorContext.getLanguage() == Language.GROOVY) {
+            return Optional.of(applicationgroovy.template(generatorContext.getProject(), generatorContext.getFeatures()));
         }
         return Optional.empty();
     }
@@ -51,8 +50,8 @@ public class SpringBootJavaApplication extends JavaApplication implements Spring
     }
 
     protected Optional<RockerModel> applicationTest(GeneratorContext generatorContext) {
-        if (generatorContext.getTestFramework() == TestFramework.JUNIT && generatorContext.getLanguage() == Language.JAVA) {
-            return Optional.of(applicationtestjavajunit.template(generatorContext.getProject()));
+        if (generatorContext.getTestFramework() == TestFramework.JUNIT && generatorContext.getLanguage() == Language.GROOVY) {
+            return Optional.of(applicationtestgroovyjunit.template(generatorContext.getProject()));
         }
         return Optional.empty();
     }
