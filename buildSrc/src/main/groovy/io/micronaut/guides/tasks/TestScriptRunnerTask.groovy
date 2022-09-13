@@ -37,9 +37,6 @@ abstract class TestScriptRunnerTask extends DefaultTask {
     @Inject
     abstract WorkerExecutor getWorkerExecutor();
 
-    @Internal
-    abstract Property<AtomicBoolean> getFirstTask();
-
     @TaskAction
     void runScript() {
         WorkQueue queue = workerExecutor.noIsolation()
@@ -48,12 +45,6 @@ abstract class TestScriptRunnerTask extends DefaultTask {
             parameters.testScript.set(testScript)
             parameters.outputFile.set(outputFile)
         }
-        try {
-            if (firstTask.get().get()) {
-                queue.await()
-            }
-        } finally {
-            firstTask.get().set(false)
-        }
+        queue.await()
     }
 }

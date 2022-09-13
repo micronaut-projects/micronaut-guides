@@ -160,7 +160,7 @@ echo "-------------------------------------------------"
 echo "Executing '$folder' tests"
 ${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
 echo "Stopping shared test resources service (if created)"
-${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} || true
+${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
 cd ..
 """
         if (stopIfFailure) {
