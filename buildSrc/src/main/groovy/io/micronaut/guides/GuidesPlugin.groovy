@@ -43,8 +43,6 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String COMMA = ","
     private static final String TASK_SUFFIX_BUILD = "Build"
 
-    private static final AtomicBoolean firstTestRunnerTask = new AtomicBoolean(true)
-
     @Override
     void apply(Project project) {
         GuideProjectGenerator projectGenerator = new GuideProjectGenerator()
@@ -207,8 +205,6 @@ class GuidesPlugin implements Plugin<Project> {
 
             it.testScript.set(testScriptTask.flatMap { t -> t.scriptFile })
             it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug}"))
-
-            it.firstTask.set(firstTestRunnerTask)
 
             // We tee the script output to a file, this is the cached result
             it.outputFile.set(codeDirectory.map(d -> d.file("output.log")))
