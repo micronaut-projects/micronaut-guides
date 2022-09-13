@@ -6,6 +6,7 @@ import io.micronaut.guides.feature.springboot.template.application;
 import io.micronaut.guides.feature.springboot.template.applicationtestjavajunit;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.feature.lang.java.JavaApplication;
+import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.starter.options.TestFramework;
 import io.micronaut.starter.template.RockerTemplate;
@@ -27,6 +28,13 @@ public class SpringBootJavaApplication extends JavaApplication implements Spring
         if (shouldGenerateApplicationFile(generatorContext)) {
             generateApplication(generatorContext);
             generateApplicationTest(generatorContext);
+        }
+        if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
+            SpringBootMavenUtils.clearMicronautVersionProperty(generatorContext);
+            if (generatorContext.getBuildTool() == BuildTool.MAVEN) {
+                SpringBootMavenUtils.addJavaVersionProperty(generatorContext);
+                SpringBootMavenUtils.addSpringBootMavenPlugin(generatorContext);
+            }
         }
     }
 
