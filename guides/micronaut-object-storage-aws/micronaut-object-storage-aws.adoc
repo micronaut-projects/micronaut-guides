@@ -5,14 +5,62 @@ external:micronaut-object-storage-base/start.adoc[]
 
 common:aws.adoc[]
 
-external:micronaut-object-storage-base/create-app.adoc[]
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Create an AWS S3 bucket
+
+First of all, we are going to
+https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/create-bucket.html[create an AWS S3 bucket]
+using the `aws` CLI:
+
+[source,bash]
+----
+aws s3api create-bucket --bucket micronaut-guide-object-storage --region=us-east-1
+----
+
+[TIP]
+====
+
+If you want to create the bucket in a region other than `us-east-1`, you need additional parameters. For example, to
+create the bucket in the `eu-west-3` region:
+
+[source,bash]
+----
+aws s3api create-bucket --bucket micronaut-guide-object-storage --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
+----
+====
+
+
+
+curl -i -F 'fileUpload=@profile.jpg' http://localhost:8080/pictures/alvaro
+
+HTTP/1.1 201 Created
+location: http://localhost:8080/pictures/alvaro
+ETag: "617cb82e296e153c29b34cccf7af0908"
+date: Wed, 14 Sep 2022 12:50:30 GMT
+connection: keep-alive
+transfer-encoding: chunked
+
+
+aws s3 ls s3://micronaut-guide-object-storage/
+
+
+curl http://localhost:8080/pictures/alvaro -O -J
+
+
+curl -X DELETE http://localhost:8080/pictures/alvaro
+
+
+
 
 == Running the Application
 
 common:runapp-instructions.adoc[]
 
 
-=== Next Steps
+== Next Steps
 
 external:micronaut-object-storage-base/end.adoc[]
 
