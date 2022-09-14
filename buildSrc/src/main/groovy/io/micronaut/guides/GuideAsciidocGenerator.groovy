@@ -170,13 +170,13 @@ class GuideAsciidocGenerator {
                         }
             }
 
-            text = text.replaceAll(~/@([\w-]):?features@/) { List<String> matches ->
+            text = text.replaceAll(~/@([\w-]*):?features@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
                 List<String> features = featuresForApp(metadata, guidesOption, app)
                 features.join(',')
             }
 
-            text = text.replaceAll(~/@([\w-]):?features-words@/) { List<String> matches ->
+            text = text.replaceAll(~/@([\w-]*):?features-words@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
                 featuresWordsForApp(metadata, guidesOption, app)
             }
