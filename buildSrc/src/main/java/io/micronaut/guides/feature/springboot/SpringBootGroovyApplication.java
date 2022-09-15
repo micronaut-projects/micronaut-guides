@@ -59,12 +59,12 @@ public class SpringBootGroovyApplication extends GroovyApplication implements Sp
     }
 
     protected void generateApplication(GeneratorContext generatorContext) {
-        application(generatorContext).ifPresent(rockerModel -> {
+        generateRockerModel(generatorContext).ifPresent(rockerModel -> {
             generatorContext.addTemplate("application", new RockerTemplate(getPath(), rockerModel));
         });
     }
 
-    protected Optional<RockerModel> application(GeneratorContext generatorContext) {
+    protected Optional<RockerModel> generateRockerModel(GeneratorContext generatorContext) {
         if (generatorContext.getLanguage() == Language.GROOVY) {
             return Optional.of(applicationgroovy.template(generatorContext.getProject(), generatorContext.getFeatures()));
         }
@@ -72,13 +72,13 @@ public class SpringBootGroovyApplication extends GroovyApplication implements Sp
     }
 
     protected void generateApplicationTest(GeneratorContext generatorContext) {
-        applicationTest(generatorContext).ifPresent(rockerModel -> {
+        generateTestRockerModel(generatorContext).ifPresent(rockerModel -> {
             String testSourcePath = generatorContext.getTestSourcePath("/{packagePath}/{className}");
             generatorContext.addTemplate("applicationTest", new RockerTemplate(testSourcePath, rockerModel));
         });
     }
 
-    protected Optional<RockerModel> applicationTest(GeneratorContext generatorContext) {
+    protected Optional<RockerModel> generateTestRockerModel(GeneratorContext generatorContext) {
         if (generatorContext.getTestFramework() == TestFramework.JUNIT && generatorContext.getLanguage() == Language.GROOVY) {
             return Optional.of(applicationtestgroovyjunit.template(generatorContext.getProject()));
         }

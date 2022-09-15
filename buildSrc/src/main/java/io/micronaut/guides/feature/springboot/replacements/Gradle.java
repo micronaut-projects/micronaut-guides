@@ -100,7 +100,7 @@ public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
     }
 
     protected GradleBuild createBuild(GeneratorContext generatorContext) {
-        return dependencyResolver.create(generatorContext, micronautRepositories());
+        return dependencyResolver.create(generatorContext, micronautRepositories(), false);
     }
 
     protected void addBuildFile(GeneratorContext generatorContext, GradleBuild build) {
