@@ -23,75 +23,39 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
 
-@Controller(ProfilePicturesController.PREFIX)
-@ExecuteOn(TaskExecutors.IO)
+//tag::begin-class[]
+@Controller(ProfilePicturesController.PREFIX) // <1>
+@ExecuteOn(TaskExecutors.IO) // <2>
 public class ProfilePicturesController implements ProfilePicturesApi {
 
     static final String PREFIX = "/pictures";
     private static final String ETAG_HEADER = "ETag";
 
-    private final AwsS3Operations objectStorage;
-    private final EmbeddedServer server;
+    private final AwsS3Operations objectStorage; // <3>
+    private final EmbeddedServer server; // <4>
 
     public ProfilePicturesController(AwsS3Operations objectStorage, EmbeddedServer server) {
         this.objectStorage = objectStorage;
         this.server = server;
     }
+//end::begin-class[]
 
+    //tag::upload[]
     @Override
     public HttpResponse upload(CompletedFileUpload fileUpload, String userId) {
-        Optional<HttpResponse<String>> validationResult = validateFileUpload(fileUpload);
-        if (validationResult.isPresent()) {
-            return validationResult.get();
-        }
-
-        String key = buildKey(userId);
-        UploadRequest objectStorageUpload = UploadRequest.fromCompletedFileUpload(fileUpload, key);
-        UploadResponse<PutObjectResponse> response = objectStorage.upload(objectStorageUpload, builder -> {
-            builder.acl(ObjectCannedACL.PUBLIC_READ);
+        String key = buildKey(userId); // <1>
+        UploadRequest objectStorageUpload = UploadRequest.fromCompletedFileUpload(fileUpload, key); // <2>
+        UploadResponse<PutObjectResponse> response = objectStorage.upload(objectStorageUpload, builder -> {  // <3>
+            builder.acl(ObjectCannedACL.PUBLIC_READ); // <4>
         });
 
         return HttpResponse
-                .created(location(userId))
-                .header(ETAG_HEADER, response.getETag());
-    }
-
-    @Override
-    public Optional<HttpResponse<StreamedFile>> download(String userId) {
-        String key = buildKey(userId);
-        return objectStorage.retrieve(key)
-                .map(ProfilePicturesController::buildStreamedFile);
-    }
-
-    @Override
-    public void delete(String userId) {
-        String key = buildKey(userId);
-
-        objectStorage.delete(key);
-    }
-
-    private static Optional<HttpResponse<String>> validateFileUpload(CompletedFileUpload fileUpload) {
-        if (fileUpload.getContentType().isPresent()) {
-            MediaType type = fileUpload.getContentType().get();
-            if (!type.matches(MediaType.IMAGE_JPEG_TYPE)) {
-                return Optional.of(HttpResponse.badRequest("Profile pictures must be in JPEG format"));
-            }
-        } else {
-            return Optional.of(HttpResponse.badRequest("Content-Type header missing"));
-        }
-        return Optional.empty();
+                .created(location(userId)) // <5>
+                .header(ETAG_HEADER, response.getETag()); // <6>
     }
 
     private static String buildKey(String userId) {
         return userId + ".jpg";
-    }
-
-    private static HttpResponse<StreamedFile> buildStreamedFile(AwsS3ObjectStorageEntry entry) {
-        GetObjectResponse nativeEntry = entry.getNativeEntry();
-        StreamedFile file = new StreamedFile(entry.getInputStream(), MediaType.of(nativeEntry.contentType())).attach(entry.getKey());
-        MutableHttpResponse<Object> httpResponse = HttpResponse.ok().header(ETAG_HEADER, nativeEntry.eTag());
-        file.process(httpResponse);
-        return httpResponse.body(file);
     }
 
     private URI location(String userId) {
@@ -102,5 +66,35 @@ public class ProfilePicturesController implements ProfilePicturesApi {
             return URI.create(uriString);
         }
     }
+    //end::upload[]
 
+
+    //tag::download[]
+    @Override
+    public Optional<HttpResponse<StreamedFile>> download(String userId) {
+        String key = buildKey(userId);
+        return objectStorage.retrieve(key) // <1>
+                .map(ProfilePicturesController::buildStreamedFile); // <2>
+    }
+
+    private static HttpResponse<StreamedFile> buildStreamedFile(AwsS3ObjectStorageEntry entry) {
+        GetObjectResponse nativeEntry = entry.getNativeEntry();
+        StreamedFile file = new StreamedFile(entry.getInputStream(), MediaType.of(nativeEntry.contentType())).attach(entry.getKey());
+        MutableHttpResponse<Object> httpResponse = HttpResponse.ok().header(ETAG_HEADER, nativeEntry.eTag()); // <3>
+        file.process(httpResponse);
+        return httpResponse.body(file);
+    }
+    //end::download[]
+
+    //tag::delete[]
+    @Override
+    public void delete(String userId) {
+        String key = buildKey(userId);
+
+        objectStorage.delete(key);
+    }
+    //end::delete[]
+
+//tag::end-class[]
 }
+//end::end-class[]

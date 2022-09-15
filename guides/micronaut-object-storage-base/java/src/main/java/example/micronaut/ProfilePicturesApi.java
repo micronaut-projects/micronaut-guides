@@ -14,15 +14,17 @@ import io.micronaut.objectstorage.response.UploadResponse;
 import java.net.URI;
 import java.util.Optional;
 
+//tag::class[]
 public interface ProfilePicturesApi {
 
-    @Post(uri = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA)
+    @Post(uri = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA) // <1>
     HttpResponse upload(CompletedFileUpload fileUpload, String userId);
 
-    @Get("/{userId}")
+    @Get("/{userId}") // <2>
     Optional<HttpResponse<StreamedFile>> download(String userId);
 
-    @Delete("/{userId}")
+    @Delete("/{userId}") // <3>
     void delete(String userId);
-
 }
+//end::class[]
+
