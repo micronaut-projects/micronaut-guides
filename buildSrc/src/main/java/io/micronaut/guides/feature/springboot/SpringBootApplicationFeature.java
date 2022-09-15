@@ -18,16 +18,7 @@ public interface SpringBootApplicationFeature extends Feature {
     }
 
     static boolean isSpringBootApplication(FeatureContext featureContext) {
-        //TODO after 3.7.x return isSpringBootApplication(featureContext.getSelectedFeatures());
-        try {
-            Field f = featureContext.getClass().getDeclaredField("selectedFeatures");
-            f.setAccessible(true);
-            return isSpringBootApplication((Set<Feature>) f.get(featureContext));
-        } catch (NoSuchFieldException e) {
-            return false;
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return isSpringBootApplication(featureContext.getSelectedFeatures());
     }
 
     static boolean isSpringBootApplication(Features features) {

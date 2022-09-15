@@ -15,7 +15,7 @@ public final class SpringBootMavenUtils {
     }
 
     public static void clearMicronautVersionProperty(GeneratorContext generatorContext) {
-        //TODO 3.7.0 generatorContext.getBuildProperties().remove("micronaut.version");
+        generatorContext.getBuildProperties().remove("micronaut.version");
     }
 
     public static void addSpringBootMavenPlugin(GeneratorContext generatorContext) {
