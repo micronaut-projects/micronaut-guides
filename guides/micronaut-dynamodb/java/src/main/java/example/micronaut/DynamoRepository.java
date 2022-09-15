@@ -38,6 +38,7 @@ import java.util.Optional;
 @Requires(condition = CIAwsRegionProviderChainCondition.class)
 @Requires(condition = CIAwsCredentialsProviderChainCondition.class)
 @Requires(beans = { DynamoConfiguration.class, DynamoDbClient.class })
+@Requires(missingBeans = { DefaultBookRepository.class })
 @Singleton
 public class DynamoRepository<T extends Identified> {
     private static final Logger LOG = LoggerFactory.getLogger(DynamoRepository.class);
