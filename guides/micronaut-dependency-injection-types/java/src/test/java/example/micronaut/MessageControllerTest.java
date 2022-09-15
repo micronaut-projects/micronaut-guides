@@ -17,6 +17,7 @@ class MessageControllerTest {
     @Client("/")
     HttpClient httpClient;
 
+    
     @ParameterizedTest
     @ValueSource(strings = {"/constructor", "/field", "/setter"})
     void validateMessageControllers(String path) {

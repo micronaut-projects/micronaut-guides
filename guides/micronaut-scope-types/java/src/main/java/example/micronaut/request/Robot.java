@@ -6,8 +6,8 @@ import io.micronaut.runtime.http.scope.RequestAware;
 import io.micronaut.runtime.http.scope.RequestScope;
 import java.util.Objects;
 
-@RequestScope
-public class Robot implements RequestAware {
+@RequestScope // <1>
+public class Robot implements RequestAware { // <2>
     @NonNull
     private String serialNumber;
 

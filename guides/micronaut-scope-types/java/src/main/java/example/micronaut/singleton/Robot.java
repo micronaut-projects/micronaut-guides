@@ -1,11 +1,16 @@
 package example.micronaut.singleton;
-
+/*
+//tag::pkg[]
+package example.micronaut;
+//end::pkg[]
+*/
+//tag::clazz[]
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
 import java.util.UUID;
 
-@Singleton
+@Singleton // <1>
 public class Robot {
     @NonNull
     private final String serialNumber;
@@ -19,3 +24,4 @@ public class Robot {
         return serialNumber;
     }
 }
+//end::clazz[]

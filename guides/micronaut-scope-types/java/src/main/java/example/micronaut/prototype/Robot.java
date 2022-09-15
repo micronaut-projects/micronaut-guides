@@ -5,7 +5,7 @@ import io.micronaut.core.annotation.NonNull;
 
 import java.util.UUID;
 
-@Prototype
+@Prototype // <1>
 public class Robot {
     @NonNull
     private final String serialNumber;

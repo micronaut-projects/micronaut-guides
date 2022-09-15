@@ -1,3 +1,4 @@
+//tag::imports[]
 package example.micronaut;
 
 import io.micronaut.core.type.Argument;
@@ -26,17 +27,27 @@ class RequestScopeTest {
 
     @Test
     void requestScopeScopeIsACustomScopeThatIndicatesANewInstanceOfTheBeanIsCreatedAndAssociatedWithEachHTTPRequest() {
+//end::imports[]        
+/*
+//tag::testheader[]        
+        String path = "/";
+//end::testheader[]
+*/
+        String path = "/request";
+//tag::test[]        
         BlockingHttpClient client = httpClient.toBlocking();
-        Set<String> responses = new HashSet<>(executeRequest(client));
-        assertEquals(1, responses.size());
-        responses.addAll(executeRequest(client));
-        assertEquals(2, responses.size());
+        Set<String> responses = new HashSet<>(executeRequest(client, path));
+        assertEquals(1, responses.size()); // <3>
+        responses.addAll(executeRequest(client, path));
+        assertEquals(2, responses.size()); // <4>
     }
 
-    private List<String> executeRequest(BlockingHttpClient client) {
-        return client.retrieve(createRequest(), Argument.listOf(String.class));
+    private List<String> executeRequest(BlockingHttpClient client, 
+                                        String path) {
+        return client.retrieve(createRequest(path), Argument.listOf(String.class));
     }
-    private HttpRequest<?> createRequest() {
-        return HttpRequest.GET("/request").header("UUID", UUID.randomUUID().toString());
+    private HttpRequest<?> createRequest(String path) {
+        return HttpRequest.GET(path).header("UUID", UUID.randomUUID().toString());
     }
 }
+//end::test[]

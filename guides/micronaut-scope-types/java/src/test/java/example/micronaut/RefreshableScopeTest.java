@@ -1,3 +1,4 @@
+//tag::imports[]
 package example.micronaut;
 
 import io.micronaut.context.annotation.Property;
@@ -30,22 +31,32 @@ class RefreshableScopeTest {
 
     @Test
     void refreshableScopeIsACustomScopeThatAllowsABeansStateToBeRefreshedViaTheRefreshEndpoint() {
+//end::imports[]        
+/*
+//tag::testheader[] 
+       String path = "/";
+//end::testheader[]
+*/
+//tag::test[]      
         String path = "/refreshable";
         BlockingHttpClient client = httpClient.toBlocking();
         Set<String> responses = new HashSet<>(executeRequest(client, path));
-        assertEquals(1, responses.size());
+        assertEquals(1, responses.size()); // <1>
         responses.addAll(executeRequest(client, path));
-        assertEquals(1, responses.size());
-        refresh(client);
+        assertEquals(1, responses.size()); // <1>
+        refresh(client); // <2>
         responses.addAll(executeRequest(client, path));
-        assertEquals(2, responses.size());
+        assertEquals(2, responses.size()); // <3>
     }
 
     private void refresh(BlockingHttpClient client) {
-        client.exchange(HttpRequest.POST("/refresh", Collections.emptyMap()));
+        client.exchange(HttpRequest.POST("/refresh", 
+                        Collections.singletonMap("force", true)));
     }
 
     private List<String> executeRequest(BlockingHttpClient client, String path) {
-        return client.retrieve(HttpRequest.GET(path), Argument.listOf(String.class));
+        return client.retrieve(HttpRequest.GET(path), 
+                               Argument.listOf(String.class));
     }
 }
+//end::test[]      
