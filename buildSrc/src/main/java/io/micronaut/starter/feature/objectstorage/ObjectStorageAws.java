@@ -16,8 +16,10 @@
 package io.micronaut.starter.feature.objectstorage;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.guides.feature.Localstack;
 import io.micronaut.starter.feature.FeatureContext;
 import io.micronaut.starter.feature.aws.AwsV2Sdk;
+import io.micronaut.starter.feature.database.TestContainers;
 import io.micronaut.starter.feature.function.Cloud;
 import jakarta.inject.Singleton;
 
@@ -31,9 +33,13 @@ import jakarta.inject.Singleton;
 public class ObjectStorageAws implements ObjectStorageFeature {
 
     private final AwsV2Sdk awsV2Sdk;
+    private final TestContainers testContainers;
+    private final Localstack localstack;
 
-    public ObjectStorageAws(AwsV2Sdk awsV2Sdk) {
+    public ObjectStorageAws(AwsV2Sdk awsV2Sdk, TestContainers testContainers, Localstack localstack) {
         this.awsV2Sdk = awsV2Sdk;
+        this.testContainers = testContainers;
+        this.localstack = localstack;
     }
 
     @Override
@@ -51,6 +57,12 @@ public class ObjectStorageAws implements ObjectStorageFeature {
     public void processSelectedFeatures(FeatureContext featureContext) {
         if (!featureContext.isPresent(AwsV2Sdk.class)) {
             featureContext.addFeature(awsV2Sdk);
+        }
+        if (!featureContext.isPresent(TestContainers.class)) {
+            featureContext.addFeature(testContainers);
+        }
+        if (!featureContext.isPresent(Localstack.class)) {
+            featureContext.addFeature(localstack);
         }
     }
 
