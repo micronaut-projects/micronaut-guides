@@ -5,11 +5,11 @@ import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 
-@MappedEntity
+@MappedEntity // <1>
 public record Book(
-        @GeneratedValue
-        @Id
-        @Nullable
+        @Id // <2>
+        @GeneratedValue // <3>
+        @Nullable // <4>
         Long id,
         String title,
         int pages

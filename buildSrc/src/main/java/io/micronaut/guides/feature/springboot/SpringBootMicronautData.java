@@ -69,11 +69,6 @@ public class SpringBootMicronautData implements SpringBootApplicationFeature {
                 .annotationProcessor());
 
         generatorContext.addDependency(Dependency.builder()
-                .groupId("io.micronaut")
-                .artifactId("micronaut-inject-java")
-                .annotationProcessor());
-
-        generatorContext.addDependency(Dependency.builder()
                 .lookupArtifactId("jakarta.annotation-api")
                 .annotationProcessor());
 

@@ -8,15 +8,15 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.util.UriComponentsBuilder;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
 class BookControllerTest {
-    @LocalServerPort
+    @LocalServerPort // <2>
     private int port;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @Autowired // <4>
+    private TestRestTemplate restTemplate; // <5>
 
-    @Autowired
+    @Autowired // <6>
     BookRepository bookRepository;
 
     @Test
@@ -33,8 +33,9 @@ class BookControllerTest {
     }
 
     private Book[] booksJsonArray() {
-        return this.restTemplate.getForObject(booksRequestUriString(), Book[].class);
+        return restTemplate.getForObject(booksRequestUriString(), Book[].class);
     }
+
     private String booksRequestUriString() {
         return UriComponentsBuilder.fromUriString("http://localhost:" + port)
                 .path("books")

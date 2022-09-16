@@ -2,16 +2,14 @@ package example.micronaut;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@RestController
+@RestController // <1>
 public class BookController {
-    private final BookRepository bookRepository;
-    
-    public BookController(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
+    @Autowired // <2>
+    private BookRepository bookRepository;
 
-    @GetMapping("/books")
+    @GetMapping("/books") // <3>
     Iterable<Book> list() {
         return bookRepository.findAll();
     }
