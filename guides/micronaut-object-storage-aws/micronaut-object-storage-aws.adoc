@@ -9,16 +9,18 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
-== Create an AWS S3 bucket
+== Create an Amazon S3 bucket
 
 First of all, we are going to
-https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/create-bucket.html[create an AWS S3 bucket]
+https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/create-bucket.html[create an Amazon S3 bucket]
 using the `aws` CLI:
 
 [source,bash]
 ----
 aws s3api create-bucket --bucket micronaut-guide-object-storage --region=us-east-1
 ----
+
+WARNING: Bucket names must be unique across all AWS accounts.
 
 [TIP]
 ====
@@ -27,7 +29,10 @@ create the bucket in the `eu-west-3` region:
 
 [source,bash]
 ----
-aws s3api create-bucket --bucket micronaut-guide-object-storage --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
+aws s3api create-bucket \
+          --bucket micronaut-guide-object-storage \
+          --region eu-west-3 \
+          --create-bucket-configuration LocationConstraint=eu-west-3
 ----
 ====
 
@@ -51,19 +56,21 @@ source:ProfilePicturesController[tags=begin-class|end-class]
 
 callout:controller[number=1,arg0=/pictures]
 callout:executes-on[2]
-<3> https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3Operations.html[AwsS3Operations] is the AWS-specific interface for using object storage.
-<4> We are injecting the @api@/io/micronaut/runtime/server/EmbeddedServer.html[EmbeddedServer] to be able to build an
-    absolute URL for the `Location` header when uploading a picture.
-
+<3> https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3Operations.html[AwsS3Operations]
+    is the AWS-specific interface for using object storage.
+<4> @api@/io/micronaut/http/server/util/HttpHostResolver.html[HttpHostResolver] allows you to resolve the host for a HTTP
+    request. We will use the host to build an absolute URL for the `Location` header when uploading a picture. Learn more
+    about https://docs.micronaut.io/latest/guide/#hostResolution[Host Resolution].
 
 === Upload endpoint
 
-Implement the upload endpoint by receiving the file from the HTTP client via CompletedFileUpload, and the `userId` path
+Implement the upload endpoint by receiving the file from the HTTP client via `CompletedFileUpload`, and the `userId` path
 parameter. Upload it to S3 using
 https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3Operations.html[AwsS3Operations],
 and then return its `ETag` in an HTTP response header to the client:
 
 source:ProfilePicturesController[tags=upload,indent=0]
+
 <1> The key represents the path under which the file will be stored.
 <2> You can use any of the https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/request/UploadRequest.html[UploadRequest] static methods to build an upload request.
 <3> The upload operation returns an https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/response/UploadResponse.html[UploadResponse], which wraps the cloud-specific SDK response
@@ -78,7 +85,8 @@ be used for accessing the vendor-specific response object, in this case https://
 For the download endpoint, simply retrieve the entry from the expected key, and transform it into an `StreamedFile`:
 
 source:ProfilePicturesController[tags=download,indent=0]
-<1> The retrieve operation returns an `ObjectStorageEntry`, in this case an https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html[AwsS3ObjectStorageEntry],
+<1> The retrieve operation returns an `ObjectStorageEntry`, in this case an
+    https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html[AwsS3ObjectStorageEntry],
     which allows accessing the AWS-specific
     https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetObjectResponse.html[GetObjectResponse]
     object in case you need more details about the object.
@@ -104,6 +112,13 @@ common:runapp-instructions.adoc[]
 We can test our application from the command line.
 
 === Uploading a profile picture
+
+[NOTE]
+====
+If you want to upload a file bigger than 1MB, you need to configure:
+
+resource:application.yml[tag=server-max-file-size]
+====
 
 Assuming you have locally a profile picture in a `profile.jpg` file, you can send it to your application with:
 
