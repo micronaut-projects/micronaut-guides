@@ -41,7 +41,7 @@ public class ProfilePicturesController implements ProfilePicturesApi {
 
     //tag::upload[]
     @Override
-    public HttpResponse upload(CompletedFileUpload fileUpload, String userId, HttpRequest<?> request) {
+    public HttpResponse<?> upload(CompletedFileUpload fileUpload, String userId, HttpRequest<?> request) {
         String key = buildKey(userId); // <1>
         UploadRequest objectStorageUpload = UploadRequest.fromCompletedFileUpload(fileUpload, key); // <2>
         UploadResponse<PutObjectResponse> response = objectStorage.upload(objectStorageUpload, builder -> {  // <3>
