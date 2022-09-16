@@ -6,4 +6,6 @@ import io.micronaut.data.repository.CrudRepository;
 
 @JdbcRepository(dialect = Dialect.H2)
 public interface BookRepository extends CrudRepository<Book, Long> {
+
+    Book save(String title, int pages);
 }
