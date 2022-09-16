@@ -136,11 +136,13 @@
 <li><a href="#writing-tests">4.6. Writing Tests</a></li>
 </ul>
 </li>
-<li><a href="#test-resources">5. Test Resources</a></li>
-<li><a href="#testing-the-application">6. Testing the Application</a></li>
-<li><a href="#running-the-application">7. Running the Application</a></li>
-<li><a href="#next-steps">8. Next steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
+<li><a href="#testing-the-application">5. Testing the Application</a></li>
+<li><a href="#running-the-application">6. Running the Application</a></li>
+<li><a href="#testing-running-api">7. Testing Running API</a></li>
+<li><a href="#test-resources">8. Test Resources</a></li>
+<li><a href="#connecting-to-a-mysql-database">9. Connecting to a MySQL database</a></li>
+<li><a href="#next-steps">10. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">11. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -886,18 +888,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 </div>
 </div>
 <div class="sect1">
-<h2 id="test-resources">5. Test Resources</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>When the application is started locally&#8201;&#8212;&#8201;either under test or by <a href="#running-the-application">running the application</a>&#8201;&#8212;&#8201;resolution of the datasource URL is detected and the Test Resources service will start a local MySQL docker container, and inject the properties required to use this as the datasource.</p>
-</div>
-<div class="paragraph">
-<p>For more information, see the <a href="https://micronaut-projects.github.io/micronaut-test-resources/snapshot/guide/#modules-databases-jdbc">JDBC section of the Test Resources documentation</a>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="testing-the-application">6. Testing the Application</h2>
+<h2 id="testing-the-application">5. Testing the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To run the tests:</p>
@@ -910,11 +901,16 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 </div>
 </div>
 <div class="sect1">
-<h2 id="running-the-application">7. Running the Application</h2>
+<h2 id="running-the-application">6. Running the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To run the application, use the <code>./mvnw mn:run</code> command, which starts the application on port 8080.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-running-api">7. Testing Running API</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>Save one genre, and your <code>genre</code> table will now contain an entry.</p>
 </div>
@@ -928,7 +924,71 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">8. Next steps</h2>
+<h2 id="test-resources">8. Test Resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When the application is started locally&#8201;&#8212;&#8201;either under test or by <a href="#running-the-application">running the application</a>&#8201;&#8212;&#8201;resolution of the datasource URL is detected and the Test Resources service will start a local MySQL docker container, and inject the properties required to use this as the datasource.</p>
+</div>
+<div class="paragraph">
+<p>For more information, see the <a href="https://micronaut-projects.github.io/micronaut-test-resources/snapshot/guide/#modules-databases-jdbc">JDBC section of the Test Resources documentation</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="connecting-to-a-mysql-database">9. Connecting to a MySQL database</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previously, we connected to a MySQL database, which Micronaut Test Resources started for us.</p>
+</div>
+<div class="paragraph">
+<p>However, it is easy to connect to an already existing database. Let&#8217;s start a database and connect to it.</p>
+</div>
+<div class="paragraph">
+<p>Execute the following command to run a MySQL container:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">docker run -it --rm \
+    -p 3306:3306 \
+    -e MYSQL_DATABASE=db \
+    -e MYSQL_USER=sherlock \
+    -e MYSQL_PASSWORD=elementary \
+    -e MYSQL_ALLOW_EMPTY_PASSWORD=true \
+    mysql:8</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+If you are using macOS on Apple Silicon – e.g. M1, M1 Pro, etc. – Docker might fail to pull an image for <code>mysql:8</code>. In that case substitute <code>mysql:oracle</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Export several environment variables:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">export DATASOURCES_DEFAULT_URL=jdbc:mysql://localhost:3306/db
+export DATASOURCES_DEFAULT_USERNAME=sherlock
+export DATASOURCES_DEFAULT_PASSWORD=elementary</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Micronaut Framework populates the properties <code>datasources.default.url</code>, <code>datasources.default.username</code> and <code>datasources.default.password</code> with those environment variables' values. Learn more about <a href="https://micronaut-projects.github.io/micronaut-sql/latest/guide/#jdbc-connection-pools">JDBC Connection Pools</a>.</p>
+</div>
+<div class="paragraph">
+<p>You can run the application and test the API as it was described in the previous sections. However, when you run the application, Micronaut Test Resources does not start a MySQL container because you have provided values for <code>datasources.default.*</code> properties.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Read more about <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/">Micronaut Data</a>.</p>
@@ -936,7 +996,7 @@ You could use a <a href="https://micronaut-projects.github.io/micronaut-data/lat
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">11. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
