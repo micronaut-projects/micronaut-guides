@@ -1220,11 +1220,11 @@ YAML definition file:</p>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">    <span class="directive">private</span> <span class="directive">final</span> BookRepository bookRepository; <i class="conum" data-value="1"></i><b>(1)</b>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">private</span> <span class="directive">final</span> BookRepository bookRepository; <i class="conum" data-value="1"></i><b>(1)</b>
 
-    <span class="directive">public</span> BooksController(BookRepository bookRepository) { <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="local-variable">this</span>.bookRepository = bookRepository;
-    }</code></pre>
+<span class="directive">public</span> BooksController(BookRepository bookRepository) { <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="local-variable">this</span>.bookRepository = bookRepository;
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1241,37 +1241,37 @@ YAML definition file:</p>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">    <span class="annotation">@ExecuteOn</span>(TaskExecutors.IO) <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;BookInfo&gt; search(
-            <span class="annotation">@QueryValue</span>(value=<span class="string"><span class="delimiter">&quot;</span><span class="content">book-name</span><span class="delimiter">&quot;</span></span>) <span class="annotation">@Nullable</span> <span class="annotation">@Size</span>(min=<span class="integer">3</span>) <span class="predefined-type">String</span> bookName,
-            <span class="annotation">@QueryValue</span>(value=<span class="string"><span class="delimiter">&quot;</span><span class="content">author-name</span><span class="delimiter">&quot;</span></span>) <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> authorName) {
-        <span class="keyword">return</span> searchEntities(bookName, authorName)
-                .stream()
-                .map(<span class="local-variable">this</span>::map) <i class="conum" data-value="5"></i><b>(5)</b>
-                .collect(Collectors.toList());
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@ExecuteOn</span>(TaskExecutors.IO) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="predefined-type">List</span>&lt;BookInfo&gt; search(
+        <span class="annotation">@QueryValue</span>(value=<span class="string"><span class="delimiter">&quot;</span><span class="content">book-name</span><span class="delimiter">&quot;</span></span>) <span class="annotation">@Nullable</span> <span class="annotation">@Size</span>(min=<span class="integer">3</span>) <span class="predefined-type">String</span> bookName,
+        <span class="annotation">@QueryValue</span>(value=<span class="string"><span class="delimiter">&quot;</span><span class="content">author-name</span><span class="delimiter">&quot;</span></span>) <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> authorName) {
+    <span class="keyword">return</span> searchEntities(bookName, authorName)
+            .stream()
+            .map(<span class="local-variable">this</span>::map) <i class="conum" data-value="5"></i><b>(5)</b>
+            .collect(Collectors.toList());
+}
+
+<span class="directive">private</span> BookInfo map(BookEntity entity) {
+    BookInfo book = <span class="keyword">new</span> BookInfo(entity.getName(), entity.getAvailability());
+    book.setISBN(entity.getIsbn());
+    book.setAuthor(entity.getAuthor());
+    <span class="keyword">return</span> book;
+}
+
+<span class="annotation">@NonNull</span>
+<span class="directive">private</span> <span class="predefined-type">List</span>&lt;BookEntity&gt; searchEntities(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> name, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> author) { <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="keyword">if</span> (StringUtils.isEmpty(name) &amp;&amp; StringUtils.isEmpty(author)) {
+        <span class="keyword">return</span> bookRepository.findAll();
+    } <span class="keyword">else</span> <span class="keyword">if</span> (StringUtils.isEmpty(name)) {
+        <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.authorLike(author)); <i class="conum" data-value="3"></i><b>(3)</b>
+
+    } <span class="keyword">else</span>  <span class="keyword">if</span> (StringUtils.isEmpty(author)) {
+        <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.nameLike(name));
+    } <span class="keyword">else</span> {
+        <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.authorLike(author)
+                .and(BookSpecifications.nameLike(name))); <i class="conum" data-value="4"></i><b>(4)</b>
     }
-
-    <span class="directive">private</span> BookInfo map(BookEntity entity) {
-        BookInfo book = <span class="keyword">new</span> BookInfo(entity.getName(), entity.getAvailability());
-        book.setISBN(entity.getIsbn());
-        book.setAuthor(entity.getAuthor());
-        <span class="keyword">return</span> book;
-    }
-
-    <span class="annotation">@NonNull</span>
-    <span class="directive">private</span> <span class="predefined-type">List</span>&lt;BookEntity&gt; searchEntities(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> name, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> author) { <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="keyword">if</span> (StringUtils.isEmpty(name) &amp;&amp; StringUtils.isEmpty(author)) {
-            <span class="keyword">return</span> bookRepository.findAll();
-        } <span class="keyword">else</span> <span class="keyword">if</span> (StringUtils.isEmpty(name)) {
-            <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.authorLike(author)); <i class="conum" data-value="3"></i><b>(3)</b>
-
-        } <span class="keyword">else</span>  <span class="keyword">if</span> (StringUtils.isEmpty(author)) {
-            <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.nameLike(name));
-        } <span class="keyword">else</span> {
-            <span class="keyword">return</span> bookRepository.findAll(BookSpecifications.authorLike(author)
-                    .and(BookSpecifications.nameLike(name))); <i class="conum" data-value="4"></i><b>(4)</b>
-        }
-    }</code></pre>
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1304,14 +1304,14 @@ YAML definition file:</p>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">    <span class="annotation">@ExecuteOn</span>(TaskExecutors.IO) <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="annotation">@Status</span>(OK) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="directive">public</span> <span class="type">void</span> addBook(<span class="annotation">@Body</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> BookInfo bookInfo) {
-        bookRepository.save(bookInfo.getName(), <i class="conum" data-value="3"></i><b>(3)</b>
-                bookInfo.getAvailability(),
-                bookInfo.getAuthor(),
-                bookInfo.getISBN());
-    }</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@ExecuteOn</span>(TaskExecutors.IO) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Status</span>(OK) <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">void</span> addBook(<span class="annotation">@Body</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> BookInfo bookInfo) {
+    bookRepository.save(bookInfo.getName(), <i class="conum" data-value="3"></i><b>(3)</b>
+            bookInfo.getAvailability(),
+            bookInfo.getAuthor(),
+            bookInfo.getISBN());
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
