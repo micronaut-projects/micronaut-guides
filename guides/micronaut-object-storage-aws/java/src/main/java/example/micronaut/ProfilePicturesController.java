@@ -1,5 +1,6 @@
 package example.micronaut;
 
+import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -29,7 +30,6 @@ import java.util.Optional;
 public class ProfilePicturesController implements ProfilePicturesApi {
 
     static final String PREFIX = "/pictures";
-    private static final String ETAG_HEADER = "ETag";
 
     private final AwsS3Operations objectStorage; // <3>
     private final EmbeddedServer server; // <4>
@@ -51,7 +51,7 @@ public class ProfilePicturesController implements ProfilePicturesApi {
 
         return HttpResponse
                 .created(location(userId)) // <5>
-                .header(ETAG_HEADER, response.getETag()); // <6>
+                .header(HttpHeaders.ETAG, response.getETag()); // <6>
     }
 
     private static String buildKey(String userId) {
@@ -80,7 +80,7 @@ public class ProfilePicturesController implements ProfilePicturesApi {
     private static HttpResponse<StreamedFile> buildStreamedFile(AwsS3ObjectStorageEntry entry) {
         GetObjectResponse nativeEntry = entry.getNativeEntry();
         StreamedFile file = new StreamedFile(entry.getInputStream(), MediaType.of(nativeEntry.contentType())).attach(entry.getKey());
-        MutableHttpResponse<Object> httpResponse = HttpResponse.ok().header(ETAG_HEADER, nativeEntry.eTag()); // <3>
+        MutableHttpResponse<Object> httpResponse = HttpResponse.ok().header(HttpHeaders.ETAG, nativeEntry.eTag()); // <3>
         file.process(httpResponse);
         return httpResponse.body(file);
     }
