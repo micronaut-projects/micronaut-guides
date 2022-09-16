@@ -8,10 +8,6 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.server.types.files.StreamedFile;
-import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.response.UploadResponse;
-
-import java.net.URI;
 import java.util.Optional;
 
 //tag::class[]
