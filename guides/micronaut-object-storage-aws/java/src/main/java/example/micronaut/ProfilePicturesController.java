@@ -6,6 +6,9 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Delete;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.http.server.util.HttpHostResolver;
@@ -41,16 +44,17 @@ public class ProfilePicturesController implements ProfilePicturesApi {
 
     //tag::upload[]
     @Override
+    @Post(uri = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA) // <1>
     public HttpResponse<?> upload(CompletedFileUpload fileUpload, String userId, HttpRequest<?> request) {
-        String key = buildKey(userId); // <1>
-        UploadRequest objectStorageUpload = UploadRequest.fromCompletedFileUpload(fileUpload, key); // <2>
-        UploadResponse<PutObjectResponse> response = objectStorage.upload(objectStorageUpload, builder -> {  // <3>
-            builder.acl(ObjectCannedACL.PUBLIC_READ); // <4>
+        String key = buildKey(userId); // <2>
+        UploadRequest objectStorageUpload = UploadRequest.fromCompletedFileUpload(fileUpload, key); // <3>
+        UploadResponse<PutObjectResponse> response = objectStorage.upload(objectStorageUpload, builder -> {  // <4>
+            builder.acl(ObjectCannedACL.PUBLIC_READ); // <5>
         });
 
         return HttpResponse
-                .created(location(request, userId)) // <5>
-                .header(HttpHeaders.ETAG, response.getETag()); // <6>
+                .created(location(request, userId)) // <6>
+                .header(HttpHeaders.ETAG, response.getETag()); // <7>
     }
 
     private static String buildKey(String userId) {
@@ -65,13 +69,13 @@ public class ProfilePicturesController implements ProfilePicturesApi {
     }
     //end::upload[]
 
-
     //tag::download[]
     @Override
+    @Get("/{userId}") // <1>
     public Optional<HttpResponse<StreamedFile>> download(String userId) {
         String key = buildKey(userId);
-        return objectStorage.retrieve(key) // <1>
-                .map(ProfilePicturesController::buildStreamedFile); // <2>
+        return objectStorage.retrieve(key) // <2>
+                .map(ProfilePicturesController::buildStreamedFile); // <3>
     }
 
     private static HttpResponse<StreamedFile> buildStreamedFile(AwsS3ObjectStorageEntry entry) {
@@ -79,7 +83,7 @@ public class ProfilePicturesController implements ProfilePicturesApi {
         MediaType mediaType = MediaType.of(nativeEntry.contentType());
         StreamedFile file = new StreamedFile(entry.getInputStream(), mediaType).attach(entry.getKey());
         MutableHttpResponse<Object> httpResponse = HttpResponse.ok()
-                .header(HttpHeaders.ETAG, nativeEntry.eTag()); // <3>
+                .header(HttpHeaders.ETAG, nativeEntry.eTag()); // <4>
         file.process(httpResponse);
         return httpResponse.body(file);
     }
@@ -87,6 +91,7 @@ public class ProfilePicturesController implements ProfilePicturesApi {
 
     //tag::delete[]
     @Override
+    @Delete("/{userId}") // <1>
     public void delete(String userId) {
         String key = buildKey(userId);
         objectStorage.delete(key);
