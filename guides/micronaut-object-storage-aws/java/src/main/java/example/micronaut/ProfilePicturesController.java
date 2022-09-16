@@ -79,8 +79,10 @@ public class ProfilePicturesController implements ProfilePicturesApi {
 
     private static HttpResponse<StreamedFile> buildStreamedFile(AwsS3ObjectStorageEntry entry) {
         GetObjectResponse nativeEntry = entry.getNativeEntry();
-        StreamedFile file = new StreamedFile(entry.getInputStream(), MediaType.of(nativeEntry.contentType())).attach(entry.getKey());
-        MutableHttpResponse<Object> httpResponse = HttpResponse.ok().header(HttpHeaders.ETAG, nativeEntry.eTag()); // <3>
+        MediaType mediaType = MediaType.of(nativeEntry.contentType());
+        StreamedFile file = new StreamedFile(entry.getInputStream(), mediaType).attach(entry.getKey());
+        MutableHttpResponse<Object> httpResponse = HttpResponse.ok()
+                .header(HttpHeaders.ETAG, nativeEntry.eTag()); // <3>
         file.process(httpResponse);
         return httpResponse.body(file);
     }
