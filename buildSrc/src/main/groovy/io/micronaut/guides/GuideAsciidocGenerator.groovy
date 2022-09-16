@@ -408,7 +408,11 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${tag}${indent}]\n".toString()
+                String attrs = tag
+                if (StringUtils.isNotEmpty(indent)) {
+                    attrs += ",${indent}"
+                }
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${attrs}]\n".toString()
             }
         } else {
             lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${indent}]".toString()
@@ -566,11 +570,7 @@ class GuideAsciidocGenerator {
 
     private static String extractIndent(String line) {
         String indentValue = extractFromParametersLine(line, 'indent')
-        if (indentValue) {
-            return ",indent=$indentValue"
-        } else {
-            return ""
-        }
+        indentValue ? "indent=$indentValue" : ""
     }
 
     private static String extractTagName(String line) {
