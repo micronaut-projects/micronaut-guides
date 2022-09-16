@@ -8,11 +8,12 @@ import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.server.types.files.StreamedFile;
+import io.micronaut.http.server.util.HttpHostResolver;
+import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.objectstorage.aws.AwsS3ObjectStorageEntry;
 import io.micronaut.objectstorage.aws.AwsS3Operations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
-import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
@@ -20,8 +21,6 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Optional;
 
 //tag::begin-class[]
@@ -32,17 +31,17 @@ public class ProfilePicturesController implements ProfilePicturesApi {
     static final String PREFIX = "/pictures";
 
     private final AwsS3Operations objectStorage; // <3>
-    private final EmbeddedServer server; // <4>
+    private final HttpHostResolver httpHostResolver; // <4>
 
-    public ProfilePicturesController(AwsS3Operations objectStorage, EmbeddedServer server) {
+    public ProfilePicturesController(AwsS3Operations objectStorage, HttpHostResolver httpHostResolver) {
         this.objectStorage = objectStorage;
-        this.server = server;
+        this.httpHostResolver = httpHostResolver;
     }
 //end::begin-class[]
 
     //tag::upload[]
     @Override
-    public HttpResponse upload(CompletedFileUpload fileUpload, String userId) {
+    public HttpResponse upload(CompletedFileUpload fileUpload, String userId, HttpRequest<?> request) {
         String key = buildKey(userId); // <1>
         UploadRequest objectStorageUpload = UploadRequest.fromCompletedFileUpload(fileUpload, key); // <2>
         UploadResponse<PutObjectResponse> response = objectStorage.upload(objectStorageUpload, builder -> {  // <3>
@@ -50,7 +49,7 @@ public class ProfilePicturesController implements ProfilePicturesApi {
         });
 
         return HttpResponse
-                .created(location(userId)) // <5>
+                .created(location(request, userId)) // <5>
                 .header(HttpHeaders.ETAG, response.getETag()); // <6>
     }
 
@@ -58,13 +57,11 @@ public class ProfilePicturesController implements ProfilePicturesApi {
         return userId + ".jpg";
     }
 
-    private URI location(String userId) {
-        String uriString = String.format("%s/%s", PREFIX, userId);
-        try {
-            return new URI(server.getScheme(), null, server.getHost(), server.getPort(), uriString, null, null);
-        } catch (URISyntaxException e) {
-            return URI.create(uriString);
-        }
+    private URI location(HttpRequest<?> request, String userId) {
+        return UriBuilder.of(PREFIX)
+                .path(userId)
+                .host(httpHostResolver.resolve(request))
+                .build();
     }
     //end::upload[]
 
@@ -92,7 +89,6 @@ public class ProfilePicturesController implements ProfilePicturesApi {
     @Override
     public void delete(String userId) {
         String key = buildKey(userId);
-
         objectStorage.delete(key);
     }
     //end::delete[]

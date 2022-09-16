@@ -18,7 +18,7 @@ import java.util.Optional;
 public interface ProfilePicturesApi {
 
     @Post(uri = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA) // <1>
-    HttpResponse upload(CompletedFileUpload fileUpload, String userId);
+    HttpResponse upload(CompletedFileUpload fileUpload, String userId, HttpRequest<?> request);
 
     @Get("/{userId}") // <2>
     Optional<HttpResponse<StreamedFile>> download(String userId);
