@@ -1,0 +1,165 @@
+external:micronaut-object-storage-base/start.adoc[]
+* An https://aws.amazon.com/[AWS account] with:
+** An IAM user with enough permissions to create and manage AWS S3 buckets.
+** The AWS CLI configured to use the IAM user above.
+
+common:aws.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Create an AWS S3 bucket
+
+First of all, we are going to
+https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/create-bucket.html[create an AWS S3 bucket]
+using the `aws` CLI:
+
+[source,bash]
+----
+aws s3api create-bucket --bucket micronaut-guide-object-storage --region=us-east-1
+----
+
+[TIP]
+====
+If you want to create the bucket in a region other than `us-east-1`, you need additional parameters. For example, to
+create the bucket in the `eu-west-3` region:
+
+[source,bash]
+----
+aws s3api create-bucket --bucket micronaut-guide-object-storage --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
+----
+====
+
+Then, configure the bucket in `application.yml`:
+
+resource:application.yml[tag=object-storage]
+
+== Controller API
+
+Let's define an interface with the endpoints of the profile pictures microservice:
+
+source:ProfilePicturesApi[tags=class]
+
+callout:post-generic[1]
+callout:get-generic[2]
+callout:delete[number=3,arg0=delete,arg1=/{userId}]
+
+And then, an implementation with the required dependencies:
+
+source:ProfilePicturesController[tags=begin-class|end-class]
+
+callout:controller[number=1,arg0=/pictures]
+callout:executes-on[2]
+<3> https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3Operations.html[AwsS3Operations] is the AWS-specific interface for using object storage.
+<4> We are injecting the @api@/io/micronaut/runtime/server/EmbeddedServer.html[EmbeddedServer] to be able to build an
+    absolute URL for the `Location` header when uploading a picture.
+
+
+=== Upload endpoint
+
+Implement the upload endpoint by receiving the file from the HTTP client via CompletedFileUpload, and the `userId` path
+parameter. Upload it to S3 using
+https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3Operations.html[AwsS3Operations],
+and then return its `ETag` in an HTTP response header to the client:
+
+source:ProfilePicturesController[tags=upload,indent=0]
+<1> The key represents the path under which the file will be stored.
+<2> You can use any of the https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/request/UploadRequest.html[UploadRequest] static methods to build an upload request.
+<3> The upload operation returns an https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/response/UploadResponse.html[UploadResponse], which wraps the cloud-specific SDK response
+object. It also has a `getNativeResponse()` method that can
+be used for accessing the vendor-specific response object, in this case https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutObjectResponse.html[PutObjectResponse].
+<4> The upload can be customised by using Amazon's https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutObjectRequest.Builder.html[PutObjectRequest.Builder] methods.
+<5> We return the absolute URL of the resource in the `Location` header.
+<6> The response object contains some common properties for all cloud vendors, such as the `ETag`, that is sent in a header to the client.
+
+=== Download endpoint
+
+For the download endpoint, simply retrieve the entry from the expected key, and transform it into an `StreamedFile`:
+
+source:ProfilePicturesController[tags=download,indent=0]
+<1> The retrieve operation returns an `ObjectStorageEntry`, in this case an https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html[AwsS3ObjectStorageEntry],
+    which allows accessing the AWS-specific
+    https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetObjectResponse.html[GetObjectResponse]
+    object in case you need more details about the object.
+<2> We transform the `AwsS3ObjectStorageEntry` into an `HttpResponse<StreamedFile>`.
+<3> The response contains not only the file, but also an `ETag` header.
+
+NOTE: The HTTP client could have used the `ETag` from the upload operation and send it in a `If-None-Match` header in the
+download request https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag#caching_of_unchanged_resources[to implement caching],
+which then would have been to be implemented in the download endpoint. But this is beyond the scope of this guide.
+
+=== Delete endpoint
+
+For the delete endpoint, all we have to do is invoking the `delete` method with the expected key:
+
+source:ProfilePicturesController[tags=delete,indent=0]
+
+== Running the Application
+
+common:runapp-instructions.adoc[]
+
+== Testing
+
+We can test our application from the command line.
+
+=== Uploading a profile picture
+
+Assuming you have locally a profile picture in a `profile.jpg` file, you can send it to your application with:
+
+[source,bash]
+----
+$ curl -i -F 'fileUpload=@profile.jpg' http://localhost:8080/pictures/alvaro
+
+HTTP/1.1 201 Created
+location: http://localhost:8080/pictures/alvaro
+ETag: "617cb82e296e153c29b34cccf7af0908"
+date: Wed, 14 Sep 2022 12:50:30 GMT
+connection: keep-alive
+transfer-encoding: chunked
+----
+
+Note the `Location` and `ETag` headers.
+
+We can use the `aws` CLI to verify that the file has actually been uploaded to an S3 bucket:
+
+[source,bash]
+----
+aws s3 ls s3://micronaut-guide-object-storage/
+----
+
+=== Download a profile picture
+
+[source,bash]
+----
+curl http://localhost:8080/pictures/alvaro -O -J
+----
+
+The file will be saved as `alvaro.jpg` since our download endpoint includes a `Content-Disposition: attachment` header.
+Open it to check that it is actually the same image as `profile.jpg`.
+
+=== Delete a profile picture
+
+[source,bash]
+----
+curl -X DELETE http://localhost:8080/pictures/alvaro
+----
+
+Then, check that the file has actually been deleted from the S3 bucket:
+
+[source,bash]
+----
+aws s3 ls s3://micronaut-guide-object-storage/
+----
+
+=== Cleanup
+
+Once you are done with this guide, you can remove the bucket from S3 to not leave stale resources:
+
+[source,bash]
+----
+aws s3api delete-bucket --bucket micronaut-guide-object-storage --region eu-west-3
+----
+
+external:micronaut-object-storage-base/end.adoc[]
+* Discover https://aws.amazon.com/s3/[Amazon Simple Storage Service (Amazon S3)].

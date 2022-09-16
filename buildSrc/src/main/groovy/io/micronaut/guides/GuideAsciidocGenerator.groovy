@@ -395,8 +395,9 @@ class GuideAsciidocGenerator {
             appName == ""
         }
         List<String> tagNames = extractTags(line)
-
         List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
+
+        String indent = extractIndent(line)
 
         String sourcePath = testFramework ? testPath(appName, name, testFramework) : mainPath(appName, name)
         String normalizedSourcePath = (Paths.get(sourcePath)).normalize().toString();
@@ -407,10 +408,10 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${tag}]\n".toString()
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${tag}${indent}]\n".toString()
             }
         } else {
-            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[]".toString()
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${indent}]".toString()
         }
 
         lines << '----'
@@ -561,6 +562,15 @@ class GuideAsciidocGenerator {
 
     private static String extractAppName(String line) {
         extractFromParametersLine(line, 'app')
+    }
+
+    private static String extractIndent(String line) {
+        String indentValue = extractFromParametersLine(line, 'indent')
+        if (indentValue) {
+            return ",indent=$indentValue"
+        } else {
+            return ""
+        }
     }
 
     private static String extractTagName(String line) {
