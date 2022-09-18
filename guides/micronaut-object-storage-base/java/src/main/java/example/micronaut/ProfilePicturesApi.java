@@ -10,7 +10,8 @@ import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.response.UploadResponse;
-
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Status;
 import java.net.URI;
 import java.util.Optional;
 
@@ -23,7 +24,8 @@ public interface ProfilePicturesApi {
     @Get("/{userId}") // <2>
     Optional<HttpResponse<StreamedFile>> download(String userId);
 
-    @Delete("/{userId}") // <3>
+    @Status(HttpStatus.NO_CONTENT) // <3>
+    @Delete("/{userId}") // <4>
     void delete(String userId);
 }
 //end::class[]
