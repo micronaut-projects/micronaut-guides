@@ -1,5 +1,6 @@
 package example.micronaut;
 
+import io.micronaut.core.io.IOUtils;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -85,28 +86,7 @@ abstract class AbstractProfilePicturesControllerTest {
     }
 
     protected String textFromFile(InputStream inputStream) throws IOException {
-        return textFromFile(new InputStreamReader(inputStream));
-    }
-
-    protected String textFromFile(Reader reader) throws IOException {
-        BufferedReader br = new BufferedReader(reader);
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-            return sb.toString();
-        } finally {
-            br.close();
-        }
-    }
-
-    protected String textFromFile(File f) throws IOException {
-        return textFromFile(new BufferedReader(new FileReader(f)));
+        return IOUtils.readText(new BufferedReader(new InputStreamReader(inputStream)));
     }
 
     protected abstract boolean assertThatFileIsStored(String key, String text) throws IOException;
