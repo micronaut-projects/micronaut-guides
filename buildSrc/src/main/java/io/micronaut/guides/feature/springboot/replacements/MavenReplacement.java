@@ -31,6 +31,7 @@ import jakarta.inject.Singleton;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static io.micronaut.starter.build.Repository.micronautRepositories;
@@ -90,7 +91,10 @@ public class MavenReplacement extends Maven {
 
     protected RockerModel pom(GeneratorContext generatorContext, MavenBuild mavenBuild) {
         if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
-            Coordinate springBootParent = coordinateResolver.resolve("spring-boot-starter-parent").orElseThrow();
+            Coordinate springBootParent = coordinateResolver.resolve("spring-boot-starter-parent")
+                    .orElseGet(() -> {
+                        throw new NoSuchElementException("No value present");
+                    });
 
             String sourceDirectory = generatorContext.getLanguage() == Language.KOTLIN ? "${project.basedir}/src/main/kotlin" : null;
             String testSourceDirectory = generatorContext.getLanguage() == Language.KOTLIN ? "${project.basedir}/src/test/kotlin" : null;
