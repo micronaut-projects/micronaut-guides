@@ -28,12 +28,12 @@ public enum Category implements Ordered {
     DISTRIBUTED_TRACING("Distributed Tracing", 21),
     SERVICE_DISCOVERY("Service Discovery", 22),
     COMMON_TASKS("Common Tasks", 23),
-    AWS("AWS", 24),
-    AWS_LAMBDA("AWS Lambda", 25),
-    AZURE("Micronaut + Microsoft Azure", 26),
-
-    GCP("Micronaut + Google Cloud", 27),
-    ORACLE_CLOUD("Micronaut + Oracle Cloud", 28);
+    OBJECT_STORAGE("Object Storage", 24),
+    AWS("AWS", 25),
+    AWS_LAMBDA("AWS Lambda", 26),
+    AZURE("Micronaut + Microsoft Azure", 27),
+    GCP("Micronaut + Google Cloud", 28),
+    ORACLE_CLOUD("Micronaut + Oracle Cloud", 29);
 
     private final String val;
     private final int order;
