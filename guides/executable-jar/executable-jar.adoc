@@ -1,0 +1,62 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+== Create an Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli-command@ example.micronaut.micronautguide --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+== Introduction
+
+To distribute a self-contained Micronaut application that can be run from the command line, you can generate a fat-jar or uber-jar. A fat JAR combines every project's dependency classes and resources into a single output JAR - an executable JAR.
+
+If you use https://launch.microanut.io[Micronaut Launch] or the Micronaut CLI to generate a Micronaut application, the application's build contains everything you need to produce an executable JAR.
+
+== Main Class
+
+The generated application contains an `Application` class, the entry point of the Micronaut application. Moreover, It has the build configuration to define that class as the application's Main class.
+
+:exclude-for-build:maven
+
+The https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/[Micronaut Gradle Plugin] implicitly applies the https://docs.gradle.org/current/userguide/application_plugin.html[Gradle Application Plugin].
+
+The application contains the only mandatory configuration for the Application plugin - the specification of the main class:
+
+:exclude-for-build:
+
+common:mainclass.adoc[]
+
+== Generate Executable JAR
+
+:exclude-for-build:maven
+
+The application applies the https://imperceptiblethoughts.com/shadow/introduction/[Shadow Gradle plugin]. You can use its task `shadowJar` to generate an executable JAR.
+
+:exclude-for-build:
+
+common:executable-jar.adoc[]
+
+:exclude-for-build:gradle
+
+The Micronaut Maven Plugin supports different `<packaging>` types. The previous command does not specify a packing type, and because of that, it uses `jar` - the default packing type. The command produces a runnable fat JAR.
+
+The Micronaut Maven Plugin delegates to the `maven-shade-plugin` to produce a JAR file. The `io.micronaut:micronaut-parent POM` defines the Maven Shade Plugin configuration, and the defaults should be enough. Refer to the https://maven.apache.org/plugins/maven-shade-plugin/[Maven Shade Plugin documentation] to customize how to produce the executable JAR.
+
+:exclude-for-build:
+
+== Run the Executable JAR
+
+Run the application packaged as a JAR file:
+
+common:executable-jar-run.adoc[]
+
+common:helpWithMicronaut.adoc[]
