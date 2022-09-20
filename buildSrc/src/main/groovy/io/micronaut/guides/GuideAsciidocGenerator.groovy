@@ -10,6 +10,7 @@ import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
 import io.micronaut.starter.options.JdkVersion
+import io.micronaut.starter.util.VersionInfo
 import org.gradle.api.GradleException
 
 import java.nio.file.Paths
@@ -186,6 +187,7 @@ class GuideAsciidocGenerator {
                     text = text.replace("@${entry.key}Version@", entry.value.version)
                 }
             }
+            text = text.replace("@micronautVersion@", VersionInfo.getMicronautVersion())
 
             File renderedAsciidocFile = new File(asciidocDir, projectName + '.adoc')
             renderedAsciidocFile.createNewFile()
