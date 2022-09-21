@@ -20,7 +20,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 
-@MicronautTest
+@MicronautTest(transactional = false) // <1>
 @Property(name = "spec.name", value = "controller-isolation")
 class ControllerIsolationSpec extends Specification {
 
