@@ -27,13 +27,15 @@ Let's describe the microservices you will build through the guide.
 
 common:annotationprocessors.adoc[]
 
+common:test-resources-rabbitmq.adoc[]
+
 === Catalogue microservice
 
 Create the `bookcatalogue` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
 [source,bash]
 ----
-mn create-app --features=rabbitmq,graalvm example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
+mn @bookcatalogue:cli-command@ --features=rabbitmq,graalvm example.micronaut.bookcatalogue --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -43,10 +45,6 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 The previous command creates a directory named `bookcatalogue` and a Micronaut application inside it with default package `example.micronaut`.
 
 diffLink:[app=bookcatalogue]
-
-By default, a Micronaut application will connect to a RabbitMQ instance running on `localhost`, so it is not necessary to add anything to `application.yml`. In case you want to change the configuration, add the following:
-
-resource:application.yml[app=bookcatalogue,tag=rabbitmq]
 
 ==== Create RabbitMQ exchange, queue, and binding
 
@@ -87,7 +85,7 @@ Create the `bookinventory` microservice using the https://docs.micronaut.io/late
 
 [source,bash]
 ----
-mn create-app --features=rabbitmq,graalvm example.micronaut.bookinventory --build=@build@ --lang=@lang@
+mn @bookinventory:cli-command@ --features=rabbitmq,graalvm example.micronaut.bookinventory --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -123,7 +121,7 @@ Create the `bookrecommendation` microservice using the https://docs.micronaut.io
 
 [source,bash]
 ----
-mn create-app --features=rabbitmq,reactor,graalvm example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
+mn @bookrecommendation:cli-command@ --features=rabbitmq,reactor,graalvm example.micronaut.bookrecommendation --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -181,6 +179,8 @@ source:BookRecommendation[app=bookrecommendation]
 
 == RabbitMQ and the Micronaut Framework
 
+As <<Test Resources,mentioned above>> a shared dockerized instance of RabbitMQ will be started automatically when you run the application, however if you want to start your own instance of RabbitMQ, you have a few options:
+
 === Install RabbitMQ via Docker
 
 The fastest way to start using https://hub.docker.com/_/rabbitmq/[RabbitMQ is via Docker]:
@@ -192,6 +192,8 @@ docker run --rm -it \
         -p 15672:15672 \
         rabbitmq:3.8.12-management
 ----
+
+=== Alternative methods
 
 Alternatively you can https://www.rabbitmq.com/download.html[install and run a local RabbitMQ instance].
 
@@ -323,7 +325,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-Start the native images for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
+Start the native executables for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
 
 :exclude-for-languages:
 

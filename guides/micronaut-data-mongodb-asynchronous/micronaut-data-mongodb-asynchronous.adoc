@@ -1,0 +1,149 @@
+common:header.adoc[]
+
+You will use https://www.mongodb.com[MongoDB] for persistence.
+
+common:requirements.adoc[]
+* https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run MongoDB and to run tests using https://www.testcontainers.org[Testcontainers].
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Dependencies
+
+In this guide, we use the MongoDB Reactive driver.
+
+The `data-mongodb-reactive` features adds the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-data-document-processor[groupId=io.micronaut.data,scope=annotationProcessor]
+dependency:micronaut-data-mongodb[groupId=io.micronaut.data]
+
+:exclude-for-languages:groovy
+
+dependency:mongodb-driver-reactivestreams[groupId=org.mongodb,scope=runtimeOnly]
+
+:exclude-for-languages:
+
+:exclude-for-languages:java
+
+dependency:mongodb-driver-reactivestreams[groupId=org.mongodb]
+
+:exclude-for-languages:
+
+:dependencies:
+
+:exclude-for-languages:groovy
+
+=== POJO
+
+Create a `Fruit` POJO:
+
+:exclude-for-languages:
+
+:exclude-for-languages:java
+
+=== POGO
+
+Create a `Fruit` POGO:
+
+:exclude-for-languages:
+
+source:Fruit[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:constraints[3]
+
+=== Repository
+
+Create a repository interface to encapsulate the CRUD actions for `Fruit`.
+
+source:FruitRepository[]
+
+<1> Annotate with `@MongoRepository`.
+<2> Extend `https://micronaut-projects.github.io/micronaut-data/latest/api/index.html?io/micronaut/data/repository/reactive/ReactiveStreamsCrudRepository.html[ReactiveStreamsCrudRepository]` for asynchronous database access.
+<3> Add a finder for finding fruit by a list of names.
+
+=== Service
+
+Create a service `FruitService` as an API to interact with the `Fruit` repository.
+This will allow you to keep business logic out of the controller, and to test the controller later without interacting with a real database.
+
+source:FruitService[]
+
+And then create a default implementation of this service.
+
+source:DefaultFruitService[]
+
+callout:singleton[number=1]
+
+=== Controller
+
+Create `FruitController`:
+
+source:FruitController[]
+
+callout:controller[number=1,arg0=/fruits]
+callout:constructor-di[number=2,arg0=FruitService]
+callout:get[number=3,arg0=list,arg1=/fruits]
+callout:post[number=4,arg0=save,arg1=/fruits]
+<5> You can specify the HTTP status code via the `@Status` annotation.
+callout:valid[6]
+callout:get[number=7,arg0=find,arg1=/fruits/\{id\}]
+callout:get[number=8,arg0=findByNameInList,arg1=/fruits/q]
+<9> Bind a list of Strings to the query parameter `names`
+
+=== Test Client
+
+Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
+
+test:FruitClient[]
+
+Then create a test that verifies the validation of the `Fruit` POJO when we create a new entity via `POST`:
+
+test:FruitValidationControllerTest[]
+
+Create a test that checks our controller works against a real MongoDB database:
+
+test:FruitControllerTest[]
+
+And finally, create a test which uses a replacement `FruitService` to test the controller without touching the database:
+
+test:ControllerIsolationTest[]
+
+common:test-resources-mongodb.adoc[]
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+[source, bash]
+----
+curl -d '{"name":"Pear"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/fruits
+----
+
+[source, bash]
+----
+curl -i localhost:8080/fruits
+----
+
+[source]
+----
+HTTP/1.1 200 OK
+date: Wed, 15 Sep 2021 12:40:15 GMT
+Content-Type: application/json
+content-length: 110
+connection: keep-alive
+
+[{"name":"Pear"}]
+----
+
+common:next.adoc[]
+
+Read more about the https://micronaut-projects.github.io/micronaut-data/latest/guide/#mongo[integration between the Micronaut Data and MongoDB].
+
+common:helpWithMicronaut.adoc[]

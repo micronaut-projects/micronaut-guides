@@ -12,6 +12,8 @@ $ ./gradlew build
 
 This will generate all the projects and guides in `build/dist` and this is what needs to be published to GitHub Pages.
 
+To build a single guide, run the dynamic task created by `GuidesPlugin`; convert the kabab case guide directory name to lowerCamelCase and add "Build", e.g. to build `micronaut-http-client`, run
+
 ```shell
 ./gradlew micronautHttpClientBuild
 ```
@@ -21,7 +23,6 @@ This will generate all the projects and guides in `build/dist` and this is what 
 For a high level overview of the Guides Infrastructure, take a look at this [blog post](https://micronaut.io/2021/04/12/improving-the-micronaut-guides-infrastructure/).
 
 All the guides leverage [Micronaut Starter](https://github.com/micronaut-projects/micronaut-starter) core to create the projects. The idea is that one guide can generate up to six different projects, one per language (Java, Groovy and Kotlin) and build tool (Gradle and Maven).
-
 
 ### Guide structure
 
@@ -276,7 +277,6 @@ Now start the application. Execute the `./gradlew run` command, which will start
 
 :exclude-for-build:
 
-
 :exclude-for-build:gradle
 
 Now start the application. Execute the `./mvnw mn:run` command, which will start the application on port 8080.
@@ -319,7 +319,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-TODO describe how you consume the endpoints exposed by the native image with curl
+TODO describe how you consume the endpoints exposed by the native executable with curl
 
 :exclude-for-languages:
 
@@ -341,6 +341,20 @@ When working on a new guide, generate it as explained before. The guide will be 
 
 In the `build/code` directory a file `test.sh` is created to run all the tests for the guides generated. Run it locally to make sure it passes before submitting a new pull request.
 
+You can run this test with a gradle task
+
+```bash
+./gradlew :____RunTestScript
+```
+
+where `____` is the camel-case name of your guide.  eg:
+
+```bash
+./gradlew micronautFlywayRunTestScript
+```
+
+to run all the tests for the `micronaut-flyway` guide.
+
 ## Upgrade Micronaut version
 
 When a new Micronaut version is released, update the [version.txt](https://github.com/micronaut-projects/micronaut-guides/blob/master/version.txt) file in the root directory. Submit a new pull request and if the build passes, merge it. A few minutes later all the guides will be upgraded to the new version.
@@ -351,7 +365,6 @@ Guides are published to [gh-pages](https://pages.github.com) following the same 
 
 - One directory per Micronaut minor version: `3.0.x`, `3.1.x`, `3.2.x`,...
 - One directory with the latest version of the guide: `latest`
-
 
 ## GitHub Actions
 

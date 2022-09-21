@@ -23,7 +23,11 @@ jobs:
         with:
           java-version: 11
       - name: Build with Gradle
-        run: ./gradlew asciidoctor
+        run: ./gradlew build
+        env:
+          GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+          GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+          GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
       - name: Calculate version of the guides
         id: guides_version
         run: |
@@ -32,7 +36,6 @@ jobs:
           version=`echo "${tmp_version[0]}.${tmp_version[1]}.x"`
           echo ::set-output name=guides_version::${version}
       - name: Publish to Github Pages
-        if: success() && github.event_name == 'push' && matrix.java == '11'
         uses: micronaut-projects/github-pages-deploy-action@master
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}

@@ -150,16 +150,12 @@ dockerBuild {
 
 :exclude-for-build:gradle
 
-Edit `pom.xml` and add these three properties in the `<properties>` section, replacing `REGION`, `TENANCY`, and `REPO` with appropriate values:
+Edit `pom.xml` and change `jib.docker.image` property in the `<properties>` section, replacing `REGION`, `TENANCY`, and `REPO` with appropriate values:
 
 [source, xml]
 .pom.xml
 ----
-<exec.mainClass>example.micronaut.Function</exec.mainClass>
-
 <jib.docker.image>[REGION].ocir.io/[TENANCY]/[REPO]/${project.artifactId}</jib.docker.image>
-
-<jib.docker.tag>${project.version}</jib.docker.tag>
 ----
 
 For `REGION`, use the lowercase value from the "Region Key" column in https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm[Regions and Availability Domains], e.g. `iad`.
@@ -173,11 +169,7 @@ The final properties should look something like this:
 [source, xml]
 .pom.xml
 ----
-<exec.mainClass>example.micronaut.Function</exec.mainClass>
-
 <jib.docker.image>iad.ocir.io/my-tenancy/mn-functions/${project.artifactId}</jib.docker.image>
-
-<jib.docker.tag>${project.version}</jib.docker.tag>
 ----
 
 :exclude-for-build:
@@ -355,17 +347,17 @@ The first invocation ("cold start") will take a while as the infrastructure is c
 
 :exclude-for-languages:groovy
 
-== Deploying as a Native Image
+== Deploying as a Native Executable
 
 === Install GraalVM
 
 common:install-graal-function.adoc[]
 
-=== Building and deploying the native image
+=== Building and deploying the native executable
 
-Deploying the function as a native image is similar to the earlier deployment above.
+Deploying the function as a native executable is similar to the earlier deployment above.
 
-First you need to update your build script with the location to deploy the native image Docker container.
+First you need to update your build script with the location to deploy the native executable Docker container.
 
 :exclude-for-build:maven
 
@@ -379,7 +371,7 @@ dockerBuildNative {
 }
 ----
 
-Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo:
+Since it's unlikely that you'll be deploying both jar-based containers and native executable-based containers, you can use the same repo:
 
 [source, groovy]
 .build.gradle
@@ -393,7 +385,7 @@ dockerBuildNative {
 
 :exclude-for-build:gradle
 
-Since it's unlikely that you'll be deploying both jar-based containers and native image-based containers, you can use the same repo. If you wish to separate the native image containers, edit `pom.xml` and update the `jib.docker.image` property, appending "-native" to the value:
+Since it's unlikely that you'll be deploying both jar-based containers and native executable-based containers, you can use the same repo. If you wish to separate the native executable containers, edit `pom.xml` and update the `jib.docker.image` property, appending "-native" to the value:
 
 [source, xml]
 .pom.xml

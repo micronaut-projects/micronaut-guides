@@ -8,6 +8,7 @@ import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.template.RockerWritable;
 
 public abstract class DockerPushFeature implements Feature {
+
     @Override
     public void apply(GeneratorContext generatorContext) {
         if (generatorContext.getBuildTool().isGradle()) {
@@ -21,12 +22,10 @@ public abstract class DockerPushFeature implements Feature {
 
     protected abstract String getImage();
 
-
     @Override
     public boolean isPreview() {
         return false;
     }
-
 
     @Override
     public boolean supports(ApplicationType applicationType) {

@@ -22,7 +22,7 @@ class NewsControllerSpec extends Specification {
     @Client("/")
     HttpClient client
 
-    @Timeout(4) // <1>
+    @Timeout(5) // <1>
     void "fetching october headlines uses cache"() {
         given:
         String expected = "Micronaut AOP: Awesome flexibility without the complexity"

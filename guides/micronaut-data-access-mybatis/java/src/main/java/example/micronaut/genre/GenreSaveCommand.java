@@ -12,9 +12,6 @@ public class GenreSaveCommand {
     @NonNull
     private String name;
 
-    public GenreSaveCommand() {
-    }
-
     public GenreSaveCommand(@NonNull @NotBlank String name) {
         this.name = name;
     }

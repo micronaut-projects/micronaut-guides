@@ -12,7 +12,7 @@ import jakarta.inject.Singleton
 class ChannelPoolListener extends ChannelInitializer {
 
     @Override
-    void initialize(Channel channel) throws IOException {
+    void initialize(Channel channel, String name) throws IOException {
         channel.exchangeDeclare('micronaut', BuiltinExchangeType.DIRECT, true) // <1>
         channel.queueDeclare('analytics', true, false, false, null) // <2>
         channel.queueBind('analytics', 'micronaut', 'analytics') // <3>

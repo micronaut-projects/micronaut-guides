@@ -1,0 +1,156 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:test-resources-mosquitto.adoc[]
+
+== Writing the CLI (Command Line Interface) Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli:cli-command@ example.micronaut.micronautguide \
+    --features=@cli:features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+Rename this `micronautguide` directory to `cli`.
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @cli:features-words@ features.
+
+diffLink:[app=cli]
+
+common:annotationprocessors.adoc[]
+
+### Create an MqttPublisher
+
+Create an interface to publish MQTT Topics:
+
+source:TemperatureClient[app=cli]
+callout:mqtt-publisher[1]
+callout:mqtt-topic[2]
+
+### Writing the CLI Command
+
+Create an enum to allow the user to submit temperatures in Celsius or Fahrenheit:
+
+source:Scale[app=cli]
+
+Create a class to show completion candidates:
+
+source:TemperatureScaleCandidates[app=cli]
+
+Replace the command:
+
+source:MicronautguideCommand[app=cli]
+
+callout:picocli-command[1]
+callout:picocli-option[2]
+callout:picocli-option-required[3]
+callout:picocli-completion-candidates-variables[4]
+callout:field-injection[5]
+<6> Publish the MQTT Topic
+
+Replace the generated test with this:
+
+test:MicronautguideCommandTest[app=cli]
+
+callout:mqtt-subscriber[1]
+callout:mqtt-topic-listen[2]
+
+The MQTT server URI is configured by referencing the properties when we used when we set up Mosquitto via <<Test Resources, Test Resources>>:
+
+resource:application.yml[app=cli,tag=mqtt]
+
+## Writing an MQTT subscriber application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @app:cli-command@ example.micronaut.micronautguide \
+    --features=@app:features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+Rename this `micronautguide` directory to `app`.
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @app:features-words@ features.
+
+diffLink:[app=cli]
+
+common:annotationprocessors.adoc[]
+
+=== Configuration
+
+The MQTT server URI is configured by referencing the properties when we used when we set up Mosquitto via <<Test Resources, Test Resources>>:
+
+resource:application.yml[app=app,tag=mqtt]
+
+=== Create Subscriber
+
+source:TemperatureListener[app=app]
+
+callout:mqtt-subscriber[1]
+callout:mqtt-topic[2]
+
+=== Add test
+
+test:SubscriptionTest[app=app]
+callout:micronaut-test[1]
+callout:property[2]
+callout:requires-property[3]
+callout:mqtt-publisher[4]
+callout:mqtt-topic[5]
+
+== Running the Application
+
+=== Run the Subscriber App
+
+common:runapp-instructions.adoc[]
+
+Keep it running. Once you publish a topic with the CLI application, you will see a log entry.
+
+=== Run the CLI
+
+Run the CLI command, which will publish a temperature at startup.
+
+[source, bash]
+----
+./gradlew run --args="-t 212 -s Fahrenheit"
+----
+
+The subscriber receives the MQTT topics, as you will see in the logs:
+
+[source, bash]
+----
+12:09:47.280 [MQTT Call: 180d98b5-75b9-41be-a874-295289346592]
+    INFO  e.micronaut.TemperatureListener - temperature: 100.00
+
+----
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Generate GraalVM native executables for both the CLI and the messaging application, then execute both. Publish a temperature, and you will see it in the subscriber logs.
+
+:exclude-for-languages:
+
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-mqtt/latest/guide/[Micronaut MQTT].
+
+common:helpWithMicronaut.adoc[]

@@ -1,4 +1,4 @@
-//tag::clazz[]
+//tag::clazz1[]
 package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 
 @MappedEntity // <1>
 public class Person {
+
     @Id // <2>
     @GeneratedValue // <3>
     private Long id;
@@ -22,7 +23,7 @@ public class Person {
     @NonNull
     @NotBlank
     private final String name;
-    //end::clazz[]
+    //end::clazz1[]
 
     //tag::nullableage[]
     @Nullable
@@ -56,7 +57,7 @@ public class Person {
 //end::ageint[]
 
      */
-//tag::gettersetters[]
+//tag::clazz2[]
 
     @NonNull
     public String getName() {
@@ -79,4 +80,4 @@ public class Person {
         this.version = version;
     }
 }
-//end::gettersetters[]
+//end::clazz2[]

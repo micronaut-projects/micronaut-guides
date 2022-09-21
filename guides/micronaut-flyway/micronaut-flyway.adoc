@@ -14,11 +14,9 @@ common:cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-app
-   example.micronaut.micronautguide \
+mn create-app example.micronaut.micronautguide \
    --features=data-jdbc,postgres,flyway \
-   --build=@build@ \
-   --lang=@lang@ \
+   --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -33,7 +31,7 @@ common:annotationprocessors.adoc[]
 
 Create a `@MappedEntity` to save persons. Initially, consider name and age required. Use `int` primitive for the age.
 
-source:Person[tags=clazz|ageint|gettersetters]
+source:Person[tags=clazz1|ageint|clazz2]
 
 callout:mapped-entity[1]
 callout:mapped-entity-id[2]
@@ -44,7 +42,7 @@ common:flyway.adoc[]
 
 resource:db/migration/V1__create-person.sql[]
 
-During application startup, http://www.flyway.org[Flyway] executes the SQL file and creates the schema needed for the application.
+During application startup, https://www.flywaydb.org[Flyway] executes the SQL file and creates the schema needed for the application.
 
 If you check the database schema, there are two tables:
 
@@ -109,8 +107,6 @@ Enable the Flyway endpoint:
 
 resource:application.yml[tag=endpoints]
 
-common:testcontainers-postgres.adoc[]
-
 === Test
 
 Create a test that invokes the Flyway endpoint.
@@ -120,28 +116,11 @@ test:FlywayEndpointTest[]
 callout:micronaut-test[1]
 callout:http-client[2]
 
-=== Running the application
+common:test-resources-postgres.adoc[]
 
-common:run-postgres-with-docker.adoc[]
+common:testApp.adoc[]
 
-Set up the following environment variables to connect to the PostgreSQL database you started with Docker.
-
-resource:application.yml[tag=datasource]
-
-<1> The JDBC URL matches the database name you used in the previous command.
-<2> Use PostgreSQL driver.
-<3> Configure the PostgreSQL dialect.
-<4> You handle database migrations via Flyway.
-
-[source,bash]
-----
-export DATASOURCES_DEFAULT_USERNAME=dbuser
-export DATASOURCES_DEFAULT_PASSWORD=theSecretPassword
-----
-
-Configure your default datasource to use the PostgreSQL database you started with Docker:
-
-common:runapp-instructions.adoc[]
+common:runapp.adoc[]
 
 You can run a cURL command to test the application:
 

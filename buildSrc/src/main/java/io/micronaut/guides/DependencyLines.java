@@ -105,6 +105,7 @@ public class DependencyLines {
             String gradleScope = Optional.ofNullable(toGradleScope(attributes, language)).orElse(SCOPE_IMPLEMENTATION);
             String mavenScope = Optional.ofNullable(toMavenScope(attributes)).orElse(SCOPE_COMPILE);
             String version = attributes.get("version");
+            String versionProperty = attributes.get("versionProperty");
             String callout = extractCallout(attributes);
             boolean pom = "true".equalsIgnoreCase(attributes.getOrDefault("pom", "false"));
 
@@ -129,6 +130,8 @@ public class DependencyLines {
                     dependencyLines.add("    <artifactId>" + artifactId + "</artifactId>");
                     if (StringUtils.isNotEmpty(version)) {
                         dependencyLines.add("    <version>" + version + "</version>");
+                    } else if (StringUtils.isNotEmpty(versionProperty)) {
+                        dependencyLines.add("    <version>" + versionProperty + "</version>");
                     }
                     dependencyLines.add("</" + mavenScopeAnnotationProcessor + ">");
                 } else {

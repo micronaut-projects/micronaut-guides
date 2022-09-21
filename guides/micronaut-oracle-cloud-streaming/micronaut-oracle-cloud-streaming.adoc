@@ -35,7 +35,7 @@ Create the `chess-game` microservice using the https://docs.micronaut.io/latest/
 
 [source,bash]
 ----
-mn create-app --features=kafka,graalvm,reactor,testcontainers example.micronaut.chess-game --build=@build@ --lang=@lang@
+mn @chess-game:cli-command@ --features=kafka,graalvm,reactor,testcontainers example.micronaut.chess-game --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -127,13 +127,15 @@ resource:application-dev.yml[app=chess-game]
 
 <1> Use local Kafka in the development environment
 
-==== UI Resources
+==== Static Resources
 
 Update `application.yml` to add static resource configuration:
 
-resource:application.yml[app=chess-game,tag=router]
+resource:application.yml[app=chess-game,tag=static-resources]
 
-<1> Configure the Framework to look for static resources in `src/main/resources/public`
+callout:static-resources[1]
+
+==== UI Resources
 
 Create `index.html` with the simple chess game UI:
 
@@ -159,7 +161,7 @@ Create the `chess-listener` microservice using the https://docs.micronaut.io/lat
 
 [source,bash]
 ----
-mn create-app --features=kafka,graalvm,data-jdbc,flyway,reactor,testcontainers example.micronaut.chess-listener --build=@build@ --lang=@lang@
+mn @chess-listener:cli-command@ --features=kafka,graalvm,data-jdbc,flyway,reactor,testcontainers example.micronaut.chess-listener --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -520,14 +522,14 @@ To run each application use:
 
 [source, bash]
 ----
-$ MICRONAUT_ENVIRONMENTS=oraclecloud ./gradlew run
+MICRONAUT_ENVIRONMENTS=oraclecloud ./gradlew run
 ----
 
 or if you use Windows:
 
 [source, bash]
 ----
-> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
+cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
 ----
 
 :exclude-for-build:
@@ -538,14 +540,14 @@ To run each application use:
 
 [source, bash]
 ----
-$ MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run
+MICRONAUT_ENVIRONMENTS=oraclecloud ./mvnw mn:run
 ----
 
 or if you use Windows:
 
 [source, bash]
 ----
-> cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
+cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
 ----
 
 :exclude-for-build:
@@ -561,7 +563,7 @@ Create a test in the `chess-game` microservice to verify that Kafka message proc
 test:GameReporterTest[app=chess-game]
 
 <1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+callout:test-instance-per-class[2]
 <3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainer instance for Kafka
 <5> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
@@ -580,7 +582,7 @@ Create a test in the `chess-listener` microservice to verify that Kafka message 
 test:GameServiceTest[app=chess-listener]
 
 <1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-<2> Classes that implement `TestPropertyProvider` must use this annotation to create a single class instance for all tests (not necessary in Spock tests)
+callout:test-instance-per-class[2]
 <3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainer instance for Kafka
 <5> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice
@@ -658,15 +660,15 @@ common:graal-with-plugins-multi.adoc[]
 
 :exclude-for-languages:groovy
 
-NOTE: Native image building will fail if the H2 driver is in the classpath, so comment out that dependency in your build script before building. No other changes are needed since there are no compile dependencies on the library, so you can keep the H2 versions of the repository interfaces for use in dev mode.
+NOTE: Native executable building will fail if the H2 driver is in the classpath, so comment out that dependency in your build script before building. No other changes are needed since there are no compile dependencies on the library, so you can keep the H2 versions of the repository interfaces for use in dev mode.
 
-=== Deployable Native Images
+=== Deployable Native Executables
 
-The native images you built probably won't be deployable to OCI even if you build on the same Linux distro your Compute instances use. To create deployable native images, change the build process a bit.
+The native executables you built probably won't be deployable to OCI even if you build on the same Linux distro your Compute instances use. To create deployable native executables, change the build process a bit.
 
 :exclude-for-build:maven
 
-To generate deployable native images for each application using Gradle, run:
+To generate deployable native executables for each application using Gradle, run:
 
 [source, bash]
 ----
@@ -677,7 +679,7 @@ To generate deployable native images for each application using Gradle, run:
 
 :exclude-for-build:gradle
 
-To generate deployable native images for each application using Maven, run:
+To generate deployable native executables for each application using Maven, run:
 
 [source, bash]
 ----
@@ -686,7 +688,7 @@ To generate deployable native images for each application using Maven, run:
 
 :exclude-for-build:
 
-Then you just need to extract the native image applications from the Docker images you built.
+Then you just need to extract the native executable applications from the Docker images you built.
 
 You'll need the Docker image IDs, so run:
 
@@ -721,7 +723,7 @@ docker cp container_temp:/app/application .
 docker rm container_temp
 ----
 
-Now you can scp each native image to a Compute instance with no Java installed and see the startup time and resource usage reduction you expect when running applications as native images.
+Now you can scp each native executable to a Compute instance with no Java installed and see the startup time and resource usage reduction you expect when running applications as native executables.
 
 :exclude-for-languages:
 

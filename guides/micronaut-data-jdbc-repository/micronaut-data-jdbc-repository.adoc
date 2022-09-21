@@ -15,13 +15,7 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
-=== Data Source configuration
-
-Define the datasource in `src/main/resources/application.yml`.
-
-resource:application.yml[tag=datasource]
-
-NOTE: This way of defining the datasource properties enables us to externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined, the Micronaut framework will use the default values.
+common:datasource.adoc[]
 
 common:flyway.adoc[]
 
@@ -104,20 +98,9 @@ callout:http-request[3]
 
 common:testApp.adoc[]
 
-== Running the Application
+common:runapp.adoc[]
 
-Execute the following command to run a MySQL container:
-
-[source,bash]
-----
-docker run -it --rm \
-	-p 3306:3306 \
-	-e MYSQL_DATABASE=db \
-	-e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
-	mysql:8
-----
-
-common:runapp-instructions.adoc[]
+== Testing Running API
 
 Save one genre, and your `genre` table will now contain an entry.
 
@@ -128,11 +111,17 @@ curl -X "POST" "http://localhost:8080/genres" \
      -d $'{ "name": "music" }'
 ----
 
+common:test-resources-mysql-datasource.adoc[]
+
+common:mysql-datasource-without-test-resources.adoc[]
+
 common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-You can execute the `genres` endpoints exposed by the native image, for example:
+Before running the native executable, start a MySQL database and define the JDBC URL, username and password via environment variables described in the section <<Connecting to a MySQL database>>.
+
+You can execute the `genres` endpoints exposed by the native executable, for example:
 
 [source, bash]
 ----

@@ -30,7 +30,7 @@ Create the `books` microservice using the https://docs.micronaut.io/latest/guide
 
 [source,bash]
 ----
-mn create-app --features=rabbitmq,reactor,graalvm example.micronaut.books --build=@build@ --lang=@lang@
+mn @books:cli-command@ --features=rabbitmq,reactor,graalvm example.micronaut.books --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -62,7 +62,7 @@ Create the `analytics` microservice using the https://docs.micronaut.io/latest/g
 
 [source,bash]
 ----
-mn create-app --features=rabbitmq,graalvm example.micronaut.analytics --build=@build@ --lang=@lang@
+mn @analytics:cli-command@ --features=rabbitmq,graalvm example.micronaut.analytics --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -135,6 +135,8 @@ common:default-dev-environment-application-dev-yaml.adoc[]
 resource:application-dev.yml[app=analytics]
 
 <1> Start the `analytics` microservice on port 8081.
+
+common:test-resources-rabbitmq.adoc[]
 
 == Running the application
 
@@ -230,36 +232,22 @@ curl http://localhost:8081/analytics
 
 Please note that getting the analytics returns an empty list because the applications are not communicating to each other (yet).
 
-== RabbitMQ and the Micronaut framework
-
-=== Install RabbitMQ via Docker
-
-The fastest way to start using https://hub.docker.com/_/rabbitmq/[RabbitMQ is via Docker]:
-
-[source,bash]
-----
-docker run --rm -it \
-        -p 5672:5672 \
-        -p 15672:15672 \
-        rabbitmq:3.8.12-management
-----
-
-Alternatively you can https://www.rabbitmq.com/download.html[install and run a local RabbitMQ instance].
-
 === Books microservice
 
-By default a Micronaut application will connect to a RabbitMQ instance running on `localhost` so it is not necessary to add anything
-to `application.yml`. In case you want to change the configuration, add the following:
+Via <<Test Resources>> the Micronaut application will connect to a RabbitMQ instance running inside Docker so it is not necessary to add anything to `application.yml`.
+In case you want to change the configuration, add the following:
 
-resource:application.yml[app=books,tag=rabbitmq]
+resource:application-prod.yml[app=books,tag=rabbitmq]
 
 ==== Create RabbitMQ exchange, queue and binding
 
 Before being able to send and receive messages using RabbitMQ it is necessary to define the exchange, queue and binding.
-One option is create them directly in the RabbitMQ Admin UI available on http://localhost:15672. Use `guest` for both
-username and password.
+One option is create them directly in the RabbitMQ Admin UI available on port 15672.
 
-Another option is create them programatically. Create the class `ChannelPoolListener`:
+NOTE: Use `guest` for both username and password.
+
+Another option is to create them programmatically.
+Create the class `ChannelPoolListener`:
 
 source:ChannelPoolListener[app=books]
 
@@ -427,7 +415,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-Start the native images for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
+Start the native executables for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
 
 :exclude-for-languages:
 

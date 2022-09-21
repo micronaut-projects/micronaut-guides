@@ -16,7 +16,7 @@ common:cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-app --jdk=17 \
+mn @cli-command@ --jdk=17 \
    example.micronaut.micronautguide \
    --features=data-jdbc,postgres,liquibase \
    --build=@build@ \
@@ -117,8 +117,6 @@ callout:executes-on[3]
 callout:get[number=4,arg0=index,arg1='/']
 <5> Respond a Java Record and the application responds JSON representation of the object
 
-common:testcontainers-postgres.adoc[]
-
 === Create a Test
 
 Create a test:
@@ -131,27 +129,29 @@ callout:http-client[3]
 <4> Multiline string
 callout:binding-json-array[5]
 
-=== Running the application
+common:test-resources-postgres.adoc[]
 
-common:run-postgres-with-docker.adoc[]
+== Datasource configuration
 
-Set up the following environment variables to connect to the PostgreSQL database you started with Docker.
+Although the URL is configured automatically via <<Test Resources>>, we must configure the PostgreSQL driver and dialect in `application.yml`:
 
 resource:application.yml[tag=datasource]
 
-<1> The JDBC URL matches the database name you used in the previous command.
-<2> Use PostgreSQL driver.
-<3> Configure the PostgreSQL dialect.
-<4> You handle database migrations via Liquibase
+<1> Use PostgreSQL driver.
+<2> Configure the PostgreSQL dialect.
+<3> You handle database migrations via Liquibase
 
+common:testApp.adoc[]
+
+== Running the application
+
+Set up the environment variable to configure the VAT percentage.
+
+Configure
 [source,bash]
 ----
-export DATASOURCES_DEFAULT_USERNAME=dbuser
-export DATASOURCES_DEFAULT_PASSWORD=theSecretPassword
 export VAT_PERCENTAGE=20
 ----
-
-Configure your default datasource to use the PostgreSQL database you started with Docker:
 
 common:runapp-instructions.adoc[]
 
@@ -169,7 +169,7 @@ curl http://localhost:8080/books
 
 common:graal-with-plugins.adoc[]
 
-WARNING: Due to a https://github.com/oracle/graal/issues/3984[bug with GraalVM and Java Records] it is necessary to include the flag `--report-unsupported-elements-at-runtime` when building the native image. Create the file `native-image.properties`:
+WARNING: Due to a https://github.com/oracle/graal/issues/3984[bug with GraalVM and Java Records] it is necessary to include the flag `--report-unsupported-elements-at-runtime` when building the native executable. Create the file `native-image.properties`:
 
 resource:META-INF/native-image/example.micronaut/guide/native-image.properties[]
 

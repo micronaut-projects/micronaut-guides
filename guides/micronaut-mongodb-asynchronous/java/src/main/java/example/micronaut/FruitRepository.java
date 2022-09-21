@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public interface FruitRepository {
+
     @NonNull
     Publisher<Fruit> list();
 

@@ -14,9 +14,9 @@ class GuideMetadata {
     String slug
     String title
     String intro
-    List<String> authors
+    Set<String> authors
     List<String> tags
-    Category category
+    List<Category> categories
     LocalDate publicationDate
 
     boolean publish
@@ -44,5 +44,16 @@ class GuideMetadata {
         List<String> features
         List<String> excludeSource
         List<String> excludeTest
+        OpenAPIGeneratorConfig openAPIGeneratorConfig
+    }
+
+    @ToString(includeNames = true)
+    @CompileStatic
+    static class OpenAPIGeneratorConfig {
+        public static final String GENERATOR_JAVA_MICRONAUT_SERVER = "java-micronaut-server"
+        String definitionFile
+        String generatorName
+        Map<String, String> properties
+        Map<String, String> globalProperties
     }
 }

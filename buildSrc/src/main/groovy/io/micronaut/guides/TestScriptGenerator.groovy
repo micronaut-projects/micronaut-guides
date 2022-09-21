@@ -70,8 +70,6 @@ exit 0
                 (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
                 (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
 
-
-
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
         metadatas = metadatas.stream()
                 .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
@@ -161,6 +159,8 @@ cd $nestedFolder
 echo "-------------------------------------------------"
 echo "Executing '$folder' tests"
 ${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
+echo "Stopping shared test resources service (if created)"
+${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
 cd ..
 """
         if (stopIfFailure) {
