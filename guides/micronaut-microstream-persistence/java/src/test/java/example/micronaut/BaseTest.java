@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
+import io.micronaut.core.annotation.NonNull;
 
 abstract class BaseTest implements TestPropertyProvider {
 
@@ -14,7 +15,7 @@ abstract class BaseTest implements TestPropertyProvider {
     static File tempDir;
 
     @Override
-    @NotNull
+    @NonNull
     public Map<String, String> getProperties() {
         return Collections.singletonMap(
                 "microstream.storage.main.storage-directory", tempDir.getAbsolutePath()
