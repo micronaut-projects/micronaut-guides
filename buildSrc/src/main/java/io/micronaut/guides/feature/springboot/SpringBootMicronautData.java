@@ -87,7 +87,6 @@ public class SpringBootMicronautData implements SpringBootApplicationFeature {
         generatorContext.addDependency(Dependency.builder()
                 .groupId("io.micronaut.spring")
                 .artifactId("micronaut-spring-boot-starter")
-                .version("4.3.0") //TODO Remove when 3.7.0
                 .compile());
 
         generatorContext.addDependency(MicronautDependencyUtils.dataDependency()
