@@ -20,7 +20,6 @@ import java.util.Optional;
 
 @Singleton
 public class SpringBootKotlinApplication extends KotlinApplication implements SpringBootApplicationFeature {
-
     private final CoordinateResolver coordinateResolver;
 
     public SpringBootKotlinApplication(CoordinateResolver coordinateResolver) {
@@ -35,18 +34,13 @@ public class SpringBootKotlinApplication extends KotlinApplication implements Sp
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        if (shouldGenerateApplicationFile(generatorContext)) {
-            generateApplication(generatorContext);
-            generateApplicationTest(generatorContext);
-        }
-        if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
-            SpringBootMavenUtils.clearMicronautVersionProperty(generatorContext);
-            if (generatorContext.getBuildTool() == BuildTool.MAVEN) {
-                SpringBootMavenUtils.addJavaVersionProperty(generatorContext);
-                addKotlinVersionProperty(generatorContext);
-                SpringBootMavenUtils.addSpringBootMavenPlugin(generatorContext);
-                addSpringKotlinMavenPlugin(generatorContext);
-            }
+        super.apply(generatorContext);
+        SpringBootMavenUtils.clearMicronautVersionProperty(generatorContext);
+        if (generatorContext.getBuildTool() == BuildTool.MAVEN) {
+            SpringBootMavenUtils.addJavaVersionProperty(generatorContext);
+            addKotlinVersionProperty(generatorContext);
+            SpringBootMavenUtils.addSpringBootMavenPlugin(generatorContext);
+            addSpringKotlinMavenPlugin(generatorContext);
         }
     }
 
@@ -62,30 +56,13 @@ public class SpringBootKotlinApplication extends KotlinApplication implements Sp
                 .build());
     }
 
-    protected void generateApplication(GeneratorContext generatorContext) {
-        application(generatorContext).ifPresent(rockerModel -> {
-            generatorContext.addTemplate("application", new RockerTemplate(getPath(), rockerModel));
-        });
+    @Override
+    protected RockerModel application(GeneratorContext generatorContext) {
+        return applicationkotlin.template(generatorContext.getProject());
     }
 
-    protected Optional<RockerModel> application(GeneratorContext generatorContext) {
-        if (generatorContext.getLanguage() == Language.KOTLIN) {
-            return Optional.of(applicationkotlin.template(generatorContext.getProject()));
-        }
-        return Optional.empty();
-    }
-
-    protected void generateApplicationTest(GeneratorContext generatorContext) {
-        applicationTest(generatorContext).ifPresent(rockerModel -> {
-            String testSourcePath = generatorContext.getTestSourcePath("/{packagePath}/{className}");
-            generatorContext.addTemplate("applicationTest", new RockerTemplate(testSourcePath, rockerModel));
-        });
-    }
-
-    protected Optional<RockerModel> applicationTest(GeneratorContext generatorContext) {
-        if (generatorContext.getTestFramework() == TestFramework.JUNIT && generatorContext.getLanguage() == Language.KOTLIN) {
-            return Optional.of(applicationtestkotlinjunit.template(generatorContext.getProject()));
-        }
-        return Optional.empty();
+    @Override
+    protected RockerModel applicationTest(GeneratorContext generatorContext) {
+        return applicationtestkotlinjunit.template(generatorContext.getProject());
     }
 }

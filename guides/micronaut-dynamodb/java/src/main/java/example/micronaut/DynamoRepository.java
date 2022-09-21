@@ -1,6 +1,7 @@
 package example.micronaut;
 
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Primary;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
@@ -39,6 +40,7 @@ import java.util.Optional;
 @Requires(condition = CIAwsCredentialsProviderChainCondition.class)
 @Requires(beans = { DynamoConfiguration.class, DynamoDbClient.class })
 @Singleton
+@Primary
 public class DynamoRepository<T extends Identified> {
     private static final Logger LOG = LoggerFactory.getLogger(DynamoRepository.class);
     protected static final String HASH = "#";

@@ -25,43 +25,21 @@ public class SpringBootJavaApplication extends JavaApplication implements Spring
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        if (shouldGenerateApplicationFile(generatorContext)) {
-            generateApplication(generatorContext);
-            generateApplicationTest(generatorContext);
-        }
-        if (SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
-            SpringBootMavenUtils.clearMicronautVersionProperty(generatorContext);
-            if (generatorContext.getBuildTool() == BuildTool.MAVEN) {
-                SpringBootMavenUtils.addJavaVersionProperty(generatorContext);
-                SpringBootMavenUtils.addSpringBootMavenPlugin(generatorContext);
-            }
+        super.apply(generatorContext);
+        SpringBootMavenUtils.clearMicronautVersionProperty(generatorContext);
+        if (generatorContext.getBuildTool() == BuildTool.MAVEN) {
+            SpringBootMavenUtils.addJavaVersionProperty(generatorContext);
+            SpringBootMavenUtils.addSpringBootMavenPlugin(generatorContext);
         }
     }
 
-    protected void generateApplication(GeneratorContext generatorContext) {
-        application(generatorContext).ifPresent(rockerModel -> {
-            generatorContext.addTemplate("application", new RockerTemplate(getPath(), rockerModel));
-        });
+    @Override
+    protected RockerModel application(GeneratorContext generatorContext) {
+        return application.template(generatorContext.getProject(), generatorContext.getFeatures());
     }
 
-    protected Optional<RockerModel> application(GeneratorContext generatorContext) {
-        if (generatorContext.getLanguage() == Language.JAVA) {
-            return Optional.of(application.template(generatorContext.getProject(), generatorContext.getFeatures()));
-        }
-        return Optional.empty();
-    }
-
-    protected void generateApplicationTest(GeneratorContext generatorContext) {
-        applicationTest(generatorContext).ifPresent(rockerModel -> {
-            String testSourcePath = generatorContext.getTestSourcePath("/{packagePath}/{className}");
-            generatorContext.addTemplate("applicationTest", new RockerTemplate(testSourcePath, rockerModel));
-        });
-    }
-
-    protected Optional<RockerModel> applicationTest(GeneratorContext generatorContext) {
-        if (generatorContext.getTestFramework() == TestFramework.JUNIT && generatorContext.getLanguage() == Language.JAVA) {
-            return Optional.of(applicationtestjavajunit.template(generatorContext.getProject()));
-        }
-        return Optional.empty();
+    @Override
+    protected RockerModel applicationTest(GeneratorContext generatorContext) {
+        return applicationtestjavajunit.template(generatorContext.getProject());
     }
 }
