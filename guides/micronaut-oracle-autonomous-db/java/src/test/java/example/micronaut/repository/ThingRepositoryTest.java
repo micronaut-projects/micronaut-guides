@@ -1,4 +1,4 @@
-package example.micronaut;
+package example.micronaut.repository;
 
 import example.micronaut.domain.Thing;
 import example.micronaut.repository.ThingRepository;
