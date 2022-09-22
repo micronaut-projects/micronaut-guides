@@ -9,7 +9,6 @@ import io.micronaut.guides.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
-import io.micronaut.starter.feature.Feature
 import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.util.VersionInfo
 import org.gradle.api.GradleException
@@ -17,7 +16,6 @@ import org.gradle.api.GradleException
 import java.nio.file.Paths
 import java.util.Map.Entry
 import java.util.regex.Pattern
-import java.util.stream.Collectors
 
 import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.application.ApplicationType.CLI
@@ -29,7 +27,6 @@ import static io.micronaut.starter.options.Language.GROOVY
 
 @CompileStatic
 class GuideAsciidocGenerator {
-    private static List<String> GUIDES_FEATURE_NAMES = guidesFeatures()
     private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
     private static final String EXTERNAL = 'external:'
@@ -174,8 +171,7 @@ class GuideAsciidocGenerator {
 
             text = text.replaceAll(~/@([\w-]*):?features@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
-                List<String> features = featuresForApp(metadata, guidesOption, app)
-                (features - GUIDES_FEATURE_NAMES).join(',')
+                featuresForApp(metadata, guidesOption, app).join(',')
             }
 
             text = text.replaceAll(~/@([\w-]*):?features-words@/) { List<String> matches ->
@@ -234,7 +230,7 @@ class GuideAsciidocGenerator {
     private static List<String> featuresForApp(GuideMetadata metadata,
                                                GuidesOption guidesOption,
                                                String app) {
-        List<String> features = metadata.apps.find { it.name == app }.features
+        List<String> features = metadata.apps.find { it.name == app }.visibleFeatures
         if (guidesOption.language == GROOVY) {
             features.remove 'graalvm'
         }
@@ -625,16 +621,6 @@ class GuideAsciidocGenerator {
         try (ApplicationContext context = ApplicationContext.run()) {
             PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
             return pomDependencyVersionResolver.getCoordinates()
-        }
-    }
-
-    private static List<String> guidesFeatures() {
-        try (ApplicationContext context = ApplicationContext.run()) {
-            return context.getBeansOfType(Feature.class)
-                    .stream()
-                    .filter(f -> f.getClass().getPackageName().startsWith("io.micronaut.guides"))
-                    .map(f -> f.getName())
-                    .collect(Collectors.toList())
         }
     }
 }
