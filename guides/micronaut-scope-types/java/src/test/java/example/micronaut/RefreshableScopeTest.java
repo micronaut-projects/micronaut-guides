@@ -22,12 +22,12 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Property(name = "endpoints.refresh.enabled", value = StringUtils.TRUE) // <1>
-@Property(name = "endpoints.refresh.sensitive", value = StringUtils.FALSE) // <1>
-@MicronautTest // <2>
+@Property(name = "endpoints.refresh.sensitive", value = StringUtils.FALSE) // <2>
+@MicronautTest // <3>
 class RefreshableScopeTest {
     @Inject
     @Client("/")
-    HttpClient httpClient; // <3>
+    HttpClient httpClient; // <4>
 
     @Test
     void refreshableScopeIsACustomScopeThatAllowsABeansStateToBeRefreshedViaTheRefreshEndpoint() {
@@ -41,12 +41,12 @@ class RefreshableScopeTest {
         String path = "/refreshable";
         BlockingHttpClient client = httpClient.toBlocking();
         Set<String> responses = new HashSet<>(executeRequest(client, path));
-        assertEquals(1, responses.size()); // <1>
+        assertEquals(1, responses.size()); // <5>
         responses.addAll(executeRequest(client, path));
-        assertEquals(1, responses.size()); // <1>
-        refresh(client); // <2>
+        assertEquals(1, responses.size()); // <6>
+        refresh(client); // <7>
         responses.addAll(executeRequest(client, path));
-        assertEquals(2, responses.size()); // <3>
+        assertEquals(2, responses.size()); // <8>
     }
 
     private void refresh(BlockingHttpClient client) {
