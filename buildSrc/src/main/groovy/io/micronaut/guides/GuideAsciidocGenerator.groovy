@@ -2,7 +2,6 @@ package io.micronaut.guides
 
 import com.fizzed.rocker.Rocker
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.util.StringUtils
