@@ -39,7 +39,8 @@ public class MavenReplacement extends Maven {
             Coordinate springBootParent = coordinateResolver.resolve("spring-boot-starter-parent").orElseThrow();
             String sourceDirectory = generatorContext.getLanguage() == Language.KOTLIN ? "${project.basedir}/src/main/kotlin" : null;
             String testSourceDirectory = generatorContext.getLanguage() == Language.KOTLIN ? "${project.basedir}/src/test/kotlin" : null;
-            return springBootGenericPom.template(generatorContext.getProject(),
+            return springBootGenericPom.template(generatorContext.getLanguage(),
+                    generatorContext.getProject(),
                     mavenBuild,
                     springBootParent.getGroupId(),
                     springBootParent.getArtifactId(),

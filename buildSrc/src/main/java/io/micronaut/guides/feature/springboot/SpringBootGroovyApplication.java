@@ -36,7 +36,6 @@ public class SpringBootGroovyApplication extends GroovyApplication implements Sp
     @Override
     public void apply(GeneratorContext generatorContext) {
         super.apply(generatorContext);
-        SpringBootMavenUtils.clearMicronautVersionProperty(generatorContext);
         if (generatorContext.getBuildTool() == BuildTool.MAVEN) {
             SpringBootMavenUtils.addJavaVersionProperty(generatorContext);
             SpringBootMavenUtils.addSpringBootMavenPlugin(generatorContext);
