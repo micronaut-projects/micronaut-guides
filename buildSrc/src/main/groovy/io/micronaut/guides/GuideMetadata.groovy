@@ -41,10 +41,15 @@ class GuideMetadata {
     static class App {
         ApplicationType applicationType
         String name
-        List<String> features
+        List<String> visibleFeatures
+        List<String> invisibleFeatures
         List<String> excludeSource
         List<String> excludeTest
         OpenAPIGeneratorConfig openAPIGeneratorConfig
+
+        List<String> getFeatures() {
+            visibleFeatures + invisibleFeatures
+        }
     }
 
     @ToString(includeNames = true)
