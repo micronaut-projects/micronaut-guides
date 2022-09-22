@@ -1,0 +1,153 @@
+common:header-top.adoc[]
+
+== Sample Project
+
+You can link:@sourceDir@.zip[download a sample application] with the code examples in this article.
+
+== Introduction
+
+Micronaut features an extensible bean scoping mechanism based on https://javax-inject.github.io/javax-inject/[JSR-330]. 
+
+
+== Scenario
+
+We use the following scenario to talk about the different types of scopes.
+
+The following `@Controller` injects two collaborators. 
+
+source:singleton/RobotController[tags=pkg|imports|controller|clazz]
+
+callout:controller[number=1,arg0=/]
+callout:constructor-di[number=2,arg0=RobotFather]
+callout:constructor-di[number=3,arg0=RobotMother]
+callout:get[number=4,arg0=children,arg1=/]
+
+Each collaborator has an injection point for a bean of type `Robot`.
+
+source:singleton/RobotFather[]
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=Robot]
+
+source:singleton/RobotMother[]
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=Robot]
+
+Let's discuss how the application behaves depending on the scope used for the bean of type `Robot`.
+
+== Singleton
+
+**Singleton scope indicates only one instance of the bean will exist**. 
+
+To define a singleton, annotate a class with `jakarta.inject.Singleton` at the class level. 
+
+The following class creates a unique identifier in the constructor. This identifier allows us to identify how many   `Robot` instances are used. 
+
+source:singleton/Robot[tags=pkg|clazz]
+callout:singleton[1]
+
+=== Singleton Test
+
+The following test verifies `@Singleton` behavior.
+  
+test:SingletonScopeTest[tags=imports|testheaders|test]
+callout:micronaut-test[1]
+callout:http-client[2]
+<3> The same instance fulfills both injection points at `RobotFather` and `RobotMother`. 
+<4> Same instance is used upon subsequent requests.
+
+== Prototype
+
+**Prototype scope indicates that a new instance of the bean is created each time it is injected**
+
+Let's use `@Prototype` instead of `@Singleton`. 
+
+source:prototype/Robot[]
+callout:prototype[1]
+
+=== Prototype Tests
+
+The following test verifies the behavior of `Prototype` scope. 
+
+test:PrototypeScopeTest[tags=imports|testheader|test]
+callout:micronaut-test[1]
+callout:http-client[2]
+<3> A new instance is created to fulfill each injection point. Two instances - one for `RobotFather` and another for `RobotMother`. 
+<4> Instances remain upon subsequent requests.
+
+== Request
+
+**@RequestScope scope is a custom scope that indicates a new instance of the bean is created and associated with each HTTP request**
+
+source:request/Robot[]
+callout:request-scope[1]
+callout:request-aware[2]
+
+=== Request Tests
+
+The following test verifies the behavior of `@RequestScope` scope. 
+
+test:RequestScopeTest[tags=imports|testheader|test]
+callout:micronaut-test[1]
+callout:http-client[2]
+<3> Both injection points, `RobotFather` and `RobotMother`, are fulfilled with the same instance of `Robot`. An instance associated with the HTTP Request. 
+<4> Both injection points are fulfilled with the new instance of `Robot`.
+
+== Refreshable
+
+**https://docs.micronaut.io/latest/guide/#refreshable[Refreshable scope] is a custom scope that allows a bean's state to be refreshed via the https://docs.micronaut.io/latest/guide/#refreshEndpoint[/refresh endpoint].**
+
+source:refreshable/Robot[]
+
+callout:refreshable[1]
+
+Your application needs the `management` dependency to enable the refresh endpoint.
+
+dependency:micronaut-management[]
+
+=== Refreshable Tests
+
+The following test enables the https://docs.micronaut.io/latest/guide/#refreshEndpoint[refresh endpoint] and verifies the behavior of `@Refreshable`
+
+test:RefreshableScopeTest[tags=imports|testheader|test]
+callout:property[1]
+<2> The refresh endpoint is sensitive by default. To invoke it in the test, we set `endpoints.refresh.sensitive` to false.
+callout:micronaut-test[3]
+callout:http-client[4]
+<5> The same instance fulfills both injection points at `RobotFather` and `RobotMother`.
+<6> The same instance serves a new request.
+<7> Hitting the refresh endpoint, publishes a https://docs.micronaut.io/latest/api/io/micronaut/runtime/context/scope/refresh/RefreshEvent.html[RefreshEvent], which invalidates the instance of `Robot`.
+<8> A new instance of `Robot` is created the next time the object is requested.
+
+== @Context
+
+**Context scope indicates that the bean will be created at the same time as the ApplicationContext (eager initialization)**
+
+The following example uses `@Context` in combination with `@ConfigurationProperties`.
+
+source:context/MicronautConfiguration[]
+
+callout:context[1]
+callout:configuration-properties[2]
+callout:constraints[3]
+
+The result is validation being performed on the Application Context start-up.
+
+test:ContextTest[]
+
+== Other scopes
+
+Micronaut Framework ships with other built-in Scopes: 
+
+=== @Infrastructure
+
+https://docs.micronaut.io/latest/api/io/micronaut/context/annotation/Infrastructure.html[@Infrastructure] scope represents a bean that cannot be overridden or replaced using `@Replaces` because it is critical to the functioning of the system.
+
+=== @ThreadLocal
+
+https://docs.micronaut.io/latest/api/io/micronaut/runtime/context/scope/ThreadLocal.html[@ThreadLocal] scope is a custom scope that associates a bean per thread via a ThreadLocal
+
+=== Next Steps
+
+Read more about https://docs.micronaut.io/latest/guide/#scopes[Scopes] in the Micronaut Framework.
+
+common:helpWithMicronaut.adoc[]
