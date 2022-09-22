@@ -3,11 +3,11 @@ package example.micronaut.singleton;
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
-@Singleton
+@Singleton // <1>
 public class RobotFather {
     private final Robot robot;
 
-    public RobotFather(Robot robot) {
+    public RobotFather(Robot robot) { // <2>
         this.robot = robot;
     }
 
