@@ -25,29 +25,27 @@ class PrototypeScopeTest {
     @Inject
     @Client("/")
     HttpClient httpClient; // <2>
-
 //end::imports[]
 /*
 //tag::testheader[]
-        @Test
-        void prototypeScopeIndicatesThatANewInstanceOfTheBeanIsCreatedEachTimeItIsInjected() {
-            String path = "/";
+   @Test
+   void prototypeScopeIndicatesThatANewInstanceOfTheBeanIsCreatedEachTimeItIsInjected() {
+     String path = "/";
 //end::testheader[]
 */    
     @ParameterizedTest
     @ValueSource(strings = {"/bean", "/prototype", "/infrastructure"})
     void prototypeScopeIndicatesThatANewInstanceOfTheBeanIsCreatedEachTimeItIsInjected(String path) {
-//tag::test[]    
-        
-        BlockingHttpClient client = httpClient.toBlocking();
-        Set<String> responses = new HashSet<>(executeRequest(client, path));
-        assertEquals(2, responses.size()); // <3>
-        responses.addAll(executeRequest(client, path));
-        assertEquals(2, responses.size()); // <4>
+//tag::test[]
+      BlockingHttpClient client = httpClient.toBlocking();
+      Set<String> responses = new HashSet<>(executeRequest(client, path));
+      assertEquals(2, responses.size()); // <3>
+      responses.addAll(executeRequest(client, path));
+      assertEquals(2, responses.size()); // <4>
     }
 
     private List<String> executeRequest(BlockingHttpClient client, String path) {
-        return client.retrieve(HttpRequest.GET(path), Argument.listOf(String.class));
+      return client.retrieve(HttpRequest.GET(path), Argument.listOf(String.class));
     }
 }
 //end::test[]    
