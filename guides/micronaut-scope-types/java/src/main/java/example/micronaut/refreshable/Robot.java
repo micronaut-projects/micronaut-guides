@@ -4,7 +4,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.runtime.context.scope.Refreshable;
 import java.util.UUID;
 
-@Refreshable
+@Refreshable // <1>
 public class Robot {
     @NonNull
     private final String serialNumber;
