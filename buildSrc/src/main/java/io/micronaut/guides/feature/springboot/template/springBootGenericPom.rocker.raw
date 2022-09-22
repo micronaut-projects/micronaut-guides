@@ -37,6 +37,15 @@
 @mavenBuild.renderPlugins(6)
     </plugins>
   </build>
+@if (mavenBuild.hasPomDependency()) {
+  <dependencyManagement>
+    <dependencies>
+@for (MavenDependency f : mavenBuild.getDependencies(true)) {
+@io.micronaut.starter.feature.build.maven.templates.dependency.template(f.getGroupId(), f.getArtifactId(), f.getMavenScope().toString(), f.getVersion(), true, f.getExclusions())
+}
+    </dependencies>
+  </dependencyManagement>
+}
   <dependencies>
 @for (MavenDependency f : mavenBuild.getDependencies(false)) {
 @io.micronaut.starter.feature.build.maven.templates.dependency.template(f.getGroupId(), f.getArtifactId(), f.getMavenScope().toString(), f.getVersion(), false, f.getExclusions())
