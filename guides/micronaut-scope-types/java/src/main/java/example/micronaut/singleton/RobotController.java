@@ -15,7 +15,7 @@ import java.util.List;
 
 /*
 //tag::controller[]
-@Controller
+@Controller // <1>
 //end::controller[]
 */
 @Controller("/singleton")
@@ -26,12 +26,12 @@ public class RobotController {
     private final RobotMother mother;
 
     public RobotController(RobotFather father,  // <2>
-                           RobotMother mother) {
+                           RobotMother mother) { // <3>
         this.father = father;
         this.mother = mother;
     }
 
-    @Get // <3>
+    @Get // <4>
     List<String> children() {
         return Arrays.asList(
                 father.child().getSerialNumber(),
