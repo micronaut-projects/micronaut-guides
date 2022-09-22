@@ -34,7 +34,7 @@ class RefreshableScopeTest {
 //end::imports[]        
 /*
 //tag::testheader[] 
-       String path = "/";
+        String path = "/";
 //end::testheader[]
 */
 //tag::test[]      
