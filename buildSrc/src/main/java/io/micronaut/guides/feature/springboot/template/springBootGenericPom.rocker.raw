@@ -2,8 +2,8 @@
 @import io.micronaut.starter.application.Project
 @import io.micronaut.starter.build.maven.MavenBuild
 @import io.micronaut.starter.build.maven.MavenDependency
-
-@args (Project project, MavenBuild mavenBuild, String parentGroupId, String parentArtifactId, String parentVersion, boolean parentRelativePath, String sourceDirectory, String testSourceDirectory)
+@import io.micronaut.starter.options.Language
+@args (Language language, Project project, MavenBuild mavenBuild, String parentGroupId, String parentArtifactId, String parentVersion, boolean parentRelativePath, String sourceDirectory, String testSourceDirectory)
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -35,6 +35,31 @@
 }
     <plugins>
 @mavenBuild.renderPlugins(6)
+@if (language == Language.JAVA) {
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- Uncomment to enable incremental compilation -->
+          <!-- <useIncrementalCompilation>false</useIncrementalCompilation> -->
+          <annotationProcessorPaths @mavenBuild.getAnnotationProcessorCombineAttribute()>
+@for (processor : mavenBuild.getAnnotationProcessors()) {
+            <path>
+              <groupId>@processor.getGroupId()</groupId>
+              <artifactId>@processor.getArtifactId()</artifactId>
+@if(processor.getVersion() != null) {
+              <version>@processor.getVersion()</version>
+}
+            </path>
+}
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <arg>-Amicronaut.processing.group=@project.getPackageName()</arg>
+            <arg>-Amicronaut.processing.module=@project.getName()</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+}
     </plugins>
   </build>
 @if (mavenBuild.hasPomDependency()) {
