@@ -17,7 +17,6 @@ import java.nio.file.Paths
 import java.util.Map.Entry
 import java.util.regex.Pattern
 
-import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.application.ApplicationType.CLI
 import static io.micronaut.starter.application.ApplicationType.DEFAULT
@@ -28,7 +27,6 @@ import static io.micronaut.starter.options.Language.GROOVY
 
 @CompileStatic
 class GuideAsciidocGenerator {
-
     private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
     private static final String EXTERNAL = 'external:'
@@ -173,8 +171,7 @@ class GuideAsciidocGenerator {
 
             text = text.replaceAll(~/@([\w-]*):?features@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
-                List<String> features = featuresForApp(metadata, guidesOption, app)
-                features.join(',')
+                featuresForApp(metadata, guidesOption, app).join(',')
             }
 
             text = text.replaceAll(~/@([\w-]*):?features-words@/) { List<String> matches ->
@@ -233,7 +230,7 @@ class GuideAsciidocGenerator {
     private static List<String> featuresForApp(GuideMetadata metadata,
                                                GuidesOption guidesOption,
                                                String app) {
-        List<String> features = metadata.apps.find { it.name == app }.features
+        List<String> features = metadata.apps.find { it.name == app }.visibleFeatures
         if (guidesOption.language == GROOVY) {
             features.remove 'graalvm'
         }
