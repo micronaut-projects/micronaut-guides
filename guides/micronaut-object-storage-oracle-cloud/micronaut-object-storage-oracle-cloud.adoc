@@ -1,0 +1,126 @@
+external:micronaut-object-storage-base/start.adoc[]
+
+common:oracle-cloud-account.adoc[]
+common:oracle-cloud-cli.adoc[]
+
+common:jq[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Create a bucket
+
+common:oracle-cloud-compartment-id.adoc[]
+
+=== Use the CLI to create the bucket
+
+[source,bash]
+----
+oci os bucket create --compartment-id $C --name micronaut-guide-object-storage
+----
+
+We can also use the CLI to get the Object Storage namespace:
+
+[source,bash]
+----
+export OCI_NS=$(oci os ns get | jq -r '.data')
+----
+
+Then, configure the bucket name and namespace in `application.yml`:
+
+resource:application.yml[tag=object-storage]
+
+== Controller API
+
+external:micronaut-object-storage-base/controller-api.adoc[]
+
+source:ProfilePicturesController[tags=begin-class|end-class]
+
+callout:controller[number=1,arg0=/pictures]
+callout:executes-on[2]
+<3> https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html[OracleCloudStorageOperations]
+    is the Oracle Cloud-specific interface for using object storage.
+<4> @api@/io/micronaut/http/server/util/HttpHostResolver.html[HttpHostResolver] allows you to resolve the host for a HTTP
+    request. We will use the host to build an absolute URL for the `Location` header when uploading a picture. Learn more
+    about https://docs.micronaut.io/latest/guide/#hostResolution[Host Resolution].
+
+=== Upload endpoint
+
+Implement the upload endpoint by receiving the file from the HTTP client via `CompletedFileUpload`, and the `userId` path
+parameter. Upload it to Oracle Cloud using
+https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html[OracleCloudStorageOperations],
+and then return its `ETag` in an HTTP response header to the client:
+
+source:ProfilePicturesController[tags=upload,indent=0]
+
+<1> The key represents the path under which the file will be stored.
+<2> You can use any of the https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/request/UploadRequest.html[UploadRequest] static methods to build an upload request.
+<3> The upload operation returns an https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/response/UploadResponse.html[UploadResponse], which wraps the cloud-specific SDK response
+object. It also has a `getNativeResponse()` method that can
+be used for accessing the vendor-specific response object, in this case https://docs.oracle.com/en-us/iaas/tools/java/2.44.0/com/oracle/bmc/objectstorage/responses/PutObjectResponse.html[PutObjectResponse].
+<4> We return the absolute URL of the resource in the `Location` header.
+<5> The response object contains some common properties for all cloud vendors, such as the `ETag`, that is sent in a header to the client.
+
+=== Download endpoint
+
+external:micronaut-object-storage-base/download-endpoint.adoc[]
+
+source:ProfilePicturesController[tags=download,indent=0]
+<1> The retrieve operation returns an `ObjectStorageEntry`, in this case an
+    https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html[OracleCloudStorageEntry],
+    which allows accessing the Oracle Cloud-specific
+https://docs.oracle.com/en-us/iaas/tools/java/2.44.0/com/oracle/bmc/objectstorage/responses/GetObjectResponse.html[GetObjectResponse]
+    object in case you need more details about the object.
+<2> We transform the `OracleCloudStorageEntry` into an `HttpResponse<StreamedFile>`.
+<3> The response contains not only the file, but also an `ETag` header.
+
+external:micronaut-object-storage-base/etag.adoc[]
+
+=== Delete endpoint
+
+external:micronaut-object-storage-base/delete-endpoint.adoc[]
+
+common:runapp.adoc[]
+
+common:graal-with-plugins.adoc[]
+
+== Testing
+
+We can test our application from the command line.
+
+=== Uploading a profile picture
+
+external:micronaut-object-storage-base/testing-upload.adoc[]
+
+We can use the `oci` CLI to verify that the file has actually been uploaded to an Oracle Cloud bucket:
+
+[source,bash]
+----
+oci os object list --bucket-name micronaut-guide-object-storage
+----
+
+=== Download a profile picture
+
+external:micronaut-object-storage-base/testing-download.adoc[]
+
+=== Delete a profile picture
+
+external:micronaut-object-storage-base/testing-delete.adoc[]
+
+[source,bash]
+----
+oci os object list --bucket-name micronaut-guide-object-storage
+----
+
+=== Cleanup
+
+Once you are done with this guide, you can remove the bucket from Oracle Cloud to not leave stale resources:
+
+[source,bash]
+----
+oci os bucket delete --bucket-name micronaut-guide-object-storage
+----
+
+external:micronaut-object-storage-base/end.adoc[]
+* Discover https://www.oracle.com/cloud/storage/object-storage/[Oracle Cloud Infrastructure (OCI) Object Storage].
