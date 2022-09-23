@@ -387,7 +387,8 @@ class GuideProjectGenerator implements AutoCloseable {
         for (String name : inBoth) {
             App baseApp = baseApps[name]
             App guideApp = guideApps[name]
-            guideApp.features.addAll baseApp.features
+            guideApp.visibleFeatures.addAll baseApp.visibleFeatures
+            guideApp.invisibleFeatures.addAll baseApp.invisibleFeatures
             merged << guideApp
         }
 
