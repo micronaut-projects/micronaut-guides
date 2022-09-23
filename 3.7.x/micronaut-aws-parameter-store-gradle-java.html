@@ -133,8 +133,11 @@
 <li><a href="#configuration">4.3. Configuration</a></li>
 <li><a href="#test">4.4. Test</a></li>
 <li><a href="#dependency">4.5. Dependency</a></li>
-<li><a href="#bootstrap-yml">4.6. Bootstrap.yml</a></li>
-<li><a href="#logging">4.7. Logging</a></li>
+<li><a href="#enable-distributed-configuration">4.6. Enable Distributed Configuration</a></li>
+<li><a href="#clean-up-application-configuration">4.7. Clean up Application Configuration</a></li>
+<li><a href="#disable-distributed-configuration-for-test">4.8. Disable Distributed Configuration for Test</a></li>
+<li><a href="#enable-distributed-configuration-with-aws-parameter-store">4.9. Enable Distributed Configuration with AWS Parameter Store</a></li>
+<li><a href="#logging">4.10. Logging</a></li>
 </ul>
 </li>
 <li><a href="#populate-configuration-at-aws-parameter-store">5. Populate Configuration at AWS Parameter Store</a>
@@ -446,37 +449,101 @@ to drive configuration add the following dependency:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="bootstrap-yml">4.6. Bootstrap.yml</h3>
+<h3 id="enable-distributed-configuration">4.6. Enable Distributed Configuration</h3>
 <div class="paragraph">
-<p>To enable distributed configuration, create a <code>src/main/resources/bootstrap.yml</code> configuration file and configure it to use Parameter Store:</p>
+<p>Create a <code>bootstrap.yml</code> file in the <code>resources</code> directory to <a href="https://docs.micronaut.io/latest/guide/#bootstrap">enable distributed configuration</a>.
+Add the following:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/bootstrap.yml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
   <span class="key">application</span>:
-    <span class="key">name</span>: <span class="string"><span class="content">micronautguide</span></span>
+    <span class="key">name</span>: <span class="string"><span class="content">micronautguide </span></span><i class="conum" data-value="1"></i><b>(1)</b>
   <span class="key">config-client</span>:
-    <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-<span class="key">aws.client.system-manager.parameterstore.enabled</span>: <span class="string"><span class="content">true</span></span></code></pre>
+    <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>micronaut.application.name</code> name will be part of the parameter name in AWS Parameter Store.</p>
-</li>
-<li>
-<p>Set <code>microanut.config-client.enabled: true</code> which is used to read and resolve configuration from distributed sources.</p>
-</li>
-<li>
-<p>With <code>aws.client.system-manager.parameterstore.enabled</code> enable distributed configuration with AWS Parameter Store.</p>
-</li>
-</ul>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the application name in <code>bootstrap.yml</code> instead of <code>application.yml</code> so that it is available when reading configuration from distributed sources.
+properties</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set <code>microanut.config-client.enabled: true</code> which is used to read and resolve configuration from distributed sources.</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="logging">4.7. Logging</h3>
+<h3 id="clean-up-application-configuration">4.7. Clean up Application Configuration</h3>
+<div class="paragraph">
+<p>If <code>application.yml</code> sets <code>micronaut.application.name</code>, remove it. You moved it to <code>bootstrap.yml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="diff"><span class="line delete"><span class="delete">-</span> micronaut:</span>
+<span class="line delete"><span class="delete">-</span>  application:</span>
+<span class="line delete"><span class="delete">-</span>    name: micronautguide</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disable-distributed-configuration-for-test">4.8. Disable Distributed Configuration for Test</h3>
+<div class="paragraph">
+<p>To disable distributed configuration for tests, create a <code>bootstrap-test.yml</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/bootstrap-test.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
+  <span class="key">config-client</span>:
+    <span class="key">enabled</span>: <span class="string"><span class="content">false</span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enable-distributed-configuration-with-aws-parameter-store">4.9. Enable Distributed Configuration with AWS Parameter Store</h3>
+<div class="paragraph">
+<p>Add the following configuration to enable distributed configuration with AWS Parameter Store:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/bootstrap.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">aws</span>:
+  <span class="key">client</span>:
+    <span class="key">system-manager</span>:
+      <span class="key">parameterstore</span>:
+        <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>With <code>aws.client.system-manager.parameterstore.enabled</code> enable distributed configuration with AWS Parameter Store.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>micronaut.application.name</code> name will be part of the parameter name in AWS Parameter Store.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="logging">4.10. Logging</h3>
 <div class="paragraph">
 <p>Add loggers to get a more verbose output:</p>
 </div>
@@ -532,7 +599,7 @@ export AWS_REGION=us-east-1</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">06:41:44.364 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
 06:41:44.377 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
-06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap.yml
+06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap-test.yml
 06:41:46.425 [main] DEBUG i.m.d.c.c.DistributedPropertySourceLocator - Resolving configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
 06:41:47.811 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
 06:41:47.813 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application, pagination requested: false
@@ -604,7 +671,7 @@ aws ssm put-parameter --name /config/micronautguide/vat/rate --value=21.0 --type
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">06:41:44.364 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
 06:41:44.377 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
-06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap.yml
+06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap-test.yml
 06:41:46.425 [main] DEBUG i.m.d.c.c.DistributedPropertySourceLocator - Resolving configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
 06:41:47.811 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
 06:41:47.813 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application, pagination requested: false
