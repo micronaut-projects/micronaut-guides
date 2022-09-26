@@ -6,6 +6,8 @@ import com.oracle.bmc.objectstorage.ObjectStorageClient;
 import com.oracle.bmc.objectstorage.model.CreateBucketDetails;
 import com.oracle.bmc.objectstorage.requests.CreateBucketRequest;
 import com.oracle.bmc.objectstorage.requests.DeleteBucketRequest;
+import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
+import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Property;
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static example.micronaut.ProfilePicturesControllerTest.SPEC_NAME;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers(disabledWithoutDocker = true)
 @MicronautTest
@@ -76,8 +79,14 @@ class ProfilePicturesControllerTest extends AbstractProfilePicturesControllerTes
     }
 
     @Override
-    protected boolean assertThatFileIsStored(String key, String text) throws IOException {
-        return false;
+    protected void assertThatFileIsStored(String key, String expected) throws IOException {
+        GetObjectResponse response = client.getObject(GetObjectRequest.builder()
+                .bucketName(configuration.getBucket())
+                .namespaceName(configuration.getNamespace())
+                .objectName(key)
+                .build());
+
+        assertEquals(expected, textFromFile(response.getInputStream()));
     }
 
     @Singleton

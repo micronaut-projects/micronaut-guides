@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @Testcontainers(disabledWithoutDocker = true)
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -52,8 +54,11 @@ class ProfilePicturesControllerTest extends AbstractProfilePicturesControllerTes
     }
 
     @Override
-    protected boolean assertThatFileIsStored(String key, String text) throws IOException {
-        ResponseInputStream<GetObjectResponse> inputStream = s3.getObject(GetObjectRequest.builder().key(key).bucket(BUCKET_NAME).build());
-        return text.equals(textFromFile(inputStream));
+    protected void assertThatFileIsStored(String key, String expected) throws IOException {
+        ResponseInputStream<GetObjectResponse> inputStream = s3.getObject(GetObjectRequest.builder()
+                .key(key)
+                .bucket(BUCKET_NAME)
+                .build());
+        assertEquals(expected, textFromFile(inputStream));
     }
 }

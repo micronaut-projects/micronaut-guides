@@ -68,7 +68,7 @@ abstract class AbstractProfilePicturesControllerTest {
         byte[] download = client.retrieve(location, byte[].class);
 
         //then:
-        assertEquals(new String(download), "micronaut");
+        assertEquals("micronaut", new String(download));
 
         //when:
         response = client.exchange(HttpRequest.DELETE(location));
@@ -89,5 +89,5 @@ abstract class AbstractProfilePicturesControllerTest {
         return IOUtils.readText(new BufferedReader(new InputStreamReader(inputStream)));
     }
 
-    protected abstract boolean assertThatFileIsStored(String key, String text) throws IOException;
+    protected abstract void assertThatFileIsStored(String key, String expected) throws IOException;
 }
