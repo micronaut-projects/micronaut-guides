@@ -17,7 +17,7 @@ public class HomeController {
     @Get // <4>
     public HttpResponse<Map<String, Object>> index(@Nullable Authentication authentication) {
 
-        HashMap<String, Object> variables = new HashMap<>();
+        Map<String, Object> variables = new HashMap<>();
         if (authentication != null) {
             variables.putAll(authentication.getAttributes());
         }
