@@ -15,7 +15,13 @@ public class HomeController {
     @Secured(SecurityRule.IS_ANONYMOUS) // <2>
     @View("home") // <3>
     @Get // <4>
-    public Map<String, Object> index() {
-        return new HashMap<>();
+    public HttpResponse<Map<String, Object>> index(@Nullable Authentication authentication) {
+
+        HashMap<String, Object> variables = new HashMap<>();
+        if (authentication != null) {
+            variables.putAll(authentication.getAttributes());
+        }
+
+        return HttpResponse.ok(variables);
     }
 }
