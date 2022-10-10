@@ -1,0 +1,34 @@
+external:micronaut-metrics/start.adoc[]
+
+common:oracle-cloud-account.adoc[]
+
+* We'll use the OCI command line to authenticate ourselves. If you don't have it already, install the https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] and run `oci setup config`.
+
+external:micronaut-metrics/create-app-external-guides.adoc[]
+
+== Monitor metrics on Oracle Cloud
+
+To publish metrics to Oracle Cloud, you have to adjust your application configuration slightly, and then you will be able to create queries and monitor your metrics on the Oracle Cloud https://cloud.oracle.com/monitoring/explore[Metrics Explorer].
+
+resource:application.yml[tag=metrics]
+
+<1> Change to `false` to disable all metrics, e.g., per-environment
+<2> These default to `true` and are only here for convenience, to be able to disable a subset of metrics
+<3> Change namespace to something meaningful, for an example app name. In this guide we are using `micronautguide`
+
+[NOTE]
+====
+By default, metrics will be published in your root compartment (tenancy). If you want to specify in which compartment metrics should be published, you can add `compartmentId` field inside your configuration. The full path of the key is `micronaut.metrics.export.oraclecloud.compartmentId`.
+====
+
+=== Visit the Oracle Cloud https://cloud.oracle.com/monitoring/explore[Metrics Explorer].
+
+In the query editor create the query that you want to monitor. You have to specify the compartment (#1), namespace (#2) and the name of the metric (#3).
+
+image::oci-metrics/query-editor.png[]
+
+After clicking the (#4) Update Chart button you will see values of your selected metric in the Metrics Explorer.
+
+image::oci-metrics/metrics-explorer.png[]
+
+external:micronaut-metrics-oci/end.adoc[]
