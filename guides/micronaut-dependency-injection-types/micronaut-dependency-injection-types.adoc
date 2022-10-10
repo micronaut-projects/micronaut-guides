@@ -1,0 +1,78 @@
+common:header-top.adoc[]
+
+== Sample Project
+
+You can link:@sourceDir@.zip[download a sample application] with the code examples shown in this article.
+
+== Introduction
+
+What is a dependency? Class A has a dependency on Class B when it interacts with it in any way. For example, Class A executes a method in an instance of Class B. You typically don't instantiate class dependencies when using Micronaut Framework's dependency injection engine. Instead, you rely on the framework to provide dependency instances.
+
+NOTE: In Micronaut Framework documentation, we often use the term `Bean` and `Dependency` interchangeably.
+
+== JSR-330
+
+Micronaut Framework implements the https://javax-inject.github.io/javax-inject/[JSR-330 - Dependency Injection for Java specification].
+ 
+== jakarta.inject vs javax.inject
+ 
+Early versions of Micronaut Framework used `javax.inject` annotations. Due to trademark restrictions imposed on the `javax.*` namespace, the Micronaut framework switched from the `javax.inject` to the `jakarta.inject` annotations. Since https://micronaut.io/2021/03/09/micronaut-2-4-released/[version 2.4], the Micronaut framework supports `jakarta.inject` annotations. Moreover, Micronaut Framework switched to `jakarta.inject` as the set of annotations included by default, and we strongly encourage you to use `jakarta.inject` going forward.
+
+== Dependency Injection Types
+
+Micronaut Framework offers three types of dependency injection:
+
+=== Constructor Injection
+
+In constructor-based injection, Micronaut Framework provides the dependencies required for the class as arguments to the constructor.
+
+source:constructor/MessageController[]
+
+If your class has multiple constructors, the Micronaut framework searches for one constructor annotated with `jakarta.inject.Inject`.  
+
+=== Field Injection
+
+With field injection, Micronaut fulfills the injection endpoints for fields annotated with `jakarta.inject.Inject`.
+
+source:field/MessageController[]
+
+Field injection makes it harder to understand a class's requirements, making it easier to get a `NullPointerException` when testing a class using Field Injection. We recommend you use <<Benefits of Constructor Injection, Constructor Injection>>.
+
+WARNING: The previous code sample uses a field with the default access modifier. There are four types of access modifies available in Java:  `private`, `protected`, `public`, and the default. Field injection works with all of them. However,  Field injection in a field with `private` access modifier requires reflection. Thus, we recommend you not to use `private`.  
+
+NOTE: You use field injection in test classes annotated with `MicronautTest`. Micronaut does not instantiate the test class. Thus, you cannot use Constructor Injection in those classes.
+
+NOTE: When using https://micronaut-projects.github.io/micronaut-spring/latest/guide/[Micronaut for Spring], you can also use Spring's `@Autowired` annotation for field injection. To learn more, read the guide: https://guides.micronaut.io/latest/micronaut-spring-boot.html[Run a Spring Boot application as a Micronaut application].
+
+=== Method parameter injection
+
+For method parameter injection, you define a method with one or more parameters and annotate the method with the `jakarta.inject.Inject` annotation.
+
+source:methodparameter/MessageController[]
+
+=== Benefits of Constructor Injection
+
+When possible, we recommend you use Constructor Injection for several reasons:
+
+**Clear Contract**
+
+Constructor injection clearly expresses the requirements of the class and requires no additional annotation.
+
+**Immutability**
+
+Constructor injection allows you to define `final` dependencies. Thus, creating immutable objects.
+
+**Identifying code smells**
+
+Constructor injection helps you easily identify if your bean depends on too many other objects.
+
+**Testing**
+
+Constructor injection simplifies writing both unit and integration tests. The constructor forces us to provide valid objects for all dependencies. 
+Thus, it decreases the chance of a NullPointerException occurrence during testing. 
+
+== Next steps
+
+Read more about https://docs.micronaut.io/latest/guide/#ioc[Micronaut Inversion of Control] capabilities.
+
+common:helpWithMicronaut.adoc[]

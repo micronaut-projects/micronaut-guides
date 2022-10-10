@@ -147,6 +147,7 @@ class IndexGenerator {
 
     private static List<GuideMetadata> latestGuides(List<GuideMetadata> metadatas) {
         metadatas.stream()
+                .distinct()
                 .sorted((o1, o2) -> {
                     o2.publicationDate <=> o1.publicationDate
                 })

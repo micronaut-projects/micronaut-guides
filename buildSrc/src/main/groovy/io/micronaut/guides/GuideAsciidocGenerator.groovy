@@ -10,13 +10,13 @@ import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
 import io.micronaut.starter.options.JdkVersion
+import io.micronaut.starter.util.VersionInfo
 import org.gradle.api.GradleException
 
 import java.nio.file.Paths
 import java.util.Map.Entry
 import java.util.regex.Pattern
 
-import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.application.ApplicationType.CLI
 import static io.micronaut.starter.application.ApplicationType.DEFAULT
@@ -27,7 +27,6 @@ import static io.micronaut.starter.options.Language.GROOVY
 
 @CompileStatic
 class GuideAsciidocGenerator {
-
     private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
     private static final String EXTERNAL = 'external:'
@@ -162,18 +161,20 @@ class GuideAsciidocGenerator {
             text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "1.8")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
-            text = text.replaceAll(~/@(\w*):?cli-command@/) { List<String> matches ->
+            text = text.replaceAll(~/@([\w-]*):?cli-command@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
-                cliCommandForApp(metadata, app).orElse('')
+                cliCommandForApp(metadata, app)
+                        .orElseThrow {
+                            new GradleException("No CLI command found for app: $app -- should be one of ${metadata.apps.name.collect { "@$it:cli-command@" }.join(", ")}")
+                        }
             }
 
-            text = text.replaceAll(~/@(\w*):?features@/) { List<String> matches ->
+            text = text.replaceAll(~/@([\w-]*):?features@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
-                List<String> features = featuresForApp(metadata, guidesOption, app)
-                features.join(',')
+                featuresForApp(metadata, guidesOption, app).join(',')
             }
 
-            text = text.replaceAll(~/@(\w*):?features-words@/) { List<String> matches ->
+            text = text.replaceAll(~/@([\w-]*):?features-words@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
                 featuresWordsForApp(metadata, guidesOption, app)
             }
@@ -183,6 +184,7 @@ class GuideAsciidocGenerator {
                     text = text.replace("@${entry.key}Version@", entry.value.version)
                 }
             }
+            text = text.replace("@micronautVersion@", VersionInfo.getMicronautVersion())
 
             File renderedAsciidocFile = new File(asciidocDir, projectName + '.adoc')
             renderedAsciidocFile.createNewFile()
@@ -228,7 +230,7 @@ class GuideAsciidocGenerator {
     private static List<String> featuresForApp(GuideMetadata metadata,
                                                GuidesOption guidesOption,
                                                String app) {
-        List<String> features = metadata.apps.find { it.name == app }.features
+        List<String> features = metadata.apps.find { it.name == app }.visibleFeatures
         if (guidesOption.language == GROOVY) {
             features.remove 'graalvm'
         }
@@ -392,8 +394,9 @@ class GuideAsciidocGenerator {
             appName == ""
         }
         List<String> tagNames = extractTags(line)
-
         List<String> tags = tagNames ? tagNames.collect { "tag=" + it } : []
+
+        String indent = extractIndent(line)
 
         String sourcePath = testFramework ? testPath(appName, name, testFramework) : mainPath(appName, name)
         String normalizedSourcePath = (Paths.get(sourcePath)).normalize().toString();
@@ -404,10 +407,14 @@ class GuideAsciidocGenerator {
         ]
         if (tags) {
             for (String tag : tags) {
-                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${tag}]\n".toString()
+                String attrs = tag
+                if (StringUtils.isNotEmpty(indent)) {
+                    attrs += ",${indent}"
+                }
+                lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${attrs}]\n".toString()
             }
         } else {
-            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[]".toString()
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${indent}]".toString()
         }
 
         lines << '----'
@@ -558,6 +565,11 @@ class GuideAsciidocGenerator {
 
     private static String extractAppName(String line) {
         extractFromParametersLine(line, 'app')
+    }
+
+    private static String extractIndent(String line) {
+        String indentValue = extractFromParametersLine(line, 'indent')
+        indentValue ? "indent=$indentValue" : ""
     }
 
     private static String extractTagName(String line) {

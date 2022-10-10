@@ -93,7 +93,7 @@ source:domain/Thing[]
 
 === Repository class
 
-Create a `ThingRepository` class to read and write `Thing` database data:
+Create a `ThingRepository` interface to read and write `Thing` database data:
 
 source:repository/ThingRepository[]
 
@@ -143,24 +143,25 @@ resource:application-oraclecloud.yml[]
 
 Create a test to verify that database access works:
 
-test:ThingRepositoryTest[]
+test:repository/ThingRepositoryTest[]
 
 == Testing the Application
 
 There are two options for running the tests; one is to run against the live database, and the other is to run tests locally with an Oracle database in a Docker container using https://www.testcontainers.org/[Testcontainers].
 
-Add the following dependencies:
+Replace the following dependency:
 
-:dependencies:
+dependency:junit-jupiter[groupId=org.testcontainers,scope=testImplementation]
+
+with:
+
 dependency:oracle-xe[groupId=org.testcontainers,scope=testImplementation]
-dependency:testcontainers[groupId=org.testcontainers,scope=testImplementation]
-:dependencies:
 
-To test using Testcontainers, create a `testcontainers.properties` file in `src/test/resources` with this content:
-
-testResource:testcontainers.properties[]
-
-and replace the generated `application-test.yml` with this:
+// Leaving commented out, in case we want to use the latest XE version 21.3.0-slim
+//To test using Testcontainers, create a `testcontainers.properties` file in `src/test/resources` with this content:
+//
+//testResource:testcontainers.properties[]
+and create `application-test.yml` file in `src/test/resources` with this content:
 
 testResource:application-test.yml[tags=datasource|flyway]
 
@@ -191,6 +192,116 @@ Then open `build/reports/tests/test/index.html` in a browser to see the results.
 ----
 
 :exclude-for-build:
+
+== Using Oracle Cloud Vault
+
+In the previous sections, we included the admin and user passwords in cleartext inside `application-oraclecloud.yml`, which is not a best practice. However, it's possible to externalize those (and other properties that shouldn't be in cleartext and/or in source control) with https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm[Oracle Cloud Vault].
+
+=== Creating the vault
+
+From the Oracle Cloud Menu select "Identity & Security" and then "Vault":
+
+image::oracleautodb/vault1.png[]
+
+Click "Create Vault":
+
+image::oracleautodb/vault2.png[]
+
+Then enter a name for the vault, e.g. "mn-guide-vault" and click "Create Vault":
+
+image::oracleautodb/vault3.png[]
+
+Click the "Copy" link in the `OCID` row; this is the unique identifier for your vault and you'll need it later.
+
+image::oracleautodb/vault4.png[]
+
+Click "Master Encryption Keys" under "Resources", then click "Create Key":
+
+image::oracleautodb/vault5.png[]
+
+Choose a name for the key, e.g. "mn-guide-encryption-key", and change "Protection Mode" to "Software", then click "Create Key":
+
+image::oracleautodb/vault6.png[]
+
+Once the key has finished provisioning, click "Secrets" under "Resources", then click "Create Secret":
+
+image::oracleautodb/vault7.png[]
+
+This first secret will be for the wallet password, so choose a name like "ATP_WALLET_PASSWORD". Select the encryption key you created, and put the wallet password value in the "Secret Contents" field, then click "Create Secret":
+
+image::oracleautodb/vault8.png[]
+
+Create another secret for the user password, using a name like "ATP_USER_PASSWORD" and for "Secret Contents" use created database password.
+
+=== Dependency
+
+Add a dependency for the `micronaut-oraclecloud-vault` library to add support for using Vault as a distributed configuration source:
+
+dependency:micronaut-oraclecloud-vault[groupId=io.micronaut.oraclecloud]
+
+=== Configuration changes
+
+Create `src/main/resources/bootstrap.yml` with just the `micronaut.application.name` property:
+
+[source, yaml]
+.src/main/resources/bootstrap.yml
+----
+micronaut:
+  application:
+    name: micronautguide
+----
+
+and delete the `micronaut.application.name` property from `application.yml` so it's only declared once:
+
+[source, yaml]
+.src/main/resources/application.yml
+----
+micronaut:
+  executors:
+    io:
+      type: fixed
+      nThreads: 75
+flyway:
+  datasources:
+    default:
+      enabled: true
+----
+
+Then create `src/main/resources/bootstrap-oraclecloud.yml` with the following content:
+
+[source, yaml]
+.src/main/resources/bootstrap-oraclecloud.yml
+----
+micronaut:
+  config-client:
+    enabled: true
+oci:
+  config:
+    profile: DEFAULT # <1>
+  vault:
+    config:
+      enabled: true
+    vaults:
+      - ocid: # <2>
+        compartment-ocid: # <3>
+----
+
+<1> Use the same profile name as above in `application-oraclecloud.yml`
+<2> Set the value of the `ocid` property with the vault OCID unique identifier you saved when creating the vault.
+<3> Set the value of the `compartment-ocid` property with the OCID unique identifier of the compartment where you created the secrets
+
+Delete the `oci.config.profile` property from `application-oraclecloud.yml`, and replace the cleartext passwords with placeholders using the secret names you created:
+
+[source, yaml]
+.src/main/resources/application-oraclecloud.yml
+----
+datasources:
+  default:
+    ocid: ocid1.autonomousdatabase.oc1.iad.anuwcl...
+    walletPassword: ${ATP_WALLET_PASSWORD}
+    username: micronautdemo
+    password: ${ATP_USER_PASSWORD}
+----
 
 == Running the Application
 
@@ -297,117 +408,71 @@ connection: keep-alive
 {"message":"Page Not Found","_links":{"self":{"href":"/things/Ralph","templated":false}}}
 ```
 
-== Using Oracle Cloud Vault
-
-In the previous sections, we included the admin and user passwords in cleartext inside `application-oraclecloud.yml`, which is not a best practice. However, it's possible to externalize those (and other properties that shouldn't be in cleartext and/or in source control) with https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm[Oracle Cloud Vault].
-
-=== Creating the vault
-
-From the Oracle Cloud Menu select "Identity & Security" and then "Vault":
-
-image::oracleautodb/vault1.png[]
-
-Click "Create Vault":
-
-image::oracleautodb/vault2.png[]
-
-Then enter a name for the vault, e.g. "mn-guide-vault" and click "Create Vault":
-
-image::oracleautodb/vault3.png[]
-
-Click the "Copy" link in the `OCID` row; this is the unique identifier for your vault and you'll need it later.
-
-image::oracleautodb/vault4.png[]
-
-Click "Master Encryption Keys" under "Resources", then click "Create Key":
-
-image::oracleautodb/vault5.png[]
-
-Choose a name for the key, e.g. "mn-guide-encryption-key", and change "Protection Mode" to "Software", then click "Create Key":
-
-image::oracleautodb/vault6.png[]
-
-Once the key has finished provisioning, click "Secrets" under "Resources", then click "Create Secret":
-
-image::oracleautodb/vault7.png[]
-
-This first secret will be for the wallet password, so choose a name like "ATP_WALLET_PASSWORD". Select the encryption key you created, and put the wallet password value in the "Secret Contents" field, then click "Create Secret":
-
-image::oracleautodb/vault8.png[]
-
-Create another key for the user password, using a name like "ATP_USER_PASSWORD".
-
-=== Dependency
-
-Add a dependency for the `micronaut-oraclecloud-vault` library to add support for using Vault as a distributed configuration source:
-
-dependency:micronaut-oraclecloud-vault[groupId=io.micronaut.oraclecloud]
-
-=== Configuration changes
-
-Create `src/main/resources/bootstrap.yml` with just the `micronaut.application.name` property:
-
-[source, yaml]
-.src/main/resources/bootstrap.yml
-----
-micronaut:
-  application:
-    name: micronautguide
-----
-
-and delete the `micronaut.application.name` property from `application.yml` so it's only declared once:
-
-[source, yaml]
-.src/main/resources/application.yml
-----
-micronaut:
-  executors:
-    io:
-      type: fixed
-      nThreads: 75
-flyway:
-  datasources:
-    default:
-      enabled: true
-----
-
-Then create `src/main/resources/bootstrap-oraclecloud.yml` with the following content:
-
-[source, yaml]
-.src/main/resources/bootstrap-oraclecloud.yml
-----
-micronaut:
-  config-client:
-    enabled: true
-oci:
-  config:
-    profile: DEFAULT # <1>
-  vault:
-    config:
-      enabled: true
-    vaults:
-      - ocid: # <2>
-        compartment-ocid: # <3>
-----
-
-<1> Use the same profile name as above in `application-oraclecloud.yml`
-<2> Set the value of the `ocid` property with the vault OCID unique identifier you saved when creating the vault.
-<3> Set the value of the `compartment-ocid` property with the OCID unique identifier of the compartment where you created the secrets
-
-Delete the `oci.config.profile` property from `application-oraclecloud.yml`, and replace the cleartext passwords with placeholders using the secret names you created:
-
-[source, yaml]
-.src/main/resources/application-oraclecloud.yml
-----
-datasources:
-  default:
-    ocid: ocid1.autonomousdatabase.oc1.iad.anuwcl...
-    walletPassword: ${ATP_WALLET_PASSWORD}
-    username: micronautdemo
-    password: ${ATP_USER_PASSWORD}
-----
-
 Run the application again, and everything should work with the password placeholders replaced with the resolved secret values at startup.
+
+== Connect the database with the IntelliJ Database tool
+
+Update your Autonomous Database Instance to Allow both TLS and mTLS Authentication:
+
+In our Oracle Cloud Autonomous Database Details page under Network section click on "Access control list" "Edit" link.
+
+image::oracleautodb/dbtool1.png[]
+
+{empty} +
+
+In opened dialog "Edit Access Control List" for "IP notation type" select box choose "IP Address", then click on "Add My IP Address" Button and "Save Changes".
+
+image::oracleautodb/dbtool2.png[]
+
+{empty} +
+
+In one field below  "Mutual TLS (mTLS) authentication:" click on "Edit" link.
+Uncheck "Require mutual TLS (mTLS) authentication" check box in opened "Edit Mutual TLS Authentication" dialog and "Save Changes".
+
+image::oracleautodb/dbtool3.png[]
+
+{empty} +
+
+Click on "DB Connection' button then choose one of Connection Strings and click "Copy" link. It will be used for creating connection url.
+
+image::oracleautodb/dbtool4.png[]
+
+{empty} +
+
+Setup DB connection in the IntelliJ Database tool:
+
+Select Database tool and Data Source Properties in IntelliJ
+
+image::oracleautodb/dbtool5.png[]
+
+{empty} +
+
+In opened Data Source and Drivers window select adding new DataSource and choose Oracle
+
+image::oracleautodb/dbtool6.png[]
+
+{empty} +
+
+In Configuration window add "Name"": MicronautDemo, "User": micronautdemo and "Password" specified before.
+In "URL" field remove "localhost:1521:XE" and add previously copied Connection String
+
+image::oracleautodb/dbtool7.png[]
+
+{empty} +
+
+URL field should looks like: jdbc:oracle:thin:@(description= (retry_count=20) .... L=Redwood City, ST=California, C=US")))
+
+Click on Test Connection and you should get "Secceeded" message, then click "Ok"
+
+image::oracleautodb/dbtool8.png[]
+
+{empty} +
+
+Under MICRONAUTDEMO user make select query of 'THING' table
+
+image::oracleautodb/dbtool9.png[]
+
+{empty} +
 
 common:next.adoc[]
 
