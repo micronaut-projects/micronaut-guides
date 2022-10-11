@@ -139,11 +139,12 @@
 <li><a href="#add-dependencies">5.1. Add Dependencies</a></li>
 <li><a href="#create-a-sessionprovider">5.2. Create a SessionProvider</a></li>
 <li><a href="#emailcontroller-class">5.3. EmailController class</a></li>
-<li><a href="#from-configuration">5.4. From Configuration</a></li>
-<li><a href="#smtp-configuration">5.5. SMTP configuration</a></li>
-<li><a href="#java-mail-properties-configuration">5.6. Java Mail Properties Configuration</a></li>
-<li><a href="#set-configuration-variables">5.7. Set Configuration Variables</a></li>
-<li><a href="#writing-tests">5.8. Writing Tests</a></li>
+<li><a href="#email-template">5.4. Email template</a></li>
+<li><a href="#from-configuration">5.5. From Configuration</a></li>
+<li><a href="#smtp-configuration">5.6. SMTP configuration</a></li>
+<li><a href="#java-mail-properties-configuration">5.7. Java Mail Properties Configuration</a></li>
+<li><a href="#set-configuration-variables">5.8. Set Configuration Variables</a></li>
+<li><a href="#writing-tests">5.9. Writing Tests</a></li>
 </ul>
 </li>
 <li><a href="#testing-the-application">6. Testing the Application</a></li>
@@ -278,7 +279,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export GRP_ID=ocid1.group.oc1..aaaaaaaaqx...</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">export GRP_ID='ocid1.group.oc1..aaaaaaaaqx...'</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -349,7 +350,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export USR_ID=ocid1.user.oc1..aaaaaaaaqx...</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">export USR_ID='ocid1.user.oc1..aaaaaaaaqx...'</code></pre>
 </div>
 </div>
 </div>
@@ -394,7 +395,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export C=ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">export C='ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...'</code></pre>
 </div>
 </div>
 </div>
@@ -716,7 +717,25 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 </div>
 <div class="sect2">
-<h3 id="from-configuration">5.4. From Configuration</h3>
+<h3 id="email-template">5.4. Email template</h3>
+<div class="paragraph">
+<p>Create a Thymeleaf template in:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/views/email.html</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attribute-name">lang</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">en</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">xmlns:th</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.thymeleaf.org</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;p&gt;</span>
+        Hello, <span class="tag">&lt;span</span> <span class="attribute-name">th:text</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">${name}</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span><span class="tag">&lt;/span&gt;</span>!
+    <span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/body&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="from-configuration">5.5. From Configuration</h3>
 <div class="paragraph">
 <p>If you always use the same Sender you can add the following configuration snippet to <code>application.yml</code></p>
 </div>
@@ -726,8 +745,8 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
   <span class="key">email</span>:
     <span class="key">from</span>:
-      <span class="key">email</span>: <span class="string"><span class="content">${FROM_EMAIL:''} </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-      <span class="key">name</span>: <span class="string"><span class="content">${FROM_NAME:''} </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+      <span class="key">email</span>: <span class="string"><span class="content">${FROM_EMAIL:``} </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="key">name</span>: <span class="string"><span class="content">${FROM_NAME:``} </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -744,7 +763,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 </div>
 <div class="sect2">
-<h3 id="smtp-configuration">5.5. SMTP configuration</h3>
+<h3 id="smtp-configuration">5.6. SMTP configuration</h3>
 <div class="paragraph">
 <p>Add the following snippet to <code>application.yml</code> to supply the SMTP credentials.</p>
 </div>
@@ -756,8 +775,8 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">smtp</span>:
-  <span class="key">password</span>: <span class="string"><span class="content">${SMTP_PASSWORD:''} </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-  <span class="key">user</span>: <span class="string"><span class="content">${SMTP_USER:''} </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+  <span class="key">password</span>: <span class="string"><span class="content">${SMTP_PASSWORD:``} </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+  <span class="key">user</span>: <span class="string"><span class="content">${SMTP_USER:``} </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -774,7 +793,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 </div>
 <div class="sect2">
-<h3 id="java-mail-properties-configuration">5.6. Java Mail Properties Configuration</h3>
+<h3 id="java-mail-properties-configuration">5.7. Java Mail Properties Configuration</h3>
 <div class="paragraph">
 <p>Add the following snippet to  <code>application.yml</code> to supply JavaMail properties:</p>
 </div>
@@ -789,7 +808,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         <span class="key">auth</span>: <span class="string"><span class="content">true</span></span>
         <span class="key">starttls</span>:
           <span class="key">enable</span>: <span class="string"><span class="content">true</span></span>
-        <span class="key">host</span>: <span class="string"><span class="content">${SMTP_HOST:''} </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+        <span class="key">host</span>: <span class="string"><span class="content">${SMTP_HOST:``} </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -802,7 +821,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 </div>
 <div class="sect2">
-<h3 id="set-configuration-variables">5.7. Set Configuration Variables</h3>
+<h3 id="set-configuration-variables">5.8. Set Configuration Variables</h3>
 <div class="paragraph">
 <p>It&#8217;s best to avoid hard-coding credentials and other sensitive information directly in config files. By using placeholder variables in <code>application.yml</code> like <code>SMTP_PASSWORD</code> and <code>SMTP_USER</code>, we can externalize the values via environment variables or secure storage such as <a href="https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm">Oracle Cloud Infrastructure (OCI) Vault</a>.</p>
 </div>
@@ -811,16 +830,16 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export FROM_EMAIL=noreply@test.com
-export FROM_NAME=noreply
-export SMTP_PASSWORD=&quot;nB$O;.......&quot;
-export SMTP_USER=&quot;ocid1.user.oc1..aaaaaaaaqx...@ocid1.tenancy.oc1..aaaaaaaa....me.com&quot;
-export SMTP_HOST=smtp.email.us-ashburn-1.oci.oraclecloud.com</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">export FROM_EMAIL='noreply@test.com'
+export FROM_NAME='noreply'
+export SMTP_PASSWORD='nB$O;.......'
+export SMTP_USER='ocid1.user.oc1..aaaaaaaaqx...@ocid1.tenancy.oc1..aaaaaaaa....me.com'
+export SMTP_HOST='smtp.email.us-ashburn-1.oci.oraclecloud.com'</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="writing-tests">5.8. Writing Tests</h3>
+<h3 id="writing-tests">5.9. Writing Tests</h3>
 <div class="paragraph">
 <p>Create a test class to ensure emails are sent successfully:</p>
 </div>
