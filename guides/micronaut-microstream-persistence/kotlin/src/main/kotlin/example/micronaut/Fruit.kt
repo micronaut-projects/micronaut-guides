@@ -1,9 +1,10 @@
 package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
+
 import javax.validation.constraints.NotBlank
 
-@Introspected // <1>
+@Serdeable // <1>
 data class Fruit(
     @field:NotBlank val name: String, // <2>
     var description: String? // <3>
