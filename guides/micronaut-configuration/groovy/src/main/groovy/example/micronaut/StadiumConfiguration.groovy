@@ -2,14 +2,16 @@ package example.micronaut
 
 import io.micronaut.context.annotation.EachProperty
 import io.micronaut.context.annotation.Parameter
+import io.micronaut.serde.annotation.Serdeable
 
-@EachProperty("stadium") // <1>
+@Serdeable // <1>
+@EachProperty("stadium") // <2>
 class StadiumConfiguration {
-    String name // <2>
+    String name // <3>
     String city
     Integer size
 
-    StadiumConfiguration(@Parameter String name) { // <2>
+    StadiumConfiguration(@Parameter String name) { // <3>
         this.name = name
     }
 

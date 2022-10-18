@@ -2,12 +2,12 @@ package example.micronaut
 
 import io.micronaut.context.annotation.EachProperty
 import io.micronaut.context.annotation.Parameter
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
-@EachProperty("stadium") // <1>
+@Serdeable // <1>
+@EachProperty("stadium") // <2>
 class StadiumConfiguration
-constructor(@param:Parameter val name: String) {  // <2>
+constructor(@param:Parameter val name: String) {  // <3>
     var city: String? = null
     var size: Int? = null
 }
