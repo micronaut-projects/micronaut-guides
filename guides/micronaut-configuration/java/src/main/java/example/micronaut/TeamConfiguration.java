@@ -1,10 +1,14 @@
 package example.micronaut;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.micronaut.context.annotation.ConfigurationBuilder;
 import io.micronaut.context.annotation.ConfigurationProperties;
+import io.micronaut.serde.annotation.Serdeable;
 
 import java.util.List;
 
+@Serdeable // <1>
+@JsonIgnoreProperties("builder") // <2>
 //tag::teamConfigClassNoBuilder[]
 @ConfigurationProperties("team")
 public class TeamConfiguration {
@@ -16,8 +20,8 @@ public class TeamConfiguration {
     public TeamConfiguration() {
     }
 
-    @ConfigurationBuilder(prefixes = "with", configurationPrefix = "team-admin") // <1>
-    protected TeamAdmin.Builder builder = TeamAdmin.builder(); // <2>
+    @ConfigurationBuilder(prefixes = "with", configurationPrefix = "team-admin") // <3>
+    protected TeamAdmin.Builder builder = TeamAdmin.builder(); // <4>
 
     public TeamAdmin.Builder getBuilder() {
         return builder;
