@@ -1,13 +1,13 @@
 package example.micronaut
 
 import groovy.transform.CompileStatic
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Positive
 
 @CompileStatic
-@Introspected // <1>
+@Serdeable // <1>
 class CommandBookSave {
 
     @NotBlank // <2>
