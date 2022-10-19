@@ -521,11 +521,15 @@ We are using the builder only here, so we will have to call <code>builder.build(
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">com.fasterxml.jackson.annotation.JsonIgnoreProperties</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationBuilder</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.ConfigurationProperties</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@JsonIgnoreProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">builder</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="comment">//tag::teamConfigClassNoBuilder[]</span>
 <span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">team</span><span class="delimiter">&quot;</span></span>)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">TeamConfiguration</span> {
@@ -537,8 +541,8 @@ We are using the builder only here, so we will have to call <code>builder.build(
     <span class="directive">public</span> TeamConfiguration() {
     }
 
-    <span class="annotation">@ConfigurationBuilder</span>(prefixes = <span class="string"><span class="delimiter">&quot;</span><span class="content">with</span><span class="delimiter">&quot;</span></span>, configurationPrefix = <span class="string"><span class="delimiter">&quot;</span><span class="content">team-admin</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="directive">protected</span> TeamAdmin.Builder builder = TeamAdmin.builder(); <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@ConfigurationBuilder</span>(prefixes = <span class="string"><span class="delimiter">&quot;</span><span class="content">with</span><span class="delimiter">&quot;</span></span>, configurationPrefix = <span class="string"><span class="delimiter">&quot;</span><span class="content">team-admin</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="directive">protected</span> TeamAdmin.Builder builder = TeamAdmin.builder(); <i class="conum" data-value="4"></i><b>(4)</b>
 
     <span class="directive">public</span> TeamAdmin.Builder getBuilder() {
         <span class="keyword">return</span> builder;
@@ -580,10 +584,18 @@ We are using the builder only here, so we will have to call <code>builder.build(
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td><code>prefixes</code> tells the Micronaut framework to find methods that are prefixed by <code>with</code>; <code>configurationPrefix</code> allows the developer to customize the <code>application.yml</code> element</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Mark the builder as being ignored during serialization.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>prefixes</code> tells the Micronaut framework to find methods that are prefixed by <code>with</code>; <code>configurationPrefix</code> allows the developer to customize the <code>application.yml</code> element</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
 <td>Instantiate the builder object so it can be populated with configuration values.</td>
 </tr>
 </table>
@@ -686,12 +698,12 @@ property will be parameterized as the name.</p>
 
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.EachProperty</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Parameter</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
-<span class="annotation">@Introspected</span>
-<span class="annotation">@EachProperty</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">stadium</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@EachProperty</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">stadium</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">StadiumConfiguration</span> {
-    <span class="directive">private</span> <span class="predefined-type">String</span> name; <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">private</span> <span class="predefined-type">String</span> name; <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="directive">private</span> <span class="predefined-type">String</span> city;
     <span class="directive">private</span> <span class="predefined-type">Integer</span> size;
 
@@ -729,10 +741,14 @@ property will be parameterized as the name.</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Establish the top layer of configuration</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Establish the top layer of configuration</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
 <td><code>name</code> is read in from the property key and send as a parameter to the bean.</td>
 </tr>
 </table>
