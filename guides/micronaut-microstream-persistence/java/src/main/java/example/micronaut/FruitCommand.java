@@ -1,12 +1,13 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.serde.annotation.Serdeable;
 
 import javax.validation.constraints.NotBlank;
 
-@Introspected // <1>
+@Serdeable // <1>
 public class FruitCommand {
 
     @NonNull
@@ -20,6 +21,7 @@ public class FruitCommand {
         this(name, null);
     }
 
+    @Creator
     public FruitCommand(@NonNull String name,
                         @Nullable String description) {
         this.name = name;
