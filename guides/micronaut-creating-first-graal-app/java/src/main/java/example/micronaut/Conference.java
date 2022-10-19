@@ -1,8 +1,8 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
-@Introspected // <1>
+@Serdeable // <1>
 public class Conference {
 
     private final String name;
