@@ -2,12 +2,12 @@ package example.micronaut;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
-@Introspected
-@EachProperty("stadium") // <1>
+@Serdeable // <1>
+@EachProperty("stadium") // <2>
 public class StadiumConfiguration {
-    private String name; // <2>
+    private String name; // <3>
     private String city;
     private Integer size;
 

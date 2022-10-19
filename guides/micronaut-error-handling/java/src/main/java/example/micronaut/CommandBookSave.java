@@ -1,11 +1,11 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
-@Introspected // <1>
+@Serdeable // <1>
 public class CommandBookSave {
 
     @NotBlank // <2>
