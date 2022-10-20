@@ -1,8 +1,8 @@
 package example.micronaut.models;
 
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.serde.annotation.Serdeable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-@Introspected // <1>
+@Serdeable // <1>
 public class RoomMessage {
 
     private static final String PATTERN = "MMM:dd HH:mm:ss";
