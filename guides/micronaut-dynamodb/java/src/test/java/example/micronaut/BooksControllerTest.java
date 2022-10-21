@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @MicronautTest // <1>
-@TestInstance(PER_CLASS) // <3>
+@TestInstance(PER_CLASS) // <2>
 class BooksControllerTest { // <3>
 
     @Inject
