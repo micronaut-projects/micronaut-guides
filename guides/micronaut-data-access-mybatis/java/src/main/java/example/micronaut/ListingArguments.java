@@ -1,7 +1,8 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.http.uri.UriBuilder;
 
 import javax.validation.constraints.Pattern;
@@ -10,7 +11,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.util.Optional;
 
-@Introspected
+@Serdeable
 public class ListingArguments {
 
     @PositiveOrZero
@@ -28,7 +29,15 @@ public class ListingArguments {
     @Nullable
     private String order;
 
-    public ListingArguments() {
+    private ListingArguments() {
+    }
+
+    @Creator
+    public ListingArguments(Integer offset, @Nullable Integer max, @Nullable String sort, @Nullable String order) {
+        this.offset = offset;
+        this.max = max;
+        this.sort = sort;
+        this.order = order;
     }
 
     public Optional<Integer> getOffset() {
