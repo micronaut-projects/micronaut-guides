@@ -1,11 +1,11 @@
 package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Positive
 import javax.validation.constraints.PositiveOrZero
 
-@Introspected
+@Serdeable
 class SortingAndOrderArguments {
     @field:PositiveOrZero var offset:  Int? = null // <1>
     @field:Positive var max: Int? = null // <1>

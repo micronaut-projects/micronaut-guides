@@ -5,12 +5,20 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.client.BlockingHttpClient;
+import io.micronaut.http.client.HttpClient;
+import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
+import io.micronaut.runtime.EmbeddedApplication;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.inject.Inject;
 
 import static io.micronaut.http.HttpHeaders.LOCATION;
 import static io.micronaut.http.HttpStatus.BAD_REQUEST;
@@ -21,7 +29,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class GenreControllerTest extends BaseMysqlTest { // <1>
+@MicronautTest(transactional = false)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class GenreControllerTest {
+
+    @Inject
+    EmbeddedApplication<?> application;
+
+    @Inject
+    @Client("/")
+    HttpClient httpClient;
 
     private BlockingHttpClient blockingClient;
 
