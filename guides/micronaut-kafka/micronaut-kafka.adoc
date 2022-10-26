@@ -29,19 +29,18 @@ Create the `books` microservice using the https://docs.micronaut.io/latest/guide
 
 [source,bash]
 ----
-mn @books:cli-command@ --features=kafka,reactor,graalvm,testcontainers example.micronaut.books --build=@build@ --lang=@lang@
+mn @books:cli-command@ --features=kafka,reactor,graalvm,serialization-jackson example.micronaut.books --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `reactor`, `graalvm`, and `testcontainers` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `reactor`, `graalvm`, and `serialization-jackson` features.
 
 The previous command creates a directory named `books` and a Micronaut application inside it with default package `example.micronaut`.
 
-In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for https://www.testcontainers.org/modules/kafka/[Kafka in Testcontainers], along with one for the http://www.awaitility.org/[Awaitility] library:
+In addition to the dependencies added by the above features, we also need a test dependency for the http://www.awaitility.org/[Awaitility] library:
 
 :dependencies:
-dependency:kafka[groupId=org.testcontainers,scope=test]
 dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
 :dependencies:
 
@@ -68,7 +67,7 @@ Create the `analytics` microservice using the https://docs.micronaut.io/latest/g
 
 [source,bash]
 ----
-mn @analytics:cli-command@ --features=kafka,graalvm example.micronaut.analytics --build=@build@ --lang=@lang@
+mn @analytics:cli-command@ --features=kafka,graalvm,serialization-jackson example.micronaut.analytics --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
@@ -271,7 +270,7 @@ source:AnalyticsClient[app=books]
 
 ==== Create Tests
 
-We could use mocks to test the message sending logic between `BookController`, `AnalyticsFilter`, and `AnalyticsClient`, but it's more realistic to use a running Kafka broker. To avoid the burden of having to install Kafka locally (and to make the tests more CI-friendly) we'll use https://www.testcontainers.org/[Testcontainers] to run Kafka inside a Docker container.
+We could use mocks to test the message sending logic between `BookController`, `AnalyticsFilter`, and `AnalyticsClient`, but it's more realistic to use a running Kafka broker this is why <<test-resources,Test Resources>> are used to run Kafka inside a Docker container.
 
 Write a test for `BookController` to verify the interaction with `AnalyticsService`:
 
