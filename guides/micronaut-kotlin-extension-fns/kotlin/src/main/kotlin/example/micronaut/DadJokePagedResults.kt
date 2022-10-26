@@ -1,8 +1,8 @@
 package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected // <1>
+@Serdeable // <1>
 data class DadJokePagedResults(
     val current_page: Int,
     val limit: Int,
