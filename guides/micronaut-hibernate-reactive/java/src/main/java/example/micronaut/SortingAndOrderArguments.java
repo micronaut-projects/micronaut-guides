@@ -27,7 +27,7 @@ public class SortingAndOrderArguments {
     @Pattern(regexp = "asc|ASC|desc|DESC")  // <1>
     private String order;
 
-    public SortingAndOrderArguments(Integer offset, Integer max, String sort, String order) {
+    public SortingAndOrderArguments(@Nullable Integer offset, @Nullable Integer max, @Nullable String sort, @Nullable String order) {
         this.offset = offset;
         this.max = max;
         this.sort = sort;
