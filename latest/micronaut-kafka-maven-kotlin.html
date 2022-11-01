@@ -255,7 +255,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,reactor,graalvm,testcontainers example.micronaut.books --build=maven --lang=kotlin</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,reactor,graalvm,serialization-jackson example.micronaut.books --build=maven --lang=kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -271,23 +271,18 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>kafka</code>, <code>reactor</code>, <code>graalvm</code>, and <code>testcontainers</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>kafka</code>, <code>reactor</code>, <code>graalvm</code>, and <code>serialization-jackson</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a directory named <code>books</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
 </div>
 <div class="paragraph">
-<p>In addition to the dependencies added by the <code>testcontainers</code> feature, we also need a test dependency for <a href="https://www.testcontainers.org/modules/kafka/">Kafka in Testcontainers</a>, along with one for the <a href="http://www.awaitility.org/">Awaitility</a> library:</p>
+<p>In addition to the dependencies added by the above features, we also need a test dependency for the <a href="http://www.awaitility.org/">Awaitility</a> library:</p>
 </div>
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>kafka<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.awaitility<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>awaitility<span class="tag">&lt;/artifactId&gt;</span>
     <span class="tag">&lt;version&gt;</span>@awaitilityVersion@<span class="tag">&lt;/version&gt;</span>
@@ -303,9 +298,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class Book(val isbn: String, val name: String)</code></pre>
 </div>
 </div>
@@ -393,7 +388,7 @@ class BookController(private val bookService: BookService) { <i class="conum" da
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,graalvm example.micronaut.analytics --build=maven --lang=kotlin</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,graalvm,serialization-jackson example.micronaut.analytics --build=maven --lang=kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -419,9 +414,9 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class Book(val isbn: String, val name: String)</code></pre>
 </div>
 </div>
@@ -445,9 +440,9 @@ This <code>Book</code> POJO is the same as the one in the <code>books</code> mic
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class BookAnalytics(val bookIsbn: String, val count: Long)</code></pre>
 </div>
 </div>
@@ -826,7 +821,7 @@ interface AnalyticsClient {
 <div class="sect3">
 <h4 id="create-tests">7.2.2. Create Tests</h4>
 <div class="paragraph">
-<p>We could use mocks to test the message sending logic between <code>BookController</code>, <code>AnalyticsFilter</code>, and <code>AnalyticsClient</code>, but it&#8217;s more realistic to use a running Kafka broker. To avoid the burden of having to install Kafka locally (and to make the tests more CI-friendly) we&#8217;ll use <a href="https://www.testcontainers.org/">Testcontainers</a> to run Kafka inside a Docker container.</p>
+<p>We could use mocks to test the message sending logic between <code>BookController</code>, <code>AnalyticsFilter</code>, and <code>AnalyticsClient</code>, but it&#8217;s more realistic to use a running Kafka broker this is why <a href="#test-resources">Test Resources</a> are used to run Kafka inside a Docker container.</p>
 </div>
 <div class="paragraph">
 <p>Write a test for <code>BookController</code> to verify the interaction with <code>AnalyticsService</code>:</p>

@@ -238,7 +238,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,reactor,graalvm,testcontainers example.micronaut.books --build=gradle --lang=groovy</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,reactor,graalvm,serialization-jackson example.micronaut.books --build=gradle --lang=groovy</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -254,19 +254,18 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>kafka</code>, <code>reactor</code>, <code>graalvm</code>, and <code>testcontainers</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>kafka</code>, <code>reactor</code>, <code>graalvm</code>, and <code>serialization-jackson</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a directory named <code>books</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
 </div>
 <div class="paragraph">
-<p>In addition to the dependencies added by the <code>testcontainers</code> feature, we also need a test dependency for <a href="https://www.testcontainers.org/modules/kafka/">Kafka in Testcontainers</a>, along with one for the <a href="http://www.awaitility.org/">Awaitility</a> library:</p>
+<p>In addition to the dependencies added by the above features, we also need a test dependency for the <a href="http://www.awaitility.org/">Awaitility</a> library:</p>
 </div>
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.testcontainers:kafka</span><span class="delimiter">&quot;</span></span>)
-testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.awaitility:awaitility:@awaitilityVersion@</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.awaitility:awaitility:@awaitilityVersion@</span><span class="delimiter">&quot;</span></span>)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -279,11 +278,11 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 
 <span class="keyword">import</span> <span class="include">groovy.transform.Canonical</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>
 
 <span class="annotation">@Canonical</span>
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="type">class</span> <span class="class">Book</span> {
     <span class="predefined-type">String</span> isbn
     <span class="predefined-type">String</span> name
@@ -388,7 +387,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,graalvm example.micronaut.analytics --build=gradle --lang=groovy</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=kafka,graalvm,serialization-jackson example.micronaut.analytics --build=gradle --lang=groovy</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -416,11 +415,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">groovy.transform.Canonical</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>
 
 <span class="annotation">@Canonical</span>
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="type">class</span> <span class="class">Book</span> {
     <span class="predefined-type">String</span> isbn
     <span class="predefined-type">String</span> name
@@ -449,11 +448,11 @@ This <code>Book</code> POJO is the same as the one in the <code>books</code> mic
 
 <span class="keyword">import</span> <span class="include">groovy.transform.Canonical</span>
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>
 
 <span class="annotation">@Canonical</span>
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="type">class</span> <span class="class">BookAnalytics</span> {
     <span class="predefined-type">String</span> bookIsbn
     <span class="type">long</span> count
@@ -859,7 +858,7 @@ This <code>Book</code> POJO is the same as the one in the <code>books</code> mic
 <div class="sect3">
 <h4 id="create-tests">7.2.2. Create Tests</h4>
 <div class="paragraph">
-<p>We could use mocks to test the message sending logic between <code>BookController</code>, <code>AnalyticsFilter</code>, and <code>AnalyticsClient</code>, but it&#8217;s more realistic to use a running Kafka broker. To avoid the burden of having to install Kafka locally (and to make the tests more CI-friendly) we&#8217;ll use <a href="https://www.testcontainers.org/">Testcontainers</a> to run Kafka inside a Docker container.</p>
+<p>We could use mocks to test the message sending logic between <code>BookController</code>, <code>AnalyticsFilter</code>, and <code>AnalyticsClient</code>, but it&#8217;s more realistic to use a running Kafka broker this is why <a href="#test-resources">Test Resources</a> are used to run Kafka inside a Docker container.</p>
 </div>
 <div class="paragraph">
 <p>Write a test for <code>BookController</code> to verify the interaction with <code>AnalyticsService</code>:</p>
