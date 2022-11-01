@@ -4,14 +4,16 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
+import io.micronaut.serde.annotation.Serdeable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@MappedEntity // <1>
+@Serdeable // <1>
+@MappedEntity // <2>
 public class Pet {
 
-    @Id // <2>
-    @GeneratedValue(GeneratedValue.Type.AUTO) // <3>
+    @Id // <3>
+    @GeneratedValue(GeneratedValue.Type.AUTO) // <4>
     private Long id;
 
     @NonNull
