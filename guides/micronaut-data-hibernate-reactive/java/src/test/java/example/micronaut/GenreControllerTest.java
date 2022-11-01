@@ -6,8 +6,14 @@ import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.client.HttpClient;
+import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class GenreControllerTest extends BaseMysqlTest { // <1>
+@MicronautTest // <1>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
+public class GenreControllerTest {
+
+    @Inject
+    @Client("/")
+    HttpClient httpClient; // <3>
+
     @Test
     public void testFindNonExistingGenreReturns404() {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -> {
@@ -33,13 +46,13 @@ public class GenreControllerTest extends BaseMysqlTest { // <1>
 
         List<Long> genreIds = new ArrayList<>();
 
-        HttpRequest<?> request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <2>
+        HttpRequest<?> request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <4>
         HttpResponse<?> response = httpClient.toBlocking().exchange(request);
         genreIds.add(entityId(response));
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
 
-        request = HttpRequest.POST("/genres", Collections.singletonMap("name", "Microservices")); // <3>
+        request = HttpRequest.POST("/genres", Collections.singletonMap("name", "Microservices")); // <4>
         response = httpClient.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
@@ -48,12 +61,12 @@ public class GenreControllerTest extends BaseMysqlTest { // <1>
         genreIds.add(id);
         request = HttpRequest.GET("/genres/" + id);
 
-        Genre genre = httpClient.toBlocking().retrieve(request, Genre.class); // <4>
+        Genre genre = httpClient.toBlocking().retrieve(request, Genre.class); // <5>
 
         assertEquals("Microservices", genre.getName());
 
         request = HttpRequest.PUT("/genres", new GenreUpdateCommand(id, "Micro-services"));
-        response = httpClient.toBlocking().exchange(request);  // <4>
+        response = httpClient.toBlocking().exchange(request);  // <6>
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
@@ -66,7 +79,7 @@ public class GenreControllerTest extends BaseMysqlTest { // <1>
 
         assertEquals(2, genres.size());
 
-        request = HttpRequest.POST("/genres/ex", Collections.singletonMap("name", "Microservices")); // <2>
+        request = HttpRequest.POST("/genres/ex", Collections.singletonMap("name", "Microservices")); // <4>
         response = httpClient.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
