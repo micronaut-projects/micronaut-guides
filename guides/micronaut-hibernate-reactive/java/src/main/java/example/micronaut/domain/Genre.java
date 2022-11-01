@@ -1,5 +1,7 @@
 package example.micronaut.domain;
 
+
+import io.micronaut.serde.annotation.Serdeable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Column;
@@ -14,6 +16,7 @@ import java.util.Set;
 
 import static javax.persistence.GenerationType.AUTO;
 
+@Serdeable
 @Entity
 @Table(name = "genre")
 public class Genre {
