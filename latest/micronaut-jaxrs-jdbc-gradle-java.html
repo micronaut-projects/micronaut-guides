@@ -241,7 +241,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=jax-rs,data-jdbc,mysql,flyway,graalvm \
+    --features=jax-rs,data-jdbc,mysql,flyway,graalvm,serialization-jackson \
     --build=gradle --lang=java</code></pre>
 </div>
 </div>
@@ -261,7 +261,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>jax-rs</code>, <code>data-jdbc</code>, <code>mysql</code>, <code>flyway</code>, and <code>graalvm</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>jax-rs</code>, <code>data-jdbc</code>, <code>mysql</code>, <code>flyway</code>, <code>graalvm</code>, and <code>serialization-jackson</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -270,7 +270,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=jax-rs&amp;features=data-jdbc&amp;features=mysql&amp;features=flyway&amp;features=graalvm&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=jax-rs&amp;features=data-jdbc&amp;features=mysql&amp;features=flyway&amp;features=graalvm&amp;features=serialization-jackson&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -413,14 +413,16 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.GeneratedValue</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Id</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.MappedEntity</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
-<span class="annotation">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@MappedEntity</span> <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Pet</span> {
 
-    <span class="annotation">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="annotation">@GeneratedValue</span>(GeneratedValue.Type.AUTO) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Id</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@GeneratedValue</span>(GeneratedValue.Type.AUTO) <i class="conum" data-value="4"></i><b>(4)</b>
     <span class="directive">private</span> <span class="predefined-type">Long</span> id;
 
     <span class="annotation">@NonNull</span>
@@ -475,14 +477,18 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Specifies the ID of an entity</td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
 <td>Specifies that the property value is generated by the database and not included in inserts</td>
 </tr>
 </table>
@@ -498,12 +504,12 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 
-<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">NameDto</span> {
 
     <span class="annotation">@NonNull</span>
@@ -525,7 +531,7 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 </table>
 </div>
@@ -602,13 +608,13 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">PetSave</span> {
     <span class="annotation">@NonNull</span>
     <span class="annotation">@NotBlank</span>

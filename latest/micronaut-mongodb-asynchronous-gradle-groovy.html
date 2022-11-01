@@ -220,7 +220,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=mongo-reactive,reactor \
+    --features=mongo-reactive,reactor,serialization-bson \
     --build=gradle --lang=groovy</code></pre>
 </div>
 </div>
@@ -240,7 +240,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>mongo-reactive</code>, and <code>reactor</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>mongo-reactive</code>, <code>reactor</code>, and <code>serialization-bson</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -249,7 +249,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=mongo-reactive&amp;features=reactor&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=mongo-reactive&amp;features=reactor&amp;features=serialization-bson&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -266,16 +266,16 @@ If you have an existing Micronaut application and want to add the functionality 
 
 <span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Creator</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>
 <span class="keyword">import</span> <span class="include">org.bson.codecs.pojo.annotations.BsonCreator</span>
 <span class="keyword">import</span> <span class="include">org.bson.codecs.pojo.annotations.BsonProperty</span>
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>
 
 <span class="annotation">@CompileStatic</span>
-<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">Fruit</span> {
 
     <span class="annotation">@NonNull</span>
@@ -315,7 +315,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>

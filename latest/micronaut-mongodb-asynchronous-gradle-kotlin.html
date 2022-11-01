@@ -226,7 +226,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=mongo-reactive,reactor \
+    --features=mongo-reactive,reactor,serialization-bson \
     --build=gradle --lang=kotlin</code></pre>
 </div>
 </div>
@@ -246,7 +246,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>mongo-reactive</code>, and <code>reactor</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>mongo-reactive</code>, <code>reactor</code>, and <code>serialization-bson</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -255,7 +255,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=mongo-reactive&amp;features=reactor&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=mongo-reactive&amp;features=reactor&amp;features=serialization-bson&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -282,12 +282,12 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.core.annotation.Creator
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonProperty
 import javax.validation.constraints.NotBlank
 
-@Introspected <i class="conum" data-value="1"></i><b>(1)</b>
+@Serdeable <i class="conum" data-value="1"></i><b>(1)</b>
 data class Fruit @Creator @BsonCreator constructor( <i class="conum" data-value="4"></i><b>(4)</b>
     @field:BsonProperty(&quot;name&quot;) @param:BsonProperty(&quot;name&quot;) @field:NotBlank val name: String,  <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b>
     @field:BsonProperty(&quot;description&quot;) @param:BsonProperty(&quot;description&quot;) var description: String?) { <i class="conum" data-value="3"></i><b>(3)</b>
@@ -300,7 +300,7 @@ data class Fruit @Creator @BsonCreator constructor( <i class="conum" data-value=
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
