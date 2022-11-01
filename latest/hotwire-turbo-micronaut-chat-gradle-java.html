@@ -168,7 +168,7 @@
 </ul>
 </li>
 <li><a href="#test-resources">11. Test Resources</a></li>
-<li><a href="#running-the-initial-application">12. Running the initial application</a></li>
+<li><a href="#running-the-application">12. Running the application</a></li>
 </ul>
 
                     </div>
@@ -1554,12 +1554,12 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.models</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
-<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">MessageForm</span> {
 
     <span class="annotation">@NonNull</span>
@@ -1591,7 +1591,7 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 </table>
 </div>
@@ -1603,9 +1603,9 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.models</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
@@ -1613,7 +1613,7 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <span class="keyword">import</span> <span class="include">java.time.ZoneId</span>;
 <span class="keyword">import</span> <span class="include">java.time.format.DateTimeFormatter</span>;
 
-<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">RoomMessage</span> {
 
     <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> PATTERN = <span class="string"><span class="delimiter">&quot;</span><span class="content">MMM:dd HH:mm:ss</span><span class="delimiter">&quot;</span></span>;
@@ -1677,7 +1677,7 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 </table>
 </div>
@@ -1870,7 +1870,7 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
   <span class="key">router</span>:
     <span class="key">static-resources</span>:
-      <span class="key">assets</span>:
+      <span class="key">assets</span>: <i class="conum" data-value="1"></i><b>(1)</b>
         <span class="key">paths</span>: <span class="string"><span class="content">'classpath:assets'</span></span>
         <span class="key">mapping</span>: <span class="string"><span class="content">'/assets/**'</span></span></code></pre>
 </div>
@@ -1879,7 +1879,7 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Configure the Framework to look for static resources in <code>src/main/resources/public</code>.</td>
+<td>Configure the Framework to resolve static resources from the request path <code>/assets/**</code> in <code>src/main/resources/assets</code>.</td>
 </tr>
 </table>
 </div>
@@ -2944,7 +2944,7 @@ action.destroy=Eliminar</code></pre>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Use <a href="https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html">View</a> annotation to specify which template to use to render the response.</td>
+<td>Set the response content-type to <code>HTML</code> with the <code>@Produces</code> annotation.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
@@ -2952,18 +2952,14 @@ action.destroy=Eliminar</code></pre>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Set the response content-type to <code>HTML</code> with the <code>@Produces</code> annotation.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="7"></i><b>7</b></td>
 <td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html">@Post</a> annotation maps the method to an HTTP POST request.</td>
 </tr>
 <tr>
-<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
 <td>You can define path variables with a RFC-6570 URI template in the HTTP Method annotation value. The method argument can optionally be annotated with <code>@PathVariable</code>.</td>
 </tr>
 <tr>
-<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
 <td>You can use a qualifier within the HTTP request body. For example, you can use a reference to a nested JSON attribute.</td>
 </tr>
 </table>
@@ -2984,7 +2980,7 @@ action.destroy=Eliminar</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="running-the-initial-application">12. Running the initial application</h2>
+<h2 id="running-the-application">12. Running the application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To run the application, use the <code>./gradlew run</code> command, which starts the application on port 8080.</p>
