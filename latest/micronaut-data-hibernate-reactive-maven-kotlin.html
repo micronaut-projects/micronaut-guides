@@ -138,10 +138,11 @@
 </ul>
 </li>
 <li><a href="#testing-the-application">5. Testing the Application</a></li>
-<li><a href="#using-mysql">6. Using MySQL</a></li>
-<li><a href="#running-the-application">7. Running the Application</a></li>
-<li><a href="#next-steps">8. Next steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
+<li><a href="#test-resources">6. Test Resources</a></li>
+<li><a href="#using-mysql">7. Using MySQL</a></li>
+<li><a href="#running-the-application">8. Running the Application</a></li>
+<li><a href="#next-steps">9. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">10. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -160,7 +161,7 @@
 <p>Authors: Sergio del Amo, Tim Yates, Roman Naglic</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 3.7.2</p>
+<p>Micronaut Version: 3.7.3</p>
 </div>
 </div>
 </div>
@@ -300,9 +301,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="key">hbm2ddl</span>:
           <span class="key">auto</span>: <span class="string"><span class="content">update </span></span><i class="conum" data-value="2"></i><b>(2)</b>
         <span class="key">connection</span>:
-          <span class="key">url</span>: <span class="string"><span class="content">${JDBC_URL:`jdbc:mysql://localhost:3306/db`}</span></span>
-          <span class="key">username</span>: <span class="string"><span class="content">${JDBC_USER:root}</span></span>
-          <span class="key">password</span>: <span class="string"><span class="content">${JDBC_PASSWORD:my-secret-pw}</span></span>
+          <span class="key">db-type</span>: <span class="string"><span class="content">mysql </span></span><i class="conum" data-value="3"></i><b>(3)</b>
     <span class="key">reactive</span>: <span class="string"><span class="content">true</span></span></code></pre>
 </div>
 </div>
@@ -315,6 +314,10 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>Configure how Hibernate will manage the database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Configure the database type for <a href="#test-resources">Test Resources</a></td>
 </tr>
 </table>
 </div>
@@ -605,106 +608,6 @@ open class GenreController(private val genreRepository: GenreRepository) { <i cl
 <div class="sect2">
 <h3 id="writing-tests">4.7. Writing Tests</h3>
 <div class="paragraph">
-<p>To allow us to run a MySQL instance in a Docker container for testing, create a base class that sets this up.</p>
-</div>
-<div class="listingblock">
-<div class="title">src/test/kotlin/example/micronaut/BaseMysqlTest.kt</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
-
-import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
-import io.micronaut.runtime.EmbeddedApplication
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
-import jakarta.inject.Inject
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.TestInstance
-import org.testcontainers.containers.GenericContainer
-import org.testcontainers.containers.wait.strategy.Wait
-import org.testcontainers.utility.DockerImageName
-
-@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
-@TestInstance(TestInstance.Lifecycle.PER_CLASS) <i class="conum" data-value="2"></i><b>(2)</b>
-open class BaseMysqlTest : TestPropertyProvider { <i class="conum" data-value="3"></i><b>(3)</b>
-    private var mysqlContainer: GenericContainer&lt;*&gt;? = null
-
-    @Inject
-    open var application: EmbeddedApplication&lt;*&gt;? = null
-
-    @Inject
-    @field:Client(&quot;/&quot;)
-    lateinit var httpClient: HttpClient <i class="conum" data-value="4"></i><b>(4)</b>
-
-    open fun startMySQL() {
-        if (mysqlContainer == null) {
-            mysqlContainer = GenericContainer(DockerImageName.parse(&quot;mysql:8.0.29&quot;))
-                .withExposedPorts(3306)
-                .withEnv(&quot;MYSQL_ROOT_PASSWORD&quot;, &quot;my-secret-pw&quot;)
-                .withEnv(&quot;MYSQL_DATABASE&quot;, &quot;db&quot;)
-                .waitingFor(Wait.forLogMessage(&quot;.*/usr/sbin/mysqld: ready for connections.*\\n&quot;, 2))
-        }
-        if (!mysqlContainer!!.isRunning) {
-            mysqlContainer!!.start()
-        }
-    }
-
-    open fun getMySQLDbUri(): String {
-        if (mysqlContainer == null || !mysqlContainer!!.isRunning) {
-            startMySQL()
-        }
-        return &quot;jdbc:mysql://localhost:&quot; + mysqlContainer!!.getMappedPort(3306) + &quot;/db&quot;
-    }
-
-    override fun getProperties(): MutableMap&lt;String, String&gt; { <i class="conum" data-value="5"></i><b>(5)</b>
-        return mutableMapOf(
-            Pair(&quot;jpa.default.properties.hibernate.connection.url&quot;, getMySQLDbUri()),
-            Pair(&quot;datasources.migration.url&quot;, getMySQLDbUri()),
-            Pair(&quot;datasources.migration.driverClassName&quot;, &quot;com.mysql.cj.jdbc.Driver&quot;)
-        )
-    }
-
-    @AfterAll
-    open fun stop() {
-        mysqlContainer!!.close()
-    }
-}</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Classes that implement <code>TestPropertyProvider</code> must use this annotation to create a single class instance for all tests (not necessary in Spock tests).</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>When you need dynamic properties definition, implement the <code>TestPropertyProvider</code> interface. Override the method <code>.getProperties()</code> and return the properties you want to expose to the application.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Configure the application properties to that of the MySQL instance.</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>To define the username and password for our Testcontainers MySQL instance, create a <code>application-test.yml</code> file in <code>src/test/resources</code>:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/test/resources/application-test.yml</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">jpa.default.properties.hibernate.connection.url</span>: <span class="string"><span class="content">jdbc:tc:mysql:8:///db</span></span></code></pre>
-</div>
-</div>
-<div class="paragraph">
 <p>Create a test to verify the CRUD operations:</p>
 </div>
 <div class="listingblock">
@@ -718,11 +621,24 @@ import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class GenreControllerTest : BaseMysqlTest() { <i class="conum" data-value="1"></i><b>(1)</b>
+import org.junit.jupiter.api.TestInstance
+
+@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) <i class="conum" data-value="2"></i><b>(2)</b>
+class GenreControllerTest { <i class="conum" data-value="3"></i><b>(3)</b>
+
+    @Inject
+    @field:Client(&quot;/&quot;)
+    lateinit var httpClient: HttpClient <i class="conum" data-value="3"></i><b>(3)</b>
 
     @Test
     fun testFindNonExistingGenreReturns404() {
@@ -736,23 +652,23 @@ class GenreControllerTest : BaseMysqlTest() { <i class="conum" data-value="1"></
     @Test
     fun testGenreCrudOperations() {
         val genreIds = mutableListOf&lt;Long?&gt;()
-        var request: HttpRequest&lt;*&gt;? = HttpRequest.POST(&quot;/genres&quot;, mapOf(Pair(&quot;name&quot;, &quot;DevOps&quot;))) <i class="conum" data-value="2"></i><b>(2)</b>
+        var request: HttpRequest&lt;*&gt;? = HttpRequest.POST(&quot;/genres&quot;, mapOf(Pair(&quot;name&quot;, &quot;DevOps&quot;))) <i class="conum" data-value="4"></i><b>(4)</b>
         var response: HttpResponse&lt;Genre&gt; = httpClient.toBlocking().exchange(request)
         genreIds.add(entityId(response))
         Assertions.assertEquals(HttpStatus.CREATED, response.status)
 
-        request = HttpRequest.POST(&quot;/genres&quot;, mapOf(Pair(&quot;name&quot;, &quot;Microservices&quot;))) <i class="conum" data-value="3"></i><b>(3)</b>
+        request = HttpRequest.POST(&quot;/genres&quot;, mapOf(Pair(&quot;name&quot;, &quot;Microservices&quot;))) <i class="conum" data-value="5"></i><b>(5)</b>
         response = httpClient.toBlocking().exchange(request)
         Assertions.assertEquals(HttpStatus.CREATED, response.status)
 
         val id = entityId(response)
         genreIds.add(id)
         request = HttpRequest.GET&lt;Any&gt;(&quot;/genres/$id&quot;)
-        var genre = httpClient.toBlocking().retrieve(request, Genre::class.java) <i class="conum" data-value="4"></i><b>(4)</b>
+        var genre = httpClient.toBlocking().retrieve(request, Genre::class.java) <i class="conum" data-value="6"></i><b>(6)</b>
         Assertions.assertEquals(&quot;Microservices&quot;, genre.name)
 
         request = HttpRequest.PUT(&quot;/genres&quot;, GenreUpdateCommand(id!!, &quot;Micro-services&quot;))
-        response = httpClient.toBlocking().exchange(request) <i class="conum" data-value="4"></i><b>(4)</b>
+        response = httpClient.toBlocking().exchange(request) <i class="conum" data-value="6"></i><b>(6)</b>
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
 
         request = HttpRequest.GET&lt;Any&gt;(&quot;/genres/$id&quot;)
@@ -765,7 +681,7 @@ class GenreControllerTest : BaseMysqlTest() { <i class="conum" data-value="1"></
         )
         Assertions.assertEquals(2, genres.size)
 
-        request = HttpRequest.POST(&quot;/genres/ex&quot;, mapOf(Pair(&quot;name&quot;, &quot;Microservices&quot;))) <i class="conum" data-value="2"></i><b>(2)</b>
+        request = HttpRequest.POST(&quot;/genres/ex&quot;, mapOf(Pair(&quot;name&quot;, &quot;Microservices&quot;))) <i class="conum" data-value="4"></i><b>(4)</b>
         response = httpClient.toBlocking()!!.exchange(request)
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
 
@@ -818,18 +734,26 @@ class GenreControllerTest : BaseMysqlTest() { <i class="conum" data-value="1"></
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Extend the <code>BaseMysqlTest</code> class.</td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.</td>
+<td>Classes that implement <code>TestPropertyProvider</code> must use this annotation to create a single class instance for all tests (not necessary in Spock tests).</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>If you care just about the object in the response use <code>retrieve</code>.</td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>If you care just about the object in the response use <code>retrieve</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
 <td>Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
 </tr>
 </table>
@@ -851,27 +775,21 @@ class GenreControllerTest : BaseMysqlTest() { <i class="conum" data-value="1"></
 </div>
 </div>
 <div class="sect1">
-<h2 id="using-mysql">6. Using MySQL</h2>
+<h2 id="test-resources">6. Test Resources</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To run the application, we will use a real database instance running in Docker.</p>
+<p>When the application is started locally&#8201;&#8212;&#8201;either under test or by <a href="#running-the-application">running the application</a>&#8201;&#8212;&#8201;resolution of the datasource URL is detected and the Test Resources service will start a local MySQL docker container, and inject the properties required to use this as the datasource.</p>
 </div>
 <div class="paragraph">
-<p>Start it with:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker run \
-    --rm \
-    -d \
-    -p 3306:3306 \
-    -e MYSQL_ROOT_PASSWORD=my-secret-pw \
-    -e MYSQL_DATABASE=db \
-    mysql:latest</code></pre>
+<p>For more information, see the <a href="https://micronaut-projects.github.io/micronaut-test-resources/snapshot/guide/#modules-databases-jdbc">JDBC section of the Test Resources documentation</a>.</p>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="using-mysql">7. Using MySQL</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>When you move to production, you will need to configure these properties to point at your real production database.
+<p>When you move to production, you will need to configure the properties injected by <a href="#test-resources">Test Resources</a> to point at your real production database.
 This can be done via environment variables like so:</p>
 </div>
 <div class="listingblock">
@@ -888,7 +806,7 @@ If you look at the output you can see that the application uses MySQL:</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="running-the-application">7. Running the Application</h2>
+<h2 id="running-the-application">8. Running the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To run the application, use the <code>./mvnw mn:run</code> command, which starts the application on port 8080.</p>
@@ -917,7 +835,7 @@ If you look at the output you can see that the application uses MySQL:</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">8. Next steps</h2>
+<h2 id="next-steps">9. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Read more about <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#hibernateReactive">Micronaut Data Hibernate Reactive</a>.</p>
@@ -925,7 +843,7 @@ If you look at the output you can see that the application uses MySQL:</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">10. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
