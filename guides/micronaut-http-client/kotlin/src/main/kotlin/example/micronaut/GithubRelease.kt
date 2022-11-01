@@ -1,6 +1,6 @@
 package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class GithubRelease(val name: String, val url: String)
