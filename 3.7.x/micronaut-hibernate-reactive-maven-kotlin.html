@@ -323,24 +323,33 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import javax.persistence.*
+import io.micronaut.serde.annotation.Serdeable
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Table
+import javax.persistence.Id
+import javax.persistence.OneToMany
+
+@Serdeable
 @Entity
 @Table(name = &quot;genre&quot;)
-class Genre(@Id
-            @GeneratedValue(strategy = GenerationType.AUTO)
-            @Column(name = &quot;id&quot;, nullable = false, updatable = false)
-            val id: Long?,
+class Genre(
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = &quot;id&quot;, nullable = false, updatable = false)
+    val id: Long?,
 
-            @Column(name = &quot;name&quot;, nullable = false)
-            var name: String
+    @Column(name = &quot;name&quot;, nullable = false)
+    var name: String
 ) {
 
     @JsonIgnore
     @OneToMany(mappedBy = &quot;genre&quot;)
     var books: MutableSet&lt;Book&gt; = mutableSetOf()
-
 }</code></pre>
 </div>
 </div>
@@ -352,25 +361,32 @@ class Genre(@Id
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.domain
 
-import javax.persistence.*
+import io.micronaut.serde.annotation.Serdeable
 
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Table
+import javax.persistence.Id
+import javax.persistence.ManyToOne
+
+@Serdeable
 @Entity
 @Table(name = &quot;book&quot;)
-class Book(@Id
-           @GeneratedValue(strategy = GenerationType.AUTO)
-           var id: Long,
+class Book(
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id: Long,
 
-           @Column(name = &quot;name&quot;, nullable = false)
-           var name: String,
+    @Column(name = &quot;name&quot;, nullable = false)
+    var name: String,
 
-           @Column(name = &quot;isbn&quot;, nullable = false)
-           var isbn: String
+    @Column(name = &quot;isbn&quot;, nullable = false)
+    var isbn: String
 ) {
-
-
     @ManyToOne
     var genre: Genre? = null
-
 }</code></pre>
 </div>
 </div>
@@ -586,10 +602,11 @@ class GenreRepositoryImpl(
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
+
 import javax.validation.constraints.NotBlank
 
-@Introspected <i class="conum" data-value="1"></i><b>(1)</b>
+@Serdeable <i class="conum" data-value="1"></i><b>(1)</b>
 class GenreSaveCommand(@field:NotBlank var name: String)</code></pre>
 </div>
 </div>
@@ -597,7 +614,7 @@ class GenreSaveCommand(@field:NotBlank var name: String)</code></pre>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 </table>
 </div>
@@ -606,10 +623,11 @@ class GenreSaveCommand(@field:NotBlank var name: String)</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
+
 import javax.validation.constraints.NotBlank
 
-@Introspected
+@Serdeable
 class GenreUpdateCommand(var id: Long, @field:NotBlank var name: String?)</code></pre>
 </div>
 </div>
@@ -621,12 +639,12 @@ class GenreUpdateCommand(var id: Long, @field:NotBlank var name: String?)</code>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Positive
 import javax.validation.constraints.PositiveOrZero
 
-@Introspected
+@Serdeable
 class SortingAndOrderArguments {
     @field:PositiveOrZero var offset:  Int? = null <i class="conum" data-value="1"></i><b>(1)</b>
     @field:Positive var max: Int? = null <i class="conum" data-value="1"></i><b>(1)</b>

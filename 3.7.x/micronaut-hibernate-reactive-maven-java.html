@@ -323,6 +323,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
 
+
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 <span class="keyword">import</span> <span class="include">com.fasterxml.jackson.annotation.JsonIgnore</span>;
 
 <span class="keyword">import</span> <span class="include">javax.persistence.Column</span>;
@@ -337,6 +339,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">javax.persistence.GenerationType.AUTO</span>;
 
+<span class="annotation">@Serdeable</span>
 <span class="annotation">@Entity</span>
 <span class="annotation">@Table</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span>)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Genre</span> {
@@ -401,6 +404,8 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
 
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
+
 <span class="keyword">import</span> <span class="include">javax.persistence.Column</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.Entity</span>;
 <span class="keyword">import</span> <span class="include">javax.persistence.GeneratedValue</span>;
@@ -411,6 +416,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">javax.persistence.GenerationType.AUTO</span>;
 
+<span class="annotation">@Serdeable</span>
 <span class="annotation">@Entity</span>
 <span class="annotation">@Table</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">book</span><span class="delimiter">&quot;</span></span>)
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Book</span> {
@@ -724,11 +730,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 
-<span class="annotation">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreSaveCommand</span> {
 
     <span class="annotation">@NotBlank</span>
@@ -752,7 +758,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
 </tr>
 </table>
 </div>
@@ -761,11 +767,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreUpdateCommand</span> {
 
     <span class="directive">private</span> <span class="type">long</span> id;
@@ -804,7 +810,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>;
@@ -812,7 +818,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.PositiveOrZero</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">SortingAndOrderArguments</span> {
 
     <span class="annotation">@Nullable</span>
@@ -830,6 +836,13 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@Nullable</span>
     <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">&quot;</span></span>)  <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="directive">private</span> <span class="predefined-type">String</span> order;
+
+    <span class="directive">public</span> SortingAndOrderArguments(<span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> offset, <span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> max, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> sort, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> order) {
+        <span class="local-variable">this</span>.offset = offset;
+        <span class="local-variable">this</span>.max = max;
+        <span class="local-variable">this</span>.sort = sort;
+        <span class="local-variable">this</span>.order = order;
+    }
 
     <span class="directive">public</span> Optional&lt;<span class="predefined-type">Integer</span>&gt; getOffset() {
         <span class="keyword">return</span> Optional.ofNullable(offset);
