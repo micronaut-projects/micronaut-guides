@@ -7,12 +7,26 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.BlockingHttpClient
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-class GenreControllerTest: BaseMysqlTest() { // <1>
+import jakarta.inject.Inject
+
+
+@MicronautTest // <1>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
+class GenreControllerTest {
+
+    @Inject
+    @field:Client("/")
+    lateinit var httpClient: HttpClient // <3>
+
     var blockingClient: BlockingHttpClient? = null
 
     @BeforeEach
@@ -41,28 +55,28 @@ class GenreControllerTest: BaseMysqlTest() { // <1>
     @Test
     fun testGenreCrudOperations() {
         val genreIds = mutableListOf<Long?>()
-        var request: HttpRequest<*>? = HttpRequest.POST("/genres", GenreSaveCommand("DevOps")) // <2>
+        var request: HttpRequest<*>? = HttpRequest.POST("/genres", GenreSaveCommand("DevOps")) // <4>
         var response: HttpResponse<Genre> = blockingClient!!.exchange(request)
         genreIds.add(entityId(response))
         Assertions.assertEquals(HttpStatus.CREATED, response.status)
 
-        request = HttpRequest.POST("/genres", GenreSaveCommand("Microservices")) // <2>
+        request = HttpRequest.POST("/genres", GenreSaveCommand("Microservices")) // <4>
         response = blockingClient!!.exchange(request)
         Assertions.assertEquals(HttpStatus.CREATED, response.status)
 
         val id = entityId(response)
         genreIds.add(id)
         request = HttpRequest.GET<Any>("/genres/$id")
-        var genre = blockingClient!!.retrieve(request, Genre::class.java) // <3>
+        var genre = blockingClient!!.retrieve(request, Genre::class.java) // <5>
         Assertions.assertEquals("Microservices", genre.name)
 
         request = HttpRequest.PUT("/genres", GenreUpdateCommand(id!!, "Micro-services"))
-        response = blockingClient!!.exchange(request) // <4>
+        response = blockingClient!!.exchange(request) // <6>
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
 
         request = HttpRequest.GET<Any>("/genres/$id")
         genre = blockingClient!!.retrieve(request, Genre::class.java)
-        Assertions.assertEquals("Micro-services", genre.name) // <4>
+        Assertions.assertEquals("Micro-services", genre.name)
 
         request = HttpRequest.GET<Any>("/genres/list")
         var genres = blockingClient!!.retrieve(
@@ -70,7 +84,7 @@ class GenreControllerTest: BaseMysqlTest() { // <1>
         )
         Assertions.assertEquals(2, genres.size)
 
-        request = HttpRequest.POST("/genres/ex", GenreSaveCommand("Microservices")) // <2>
+        request = HttpRequest.POST("/genres/ex", GenreSaveCommand("Microservices")) // <4>
         response = blockingClient!!.exchange(request)
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
 
