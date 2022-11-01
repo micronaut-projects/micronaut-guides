@@ -1,9 +1,9 @@
 package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import javax.validation.constraints.NotBlank
 
-@Introspected // <1>
+@Serdeable // <1>
 data class GenreUpdateCommand(
     val id: Long,
     @field:NotBlank val name: String
