@@ -1,5 +1,7 @@
 package example.micronaut.domain;
 
+import io.micronaut.serde.annotation.Serdeable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 import static javax.persistence.GenerationType.AUTO;
 
+@Serdeable
 @Entity
 @Table(name = "book")
 public class Book {

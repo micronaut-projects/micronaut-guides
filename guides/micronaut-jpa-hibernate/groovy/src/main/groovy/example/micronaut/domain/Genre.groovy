@@ -2,6 +2,7 @@ package example.micronaut.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import groovy.transform.CompileStatic
+import io.micronaut.serde.annotation.Serdeable
 
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotNull
 import static javax.persistence.GenerationType.AUTO
 
 @CompileStatic
+@Serdeable
 @Entity
 @Table(name = 'genre')
 class Genre {
