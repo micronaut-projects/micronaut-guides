@@ -30,6 +30,7 @@ resource:application.yml[tag=jpa]
 
 <1> Configure the package that contains our entity classes.
 <2> Configure how Hibernate will manage the database.
+<3> Configure the database type for <<test-resources,Test Resources>>
 
 With `update` for the hbm2ddl option, Hibernate creates the database schema.
 
@@ -93,49 +94,24 @@ callout:constructor-di[number=2,arg0=GenreRepository]
 
 === Writing Tests
 
-To allow us to run a MySQL instance in a Docker container for testing, create a base class that sets this up.
-
-test:BaseMysqlTest[]
-
-callout:micronaut-test[1]
-callout:test-instance-per-class[2]
-callout:test-property-provider[3]
-callout:http-client[4]
-<5> Configure the application properties to that of the MySQL instance.
-
-To define the username and password for our Testcontainers MySQL instance, create a `application-test.yml` file in `src/test/resources`:
-
-testResource:application-test.yml[]
-
 Create a test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 
-<1> Extend the `BaseMysqlTest` class.
-callout:http-request[2]
-<2> If you care just about the object in the response use `retrieve`.
-<3> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
+callout:micronaut-test[1]
+callout:test-instance-per-class[2]
+callout:http-client[3]
+callout:http-request[4]
+<5> If you care just about the object in the response use `retrieve`.
+<6> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
 common:testApp.adoc[]
 
+common:test-resources-mysql-datasource.adoc[]
+
 == Using MySQL
 
-To run the application, we will use a real database instance running in Docker.
-
-Start it with:
-
-[source,bash]
-----
-docker run \
-    --rm \
-    -d \
-    -p 3306:3306 \
-    -e MYSQL_ROOT_PASSWORD=my-secret-pw \
-    -e MYSQL_DATABASE=db \
-    mysql:latest
-----
-
-When you move to production, you will need to configure these properties to point at your real production database.
+When you move to production, you will need to configure the properties injected by <<test-resources,Test Resources>> to point at your real production database.
 This can be done via environment variables like so:
 
 [source,bash]
