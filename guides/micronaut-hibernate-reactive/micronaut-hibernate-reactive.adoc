@@ -17,14 +17,12 @@ Add the following dependencies:
 dependency:micronaut-reactor[groupId=io.micronaut.reactor,callout=1]
 dependency:micronaut-hibernate-reactive[groupId=io.micronaut.sql,callout=2]
 dependency:vertx-mysql-client[groupId=io.vertx,callout=3]
-dependency:testcontainers[groupId=org.testcontainers,callout=4]
 
 :dependencies:
 
 <1> Add a dependency to the Micronaut Framework Project Reactor support
 <2> Configures Hibernate Reactive/JPA beans.
 <3> Adds a dependency to the Vert.x MySQL client.
-<4> Adds a dependency to the Testcontainers library which will be uses for testing the application.
 
 === JPA configuration
 
@@ -112,50 +110,24 @@ callout:at-status[number=12]
 
 === Writing Tests
 
-To allow us to run a MySQL instance in a Docker container for testing, create a base class that sets this up.
-
-test:BaseMysqlTest[]
-
-callout:micronaut-test[1]
-callout:test-instance-per-class[2]
-callout:test-property-provider[3]
-callout:http-client[4]
-<5> Configure the application properties to that of the MySQL instance.
-
 Create a test to verify the CRUD operations:
 
 test:GenreControllerTest[]
 
-<1> Extend the `BaseMysqlTest` class.
-callout:http-request[2]
-<2> If you care just about the object in the response use `retrieve`.
-<3> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
+callout:micronaut-test[1]
+callout:test-instance-per-class[2]
+callout:http-client[3]
+callout:http-request[4]
+<5> If you care just about the object in the response use `retrieve`.
+<6> Sometimes, receiving just the object is not enough and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 
 common:testApp.adoc[]
 
-To define the username and password for our Testcontainers MySQL instance, create a `application-test.yml` file in `src/test/resources`:
-
-testResource:application-test.yml[]
+common:test-resources-mysql-datasource.adoc[]
 
 == Using MySQL
 
-To run the application, we will use a real database instance running in Docker.
-
-Start it with:
-
-[source,bash]
-----
-docker run \
-    -p 3306:3306 \
-    -e MYSQL_ROOT_PASSWORD=pass \
-    mysql:oracle
-----
-
-For configuration with local development, create an `application-dev.yml` file in the `src/main/resources` directory:
-
-resource:application-dev.yml[]
-
-When you move to production, you will need to configure these properties to point at your real production database.
+When you move to production, you will need to configure the properties injected by <<test-resources,Test Resources>> to point at your real production database.
 This can be done via environment variables like so:
 
 [source,bash]
