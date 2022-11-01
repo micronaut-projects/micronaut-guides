@@ -70,7 +70,7 @@ Create a POJO to save books to DynamoDB.
 
 source:Book[]
 
-callout:introspected[1]
+callout:serdeable[1]
 callout:constraints[2]
 
 === Configuration
@@ -122,19 +122,21 @@ callout:at-status[10]
 
 === Running the application
 
-common:run-dynamodb-with-docker.adoc[]
+Under development and testing, we have https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/#modules-testcontainers[configured Test Resources] to supply the properties `dynamodb-local.host` and `dynamodb-port`.
+
+resource:application.yml[tag=testresources]
+
+<1> The docker image to use for local dynamodb.
+<2> The property to bind the container hostname into.
+<3> The property to bind the container port into, and the port that should be exposed.
+
+This will start DynamoDB in a container via TestContainers, and inject the properties into your application.
 
 ==== Dev default environment
 
 Modify `Application` to use `dev` as a https://docs.micronaut.io/latest/guide/index.html#_default_environment[default environment].
 
 source:Application[]
-
-==== Dev specific configuration
-
-Create an environment-specific configuration class for the `dev` environment that defines the host and port of the DynamoDB local instance.
-
-resource:application-dev.yml[]
 
 ==== Dev Bootstrap
 
