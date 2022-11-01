@@ -1,10 +1,10 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
 import java.util.Objects;
 
-@Introspected
+@Serdeable
 public class BookInventory {
 
     private final String isbn;
