@@ -1,14 +1,14 @@
 package example.micronaut.model
 
-import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.Nullable
+import io.micronaut.serde.annotation.Serdeable
 
 import java.security.Principal
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-@Introspected
+@Serdeable
 class ViewModel {
 
     final String pageTitle
