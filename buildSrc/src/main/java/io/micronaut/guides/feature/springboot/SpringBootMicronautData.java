@@ -66,7 +66,7 @@ public class SpringBootMicronautData implements SpringBootApplicationFeature {
         }
         generatorContext.addDependency(MicronautDependencyUtils.dataDependency()
                 .artifactId("micronaut-data-processor")
-                .versionProperty(MICRONAUT_VERSION)
+                .version(VersionInfo.getBomVersion("micronaut.data"))
                 .annotationProcessor());
 
         generatorContext.addDependency(MicronautDependencyUtils.coreDependency()
