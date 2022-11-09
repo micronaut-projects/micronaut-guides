@@ -1,0 +1,121 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+* An https://aws.amazon.com/[AWS account] with:
+** An IAM user with enough permissions to create and manage a queue instances in SQS.
+** The AWS CLI configured to use the IAM user above.
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Micronaut JMS SQS Dependency
+
+To use the Micronaut JMS SQS integration, add the following dependency:
+
+dependency:micronaut-jms-sqs[groupId=io.micronaut.jms]
+
+== Create an application
+
+=== Creating a JMS Producer
+source:DemoProducer[]
+
+=== Creating a JMS Consumer
+source:DemoConsumer[]
+
+=== Creating a Controller
+source:DemoController[]
+
+=== Configure a SQS client factory
+Additionally, you’ll need to configure an instance of `com.amazonaws.services.sqs.AmazonSQS` as a bean for AWS authentication, for example:
+source:SqsClientFactory[]
+
+common:aws.adoc[]
+
+== Creating a queue instance in Amazon Simple Queue Service (Amazon SQS)
+
+You will create a queue with the AWS CLI. See the https://awscli.amazonaws.com/v2/documentation/api/latest/reference/sqs/index.html[AWS CLI `sqs` command] for more information.
+
+=== Create a queue instance
+
+[source,bash]
+----
+aws sqs create-queue --queue-name demo_queue
+----
+Copy and save the response of the command. You will need the `QueueUrl` to delete the queue after you finish with it.
+
+== Update the Application configuration to use AWS
+
+=== Add the AWS IAM user access key and secret key placeholders to the Application Configuration
+[,diff]
+.src/main/resources/application.yml
+----
+micronaut:
+  application:
+    name: demo
+  jms:
+    sqs:
+      enabled: true
++ aws:
++  access-key-id: ${AWS_ACCESS_KEY_ID}
++  secret-key: ${AWS_SECRET_KEY}
+----
+
+== Running the Application
+
+With almost everything in place, you can start the application and try it out. First, set environment variables to configure the queue connection. Then you can start the app.
+
+Create environment variables for `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_KEY`, which will be used in the Micronaut app's `application.yml`:
+
+[source,bash]
+----
+export AWS_ACCESS_KEY_ID=<the access key from the AWS configuratipn step>
+export AWS_SECRET_KEY=<the secret key from the AWS configuratipn step>
+----
+
+[NOTE]
+.Window System
+====
+Command Prompt:: Change '*export*' to '*set*'
++
+Example: `set AWS_ACCESS_KEY_ID=aws_access_key`
+
+PowerShell:: Change '*export* ' to '*$*' and use quotes around the value
++
+Example: `$AWS_ACCESS_KEY_ID="aws_access_key"`
+====
+
+common:runapp-instructions.adoc[]
+
+You can test the application in a web browser or with cURL.
+
+Run from a terminal window to publish and consume a message:
+
+[source, bash]
+----
+curl "http://localhost:8080/demo"
+----
+
+=== Stopping the Instance and cleaning up
+
+Once you are done with this guide, you can stop/delete the AWS resources created to avoid incurring unnecessary charges.
+
+[source,bash]
+----
+aws sqs delete-queue --queue-url <QUEUE_URL>
+----
+Replace the `<QUEUE_URL>` placeholder with a queue URL value returned from the `create-queue` command.
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+Start the native executable and execute the same cURL request as before.
+
+:exclude-for-languages:
+
+common:next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-jms/latest/guide/[Micronaut JMS].
+
+Discover https://aws.amazon.com/sqs/[Amazon Simple Queue Service (SQS)].
