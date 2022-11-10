@@ -20,7 +20,7 @@ import javax.validation.Valid
 open class GenreController(private val genreRepository: GenreRepository) { // <2>
 
     @Get("/{id}") // <3>
-    fun show(id: Long): Genre = genreRepository.findById(id).orElse(null) // <4>
+    fun show(id: Long): Genre? = genreRepository.findById(id).orElse(null) // <4>
 
     @Put // <5>
     open fun update(@Body @Valid command: GenreUpdateCommand): HttpResponse<*> { // <6>

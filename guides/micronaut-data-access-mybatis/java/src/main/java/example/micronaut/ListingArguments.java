@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.http.uri.UriBuilder;
@@ -32,7 +31,6 @@ public class ListingArguments {
     private ListingArguments() {
     }
 
-    @Creator
     public ListingArguments(Integer offset, @Nullable Integer max, @Nullable String sort, @Nullable String order) {
         this.offset = offset;
         this.max = max;
