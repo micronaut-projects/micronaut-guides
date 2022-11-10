@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import static io.micronaut.jms.sqs.configuration.SqsConfiguration.CONNECTION_FACTORY_BEAN_NAME;
 
-@JMSListener(CONNECTION_FACTORY_BEAN_NAME)
+@JMSListener(CONNECTION_FACTORY_BEAN_NAME)  // <1>
 public class DemoConsumer {
-    private static Logger LOGGER = LoggerFactory.getLogger(DemoConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DemoConsumer.class);
 
-    @Queue(value = "demo_queue", concurrency = "1-3")
-    public void receive(@MessageBody String body) {
+    @Queue(value = "demo_queue", concurrency = "1-3")  // <2>
+    public void receive(@MessageBody String body) {  // <3>
         LOGGER.info("Message consumed: {}", body);
     }
 }

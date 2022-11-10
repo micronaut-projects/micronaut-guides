@@ -9,26 +9,38 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
-== Micronaut JMS SQS Dependency
-
-To use the Micronaut JMS SQS integration, add the following dependency:
-
-dependency:micronaut-jms-sqs[groupId=io.micronaut.jms]
-
 == Create an application
+Let’s create a set of components that will use the Micronaut JMS to integrate with Amazon SQS. This will allow us to send and receive messages from the SQS. The SQS is a reliable, highly-scalable hosted queue for storing messages as they travel between applications or microservices. Amazon SQS moves data between distributed application components and helps you decouple these components.
 
 === Creating a JMS Producer
+Create a JMS Producer interface.
 source:DemoProducer[]
+<1> The `JMSProducer` annotation defines this interface as a client that sends messages.
+<2> The `@Queue` annotation indicates which queue the message should be published to.
+<3> The `send` method accepts a single parameter which is the payload of a message.
 
 === Creating a JMS Consumer
+Create a JMS Consumer class.
 source:DemoConsumer[]
-
-=== Creating a Controller
-source:DemoController[]
+<1> The `@JMSListener` defines the bean as a message listener.
+<2> The `@Queue` annotation indicates which queue to subscribe to.
+<3> The `receive` method accepts a single parameter which is the payload of a message.
 
 === Configure a SQS client factory
 Additionally, you’ll need to configure an instance of `com.amazonaws.services.sqs.AmazonSQS` as a bean for AWS authentication, for example:
 source:SqsClientFactory[]
+callout:factory[1]
+<2> Configures `com.amazonaws.services.sqs.AmazonSQS` bean as a singleton instance.
+<3> Sets the region to be used by the client. This will be used to determine both the service endpoint (eg: https://sns.us-east-1.amazonaws.com) and signing region (eg: us-east-1) for requests.
+<4> Sets the `com.amazonaws.auth.AWSCredentialsProvider` used by the client. In this example sets the provider that reads from the `io.micronaut.context.env.Environment`.
+
+=== Creating a Controller
+Let’s create a Controller with an endpoint that we will call to verify that message has been sent by the JMS Producer (`DemoProducer`) and then finally received and consumed by the JMS Consumer (`DemoConsumer`).
+source:DemoController[]
+callout:controller[number=1,arg0=/]
+<2> Injects `DemoProducer` bean.
+<3> Maps a `GET` request to `/demo` path, which attempts to publish a message to a SQS queue instance.
+<4> Calls `send` method on `DemoProducer` instances providing the message payload.
 
 common:aws.adoc[]
 

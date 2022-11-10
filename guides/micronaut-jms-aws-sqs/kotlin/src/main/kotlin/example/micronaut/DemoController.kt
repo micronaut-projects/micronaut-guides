@@ -3,11 +3,11 @@ package example.micronaut
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 
-@Controller
-class DemoController(private val demoProducer: DemoProducer) {
+@Controller  // <1>
+class DemoController(private val demoProducer: DemoProducer) {  // <2>
 
-    @Get("/demo")
+    @Get("/demo")  // <3>
     fun publishDemoMessages() {
-        demoProducer.send("Demo message body")
+        demoProducer.send("Demo message body")  // <4>
     }
 }

@@ -5,9 +5,11 @@ import io.micronaut.jms.annotations.Queue
 import io.micronaut.jms.sqs.configuration.SqsConfiguration
 import io.micronaut.messaging.annotation.MessageBody
 
-@JMSProducer(SqsConfiguration.CONNECTION_FACTORY_BEAN_NAME)
+import io.micronaut.jms.sqs.configuration.SqsConfiguration.CONNECTION_FACTORY_BEAN_NAME
+
+@JMSProducer(CONNECTION_FACTORY_BEAN_NAME)  // <1>
 interface DemoProducer {
 
-    @Queue("demo_queue")
-    fun send(@MessageBody body: String?)
+    @Queue("demo_queue")  // <2>
+    fun send(@MessageBody body: String?)  // <3>
 }

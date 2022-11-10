@@ -9,15 +9,15 @@ import jakarta.inject.Singleton;
 
 import static com.amazonaws.regions.Regions.US_EAST_1;
 
-@Factory
+@Factory  // <1>
 public class SqsClientFactory {
 
     @Singleton
-    AmazonSQS sqsClient(Environment environment) {
+    AmazonSQS sqsClient(Environment environment) {  // <2>
         return AmazonSQSClientBuilder
                 .standard()
-                .withRegion(US_EAST_1)
-                .withCredentials(new EnvironmentAWSCredentialsProvider(environment))
+                .withRegion(US_EAST_1)  // <3>
+                .withCredentials(new EnvironmentAWSCredentialsProvider(environment))  // <4>
                 .build();
     }
 }
