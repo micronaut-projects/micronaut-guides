@@ -1,8 +1,8 @@
 package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import javax.validation.constraints.NotBlank
 
-@Introspected
+@Serdeable
 data class Book(@NotBlank val isbn: String,
                 @NotBlank val name: String)

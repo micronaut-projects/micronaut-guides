@@ -2,14 +2,14 @@ package example.micronaut
 
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
-import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.NonNull
+import io.micronaut.serde.annotation.Serdeable
 
 import javax.validation.constraints.NotBlank
 
 @CompileStatic
 @EqualsAndHashCode
-@Introspected
+@Serdeable
 class BookRecommendation {
 
     @NonNull
