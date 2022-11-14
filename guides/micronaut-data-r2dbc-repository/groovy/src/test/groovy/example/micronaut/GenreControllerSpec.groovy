@@ -15,7 +15,7 @@ import jakarta.inject.Inject
 import spock.lang.Specification
 import spock.lang.Unroll
 
-@MicronautTest //<1>
+@MicronautTest(transactional = false) //<1>
 class GenreControllerSpec extends Specification {
 
     @Inject

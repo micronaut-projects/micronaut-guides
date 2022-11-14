@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@MicronautTest // <1>
+@MicronautTest(transactional = false) // <1>
 public class GenreControllerTest {
 
     @Inject

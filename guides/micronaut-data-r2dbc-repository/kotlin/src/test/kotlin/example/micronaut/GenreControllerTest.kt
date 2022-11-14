@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-@MicronautTest //<1>
+@MicronautTest(transactional = false) //<1>
 class GenreControllerTest {
 
     @Inject
