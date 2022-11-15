@@ -13,14 +13,14 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @R2dbcRepository(dialect = Dialect.MYSQL) // <1>
-interface GenreRepository : ReactorPageableRepository<Genre, Long> { // <2>
-    fun save(@NonNull name: @NotBlank String): Mono<Genre>
+abstract class GenreRepository : ReactorPageableRepository<Genre, Long> { // <2>
+    abstract fun save(@NonNull name: @NotBlank String): Mono<Genre>
 
     @Transactional
-    fun saveWithException(@NonNull name: @NotBlank String): Mono<Genre> {
+    open fun saveWithException(@NonNull name: @NotBlank String): Mono<Genre> {
         return save(name)
             .then(Mono.error(DataAccessException("test exception")))
     }
 
-    fun update(@NonNull @Id id: @NotNull Long, @NonNull name: @NotBlank String): Mono<Long>
+    abstract fun update(@NonNull @Id id: @NotNull Long, @NonNull name: @NotBlank String): Mono<Long>
 }
