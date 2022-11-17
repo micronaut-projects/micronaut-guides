@@ -117,6 +117,7 @@ class GuideProjectGenerator implements AutoCloseable {
                         applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                         excludeSource:  it.excludeSource,
                         excludeTest:  it.excludeTest,
+                        packageName: it.packageName,
                         openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
                             definitionFile: it.openAPIGeneratorConfig.definitionFile,
                             generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
@@ -188,6 +189,14 @@ class GuideProjectGenerator implements AutoCloseable {
             Language lang = guidesOption.language
 
             for (App app: metadata.apps) {
+                def packageName = BASE_PACKAGE
+                def packageNameWithAppName = packageAndName
+
+                if (app.packageName != null && !app.packageName.isEmpty()) {
+                    packageName = app.packageName
+                    packageNameWithAppName = app.packageName + "." + app.name
+                }
+
                 List<String> appFeatures = [] + app.features
 
                 if (guidesOption.language == GROOVY ||
@@ -208,11 +217,11 @@ class GuideProjectGenerator implements AutoCloseable {
                 destination.mkdir()
 
                 if (app.openAPIGeneratorConfig) {
-                    OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig, testFramework, buildTool)
+                    OpenAPIGenerator.generate(inputDir, destination, lang, packageName , app.openAPIGeneratorConfig, testFramework, buildTool)
                     deleteEveryFileButSources(destination)
                 }
 
-                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
+                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageNameWithAppName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)
 
                 if (metadata.base) {

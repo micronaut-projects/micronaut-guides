@@ -33,7 +33,8 @@ public enum Category implements Ordered {
     AWS_LAMBDA("AWS Lambda", 26),
     AZURE("Micronaut + Microsoft Azure", 27),
     GCP("Micronaut + Google Cloud", 28),
-    ORACLE_CLOUD("Micronaut + Oracle Cloud", 29);
+    ORACLE_CLOUD("Micronaut + Oracle Cloud", 29),
+    KUBERNETES( "Micronaut + Kubernetes", 30);
 
     private final String val;
     private final int order;

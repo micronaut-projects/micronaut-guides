@@ -46,6 +46,7 @@ class GuideMetadata {
         List<String> excludeSource
         List<String> excludeTest
         OpenAPIGeneratorConfig openAPIGeneratorConfig
+        String packageName
 
         List<String> getFeatures() {
             visibleFeatures + invisibleFeatures

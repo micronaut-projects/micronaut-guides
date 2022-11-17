@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ServiceAccount # <1>
+metadata:
+  name: micronaut-service
+---
+kind: Role # <2>
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: micronaut_service_role
+rules:
+  - apiGroups: [""]
+    resources: ["services", "endpoints", "configmaps", "secrets", "pods"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding # <3>
+metadata:
+  name: micronaut_service_role_bind
+subjects:
+  - kind: ServiceAccount
+    name: micronaut-service
+roleRef:
+  kind: Role
+  name: micronaut_service_role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret # <4>
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  username: YWRtaW4= # <5>
+  password: bWljcm9uYXV0aXNhd2Vzb21l # <6>
