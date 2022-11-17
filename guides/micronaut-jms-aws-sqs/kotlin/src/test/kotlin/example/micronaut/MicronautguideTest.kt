@@ -35,12 +35,12 @@ internal class MicronautguideTest : TestPropertyProvider {
 
     @NonNull
     override fun getProperties(): Map<String, String> {
-        return LocalStack.getProperties()
+        return LocalStackUtil.properties
     }
 
     @AfterAll
     fun afterAll() {
-        LocalStack.close()
+        LocalStackUtil.close()
     }
 
 }
