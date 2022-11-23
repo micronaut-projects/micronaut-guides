@@ -1,23 +1,23 @@
-package example.micronaut.clients;
+package example.micronaut;
 
 import example.micronaut.models.User;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
-import io.micronaut.retry.annotation.Recoverable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-@Client("users") // <1>
+import java.util.List;
+
+@Client("/")
 public interface UsersClient {
+
     @Get("/users/{id}")
-    Mono<User> getById(Integer id);
+    User getById(@Header String authorization, Integer id);
 
     @Post("/users")
-    Mono<User> createUser(@Body User user);
+    User createUser(@Header String authorization, @Body User user);
 
     @Get("/users")
-    Flux<User> getUsers();
+    List<User> getUsers(@Header String authorization);
 }
-

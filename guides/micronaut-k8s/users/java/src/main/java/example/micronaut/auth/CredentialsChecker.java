@@ -11,11 +11,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
 @Singleton
-public class CredentailsChecker implements AuthenticationProvider {
+public class CredentialsChecker implements AuthenticationProvider {
 
     private final Credentials credentials;
 
-    public CredentailsChecker(Credentials credentials) {
+    public CredentialsChecker(Credentials credentials) {
         this.credentials = credentials;
     }
 

@@ -9,6 +9,8 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
@@ -16,6 +18,7 @@ import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.matchers.Or;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,6 +27,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,8 +45,7 @@ public class GatewayControllerTest {
     UsersClient usersClient;
 
     @Inject
-    @Client("/")
-    HttpClient client;
+    GatewayClient gatewayClient;
 
     @MockBean(OrdersClient.class)
     OrdersClient ordersClient() {
@@ -62,79 +65,55 @@ public class GatewayControllerTest {
 
         when(ordersClient.getItemsById(1)).thenReturn(Mono.just(item));
 
-        Item retrievedItem = client.toBlocking().retrieve(
-                HttpRequest.GET("/api/items/" + itemId)
-                , Item.class
-        );
+        Item retrievedItem = gatewayClient.getItemById(item.id());
 
-        assertEquals(item.getId(), retrievedItem.getId());
-        assertEquals(item.getName(), retrievedItem.getName());
-        assertEquals(item.getPrice(), retrievedItem.getPrice());
+        assertEquals(item.id(), retrievedItem.id());
+        assertEquals(item.name(), retrievedItem. name());
+        assertEquals(item.price(), retrievedItem.price());
 
     }
 
     @Test
     void getOrderById() {
-        Order order = new Order();
-        order.setUserId(2);
-        order.setId(1);
 
-        User user = new User();
-        user.setUsername("test");
-        user.setId(order.getUserId());
+        Order order = new Order(1, 2, null, null, null, null);;
+        User user = new User(order.userId(), null, null, "test");
 
         when(ordersClient.getOrderById(1)).thenReturn(Mono.just(order));
+        when(usersClient.getById(user.id())).thenReturn(Mono.just(user));
 
-        when(usersClient.getById(user.getId())).thenReturn(Mono.just(user));
+        Order retrievedOrder = gatewayClient.getOrderById(order.id());
 
-
-        Order retrievedOrder = client.toBlocking().retrieve(
-                HttpRequest.GET("/api/orders/" + order.getId())
-                , Order.class
-        );
-
-        assertEquals(order.getId(), retrievedOrder.getId());
-        assertEquals(order.getUserId(), retrievedOrder.getUser().getId());
-        assertEquals(order.getUserId(), retrievedOrder.getUserId());
-        assertEquals(user.getUsername(), retrievedOrder.getUser().getUsername());
+        assertEquals(order.id(), retrievedOrder.id());
+        assertEquals(order.userId(), retrievedOrder.user().id());
+        assertNull(retrievedOrder.userId());
+        assertEquals(user.username(), retrievedOrder.user().username());
     }
 
     @Test
     void getUserById() {
-        User user = new User();
-        user.setUsername("test");
-        user.setId(1);
+        User user = new User(1, null, null, "test");
 
         when(usersClient.getById(1)).thenReturn(Mono.just(user));
 
-        User retrievedUser = client.toBlocking().retrieve(
-                HttpRequest.GET("/api/users/" + user.getId())
-                , User.class
-        );
+        User retrievedUser = gatewayClient.getUsersById(user.id());
 
-        assertEquals(user.getId(), retrievedUser.getId());
-        assertEquals(user.getUsername(), retrievedUser.getUsername());
+        assertEquals(user.id(), retrievedUser.id());
+        assertEquals(user.username(), retrievedUser.username());
     }
 
     @Test
     void getUsers() {
-        User user = new User();
-        user.setUsername("test");
-        user.setId(1);
+        User user = new User(1, null, null, "test");
 
         when(usersClient.getUsers()).thenReturn(Flux.just(user));
 
-        HttpResponse<List<User>> rsp = client.toBlocking().exchange(
-                HttpRequest.GET("/api/users"),
-                Argument.listOf(User.class));
+        List<User> users = gatewayClient.getUsers();
 
-        assertEquals(HttpStatus.OK, rsp.getStatus());
-        assertNotNull(rsp.body());
-        List<User> users = rsp.body();
         assertNotNull(users);
         assertEquals(1, users.size());
-        assertEquals(user.getId(), users.get(0).getId());
-        assertEquals(user.getUsername(), users.get(0).getUsername());
+        assertEquals(user.id(), users.get(0).id());
+        assertEquals(user.username(), users.get(0).username());
     }
 
     @Test
@@ -144,107 +123,76 @@ public class GatewayControllerTest {
 
         when(ordersClient.getItems()).thenReturn(Flux.just(item));
 
-        HttpResponse<List<Item>> rsp = client.toBlocking().exchange(
-                HttpRequest.GET("/api/items"),
-                Argument.listOf(Item.class));
+        List<Item> items  = gatewayClient.getItems();
 
-        assertEquals(HttpStatus.OK, rsp.getStatus());
-        assertNotNull(rsp.body());
-        List<Item> items = rsp.body();
         assertNotNull(items);
         assertEquals(1, items.size());
-        assertEquals(item.getName(), items.get(0).getName());
-        assertEquals(item.getPrice(), items.get(0).getPrice());
+        assertEquals(item.name(), items.get(0).name());
+        assertEquals(item.price(), items.get(0).price());
     }
 
     @Test
     void getOrders() {
-
-        Order order = new Order();
-        order.setUserId(2);
-        order.setId(1);
-        User user = new User();
-        user.setUsername("test");
-        user.setId(order.getUserId());
+        Order order = new Order(1, 2, null, null, null, null);;
+        User user = new User(order.userId(), null, null, "test");
 
         when(ordersClient.getOrders()).thenReturn(Flux.just(order));
+        when(usersClient.getById(order.userId())).thenReturn(Mono.just(user));
 
-        when(usersClient.getById(order.getUserId())).thenReturn(Mono.just(user));
+        List<Order> orders = gatewayClient.getOrders();
 
-
-        HttpResponse<List<Order>> rsp = client.toBlocking().exchange(
-                HttpRequest.GET("/api/orders"),
-                Argument.listOf(Order.class));
-
-        assertEquals(HttpStatus.OK, rsp.getStatus());
-        assertNotNull(rsp.body());
-        List<Order> orders = rsp.body();
         assertNotNull(orders);
         assertEquals(1, orders.size());
-        assertEquals(order.getUserId(), orders.get(0).getUserId());
-        assertEquals(order.getUserId(), orders.get(0).getUser().getId());
-        assertEquals(order.getId(), orders.get(0).getId());
-        assertEquals(user.getUsername(), orders.get(0).getUser().getUsername());
+        assertNull(orders.get(0).userId());
+        assertEquals(user.id(), orders.get(0).user().id());
+
+        assertEquals(order.id(), orders.get(0).id());
+        assertEquals(user.username(), orders.get(0).user().username());
     }
 
     @Test
     void createUser() {
-        User user = new User();
         String firstName = "firstName";
         String lastName = "lastName";
         String username = "username";
 
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setUsername(username);
+        User user = new User(0, firstName, lastName, username);
 
         when(usersClient.createUser(any())).thenReturn(Mono.just(user));
 
-        User createdUser = client.toBlocking().retrieve(
-                HttpRequest.POST("/api/users", user), User.class
-        );
+        User createdUser = gatewayClient.createUser(user);
 
-        assertEquals(firstName, createdUser.getFirstName());
-        assertEquals(lastName, createdUser.getLastName());
-        assertEquals(username, createdUser.getUsername());
+        assertEquals(firstName, createdUser.firstName());
+        assertEquals(lastName, createdUser.lastName());
+        assertEquals(username, createdUser.username());
     }
 
     @Test
     void createOrder() {
-        Order order = new Order();
-        order.setUserId(2);
-        order.setId(1);
-        User user = new User();
-        user.setUsername("test");
-        user.setId(order.getUserId());
+        Order order = new Order(1, 2, null, null, null, null);;
+        User user = new User(order.userId(), null, null, "test");
 
-        when(usersClient.getById(user.getId())).thenReturn(Mono.just(user));
+        when(usersClient.getById(user.id())).thenReturn(Mono.just(user));
 
         when(ordersClient.createOrder(any())).thenReturn(Mono.just(order));
 
-        Order createdOrder = client.toBlocking().retrieve(
-                HttpRequest.POST("/api/orders", order), Order.class
-        );
+        Order createdOrder = gatewayClient.createOrder(order);
 
-        assertEquals(order.getId(), createdOrder.getId());
-        assertEquals(order.getUserId(), createdOrder.getUserId());
-        assertEquals(order.getUserId(), createdOrder.getUser().getId());
-        assertEquals(order.getUser().getUsername(), createdOrder.getUser().getUsername());
+        assertEquals(order.id(), createdOrder.id());
+        assertNull(createdOrder.userId());
+        assertEquals(order.userId(), createdOrder.user().id());
+        assertEquals(user.username(), createdOrder.user().username());
     }
 
     @Test
     void createOrderUserDoesntExists() {
-        Order order = new Order();
-        order.setUserId(2);
-        order.setId(1);
+        Order order = new Order(1, 2, null, null, null, null);;
 
         when(ordersClient.createOrder(any())).thenReturn(Mono.just(order));
 
-        when(usersClient.getById(order.getUserId())).thenReturn(Mono.empty());
+        when(usersClient.getById(order.userId())).thenReturn(Mono.empty());
 
-        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> client.toBlocking().retrieve(
-                HttpRequest.POST("/api/orders", order), Order.class
-        ));
+        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> gatewayClient.createOrder(order));
 
         assertEquals(exception.getStatus(), HttpStatus.BAD_REQUEST);
 
@@ -253,14 +201,13 @@ public class GatewayControllerTest {
 
     @Test
     void exceptionHandler() {
-        User user = new User();
+        User user = new User(null, null, null, null);
+
         String message = "Test error message";
 
         when(usersClient.createUser(any())).thenThrow(new HttpClientResponseException("Test", HttpResponse.badRequest(message)));
 
-        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> client.toBlocking().retrieve(
-                HttpRequest.POST("/api/users", user), User.class
-        ));
+        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> gatewayClient.createUser(user));
 
         assertEquals(exception.getStatus(), HttpStatus.BAD_REQUEST);
 

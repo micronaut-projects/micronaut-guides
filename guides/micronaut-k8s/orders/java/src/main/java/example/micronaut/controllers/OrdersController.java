@@ -10,8 +10,6 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.exceptions.HttpStatusException;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -27,35 +25,36 @@ public class OrdersController {
     private final List<Order> orders = new ArrayList<>();
 
     @Get("/{id}")  // <3>
-    public Mono<Order> findById(@NotNull Integer id) {
-        return Mono.justOrEmpty(orders.stream()
-                .filter(it -> it.getId().equals(id))
-                .findFirst());
+    public Order findById(@NotNull Integer id) {
+        return orders.stream()
+                .filter(it -> it.id().equals(id))
+                .findFirst().orElse(null);
     }
 
     @Get  // <4>
-    public Flux<Order> getOrders() {
-        return Flux.fromStream(orders.stream());
+    public List<Order> getOrders() {
+        return orders;
     }
 
     @Post  // <5>
-    public Mono<Order> createOrder(@Body @Valid Order order) {
-        order.setId(orders.size() + 1);
-        List<Item> items = order.getItemIds().stream().map(
+    public Order createOrder(@Body @Valid Order order) {
+        if (order.itemIds() == null || order.itemIds().isEmpty()) {
+            throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Items must be supplied");
+        }
+
+        List<Item> items = order.itemIds().stream().map(
                 x -> Item.items.stream().filter(
-                        y -> y.getId().equals(x)
+                        y -> y.id().equals(x)
                 ).findFirst().orElseThrow(
                         () -> new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("Item with id %s doesn't exists", x))
                 )
         ).collect(Collectors.toList());
 
-        if (items.isEmpty()) {
-            throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Items must be supplied");
-        }
-        order.setItems(items);
-        order.setTotal(order.getItems().stream().map(Item::getPrice).reduce(BigDecimal::add).orElse(new BigDecimal("0")));
-        orders.add(order);
-        return Mono.just(order);
+        BigDecimal total = items.stream().map(Item::price).reduce(BigDecimal::add).orElse(new BigDecimal("0"));
+        Order newOrder = new Order(orders.size() + 1, order.userId(), items, null, total);
+
+        orders.add(newOrder);
+        return newOrder;
     }
 
 }

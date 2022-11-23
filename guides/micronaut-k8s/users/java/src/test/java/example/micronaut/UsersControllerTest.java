@@ -2,22 +2,20 @@ package example.micronaut;
 
 import example.micronaut.auth.Credentials;
 import example.micronaut.models.User;
-import io.micronaut.core.type.Argument;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.HttpClient;
-import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
+import java.util.Base64;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -25,99 +23,74 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class UsersControllerTest {
 
     @Inject
-    @Client("/")
-    HttpClient client;
+    UsersClient usersClient;
 
     @Inject
     Credentials credentials;
 
     @Test
     void testUnauthorized() {
-        HttpClientException exception = assertThrows(HttpClientException.class, () -> client.toBlocking().retrieve(HttpRequest.GET("/users"), HttpStatus.class));
+        HttpClientException exception = assertThrows(HttpClientException.class, () -> usersClient.getUsers(""));
         assertTrue(exception.getMessage().contains("Unauthorized"));
     }
 
     @Test
-    void getUsers() {
-        HttpStatus status = client.toBlocking().retrieve(
-                HttpRequest.GET("/users")
-                        .basicAuth(credentials.getUsername(), credentials.getPassword())
-                , HttpStatus.class);
-        assertEquals(HttpStatus.OK, status);
+    void getUserThatDoesntExists() {
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+        User retriedUser = usersClient.getById(authHeader, 100);
+        assertNull(retriedUser);
     }
 
     @Test
     void multipleUserInteraction() {
-        User user = new User();
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+
         String firstName = "firstName";
         String lastName = "lastName";
         String username = "username";
 
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setUsername(username);
-        User createdUser = client.toBlocking().retrieve(
-                HttpRequest.POST("/users", user)
-                        .basicAuth(
-                                credentials.getUsername(), credentials.getPassword()
-                        ), User.class
-        );
-        assertEquals(firstName, createdUser.getFirstName());
-        assertEquals(lastName, createdUser.getLastName());
-        assertEquals(username, createdUser.getUsername());
-        assertNotNull(createdUser.getId());
+        User user = new User(0 ,firstName, lastName, username);
 
-        User retriedUser = client.toBlocking().retrieve(
-                HttpRequest.GET("/users/" + createdUser.getId())
-                        .basicAuth(credentials.getUsername(), credentials.getPassword())
-                , User.class
-        );
-        assertEquals(firstName, retriedUser.getFirstName());
-        assertEquals(lastName, retriedUser.getLastName());
-        assertEquals(username, retriedUser.getUsername());
+        User createdUser = usersClient.createUser(authHeader, user);
 
-        HttpResponse<List<User>> rsp = client.toBlocking().exchange(
-                HttpRequest.GET("/users")
-                        .basicAuth(credentials.getUsername(), credentials.getPassword()),
-                Argument.listOf(User.class));
+        assertEquals(firstName, createdUser.firstName());
+        assertEquals(lastName, createdUser.lastName());
+        assertEquals(username, createdUser.username());
+        assertNotNull(createdUser.id());
 
-        assertEquals(HttpStatus.OK, rsp.getStatus());
-        assertNotNull(rsp.body());
-        List<User> users = rsp.body();
+        User retriedUser = usersClient.getById(authHeader, createdUser.id());
+
+        assertEquals(firstName, retriedUser.firstName());
+        assertEquals(lastName, retriedUser.lastName());
+        assertEquals(username, retriedUser.username());
+
+        List<User> users = usersClient.getUsers(authHeader);
         assertNotNull(users);
         assertTrue(users.stream()
-                .map(User::getUsername)
+                .map(User::username)
                 .anyMatch(name -> name.equals(username)));
 
     }
 
     @Test
     void createSameUserTwice() {
-        User user = new User();
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+
         String firstName = "SameUserFirstName";
         String lastName = "SameUserLastName";
         String username = "SameUserUsername";
 
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setUsername(username);
-        User createdUser = client.toBlocking().retrieve(
-                HttpRequest.POST("/users", user)
-                        .basicAuth(
-                                credentials.getUsername(), credentials.getPassword()
-                        ), User.class
-        );
-        assertEquals(firstName, createdUser.getFirstName());
-        assertEquals(lastName, createdUser.getLastName());
-        assertEquals(username, createdUser.getUsername());
-        assertNotNull(createdUser.getId());
+        User user = new User(0 ,firstName, lastName, username);
 
-        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> client.toBlocking().retrieve(
-                HttpRequest.POST("/users", user)
-                        .basicAuth(
-                                credentials.getUsername(), credentials.getPassword()
-                        ), User.class
-        ));
+        User createdUser = usersClient.createUser(authHeader, user);
+
+        assertEquals(firstName, createdUser.firstName());
+        assertEquals(lastName, createdUser.lastName());
+        assertEquals(username, createdUser.username());
+        assertNotNull(createdUser.id());
+        assertNotEquals(createdUser.id(), 0);
+
+        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> usersClient.createUser(authHeader, user));
         assertEquals(exception.getStatus(), HttpStatus.CONFLICT);
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("User with provided username already exists"));
 

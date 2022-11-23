@@ -1,4 +1,3 @@
-//tag::packageandimports[]
 package example.micronaut.clients;
 
 import example.micronaut.models.Item;
@@ -10,17 +9,9 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.retry.annotation.Recoverable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-//end::packageandimports[]
 
-/*
-//tag::harcoded[]
-@Client("http://localhost:8081") // <1>
-//end::harcoded[]
-*/
-//tag::k8s[]
+
 @Client("orders") // <1>
-//end::k8s[]
-//tag::clazz[]
 public interface OrdersClient {
     @Get("/orders/{id}")
     Mono<Order> getOrderById(Integer id);
@@ -37,4 +28,4 @@ public interface OrdersClient {
     @Get("/items/{id}")
     Mono<Item> getItemsById(Integer id);
 }
-//end::clazz[]
+

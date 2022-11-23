@@ -2,12 +2,6 @@ package example.micronaut;
 
 import example.micronaut.auth.Credentials;
 import example.micronaut.models.Item;
-import io.micronaut.core.type.Argument;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.HttpClient;
-import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -15,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,25 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ItemsControllerTest {
 
     @Inject
-    @Client("/")
-    HttpClient client;
+    OrderItemClient orderItemClient;
 
     @Inject
     Credentials credentials;
 
     @Test
     void testUnauthorized() {
-        HttpClientException exception = assertThrows(HttpClientException.class, () -> client.toBlocking().retrieve(HttpRequest.GET("/items"), HttpStatus.class));
+        HttpClientException exception = assertThrows(HttpClientException.class, () -> orderItemClient.getItems(""));
         assertTrue(exception.getMessage().contains("Unauthorized"));
-    }
-
-    @Test
-    void getUsers() {
-        HttpStatus status = client.toBlocking().retrieve(
-                HttpRequest.GET("/items")
-                        .basicAuth(credentials.getUsername(), credentials.getPassword())
-                , HttpStatus.class);
-        assertEquals(HttpStatus.OK, status);
     }
 
     @Test
@@ -52,33 +37,27 @@ public class ItemsControllerTest {
 
         Integer itemId = 1;
 
-        Item item = client.toBlocking().retrieve(
-                HttpRequest.GET("/items/" + itemId)
-                        .basicAuth(credentials.getUsername(), credentials.getPassword())
-                , Item.class
-        );
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
 
-        assertEquals(itemId, item.getId());
-        assertEquals("Banana", item.getName());
-        assertEquals(new BigDecimal("1.5"), item.getPrice());
+        Item item = orderItemClient.getItemsById(authHeader, itemId);
+
+        assertEquals(itemId, item.id());
+        assertEquals("Banana", item.name());
+        assertEquals(new BigDecimal("1.5"), item.price());
 
     }
 
     @Test
     void getItems() {
-        HttpResponse<List<Item>> rsp = client.toBlocking().exchange(
-                HttpRequest.GET("/items")
-                        .basicAuth(credentials.getUsername(), credentials.getPassword()),
-                Argument.listOf(Item.class));
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
 
-        assertEquals(HttpStatus.OK, rsp.getStatus());
-        assertNotNull(rsp.body());
-        List<Item> items = rsp.body();
+        List<Item> items = orderItemClient.getItems(authHeader);
+
         assertNotNull(items);
         List<String> existingItemNames = Arrays.asList("Kiwi", "Banana", "Grape");
         assertEquals(3, items.size());
         assertTrue(items.stream()
-                .map(Item::getName)
+                .map(Item::name)
                 .allMatch(name -> existingItemNames.stream().anyMatch(x -> x.equals(name))));
     }
 

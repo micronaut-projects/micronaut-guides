@@ -33,61 +33,55 @@ public class GatewayController {
 
     @Get("/users/{id}") // <2>
     public Mono<User> getUserById(@NonNull Integer id) {
-        return userClient.getById(id);
+        return userClient.getById(id).publishOn(Schedulers.boundedElastic());
     }
 
     @Get("/orders/{id}") // <3>
     public Mono<Order> getOrdersById(@NonNull Integer id) {
         return orderClient.getOrderById(id).publishOn(Schedulers.boundedElastic()).map(
-                x -> {
-                    x.setUser(getUserById(x.getUserId()).block());
-                    return x;
-                }
+                x -> new Order(x.id(), null, getUserById(x.userId()).publishOn(Schedulers.boundedElastic()).block(), x.items(), x.itemIds(), x.total())
         );
     }
 
     @Get("/items/{id}") // <4>
     public Mono<Item> getItemsById(@NonNull Integer id) {
-        return orderClient.getItemsById(id);
+        return orderClient.getItemsById(id).publishOn(Schedulers.boundedElastic());
     }
 
     @Get("/users") // <5>
     public Flux<User> getUsers() {
-        return userClient.getUsers();
+        return userClient.getUsers().publishOn(Schedulers.boundedElastic());
     }
 
     @Get("/items") // <6>
     public Flux<Item> getItems() {
-        return orderClient.getItems();
+        return orderClient.getItems().publishOn(Schedulers.boundedElastic());
     }
 
     @Get("/orders") // <7>
     public Flux<Order> getOrders() {
         return orderClient.getOrders().publishOn(Schedulers.boundedElastic()).map(
-                x -> {
-                    x.setUser(getUserById(x.getUserId()).block());
-                    return x;
-                }
+                x -> new Order(x.id(), null, getUserById(x.userId()).publishOn(Schedulers.boundedElastic()).block(), x.items(), x.itemIds(), x.total())
         );
     }
 
     @Post("/orders") // <8>
     public Mono<Order> createOrder(@Body @Valid Order order) {
-        return getUserById(order.getUserId())
+        return getUserById(order.userId()).publishOn(Schedulers.boundedElastic())
                 .map(
                         x -> {
-                            Order createdOrder = orderClient.createOrder(order).block();
-                            createdOrder.setUser(x);
+                            Order createdOrder = orderClient.createOrder(order).publishOn(Schedulers.boundedElastic()).block();
+                            createdOrder = new Order(createdOrder.id(), null, x, createdOrder.items(), createdOrder.itemIds(), createdOrder.total());
                             return createdOrder;
                         }
                 ).switchIfEmpty(
-                        Mono.error(new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id doesn't exist", order.getUserId())))
+                        Mono.error(new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id doesn't exist", order.userId())))
                 );
     }
 
     @Post("/users")  // <9>
     public Mono<User> createUser(@Body @NonNull User user) {
-        return userClient.createUser(user);
+        return userClient.createUser(user).publishOn(Schedulers.boundedElastic());
     }
 
 }

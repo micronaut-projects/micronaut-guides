@@ -4,6 +4,7 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 
 @ConfigurationProperties("micronaut.authentication-credentials")
 public class Credentials {
+
     private String username;
     private String password;
 
