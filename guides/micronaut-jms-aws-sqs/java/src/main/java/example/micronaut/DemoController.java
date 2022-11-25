@@ -1,7 +1,9 @@
 package example.micronaut;
 
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Status;
 
 @Controller  // <1>
 public class DemoController {
@@ -12,9 +14,9 @@ public class DemoController {
         this.demoProducer = demoProducer;
     }
 
-    @Get("/demo")  // <3>
+    @Post("/demo") // <3>
+    @Status(HttpStatus.NO_CONTENT)
     public void publishDemoMessages() {
         demoProducer.send("Demo message body");  // <4>
     }
-
 }

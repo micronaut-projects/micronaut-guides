@@ -1,6 +1,9 @@
 package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.client.HttpClient;
+import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
@@ -10,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.Collections;
 import java.util.Map;
 
 
@@ -19,7 +23,8 @@ import java.util.Map;
 class MicronautguideTest implements TestPropertyProvider {
 
     @Inject
-    DemoController demoController;
+    @Client("/")
+    HttpClient httpClient;
 
     @Inject
     DemoConsumer demoConsumer;
@@ -28,11 +33,13 @@ class MicronautguideTest implements TestPropertyProvider {
     void testItWorks() {
         int messageCount = demoConsumer.getMessageCount();
         Assertions.assertTrue(messageCount == 0);
-        demoController.publishDemoMessages();
+
+        httpClient.toBlocking().exchange(HttpRequest.POST("/demo", Collections.emptyMap()));
         messageCount = demoConsumer.getMessageCount();
         while (messageCount == 0) {
             messageCount = demoConsumer.getMessageCount();
         }
+
         Assertions.assertTrue(messageCount == 1);
     }
 
