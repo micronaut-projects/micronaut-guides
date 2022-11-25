@@ -18,6 +18,6 @@ public class AuthClientFilter implements HttpClientFilter {
 
     @Override
     public Publisher<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
-        return chain.proceed(request.basicAuth(credentials.getUsername(), credentials.getPassword()));
+        return chain.proceed(request.basicAuth(credentials.username(), credentials.password()));
     }
 }

@@ -36,7 +36,7 @@ public class OrdersControllerTest {
 
     @Test
     void multipleOrderInteraction() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
         Integer userId = 1;
         List<Integer> itemIds = Arrays.asList(1, 1, 2, 3);
@@ -69,8 +69,8 @@ public class OrdersControllerTest {
     }
 
     @Test
-    void ItemDoesntExists() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+    void itemDoesntExists() {
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
         Integer userId = 1;
         List<Integer> itemIds = List.of(5);
@@ -84,8 +84,8 @@ public class OrdersControllerTest {
     }
 
     @Test
-    void OrderEmptyItems() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+    void orderEmptyItems() {
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
         Integer userId = 1;
         Order order = new Order(0, userId, null, null, null);

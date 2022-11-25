@@ -1,7 +1,8 @@
 package example.micronaut.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.serde.annotation.Serdeable;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
@@ -11,14 +12,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@Introspected
+@Serdeable
 public record Order(
         @Max(10000) @JsonProperty Integer id,
-        @NotBlank @JsonProperty("user_id") Integer userId,
-        @JsonProperty User user,
-        @JsonProperty List<Item> items,
-        @NotBlank @JsonProperty("item_ids") List<Integer> itemIds,
-        BigDecimal total
+        @NotBlank @Nullable @JsonProperty("user_id") Integer userId,
+        @JsonProperty @Nullable User user,
+        @JsonProperty @Nullable List<Item> items,
+        @NotBlank @Nullable @JsonProperty("item_ids") List<Integer> itemIds,
+        @Nullable BigDecimal total
 ) {
 }

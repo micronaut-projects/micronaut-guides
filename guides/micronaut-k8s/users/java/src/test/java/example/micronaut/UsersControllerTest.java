@@ -36,14 +36,14 @@ public class UsersControllerTest {
 
     @Test
     void getUserThatDoesntExists() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
         User retriedUser = usersClient.getById(authHeader, 100);
         assertNull(retriedUser);
     }
 
     @Test
     void multipleUserInteraction() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
         String firstName = "firstName";
         String lastName = "lastName";
@@ -74,7 +74,7 @@ public class UsersControllerTest {
 
     @Test
     void createSameUserTwice() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
         String firstName = "SameUserFirstName";
         String lastName = "SameUserLastName";

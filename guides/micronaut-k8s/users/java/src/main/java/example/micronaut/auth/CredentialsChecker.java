@@ -23,8 +23,8 @@ public class CredentialsChecker implements AuthenticationProvider {
     public Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<?> httpRequest,
                                                           AuthenticationRequest<?, ?> authenticationRequest) {
         return Flux.create(emitter -> {
-            if ( authenticationRequest.getIdentity().equals(credentials.getUsername()) &&
-                    authenticationRequest.getSecret().equals(credentials.getPassword()) ) {
+            if ( authenticationRequest.getIdentity().equals(credentials.username()) &&
+                    authenticationRequest.getSecret().equals(credentials.password()) ) {
                 emitter.next(AuthenticationResponse.success((String) authenticationRequest.getIdentity()));
                 emitter.complete();
             } else {

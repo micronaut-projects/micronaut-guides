@@ -13,6 +13,6 @@ public class ErrorExceptionHandler implements ExceptionHandler<HttpClientRespons
 
     @Override
     public HttpResponse<?> handle(HttpRequest request, HttpClientResponseException exception) {
-        return HttpResponse.status(exception.getResponse().status()).body(exception.getResponse().getBody(String.class));
+        return HttpResponse.status(exception.getResponse().status()).body(exception.getResponse().getBody(String.class).orElse(null));
     }
 }

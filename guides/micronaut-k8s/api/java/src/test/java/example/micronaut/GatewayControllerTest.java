@@ -5,24 +5,18 @@ import example.micronaut.clients.UsersClient;
 import example.micronaut.models.Item;
 import example.micronaut.models.Order;
 import example.micronaut.models.User;
-import io.micronaut.core.type.Argument;
-import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.QueryValue;
-import io.micronaut.http.client.HttpClient;
-import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.matchers.Or;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,8 +70,8 @@ public class GatewayControllerTest {
     @Test
     void getOrderById() {
 
-        Order order = new Order(1, 2, null, null, null, null);;
-        User user = new User(order.userId(), null, null, "test");
+        Order order = new Order(1, 2, null, null, new ArrayList<>(), null);
+        User user = new User(order.userId(), "firstName", "lastName", "test");
 
         when(ordersClient.getOrderById(1)).thenReturn(Mono.just(order));
         when(usersClient.getById(user.id())).thenReturn(Mono.just(user));
@@ -92,7 +86,7 @@ public class GatewayControllerTest {
 
     @Test
     void getUserById() {
-        User user = new User(1, null, null, "test");
+        User user = new User(1, "firstName", "lastName", "test");
 
         when(usersClient.getById(1)).thenReturn(Mono.just(user));
 
@@ -104,7 +98,7 @@ public class GatewayControllerTest {
 
     @Test
     void getUsers() {
-        User user = new User(1, null, null, "test");
+        User user = new User(1, "firstName", "lastName", "test");
 
         when(usersClient.getUsers()).thenReturn(Flux.just(user));
 
@@ -133,8 +127,8 @@ public class GatewayControllerTest {
 
     @Test
     void getOrders() {
-        Order order = new Order(1, 2, null, null, null, null);;
-        User user = new User(order.userId(), null, null, "test");
+        Order order = new Order(1, 2, null, null, new ArrayList<>(), null);
+        User user = new User(order.userId(), "firstName", "lastName", "test");
 
         when(ordersClient.getOrders()).thenReturn(Flux.just(order));
         when(usersClient.getById(order.userId())).thenReturn(Mono.just(user));
@@ -169,8 +163,8 @@ public class GatewayControllerTest {
 
     @Test
     void createOrder() {
-        Order order = new Order(1, 2, null, null, null, null);;
-        User user = new User(order.userId(), null, null, "test");
+        Order order = new Order(1, 2, null, null, new ArrayList<>(), null);
+        User user = new User(order.userId(), "firstName", "lastName", "test");
 
         when(usersClient.getById(user.id())).thenReturn(Mono.just(user));
 
@@ -186,7 +180,7 @@ public class GatewayControllerTest {
 
     @Test
     void createOrderUserDoesntExists() {
-        Order order = new Order(1, 2, null, null, null, null);;
+        Order order = new Order(1, 2, null, null, new ArrayList<>(), new BigDecimal(0));;
 
         when(ordersClient.createOrder(any())).thenReturn(Mono.just(order));
 
@@ -201,7 +195,7 @@ public class GatewayControllerTest {
 
     @Test
     void exceptionHandler() {
-        User user = new User(null, null, null, null);
+        User user = new User(1, "firstname", "lastname", "username");
 
         String message = "Test error message";
 

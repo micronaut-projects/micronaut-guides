@@ -37,7 +37,7 @@ public class ItemsControllerTest {
 
         Integer itemId = 1;
 
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
         Item item = orderItemClient.getItemsById(authHeader, itemId);
 
@@ -49,7 +49,7 @@ public class ItemsControllerTest {
 
     @Test
     void getItems() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.getUsername() + ":" + credentials.getPassword()).getBytes());
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
         List<Item> items = orderItemClient.getItems(authHeader);
 
