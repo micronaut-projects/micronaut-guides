@@ -380,15 +380,15 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
 
 <span class="keyword">import</span> <span class="include">com.fasterxml.jackson.annotation.JsonIgnore</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">java.util.HashSet</span>;
 <span class="keyword">import</span> <span class="include">java.util.Set</span>;
 
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Genre</span> {
 
     <span class="annotation">@Nullable</span>
@@ -449,13 +449,13 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotNull</span>;
 
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Book</span> {
 
     <span class="annotation">@Nullable</span>
@@ -840,12 +840,12 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.genre</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreSaveCommand</span> {
 
     <span class="annotation">@NotBlank</span>
@@ -872,12 +872,12 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.genre</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.NotBlank</span>;
 
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">GenreUpdateCommand</span> {
 
     <span class="directive">private</span> <span class="type">long</span> id;
@@ -918,8 +918,8 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>;
 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>;
@@ -928,7 +928,7 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
 <span class="keyword">import</span> <span class="include">java.net.URI</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
-<span class="annotation">@Introspected</span>
+<span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">ListingArguments</span> {
 
     <span class="annotation">@PositiveOrZero</span>
@@ -946,7 +946,14 @@ runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span clas
     <span class="annotation">@Nullable</span>
     <span class="directive">private</span> <span class="predefined-type">String</span> order;
 
-    <span class="directive">public</span> ListingArguments() {
+    <span class="directive">private</span> ListingArguments() {
+    }
+
+    <span class="directive">public</span> ListingArguments(<span class="predefined-type">Integer</span> offset, <span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> max, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> sort, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> order) {
+        <span class="local-variable">this</span>.offset = offset;
+        <span class="local-variable">this</span>.max = max;
+        <span class="local-variable">this</span>.sort = sort;
+        <span class="local-variable">this</span>.order = order;
     }
 
     <span class="directive">public</span> Optional&lt;<span class="predefined-type">Integer</span>&gt; getOffset() {

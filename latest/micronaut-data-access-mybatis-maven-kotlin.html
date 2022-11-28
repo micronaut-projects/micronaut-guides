@@ -384,9 +384,9 @@ class MybatisFactory(private val dataSource: DataSource) { <i class="conum" data
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class Genre(var name: String) {
 
     var id: Long? = null
@@ -403,9 +403,9 @@ data class Genre(var name: String) {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.domain
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class Book(
     var isbn: String,
     var name: String,
@@ -687,10 +687,10 @@ open class GenreRepositoryImpl(private val genreMapper: GenreMapper) : GenreRepo
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.genre
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import javax.validation.constraints.NotBlank
 
-@Introspected
+@Serdeable
 data class GenreSaveCommand(@NotBlank var name: String)</code></pre>
 </div>
 </div>
@@ -699,10 +699,10 @@ data class GenreSaveCommand(@NotBlank var name: String)</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.genre
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import javax.validation.constraints.NotBlank
 
-@Introspected
+@Serdeable
 class GenreUpdateCommand(var id: Long, @NotBlank var name: String)</code></pre>
 </div>
 </div>
@@ -714,7 +714,7 @@ class GenreUpdateCommand(var id: Long, @NotBlank var name: String)</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.http.uri.UriBuilder
 import java.net.URI
 import java.util.Optional
@@ -722,44 +722,20 @@ import javax.validation.constraints.Pattern
 import javax.validation.constraints.Positive
 import javax.validation.constraints.PositiveOrZero
 
-@Introspected
-class ListingArguments {
-
-    @PositiveOrZero
-    private var offset: Int? = 0
-
-    @Positive
-    private var max: Int? = null
-
-    @Pattern(regexp = &quot;id|name&quot;)
-    private var sort: String? = null
-
-    @Pattern(regexp = &quot;asc|ASC|desc|DESC&quot;)
-    private var order: String? = null
-
+@Serdeable
+class ListingArguments(
+    @field:PositiveOrZero var offset: Int? = 0,
+    @field:Positive var max: Int? = null,
+    @field:Pattern(regexp = &quot;id|name&quot;) var sort: String? = null,
+    @field:Pattern(regexp = &quot;asc|ASC|desc|DESC&quot;) var order: String? = null
+) {
     fun getOffset(): Optional&lt;Int&gt; = Optional.ofNullable(offset)
-
-    fun setOffset(offset: Int?) {
-        this.offset = offset
-    }
 
     fun getMax(): Optional&lt;Int&gt; = Optional.ofNullable(max)
 
-    fun setMax(max: Int?) {
-        this.max = max
-    }
-
     fun getSort(): Optional&lt;String&gt; = Optional.ofNullable(sort)
 
-    fun setSort(sort: String?) {
-        this.sort = sort
-    }
-
     fun getOrder(): Optional&lt;String&gt; = Optional.ofNullable(order)
-
-    fun setOrder(order: String?) {
-        this.order = order
-    }
 
     fun of(uriBuilder: UriBuilder): URI {
         if (max != null) {
@@ -782,22 +758,22 @@ class ListingArguments {
         private val args = ListingArguments()
 
         fun max(max: Int): Builder {
-            args.setMax(max)
+            args.max = max
             return this
         }
 
         fun sort(sort: String?): Builder {
-            args.setSort(sort)
+            args.sort = sort
             return this
         }
 
         fun order(order: String?): Builder {
-            args.setOrder(order)
+            args.order = order
             return this
         }
 
         fun offset(offset: Int): Builder {
-            args.setOffset(offset)
+            args.offset = offset
             return this
         }
 
@@ -867,7 +843,7 @@ import javax.validation.Valid
 open class GenreController(private val genreRepository: GenreRepository) { <i class="conum" data-value="2"></i><b>(2)</b>
 
     @Get(&quot;/{id}&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
-    fun show(id: Long): Genre = genreRepository.findById(id).orElse(null) <i class="conum" data-value="4"></i><b>(4)</b>
+    fun show(id: Long): Genre? = genreRepository.findById(id).orElse(null) <i class="conum" data-value="4"></i><b>(4)</b>
 
     @Put <i class="conum" data-value="5"></i><b>(5)</b>
     open fun update(@Body @Valid command: GenreUpdateCommand): HttpResponse&lt;*&gt; { <i class="conum" data-value="6"></i><b>(6)</b>
