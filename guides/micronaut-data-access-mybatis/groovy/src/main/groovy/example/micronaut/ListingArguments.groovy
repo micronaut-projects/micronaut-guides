@@ -1,6 +1,6 @@
 package example.micronaut
 
-import groovy.transform.CompileStatic
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.http.uri.UriBuilder
@@ -8,10 +8,11 @@ import io.micronaut.http.uri.UriBuilder
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Positive
 import javax.validation.constraints.PositiveOrZero
+import groovy.transform.CompileStatic
 
 @CompileStatic
 @Serdeable
-class ListingArguments {
+public class ListingArguments {
 
     @PositiveOrZero
     private Integer offset = 0
@@ -28,9 +29,6 @@ class ListingArguments {
     @Nullable
     private String order
 
-    private ListingArguments() {
-    }
-
     ListingArguments(Integer offset, @Nullable Integer max, @Nullable String sort, @Nullable String order) {
         this.offset = offset
         this.max = max
@@ -39,7 +37,7 @@ class ListingArguments {
     }
 
     Optional<Integer> getOffset() {
-        Optional.ofNullable(offset)
+        Optional.ofNullable(offset);
     }
 
     void setOffset(@Nullable Integer offset) {
@@ -70,54 +68,69 @@ class ListingArguments {
         this.order = order
     }
 
+    @NonNull
     static Builder builder() {
-        new Builder()
+        return new Builder()
     }
 
     URI of(UriBuilder uriBuilder) {
         if (max != null) {
-            uriBuilder.queryParam("max", max)
+            uriBuilder.queryParam("max", max);
         }
         if (order != null) {
-            uriBuilder.queryParam("order", order)
+            uriBuilder.queryParam("order", order);
         }
         if (offset != null) {
-            uriBuilder.queryParam("offset", offset)
+            uriBuilder.queryParam("offset", offset);
         }
         if (sort != null) {
-            uriBuilder.queryParam("sort", sort)
+            uriBuilder.queryParam("sort", sort);
         }
         uriBuilder.build()
     }
 
     static final class Builder {
-        private final ListingArguments args = new ListingArguments()
+        private Integer offset
+
+        @Nullable
+        private Integer max
+
+        @Nullable
+        private String sort
+
+        @Nullable
+        private String order
 
         private Builder() {
         }
 
+        @NonNull
         Builder max(int max) {
-            args.max = max
+            this.max = max
             this
         }
 
+        @NonNull
         Builder sort(String sort) {
-            args.sort = sort
+            this.sort = sort
             this
         }
 
+        @NonNull
         Builder order(String order) {
-            args.order = order
+            this.order = order
             this
         }
 
+        @NonNull
         Builder offset(int offset) {
-            args.offset = offset
+            this.offset = offset
             this
         }
 
+        @NonNull
         ListingArguments build() {
-            args
+            new ListingArguments(Optional.ofNullable(offset).orElse(0), max, sort, order)
         }
     }
 }
