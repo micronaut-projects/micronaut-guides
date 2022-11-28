@@ -26,6 +26,6 @@ public class Localstack extends AbstractFeature {
     @Override
     public void apply(GeneratorContext generatorContext) {
         super.apply(generatorContext);
-        addDependency(generatorContext, "aws-java-sdk-core", Scope.TEST);
+        addDependency(generatorContext, "aws-java-sdk-core");
     }
 }
