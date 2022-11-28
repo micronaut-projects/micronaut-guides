@@ -1,12 +1,12 @@
 package example.micronaut.domain;
 
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.serde.annotation.Serdeable;
 
 import javax.validation.constraints.NotNull;
 
-@Introspected
+@Serdeable
 public class Book {
 
     @Nullable
