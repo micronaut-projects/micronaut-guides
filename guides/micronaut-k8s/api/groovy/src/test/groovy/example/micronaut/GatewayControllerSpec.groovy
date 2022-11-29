@@ -178,7 +178,7 @@ class GatewayControllerSpec extends Specification {
 
         HttpClientResponseException e = thrown()
         e.response.status == HttpStatus.BAD_REQUEST
-        e.response.getBody(String.class).orElse("").contains("User with 2 id doesn't exist")
+        e.response.getBody(String.class).orElse("").contains("User with id 2 doesn't exist")
 
 
     }

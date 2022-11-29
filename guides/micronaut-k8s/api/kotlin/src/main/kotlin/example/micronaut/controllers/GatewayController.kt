@@ -98,7 +98,7 @@ class GatewayController(ordersClient: OrdersClient, usersClient: UsersClient) {
                 Mono.error(
                     HttpStatusException(
                         HttpStatus.BAD_REQUEST,
-                        String.format("User with %s id doesn't exist", order.userId)
+                        String.format("User with id %s doesn't exist", order.userId)
                     )
                 )
             )

@@ -190,7 +190,7 @@ public class GatewayControllerTest {
 
         assertEquals(exception.getStatus(), HttpStatus.BAD_REQUEST);
 
-        assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("User with 2 id doesn't exist"));
+        assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("User with id 2 doesn't exist"));
     }
 
     @Test

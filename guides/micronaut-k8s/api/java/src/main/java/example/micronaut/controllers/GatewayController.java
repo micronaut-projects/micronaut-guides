@@ -75,7 +75,7 @@ public class GatewayController {
                             return createdOrder;
                         }
                 ).switchIfEmpty(
-                        Mono.error(new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id doesn't exist", order.userId())))
+                        Mono.error(new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("User with id %s doesn't exist", order.userId())))
                 );
     }
 

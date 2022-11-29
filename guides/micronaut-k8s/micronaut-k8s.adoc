@@ -696,6 +696,12 @@ Run next command to create described resources:
 kubectl create -f users/k8s.yml
 ----
 
+[source,text]
+----
+deployment.apps/users created
+service/users created
+----
+
 === Orders Microservice
 
 The next command will build docker image of `orders` service with image name `orders`.
@@ -736,6 +742,12 @@ Run next command to create described resources:
 kubectl create -f orders/k8s.yml
 ----
 
+[source,text]
+----
+deployment.apps/orders created
+service/orders created
+----
+
 === API (Gateway) Microservice
 
 The next command will build docker image of `api` service with image name `api`.
@@ -774,6 +786,12 @@ Run next command to create described resources:
 [source,bash]
 ----
 kubectl create -f api/k8s.yml
+----
+
+[source,text]
+----
+deployment.apps/api created
+service/api created
 ----
 
 === Test integration between applications
@@ -850,6 +868,18 @@ curl "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8'
 [source, json]
 ----
 [{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
+----
+
+We can try to place an order with user that doesn't exist (with id 100). Run a cURL command:
+
+[source,bash]
+----
+curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 100, "item_ids": [1,2] }'
+----
+
+[source, json]
+----
+{"message":"Bad Request","_links":{"self":[{"href":"/api/orders","templated":false}]},"_embedded":{"errors":[{"message":"User with id 100 doesn't exist"}]}}
 ----
 
 == Next steps

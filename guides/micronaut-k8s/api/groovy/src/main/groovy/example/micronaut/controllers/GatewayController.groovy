@@ -70,7 +70,7 @@ class GatewayController {
     Mono<Order> createOrder(@Body @Valid Order order) {
         User user = getUserById(order.userId).publishOn(Schedulers.boundedElastic()).block()
         if (user == null) {
-           return Mono.error(new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id doesn't exist", order.userId)))
+           return Mono.error(new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("User with id %s doesn't exist", order.userId)))
         }
         def createdOrder = ordersClient.createOrder(order).publishOn(Schedulers.boundedElastic()).block()
         Mono.just(new Order(createdOrder.id, null, user, createdOrder.items, createdOrder.itemIds , createdOrder.total))

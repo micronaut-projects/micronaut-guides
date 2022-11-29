@@ -151,7 +151,7 @@ class GatewayControllerTest {
         ) { gatewayClient!!.createOrder(order) }
         assertEquals(exception.status, HttpStatus.BAD_REQUEST)
         assertTrue(
-            exception.response.getBody(String::class.java).orElse("").contains("User with 2 id doesn't exist")
+            exception.response.getBody(String::class.java).orElse("").contains("User with id 2 doesn't exist")
         )
     }
 
