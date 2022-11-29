@@ -11,9 +11,9 @@ import java.util.List;
 
 @Serdeable
 public record Order(
-        @Max(10000) @JsonProperty Integer id, // <1>
+        @Max(10000) @Nullable Integer id, // <1>
         @NotBlank @JsonProperty("user_id") Integer userId,
-        @JsonProperty @Nullable List<Item> items, // <2>
+        @Nullable List<Item> items, // <2>
         @NotBlank @JsonProperty("item_ids") @Nullable List<Integer> itemIds, // <3>
         @Nullable BigDecimal total
 ) {

@@ -117,7 +117,7 @@ public class GatewayControllerTest {
 
         when(ordersClient.getItems()).thenReturn(Flux.just(item));
 
-        List<Item> items  = gatewayClient.getItems();
+        List<Item> items = gatewayClient.getItems();
 
         assertNotNull(items);
         assertEquals(1, items.size());
