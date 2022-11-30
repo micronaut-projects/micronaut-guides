@@ -20,8 +20,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.math.BigDecimal
 
 @MicronautTest
@@ -49,7 +47,7 @@ class GatewayControllerTest {
     fun itemById() {
         val itemId = 1
         val item = Item(itemId, "test", BigDecimal.ONE)
-        `when`(ordersClient!!.getItemsById(1)).thenReturn(Mono.just(item))
+        `when`(ordersClient!!.getItemsById(1)).thenReturn(item)
         val retrievedItem = gatewayClient!!.getItemById(item.id)
         assertEquals(item.id, retrievedItem!!.id)
         assertEquals(item.name, retrievedItem.name)
@@ -60,8 +58,8 @@ class GatewayControllerTest {
     fun orderById() {
         val order = Order(1, 2, null, null, ArrayList(), null)
         val user = User(order.userId!!, "firstName", "lastName", "test")
-        `when`(ordersClient!!.getOrderById(1)).thenReturn(Mono.just(order))
-        `when`(usersClient!!.getById(user.id)).thenReturn(Mono.just(user))
+        `when`(ordersClient!!.getOrderById(1)).thenReturn(order)
+        `when`(usersClient!!.getById(user.id)).thenReturn(user)
         val retrievedOrder = gatewayClient!!.getOrderById(order.id)
         assertEquals(order.id, retrievedOrder!!.id)
         assertEquals(order.userId, retrievedOrder.user!!.id)
@@ -72,7 +70,7 @@ class GatewayControllerTest {
     @Test
     fun userById() {
         val user = User(1, "firstName", "lastName", "test")
-        `when`(usersClient!!.getById(1)).thenReturn(Mono.just(user))
+        `when`(usersClient!!.getById(1)).thenReturn(user)
         val retrievedUser = gatewayClient!!.getUsersById(user.id)
         assertEquals(user.id, retrievedUser!!.id)
         assertEquals(user.username, retrievedUser.username)
@@ -81,7 +79,7 @@ class GatewayControllerTest {
     @Test
     fun users() {
         val user = User(1, "firstName", "lastName", "test")
-        `when`(usersClient!!.users).thenReturn(Flux.just(user))
+        `when`(usersClient!!.users).thenReturn(listOf(user))
         val users = gatewayClient!!.users
         assertNotNull(users)
         assertEquals(1, users.size)
@@ -92,7 +90,7 @@ class GatewayControllerTest {
     @Test
     fun items() {
         val item = Item(1, "test", BigDecimal.ONE)
-        `when`(ordersClient!!.items).thenReturn(Flux.just(item))
+        `when`(ordersClient!!.items).thenReturn(listOf(item))
         val items = gatewayClient!!.items
         assertNotNull(items)
         assertEquals(1, items.size)
@@ -104,8 +102,8 @@ class GatewayControllerTest {
     fun orders() {
         val order = Order(1, 2, null, null, ArrayList(), null)
         val user = User(order.userId!!, "firstName", "lastName", "test")
-        `when`(ordersClient!!.orders).thenReturn(Flux.just(order))
-        `when`(usersClient!!.getById(order.userId)).thenReturn(Mono.just(user))
+        `when`(ordersClient!!.orders).thenReturn(listOf(order))
+        `when`(usersClient!!.getById(order.userId!!)).thenReturn(user)
         val orders = gatewayClient!!.orders
         assertNotNull(orders)
         assertEquals(1, orders.size)
@@ -121,7 +119,7 @@ class GatewayControllerTest {
         val lastName = "lastName"
         val username = "username"
         val user = User(0, firstName, lastName, username)
-        `when`(usersClient!!.createUser(any())).thenReturn(Mono.just(user))
+        `when`(usersClient!!.createUser(any())).thenReturn(user)
         val createdUser = gatewayClient!!.createUser(user)
         assertEquals(firstName, createdUser.firstName)
         assertEquals(lastName, createdUser.lastName)
@@ -132,8 +130,8 @@ class GatewayControllerTest {
     fun createOrder() {
         val order = Order(1, 2, null, null, ArrayList(), null)
         val user = User(order.userId!!, "firstName", "lastName", "test")
-        `when`(usersClient!!.getById(user.id)).thenReturn(Mono.just(user))
-        `when`(ordersClient!!.createOrder(any())).thenReturn(Mono.just(order))
+        `when`(usersClient!!.getById(user.id)).thenReturn(user)
+        `when`(ordersClient!!.createOrder(any())).thenReturn(order)
         val createdOrder = gatewayClient!!.createOrder(order)
         assertEquals(order.id, createdOrder.id)
         assertNull(createdOrder.userId)
@@ -144,8 +142,8 @@ class GatewayControllerTest {
     @Test
     fun createOrderUserDoesntExists() {
         val order = Order(1, 2, null, null, ArrayList(), BigDecimal(0))
-        `when`(ordersClient!!.createOrder(any())).thenReturn(Mono.just(order))
-        `when`(usersClient!!.getById(order.userId)).thenReturn(Mono.empty())
+        `when`(ordersClient!!.createOrder(any())).thenReturn(order)
+        `when`(usersClient!!.getById(order.userId!!)).thenReturn(null)
         val exception = assertThrows(
             HttpClientResponseException::class.java
         ) { gatewayClient!!.createOrder(order) }

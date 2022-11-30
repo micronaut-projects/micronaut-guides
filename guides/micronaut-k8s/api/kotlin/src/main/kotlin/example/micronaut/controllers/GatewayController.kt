@@ -32,80 +32,75 @@ class GatewayController(ordersClient: OrdersClient, usersClient: UsersClient) {
 
 
     @Get("/users/{id}") // <2>
-    fun getUserById(@NonNull id: Int?): Mono<User?> {
-        return userClient.getById(id).publishOn(Schedulers.boundedElastic())
+    fun getUserById(@NonNull id: Int): User? {
+        return userClient.getById(id)
     }
 
     @Get("/orders/{id}") // <3>
-    fun getOrdersById(@NonNull id: Int?): Mono<Order>? {
-        return ordersClient.getOrderById(id).publishOn(Schedulers.boundedElastic()).map { x: Order ->
-            Order(
-                x.id,
-                null,
-                getUserById(x.userId).publishOn(Schedulers.boundedElastic()).block(),
-                x.items,
-                x.itemIds,
-                x.total
-            )
-        }
+    fun getOrdersById(@NonNull id: Int): Order {
+        val order = ordersClient.getOrderById(id)
+
+        return Order(
+            order.id,
+            null,
+            getUserById(order.userId!!),
+            order.items,
+            order.itemIds,
+            order.total
+        )
     }
 
     @Get("/items/{id}") // <4>
-    fun getItemsById(@NonNull id: Int?): Mono<Item?>? {
-        return ordersClient.getItemsById(id).publishOn(Schedulers.boundedElastic())
+    fun getItemsById(@NonNull id: Int): Item {
+        return ordersClient.getItemsById(id)
     }
 
     @Get("/users") // <5>
-    fun getUsers(): Flux<User?>? {
-        return userClient.users.publishOn(Schedulers.boundedElastic())
+    fun getUsers(): List<User> {
+        return userClient.users
     }
 
     @Get("/items") // <6>
-    fun getItems(): Flux<Item?>? {
-        return ordersClient.items.publishOn(Schedulers.boundedElastic())
+    fun getItems(): List<Item> {
+        return ordersClient.items
     }
 
     @Get("/orders") // <7>
-    fun getOrders(): Flux<Order>? {
-        return ordersClient.orders.publishOn(Schedulers.boundedElastic()).map { x: Order ->
-            Order(
-                x.id,
-                null,
-                getUserById(x.userId).publishOn(Schedulers.boundedElastic()).block(),
-                x.items,
-                x.itemIds,
-                x.total
-            )
+    fun getOrders(): List<Order>? {
+        val orders = mutableListOf<Order>()
+        ordersClient.orders.forEach{orders.add(Order(
+            it.id,
+            null,
+            getUserById(it.userId!!),
+            it.items,
+            it.itemIds,
+            it.total))
         }
+        return orders
     }
 
     @Post("/orders") // <8>
-    fun createOrder(@Body order: @Valid Order?): Mono<Order>? {
-        return getUserById(order!!.userId).publishOn(Schedulers.boundedElastic())
-            .map { x: User? ->
-                var createdOrder: Order? =
-                    ordersClient.createOrder(order).publishOn(Schedulers.boundedElastic()).block()
-                createdOrder = Order(
-                    createdOrder!!.id,
-                    null,
-                    x,
-                    createdOrder.items,
-                    createdOrder.itemIds,
-                    createdOrder.total
-                )
-                createdOrder
-            }.switchIfEmpty(
-                Mono.error(
-                    HttpStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        String.format("User with id %s doesn't exist", order.userId)
-                    )
-                )
+    fun createOrder(@Body order: @Valid Order): Order? {
+        val user = getUserById(order!!.userId!!)
+            ?: throw  HttpStatusException(
+                HttpStatus.BAD_REQUEST,
+                String.format("User with id %s doesn't exist", order.userId)
             )
+
+        val createdOrder = ordersClient.createOrder(order)
+
+        return Order(
+            createdOrder!!.id,
+            null,
+            user,
+            createdOrder.items,
+            createdOrder.itemIds,
+            createdOrder.total
+        )
     }
 
     @Post("/users") // <9>
-    fun createUser(@Body @NonNull user: User?): Mono<User?>? {
-        return userClient.createUser(user).publishOn(Schedulers.boundedElastic())
+    fun createUser(@Body @NonNull user: User): User {
+        return userClient.createUser(user)
     }
 }

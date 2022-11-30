@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,7 +58,7 @@ public class GatewayControllerTest {
         int itemId = 1;
         Item item = new Item(itemId, "test", BigDecimal.ONE);
 
-        when(ordersClient.getItemsById(1)).thenReturn(Mono.just(item));
+        when(ordersClient.getItemsById(1)).thenReturn(item);
 
         Item retrievedItem = gatewayClient.getItemById(item.id());
 
@@ -73,8 +74,8 @@ public class GatewayControllerTest {
         Order order = new Order(1, 2, null, null, new ArrayList<>(), null);
         User user = new User(order.userId(), "firstName", "lastName", "test");
 
-        when(ordersClient.getOrderById(1)).thenReturn(Mono.just(order));
-        when(usersClient.getById(user.id())).thenReturn(Mono.just(user));
+        when(ordersClient.getOrderById(1)).thenReturn(order);
+        when(usersClient.getById(user.id())).thenReturn(user);
 
         Order retrievedOrder = gatewayClient.getOrderById(order.id());
 
@@ -88,7 +89,7 @@ public class GatewayControllerTest {
     void getUserById() {
         User user = new User(1, "firstName", "lastName", "test");
 
-        when(usersClient.getById(1)).thenReturn(Mono.just(user));
+        when(usersClient.getById(1)).thenReturn(user);
 
         User retrievedUser = gatewayClient.getUsersById(user.id());
 
@@ -100,7 +101,7 @@ public class GatewayControllerTest {
     void getUsers() {
         User user = new User(1, "firstName", "lastName", "test");
 
-        when(usersClient.getUsers()).thenReturn(Flux.just(user));
+        when(usersClient.getUsers()).thenReturn(List.of(user));
 
         List<User> users = gatewayClient.getUsers();
 
@@ -115,7 +116,7 @@ public class GatewayControllerTest {
 
         Item item = new Item(1, "test", BigDecimal.ONE);
 
-        when(ordersClient.getItems()).thenReturn(Flux.just(item));
+        when(ordersClient.getItems()).thenReturn(List.of(item));
 
         List<Item> items = gatewayClient.getItems();
 
@@ -130,8 +131,8 @@ public class GatewayControllerTest {
         Order order = new Order(1, 2, null, null, new ArrayList<>(), null);
         User user = new User(order.userId(), "firstName", "lastName", "test");
 
-        when(ordersClient.getOrders()).thenReturn(Flux.just(order));
-        when(usersClient.getById(order.userId())).thenReturn(Mono.just(user));
+        when(ordersClient.getOrders()).thenReturn(List.of(order));
+        when(usersClient.getById(order.userId())).thenReturn(user);
 
         List<Order> orders = gatewayClient.getOrders();
 
@@ -152,7 +153,7 @@ public class GatewayControllerTest {
 
         User user = new User(0, firstName, lastName, username);
 
-        when(usersClient.createUser(any())).thenReturn(Mono.just(user));
+        when(usersClient.createUser(any())).thenReturn(user);
 
         User createdUser = gatewayClient.createUser(user);
 
@@ -166,9 +167,9 @@ public class GatewayControllerTest {
         Order order = new Order(1, 2, null, null, new ArrayList<>(), null);
         User user = new User(order.userId(), "firstName", "lastName", "test");
 
-        when(usersClient.getById(user.id())).thenReturn(Mono.just(user));
+        when(usersClient.getById(user.id())).thenReturn(user);
 
-        when(ordersClient.createOrder(any())).thenReturn(Mono.just(order));
+        when(ordersClient.createOrder(any())).thenReturn(order);
 
         Order createdOrder = gatewayClient.createOrder(order);
 
@@ -182,9 +183,9 @@ public class GatewayControllerTest {
     void createOrderUserDoesntExists() {
         Order order = new Order(1, 2, null, null, new ArrayList<>(), new BigDecimal(0));;
 
-        when(ordersClient.createOrder(any())).thenReturn(Mono.just(order));
+        when(ordersClient.createOrder(any())).thenReturn(order);
 
-        when(usersClient.getById(order.userId())).thenReturn(Mono.empty());
+        when(usersClient.getById(order.userId())).thenReturn(null);
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> gatewayClient.createOrder(order));
 

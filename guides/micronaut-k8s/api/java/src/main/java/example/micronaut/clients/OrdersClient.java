@@ -6,26 +6,25 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
-import io.micronaut.retry.annotation.Recoverable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 
 @Client("orders") // <1>
 public interface OrdersClient {
     @Get("/orders/{id}")
-    Mono<Order> getOrderById(Integer id);
+    Order getOrderById(Integer id);
 
     @Post("/orders")
-    Mono<Order> createOrder(@Body Order order);
+    Order createOrder(@Body Order order);
 
     @Get("/orders")
-    Flux<Order> getOrders();
+    List<Order> getOrders();
 
     @Get("/items")
-    Flux<Item> getItems();
+    List<Item> getItems();
 
     @Get("/items/{id}")
-    Mono<Item> getItemsById(Integer id);
+    Item getItemsById(Integer id);
 }
 

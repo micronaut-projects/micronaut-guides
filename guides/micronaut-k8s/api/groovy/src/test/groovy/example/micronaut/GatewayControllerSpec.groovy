@@ -11,8 +11,6 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import spock.lang.Specification
 
 @MicronautTest
@@ -47,7 +45,7 @@ class GatewayControllerSpec extends Specification {
         def retrievedItem = gatewayClient.getItemById(1)
 
         then:
-        1 * ordersClient.getItemsById(1) >> Mono.just(item)
+        1 * ordersClient.getItemsById(1) >> item
 
         item.id == retrievedItem.id
         item.name == retrievedItem.name
@@ -63,8 +61,8 @@ class GatewayControllerSpec extends Specification {
         def retrievedOrder = gatewayClient.getOrderById(order.id)
 
         then:
-        1 * ordersClient.getOrderById(1) >> Mono.just(order)
-        1 * usersClient.getById(user.id) >> Mono.just(user)
+        1 * ordersClient.getOrderById(1) >> order
+        1 * usersClient.getById(user.id) >> user
 
         order.id == retrievedOrder.id
         order.userId == retrievedOrder.user.id
@@ -80,7 +78,7 @@ class GatewayControllerSpec extends Specification {
         def retrievedUser = gatewayClient.getUsersById(user.id)
 
         then:
-        1 * usersClient.getById(user.id) >> Mono.just(user)
+        1 * usersClient.getById(user.id) >> user
         user.id == retrievedUser.id
         user.username == retrievedUser.username
     }
@@ -93,7 +91,7 @@ class GatewayControllerSpec extends Specification {
         def users = gatewayClient.getUsers()
 
         then:
-        1 * usersClient.getUsers() >> Flux.just(user)
+        1 * usersClient.getUsers() >> [user]
         users.size() == 1
         user.id == users[0].id
         user.username == users[0].username
@@ -107,7 +105,7 @@ class GatewayControllerSpec extends Specification {
         def items = gatewayClient.getItems()
 
         then:
-        1 * ordersClient.getItems() >> Flux.just(item)
+        1 * ordersClient.getItems() >> [item]
         items.size() == 1
         item.id == items[0].id
         item.name == items[0].name
@@ -123,8 +121,8 @@ class GatewayControllerSpec extends Specification {
         def orders = gatewayClient.getOrders()
 
         then:
-        1 * ordersClient.getOrders() >> Flux.just(order)
-        1 * usersClient.getById(user.id) >> Mono.just(user)
+        1 * ordersClient.getOrders() >> [order]
+        1 * usersClient.getById(user.id) >> user
 
         orders.size() == 1
         order.id == orders[0].id
@@ -141,7 +139,7 @@ class GatewayControllerSpec extends Specification {
         def createdUser = gatewayClient.createUser(user)
 
         then:
-        1 * usersClient.createUser(_) >> Mono.just(user)
+        1 * usersClient.createUser(_) >> user
 
         user.firstName == createdUser.firstName
         user.lastName == createdUser.lastName
@@ -158,8 +156,8 @@ class GatewayControllerSpec extends Specification {
         def createdOrder = gatewayClient.createOrder(order)
 
         then:
-        1 * usersClient.getById(user.id) >> Mono.just(user)
-        1 * ordersClient.createOrder(_) >> Mono.just(order)
+        1 * usersClient.getById(user.id) >> user
+        1 * ordersClient.createOrder(_) >> order
         order.id == createdOrder.id
         createdOrder.userId == null
         order.userId == createdOrder.user.id
@@ -174,7 +172,7 @@ class GatewayControllerSpec extends Specification {
         gatewayClient.createOrder(order)
 
         then:
-        1 * usersClient.getById(_) >> Mono.empty()
+        1 * usersClient.getById(_) >> null
 
         HttpClientResponseException e = thrown()
         e.response.status == HttpStatus.BAD_REQUEST

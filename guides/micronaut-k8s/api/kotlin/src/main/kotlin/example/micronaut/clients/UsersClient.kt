@@ -11,11 +11,11 @@ import reactor.core.publisher.Mono
 @Client("users") // <1>
 interface UsersClient {
     @Get("/users/{id}")
-    fun getById(id: Int?): Mono<User?>
+    fun getById(id: Int): User
 
     @Post("/users")
-    fun createUser(@Body user: User?): Mono<User?>
+    fun createUser(@Body user: User?): User
 
     @get:Get("/users")
-    val users: Flux<User?>
+    val users: List<User>
 }
