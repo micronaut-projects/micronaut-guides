@@ -192,7 +192,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 def packageName = BASE_PACKAGE
                 def packageNameWithAppName = packageAndName
 
-                if (app.packageName != null && !app.packageName.isEmpty()) {
+                if (app.packageName) {
                     packageName = app.packageName
                     packageNameWithAppName = app.packageName + "." + app.name
                 }
