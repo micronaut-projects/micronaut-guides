@@ -6,9 +6,9 @@ import java.math.BigDecimal
 
 @Serdeable
 data class Item (
-    @JsonProperty("id") val id:Int,
-    @JsonProperty("name") val name:String,
-    @JsonProperty("price") val price: BigDecimal
+    val id:Int,
+    val name:String,
+    val price: BigDecimal
 ) {
     companion object {
         var items: List<Item> = listOf(

@@ -2,7 +2,7 @@ package example.micronaut.auth
 
 import io.micronaut.context.annotation.ConfigurationProperties
 
-@ConfigurationProperties("micronaut.authentication-credentials")
+@ConfigurationProperties("authentication-credentials")
 class Credentials {
     String username
     String password

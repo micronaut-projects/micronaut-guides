@@ -141,12 +141,6 @@ testResource:application-test.yml[app=users]
 <1> Hardcoded username for test environment.
 <2> Hardcoded password for test environment.
 
-Create a file named `bootstrap-test.yml` to disable distributed configuration in the test environment:
-
-testResource:bootstrap-test.yml[app=users]
-<1> Disable configuration from distributed sources.
-<2> Disable Kubernetes secrets client.
-
 Run the unit test:
 
 :exclude-for-build:maven
@@ -324,12 +318,6 @@ Create a file named `application-test.yml` which is used in the test environment
 testResource:application-test.yml[app=orders]
 <1> Hardcoded username for development environment.
 <2> Hardcoded password for development environment.
-
-Create a file named `bootstrap-test.yml` to disable distributed configuration in the test environment:
-
-testResource:bootstrap-test.yml[app=orders]
-<1> Disable configuration from distributed sources.
-<2> Disable Kubernetes secrets client.
 
 Run the unit test:
 
@@ -621,6 +609,18 @@ curl "http://localhost:8080/api/orders" -H 'Content-Type: application/json; char
 [source, json]
 ----
 [{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
+----
+
+We can try to place an order with user that doesn't exist (with id 100). Run a cURL command:
+
+[source,bash]
+----
+curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 100, "item_ids": [1,2] }'
+----
+
+[source, json]
+----
+{"message":"Bad Request","_links":{"self":[{"href":"/api/orders","templated":false}]},"_embedded":{"errors":[{"message":"User with id 100 doesn't exist"}]}}
 ----
 
 == Kubernetes and the Micronaut framework

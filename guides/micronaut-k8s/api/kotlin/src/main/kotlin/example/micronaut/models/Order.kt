@@ -9,9 +9,9 @@ import javax.validation.constraints.NotBlank
 
 @Serdeable
 data class Order (
-    @Max(10000) @JsonProperty val id:Int, // <1>
+    @Nullable @Max(10000) val id:Int, // <1>
     @NotBlank @Nullable @JsonProperty("user_id") val userId:Int?,
-    @JsonProperty @Nullable val user: User?,
-    @JsonProperty val items: List<Item>?, // <2>
+    @Nullable val user: User?,
+    val items: List<Item>?, // <2>
     @NotBlank @JsonProperty("item_ids") val itemIds:List<Int>?, // <3>
     val total: BigDecimal?)

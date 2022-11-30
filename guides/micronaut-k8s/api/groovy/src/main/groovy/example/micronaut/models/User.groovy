@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import io.micronaut.core.annotation.Creator
+import io.micronaut.core.annotation.Nullable
 import io.micronaut.serde.annotation.Serdeable
 
 import javax.validation.constraints.NotBlank
@@ -12,7 +13,7 @@ import javax.validation.constraints.NotBlank
 @EqualsAndHashCode
 @Serdeable
 class User {
-    Integer id // <1>
+    @Nullable Integer id // <1>
 
     @NotBlank @JsonProperty("first_name")
     String firstName

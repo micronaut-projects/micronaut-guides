@@ -10,8 +10,8 @@ import java.util.List;
 
 @Serdeable
 public record Item(
-        @JsonProperty("id") Integer id,
-        @JsonProperty("name") String name,
-        @JsonProperty("price") BigDecimal price
+        Integer id,
+        String name,
+        BigDecimal price
 ) {
 }

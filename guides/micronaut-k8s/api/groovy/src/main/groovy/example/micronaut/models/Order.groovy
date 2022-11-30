@@ -13,23 +13,23 @@ import javax.validation.constraints.NotBlank
 @EqualsAndHashCode
 @Serdeable
 class Order {
-    @JsonProperty Integer id // <1>
+    @Nullable Integer id // <1>
 
     @NotBlank @Nullable @JsonProperty("user_id") Integer userId
 
-    @JsonProperty @Nullable User user
+    @Nullable User user
 
-    @JsonProperty @Nullable List<Item> items // <2>
+    @Nullable List<Item> items // <2>
 
     @NotBlank @Nullable @JsonProperty("item_ids") List<Integer> itemIds // <3>
 
     @Nullable BigDecimal total
 
     @Creator
-    Order(@JsonProperty Integer id,
+    Order(Integer id,
           @NotBlank @Nullable @JsonProperty("user_id") Integer userId,
-          @JsonProperty @Nullable User user,
-          @JsonProperty @Nullable List<Item> items,
+          @Nullable User user,
+          @Nullable List<Item> items,
           @NotBlank @JsonProperty("item_ids")
           @Nullable List<Integer> itemIds,
           @Nullable BigDecimal total

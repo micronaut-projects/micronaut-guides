@@ -25,9 +25,9 @@ class Order {
     @Nullable BigDecimal total
 
     @Creator
-    Order(@JsonProperty Integer id,
+    Order(Integer id,
          @NotBlank @JsonProperty("user_id") Integer userId,
-         @JsonProperty @Nullable List<Item> items,
+         @Nullable List<Item> items,
          @NotBlank @JsonProperty("item_ids") @Nullable List<Integer> itemIds,
          @Nullable BigDecimal total
     ) {

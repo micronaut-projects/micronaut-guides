@@ -2,9 +2,9 @@ package example.micronaut.auth;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 
-@ConfigurationProperties("micronaut.authentication-credentials")
+@ConfigurationProperties("authentication-credentials")
 public record Credentials (
         String username,
         String password
-        ) {
-        }
+) {
+}

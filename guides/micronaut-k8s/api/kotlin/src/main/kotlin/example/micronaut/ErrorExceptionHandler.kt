@@ -7,7 +7,6 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.http.server.exceptions.ExceptionHandler
 import jakarta.inject.Singleton
 
-@Produces
 @Singleton
 class ErrorExceptionHandler :
     ExceptionHandler<HttpClientResponseException, HttpResponse<*>> {
