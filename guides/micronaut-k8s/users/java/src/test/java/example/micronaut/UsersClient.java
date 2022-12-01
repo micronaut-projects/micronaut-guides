@@ -9,7 +9,7 @@ import io.micronaut.http.client.annotation.Client;
 
 import java.util.List;
 
-@Client("/")
+@Client("/") // <1>
 public interface UsersClient {
 
     @Get("/users/{id}")

@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.Header
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.client.annotation.Client
 
-@Client("/")
+@Client("/") // <1>
 interface UsersClient {
     @Get("/users/{id}")
     User getById(@Header String authorization, Integer id)

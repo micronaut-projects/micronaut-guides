@@ -22,7 +22,7 @@ import java.util.List;
 
 @Controller("/api") // <1>
 @Validated
-@ExecuteOn(TaskExecutors.IO)
+@ExecuteOn(TaskExecutors.IO) // <2>
 public class GatewayController {
 
     private final OrdersClient orderClient;
@@ -33,40 +33,40 @@ public class GatewayController {
         this.userClient = userClient;
     }
 
-    @Get("/users/{id}") // <2>
+    @Get("/users/{id}") // <3>
     public User getUserById(@NonNull Integer id) {
         return userClient.getById(id);
     }
 
-    @Get("/orders/{id}") // <3>
+    @Get("/orders/{id}") // <4>
     public Order getOrdersById(@NonNull Integer id) {
         Order order = orderClient.getOrderById(id);
         return new Order(order.id(), null, getUserById(order.userId()), order.items(), order.itemIds(), order.total());
     }
 
-    @Get("/items/{id}") // <4>
+    @Get("/items/{id}") // <5>
     public Item getItemsById(@NonNull Integer id) {
         return orderClient.getItemsById(id);
     }
 
-    @Get("/users") // <5>
+    @Get("/users") // <6>
     public List<User> getUsers() {
         return userClient.getUsers();
     }
 
-    @Get("/items") // <6>
+    @Get("/items") // <7>
     public List<Item> getItems() {
         return orderClient.getItems();
     }
 
-    @Get("/orders") // <7>
+    @Get("/orders") // <8>
     public List<Order> getOrders() {
         List<Order> orders = new ArrayList<>();
         orderClient.getOrders().forEach(x-> orders.add(new Order(x.id(), null, getUserById(x.userId()), x.items(), x.itemIds(), x.total())));
         return orders;
     }
 
-    @Post("/orders") // <8>
+    @Post("/orders") // <9>
     public Order createOrder(@Body @Valid Order order) {
         User user = getUserById(order.userId());
         if (user == null) {
@@ -76,7 +76,7 @@ public class GatewayController {
         return new Order(createdOrder.id(), null, user, createdOrder.items(), createdOrder.itemIds(), createdOrder.total());
     }
 
-    @Post("/users")  // <9>
+    @Post("/users")  // <10>
     public User createUser(@Body @NonNull User user) {
         return userClient.createUser(user);
     }

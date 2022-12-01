@@ -7,10 +7,9 @@ import io.micronaut.security.authentication.AuthenticationRequest;
 import io.micronaut.security.authentication.AuthenticationResponse;
 import jakarta.inject.Singleton;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 
-@Singleton
+@Singleton // <1>
 public class CredentialsChecker implements AuthenticationProvider {
 
     private final Credentials credentials;
@@ -22,14 +21,13 @@ public class CredentialsChecker implements AuthenticationProvider {
     @Override
     public Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<?> httpRequest,
                                                           AuthenticationRequest<?, ?> authenticationRequest) {
-        return Flux.create(emitter -> {
+        return Mono.<AuthenticationResponse>create(emitter -> {
             if ( authenticationRequest.getIdentity().equals(credentials.username()) &&
                     authenticationRequest.getSecret().equals(credentials.password()) ) {
-                emitter.next(AuthenticationResponse.success((String) authenticationRequest.getIdentity()));
-                emitter.complete();
+                emitter.success(AuthenticationResponse.success((String) authenticationRequest.getIdentity()));
             } else {
                 emitter.error(AuthenticationResponse.exception());
             }
-        }, FluxSink.OverflowStrategy.ERROR);
+        });
     }
 }

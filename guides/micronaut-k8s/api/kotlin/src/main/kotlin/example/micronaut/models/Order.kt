@@ -7,11 +7,11 @@ import java.math.BigDecimal
 import javax.validation.constraints.Max
 import javax.validation.constraints.NotBlank
 
-@Serdeable
+@Serdeable // <1>
 data class Order (
-    @Nullable @Max(10000) val id:Int, // <1>
+    @Nullable @Max(10000) val id:Int, // <2>
     @NotBlank @Nullable @JsonProperty("user_id") val userId:Int?,
     @Nullable val user: User?,
-    val items: List<Item>?, // <2>
-    @NotBlank @JsonProperty("item_ids") val itemIds:List<Int>?, // <3>
+    val items: List<Item>?, // <3>
+    @NotBlank @JsonProperty("item_ids") val itemIds:List<Int>?, // <4>
     val total: BigDecimal?)

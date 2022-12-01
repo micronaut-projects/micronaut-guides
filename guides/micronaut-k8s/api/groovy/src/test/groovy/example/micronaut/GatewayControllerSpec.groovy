@@ -13,7 +13,7 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
 
-@MicronautTest
+@MicronautTest // <1>
 class GatewayControllerSpec extends Specification {
 
     @Inject

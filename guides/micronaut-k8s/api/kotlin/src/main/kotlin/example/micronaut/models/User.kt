@@ -6,7 +6,7 @@ import io.micronaut.serde.annotation.Serdeable
 import javax.validation.constraints.Max
 import javax.validation.constraints.NotBlank
 
-@Serdeable
+@Serdeable // <1>
 data class User(@Nullable @Max(10000) val id: Int, // <1>
                 @NotBlank @JsonProperty("first_name") val firstName:String,
                 @NotBlank @JsonProperty("last_name")  val lastName:String,

@@ -9,7 +9,7 @@ import spock.lang.Specification
 
 import static io.micronaut.http.HttpStatus.UNAUTHORIZED
 
-@MicronautTest
+@MicronautTest // <1>
 class ItemsControllerSpec extends Specification {
 
     @Inject

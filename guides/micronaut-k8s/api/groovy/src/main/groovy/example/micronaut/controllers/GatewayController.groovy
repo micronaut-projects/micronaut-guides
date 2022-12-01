@@ -20,7 +20,7 @@ import javax.validation.Valid
 
 @Controller("/api") // <1>
 @Validated
-@ExecuteOn(TaskExecutors.IO)
+@ExecuteOn(TaskExecutors.IO) // <2>
 class GatewayController {
 
     private final OrdersClient ordersClient
@@ -31,33 +31,33 @@ class GatewayController {
         this.userClient = userClient
     }
 
-    @Get("/users/{id}") // <2>
+    @Get("/users/{id}") // <3>
     User getUserById(@NonNull Integer id) {
         userClient.getById(id)
     }
 
-    @Get("/orders/{id}") // <3>
+    @Get("/orders/{id}") // <4>
     Order getOrdersById(@NonNull Integer id) {
         def order = ordersClient.getOrderById(id)
         new Order(order.id, null, getUserById(order.userId), order.items, order.itemIds, order.total)
     }
 
-    @Get("/items/{id}") // <4>
+    @Get("/items/{id}") // <5>
     Item getItemsById(@NonNull Integer id) {
         ordersClient.getItemsById(id)
     }
 
-    @Get("/users") // <5>
+    @Get("/users") // <6>
     List<User> getUsers() {
         userClient.getUsers()
     }
 
-    @Get("/items") // <6>
+    @Get("/items") // <7>
     List<Item> getItems() {
         ordersClient.getItems()
     }
 
-    @Get("/orders") // <7>
+    @Get("/orders") // <8>
     List<Order> getOrders() {
         def orders = []
         ordersClient.getOrders().each {
@@ -66,7 +66,7 @@ class GatewayController {
         orders
     }
 
-    @Post("/orders") // <8>
+    @Post("/orders") // <9>
     Order createOrder(@Body @Valid Order order) {
         User user = getUserById(order.userId)
         if (user == null) {
@@ -76,7 +76,7 @@ class GatewayController {
         new Order(createdOrder.id, null, user, createdOrder.items, createdOrder.itemIds , createdOrder.total)
     }
 
-    @Post("/users")  // <9>
+    @Post("/users")  // <10>
     User createUser(@Body @NonNull User user) {
         userClient.createUser(user)
     }

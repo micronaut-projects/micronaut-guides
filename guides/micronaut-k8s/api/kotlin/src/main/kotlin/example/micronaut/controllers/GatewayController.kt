@@ -12,6 +12,8 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.exceptions.HttpStatusException
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
 import io.micronaut.validation.Validated
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -20,6 +22,7 @@ import javax.validation.Valid
 
 @Controller("/api") // <1>
 @Validated
+@ExecuteOn(TaskExecutors.IO) // <2>
 class GatewayController(ordersClient: OrdersClient, usersClient: UsersClient) {
 
     private val ordersClient: OrdersClient
@@ -31,12 +34,12 @@ class GatewayController(ordersClient: OrdersClient, usersClient: UsersClient) {
     }
 
 
-    @Get("/users/{id}") // <2>
+    @Get("/users/{id}") // <3>
     fun getUserById(@NonNull id: Int): User? {
         return userClient.getById(id)
     }
 
-    @Get("/orders/{id}") // <3>
+    @Get("/orders/{id}") // <4>
     fun getOrdersById(@NonNull id: Int): Order {
         val order = ordersClient.getOrderById(id)
 
@@ -50,22 +53,22 @@ class GatewayController(ordersClient: OrdersClient, usersClient: UsersClient) {
         )
     }
 
-    @Get("/items/{id}") // <4>
+    @Get("/items/{id}") // <5>
     fun getItemsById(@NonNull id: Int): Item {
         return ordersClient.getItemsById(id)
     }
 
-    @Get("/users") // <5>
+    @Get("/users") // <6>
     fun getUsers(): List<User> {
         return userClient.users
     }
 
-    @Get("/items") // <6>
+    @Get("/items") // <7>
     fun getItems(): List<Item> {
         return ordersClient.items
     }
 
-    @Get("/orders") // <7>
+    @Get("/orders") // <8>
     fun getOrders(): List<Order>? {
         val orders = mutableListOf<Order>()
         ordersClient.orders.forEach{orders.add(Order(
@@ -79,7 +82,7 @@ class GatewayController(ordersClient: OrdersClient, usersClient: UsersClient) {
         return orders
     }
 
-    @Post("/orders") // <8>
+    @Post("/orders") // <9>
     fun createOrder(@Body order: @Valid Order): Order? {
         val user = getUserById(order!!.userId!!)
             ?: throw  HttpStatusException(
@@ -99,7 +102,7 @@ class GatewayController(ordersClient: OrdersClient, usersClient: UsersClient) {
         )
     }
 
-    @Post("/users") // <9>
+    @Post("/users") // <10>
     fun createUser(@Body @NonNull user: User): User {
         return userClient.createUser(user)
     }

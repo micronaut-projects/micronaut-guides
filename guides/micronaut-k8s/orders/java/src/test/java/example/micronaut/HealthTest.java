@@ -11,12 +11,12 @@ import jakarta.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@MicronautTest
+@MicronautTest // <1>
 public class HealthTest {
 
     @Inject
     @Client("/")
-    HttpClient client;
+    HttpClient client; // <2>
 
     @Test
     public void healthEndpointExposed() {

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import java.util.Base64
 
 
-@MicronautTest
+@MicronautTest // <1>
 class UsersControllerTest {
     @Inject
     var usersClient: UsersClient? = null

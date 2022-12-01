@@ -22,7 +22,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import java.math.BigDecimal
 
-@MicronautTest
+@MicronautTest // <1>
 class GatewayControllerTest {
     @Inject
     var ordersClient: OrdersClient? = null

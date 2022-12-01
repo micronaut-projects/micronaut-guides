@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.serde.annotation.Serdeable
 import java.math.BigDecimal
 
-@Serdeable
+@Serdeable // <1>
 data class Item (
     val id:Int,
     val name:String,

@@ -11,9 +11,9 @@ import javax.validation.constraints.NotBlank
 
 @CompileStatic
 @EqualsAndHashCode
-@Serdeable
+@Serdeable // <1>
 class User {
-    @Nullable Integer id // <1>
+    @Nullable Integer id // <2>
 
     @NotBlank @JsonProperty("first_name")
     String firstName

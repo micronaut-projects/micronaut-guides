@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Serdeable
+@Serdeable // <1>
 public record Order(
         @Nullable @Max(10000) Integer id,
         @NotBlank @Nullable @JsonProperty("user_id") Integer userId,

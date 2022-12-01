@@ -8,12 +8,12 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
 
-@MicronautTest
+@MicronautTest // <1>
 class HealthSpec extends Specification {
 
     @Inject
     @Client("/")
-    HttpClient client
+    HttpClient client // <2>
 
     void 'health endpoint exposed'() {
         when:

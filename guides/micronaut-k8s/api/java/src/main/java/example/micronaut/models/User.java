@@ -7,7 +7,7 @@ import io.micronaut.serde.annotation.Serdeable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 
-@Serdeable
+@Serdeable // <1>
 public record User(
         @Nullable @Max(10000) Integer id,
         @NotBlank @JsonProperty("first_name") String firstName,

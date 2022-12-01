@@ -8,7 +8,7 @@ import io.micronaut.http.annotation.Header
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.client.annotation.Client
 
-@Client("/")
+@Client("/") // <1>
 interface OrderItemClient {
     @Get("/orders/{id}")
     fun getOrderById(@Header authorization: String?, id: Int?): Order?

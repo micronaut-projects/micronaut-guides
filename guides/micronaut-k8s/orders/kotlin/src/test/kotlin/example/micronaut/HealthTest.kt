@@ -9,12 +9,12 @@ import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-@MicronautTest
+@MicronautTest // <1>
 class HealthTest {
 
     @Inject
     @field:Client("/")
-    lateinit var client: HttpClient
+    lateinit var client: HttpClient // <2>
 
     @Test
     fun healthEndpointExposed() {

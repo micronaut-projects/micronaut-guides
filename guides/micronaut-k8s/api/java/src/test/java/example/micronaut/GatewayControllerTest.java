@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-@MicronautTest
+@MicronautTest // <1>
 public class GatewayControllerTest {
 
     @Inject

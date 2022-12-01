@@ -11,16 +11,16 @@ import javax.validation.constraints.NotBlank
 
 @CompileStatic
 @EqualsAndHashCode
-@Serdeable
+@Serdeable // <1>
 class Order {
 
-    @Nullable Integer id // <1>
+    @Nullable Integer id // <2>
 
     @NotBlank @JsonProperty("user_id") Integer userId
 
-    @Nullable List<Item> items // <2>
+    @Nullable List<Item> items // <3>
 
-    @NotBlank @JsonProperty("item_ids") @Nullable List<Integer> itemIds // <3>
+    @NotBlank @JsonProperty("item_ids") @Nullable List<Integer> itemIds // <4>
 
     @Nullable BigDecimal total
 

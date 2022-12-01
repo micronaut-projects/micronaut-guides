@@ -8,7 +8,7 @@ import io.micronaut.serde.annotation.Serdeable
 
 @CompileStatic
 @EqualsAndHashCode
-@Serdeable
+@Serdeable // <1>
 class Item {
 
     Integer id

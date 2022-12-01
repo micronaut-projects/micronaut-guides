@@ -9,12 +9,12 @@ import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Serdeable
+@Serdeable // <1>
 public record Order(
-        @Max(10000) @Nullable Integer id, // <1>
+        @Max(10000) @Nullable Integer id, // <2>
         @NotBlank @JsonProperty("user_id") Integer userId,
-        @Nullable List<Item> items, // <2>
-        @NotBlank @JsonProperty("item_ids") @Nullable List<Integer> itemIds, // <3>
+        @Nullable List<Item> items, // <3>
+        @NotBlank @JsonProperty("item_ids") @Nullable List<Integer> itemIds, // <4>
         @Nullable BigDecimal total
 ) {
 }
