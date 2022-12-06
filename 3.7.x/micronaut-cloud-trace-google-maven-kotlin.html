@@ -140,7 +140,8 @@
 <li><a href="#inventory-service">6.3. Inventory Service</a></li>
 <li><a href="#store-controller">6.4. Store Controller</a></li>
 <li><a href="#warehouse-client">6.5. Warehouse Client</a></li>
-<li><a href="#tracer-configuration">6.6. Tracer Configuration</a></li>
+<li><a href="#warehouse-controller">6.6. Warehouse Controller</a></li>
+<li><a href="#tracer-configuration">6.7. Tracer Configuration</a></li>
 </ul>
 </li>
 <li><a href="#run-the-application">7. Run the Application</a></li>
@@ -679,7 +680,68 @@ interface WarehouseClient {
 </div>
 </div>
 <div class="sect2">
-<h3 id="tracer-configuration">6.6. Tracer Configuration</h3>
+<h3 id="warehouse-controller">6.6. Warehouse Controller</h3>
+<div class="paragraph">
+<p>The <code>WarehouseController</code> class represents external service that will be called by <code>WarehouseClient</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/WarehouseController.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
+import java.util.Random
+
+@ExecuteOn(TaskExecutors.IO)
+@Controller(&quot;/warehouse&quot;)
+class WarehouseController {
+
+    @Get(&quot;/count&quot;)
+    fun getItemCount() : HttpResponse&lt;Int&gt; = HttpResponse.ok(Random().nextInt(11))
+
+
+    @Post(&quot;/order&quot;)
+    fun order() : HttpResponse&lt;Any&gt; {
+        try {
+            //To simulate an external process taking time
+            Thread.sleep(500)
+        } catch (e: InterruptedException) {
+        }
+
+        return HttpResponse.accepted()
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/warehouse</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>getItemCount</code> method to an HTTP GET request on <code>/users/{id}</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>order</code> method to an HTTP GET request on <code>/users/{id}</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tracer-configuration">6.7. Tracer Configuration</h3>
 <div class="paragraph">
 <p>If you used Micronaut CLI or Launch to create your application, the OpenTelemetry exporter will automatically be added to your <code>application.yml</code> configurations.</p>
 </div>
