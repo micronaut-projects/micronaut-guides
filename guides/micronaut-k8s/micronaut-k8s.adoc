@@ -11,6 +11,7 @@ ____
 You will discover how the Micronaut framework eases Kubernetes integration.
 
 external:micronaut-k8s/requirements.adoc[]
+* Local Kubernetes cluster. We will use https://minikube.sigs.k8s.io/docs/[Minikube] in this guide.
 
 common:completesolution.adoc[]
 
@@ -65,7 +66,6 @@ The previous `UsersController` controller uses `User` object to represent custom
 :exclude-for-languages:java
 The previous `UsersController` controller uses `User` object to represent customer. Create the `User` class
 :exclude-for-languages:
-
 
 source:models/User[app=users]
 callout:serdeable[1]
@@ -582,53 +582,14 @@ Run `api` microservice:
 
 === Test integration between applications
 
-Run a cURL command to create user through api:
+Store the api microservice url to API_URL variable.
 
 [source,bash]
 ----
-curl -X "POST" "http://localhost:8080/api/users" -H 'Content-Type: application/json; charset=utf-8' -d '{ "first_name": "Nemanja", "last_name": "Mikic", "username": "nmikic" }'
+export API_URL=http://localhost:8080
 ----
 
-[source, json]
-----
-{"id":1,"username":"nmikic","first_name":"Nemanja","last_name":"Mikic"}
-----
-
-Run a cURL command to create order through api:
-
-[source,bash]
-----
-curl -X "POST" "http://localhost:8080/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 1, "item_ids": [1,2] }'
-----
-
-[source, json]
-----
-{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}
-----
-
-Run a cURL to list created orders:
-
-[source,bash]
-----
-curl "http://localhost:8080/api/orders" -H 'Content-Type: application/json; charset=utf-8'
-----
-
-[source, json]
-----
-[{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
-----
-
-We can try to place an order with user that doesn't exist (with id 100). Run a cURL command:
-
-[source,bash]
-----
-curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 100, "item_ids": [1,2] }'
-----
-
-[source, json]
-----
-{"message":"Bad Request","_links":{"self":[{"href":"/api/orders","templated":false}]},"_embedded":{"errors":[{"message":"User with id 100 doesn't exist"}]}}
-----
+external:micronaut-k8s/verify.adoc[]
 
 == Kubernetes and the Micronaut framework
 
@@ -696,18 +657,7 @@ include::{sourceDir}/micronaut-k8s/@sourceDir@/users/k8s.yml[]
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
 
-Run next command to create described resources:
-
-[source,bash]
-----
-kubectl create -f users/k8s.yml
-----
-
-[source,text]
-----
-deployment.apps/users created
-service/users created
-----
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=users]
 
 === Orders Microservice
 
@@ -742,18 +692,7 @@ include::{sourceDir}/micronaut-k8s/@sourceDir@/orders/k8s.yml[]
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
 
-Run next command to create described resources:
-
-[source,bash]
-----
-kubectl create -f orders/k8s.yml
-----
-
-[source,text]
-----
-deployment.apps/orders created
-service/orders created
-----
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=orders]
 
 === API (Gateway) Microservice
 
@@ -788,20 +727,9 @@ include::{sourceDir}/micronaut-k8s/@sourceDir@/api/k8s.yml[]
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
 
-Run next command to create described resources:
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=api]
 
-[source,bash]
-----
-kubectl create -f api/k8s.yml
-----
-
-[source,text]
-----
-deployment.apps/api created
-service/api created
-----
-
-=== Test integration between applications
+=== Test integration between applications deployed on Kubernetes
 
 Run next command to check status of created pods and make sure that all have status "Running":
 
@@ -843,55 +771,9 @@ Run next command to get url of api service:
 export API_URL=$(minikube service api --url)
 ----
 
-Run a cURL command to create user through api:
+external:micronaut-k8s/verify.adoc[]
 
-[source,bash]
-----
-curl -X "POST" "$API_URL/api/users" -H 'Content-Type: application/json; charset=utf-8' -d '{ "first_name": "Nemanja", "last_name": "Mikic", "username": "nmikic" }'
-----
-
-[source, json]
-----
-{"id":1,"username":"nmikic","first_name":"Nemanja","last_name":"Mikic"}
-----
-
-Run a cURL command to create order through api:
-
-[source,bash]
-----
-curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 1, "item_ids": [1,2] }'
-----
-
-[source, json]
-----
-{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}
-----
-
-Run a cURL to list created orders:
-
-[source,bash]
-----
-curl "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8'
-----
-
-[source, json]
-----
-[{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
-----
-
-We can try to place an order with user that doesn't exist (with id 100). Run a cURL command:
-
-[source,bash]
-----
-curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 100, "item_ids": [1,2] }'
-----
-
-[source, json]
-----
-{"message":"Bad Request","_links":{"self":[{"href":"/api/orders","templated":false}]},"_embedded":{"errors":[{"message":"User with id 100 doesn't exist"}]}}
-----
-
-== Next steps
+common:next.adoc[]
 
 Read more about https://kubernetes.io/docs/home/[Kubernetes].
 

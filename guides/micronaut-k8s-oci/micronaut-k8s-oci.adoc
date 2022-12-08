@@ -1,0 +1,170 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will deploy three microservices on the https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm[Oracle Cloud Container Engine for Kubernetes (OKE)]. We will use Kubernetes Service discovery and Distributed configuration to wire up our microservices.
+
+You will discover how the Micronaut framework eases Kubernetes integration and deployment to OKE.
+
+external:micronaut-k8s/requirements.adoc[]
+common:oracle-cloud-account-paid.adoc[]
+
+NOTE: Your Oracle Cloud account must be a paid account or trial with credits available because there isn't currently a free-tier option for OKE.
+
+* We'll use the OCI command line to authenticate ourselves. If you don't have it already, install the https://docs.cloud.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm[Oracle Cloud CLI] and run `oci setup config`.
+
+common:jq[]
+
+
+external:micronaut-k8s/create-app-external-guides.adoc[]
+
+== Create Oracle Cloud Kubernetes Cluster
+
+We will use Quick create cluster option on OKE to create Kubernetes Cluster. To start browse https://cloud.oracle.com/containers/clusters/quick[Quick Kubernetes Clusters (OKE)].
+
+image::k8s-oci/create-cluster-wizard.png[]
+
+Choose name for kubernetes cluster, we chose to name it `micronaut-k8s`.
+
+{empty} +
+
+image::k8s-oci/finish-creating-cluster.png[]
+
+Wait to finish all resources to be created.
+
+{empty} +
+
+image::k8s-oci/micronaut-k8s-cluster.png[]
+
+Copy `Cluster Id` you will need it later.
+
+== Prepare and deploy microservices
+
+We will define some variables to make deploying process easier. In `OCI_USER_ID` store your user ocid, you can find it in your oci config file. In `OCI_TENANCY_NAME` store your tenancy name. In `OCI_USERNAME` we will store username in format <tenancy>/<username>. We can reuse `OCI_TENANCY_NAME` and only edit <username> part. Store your region key code in `OCI_REGION` for an example us-phoenix-1. In `OCI_CLUSTER_ID` put the Cluster Id that you copied before.
+
+[source,bash]
+----
+export OCI_USER_ID="ocid1.user.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+export OCI_TENANCY_NAME="<tenancy-id>"
+export OCI_USERNAME="$OCI_TENANCY_NAME/<username>"
+export OCI_REGION="<region-key>"
+export OCI_CLUSTER_ID="ocid1.cluster.oc1.iad.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+----
+
+We have to create `AUTH_TOKEN` to be able to authenticate to Oracle Cloud Container Registry.
+
+[source,bash]
+----
+export AUTH_TOKEN=$(oci iam auth-token create --user-id $OCI_USER_ID --description k8s-micronaut | jq -r '.data.token')
+----
+
+Run next command to log in to `ocir.io` (Oracle Cloud Container Registry):
+
+[source,bash]
+----
+docker login $OCI_REGION.ocir.io -u $OCI_USERNAME -p $AUTH_TOKEN
+----
+
+=== Users microservice
+
+external-template:micronaut-k8s-oci/k8s-microservice.adoc[arg0=users]
+
+=== Orders microservice
+
+external-template:micronaut-k8s-oci/k8s-microservice.adoc[arg0=orders]
+
+=== API microservice
+
+external-template:micronaut-k8s-oci/k8s-microservice.adoc[arg0=api]
+
+=== Deploy services to OKE
+
+Create folder for `kubectl` configuration.
+
+[source,bash]
+----
+mkdir -p $HOME/.kube
+----
+
+Generate `kubectl` configuration for authentication to OKE.
+
+[source,bash]
+----
+oci ce cluster create-kubeconfig --cluster-id $OCI_CLUSTER_ID --file $HOME/.kube/config --region $OCI_REGION --token-version 2.0.0  --kube-endpoint PUBLIC_ENDPOINT
+----
+
+Set `KUBECONFIG` to created config file. This variable is consumed by `kubectl`.
+
+[source,bash]
+----
+export KUBECONFIG=$HOME/.kube/config
+----
+
+Create `ocirsecret` secret that will be used for authentication to Oracle Cloud Container Registry. This is needed because OKE needs docker credentials to be able to pull microservices images.
+
+[source,bash]
+----
+kubectl create secret docker-registry ocirsecret --docker-server=$OCI_REGION.ocir.io --docker-username=$OCI_USERNAME --docker-password=$AUTH_TOKEN
+----
+
+Deploy `auth.yml` file that we created in https://cloud.oracle.com/containers/clusters/quick[Quick Kubernetes Clusters (OKE)] guide.
+
+[source,bash]
+----
+kubectl create -f auth.yml
+----
+
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=users]
+
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=orders]
+
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=api]
+
+== Test integration between applications deployed on OKE
+
+Run next command to check status of created pods and make sure that all have status "Running":
+
+[source,bash]
+----
+kubectl get pods
+----
+
+[source,text]
+----
+NAME                      READY   STATUS    RESTARTS   AGE
+api-6fb4cd949f-kxxx8      1/1     Running   0          2d1h
+orders-595887ddd6-6lzp4   1/1     Running   0          2d1h
+users-df6f78cd7-lgnzx     1/1     Running   0          2d1h
+----
+
+Run next command to check status of created services:
+
+[source,bash]
+----
+kubectl get services
+----
+
+[source,text]
+----
+NAME         TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)             AGE
+api          LoadBalancer   10.96.70.48    129.159.92.209   8080:31690/TCP      2d1h
+kubernetes   ClusterIP      10.96.0.1      <none>           443/TCP,12250/TCP   7d23h
+orders       NodePort       10.96.94.130   <none>           8080:31245/TCP      2d1h
+users        NodePort       10.96.34.174   <none>           8080:30790/TCP      2d1h
+----
+
+Run next command to get url of api service:
+
+[source,bash]
+----
+export API_URL=http://$(kubectl get svc api -o json | jq -r .status.loadBalancer.ingress[0].ip):8080
+----
+
+external:micronaut-k8s/verify.adoc[]
+
+common:next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-kubernetes/snapshot/guide/[Micronaut Kubernetes] module.
+
+Read more about https://docs.oracle.com/en-us/iaas/Content/ContEng/home.htm[Oracle Container Engine for Kubernetes (OKE)]
+
