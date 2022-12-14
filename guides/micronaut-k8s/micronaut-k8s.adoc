@@ -521,7 +521,7 @@ resource:bootstrap-dev.yml[app=api]
 <2> URL of the `orders` microservice
 <3> Disable Kubernetes secrets client.
 
-Create a file named `application-test.yml` which is used in the test environment:
+Create a file named _application-test.yml_ to be used in the test environment:
 
 testResource:application-test.yml[app=api]
 <1> Hardcoded username for development environment.
@@ -582,7 +582,7 @@ Run `api` microservice:
 
 === Test integration between applications
 
-Run a cURL command to create user through api:
+Run a cURL command to create a new user via the `api` microservice:
 
 [source,bash]
 ----
@@ -594,7 +594,7 @@ curl -X "POST" "http://localhost:8080/api/users" -H 'Content-Type: application/j
 {"id":1,"username":"nmikic","first_name":"Nemanja","last_name":"Mikic"}
 ----
 
-Run a cURL command to create order through api:
+Run a cURL command to a new order via the `api` microservice:
 
 [source,bash]
 ----
@@ -606,7 +606,7 @@ curl -X "POST" "http://localhost:8080/api/orders" -H 'Content-Type: application/
 {"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}
 ----
 
-Run a cURL to list created orders:
+Run a cURL command to list created orders:
 
 [source,bash]
 ----
@@ -618,7 +618,7 @@ curl "http://localhost:8080/api/orders" -H 'Content-Type: application/json; char
 [{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
 ----
 
-We can try to place an order with user that doesn't exist (with id 100). Run a cURL command:
+We can try to place an order for a user who doesn't exist (with id 100). Run a cURL command:
 
 [source,bash]
 ----
@@ -632,31 +632,31 @@ curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset
 
 == Kubernetes and the Micronaut framework
 
-In this chapter we will first create necessary kubernetes resources for our services that will make them work properly then we will configure, build docker image and deploy each of microservices that we created on the local Kubernetes cluster.
+In this chapter we will first create the necessary Kubernetes resources for our microservices that will make them work properly then we will configure, build container images and deploy each of the microservices that we created on the local Kubernetes cluster.
 
-Create `auth.yml` file that will service role for microservices and have secret configuration.
+Create a filed named _auth.yml_  that will service role for microservices that have secret configurations.
 
 [source, yaml]
 .auth.yml
 ----
 include::{sourceDir}/micronaut-k8s/@sourceDir@/auth.yml[]
 ----
-<1> We crate a service account with name `micronaut-service`.
-<2> We create a role with name `micronaut_service_role`.
-<3> We bind  `micronaut_service_role` role to the `micronaut-service` service account.
-<4> We create a secret with name `micronaut_service_role`.
-<5> Base64 value of username secret that will be used by ours microservices.
-<6> Base64 value of password secret that will be used by ours microservices.
+<1> We create a service account named `micronaut-service`.
+<2> We create a role named `micronaut_service_role`.
+<3> We bind  the `micronaut_service_role` role to the `micronaut-service` service account.
+<4> We create a secret named `micronaut_service_role`.
+<5> Base64 value of the username secret that will be used by the microservices.
+<6> Base64 value of the password secret that will be used by the microservices.
 
-Run next command to create described resources:
+Run the next command to create the resources described above:
 
 [source,bash]
 ----
 kubectl create -f auth.yml
 ----
 
-Before we start deploying each of service, we have to make sure that Docker daemon is configured to use Kubernetes.
-if you are using https://minikube.sigs.k8s.io/[Minikube] execute next comand to switch docker deamon to use Minikube.
+Before we start deploying each service, ensure that Docker daemon is configured to use Kubernetes.
+If you are using https://minikube.sigs.k8s.io/[Minikube] run the next command to switch the docker daemon to use Minikube.
 
 [source,bash]
 ----
@@ -665,7 +665,7 @@ eval $(minikube docker-env)
 
 === Users Microservice
 
-The next command will build docker image of `users` service with image name `users`.
+The next command will build a container image of the `users` service with named `users`.
 
 :exclude-for-build:gradle
 
@@ -683,20 +683,20 @@ The next command will build docker image of `users` service with image name `use
 ----
 :exclude-for-build:
 
-Edit `k8s.yml` inside `users` service.
+Edit the file named _k8s.yml_ inside the `users` microservice.
 
 [source, yaml]
 ./users/k8s.yml
 ----
 include::{sourceDir}/micronaut-k8s/@sourceDir@/users/k8s.yml[]
 ----
-<1> Service name that we created in auth.yaml.
-<2> Name of the image that deployment use.
+<1> The service name that we created in the _auth.yaml_ file.
+<2> The name of the container image for deployment.
 <3> The imagePullPolicy is set to Never. We will always use local one that we built in previous step.
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
 
-Run next command to create described resources:
+Run the next command to create the resources described above:
 
 [source,bash]
 ----
@@ -711,7 +711,7 @@ service/users created
 
 === Orders Microservice
 
-The next command will build docker image of `orders` service with image name `orders`.
+The next command will build a container image of the `orders` service named `orders`.
 
 :exclude-for-build:gradle
 
@@ -729,15 +729,15 @@ The next command will build docker image of `orders` service with image name `or
 ----
 :exclude-for-build:
 
-Edit `k8s.yml` inside `orders` service.
+Edit the file named _k8s.yml_ inside the `orders` microservice.
 
 [source, yaml]
 ./orders/k8s.yml
 ----
 include::{sourceDir}/micronaut-k8s/@sourceDir@/orders/k8s.yml[]
 ----
-<1> Service name that we created in auth.yaml.
-<2> Name of the image that deployment use.
+<1> The service name that we created in the _auth.yaml_ file.
+<2> The name of the container image for deployment.
 <3> The imagePullPolicy is set to Never. We will always use local one that we built in previous step.
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
