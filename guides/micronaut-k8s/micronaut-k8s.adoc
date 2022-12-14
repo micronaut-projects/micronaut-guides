@@ -641,18 +641,19 @@ Create a filed named _auth.yml_  that will service role for microservices that h
 ----
 include::{sourceDir}/micronaut-k8s/@sourceDir@/auth.yml[]
 ----
-<1> We create a service account named `micronaut-service`.
-<2> We create a role named `micronaut_service_role`.
-<3> We bind  the `micronaut_service_role` role to the `micronaut-service` service account.
-<4> We create a secret named `micronaut_service_role`.
-<5> Base64 value of the username secret that will be used by the microservices.
-<6> Base64 value of the password secret that will be used by the microservices.
+<1> We create a namespace named `micronaut-k8s`.
+<2> We create a service account named `micronaut-service`.
+<3> We create a role named `micronaut_service_role`.
+<4> We bind  the `micronaut_service_role` role to the `micronaut-service` service account.
+<5> We create a secret named `mysecret`.
+<6> Base64 value of the username secret that will be used by the microservices.
+<7> Base64 value of the password secret that will be used by the microservices.
 
 Run the next command to create the resources described above:
 
 [source,bash]
 ----
-kubectl create -f auth.yml
+kubectl apply -f auth.yml
 ----
 
 Before we start deploying each service, ensure that Docker daemon is configured to use Kubernetes.
@@ -700,7 +701,7 @@ Run the next command to create the resources described above:
 
 [source,bash]
 ----
-kubectl create -f users/k8s.yml
+kubectl apply -f users/k8s.yml
 ----
 
 [source,text]
@@ -746,7 +747,7 @@ Run the next command to create the resources described above:
 
 [source,bash]
 ----
-kubectl create -f orders/k8s.yml
+kubectl apply -f orders/k8s.yml
 ----
 
 [source,text]
@@ -792,7 +793,7 @@ Run next command to create described resources:
 
 [source,bash]
 ----
-kubectl create -f api/k8s.yml
+kubectl apply -f api/k8s.yml
 ----
 
 [source,text]
@@ -807,7 +808,7 @@ Run next command to check status of created pods and make sure that all have sta
 
 [source,bash]
 ----
-kubectl get pods
+kubectl get pods -n=micronaut-k8s
 ----
 
 [source,text]
@@ -822,16 +823,15 @@ Run next command to check status of created services:
 
 [source,bash]
 ----
-kubectl get services
+kubectl get services -n=micronaut-k8s
 ----
 
 [source,text]
 ----
-NAME         TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-api          LoadBalancer   10.102.7.238    <pending>     8080:30049/TCP   24h
-kubernetes   ClusterIP      10.96.0.1       <none>        443/TCP          26d
-orders       NodePort       10.99.172.89    <none>        8080:31811/TCP   24h
-users        NodePort       10.109.219.86   <none>        8080:32409/TCP   24h
+NAME     TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+api      LoadBalancer   10.110.42.201    <pending>     8080:32601/TCP   18s
+orders   NodePort       10.105.43.19     <none>        8080:31033/TCP   21s
+users    NodePort       10.104.130.114   <none>        8080:31482/TCP   26s
 ----
 
 NOTE: By default, EXTERNAL-IP of LoadBalancer service inside Minikube will be in <pending> state. If you want to assign an external ip you have to run `minikube tunnel` command.
@@ -840,7 +840,7 @@ Run next command to get url of api service:
 
 [source,bash]
 ----
-export API_URL=$(minikube service api --url)
+export API_URL=$(minikube service api -n=micronaut-k8s --url)
 ----
 
 Run a cURL command to create user through api:
@@ -879,7 +879,7 @@ curl "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8'
 [{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
 ----
 
-We can try to place an order with user that doesn't exist (with id 100). Run a cURL command:
+We can try to place an order for a user who doesn't exist (with id 100). Run a cURL command:
 
 [source,bash]
 ----
@@ -889,6 +889,22 @@ curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset
 [source, json]
 ----
 {"message":"Bad Request","_links":{"self":[{"href":"/api/orders","templated":false}]},"_embedded":{"errors":[{"message":"User with id 100 doesn't exist"}]}}
+----
+
+== Cleaning Up
+
+To delete all pods, services and deployments created in this guide run next command.
+
+[source,bash]
+----
+kubectl delete all --all -n micronaut-k8s
+----
+
+Run next command to delete role, service account, service, role binding and namespace.
+
+[source,bash]
+----
+kubectl delete -f auth.yml
 ----
 
 == Next steps
