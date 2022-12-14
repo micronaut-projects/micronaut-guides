@@ -776,20 +776,20 @@ The next command will build a container image of the `api` microservice named `a
 ----
 :exclude-for-build:
 
-Edit `k8s.yml` inside `api` service.
+Edit the file named _k8s.yml_ inside the `api` microservice.
 
 [source, yaml]
 ./api/k8s.yml
 ----
 include::{sourceDir}/micronaut-k8s/@sourceDir@/api/k8s.yml[]
 ----
-<1> Service name that we created in auth.yaml.
-<2> Name of the image that deployment use.
+<1> The service name that we created in the _auth.yaml_ file.
+<2> The name of the container image for deployment.
 <3> The imagePullPolicy is set to Never. We will always use local one that we built in previous step.
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
 
-Run next command to create described resources:
+Run the next command to create the resources described above:
 
 [source,bash]
 ----
@@ -804,7 +804,7 @@ service/api created
 
 === Test integration between applications
 
-Run next command to check status of created pods and make sure that all have status "Running":
+Run the next command to check the status of the pods you created and make sure that all have the status "Running":
 
 [source,bash]
 ----
@@ -819,7 +819,7 @@ orders-74ff4fcbc4-dnfbw   1/1     Running   0          19s
 users-9f46dd7c6-vs8z7     1/1     Running   0          13s
 ----
 
-Run next command to check status of created services:
+Run the next command to check the status of the microservices:
 
 [source,bash]
 ----
@@ -834,16 +834,16 @@ orders   NodePort       10.105.43.19     <none>        8080:31033/TCP   21s
 users    NodePort       10.104.130.114   <none>        8080:31482/TCP   26s
 ----
 
-NOTE: By default, EXTERNAL-IP of LoadBalancer service inside Minikube will be in <pending> state. If you want to assign an external ip you have to run `minikube tunnel` command.
+NOTE: By default, the EXTERNAL-IP address  of the LoadBalancer service inside Minikube will be in the <pending> state. If you want to assign an external ip you have to run the `minikube tunnel` command.
 
-Run next command to get url of api service:
+Run the next command to retrieve the URL of the `api` microservice:
 
 [source,bash]
 ----
 export API_URL=$(minikube service api -n=micronaut-k8s --url)
 ----
 
-Run a cURL command to create user through api:
+Run a cURL command to create a user via the `api` service:
 
 [source,bash]
 ----
@@ -855,7 +855,7 @@ curl -X "POST" "$API_URL/api/users" -H 'Content-Type: application/json; charset=
 {"id":1,"username":"nmikic","first_name":"Nemanja","last_name":"Mikic"}
 ----
 
-Run a cURL command to create order through api:
+Run a cURL command to create an order via the `api` microservice:
 
 [source,bash]
 ----
@@ -867,7 +867,7 @@ curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset
 {"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}
 ----
 
-Run a cURL to list created orders:
+Run a cURL command to list the orders:
 
 [source,bash]
 ----
@@ -879,7 +879,7 @@ curl "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8'
 [{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
 ----
 
-We can try to place an order for a user who doesn't exist (with id 100). Run a cURL command:
+We can try to place an order with a user who doesn't exist (with id 100). Run a cURL command:
 
 [source,bash]
 ----
