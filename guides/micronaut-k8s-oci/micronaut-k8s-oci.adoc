@@ -40,15 +40,16 @@ Copy `Cluster Id` (you will need it later).
 
 == Prepare and Deploy Microservices
 
-We will define some environment variables to make deploying process easier. In `OCI_USER_ID` store your user OCI, which you can find in your oci configuration file. In `OCI_TENANCY_NAME` store your tenancy name. In `OCI_USERNAME` store your username in the format <tenancy>/<username>. We can reuse `OCI_TENANCY_NAME` and only edit the <username> part. Store your region key code in `OCI_REGION` for an example "us-phoenix-1". In `OCI_CLUSTER_ID` store the Cluster Id that you copied earlier.
+We will define some environment variables to make deploying process easier. In `OCI_USER_ID` store your user OCI, which you can find in your oci configuration file. We will get tenancy namespace from the oci commandline tool and store it in `OCI_TENANCY_NAMESPACE`.  In `OCIR_USERNAME` store your username in the format <tenancy_namespace>/<username>. We can reuse `OCI_TENANCY_NAMESPACE` and only edit the <username> part. Store your region key code in `OCI_REGION` for an example "us-phoenix-1". In `OCI_CLUSTER_ID` store the Cluster Id that you copied earlier. Put your compartment id inside `OCI_COMPARTMENT_ID` variable.
 
 [source,bash]
 ----
 export OCI_USER_ID="ocid1.user.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-export OCI_TENANCY_NAME="<tenancy-id>"
-export OCI_USERNAME="$OCI_TENANCY_NAME/<username>"
+export OCI_TENANCY_NAMESPACE=$(oci os ns get | jq .data -r)
+export OCIR_USERNAME="$OCI_TENANCY_NAMESPACE/<username>"
 export OCI_REGION="<region-key>"
 export OCI_CLUSTER_ID="ocid1.cluster.oc1.iad.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+export OCI_COMPARTMENT_ID="ocid1.compartment.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 ----
 
 We have to create `AUTH_TOKEN` to be able to authenticate to Oracle Cloud Container Registry. Run the following command:
@@ -62,20 +63,25 @@ Run the next command to log in to `ocir.io` (Oracle Cloud Container Registry):
 
 [source,bash]
 ----
-docker login $OCI_REGION.ocir.io -u $OCI_USERNAME -p $AUTH_TOKEN
+docker login $OCI_REGION.ocir.io -u $OCIR_USERNAME -p $AUTH_TOKEN
 ----
 
 === Users Microservice
 
 external-template:micronaut-k8s-oci/k8s-microservice.adoc[arg0=users]
+external-template:micronaut-k8s-oci/docker-microservice.adoc[arg0=users]
 
 === Orders Microservice
 
 external-template:micronaut-k8s-oci/k8s-microservice.adoc[arg0=orders]
+external-template:micronaut-k8s-oci/docker-microservice.adoc[arg0=orders]
 
 === API Microservice
 
 external-template:micronaut-k8s-oci/k8s-microservice.adoc[arg0=api]
+<4> Metadata annotations for https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingloadbalancer.htm[OCI Load Balancer]
+
+external-template:micronaut-k8s-oci/docker-microservice.adoc[arg0=api]
 
 === Deploy Services to OKE
 
@@ -100,18 +106,18 @@ Set `KUBECONFIG` to the created config file. This variable is consumed by `kubec
 export KUBECONFIG=$HOME/.kube/config
 ----
 
-Create `ocirsecret` secret that will be used for authentication to Oracle Cloud Container Registry. This is needed because OKE needs credentials to be able to pull microservices images.
-
-[source,bash]
-----
-kubectl create secret docker-registry ocirsecret --docker-server=$OCI_REGION.ocir.io --docker-username=$OCI_USERNAME --docker-password=$AUTH_TOKEN
-----
-
 Deploy the _auth.yml_ file that we created in the https://cloud.oracle.com/containers/clusters/quick[Quick Kubernetes Clusters (OKE)] guide.
 
 [source,bash]
 ----
-kubectl create -f auth.yml
+kubectl apply -f auth.yml
+----
+
+Create `ocirsecret` secret that will be used for authentication to Oracle Cloud Container Registry. This is needed because OKE needs credentials to be able to pull microservices images.
+
+[source,bash]
+----
+kubectl create secret docker-registry ocirsecret --docker-server=$OCI_REGION.ocir.io --docker-username=$OCIR_USERNAME --docker-password=$AUTH_TOKEN --namespace=micronaut-k8s
 ----
 
 external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=users]
@@ -126,7 +132,7 @@ Run the next command to check status of the pods and make sure that all of them 
 
 [source,bash]
 ----
-kubectl get pods
+kubectl get pods -n=micronaut-k8s
 ----
 
 [source,text]
@@ -141,26 +147,50 @@ Run the next command to check the status of the microservices:
 
 [source,bash]
 ----
-kubectl get services
+kubectl get services -n=micronaut-k8s
 ----
 
 [source,text]
 ----
 NAME         TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)             AGE
 api          LoadBalancer   10.96.70.48    129.159.92.209   8080:31690/TCP      2d1h
-kubernetes   ClusterIP      10.96.0.1      <none>           443/TCP,12250/TCP   7d23h
 orders       NodePort       10.96.94.130   <none>           8080:31245/TCP      2d1h
 users        NodePort       10.96.34.174   <none>           8080:30790/TCP      2d1h
 ----
+
+NOTE: `If EXTERNAL-IP` is in <pending> state wait a couple of seconds and then run command again.
 
 Run the next command to retrieve the URL of the `api` microservice:
 
 [source,bash]
 ----
-export API_URL=http://$(kubectl get svc api -o json | jq -r .status.loadBalancer.ingress[0].ip):8080
+export API_URL=http://$(kubectl get svc api -n=micronaut-k8s -o json | jq -r .status.loadBalancer.ingress[0].ip):8080
 ----
 
 external:micronaut-k8s/verify.adoc[]
+
+== Cleaning Up
+
+To delete all pods, services and deployments created in this guide run next command.
+
+[source,bash]
+----
+kubectl delete all --all -n micronaut-k8s
+----
+
+Run next command to delete role, service account, service, role binding and namespace.
+
+[source,bash]
+----
+kubectl delete -f auth.yml
+----
+
+Run next command to delete OKE cluster.
+
+[source,bash]
+----
+oci ce cluster delete --cluster-id $OCI_CLUSTER_ID --force
+----
 
 common:next.adoc[]
 

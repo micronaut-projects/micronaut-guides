@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: micronaut-k8s
   name: "api"
 spec:
   selector:
@@ -14,7 +15,7 @@ spec:
       serviceAccountName: micronaut-service
       containers:
         - name: "api"
-          image: <region-key>.ocir.io/<tenancy-name>/api:last # <1>
+          image: <region-key>.ocir.io/<tenancy-namespace>/micronaut-k8s/api:latest # <1>
           imagePullPolicy: Always # <2>
           ports:
             - name: http
@@ -38,7 +39,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: micronaut-k8s
   name: "api"
+  annotations: # <4>
+    oci.oraclecloud.com/load-balancer-type: "lb"
+    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
 spec:
   selector:
     app: "api"
