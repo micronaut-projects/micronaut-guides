@@ -40,7 +40,7 @@ Copy `Cluster Id` (you will need it later).
 
 == Prepare and Deploy Microservices
 
-We will define some environment variables to make deploying process easier. In `OCI_USER_ID` store your user OCI, which you can find in your oci configuration file. We will get tenancy namespace from the oci commandline tool and store it in `OCI_TENANCY_NAMESPACE`.  In `OCIR_USERNAME` store your username in the format <tenancy_namespace>/<username>. We can reuse `OCI_TENANCY_NAMESPACE` and only edit the <username> part. Store your region key code in `OCI_REGION` for an example "us-phoenix-1". In `OCI_CLUSTER_ID` store the Cluster Id that you copied earlier. Put your compartment id inside `OCI_COMPARTMENT_ID` variable.
+We will define some environment variables to make deploying process easier. In `OCI_USER_ID` store your user OCI, which you can find in your oci configuration file. We will get tenancy namespace from the oci commandline tool and store it in `OCI_TENANCY_NAMESPACE`.  In `OCIR_USERNAME` store your username in the format <tenancy_namespace>/<username>. We can reuse `OCI_TENANCY_NAMESPACE` and only edit the <username> part. Store your region code in `OCI_REGION` for an example "us-phoenix-1". In `OCI_CLUSTER_ID` store the Cluster Id that you copied earlier. Put your compartment id inside `OCI_COMPARTMENT_ID` variable.
 
 [source,bash]
 ----
@@ -120,11 +120,11 @@ Create `ocirsecret` secret that will be used for authentication to Oracle Cloud 
 kubectl create secret docker-registry ocirsecret --docker-server=$OCI_REGION.ocir.io --docker-username=$OCIR_USERNAME --docker-password=$AUTH_TOKEN --namespace=micronaut-k8s
 ----
 
-external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=users]
+external-template:micronaut-k8s-oci/k8s-deploy-service.adoc[arg0=users]
 
-external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=orders]
+external-template:micronaut-k8s-oci/k8s-deploy-service.adoc[arg0=orders]
 
-external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=api]
+external-template:micronaut-k8s-oci/k8s-deploy-service.adoc[arg0=api]
 
 == Test integration between applications deployed on OKE
 
@@ -171,18 +171,11 @@ external:micronaut-k8s/verify.adoc[]
 
 == Cleaning Up
 
-To delete all pods, services and deployments created in this guide run next command.
+To delete all resources that were created in this guide run next command.
 
 [source,bash]
 ----
-kubectl delete all --all -n micronaut-k8s
-----
-
-Run next command to delete role, service account, service, role binding and namespace.
-
-[source,bash]
-----
-kubectl delete -f auth.yml
+kubectl delete namespaces micronaut-k8s
 ----
 
 Run next command to delete OKE cluster.
@@ -191,6 +184,10 @@ Run next command to delete OKE cluster.
 ----
 oci ce cluster delete --cluster-id $OCI_CLUSTER_ID --force
 ----
+
+external-template:micronaut-k8s-oci/oci-delete-repository.adoc[arg0=users]
+external-template:micronaut-k8s-oci/oci-delete-repository.adoc[arg0=orders]
+external-template:micronaut-k8s-oci/oci-delete-repository.adoc[arg0=api]
 
 common:next.adoc[]
 

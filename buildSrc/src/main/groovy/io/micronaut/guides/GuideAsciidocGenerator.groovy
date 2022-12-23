@@ -306,7 +306,7 @@ class GuideAsciidocGenerator {
 
         List<String> newLines = commonLines(file, projectDir)
 
-        String pattern = "\\{(\\d+)}"
+        String pattern = "(\\{(\\d+)(:?([UL])?)})"
 
         // Create a Pattern object
         Pattern r = Pattern.compile(pattern)
@@ -314,11 +314,24 @@ class GuideAsciidocGenerator {
         for (int i = 0; i < newLines.size(); i++) {
             String line = newLines[i]
             Matcher m = r.matcher(line)
-            if (m.find()) {
-                def argNum = m.group(1)
+            while (m.find()) {
+                def replaceString = m.group(1)
+                def argNum = m.group(2)
                 String value = extractFromParametersLine(rawLine, "arg" + argNum)
+                def letter = m.group(4)
                 if (value) {
-                    newLines[i] = line.replace("{" + argNum + "}", value)
+                    switch (letter) {
+                        case 'U':
+                            line = line.replace(replaceString, value.toUpperCase())
+                            break
+                        case 'L':
+                            line = line.replace(replaceString, value.toUpperCase())
+                            break
+                       default:
+                            line = line.replace(replaceString, value)
+                           break
+                    }
+                    newLines[i] = line
                 }
             }
         }
