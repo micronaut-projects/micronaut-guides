@@ -12,7 +12,7 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 @Serdeable
-public class ListingArguments {
+class ListingArguments {
 
     @PositiveOrZero
     private Integer offset = 0
