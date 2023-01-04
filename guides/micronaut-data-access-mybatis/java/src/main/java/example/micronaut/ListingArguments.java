@@ -1,5 +1,6 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.http.uri.UriBuilder;
@@ -9,6 +10,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.util.Optional;
+import java.util.Objects;
 
 @Serdeable
 public class ListingArguments {
@@ -27,9 +29,6 @@ public class ListingArguments {
     @Pattern(regexp = "asc|ASC|desc|DESC")
     @Nullable
     private String order;
-
-    private ListingArguments() {
-    }
 
     public ListingArguments(Integer offset, @Nullable Integer max, @Nullable String sort, @Nullable String order) {
         this.offset = offset;
@@ -70,6 +69,7 @@ public class ListingArguments {
         this.order = order;
     }
 
+    @NonNull
     public static Builder builder() {
         return new Builder();
     }
@@ -91,33 +91,46 @@ public class ListingArguments {
     }
 
     public static final class Builder {
-        private final ListingArguments args = new ListingArguments();
+        private Integer offset;
 
+        @Nullable
+        private Integer max;
+
+        @Nullable
+        private String sort;
+
+        @Nullable
+        private String order;
         private Builder() {
         }
 
+        @NonNull
         public Builder max(int max) {
-            args.setMax(max);
+            this.max = max;
             return this;
         }
 
+        @NonNull
         public Builder sort(String sort) {
-            args.setSort(sort);
+            this.sort = sort;
             return this;
         }
 
+        @NonNull
         public Builder order(String order) {
-            args.setOrder(order);
+            this.order = order;
             return this;
         }
 
+        @NonNull
         public Builder offset(int offset) {
-            args.setOffset(offset);
+            this.offset = offset;
             return this;
         }
 
+        @NonNull
         public ListingArguments build() {
-            return args;
+            return new ListingArguments(Optional.ofNullable(offset).orElse(0), max, sort, order);
         }
     }
 }
