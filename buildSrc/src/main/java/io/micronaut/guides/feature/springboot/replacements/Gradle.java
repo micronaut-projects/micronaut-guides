@@ -30,13 +30,14 @@ import io.micronaut.starter.feature.build.KotlinBuildPlugins;
 import io.micronaut.starter.feature.build.MicronautBuildPlugin;
 import io.micronaut.starter.feature.lang.LanguageFeature;
 import io.micronaut.starter.template.RockerTemplate;
-import io.micronaut.starter.template.Template;
 import jakarta.inject.Singleton;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import static io.micronaut.guides.feature.springboot.SpringBootApplicationFeature.*;
+
+import static io.micronaut.guides.feature.springboot.SpringBootApplicationFeature.isSpringBootApplication;
+import static io.micronaut.starter.template.Template.ROOT;
 
 @Singleton
 @Replaces(io.micronaut.starter.feature.build.gradle.Gradle.class)
@@ -59,7 +60,7 @@ public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
     public void apply(GeneratorContext generatorContext) {
         super.apply(generatorContext);
         if (isSpringBootApplication(generatorContext)) {
-            generatorContext.addTemplate("help", new RockerTemplate(Template.ROOT, "HELP.md", help.template()));
+            generatorContext.addTemplate("help", new RockerTemplate(ROOT, "HELP.md", help.template()));
         }
     }
 
@@ -103,10 +104,10 @@ public class Gradle extends io.micronaut.starter.feature.build.gradle.Gradle {
     protected Optional<String> gradlePluginIdForLanguage(LanguageFeature language) {
         if (language.isGroovy()) {
             return Optional.of("groovy");
-        } else if (language.isJava()) {
+        }
+        if (language.isJava()) {
             return Optional.of("java");
         }
         return Optional.empty();
     }
 }
-

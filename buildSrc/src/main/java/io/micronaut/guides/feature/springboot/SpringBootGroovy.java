@@ -17,13 +17,15 @@ import static io.micronaut.guides.feature.springboot.SpringBootApplicationFeatur
 @Replaces(Groovy.class)
 @Singleton
 public class SpringBootGroovy extends Groovy {
+
     @Override
     @NonNull
     public String getName() {
         return "spring-boot-groovy";
     }
 
-    public SpringBootGroovy(List<GroovyApplicationFeature> applicationFeatures, Spock spock) {
+    public SpringBootGroovy(List<GroovyApplicationFeature> applicationFeatures,
+                            Spock spock) {
         super(applicationFeatures, spock);
     }
 

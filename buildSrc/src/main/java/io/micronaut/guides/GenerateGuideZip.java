@@ -11,12 +11,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 public class GenerateGuideZip {
 
-    private static final List<String> EXECUTABLES = Arrays.asList("gradlew", "gradlew.bat", "mvnw", "mvnw.bat");
+    private static final List<String> EXECUTABLES = List.of("gradlew", "gradlew.bat", "mvnw", "mvnw.bat");
 
     public static void compressZipfile(String sourceDir, String outputFile) throws IOException {
         ZipArchiveOutputStream zipFile = new ZipArchiveOutputStream(new FileOutputStream(outputFile));

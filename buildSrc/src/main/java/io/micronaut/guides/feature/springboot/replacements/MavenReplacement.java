@@ -10,17 +10,18 @@ import io.micronaut.starter.build.dependencies.CoordinateResolver;
 import io.micronaut.starter.build.maven.MavenBuild;
 import io.micronaut.starter.build.maven.MavenBuildCreator;
 import io.micronaut.starter.feature.build.maven.Maven;
-import io.micronaut.starter.options.Language;
 import jakarta.inject.Singleton;
 
 import static io.micronaut.guides.feature.springboot.SpringBootApplicationFeature.isSpringBootApplication;
+import static io.micronaut.starter.options.Language.KOTLIN;
 
 @Replaces(Maven.class)
 @Singleton
 public class MavenReplacement extends Maven {
     protected final CoordinateResolver coordinateResolver;
 
-    public MavenReplacement(MavenBuildCreator dependencyResolver, CoordinateResolver coordinateResolver) {
+    public MavenReplacement(MavenBuildCreator dependencyResolver,
+                            CoordinateResolver coordinateResolver) {
         super(dependencyResolver);
         this.coordinateResolver = coordinateResolver;
     }
@@ -37,8 +38,8 @@ public class MavenReplacement extends Maven {
     protected RockerModel pom(GeneratorContext generatorContext, MavenBuild mavenBuild) {
         if (isSpringBootApplication(generatorContext)) {
             Coordinate springBootParent = coordinateResolver.resolve("spring-boot-starter-parent").orElseThrow();
-            String sourceDirectory = generatorContext.getLanguage() == Language.KOTLIN ? "${project.basedir}/src/main/kotlin" : null;
-            String testSourceDirectory = generatorContext.getLanguage() == Language.KOTLIN ? "${project.basedir}/src/test/kotlin" : null;
+            String sourceDirectory = generatorContext.getLanguage() == KOTLIN ? "${project.basedir}/src/main/kotlin" : null;
+            String testSourceDirectory = generatorContext.getLanguage() == KOTLIN ? "${project.basedir}/src/test/kotlin" : null;
             return springBootGenericPom.template(generatorContext.getLanguage(),
                     generatorContext.getProject(),
                     mavenBuild,
