@@ -368,6 +368,9 @@ class GuidesPlugin implements Plugin<Project> {
             it.guidesGenerator = projectGenerator
             it.slug.set(metadata.slug)
             it.inputDirectory.set(guidesDir.dir(metadata.slug))
+            if (metadata.base != null) {
+                it.baseInputDirectory.set(guidesDir.dir(metadata.base))
+            }
             it.outputDir.set(codeDir.map(s -> s.dir(metadata.slug)))
             it.guidesGenerator = projectGenerator
             it.metadata = metadata
