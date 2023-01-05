@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 @Controller("/genres")  // <1>
 class GenreController {
 
-    protected final GenreRepository genreRepository;
+    private final GenreRepository genreRepository;
 
     public GenreController(GenreRepository genreRepository) { // <2>
         this.genreRepository = genreRepository;
