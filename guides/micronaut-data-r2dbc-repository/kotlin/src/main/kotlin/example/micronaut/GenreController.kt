@@ -51,7 +51,7 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
     }
 
     @Post("/ex") // <11>
-    fun saveExceptions(@Body name: @NotBlank String): Mono<MutableHttpResponse<Genre>> {
+    fun saveExceptions(@NotBlank @Body name: String): Mono<MutableHttpResponse<Genre>> {
         return genreRepository.saveWithException(name)
             .map(this::createGenre)
             .onErrorReturn(HttpResponse.noContent())
