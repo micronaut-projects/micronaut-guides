@@ -45,7 +45,7 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
     }
 
     @Post // <10>
-    fun save(@Body("name") name: @NotBlank String): Mono<HttpResponse<Genre>> {
+    fun save(@NotBlank @Body("name") name: String): Mono<HttpResponse<Genre>> {
         return genreRepository.save(name)
             .map(this::createGenre)
     }
