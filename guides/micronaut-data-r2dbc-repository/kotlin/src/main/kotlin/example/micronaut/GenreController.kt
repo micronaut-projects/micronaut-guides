@@ -39,7 +39,7 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
     }
 
     @Get("/list") // <8>
-    fun list(pageable: @Valid Pageable): Mono<List<Genre>> { // <9>
+    fun list(@Valid pageable: Pageable): Mono<List<Genre>> { // <9>
         return genreRepository.findAll(pageable)
             .map { it.content }
     }
