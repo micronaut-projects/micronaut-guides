@@ -4,7 +4,7 @@ import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.serde.annotation.Serdeable;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 @Serdeable
 @MappedEntity
@@ -14,7 +14,7 @@ public class Genre {
     @GeneratedValue(GeneratedValue.Type.AUTO)
     private Long id;
 
-    @NotNull
+    @NotBlank
     private String name;
 
     public Long getId() {
