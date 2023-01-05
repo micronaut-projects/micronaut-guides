@@ -1,5 +1,6 @@
 package io.micronaut.guides.feature;
 
+import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -15,7 +16,7 @@ public class DockerPushGoogleCloudContainerRegistry extends DockerPushFeature {
         return "gcr.io/micronaut-guides/micronautguide:latest";
     }
 
-
+    @NonNull
     @Override
     public String getName() {
         return "docker-push-gcr";

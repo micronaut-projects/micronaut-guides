@@ -6,8 +6,10 @@ import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.starter.build.dependencies.Coordinate;
 import io.micronaut.starter.build.dependencies.DefaultPomDependencyVersionResolver;
 import jakarta.inject.Singleton;
+
 import java.util.Map;
 import java.util.Optional;
+
 import static io.micronaut.starter.build.dependencies.CoordinatesUtils.readCoordinates;
 
 @Replaces(DefaultPomDependencyVersionResolver.class)

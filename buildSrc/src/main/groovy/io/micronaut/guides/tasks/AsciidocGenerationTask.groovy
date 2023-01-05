@@ -12,8 +12,9 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+
+import static org.gradle.api.tasks.PathSensitivity.RELATIVE
 
 @CompileStatic
 @CacheableTask
@@ -26,7 +27,7 @@ abstract class AsciidocGenerationTask extends DefaultTask {
     abstract Property<String> getSlug()
 
     @InputDirectory
-    @PathSensitive(PathSensitivity.RELATIVE)
+    @PathSensitive(RELATIVE)
     abstract DirectoryProperty getInputDirectory()
 
     @OutputDirectory

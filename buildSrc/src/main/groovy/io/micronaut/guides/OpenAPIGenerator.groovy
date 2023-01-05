@@ -51,12 +51,11 @@ class OpenAPIGenerator {
             generator.opts(clientOptInput)
             generator.generate()
         } catch (GeneratorNotFoundException e) {
-            throw new GradleException("OpenAPI couldn't find specified generator: \"" +
-                    e.message + "\". Check 'generatorName' property. ")
+            throw new GradleException("""OpenAPI couldn't find specified generator: "$e.message". Check 'generatorName' property. """)
         } catch(NoSuchMethodError e) {
-            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"")
+            throw new GradleException("""OpenAPI generator failed with "$e.message" """)
         } catch (Exception e) {
-            throw new GradleException("OpenAPI generator failed with \"" + e.message + "\"")
+            throw new GradleException("""OpenAPI generator failed with "$e.message" """)
         }
     }
 
@@ -67,9 +66,9 @@ class OpenAPIGenerator {
                                                            BuildTool buildTool,
                                                            String destinationPackage) {
         CodegenConfigurator configurator = new CodegenConfigurator()
-        configurator.setInputSpec(definitionFilePath.getPath())
-        configurator.setGeneratorName(config.generatorName)
-        configurator.setOutputDir(destination.getPath())
+        configurator.inputSpec = definitionFilePath.path
+        configurator.generatorName = config.generatorName
+        configurator.outputDir = destination.path
         config.globalProperties?.each { k, v -> configurator.addGlobalProperty(k, v) }
         configurationAdditionalProperties(config, testFramework, buildTool, destinationPackage).each { k, v ->
             configurator.addAdditionalProperty(k, v)
@@ -88,9 +87,7 @@ class OpenAPIGenerator {
         additionalProperties.put(PROPERTY_CONTROLLER_PACKAGE, destinationPackage + PACKAGE_CONTROLLER)
         additionalProperties.put(PROPERTY_API_PACKAGE, destinationPackage + PACKAGE_API)
         additionalProperties.put(PROPERTY_MODEL_PACKAGE, destinationPackage + PACKAGE_MODEL)
-        config.properties?.each {k, v ->
-            additionalProperties.put(k, v)
-        }
+        config.properties?.each {k, v -> additionalProperties.put(k, v)}
         additionalProperties
     }
 
@@ -98,7 +95,8 @@ class OpenAPIGenerator {
     private static Optional<String> buildProperty(@NonNull BuildTool buildTool) {
         if (buildTool.isGradle()) {
             return Optional.of(GRADLE.toString())
-        } else if (buildTool == MAVEN) {
+        }
+        if (buildTool == MAVEN) {
             return Optional.of(MAVEN.toString())
         }
         Optional.empty()

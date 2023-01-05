@@ -9,16 +9,16 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import java.util.Random;
 
-@ExecuteOn(TaskExecutors.IO)
-@Controller("/warehouse")
+@ExecuteOn(TaskExecutors.IO) // <1>
+@Controller("/warehouse") // <2>
 public class WarehouseController {
 
-    @Get("/count")
+    @Get("/count") // <3>
     public HttpResponse getItemCount() {
         return HttpResponse.ok(new Random().nextInt(11));
     }
 
-    @Post("/order")
+    @Post("/order") // <4>
     public HttpResponse order() {
         try {
             //To simulate an external process taking time

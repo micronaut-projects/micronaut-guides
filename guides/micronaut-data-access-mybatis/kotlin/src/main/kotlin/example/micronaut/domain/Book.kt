@@ -1,8 +1,8 @@
 package example.micronaut.domain
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class Book(
     var isbn: String,
     var name: String,

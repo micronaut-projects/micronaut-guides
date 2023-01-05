@@ -12,8 +12,9 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+
+import static org.gradle.api.tasks.PathSensitivity.RELATIVE
 
 @CompileStatic
 @CacheableTask
@@ -23,7 +24,7 @@ abstract class TestScriptTask extends DefaultTask {
     abstract Property<String> getGuideSlug()
 
     @InputFile
-    @PathSensitive(PathSensitivity.RELATIVE)
+    @PathSensitive(RELATIVE)
     abstract RegularFileProperty getMetadataFile()
 
     @Internal
@@ -34,6 +35,6 @@ abstract class TestScriptTask extends DefaultTask {
 
     @TaskAction
     def perform() {
-        TestScriptGenerator.generateTestScript(scriptFile.get().asFile.parentFile, Collections.singletonList(metadata), false)
+        TestScriptGenerator.generateTestScript(scriptFile.get().asFile.parentFile, [metadata], false)
     }
 }

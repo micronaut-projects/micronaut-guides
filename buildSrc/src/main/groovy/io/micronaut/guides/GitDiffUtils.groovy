@@ -23,13 +23,13 @@ class GitDiffUtils {
     static boolean onlyImagesOrMarkdownOrAsciidocChanged(List<String> filesChanged) {
         filesChanged.every { String filename ->
             filename.endsWith('adoc') ||
-                    filename.endsWith('markdown')   ||
-                    filename.endsWith('md')   ||
-                    filename.endsWith('png')  ||
-                    filename.endsWith('jpeg') ||
-                    filename.endsWith('jpg')  ||
-                    filename.endsWith('svg')  ||
-                    filename.endsWith('gif')
+            filename.endsWith('markdown') ||
+            filename.endsWith('md') ||
+            filename.endsWith('png') ||
+            filename.endsWith('jpeg') ||
+            filename.endsWith('jpg') ||
+            filename.endsWith('svg') ||
+            filename.endsWith('gif')
         }
     }
 }

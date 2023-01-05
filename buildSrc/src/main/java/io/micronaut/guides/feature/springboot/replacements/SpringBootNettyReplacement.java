@@ -8,6 +8,7 @@ import io.micronaut.starter.options.Options;
 import jakarta.inject.Singleton;
 
 import java.util.Set;
+
 import static io.micronaut.guides.feature.springboot.SpringBootApplicationFeature.isSpringBootApplication;
 
 @Replaces(Netty.class)

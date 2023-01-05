@@ -11,11 +11,12 @@ import io.micronaut.starter.build.BuildProperties;
 import io.micronaut.starter.build.dependencies.CoordinateResolver;
 import io.micronaut.starter.build.gradle.GradlePlugin;
 import io.micronaut.starter.build.maven.MavenPlugin;
-import io.micronaut.starter.feature.Category;
 import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.template.RockerWritable;
 import jakarta.inject.Singleton;
+
+import static io.micronaut.starter.feature.Category.CLOUD;
 
 @Singleton
 public class GoogleAppEngine implements Feature {
@@ -27,7 +28,7 @@ public class GoogleAppEngine implements Feature {
 
     @Override
     public String getCategory() {
-        return Category.CLOUD;
+        return CLOUD;
     }
 
     @Nullable

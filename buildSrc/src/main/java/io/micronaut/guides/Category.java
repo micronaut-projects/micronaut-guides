@@ -51,6 +51,5 @@ public enum Category implements Ordered {
     @Override
     public int getOrder() {
         return order;
-
     }
 }
