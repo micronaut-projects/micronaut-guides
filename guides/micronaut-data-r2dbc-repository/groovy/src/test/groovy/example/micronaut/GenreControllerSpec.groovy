@@ -76,7 +76,7 @@ class GenreControllerSpec extends Specification {
         noExceptionThrown()
 
         when: "verify get/read operation"
-        URI microservicesUri = UriBuilder.of("/genres").path(""+microservicesId).build()
+        URI microservicesUri = UriBuilder.of("/genres").path(microservicesId as String).build()
         Genre genre = client.toBlocking().retrieve(microservicesUri.toString(), Genre) //<4>
 
         then:
