@@ -931,6 +931,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>;
@@ -940,6 +941,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.PositiveOrZero</span>;
 <span class="keyword">import</span> <span class="include">java.net.URI</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+<span class="keyword">import</span> <span class="include">java.util.Objects</span>;
 
 <span class="annotation">@Serdeable</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">ListingArguments</span> {
@@ -958,9 +960,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@Pattern</span>(regexp = <span class="string"><span class="delimiter">&quot;</span><span class="content">asc|ASC|desc|DESC</span><span class="delimiter">&quot;</span></span>)
     <span class="annotation">@Nullable</span>
     <span class="directive">private</span> <span class="predefined-type">String</span> order;
-
-    <span class="directive">private</span> ListingArguments() {
-    }
 
     <span class="directive">public</span> ListingArguments(<span class="predefined-type">Integer</span> offset, <span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> max, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> sort, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> order) {
         <span class="local-variable">this</span>.offset = offset;
@@ -1001,6 +1000,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="local-variable">this</span>.order = order;
     }
 
+    <span class="annotation">@NonNull</span>
     <span class="directive">public</span> <span class="directive">static</span> Builder builder() {
         <span class="keyword">return</span> <span class="keyword">new</span> Builder();
     }
@@ -1022,33 +1022,46 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     }
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Builder</span> {
-        <span class="directive">private</span> <span class="directive">final</span> ListingArguments args = <span class="keyword">new</span> ListingArguments();
+        <span class="directive">private</span> <span class="predefined-type">Integer</span> offset;
 
+        <span class="annotation">@Nullable</span>
+        <span class="directive">private</span> <span class="predefined-type">Integer</span> max;
+
+        <span class="annotation">@Nullable</span>
+        <span class="directive">private</span> <span class="predefined-type">String</span> sort;
+
+        <span class="annotation">@Nullable</span>
+        <span class="directive">private</span> <span class="predefined-type">String</span> order;
         <span class="directive">private</span> Builder() {
         }
 
+        <span class="annotation">@NonNull</span>
         <span class="directive">public</span> Builder max(<span class="type">int</span> max) {
-            args.setMax(max);
+            <span class="local-variable">this</span>.max = max;
             <span class="keyword">return</span> <span class="local-variable">this</span>;
         }
 
+        <span class="annotation">@NonNull</span>
         <span class="directive">public</span> Builder sort(<span class="predefined-type">String</span> sort) {
-            args.setSort(sort);
+            <span class="local-variable">this</span>.sort = sort;
             <span class="keyword">return</span> <span class="local-variable">this</span>;
         }
 
+        <span class="annotation">@NonNull</span>
         <span class="directive">public</span> Builder order(<span class="predefined-type">String</span> order) {
-            args.setOrder(order);
+            <span class="local-variable">this</span>.order = order;
             <span class="keyword">return</span> <span class="local-variable">this</span>;
         }
 
+        <span class="annotation">@NonNull</span>
         <span class="directive">public</span> Builder offset(<span class="type">int</span> offset) {
-            args.setOffset(offset);
+            <span class="local-variable">this</span>.offset = offset;
             <span class="keyword">return</span> <span class="local-variable">this</span>;
         }
 
+        <span class="annotation">@NonNull</span>
         <span class="directive">public</span> ListingArguments build() {
-            <span class="keyword">return</span> args;
+            <span class="keyword">return</span> <span class="keyword">new</span> ListingArguments(Optional.ofNullable(offset).orElse(<span class="integer">0</span>), max, sort, order);
         }
     }
 }</code></pre>

@@ -827,7 +827,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>
@@ -835,6 +835,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Pattern</span>
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.Positive</span>
 <span class="keyword">import</span> <span class="include">javax.validation.constraints.PositiveOrZero</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
 
 <span class="annotation">@CompileStatic</span>
 <span class="annotation">@Serdeable</span>
@@ -855,9 +856,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     <span class="annotation">@Nullable</span>
     <span class="directive">private</span> <span class="predefined-type">String</span> order
 
-    <span class="directive">private</span> ListingArguments() {
-    }
-
     ListingArguments(<span class="predefined-type">Integer</span> offset, <span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> max, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> sort, <span class="annotation">@Nullable</span> <span class="predefined-type">String</span> order) {
         <span class="local-variable">this</span>.offset = offset
         <span class="local-variable">this</span>.max = max
@@ -866,7 +864,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
     }
 
     Optional&lt;<span class="predefined-type">Integer</span>&gt; getOffset() {
-        Optional.ofNullable(offset)
+        Optional.ofNullable(offset);
     }
 
     <span class="type">void</span> setOffset(<span class="annotation">@Nullable</span> <span class="predefined-type">Integer</span> offset) {
@@ -897,54 +895,69 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
         <span class="local-variable">this</span>.order = order
     }
 
+    <span class="annotation">@NonNull</span>
     <span class="directive">static</span> Builder builder() {
-        <span class="keyword">new</span> Builder()
+        <span class="keyword">return</span> <span class="keyword">new</span> Builder()
     }
 
     <span class="predefined-type">URI</span> of(UriBuilder uriBuilder) {
         <span class="keyword">if</span> (max != <span class="predefined-constant">null</span>) {
-            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">max</span><span class="delimiter">&quot;</span></span>, max)
+            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">max</span><span class="delimiter">&quot;</span></span>, max);
         }
         <span class="keyword">if</span> (order != <span class="predefined-constant">null</span>) {
-            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">order</span><span class="delimiter">&quot;</span></span>, order)
+            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">order</span><span class="delimiter">&quot;</span></span>, order);
         }
         <span class="keyword">if</span> (offset != <span class="predefined-constant">null</span>) {
-            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">offset</span><span class="delimiter">&quot;</span></span>, offset)
+            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">offset</span><span class="delimiter">&quot;</span></span>, offset);
         }
         <span class="keyword">if</span> (sort != <span class="predefined-constant">null</span>) {
-            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">sort</span><span class="delimiter">&quot;</span></span>, sort)
+            uriBuilder.queryParam(<span class="string"><span class="delimiter">&quot;</span><span class="content">sort</span><span class="delimiter">&quot;</span></span>, sort);
         }
         uriBuilder.build()
     }
 
     <span class="directive">static</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Builder</span> {
-        <span class="directive">private</span> <span class="directive">final</span> ListingArguments args = <span class="keyword">new</span> ListingArguments()
+        <span class="directive">private</span> <span class="predefined-type">Integer</span> offset
+
+        <span class="annotation">@Nullable</span>
+        <span class="directive">private</span> <span class="predefined-type">Integer</span> max
+
+        <span class="annotation">@Nullable</span>
+        <span class="directive">private</span> <span class="predefined-type">String</span> sort
+
+        <span class="annotation">@Nullable</span>
+        <span class="directive">private</span> <span class="predefined-type">String</span> order
 
         <span class="directive">private</span> Builder() {
         }
 
+        <span class="annotation">@NonNull</span>
         Builder max(<span class="type">int</span> max) {
-            args.max = max
+            <span class="local-variable">this</span>.max = max
             <span class="local-variable">this</span>
         }
 
+        <span class="annotation">@NonNull</span>
         Builder sort(<span class="predefined-type">String</span> sort) {
-            args.sort = sort
+            <span class="local-variable">this</span>.sort = sort
             <span class="local-variable">this</span>
         }
 
+        <span class="annotation">@NonNull</span>
         Builder order(<span class="predefined-type">String</span> order) {
-            args.order = order
+            <span class="local-variable">this</span>.order = order
             <span class="local-variable">this</span>
         }
 
+        <span class="annotation">@NonNull</span>
         Builder offset(<span class="type">int</span> offset) {
-            args.offset = offset
+            <span class="local-variable">this</span>.offset = offset
             <span class="local-variable">this</span>
         }
 
+        <span class="annotation">@NonNull</span>
         ListingArguments build() {
-            args
+            <span class="keyword">new</span> ListingArguments(Optional.ofNullable(offset).orElse(<span class="integer">0</span>), max, sort, order)
         }
     }
 }</code></pre>
