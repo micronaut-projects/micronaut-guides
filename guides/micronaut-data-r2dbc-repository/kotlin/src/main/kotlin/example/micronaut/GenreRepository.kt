@@ -1,7 +1,6 @@
 package example.micronaut
 
 import example.micronaut.domain.Genre
-import io.micronaut.core.annotation.NonNull
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.exceptions.DataAccessException
 import io.micronaut.data.model.query.builder.sql.Dialect
