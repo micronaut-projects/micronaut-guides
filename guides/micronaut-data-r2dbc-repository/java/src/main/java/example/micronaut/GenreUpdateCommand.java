@@ -11,7 +11,7 @@ public class GenreUpdateCommand {
     @NotBlank
     private final String name;
 
-    public GenreUpdateCommand(Long id, String name) {
+    public GenreUpdateCommand(long id, String name) {
         this.id = id;
         this.name = name;
     }
