@@ -28,7 +28,7 @@ class GenreController {
 
     private final GenreRepository genreRepository;
 
-    public GenreController(GenreRepository genreRepository) { // <2>
+    GenreController(GenreRepository genreRepository) { // <2>
         this.genreRepository = genreRepository;
     }
 
