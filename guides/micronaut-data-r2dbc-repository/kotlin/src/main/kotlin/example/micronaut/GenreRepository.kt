@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull
 
 @R2dbcRepository(dialect = Dialect.MYSQL) // <1>
 abstract class GenreRepository : ReactorPageableRepository<Genre, Long> { // <2>
-    abstract fun save(@NonNull name: @NotBlank String): Mono<Genre>
+    abstract fun save(@NotBlank name: String): Mono<Genre>
 
     @Transactional
     open fun saveWithException(@NonNull name: @NotBlank String): Mono<Genre> {
