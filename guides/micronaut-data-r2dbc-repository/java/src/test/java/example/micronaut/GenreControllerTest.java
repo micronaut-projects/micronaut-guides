@@ -39,7 +39,7 @@ class GenreControllerTest {
     }
 
     @Test
-    public void testGenreCrudOperations() {
+    void testGenreCrudOperations() {
 
         List<Long> genreIds = new ArrayList<>();
 
