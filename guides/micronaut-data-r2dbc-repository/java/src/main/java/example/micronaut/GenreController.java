@@ -52,7 +52,7 @@ public class GenreController {
                     .map(Page::getContent);
     }
 
-    @Post // <10>    
+    @Post // <10>
     public Mono<HttpResponse<Genre>> save(@Body("name") @NotBlank String name) {
         return genreRepository.save(name)
                 .map(GenreController::createdGenre);
