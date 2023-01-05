@@ -47,7 +47,7 @@ class GenreController {
     }
 
     @Get("/list") // <8>
-    public Mono<List<Genre>> list(@Valid Pageable pageable) { // <9>
+    Mono<List<Genre>> list(@Valid Pageable pageable) { // <9>
         return genreRepository.findAll(pageable)
                     .map(Page::getContent);
     }
