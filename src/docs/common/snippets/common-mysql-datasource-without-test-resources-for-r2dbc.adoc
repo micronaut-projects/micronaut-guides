@@ -1,0 +1,31 @@
+== Connecting to a MySQL database
+
+Previously, we connected to a MySQL database, which Micronaut Test Resources started for us.
+
+However, it is easy to connect to an already existing database. Let's start a database and connect to it.
+
+common:run-mysql-container.adoc[]
+
+Database Migrations tools, such Flyway need a  configured JDBC datasource. Export several environment variables:
+
+[source,bash]
+----
+export DATASOURCES_DEFAULT_URL=jdbc:mysql://localhost:3306/db
+export DATASOURCES_DEFAULT_USERNAME=sherlock
+export DATASOURCES_DEFAULT_PASSWORD=elementary
+----
+
+Micronaut Framework populates the properties `datasources.default.url`, `datasources.default.username` and `datasources.default.password` with those environment variables' values. Learn more about https://micronaut-projects.github.io/micronaut-sql/latest/guide/#jdbc-connection-pools[JDBC Connection Pools].
+
+For R2DBC, export serveral environment variables:
+
+[source,bash]
+----
+export R2DBC_DATASOURCES_DEFAULT_URL=jdbc:mysql://localhost:3306/db
+export R2DBC_DATASOURCES_DEFAULT_USERNAME=sherlock
+export R2DBC_DATASOURCES_DEFAULT_PASSWORD=elementary
+----
+
+Micronaut Framework populates the properties `r2dbc.datasources.default.url`, `r2dbc.datasources.default.username` and `r2dbc.datasources.default.password` with those environment variables' values.
+
+You can run the application and test the API as it was described in the previous sections. However, when you run the application, Micronaut Test Resources does not start a MySQL container because you have provided values for `r2dbc.datasources.default.*` and `datasources.default.*` properties.
