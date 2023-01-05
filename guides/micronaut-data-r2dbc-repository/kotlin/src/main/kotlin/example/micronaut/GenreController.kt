@@ -68,9 +68,7 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
         return HttpResponse
             .created(genre)
             .headers { headers: MutableHttpHeaders ->
-                headers.location(
-                    location(genre)
-                )
+                headers.location(location(genre))
             }
     }
 
