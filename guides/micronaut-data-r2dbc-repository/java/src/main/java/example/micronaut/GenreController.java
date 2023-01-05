@@ -24,7 +24,7 @@ import io.micronaut.http.annotation.Status;
 import reactor.core.publisher.Mono;
 
 @Controller("/genres")  // <1>
-public class GenreController {
+class GenreController {
 
     protected final GenreRepository genreRepository;
 
