@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MicronautTest(transactional = false) // <1>
-public class GenreControllerTest {
+class GenreControllerTest {
 
     @Inject
     @Client("/")
