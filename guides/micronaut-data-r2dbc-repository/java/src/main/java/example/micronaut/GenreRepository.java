@@ -24,5 +24,5 @@ public interface GenreRepository extends ReactorPageableRepository<Genre, Long> 
             .then(Mono.error(new DataAccessException("test exception")));
     }
 
-    Mono<Long> update(@NonNull @NotNull @Id Long id, @NonNull @NotBlank String name);
+    Mono<Long> update(long id, @NonNull @NotBlank String name);
 }
