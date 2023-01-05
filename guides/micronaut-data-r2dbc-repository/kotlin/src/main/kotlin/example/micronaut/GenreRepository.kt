@@ -10,7 +10,6 @@ import io.micronaut.data.repository.reactive.ReactorPageableRepository
 import reactor.core.publisher.Mono
 import javax.transaction.Transactional
 import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
 
 @R2dbcRepository(dialect = Dialect.MYSQL) // <1>
 abstract class GenreRepository : ReactorPageableRepository<Genre, Long> { // <2>
