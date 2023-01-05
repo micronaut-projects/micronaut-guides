@@ -30,7 +30,7 @@ class GenreController {
     }
 
     @Get("/{id}") // <3>
-    Mono<Genre> show(Long id) {
+    Mono<Genre> show(long id) {
         return genreRepository
                 .findById(id) // <4>
     }
