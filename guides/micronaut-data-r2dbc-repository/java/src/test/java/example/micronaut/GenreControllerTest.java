@@ -104,7 +104,7 @@ class GenreControllerTest {
         assertEquals(0, genres.size());
 
         // cleanup:
-        for (Long genreId : genreIds) {
+        for (long genreId : genreIds) {
             request = HttpRequest.DELETE("/genres/" + genreId);
             response = client.toBlocking().exchange(request);
             assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
