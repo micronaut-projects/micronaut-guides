@@ -39,7 +39,7 @@ class GenreController {
     }
 
     @Put // <5>
-    public Mono<HttpResponse<?>> update(@Body @Valid GenreUpdateCommand command) { // <6>
+    Mono<HttpResponse<?>> update(@Body @Valid GenreUpdateCommand command) { // <6>
         return genreRepository.update(command.getId(), command.getName())
                     .thenReturn(HttpResponse
                         .noContent()
