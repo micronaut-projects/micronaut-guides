@@ -111,7 +111,7 @@ class GenreControllerTest {
         }
     }
 
-    protected Long entityId(HttpResponse<?> response) {
+    private Long entityId(HttpResponse<?> response) {
         String path = "/genres/";
         String value = response.header(HttpHeaders.LOCATION);
         if (value == null) {
