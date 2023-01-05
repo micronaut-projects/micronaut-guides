@@ -22,5 +22,5 @@ abstract class GenreRepository : ReactorPageableRepository<Genre, Long> { // <2>
             .then(Mono.error(DataAccessException("test exception")))
     }
 
-    abstract fun update(@NonNull @Id id: @NotNull Long, @NonNull name: @NotBlank String): Mono<Long>
+    abstract fun update(@Id id: Long, @NotBlank name: String): Mono<Long>
 }
