@@ -1,5 +1,6 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.NonNull;
 import java.net.URI;
 import java.util.List;
 
@@ -54,19 +55,14 @@ public class GenreController {
     @Post // <10>    
     public Mono<HttpResponse<Genre>> save(@Body("name") @NotBlank String name) {
         return genreRepository.save(name)
-         .map(genre -> HttpResponse
-                .created(genre)
-                .headers(headers -> headers.location(location(genre.getId())))
-         );
+                .map(GenreController::createdGenre);
     }
 
     @Post("/ex") // <11>
     public Mono<MutableHttpResponse<Genre>> saveExceptions(@Body @NotBlank String name) {
         return genreRepository.saveWithException(name)
-         .map(genre -> HttpResponse
-                .created(genre)
-                .headers(headers -> headers.location(location(genre.getId())))
-         ).onErrorReturn(HttpResponse.noContent());
+         .map(GenreController::createdGenre)
+         .onErrorReturn(HttpResponse.noContent());
     }
 
     @Delete("/{id}") // <12>
@@ -76,11 +72,18 @@ public class GenreController {
             .then();
     }
 
-    protected URI location(Long id) {
+    @NonNull
+    private static MutableHttpResponse<Genre> createdGenre(@NonNull Genre genre) {
+        return HttpResponse
+                .created(genre)
+                .headers(headers -> headers.location(location(genre.getId())));
+    }
+
+    private static URI location(Long id) {
         return URI.create("/genres/" + id);
     }
 
-    protected URI location(Genre genre) {
+    private static URI location(Genre genre) {
         return location(genre.getId());
     }
 }

@@ -47,29 +47,14 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
     @Post // <10>
     fun save(@Body("name") name: @NotBlank String): Mono<HttpResponse<Genre>> {
         return genreRepository.save(name)
-            .map { genre ->
-                HttpResponse
-                    .created(genre)
-                    .headers { headers: MutableHttpHeaders ->
-                        headers.location(
-                            location(genre)
-                        )
-                    }
-            }
+            .map(this::createGenre)
     }
 
     @Post("/ex") // <11>
     fun saveExceptions(@Body name: @NotBlank String): Mono<MutableHttpResponse<Genre>> {
         return genreRepository.saveWithException(name)
-            .map { genre ->
-                HttpResponse
-                    .created(genre)
-                    .headers { headers: MutableHttpHeaders ->
-                        headers.location(
-                            location(genre)
-                        )
-                    }
-            }.onErrorReturn(HttpResponse.noContent())
+            .map(this::createGenre)
+            .onErrorReturn(HttpResponse.noContent())
     }
 
     @Delete("/{id}") // <12>
@@ -77,6 +62,16 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
     fun delete(id: Long): Mono<Void> {
         return genreRepository.deleteById(id)
             .then()
+    }
+
+    private fun createGenre(genre: Genre) : MutableHttpResponse<Genre> {
+        return HttpResponse
+            .created(genre)
+            .headers { headers: MutableHttpHeaders ->
+                headers.location(
+                    location(genre)
+                )
+            }
     }
 
     private fun location(id: Long?): URI {

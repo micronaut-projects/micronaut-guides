@@ -1,5 +1,6 @@
 package example.micronaut
 
+import io.micronaut.core.annotation.NonNull
 import example.micronaut.domain.Genre
 import io.micronaut.data.model.Page
 import io.micronaut.data.model.Pageable
@@ -51,19 +52,14 @@ class GenreController {
     @Post // <10>
     Mono<HttpResponse<Genre>> save(@Body("name") @NotBlank String name) {
         return genreRepository.save(name)
-                .map(genre -> HttpResponse
-                        .created(genre)
-                        .headers(headers -> headers.location(location(genre.id)))
-                )
+                .map(GenreController::createdGenre)
     }
 
     @Post("/ex") // <11>
     Mono<MutableHttpResponse<Genre>> saveExceptions(@Body @NotBlank String name) {
         return genreRepository.saveWithException(name)
-                .map(genre -> HttpResponse
-                        .created(genre)
-                        .headers(headers -> headers.location(location(genre.id)))
-                ).onErrorReturn(HttpResponse.noContent())
+                .map(GenreController::createdGenre)
+                .onErrorReturn(HttpResponse.noContent())
     }
 
     @Delete("/{id}") // <12>
@@ -73,11 +69,18 @@ class GenreController {
                 .then()
     }
 
-    protected URI location(Long id) {
+    @NonNull
+    private static MutableHttpResponse<Genre> createdGenre(@NonNull Genre genre) {
+        return HttpResponse
+                .created(genre)
+                .headers(headers -> headers.location(location(genre.getId())));
+    }
+
+    protected static URI location(Long id) {
         return URI.create("/genres/$id")
     }
 
-    protected URI location(Genre genre) {
+    protected static URI location(Genre genre) {
         return location(genre.id)
     }
 }
