@@ -29,7 +29,7 @@ class GenreControllerTest {
     HttpClient client; // <2>
 
     @Test
-    public void testFindNonExistingGenreReturns404() {
+    void testFindNonExistingGenreReturns404() {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -> {
             client.toBlocking().exchange(HttpRequest.GET("/genres/99"));
         });
