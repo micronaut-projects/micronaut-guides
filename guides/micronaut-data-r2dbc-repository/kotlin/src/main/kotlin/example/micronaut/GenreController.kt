@@ -29,7 +29,7 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
     }
 
     @Put // <5>
-    fun update(@Body command: @Valid GenreUpdateCommand): Mono<HttpResponse<*>> { // <6>
+    fun update(@Body @Valid command: GenreUpdateCommand): Mono<HttpResponse<*>> { // <6>
         return genreRepository.update(command.id, command.name)
             .thenReturn(
                 HttpResponse
