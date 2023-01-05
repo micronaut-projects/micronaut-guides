@@ -17,7 +17,7 @@ abstract class GenreRepository : ReactorPageableRepository<Genre, Long> { // <2>
     abstract fun save(@NotBlank name: String): Mono<Genre>
 
     @Transactional
-    open fun saveWithException(@NonNull name: @NotBlank String): Mono<Genre> {
+    open fun saveWithException(@NotBlank name: String): Mono<Genre> {
         return save(name)
             .then(Mono.error(DataAccessException("test exception")))
     }
