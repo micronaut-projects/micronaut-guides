@@ -20,7 +20,7 @@ import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 
 @Controller("/genres") // <1>
-class GenreController (private val genreRepository: GenreRepository) {     // <2>
+open class GenreController(private val genreRepository: GenreRepository) {     // <2>
 
     @Get("/{id}") // <3>
     fun show(id: Long): Mono<Genre> {
@@ -29,7 +29,7 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
     }
 
     @Put // <5>
-    fun update(@Body @Valid command: GenreUpdateCommand): Mono<HttpResponse<*>> { // <6>
+    open fun update(@Body @Valid command: GenreUpdateCommand): Mono<HttpResponse<*>> { // <6>
         return genreRepository.update(command.id, command.name)
             .thenReturn(
                 HttpResponse
@@ -39,19 +39,19 @@ class GenreController (private val genreRepository: GenreRepository) {     // <2
     }
 
     @Get("/list") // <8>
-    fun list(@Valid pageable: Pageable): Mono<List<Genre>> { // <9>
+    open fun list(@Valid pageable: Pageable): Mono<List<Genre>> { // <9>
         return genreRepository.findAll(pageable)
             .map { it.content }
     }
 
     @Post // <10>
-    fun save(@NotBlank @Body("name") name: String): Mono<HttpResponse<Genre>> {
+    open fun save(@NotBlank @Body("name") name: String): Mono<HttpResponse<Genre>> {
         return genreRepository.save(name)
             .map(this::createGenre)
     }
 
     @Post("/ex") // <11>
-    fun saveExceptions(@NotBlank @Body name: String): Mono<MutableHttpResponse<Genre>> {
+    open fun saveExceptions(@NotBlank @Body name: String): Mono<MutableHttpResponse<Genre>> {
         return genreRepository.saveWithException(name)
             .map(this::createGenre)
             .onErrorReturn(HttpResponse.noContent())
