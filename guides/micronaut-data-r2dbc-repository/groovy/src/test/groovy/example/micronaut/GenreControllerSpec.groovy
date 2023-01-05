@@ -147,7 +147,7 @@ class GenreControllerSpec extends Specification {
         genres.size() == 0
 
         when: "verify delete operation - id: #id"
-        request = HttpRequest.DELETE(UriBuilder.of("/genres").path("" + microservicesId).build().toString())
+        request = HttpRequest.DELETE(UriBuilder.of("/genres").path(microservicesId as String).build().toString())
         response = client.toBlocking().exchange(request)
 
         then:
