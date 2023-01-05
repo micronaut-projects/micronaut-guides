@@ -8,7 +8,8 @@ import io.micronaut.starter.options.Options;
 import jakarta.inject.Singleton;
 
 import java.util.Set;
-import static io.micronaut.guides.feature.springboot.SpringBootApplicationFeature.*;
+
+import static io.micronaut.guides.feature.springboot.SpringBootApplicationFeature.isSpringBootApplication;
 
 @Singleton
 @Replaces(HttpClient.class)

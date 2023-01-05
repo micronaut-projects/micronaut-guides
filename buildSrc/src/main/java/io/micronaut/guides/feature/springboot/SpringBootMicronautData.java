@@ -5,14 +5,14 @@ import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
 import io.micronaut.starter.build.dependencies.MicronautDependencyUtils;
-import io.micronaut.starter.feature.Category;
 import io.micronaut.starter.feature.database.H2;
-import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.util.VersionInfo;
 import jakarta.inject.Singleton;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static io.micronaut.starter.application.ApplicationType.DEFAULT;
+import static io.micronaut.starter.feature.Category.DATABASE;
 
 @Singleton
 public class SpringBootMicronautData implements SpringBootApplicationFeature {
@@ -33,17 +33,17 @@ public class SpringBootMicronautData implements SpringBootApplicationFeature {
     @Override
     @NonNull
     public String getDescription() {
-        return "Adds Micronatu Data to a Spring Boot application";
+        return "Adds Micronaut Data to a Spring Boot application";
     }
 
     @Override
     public String getCategory() {
-        return Category.DATABASE;
+        return DATABASE;
     }
 
     @Override
     public boolean supports(ApplicationType applicationType) {
-        return applicationType == ApplicationType.DEFAULT;
+        return applicationType == DEFAULT;
     }
 
     @Override
@@ -103,16 +103,14 @@ public class SpringBootMicronautData implements SpringBootApplicationFeature {
                 .artifactId("micronaut-jdbc-hikari")
                 .compile());
 
-
         if (generatorContext.getFeatures().isFeaturePresent(H2.class)) {
-            Map<String, Object> jdbcConfig = new LinkedHashMap<>();
-            jdbcConfig.put("datasources.default.url", "jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE");
-            jdbcConfig.put("datasources.default.username", "sa");
-            jdbcConfig.put("datasources.default.password", "");
-            jdbcConfig.put("datasources.default.driverClassName", "org.h2.Driver");
-            jdbcConfig.put("datasources.default.schema-generate", "CREATE_DROP");
-            jdbcConfig.put("datasources.default.dialect", "H2");
-            generatorContext.getConfiguration().addNested(jdbcConfig);
+            generatorContext.getConfiguration().addNested(Map.of(
+                    "datasources.default.url", "jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
+                    "datasources.default.username", "sa",
+                    "datasources.default.password", "",
+                    "datasources.default.driverClassName", "org.h2.Driver",
+                    "datasources.default.schema-generate", "CREATE_DROP",
+                    "datasources.default.dialect", "H2"));
         }
 
     }
