@@ -59,7 +59,7 @@ class GenreController {
     }
 
     @Post("/ex") // <11>
-    public Mono<MutableHttpResponse<Genre>> saveExceptions(@Body @NotBlank String name) {
+    Mono<MutableHttpResponse<Genre>> saveExceptions(@Body @NotBlank String name) {
         return genreRepository.saveWithException(name)
          .map(GenreController::createdGenre)
          .onErrorReturn(HttpResponse.noContent());
