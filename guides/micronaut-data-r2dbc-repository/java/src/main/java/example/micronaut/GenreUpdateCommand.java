@@ -16,7 +16,7 @@ public class GenreUpdateCommand {
         this.name = name;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
