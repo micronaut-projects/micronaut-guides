@@ -10,8 +10,7 @@ import javax.validation.constraints.NotNull
 @Serdeable // <1>
 class GenreUpdateCommand {
 
-    @NotNull
-    final Long id
+    final long id
 
     @NotBlank
     final String name
