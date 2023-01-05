@@ -67,7 +67,7 @@ class GenreController {
 
     @Delete("/{id}") // <12>
     @Status(HttpStatus.NO_CONTENT)
-    public Mono<Void> delete(Long id) {
+    Mono<Void> delete(long id) {
         return genreRepository.deleteById(id)
             .then();
     }
