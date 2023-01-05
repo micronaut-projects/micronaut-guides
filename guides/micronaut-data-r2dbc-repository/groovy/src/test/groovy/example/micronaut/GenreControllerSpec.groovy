@@ -154,7 +154,7 @@ class GenreControllerSpec extends Specification {
         response.status == HttpStatus.NO_CONTENT
 
         when:
-        request = HttpRequest.DELETE(UriBuilder.of("/genres").path("" + devOpsId).build().toString())
+        request = HttpRequest.DELETE(UriBuilder.of("/genres").path(devOpsId as String).build().toString())
         response = client.toBlocking().exchange(request)
 
         then:
