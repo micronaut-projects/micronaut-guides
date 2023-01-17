@@ -11,13 +11,13 @@ import jakarta.inject.Inject
 
 @MicronautTest // <1>
 class HelloControllerTest {
-    @Inject
-    @field:Client("/")  // <2>
-    lateinit var client : HttpClient
+    @Inject // <2>
+    @field:Client("/") // <3>
+    lateinit var client : HttpClient // <4>
 
     @Test
     fun testHello() {
-        val request: HttpRequest<Any> = HttpRequest.GET("/hello")  // <3>
+        val request: HttpRequest<Any> = HttpRequest.GET("/hello")  // <5>
         val body = client.toBlocking().retrieve(request)
         assertNotNull(body)
         assertEquals("Hello World", body)
