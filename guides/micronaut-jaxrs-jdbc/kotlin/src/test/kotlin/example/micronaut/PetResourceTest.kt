@@ -12,12 +12,12 @@ import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-@MicronautTest(transactional = false)
+@MicronautTest(transactional = false) // <1>
 class PetResourceTest {
 
     @Inject
     @field:Client("/")
-    lateinit var httpClient : HttpClient
+    lateinit var httpClient : HttpClient // <2>
 
     @Inject
     lateinit var repository: PetRepository
@@ -75,7 +75,7 @@ class PetResourceTest {
         val thrown: HttpClientResponseException = assertThrows(HttpClientResponseException::class.java) {
             client.exchange(request, Pet::class.java)
         }
-        assertEquals(HttpStatus.NOT_FOUND, thrown.response.status())
+        assertEquals(HttpStatus.NOT_FOUND, thrown.response.status()) // <3>
         if (id != null) {
             repository.deleteById(id)
         }
