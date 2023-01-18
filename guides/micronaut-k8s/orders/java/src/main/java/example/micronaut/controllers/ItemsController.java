@@ -11,10 +11,10 @@ import java.util.List;
 
 @Controller("/items")  // <1>
 @Secured(SecurityRule.IS_AUTHENTICATED)  // <2>
-public class ItemsController {
+class ItemsController {
 
     @Get("/{id}")  // <3>
-    public Item findById(@NotNull Integer id) {
+    public Item findById(int id) {
         return Item.items.stream()
                 .filter(it -> it.id().equals(id))
                 .findFirst().orElse(null);

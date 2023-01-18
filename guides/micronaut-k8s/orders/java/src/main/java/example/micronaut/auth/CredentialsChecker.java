@@ -10,11 +10,11 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 @Singleton // <1>
-public class CredentialsChecker implements AuthenticationProvider {
+class CredentialsChecker implements AuthenticationProvider {
 
     private final Credentials credentials;
 
-    public CredentialsChecker(Credentials credentials) {
+    CredentialsChecker(Credentials credentials) {
         this.credentials = credentials;
     }
 

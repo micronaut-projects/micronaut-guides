@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest // <1>
-public class OrdersControllerTest {
+class OrdersControllerTest {
 
     @Inject
     OrderItemClient orderItemClient;
@@ -38,8 +38,8 @@ public class OrdersControllerTest {
     void multipleOrderInteraction() {
         String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
-        Integer userId = 1;
-        List<Integer> itemIds = Arrays.asList(1, 1, 2, 3);
+        int userId = 1;
+        List<Integer> itemIds = List.of(1, 1, 2, 3);
 
         Order order = new Order(0, userId, null, itemIds, null);
 
@@ -72,26 +72,27 @@ public class OrdersControllerTest {
     void itemDoesntExists() {
         String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
-        Integer userId = 1;
+        int userId = 1;
         List<Integer> itemIds = List.of(5);
 
         Order order = new Order(0, userId, null, itemIds, null);
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> orderItemClient.createOrder(authHeader, order));
 
-        assertEquals(exception.getStatus(), HttpStatus.BAD_REQUEST);
-        assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("Item with id 5 doesn't exists"));
+        assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
+
+        assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("Item with id 5 doesn't exist"));
     }
 
     @Test
     void orderEmptyItems() {
         String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
-        Integer userId = 1;
+        int userId = 1;
         Order order = new Order(0, userId, null, null, null);
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> orderItemClient.createOrder(authHeader, order));
 
-        assertEquals(exception.getStatus(), HttpStatus.BAD_REQUEST);
+        assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("Items must be supplied"));
     }
 

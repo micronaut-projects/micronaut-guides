@@ -11,7 +11,7 @@ import java.util.List;
 @Client("users") // <1>
 public interface UsersClient {
     @Get("/users/{id}")
-    User getById(Integer id);
+    User getById(int id);
 
     @Post("/users")
     User createUser(@Body User user);

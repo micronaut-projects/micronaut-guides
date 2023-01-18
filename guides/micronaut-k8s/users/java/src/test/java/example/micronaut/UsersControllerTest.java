@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest // <1>
-public class UsersControllerTest {
+class UsersControllerTest {
 
     @Inject
     UsersClient usersClient;
@@ -91,7 +91,7 @@ public class UsersControllerTest {
         assertNotEquals(createdUser.id(), 0);
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> usersClient.createUser(authHeader, user));
-        assertEquals(exception.getStatus(), HttpStatus.CONFLICT);
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("User with provided username already exists"));
 
     }

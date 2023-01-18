@@ -21,7 +21,7 @@ class OrdersController {
     private final List<Order> orders = []
 
     @Get("/{id}")  // <3>
-    Order findById(@NonNull Integer id) {
+    Order findById(int id) {
         orders.stream()
                 .filter(it -> it.id == id)
                 .findFirst().orElse(null)
@@ -42,7 +42,7 @@ class OrdersController {
                 x -> Item.items.stream().filter(
                         y -> y.id == x
                 ).findFirst().orElseThrow(
-                        () -> new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("Item with id %s doesn't exists", x))
+                        () -> new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("Item with id %s doesn't exist", x))
                 )).collect()
 
         BigDecimal total = items.stream().map(x->x.price).reduce(BigDecimal::add).orElse(new BigDecimal("0"))

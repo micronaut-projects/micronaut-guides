@@ -10,6 +10,8 @@ import jakarta.inject.Singleton
 class ErrorExceptionHandler implements ExceptionHandler<HttpClientResponseException, HttpResponse<?>> {
     @Override
     HttpResponse<?> handle(HttpRequest request, HttpClientResponseException exception) {
-        HttpResponse.status(exception.getResponse().status()).body(exception.response.getBody(String.class).orElse(null))
+        HttpResponse
+                .status(exception.getResponse().status())
+                .body(exception.response.getBody(String.class).orElse(null))
     }
 }

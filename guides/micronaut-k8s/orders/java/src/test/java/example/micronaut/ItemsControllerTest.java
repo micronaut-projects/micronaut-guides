@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest // <1>
-public class ItemsControllerTest {
+class ItemsControllerTest {
 
     @Inject
     OrderItemClient orderItemClient;
@@ -35,7 +35,7 @@ public class ItemsControllerTest {
     @Test
     void getItem() {
 
-        Integer itemId = 1;
+        int itemId = 1;
 
         String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
 
@@ -54,7 +54,7 @@ public class ItemsControllerTest {
         List<Item> items = orderItemClient.getItems(authHeader);
 
         assertNotNull(items);
-        List<String> existingItemNames = Arrays.asList("Kiwi", "Banana", "Grape");
+        List<String> existingItemNames = List.of("Kiwi", "Banana", "Grape");
         assertEquals(3, items.size());
         assertTrue(items.stream()
                 .map(Item::name)

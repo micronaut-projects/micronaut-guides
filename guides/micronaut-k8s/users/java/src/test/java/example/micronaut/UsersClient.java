@@ -13,7 +13,7 @@ import java.util.List;
 public interface UsersClient {
 
     @Get("/users/{id}")
-    User getById(@Header String authorization, Integer id);
+    User getById(@Header String authorization, int id);
 
     @Post("/users")
     User createUser(@Header String authorization, @Body User user);

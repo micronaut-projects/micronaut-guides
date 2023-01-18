@@ -41,7 +41,7 @@ class OrdersController {
         val items: List<Item> = order.itemIds.map { x ->
             items.firstOrNull { y: Item ->
                 y.id == x
-            }?: throw HttpStatusException(HttpStatus.BAD_REQUEST, String.format("Item with id %s doesn't exists", x))
+            }?: throw HttpStatusException(HttpStatus.BAD_REQUEST, String.format("Item with id %s doesn't exist", x))
         }
         val total: BigDecimal = items.map(Item::price).reduce(BigDecimal::add)
         val newOrder = Order(orders.size + 1, order.userId, items, null, total)

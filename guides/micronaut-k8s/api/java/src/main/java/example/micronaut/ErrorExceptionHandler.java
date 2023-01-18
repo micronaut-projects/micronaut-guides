@@ -7,10 +7,12 @@ import io.micronaut.http.server.exceptions.ExceptionHandler;
 import jakarta.inject.Singleton;
 
 @Singleton // <1>
-public class ErrorExceptionHandler implements ExceptionHandler<HttpClientResponseException, HttpResponse<?>> {
+class ErrorExceptionHandler implements ExceptionHandler<HttpClientResponseException, HttpResponse<?>> {
 
     @Override
     public HttpResponse<?> handle(HttpRequest request, HttpClientResponseException exception) {
-        return HttpResponse.status(exception.getResponse().status()).body(exception.getResponse().getBody(String.class).orElse(null));
+        return HttpResponse
+                .status(exception.getResponse().status())
+                .body(exception.getResponse().getBody(String.class).orElse(null));
     }
 }

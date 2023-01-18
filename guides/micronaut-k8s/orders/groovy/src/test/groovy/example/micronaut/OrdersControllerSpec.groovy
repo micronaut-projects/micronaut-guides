@@ -62,7 +62,7 @@ class OrdersControllerSpec extends Specification {
         orders.stream().anyMatch(x -> x.userId == userId)
     }
 
-    void "item doesn't exists"() {
+    void "item doesn't exist"() {
         def authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username + ":" + credentials.password).getBytes())
 
         def  userId = 1
@@ -76,7 +76,7 @@ class OrdersControllerSpec extends Specification {
         then:
         HttpClientResponseException e = thrown()
         e.response.status == BAD_REQUEST
-        e.response.getBody(String.class).orElse("").contains("Item with id 5 doesn't exists")
+        e.response.getBody(String.class).orElse("").contains("Item with id 5 doesn't exist")
     }
 
     void "order empty items"() {

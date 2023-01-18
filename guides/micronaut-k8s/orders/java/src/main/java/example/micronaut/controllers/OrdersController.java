@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 
 @Controller("/orders")  // <1>
 @Secured(SecurityRule.IS_AUTHENTICATED)  // <2>
-public class OrdersController {
+class OrdersController {
 
     private final List<Order> orders = new ArrayList<>();
 
     @Get("/{id}")  // <3>
-    public Order findById(@NotNull Integer id) {
+    public Order findById(int id) {
         return orders.stream()
                 .filter(it -> it.id().equals(id))
                 .findFirst().orElse(null);
@@ -46,7 +46,7 @@ public class OrdersController {
                 x -> Item.items.stream().filter(
                         y -> y.id().equals(x)
                 ).findFirst().orElseThrow(
-                        () -> new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("Item with id %s doesn't exists", x))
+                        () -> new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("Item with id %s doesn't exist", x))
                 )
         ).collect(Collectors.toList());
 
