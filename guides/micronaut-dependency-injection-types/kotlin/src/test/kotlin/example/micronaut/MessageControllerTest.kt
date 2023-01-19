@@ -11,7 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 @MicronautTest
-class MessageControllerTest(@Client("/") val client: HttpClient) {
+class MessageControllerTest(@Client("/") val httpClient: HttpClient) {
 
     @ParameterizedTest
     @ValueSource(strings = ["/constructor", "/field", "/setter"])
