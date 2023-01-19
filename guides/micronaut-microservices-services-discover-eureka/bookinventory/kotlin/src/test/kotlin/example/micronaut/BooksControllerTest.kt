@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 @MicronautTest
-class BooksControllerTest(@Client("/") val client: HttpClient) {
+class BooksControllerTest(@Client("/") val httpClient: HttpClient) {
 
     @Test
     fun testBooksController() {
