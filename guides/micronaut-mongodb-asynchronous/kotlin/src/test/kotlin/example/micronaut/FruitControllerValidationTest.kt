@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 
 @Property(name = "spec.name", value = "FruitControllerValidationTest")
 @MicronautTest
-class FruitControllerValidationTest(@Client("/") val client: HttpClient) {
+class FruitControllerValidationTest(@Client("/") val httpClient: HttpClient) {
 
     @Test
     fun testFruitIsValidated() {
