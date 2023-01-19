@@ -21,12 +21,8 @@ import jakarta.inject.Inject
 
 @MicronautTest // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
-class GenreControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var httpClient: HttpClient // <3>
-
+class GenreControllerTest(@Client("/") val client: HttpClient) { // <3>
+    
     var blockingClient: BlockingHttpClient? = null
 
     @BeforeEach

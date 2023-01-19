@@ -13,11 +13,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 @MicronautTest // <1>
-class GithubControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class GithubControllerTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {

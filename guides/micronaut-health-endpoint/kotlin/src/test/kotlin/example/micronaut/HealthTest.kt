@@ -10,11 +10,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 @MicronautTest  // <1>
-class HealthTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class HealthTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun healthEndpointExposed() {

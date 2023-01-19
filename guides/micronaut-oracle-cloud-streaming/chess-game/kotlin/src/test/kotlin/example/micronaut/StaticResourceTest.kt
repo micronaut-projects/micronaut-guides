@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
 
 @MicronautTest
-class StaticResourceTest {
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+class StaticResourceTest(@Client("/") val client: HttpClient) {
 
     @Test
     fun staticResourcesAreExposedAtPublic() {

@@ -11,10 +11,7 @@ import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
 
 @MicronautTest
-class BooksControllerTest {
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+class BooksControllerTest(@Client("/") val client: HttpClient) {
 
     @Test
     fun testRetrieveBooks() {

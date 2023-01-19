@@ -34,21 +34,21 @@ class BookControllerTest {
     @Inject
     lateinit var analyticsListener: AnalyticsListener // <2>
 
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <3>
+    @Inject // <3>
+    @field:Client("/") // <4>
+    lateinit var client: HttpClient // <5>
 
     @Test
     fun testMessageIsPublishedToKafkaWhenBookFound() {
         val isbn = "1491950358"
 
-        val result : Optional<Book> = retrieveGet("/books/" + isbn) as Optional<Book> // <4>
+        val result : Optional<Book> = retrieveGet("/books/" + isbn) as Optional<Book> // <6>
         assertNotNull(result)
         assertTrue(result.isPresent)
         assertEquals(isbn, result.get().isbn)
 
-        await().atMost(5, SECONDS).until { !received.isEmpty() } // <5>
-        assertEquals(1, received.size) // <6>
+        await().atMost(5, SECONDS).until { !received.isEmpty() } // <7>
+        assertEquals(1, received.size) // <8>
 
         val bookFromKafka = received.iterator().next()
         assertNotNull(bookFromKafka)
@@ -59,7 +59,7 @@ class BookControllerTest {
     fun testMessageIsNotPublishedToKafkaWhenBookNotFound() {
         assertThrows(HttpClientResponseException::class.java) { retrieveGet("/books/INVALID") }
 
-        Thread.sleep(5_000); // <7>
+        Thread.sleep(5_000); // <9>
         assertEquals(0, received.size);
     }
 

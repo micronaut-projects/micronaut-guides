@@ -18,14 +18,10 @@ import java.util.Optional
 import jakarta.inject.Inject
 
 @MicronautTest
-class BookControllerTest {
+class BookControllerTest(@Client("/") val client: HttpClient) {
 
     @Inject
     lateinit var analyticsClient: AnalyticsClient
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
 
     @Test
     fun testMessageIsPublishedToRabbitMQWhenBookFound() {
