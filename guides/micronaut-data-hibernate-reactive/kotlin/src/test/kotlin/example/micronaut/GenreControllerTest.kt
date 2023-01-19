@@ -19,8 +19,12 @@ import org.junit.jupiter.api.TestInstance
 
 @MicronautTest // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
-class GenreControllerTest(@Client("/") val httpClient: HttpClient) { // <3>
-    
+class GenreControllerTest { // <3>
+
+    @Inject
+    @field:Client("/")
+    lateinit var httpClient: HttpClient // <3>
+
     @Test
     fun testFindNonExistingGenreReturns404() {
         val thrown = Assertions.assertThrows(HttpClientResponseException::class.java) {
