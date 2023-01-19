@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
 
 @MicronautTest
-class BooksControllerTest(@Client("/") val client: HttpClient) {
+class BooksControllerTest(@Client("/") val httpClient: HttpClient) {
 
     @Test
     fun testBooksController() {
