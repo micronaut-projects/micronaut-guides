@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import io.micronaut.http.HttpStatus.UNAUTHORIZED
 
 @MicronautTest
-class BooksControllerSecuredTest(@Client("/") val client: HttpClient) {
+class BooksControllerSecuredTest(@Client("/") val httpClient: HttpClient) {
 
     @Test
     fun testBooksControllerIsSecured() {
