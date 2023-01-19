@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
 @MicronautTest // <1>
-class FlywayEndpointTest(@Client("/") val client: HttpClient) { // <2>
+class FlywayEndpointTest(@Client("/") val httpClient: HttpClient) { // <2>
 
     @Test
     fun migrationsAreExposedViaAndEndpoint() {
