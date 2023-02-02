@@ -56,12 +56,6 @@ callout:http-request[4]
 <6> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
 <7> Use `retrieve` to perform an HTTP request for the given request object and convert the full HTTP response's body into the specified type. e.g. `List<GithubRelease>`.
 
-NOTE: Instead of `retrieve` we could have used `jsonStream`. You can use `jsonStream()` to stream arrays of type `application/json` or
-JSON streams of type `application/x-json-stream`. If we use `retrieve`, such as in the previous code listing, the operation will not block.
-However, it will not return until all the data has been received from the server. In the case of a JSON array that would be the whole array.
-However, if you are interested in just the first element of the array, `jsonStream` provides a better alternative since it starts streaming data from the server without needing the whole response.
-For example, `jsonStream().firstElement()` will only parse the first item in a JSON array. Hence it is more efficient.
-
 === Declarative Client
 
 It is time to take a look at support for declarative clients via the Client annotation.
@@ -94,9 +88,9 @@ callout:controller[number=1,arg0=/github]
 
 === Tests
 
-Create a test to verify that both clients work as expected, and the controller echoes the output of the GitHub API in a Reactive way.
+Create a test to verify that the low-level client works as expected, and the controller echoes the output of the GitHub API in a Reactive way.
 
-test:GithubControllerTest[]
+test:GithubLowLevelControllerTest[]
 
 callout:micronaut-test[1]
 <2> Inject the `HttpClient` bean in the application context.
@@ -104,7 +98,14 @@ callout:micronaut-test[1]
 <4> The Micronaut framework makes it easy to parse JSON into Java objects.
 <5> Use `status` to check the HTTP status code.
 callout:body-method[6]
-callout:binding-json-array[7]
+
+Then create a test that verifies the response from the `/github/releases` endpoint which uses the Declarative Client to generate a JSON stream response.
+
+test:GithubDeclarativeControllerTest[]
+
+callout:micronaut-test[1]
+<2> For consuming a JSON stream, we inject a `StreamingHttpClient` bean.
+<3> Read the JSON stream, and convert it to a Java Stream of GithubRelease objects.
 
 common:testApp.adoc[]
 
