@@ -30,7 +30,7 @@ class GithubControllerTest {
     @Client("/")
     StreamingHttpClient streamingClient;
 
-    private static Pattern MICRONAUT_RELEASE = Pattern.compile("([Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?|v3.6.5)");
+    private static Pattern MICRONAUT_RELEASE = Pattern.compile("[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?");
 
     @Test
     public void verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {

@@ -27,7 +27,7 @@ class GithubControllerSpec extends Specification {
     StreamingHttpClient streamingClient
 
     @Shared
-    Pattern MICRONAUT_RELEASE = Pattern.compile("([Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?|v3.6.5)");
+    Pattern MICRONAUT_RELEASE = Pattern.compile("[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?");
 
 
     void 'verify github releases can be fetched with low level HttpClient'() {

@@ -42,7 +42,7 @@ class GithubControllerTest {
 
         //then:
         assertNotNull(releases)
-        val regex = Regex("(Micronaut( Framework)? |v)?[0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?")
+        val regex = Regex("Micronaut( Framework)? [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?")
         for (release in releases) {
             assertTrue(regex.matches(release.name))
         }
@@ -56,7 +56,7 @@ class GithubControllerTest {
         val githubReleases = Flux.from(streamingClient.jsonStream(request, GithubRelease::class.java)).toStream().collect(Collectors.toList()) // <7>
 
         //then:
-        val regex = Regex("(Micronaut( Framework)? |v)?[0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?")
+        val regex = Regex("Micronaut( Framework)? [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?")
         for (release in githubReleases) {
             assertTrue(regex.matches(release.name))
         }
