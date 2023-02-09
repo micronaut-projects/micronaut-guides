@@ -167,7 +167,7 @@
 <p>Authors: Sergio del Amo, Iván López</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 3.8.2</p>
+<p>Micronaut Version: 3.8.4</p>
 </div>
 </div>
 </div>
@@ -299,6 +299,20 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">github</span>:
   <span class="key">organization</span>: <span class="string"><span class="content">micronaut-projects</span></span>
   <span class="key">repo</span>: <span class="string"><span class="content">micronaut-core</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add configuration to associate a service identifier to the GitHub API URL.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="head"><span class="head">---</span></span>
+<span class="key">micronaut</span>:
+  <span class="key">http</span>:
+    <span class="key">services</span>:
+      <span class="key">github</span>:
+        <span class="key">url</span>: <span class="string"><span class="content">'https://api.github.com'</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -435,7 +449,7 @@ If you have an existing Micronaut application and want to add the functionality 
     <span class="directive">private</span> <span class="directive">final</span> HttpClient httpClient;
     <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">URI</span> uri;
 
-    <span class="directive">public</span> GithubLowLevelClient(<span class="annotation">@Client</span>(GithubConfiguration.GITHUB_API_URL) HttpClient httpClient,  <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">public</span> GithubLowLevelClient(<span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">&quot;</span><span class="content">github</span><span class="delimiter">&quot;</span></span>) HttpClient httpClient,  <i class="conum" data-value="2"></i><b>(2)</b>
                                 GithubConfiguration configuration) {  <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="local-variable">this</span>.httpClient = httpClient;
         uri = UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/repos</span><span class="delimiter">&quot;</span></span>)
@@ -462,7 +476,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Inject <code>HttpClient</code> via constructor injection.</td>
+<td>Inject <code>HttpClient</code> via constructor injection. The <code>@Client</code> <code>id</code> member uses <code>github</code>; the service identifier set in the configuration.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -524,7 +538,7 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.ACCEPT</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.USER_AGENT</span>;
 
-<span class="annotation">@Client</span>(GithubConfiguration.GITHUB_API_URL) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">&quot;</span><span class="content">github</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Header</span>(name = USER_AGENT, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut HTTP Client</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="annotation">@Header</span>(name = ACCEPT, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">application/vnd.github.v3+json, application/json</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
 <span class="directive">public</span> <span class="type">interface</span> <span class="class">GithubApiClient</span> {
@@ -626,7 +640,7 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>The <code>releasesWithLowLevelClient</code> returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.</td>
+<td>The <code>releasesWithLowLevelClient</code> returns a <code>Mono</code> which may or may not emit an item. If an item is not emitted a 404 is returned.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
@@ -649,46 +663,59 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.io.ResourceLoader</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">java.io.InputStream</span>;
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 <span class="keyword">import</span> <span class="include">java.util.regex.Pattern</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
+
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
 
-<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">GithubControllerTest</span> {
-
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client; <i class="conum" data-value="2"></i><b>(2)</b>
-
-    <span class="directive">private</span> <span class="directive">static</span> <span class="predefined-type">Pattern</span> MICRONAUT_RELEASE = <span class="predefined-type">Pattern</span>.compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?</span><span class="delimiter">&quot;</span></span>);
+    <span class="directive">private</span> <span class="directive">static</span> <span class="predefined-type">Pattern</span> MICRONAUT_RELEASE =
+            <span class="predefined-type">Pattern</span>.compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?</span><span class="delimiter">&quot;</span></span>);
 
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {
-        <span class="comment">//when:</span>
+    <span class="type">void</span> verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {
+        EmbeddedServer github = ApplicationContext.run(EmbeddedServer.class,
+                <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">GithubControllerTest</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="1"></i><b>(1)</b>
+        EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer.class,
+                <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">micronaut.http.services.github.url</span><span class="delimiter">&quot;</span></span>,
+                        <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:</span><span class="delimiter">&quot;</span></span> + github.getPort())); <i class="conum" data-value="2"></i><b>(2)</b>
+        HttpClient httpClient = embeddedServer.getApplicationContext()
+                .createBean(HttpClient.class, embeddedServer.getURL());
+        BlockingHttpClient client = httpClient.toBlocking();
+
         HttpRequest&lt;<span class="predefined-type">Object</span>&gt; request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/github/releases-lowlevel</span><span class="delimiter">&quot;</span></span>);
 
-        HttpResponse&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; rsp = client.toBlocking().exchange(request, <i class="conum" data-value="3"></i><b>(3)</b>
+        HttpResponse&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; rsp = client.exchange(request, <i class="conum" data-value="3"></i><b>(3)</b>
                 Argument.listOf(GithubRelease.class)); <i class="conum" data-value="4"></i><b>(4)</b>
 
-        <span class="comment">//then: 'the endpoint can be accessed'</span>
         assertEquals(HttpStatus.OK, rsp.getStatus());   <i class="conum" data-value="5"></i><b>(5)</b>
-        assertNotNull(rsp.body()); <i class="conum" data-value="6"></i><b>(6)</b>
+        assertReleases(rsp.body()); <i class="conum" data-value="6"></i><b>(6)</b>
 
-        <span class="comment">//when:</span>
-        <span class="predefined-type">List</span>&lt;GithubRelease&gt; releases = rsp.body();
+        httpClient.close();
+        embeddedServer.close();
+        github.close();
+    }
 
-        <span class="comment">//then:</span>
+    <span class="directive">private</span> <span class="directive">static</span> <span class="type">void</span> assertReleases(<span class="predefined-type">List</span>&lt;GithubRelease&gt; releases) {
         assertNotNull(releases);
         assertTrue(releases.stream()
                 .map(GithubRelease::getName)
@@ -696,18 +723,18 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
                         .find()));
     }
 
-    <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> verifyGithubReleasesCanBeFetchedWithCompileTimeAutoGeneratedAtClient() {
-        <span class="comment">//when:</span>
-        HttpRequest&lt;<span class="predefined-type">Object</span>&gt; request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/github/releases-lowlevel</span><span class="delimiter">&quot;</span></span>);
+    <span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">GithubControllerTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="annotation">@Controller</span>
+    <span class="directive">static</span> <span class="type">class</span> <span class="class">GithubReleases</span> {
+        <span class="directive">private</span> <span class="directive">final</span> ResourceLoader resourceLoader;
+        GithubReleases(ResourceLoader resourceLoader) {
+            <span class="local-variable">this</span>.resourceLoader = resourceLoader;
+        }
 
-        <span class="predefined-type">List</span>&lt;GithubRelease&gt; githubReleases = client.toBlocking().retrieve(request, Argument.listOf(GithubRelease.class)); <i class="conum" data-value="7"></i><b>(7)</b>
-
-        <span class="comment">//then:</span>
-        assertTrue(githubReleases.stream()
-                .map(GithubRelease::getName)
-                .allMatch(name -&gt; MICRONAUT_RELEASE.matcher(name)
-                        .find()));
+        <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/repos/micronaut-projects/micronaut-core/releases</span><span class="delimiter">&quot;</span></span>)
+        Optional&lt;<span class="predefined-type">InputStream</span>&gt; coreReleases() {
+            <span class="keyword">return</span> resourceLoader.getResourceAsStream(<span class="string"><span class="delimiter">&quot;</span><span class="content">releases.json</span><span class="delimiter">&quot;</span></span>);
+        }
     }
 }</code></pre>
 </div>
@@ -716,11 +743,11 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+<td>Combine <code>@Requires</code> and properties (either via the <code>@Property</code> annotation or by passing properties when starting the context) to avoid bean pollution.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Inject the <code>HttpClient</code> bean in the application context.</td>
+<td>This test mocks an HTTP Server for <code>GitHub</code> with an extra Micronaut Embedded Server. This allows you to test how your application behaves with a specific JSON response or avoid issues such as rate limits which can make your tests flaky.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -728,7 +755,7 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>The Micronaut framework makes it easy to parse JSON into Java objects.</td>
+<td>Micronaut HTTP Client simplifies binding a JSON array to a list of POJOs by using <code>Argument::listOf</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
@@ -737,10 +764,6 @@ For example, <code>jsonStream().firstElement()</code> will only parse the first 
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
 <td>Use <code>.body()</code> to retrieve the parsed payload.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="7"></i><b>7</b></td>
-<td>Micronaut HTTP Client simplifies binding a JSON array to a list of POJOs by using <code>Argument::listOf</code>.</td>
 </tr>
 </table>
 </div>
