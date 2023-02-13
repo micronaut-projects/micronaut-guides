@@ -20,10 +20,8 @@ public class HelloControllerTest {
 
     @Test
     public void testHello() {
-        HttpRequest<String> request = HttpRequest.GET("/hello");  // <3>
-        String body = client.toBlocking().retrieve(request);
-
+        String body = client.toBlocking().retrieve(HttpRequest.GET("/"));
         assertNotNull(body);
-        assertEquals("Hello World", body);
+        assertEquals("{\"message\":\"Hello World\"}", body);
     }
 }
