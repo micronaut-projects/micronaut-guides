@@ -6,9 +6,7 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
-import spock.lang.Ignore
 
-@Ignore
 @MicronautTest
 class HelloControllerSpec extends Specification {
 

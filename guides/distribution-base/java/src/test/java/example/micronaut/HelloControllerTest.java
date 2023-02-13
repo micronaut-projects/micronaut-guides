@@ -10,9 +10,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Disabled;
 
-@Disabled
 @MicronautTest // <1>
 public class HelloControllerTest {
 
