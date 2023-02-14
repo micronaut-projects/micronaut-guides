@@ -128,9 +128,17 @@
 <li><a href="#create-an-application">3. Create an Application</a></li>
 <li><a href="#introduction">4. Introduction</a></li>
 <li><a href="#main-class">5. Main Class</a></li>
-<li><a href="#generate-executable-jar">6. Generate Executable JAR</a></li>
-<li><a href="#run-the-executable-jar">7. Run the Executable JAR</a></li>
-<li><a href="#help-with-the-micronaut-framework">8. Help with the Micronaut Framework</a></li>
+<li><a href="#controller">6. Controller</a></li>
+<li><a href="#generate-executable-jar">7. Generate Executable JAR</a></li>
+<li><a href="#run-the-executable-jar">8. Run the Executable JAR</a></li>
+<li><a href="#time-to-first-request">9. Time To First Request</a>
+<ul class="sectlevel2">
+<li><a href="#script">9.1. Script</a></li>
+<li><a href="#measurement">9.2. Measurement</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">10. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">11. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -244,7 +252,56 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect1">
-<h2 id="generate-executable-jar">6. Generate Executable JAR</h2>
+<h2 id="controller">6. Controller</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Add a controller which responds with the JSON payload in the root route.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/HelloController.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+
+<span class="annotation">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">HelloController</span> {
+    <span class="annotation">@Get</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; index() {
+        <span class="keyword">return</span> <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the method to an HTTP GET request.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The Micronaut framework will automatically convert it to JSON before sending it.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-executable-jar">7. Generate Executable JAR</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The application applies the <a href="https://imperceptiblethoughts.com/shadow/introduction/">Shadow Gradle plugin</a>. You can use its task <code>shadowJar</code> to generate an executable JAR.</p>
@@ -260,7 +317,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect1">
-<h2 id="run-the-executable-jar">7. Run the Executable JAR</h2>
+<h2 id="run-the-executable-jar">8. Run the Executable JAR</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Run the application packaged as a JAR file:</p>
@@ -273,7 +330,128 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">8. Help with the Micronaut Framework</h2>
+<h2 id="time-to-first-request">9. Time To First Request</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="script">9.1. Script</h3>
+<div class="paragraph">
+<p>Use the following script to measure time to first request of a single output Jar.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/../../ttfr.sh</div>
+<div class="content">
+<pre class="CodeRay highlight"><code>#!/usr/bin/env bash
+
+set -e
+
+TYPE=&quot;docker&quot;
+PORT=8080
+DELAY=20
+
+usage() {
+  echo &quot;$0: Time to first request for native, java or docker applications&quot;
+  echo &quot;&quot;
+  echo &quot;  $0 [-d|-j|-n] [-p port] ARTIFACT&quot;
+  echo &quot;&quot;
+  echo &quot;    -d : ARTIFACT is a docker image (default)&quot;
+  echo &quot;    -j : ARTIFACT is a fat jar&quot;
+  echo &quot;    -n : ARTIFACT is a native executable&quot;
+  echo &quot;    -p : port to check (default 8080)&quot;
+  echo &quot;&quot;
+}
+
+while getopts 'djnp:' flag; do
+  case &quot;${flag}&quot; in
+    d) TYPE=&quot;docker&quot; ;;
+    j) TYPE=&quot;java&quot; ;;
+    n) TYPE=&quot;native&quot; ;;
+    p) PORT=&quot;${OPTARG}&quot; ;;
+    *) usage
+       exit 1 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+echo $1
+
+if [ $# -eq 0 ]; then
+  echo &quot;Needs the docker image or Jar file to run&quot;
+  exit 1
+fi
+
+execute() {
+  local END=$((SECONDS+DELAY))
+  while ! curl -o /dev/null -s &quot;http://localhost:${PORT}&quot;; do
+    if [ $SECONDS -gt $END ]; then
+      echo &quot;No response from the app in $DELAY seconds&quot; &gt;&amp;2
+      exit 1
+    fi
+    sleep 0.001;
+  done
+}
+
+mytime() {
+  exec 3&gt;&amp;1 4&gt;&amp;2
+  mytime=$(TIMEFORMAT=&quot;%3R&quot;; { time $1 1&gt;&amp;3 2&gt;&amp;4; } 2&gt;&amp;1)
+  exec 3&gt;&amp;- 4&gt;&amp;-
+  echo $mytime
+}
+
+if [[ &quot;$TYPE&quot; == &quot;java&quot; ]]; then
+  java -jar $1 &amp;
+  PID=$!
+  TTFR=$(mytime execute)
+  kill -9 $PID
+elif [[ &quot;$TYPE&quot; == &quot;docker&quot; ]]; then
+  CONTAINER=$(docker run -d --rm -p $PORT:$PORT --privileged $1)
+  TTFR=$(mytime execute)
+  docker container kill $CONTAINER &gt; /dev/null
+else
+  $1 &amp;
+  PID=$!
+  TTFR=$(mytime execute)
+  kill -9 $PID
+fi
+
+if [ &quot;$TTFR&quot; != &quot;&quot; ]; then
+    echo &quot;${TTFR} seconds&quot;
+else
+    exit 1
+fi</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="measurement">9.2. Measurement</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./ttfr.sh -j build/libs/micronautguide-0.1-all.jar
+ __  __ _                                  _
+|  \/  (_) ___ _ __ ___  _ __   __ _ _   _| |_
+| |\/| | |/ __| '__/ _ \| '_ \ / _` | | | | __|
+| |  | | | (__| | | (_) | | | | (_| | |_| | |_
+|_|  |_|_|\___|_|  \___/|_| |_|\__,_|\__,_|\__|
+  Micronaut (v3.8.4)
+
+16:00:32.037 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 439ms. Server Running: http://localhost:8080
+0.734 seconds</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Learn more about <a href="https://guides.micronaut.io/latest/micronaut-docker-image.html">how to build a Docker Image of your Micronaut application</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">11. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
