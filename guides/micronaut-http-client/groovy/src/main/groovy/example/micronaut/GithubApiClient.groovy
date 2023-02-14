@@ -8,7 +8,7 @@ import org.reactivestreams.Publisher;
 import static io.micronaut.http.HttpHeaders.ACCEPT
 import static io.micronaut.http.HttpHeaders.USER_AGENT
 
-@Client(GithubConfiguration.GITHUB_API_URL) // <1>
+@Client(id = "github") // <1>
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client") // <2>
 @Header(name = ACCEPT, value = "application/vnd.github.v3+json, application/json") // <3>
 interface GithubApiClient {

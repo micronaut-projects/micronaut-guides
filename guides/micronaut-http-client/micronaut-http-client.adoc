@@ -28,6 +28,10 @@ Modify `src/main/resources/application.yml` to create some configuration paramet
 
 resource:application.yml[tag=githubconfig]
 
+Add configuration to associate a service identifier to the GitHub API URL.
+
+resource:application.yml[tag=githubapi]
+
 To encapsulate type-safe configuration retrieval, we use a https://docs.micronaut.io/latest/guide/#configurationProperties[`@ConfigurationProperties`] object:
 
 source:GithubConfiguration[]
@@ -49,7 +53,7 @@ Create `GithubLowLevelClient`:
 source:GithubLowLevelClient[]
 
 callout:singleton[1]
-<2> Inject `HttpClient` via constructor injection.
+<2> Inject `HttpClient` via constructor injection. The `@Client` `id` member uses `github`; the service identifier set in the configuration.
 <3> Inject the previously defined configuration parameters.
 callout:http-request[4]
 <5> GitHub API requires to set the `User-Agent` header.
@@ -88,7 +92,7 @@ source:GithubController[]
 callout:controller[number=1,arg0=/github]
 <2> Inject beans via constructor injection.
 <3> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the index method to all requests that use an HTTP GET
-<4> The `releasesWithLowLevelClient` returns a Maybe which may or may not emit an item. If an item is not emitted a 404 is returned.
+<4> The `releasesWithLowLevelClient` returns a `Mono` which may or may not emit an item. If an item is not emitted a 404 is returned.
 <5> In order to do JSON streaming you can declare a controller method that returns a `application/x-json-stream` of JSON objects.
 <6> You can return any reactive type of any implementation (RxJava, Reactor...), but it's better to use the Reactive Streams public interfaces like `Publisher`.
 
@@ -98,13 +102,13 @@ Create a test to verify that both clients work as expected, and the controller e
 
 test:GithubControllerTest[]
 
-callout:micronaut-test[1]
-<2> Inject the `HttpClient` bean in the application context.
+callout:spec-name[1]
+callout:mock-http-server[number=2,arg0=GitHub]
 <3> Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
-<4> The Micronaut framework makes it easy to parse JSON into Java objects.
+callout:binding-json-array[4]
 <5> Use `status` to check the HTTP status code.
 callout:body-method[6]
-callout:binding-json-array[7]
+
 
 common:testApp.adoc[]
 
