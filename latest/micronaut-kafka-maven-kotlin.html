@@ -865,21 +865,21 @@ class BookControllerTest {
     @Inject
     lateinit var analyticsListener: AnalyticsListener <i class="conum" data-value="2"></i><b>(2)</b>
 
-    @Inject
-    @field:Client(&quot;/&quot;)
-    lateinit var client: HttpClient <i class="conum" data-value="3"></i><b>(3)</b>
+    @Inject <i class="conum" data-value="3"></i><b>(3)</b>
+    @field:Client(&quot;/&quot;) <i class="conum" data-value="4"></i><b>(4)</b>
+    lateinit var client: HttpClient <i class="conum" data-value="5"></i><b>(5)</b>
 
     @Test
     fun testMessageIsPublishedToKafkaWhenBookFound() {
         val isbn = &quot;1491950358&quot;
 
-        val result : Optional&lt;Book&gt; = retrieveGet(&quot;/books/&quot; + isbn) as Optional&lt;Book&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+        val result : Optional&lt;Book&gt; = retrieveGet(&quot;/books/&quot; + isbn) as Optional&lt;Book&gt; <i class="conum" data-value="6"></i><b>(6)</b>
         assertNotNull(result)
         assertTrue(result.isPresent)
         assertEquals(isbn, result.get().isbn)
 
-        await().atMost(5, SECONDS).until { !received.isEmpty() } <i class="conum" data-value="5"></i><b>(5)</b>
-        assertEquals(1, received.size) <i class="conum" data-value="6"></i><b>(6)</b>
+        await().atMost(5, SECONDS).until { !received.isEmpty() } <i class="conum" data-value="7"></i><b>(7)</b>
+        assertEquals(1, received.size) <i class="conum" data-value="8"></i><b>(8)</b>
 
         val bookFromKafka = received.iterator().next()
         assertNotNull(bookFromKafka)
@@ -890,7 +890,7 @@ class BookControllerTest {
     fun testMessageIsNotPublishedToKafkaWhenBookNotFound() {
         assertThrows(HttpClientResponseException::class.java) { retrieveGet(&quot;/books/INVALID&quot;) }
 
-        Thread.sleep(5_000); <i class="conum" data-value="7"></i><b>(7)</b>
+        Thread.sleep(5_000); <i class="conum" data-value="9"></i><b>(9)</b>
         assertEquals(0, received.size);
     }
 
@@ -931,18 +931,26 @@ class BookControllerTest {
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Use the <code>HttpClient</code> to retrieve a <code>Book</code>, which will trigger sending a message with Kafka</td>
+<td>When annotating a property or a primary constructor parameter, multiple Java elements are generated from the corresponding Kotlin element, and therefore multiple locations for the annotation in the generated Java bytecode. <code>@field:</code> specifies that it should annotate a Java field.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread</td>
+<td>By using <code>lateinit</code>, you tell Kotlin that you have not forgotten to initialize the variable and plan to get to that momentarily. Without <code>lateinit</code>, the Kotlin compiler will give an error for the unassigned variable.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Verify that the message was received and has the correct data</td>
+<td>Use the <code>HttpClient</code> to retrieve a <code>Book</code>, which will trigger sending a message with Kafka</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>Verify that the message was received and has the correct data</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
 <td>Wait a few seconds to make sure no message is sent</td>
 </tr>
 </table>

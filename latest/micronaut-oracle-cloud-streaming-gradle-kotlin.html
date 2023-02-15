@@ -2010,9 +2010,9 @@ class GameReporterTest : TestPropertyProvider { <i class="conum" data-value="3">
     @Inject
     lateinit var chessListener: ChessListener <i class="conum" data-value="5"></i><b>(5)</b>
 
-    @Inject
-    @field:Client(&quot;/&quot;)
-    lateinit var client: HttpClient <i class="conum" data-value="6"></i><b>(6)</b>
+    @Inject <i class="conum" data-value="6"></i><b>(6)</b>
+    @field:Client(&quot;/&quot;) <i class="conum" data-value="7"></i><b>(7)</b>
+    lateinit var client: HttpClient <i class="conum" data-value="8"></i><b>(8)</b>
 
     @Test
     fun testGameEndingInCheckmate() {
@@ -2025,7 +2025,7 @@ class GameReporterTest : TestPropertyProvider { <i class="conum" data-value="3">
         val result = startGame(blackName, whiteName)
         val gameId = result.orElseThrow { RuntimeException(&quot;Expected GameDTO id&quot;) }
 
-        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() } <i class="conum" data-value="7"></i><b>(7)</b>
+        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() } <i class="conum" data-value="9"></i><b>(9)</b>
 
         assertEquals(1, receivedGames.size)
         assertEquals(0, receivedMoves.size)
@@ -2142,7 +2142,7 @@ class GameReporterTest : TestPropertyProvider { <i class="conum" data-value="3">
 
     override fun getProperties(): Map&lt;String, String&gt; {
         kafka.start()
-        return mapOf(&quot;kafka.bootstrap.servers&quot; to kafka.bootstrapServers) <i class="conum" data-value="8"></i><b>(8)</b>
+        return mapOf(&quot;kafka.bootstrap.servers&quot; to kafka.bootstrapServers) <i class="conum" data-value="10"></i><b>(10)</b>
     }
 
     @AfterEach
@@ -2165,11 +2165,11 @@ class GameReporterTest : TestPropertyProvider { <i class="conum" data-value="3">
     }
 
     private fun startGame(blackName: String, whiteName: String): Optional&lt;String&gt; {
-        val body = mapOf(&quot;b&quot; to blackName, &quot;w&quot; to whiteName) <i class="conum" data-value="9"></i><b>(9)</b>
+        val body = mapOf(&quot;b&quot; to blackName, &quot;w&quot; to whiteName) <i class="conum" data-value="11"></i><b>(11)</b>
         val request: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/game/start&quot;, body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE)
         return client.toBlocking().retrieve(request,
-                Argument.of(Optional::class.java, String::class.java)) as Optional&lt;String&gt; <i class="conum" data-value="10"></i><b>(10)</b>
+                Argument.of(Optional::class.java, String::class.java)) as Optional&lt;String&gt; <i class="conum" data-value="12"></i><b>(12)</b>
     }
 
     private fun makeMove(gameId: String, player: String, move: String,
@@ -2178,14 +2178,14 @@ class GameReporterTest : TestPropertyProvider { <i class="conum" data-value="3">
         val body = mapOf(&quot;player&quot; to player, &quot;move&quot; to move, &quot;fen&quot; to fen, &quot;pgn&quot; to pgn)
         val request = HttpRequest.POST(&quot;/game/move/$gameId&quot;, body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE)
-        client.toBlocking().exchange&lt;Map&lt;String, String&gt;, Any&gt;(request) <i class="conum" data-value="11"></i><b>(11)</b>
+        client.toBlocking().exchange&lt;Map&lt;String, String&gt;, Any&gt;(request) <i class="conum" data-value="13"></i><b>(13)</b>
 
     }
 
     private fun endGame(gameId: String, winner: String?) {
         val uri = if (winner == null) &quot;/game/draw/$gameId&quot; else &quot;/game/checkmate/$gameId/$winner&quot;
         val request: HttpRequest&lt;Any?&gt; = HttpRequest.POST(uri, null)
-        client.toBlocking().exchange&lt;Any?, Any&gt;(request) <i class="conum" data-value="12"></i><b>(12)</b>
+        client.toBlocking().exchange&lt;Any?, Any&gt;(request) <i class="conum" data-value="14"></i><b>(14)</b>
     }
 }</code></pre>
 </div>
@@ -2218,26 +2218,34 @@ class GameReporterTest : TestPropertyProvider { <i class="conum" data-value="3">
 </tr>
 <tr>
 <td><i class="conum" data-value="7"></i><b>7</b></td>
-<td>Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread</td>
+<td>When annotating a property or a primary constructor parameter, multiple Java elements are generated from the corresponding Kotlin element, and therefore multiple locations for the annotation in the generated Java bytecode. <code>@field:</code> specifies that it should annotate a Java field.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="8"></i><b>8</b></td>
-<td>Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker</td>
+<td>By using <code>lateinit</code>, you tell Kotlin that you have not forgotten to initialize the variable and plan to get to that momentarily. Without <code>lateinit</code>, the Kotlin compiler will give an error for the unassigned variable.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="9"></i><b>9</b></td>
-<td>Use a Map to hold form parameter names and values</td>
+<td>Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="10"></i><b>10</b></td>
-<td>Use the <code>HttpClient</code> to send a POST request that indicates a game has started, which will trigger sending a message with Kafka</td>
+<td>Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="11"></i><b>11</b></td>
-<td>Use the <code>HttpClient</code> to send a POST request that indicates a game move has occurred, which will trigger sending a message with Kafka</td>
+<td>Use a Map to hold form parameter names and values</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="12"></i><b>12</b></td>
+<td>Use the <code>HttpClient</code> to send a POST request that indicates a game has started, which will trigger sending a message with Kafka</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="13"></i><b>13</b></td>
+<td>Use the <code>HttpClient</code> to send a POST request that indicates a game move has occurred, which will trigger sending a message with Kafka</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="14"></i><b>14</b></td>
 <td>Use the <code>HttpClient</code> to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka</td>
 </tr>
 </table>
