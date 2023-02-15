@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@MicronautTest(startApplication = false) // <3>
+@MicronautTest(startApplication = false) // <1>
 class ContactTest {
     @Inject // <2>
     MessageSource messageSource;
