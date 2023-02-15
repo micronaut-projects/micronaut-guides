@@ -15,11 +15,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
 @MicronautTest(rollback = false)
-internal class OauthAccessTokenTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+internal class OauthAccessTokenTest(@Client("/") val client: HttpClient) {
 
     @Inject
     lateinit var refreshTokenRepository: RefreshTokenRepository

@@ -19,11 +19,7 @@ import org.junit.jupiter.api.Test
 import java.util.Optional
 
 @MicronautTest
-class RefreshTokenNotFoundTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+class RefreshTokenNotFoundTest(@Client("/") val client: HttpClient) {
 
     @Inject
     lateinit var refreshTokenGenerator: RefreshTokenGenerator

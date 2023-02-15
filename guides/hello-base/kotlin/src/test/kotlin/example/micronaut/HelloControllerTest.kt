@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
 
 @MicronautTest // <1>
-class HelloControllerTest {
-    @Inject
-    @field:Client("/")  // <2>
-    lateinit var client : HttpClient
+class HelloControllerTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun testHello() {

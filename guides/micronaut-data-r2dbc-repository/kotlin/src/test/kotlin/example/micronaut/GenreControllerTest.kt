@@ -16,11 +16,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 @MicronautTest(transactional = false) //<1>
-class GenreControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class GenreControllerTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun testFindNonExistingGenreReturn404() {

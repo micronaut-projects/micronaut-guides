@@ -17,11 +17,7 @@ import org.junit.jupiter.api.Test
 import java.util.Optional
 
 @MicronautTest
-internal class UnsignedRefreshTokenTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+internal class UnsignedRefreshTokenTest(@Client("/") val client: HttpClient) {
 
     @Test
     fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
