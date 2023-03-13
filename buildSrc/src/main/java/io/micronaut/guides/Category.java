@@ -30,11 +30,12 @@ public enum Category implements Ordered {
     SERVICE_DISCOVERY("Service Discovery", 23),
     COMMON_TASKS("Common Tasks", 24),
     OBJECT_STORAGE("Object Storage", 25),
-    AWS("AWS", 26),
-    AWS_LAMBDA("AWS Lambda", 27),
-    AZURE("Micronaut + Microsoft Azure", 28),
-    GCP("Micronaut + Google Cloud", 29),
-    ORACLE_CLOUD("Micronaut + Oracle Cloud", 30);
+    CHATBOTS("ChatBots", 26),
+    AWS("AWS", 27),
+    AWS_LAMBDA("AWS Lambda", 28),
+    AZURE("Micronaut + Microsoft Azure", 29),
+    GCP("Micronaut + Google Cloud", 30),
+    ORACLE_CLOUD("Micronaut + Oracle Cloud", 31);
 
     private final String val;
     private final int order;

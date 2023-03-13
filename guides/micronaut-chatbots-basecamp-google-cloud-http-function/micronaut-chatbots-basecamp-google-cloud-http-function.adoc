@@ -1,0 +1,198 @@
+common:header.adoc[]
+
+You are going to deploy a https://github.com/basecamp/bc3-api/blob/master/sections/chatbots.md[Basecamp Chatbot] built with https://micronaut-projects.github.io/micronaut-chatbots/snapshot/guide/[Micronaut Chatbots] as an HTTP Function to https://cloud.google.com/functions[Google Cloud Functions].
+____
+Cloud Functions is a serverless execution environment for building and connecting cloud services. With Cloud Functions, you write simple, single-purpose functions that are attached to events emitted from your cloud infrastructure and services. Your function is triggered when an event being watched is fired.
+____
+common:requirements-jdk11.adoc[]
+
+You need a https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account and a GCP project.
+
+common:completesolution.adoc[]
+
+== Writing the Application
+
+=== Create application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli-command@ example.micronaut.micronautguide \
+              --features=chatbots-basecamp-gcp-function \
+              --build=@build@ \
+              --lang=@lang@ \
+              --jdk=11
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+diffLink:[]
+
+=== Runtime
+
+:exclude-for-build:maven
+
+By supplying the feature `chatbots-basecamp-gcp-function` to the CLI command `create-app`, the https://github.com/micronaut-projects/micronaut-gradle-plugin#micronaut-runtimes[Micronaut runtime] is set to `google_function`.
+
+> A higher-level concept of "runtimes" is included in the Micronaut Gradle plugin, which essentially allows the plugin to decide which server runtime to include in the dependencies of the application when building the application.
+
+[source,groovy]
+.build.gradle
+----
+...
+..
+micronaut {
+    runtime("google_function")
+...
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+By supplying the feature `chatbots-basecamp-gcp-function` to the CLI command `create-app`, `Micronaut runtime` is set to `google_function`.
+
+[source,xml]
+.pom.xml
+----
+...
+..
+    <properties>
+    ...
+    ..
+        <micronaut.runtime>google_function</micronaut.runtime>
+    </properties>
+----
+
+:exclude-for-build:
+
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+
+== Entry Point
+
+The entry point of your HTTP Cloud Function is `io.micronaut.chatbots.basecamp.googlecloud.Handler`. This is a class provided by the https://micronaut-projects.github.io/micronaut-gcp/latest/guide/#httpFunctions[Micronaut GCP Function HTTP] dependency. This dependency allows developers to create applications triggered by HTTP requests with classes annotated like `@Controller` and `@Get` etc.
+
+That is to say, developers code HTTP Server applications deployed to HTTP Cloud Functions the same way as if they were targeting a runtime such as https://netty.io[Netty]. Micronaut GCP abstracts the details of the Cloud Function runtime so that developers can focus on their code.
+
+== Code
+
+The generated project contains a `Controller`:
+
+source:MicronautguideController[]
+
+The previous snippet exposes two endpoints (a `GET` and a `POST` endpoint) in the `/micronautguide` path.
+
+== Run Functions Locally
+
+To run the function locally:
+
+:exclude-for-build:gradle
+
+[source,bash]
+----
+./mvnw function:run
+----
+
+:exclude-for-build:
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+./gradlew runFunction
+----
+
+:exclude-for-build:
+
+[source, bash]
+----
+curl -w "\n" localhost:8080/micronautguide
+----
+
+[source]
+----
+Example Response
+----
+
+TIP: Automatically add newline with `curl -w "\n"`
+
+common:google-cloud-platform.adoc[]
+
+common:google-cloud-cli.adoc[]
+
+== Deploy
+
+common:executable-jar.adoc[]
+
+:exclude-for-build:gradle
+
+Then `cd` into the `target` directory (deployment has to be done from the location where the JAR lives):
+
+[source,bash]
+----
+cd target
+----
+
+You need a single JAR. Delete every 'jar' except `micronautguide-0.1.jar`.
+
+:exclude-for-build:
+
+:exclude-for-build:maven
+
+Then `cd` into the `build/libs` directory (deployment has to be done from the location where the JAR lives):
+
+[source,bash]
+----
+cd build/libs
+----
+
+You need a single JAR. Delete every 'jar' except `*.all-jar`.
+
+:exclude-for-build:
+
+Now run:
+
+[source,bash]
+----
+gcloud functions deploy micronautguide
+    --entry-point io.micronaut.chatbots.basecamp.googlecloud.Handler
+    --runtime java11
+    --trigger-http
+----
+
+Choose unauthenticated access. You do not need authenticated access for this tutorial.
+
+To obtain the trigger URL, do the following:
+
+[source,bash]
+----
+YOUR_HTTP_TRIGGER_URL=$(gcloud functions describe micronautguide
+    --format='value(httpsTrigger.url)')
+----
+
+You can then use this variable to test the function invocation:
+
+[source,bash]
+----
+curl -w "\n" $YOUR_HTTP_TRIGGER_URL/micronautguide
+----
+
+[source]
+----
+Example Response
+----
+
+== Next Steps
+
+Read more about:
+
+- https://micronaut-projects.github.io/micronaut-gcp/latest/guide/[Micronaut GCP]
+- https://cloud.google.com/functions[Cloud Functions]
+- https://github.com/basecamp/bc3-api/blob/master/sections/chatbots.md[Basecamp Chatbot]
+- https://micronaut-projects.github.io/micronaut-chatbots/snapshot/guide/[Micronaut Chatbots]
+
+common:helpWithMicronaut.adoc[]
