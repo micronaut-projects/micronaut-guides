@@ -1,9 +1,6 @@
-package example.micronaut.singleton;
-/*
 //tag::pkg[]
-package example.micronaut;
+package example.micronaut.singleton;
 //end::pkg[]
-*/
 
 //tag::imports[]
 import io.micronaut.http.annotation.Controller;
@@ -13,12 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 //end::imports[]
 
-/*
 //tag::controller[]
-@Controller // <1>
+@Controller("/singleton") // <1>
 //end::controller[]
-*/
-@Controller("/singleton")
+
 //tag::clazz[]
 public class RobotController {
 

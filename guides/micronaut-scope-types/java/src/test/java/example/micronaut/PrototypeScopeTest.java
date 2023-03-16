@@ -3,14 +3,11 @@ package example.micronaut;
 
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -28,15 +25,14 @@ class PrototypeScopeTest {
 //end::imports[]
 /*
 //tag::testheader[]
-   @Test
-   void prototypeScopeIndicatesThatANewInstanceOfTheBeanIsCreatedEachTimeItIsInjected() {
-     String path = "/";
+    @ParameterizedTest
+    @ValueSource(strings = {"/prototype"})
 //end::testheader[]
 */    
     @ParameterizedTest
     @ValueSource(strings = {"/bean", "/prototype", "/infrastructure"})
+    //tag::test[]
     void prototypeScopeIndicatesThatANewInstanceOfTheBeanIsCreatedEachTimeItIsInjected(String path) {
-//tag::test[]
       BlockingHttpClient client = httpClient.toBlocking();
       Set<String> responses = new HashSet<>(executeRequest(client, path));
       assertEquals(2, responses.size()); // <3>

@@ -1,9 +1,7 @@
-package example.micronaut.singleton;
-/*
 //tag::pkg[]
-package example.micronaut;
+package example.micronaut.singleton;
 //end::pkg[]
-*/
+
 //tag::clazz[]
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
