@@ -1,5 +1,6 @@
 package example.micronaut
 
+import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,19 +14,19 @@ import jakarta.inject.Inject
 class HelloControllerTest {
 
     @Inject
-    lateinit var beanContext: BeanContext // <2>
+    lateinit var beanContext: BeanContext
 
     @Test
     fun testHello() {
-        val httpClient = createHttpClient(beanContext)
-        val body = httpClient.toBlocking().retrieve("/")
+        val httpClient = createHttpClient(beanContext) // <2>
+        val request: HttpRequest<Any> = HttpRequest.GET("/")  // <3>
+        val body = httpClient.toBlocking().retrieve(request)
         assertNotNull(body)
         assertEquals("{\"message\":\"Hello World\"}", body)
     }
 
     private fun createHttpClient(beanContext: BeanContext): HttpClient {
-        return beanContext.createBean(
-            HttpClient::class.java, "http://localhost:" + beanContext.getBean(EmbeddedServer::class.java).port
-        )
+        val url = "http://localhost:" + beanContext.getBean(EmbeddedServer::class.java).port
+        return beanContext.createBean(HttpClient::class.java, url)
     }
 }

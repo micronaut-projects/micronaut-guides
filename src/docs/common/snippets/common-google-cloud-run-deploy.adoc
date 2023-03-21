@@ -1,0 +1,63 @@
+== Google Cloud Run Deploy
+
+You can deploy to Google Cloud Run via the CLI. Use the value you configured in your build as the image argument's value.
+
+[source, bash]
+----
+gcloud run deploy \
+    --image=gcr.io/micronaut-guides/micronautguide:latest \
+    --platform managed \
+    --allow-unauthenticated
+----
+
+You will see an output such as:
+
+[source, bash]
+----
+Service name (micronautguide):
+Please specify a region:
+...
+..
+.
+ [22] us-central1
+ [23] us-east1
+ [24] us-east4
+...
+..
+.
+ [29] cancel
+Please enter your numeric choice:  23
+
+To make this the default region, run `gcloud config set run/region us-east1`.
+
+Deploying container to Cloud Run service [micronautguide]
+in project [micronaut-guides] region [us-east1]
+✓ Deploying... Done.
+  ✓ Creating Revision...
+  ✓ Routing traffic...
+  ✓ Setting IAM Policy...
+Done.
+Service [micronautguide] revision [micronautguide-00002-fat] has been deployed
+ and is serving 100 percent of traffic at
+ https://micronautguide-li3tercjmq-ue.a.run.app
+----
+
+== Running the Application
+
+[source, bash]
+----
+curl -i https://micronautguide-li3tercjmq-ue.a.run.app/hello
+----
+
+[source]
+----
+HTTP/2 200
+content-type: text/plain
+x-cloud-trace-context: 139f91d74bfe5d24a2770fca9abef1d7
+date: Sat, 02 Oct 2021 07:18:52 GMT
+server: Google Frontend
+content-length: 11
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
+
+Hello World
+----

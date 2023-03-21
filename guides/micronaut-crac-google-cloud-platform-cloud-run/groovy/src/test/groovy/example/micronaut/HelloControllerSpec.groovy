@@ -16,10 +16,10 @@ class HelloControllerSpec extends Specification {
 
     void "apex returns JSON"() {
         given:
-        HttpClient httpClient = createHttpClient(beanContext)
+        HttpClient httpClient = createHttpClient(beanContext)  // <2>
 
         when:
-        String body = httpClient.toBlocking().retrieve(HttpRequest.GET("/"))
+        String body = httpClient.toBlocking().retrieve(HttpRequest.GET("/"))  // <3>
         then:
         body
         "{\"message\":\"Hello World\"}" == body
