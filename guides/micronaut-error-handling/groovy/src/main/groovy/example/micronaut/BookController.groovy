@@ -81,4 +81,6 @@ class BookController {
         [title: '', pages: ''] as Map
     }
     //end::createModelWithBlankValues[]
+    //tag::endOfFile[]
 }
+//end::endOfFile[]
