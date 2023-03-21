@@ -1,31 +1,58 @@
 package example.micronaut
 
-import io.micronaut.http.HttpRequest
+import io.micronaut.context.ApplicationContext
+import io.micronaut.crac.test.CheckpointSimulator
+import io.micronaut.http.client.BlockingHttpClient
 import io.micronaut.http.client.HttpClient
 import io.micronaut.runtime.server.EmbeddedServer
-import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import jakarta.inject.Inject
 import spock.lang.Specification
-import io.micronaut.context.BeanContext
 
-@MicronautTest
 class HelloControllerSpec extends Specification {
 
-    @Inject
-    BeanContext beanContext
-
-    void "apex returns JSON"() {
+    void "test hello endpoint works after checkpoint"() throws IOException {
         given:
-        HttpClient httpClient = createHttpClient(beanContext)  // <2>
+        EmbeddedServer server = ApplicationContext.run(EmbeddedServer)
+        HttpClient httpClient = createHttpClient(server)
+        BlockingHttpClient client = httpClient.toBlocking()
 
         when:
-        String body = httpClient.toBlocking().retrieve(HttpRequest.GET("/"))  // <3>
+        String body = client.retrieve("/")
+
         then:
         body
         "{\"message\":\"Hello World\"}" == body
+
+        when:
+        CheckpointSimulator checkpointSimulator = server.getApplicationContext().getBean(CheckpointSimulator)
+        checkpointSimulator.runBeforeCheckpoint()
+
+        then:
+        !server.isRunning()
+
+        when:
+        client.close()
+        httpClient.close()
+        checkpointSimulator.runAfterRestore()
+
+        then:
+        server.isRunning()
+
+        when:
+        httpClient = createHttpClient(server)
+        client = httpClient.toBlocking()
+        body = client.retrieve("/")
+
+        then:
+        body
+        "{\"message\":\"Hello World\"}" == body
+
+        cleanup:
+        client.close()
+        httpClient.close()
     }
 
-    private static HttpClient createHttpClient(BeanContext beanContext) {
-        beanContext.createBean(HttpClient, "http://localhost:" + beanContext.getBean(EmbeddedServer).getPort())
+    private static HttpClient createHttpClient(EmbeddedServer embeddedServer) {
+        String url = "http://localhost:${embeddedServer.getPort()}"
+        return embeddedServer.applicationContext.createBean(HttpClient, url);
     }
 }
