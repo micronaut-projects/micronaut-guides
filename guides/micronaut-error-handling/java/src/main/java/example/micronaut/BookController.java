@@ -85,4 +85,6 @@ public class BookController {
         return model;
     }
     //end::createModelWithBlankValues[]
+    //tag::endOfFile[]
 }
+//end::endOfFile[]
