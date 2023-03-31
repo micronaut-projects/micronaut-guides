@@ -16,7 +16,6 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.multipart.MultipartBody
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -26,8 +25,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.function.Consumer
-import javax.mail.Message
-import javax.validation.Valid
+import jakarta.mail.Message
+import jakarta.validation.Valid
 
 @MicronautTest // <1>
 class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
