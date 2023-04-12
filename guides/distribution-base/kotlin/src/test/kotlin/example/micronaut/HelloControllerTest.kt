@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 
 @MicronautTest // <1>
 class HelloControllerTest(@Client("/") val httpClient: HttpClient) {
+
     @Test
     fun testHello() {
         val body = httpClient.toBlocking().retrieve("/")

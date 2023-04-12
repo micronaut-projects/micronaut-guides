@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HelloControllerTest {
+
     @Test
     void testHello() throws IOException {
         try(EmbeddedServer server = ApplicationContext.run(EmbeddedServer.class)) {
 
-            HttpClient httpClient = createHttpClient(server);
-            BlockingHttpClient client = httpClient.toBlocking();
+            BlockingHttpClient client = createHttpClient(server);
 
             String body = client.retrieve("/");
             assertNotNull(body);
@@ -31,24 +31,21 @@ class HelloControllerTest {
             checkpointSimulator.runBeforeCheckpoint();
             assertFalse(server.isRunning());
             client.close();
-            httpClient.close();
 
             checkpointSimulator.runAfterRestore();
             assertTrue(server.isRunning());
 
-            httpClient = createHttpClient(server);
-            client = httpClient.toBlocking();
+            client = createHttpClient(server);
             body = client.retrieve("/");
             assertNotNull(body);
             assertEquals("{\"message\":\"Hello World\"}", body);
 
             client.close();
-            httpClient.close();
         }
     }
 
-    private static HttpClient createHttpClient(EmbeddedServer embeddedServer) {
+    private static BlockingHttpClient createHttpClient(EmbeddedServer embeddedServer) {
         String url = "http://localhost:" + embeddedServer.getPort();
-        return embeddedServer.getApplicationContext().createBean(HttpClient.class, url);
+        return embeddedServer.getApplicationContext().createBean(HttpClient.class, url).toBlocking();
     }
 }

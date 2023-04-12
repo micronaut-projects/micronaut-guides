@@ -12,47 +12,42 @@ class HelloControllerSpec extends Specification {
     void "test hello endpoint works after checkpoint"() throws IOException {
         given:
         EmbeddedServer server = ApplicationContext.run(EmbeddedServer)
-        HttpClient httpClient = createHttpClient(server)
-        BlockingHttpClient client = httpClient.toBlocking()
+        BlockingHttpClient client = createHttpClient(server)
 
         when:
         String body = client.retrieve("/")
 
         then:
-        body
-        "{\"message\":\"Hello World\"}" == body
+        body == '{"message":"Hello World"}'
 
         when:
-        CheckpointSimulator checkpointSimulator = server.getApplicationContext().getBean(CheckpointSimulator)
+        CheckpointSimulator checkpointSimulator = server.applicationContext.getBean(CheckpointSimulator)
         checkpointSimulator.runBeforeCheckpoint()
 
         then:
-        !server.isRunning()
+        !server.running
 
         when:
         client.close()
-        httpClient.close()
         checkpointSimulator.runAfterRestore()
 
         then:
-        server.isRunning()
+        server.running
 
         when:
-        httpClient = createHttpClient(server)
-        client = httpClient.toBlocking()
+        client = createHttpClient(server)
+
         body = client.retrieve("/")
 
         then:
-        body
-        "{\"message\":\"Hello World\"}" == body
+        body == '{"message":"Hello World"}'
 
         cleanup:
         client.close()
-        httpClient.close()
     }
 
-    private static HttpClient createHttpClient(EmbeddedServer embeddedServer) {
-        String url = "http://localhost:${embeddedServer.getPort()}"
-        return embeddedServer.applicationContext.createBean(HttpClient, url);
+    private static BlockingHttpClient createHttpClient(EmbeddedServer embeddedServer) {
+        String url = "http://localhost:${embeddedServer.port}"
+        return embeddedServer.applicationContext.createBean(HttpClient, url).toBlocking();
     }
 }
