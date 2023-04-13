@@ -1,10 +1,34 @@
-include::{commondir}/common-header.adoc[]
+common:header.adoc[]
 
-include::{commondir}/common-requirements.adoc[]
+common:requirements.adoc[]
 
-include::{commondir}/common-completesolution.adoc[]
+common:completesolution.adoc[]
 
-include::{commondir}/common-create-app.adoc[]
+== Run Keycloak on Docker
+
+Follow the tutorial https://www.keycloak.org/getting-started/getting-started-docker[Get started with Keycloak on Docker].
+
+Replace the client creation in the tutorial with the steps illustrated following screenshots.
+
+image::keycloak/keycloak-client-step1.png[]
+
+image::keycloak/keycloak-client-step2.png[]
+
+Set `http://localhost:8080/oauth/callback/keycloak` as _Valid redirect URIs_ and `http://localhost:8080/logout` as _Valid post logout redirect URIs_.
+
+image::keycloak/keycloak-client-step3.png[]
+
+common:create-app-features.adoc[]
+
+common:dev-env.adoc[]
+
+=== Start in Port 8081
+
+common:default-dev-environment-application-dev-yaml.adoc[]
+
+Configure the application to start in port 8081:
+
+resource:application-dev.yml[tag=port]
 
 === Views
 
@@ -16,9 +40,6 @@ dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
 
 === OAuth 2.0
 
-TODO: Explain how to install keycloak, run it and setup an app. Add screenshots
-
-
 To use OAuth 2.0 integration, add the following dependency:
 
 dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
@@ -27,9 +48,12 @@ Also add JWT https://micronaut-projects.github.io/micronaut-security/latest/guid
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
+
+=== OAuth 2.0 Configuration
+
 Add the following OAuth2 Configuration:
 
-resource:application.yml[tag=oauth2]
+resource:application-dev.yml[tag=oauth2]
 
 callout:authentication-idtoken[number=1,arg0=Keycloack]
 <2> The provider identifier should match the last part of the URL you entered as a redirect URL `/oauth/callback/keycloak`
@@ -38,16 +62,23 @@ callout:authentication-idtoken[number=1,arg0=Keycloack]
 <5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
 <6> Accept GET request to the `/logout` endpoint.
 
-The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OIDC_ISSUER_DOMAIN` and `OIDC_ISSUER_AUTHSERVERID` environment variables.
+Check Keycloak realm's OpenID configuration by visiting http://localhost:8080/realms/myrealm/.well-known/openid-configuration[http://localhost:8080/realms/myrealm/.well-known/openid-configuration].
+
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OIDC_ISSUER_DOMAIN` and `KEYCLOAK_REALM` environment variables.
 
 [soruce, bash]
 ----
 export OAUTH_CLIENT_ID=XXXXXXXXXX
 export OAUTH_CLIENT_SECRET=YYYYYYYYYY
 export OIDC_ISSUER_DOMAIN=ZZZZZ
+export KEYCLOAK_REALM=myrealm
 ----
 
-TODO add link to .well-known/openid-configuration 
+You can obtain the realm name, client id and client secret in the Keycloak UI:
+
+image::keycloak/keycloak-clientid.png[]
+
+image::keycloak/keycloak-clientsecret.png[]
 
 We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
 
@@ -74,34 +105,33 @@ Also, note that we return an empty model in the controller. However, we are acce
 injects into the model a `security` map with the authenticated user.  See
 https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
 
-=== Run Keycloak
+=== EndSessionEndpointResolver
 
-To start a Keycloak Server you can use Docker and just run the following command:
+Create an https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/oauth2/endpoint/endsession/request/EndSessionEndpointResolver.html[EndSessionEndpointResolver] replacement to logout from Keycloak.
 
-[source, bash]
-----
-docker run --name keycloak -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin -p 8180:8080 quay.io/keycloak/keycloak:{keycloak.version} start-dev
-----
+source:EndSessionEndpointResolverReplacement[]
 
-where `keycloak.version` should be set to 17.0.0 or higher.
+== Running the Application
 
-You should be able to access your Keycloak Server at `localhost:8180`.
+:exclude-for-build:maven
 
-Log in as the admin user to access the Keycloak Administration Console. Username should be `admin` and password `admin`.
+To run the application, use the `./gradlew run` command, which starts the application on port 8081.
 
-Import the https://github.com/quarkusio/quarkus-quickstarts/blob/main/security-openid-connect-web-authentication-quickstart/config/quarkus-realm.json[realm configuration file] to create a new realm. For more details, see the Keycloak documentation about how to https://www.keycloak.org/docs/latest/server_admin/index.html#_create-realm[create a new realm].
+:exclude-for-build:
 
+:exclude-for-build:gradle
 
+To run the application, use the `./mvnw mn:run` command, which starts the application on port 8081.
 
-include::{commondir}/common-runapp.adoc[]
+:exclude-for-build:
 
-TODO add keycloak gif
+image::keycloak.gif[]
 
-include::{commondir}/common-graal-with-plugins.adoc[]
+common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-After you execute the native image, navigate to localhost:8080 and authenticate with Keycloak.
+After you execute the native image, navigate to localhost:8081 and authenticate with Keycloak.
 
 :exclude-for-languages:
 
@@ -110,3 +140,5 @@ After you execute the native image, navigate to localhost:8080 and authenticate 
 Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
 
 Checkout https://www.keycloak.org[Keycloak] website.
+
+common:helpWithMicronaut.adoc[]
