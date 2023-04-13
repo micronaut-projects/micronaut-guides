@@ -134,16 +134,15 @@
 </li>
 <li><a href="#google-cloud-platform">5. Google Cloud Platform</a>
 <ul class="sectlevel2">
-<li><a href="#google-cloud-platform-project">5.1. Google Cloud Platform Project</a></li>
-<li><a href="#cloud-sdk">5.2. Cloud SDK</a></li>
+<li><a href="#cloud-sdk">5.1. Cloud SDK</a></li>
+<li><a href="#google-cloud-platform-project">5.2. Google Cloud Platform Project</a></li>
 </ul>
 </li>
-<li><a href="#configure-google-cloud-docker">6. Configure Google Cloud Docker</a></li>
-<li><a href="#docker-push">7. Docker Push</a></li>
-<li><a href="#google-cloud-deployment">8. Google Cloud Deployment</a></li>
-<li><a href="#running-the-application">9. Running the Application</a></li>
-<li><a href="#next-steps">10. Next steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">11. Help with the Micronaut Framework</a></li>
+<li><a href="#docker-push">6. Docker Push</a></li>
+<li><a href="#google-cloud-run-deploy">7. Google Cloud Run Deploy</a></li>
+<li><a href="#running-the-application">8. Running the Application</a></li>
+<li><a href="#next-steps">9. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">10. Help with the Micronaut Framework</a></li>
 </ul>
 
                     </div>
@@ -362,24 +361,12 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <h2 id="google-cloud-platform">5. Google Cloud Platform</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Signup for <a href="https://console.cloud.google.com/">Google Cloud Platform</a></p>
+<p>Signup for the <a href="https://console.cloud.google.com/">Google Cloud Platform</a></p>
 </div>
 <div class="sect2">
-<h3 id="google-cloud-platform-project">5.1. Google Cloud Platform Project</h3>
+<h3 id="cloud-sdk">5.1. Cloud SDK</h3>
 <div class="paragraph">
-<p>Create a new project:</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/gcp-project.png" alt="gcp project"></span></p>
-</div>
-<div class="paragraph">
-<p>We named the project <code>micronaut-guides</code></p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="cloud-sdk">5.2. Cloud SDK</h3>
-<div class="paragraph">
-<p>Install <a href="https://cloud.google.com/sdk">Cloud SDK</a> for your operating system.</p>
+<p>Install the <a href="https://cloud.google.com/sdk/docs/install">Cloud SDK CLI</a> for your operating system.</p>
 </div>
 <div class="paragraph">
 <p>Cloud SDK includes the <code>gcloud</code> command-line tool. Run the <code>init</code> command in your terminal:</p>
@@ -397,66 +384,63 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <pre class="CodeRay highlight"><code data-lang="bash">gcloud auth login</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="google-cloud-platform-project">5.2. Google Cloud Platform Project</h3>
+<div class="paragraph">
+<p>Create a new project with a unique name (replace <code>xxxxxx</code> with alphanumeric characters of your choice):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects create micronaut-guides-xxxxxx</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In GCP, project ids are globally unique, so the id you used above is the one you should use in the rest of this guide.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Change your project:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud config set project micronaut-guides</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud config set project micronaut-guides-xxxxxx</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>My Project ID is <code>micronaut-guides</code>. You can get the IDs of your projects by running the command <code>gcloud projects list</code>.</p>
+<p>If you forget the project id, you can list all projects:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects list</code></pre>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="configure-google-cloud-docker">6. Configure Google Cloud Docker</h2>
+<h2 id="docker-push">6. Docker Push</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Run <code>auth configure-docker</code> via the Google Cloud CLI:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">&gt; gcloud auth configure-docker</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">Adding credentials for all GCR repositories.
-WARNING: A long list of credential helpers may cause delays running 'docker build'. We recommend passing the registry name to configure only the registry you are using.
-After update, the following will be written to your Docker config file
- located at [~/.docker/config.json]:
- {
-  &quot;credHelpers&quot;: {
-    &quot;gcr.io&quot;: &quot;gcloud&quot;,
-    &quot;marketplace.gcr.io&quot;: &quot;gcloud&quot;,
-    &quot;eu.gcr.io&quot;: &quot;gcloud&quot;,
-    &quot;us.gcr.io&quot;: &quot;gcloud&quot;,
-    &quot;staging-k8s.gcr.io&quot;: &quot;gcloud&quot;,
-    &quot;asia.gcr.io&quot;: &quot;gcloud&quot;
-  }
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="docker-push">7. Docker Push</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Push the Docker image of your application to <a href="https://cloud.google.com/container-registry">Google Cloud Container Registry</a>.</p>
+<p>Push the Docker image of your application to <a href="https://cloud.google.com/container-registry">Google Cloud Container Registry</a> or to <a href="https://cloud.google.com/artifact-registry">Google Cloud Artifact Registry</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">./mvnw deploy \
      -Dpackaging=docker \
-     -Djib.to.image=gcr.io/micronaut-guides/micronautguide:latest</code></pre>
+     -Djib.to.image=gcr.io/micronaut-guides-xxxxxx/micronautguide:latest</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The previous URL uses the pattern: <code>gcr.io/PROJECT_ID/micronautguide:latest</code>. Change it to use your Project ID.</p>
+<p>The previous URL uses the pattern: <code>gcr.io/micronaut-guides-xxxxxx/micronautguide:latest</code>. Change it to use your Project ID.</p>
 </div>
 <div class="paragraph">
 <p>You get an output such as:</p>
@@ -466,13 +450,13 @@ After update, the following will be written to your Docker config file
 <pre class="CodeRay highlight"><code data-lang="bash">....
 ..
 .
-Pushing image 'gcr.io/micronaut-guides/micronautguide:latest'.</code></pre>
+Pushing image 'gcr.io/micronaut-guides-xxxxxx/micronautguide:latest'.</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="google-cloud-deployment">8. Google Cloud Deployment</h2>
+<h2 id="google-cloud-run-deploy">7. Google Cloud Run Deploy</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>You can deploy to Google Cloud Run via the CLI. Use the value you configured in your build as the image argument&#8217;s value.</p>
@@ -480,7 +464,7 @@ Pushing image 'gcr.io/micronaut-guides/micronautguide:latest'.</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">gcloud run deploy \
-    --image=gcr.io/micronaut-guides/micronautguide:latest \
+    --image=gcr.io/micronaut-guides-xxxxxx/micronautguide:latest \
     --platform managed \
     --allow-unauthenticated</code></pre>
 </div>
@@ -492,36 +476,34 @@ Pushing image 'gcr.io/micronaut-guides/micronautguide:latest'.</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">Service name (micronautguide):
 Please specify a region:
+
 ...
-..
-.
+
  [22] us-central1
  [23] us-east1
  [24] us-east4
+
 ...
-..
-.
+
  [29] cancel
 Please enter your numeric choice:  23
 
 To make this the default region, run `gcloud config set run/region us-east1`.
 
-Deploying container to Cloud Run service [micronautguide]
-in project [micronaut-guides] region [us-east1]
+Deploying container to Cloud Run service [micronautguide] in project [micronaut-guides-xxxxxx] region [us-east1]
 ✓ Deploying... Done.
   ✓ Creating Revision...
   ✓ Routing traffic...
   ✓ Setting IAM Policy...
 Done.
-Service [micronautguide] revision [micronautguide-00002-fat] has been deployed
- and is serving 100 percent of traffic at
- https://micronautguide-li3tercjmq-ue.a.run.app</code></pre>
+Service [micronautguide] revision [micronautguide-00002-fat] has been deployed and is serving 100 percent of traffic.
+Service URL: https://micronautguide-63kwrzytgq-ue.a.run.app</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="running-the-application">9. Running the Application</h2>
+<h2 id="running-the-application">8. Running the Application</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -532,8 +514,8 @@ Service [micronautguide] revision [micronautguide-00002-fat] has been deployed
 <div class="content">
 <pre class="CodeRay highlight"><code>HTTP/2 200
 content-type: text/plain
-x-cloud-trace-context: ae42a5a18907ef640ae99520958488ff
-date: Sat, 02 Oct 2021 05:53:16 GMT
+x-cloud-trace-context: 139f91d74bfe5d24a2770fca9abef1d7
+date: Sat, 02 Oct 2021 07:18:52 GMT
 server: Google Frontend
 content-length: 11
 alt-svc: h3=&quot;:443&quot;; ma=2592000,h3-29=&quot;:443&quot;; ma=2592000,h3-T051=&quot;:443&quot;; ma=2592000,h3-Q050=&quot;:443&quot;; ma=2592000,h3-Q046=&quot;:443&quot;; ma=2592000,h3-Q043=&quot;:443&quot;; ma=2592000,quic=&quot;:443&quot;; ma=2592000; v=&quot;46,43&quot;
@@ -544,7 +526,7 @@ Hello World</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">10. Next steps</h2>
+<h2 id="next-steps">9. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>You will probably want to deploy to Google Cloud Run from your CI server. <a href="https://launch.micronaut.io">Micronaut Launch</a> contains feature <a href="https://micronaut.io/launch?type=DEFAULT&amp;name=demo&amp;package=com.example&amp;javaVersion=JDK_11&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;features=github-workflow-google-cloud-run&amp;version=3.0.3">github-workflow-google-cloud-run</a>, which adds a <a href="https://github.com/features/actions">GitHub Actions</a> Workflow that deploys an application to Google Cloud Run from Google Container Registry.</p>
@@ -568,7 +550,7 @@ Hello World</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">11. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">10. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
