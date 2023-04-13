@@ -2,7 +2,9 @@ common:header.adoc[]
 
 You are going to deploy a Micronaut application to https://cloud.google.com/run[Google Cloud Run].
 
-common:cloudrun.adoc[]
+> Develop and deploy highly scalable containerized applications on a fully managed serverless platform.
+
+common:gcp-deploy-requirements2content.adoc[]
 
 == Docker Push
 
@@ -20,7 +22,7 @@ Modify your Gradle build and configure the
 ..
 .
 dockerBuild {
-    images = ["gcr.io/micronaut-guides/micronautguide:latest"]
+    images = ["gcr.io/micronaut-guides-xxxxxx/micronautguide:latest"]
 }
 ----
 
@@ -34,12 +36,12 @@ common:docker-push-gradle.adoc[]
 ----
 ./mvnw deploy \
      -Dpackaging=docker \
-     -Djib.to.image=gcr.io/micronaut-guides/micronautguide:latest
+     -Djib.to.image=gcr.io/micronaut-guides-xxxxxx/micronautguide:latest
 ----
 
 :exclude-for-build:
 
-The previous URL uses the pattern: `gcr.io/PROJECT_ID/micronautguide:latest`. Change it to use your Project ID.
+The previous URL uses the pattern: `gcr.io/micronaut-guides-xxxxxx/micronautguide:latest`. Change it to use your Project ID.
 
 You get an output such as:
 
@@ -48,10 +50,22 @@ You get an output such as:
 ....
 ..
 .
-Pushing image 'gcr.io/micronaut-guides/micronautguide:latest'.
+Pushing image 'gcr.io/micronaut-guides-xxxxxx/micronautguide:latest'.
 ----
 
-common:google-cloud-run-deploy.adoc[]
+== Google Cloud Run Deploy
+
+You can deploy to Google Cloud Run via the CLI. Use the value you configured in your build as the image argument's value.
+
+[source, bash]
+----
+gcloud run deploy \
+    --image=gcr.io/micronaut-guides-xxxxxx/micronautguide:latest \
+    --platform managed \
+    --allow-unauthenticated
+----
+
+common:google-cloud-run-deploy-plain.adoc[]
 
 == Next steps
 
