@@ -8,6 +8,7 @@ import java.util.Map;
 
 @Controller // <1>
 public class HelloController {
+
     @Get // <2>
     public Map<String, Object> index() {
         return Collections.singletonMap("message", "Hello World"); // <3>

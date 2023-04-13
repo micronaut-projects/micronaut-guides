@@ -7,18 +7,18 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
 
-@MicronautTest
+@MicronautTest // <1>
 class HelloControllerSpec extends Specification {
 
     @Inject
-    @Client("/")
+    @Client("/") // <2>
     HttpClient client
 
-    void "apex returns JSON"() {
+    void "test hello"() {
         when:
-        String body = client.toBlocking().retrieve(HttpRequest.GET("/"));
+        String body = client.toBlocking().retrieve(HttpRequest.GET("/")); // <3>
+
         then:
-        body
-        "{\"message\":\"Hello World\"}" == body
+        body == '{"message":"Hello World"}'
     }
 }
