@@ -1,0 +1,124 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, you will create a Micronaut application written in @language@ and secure it with an API Key.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== ApiKey Repository
+
+To keep things simple, populate API keys via configuration.
+
+source:ApiKeyConfiguration[]
+
+callout:each-property[1]
+
+Create a functional interface to retrieve a user given an API Key.
+
+source:ApiKeyRepository[]
+
+callout:functional-interface[1]
+
+Create an implementation of `ApiKeyRepository` which uses the API Keys stored in configuration.
+
+source:ApiKeyRepositoryImpl[]
+
+callout:singleton[1]
+
+=== Token Reader
+
+Micronaut Security is flexible. You define a bean of type https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/reader/TokenReader.html[TokenReader] to read tokens from a custom HTTP Header such as `X-API-Key`.
+
+source:ApiKeyTokenReader[]
+
+callout:singleton[1]
+<2> `HttpHeaderTokenReader` is a convenient abstract class to ease reading a token from an HTTP Header.
+
+=== Token Validator
+
+Define a bean of type https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/validator/TokenValidator.html[TokenValidator] to validate the API Keys leveraging the `ApiKeyRepository`.
+
+source:ApiKeyTokenValidator[]
+
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=ApiKeyRepository]
+<3> You can restrict the validity of an API Key to specific paths.
+
+=== Controllers
+
+To test the application create several controllers.
+
+source:ApiController[]
+
+callout:controller[number=1,arg0=/api]
+callout:produces[2]
+callout:get[number=3,arg0=index,arg1=/]
+callout:secured-is-authenticated[number=4]
+callout:principal[number=5]
+
+Create tests that verify `/api` returns 401 if no API Key is present or the request contains a wrong API Key.
+
+test:ApiControllerTest[]
+
+callout:property[1]
+callout:micronaut-test[2]
+callout:http-client[3]
+
+Create a controller whose path does not match the `ApiKeyTokenValidator`.
+
+source:AppController[]
+
+callout:controller[number=1,arg0=/app]
+callout:produces[2]
+callout:secured-is-authenticated[number=3]
+callout:get[number=4,arg0=index,arg1=/]
+
+Create tests that verify `/app` returns 401 if no API Key is present or even when the request contains a valid API Key.
+
+test:AppControllerTest[]
+
+callout:property[1]
+callout:micronaut-test[2]
+callout:http-client[3]
+
+common:testApp.adoc[]
+
+=== Resources
+
+Set configuration to have an API available when you run your application:
+
+resource:application.yml[tag=apikeys]
+
+common:runapp.adoc[]
+
+To test the running application, issue a GET request to localhost:8080 providing a valid API Key:
+
+[source,bash]
+----
+curl -i --header "Accept: text/plain" --header "X-API-KEY: FOOBAR" localhost:8080
+----
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+
+To test the native executable, issue a GET request to localhost:8080 providing a valid API Key:
+
+[source,bash]
+----
+curl -i --header "Accept: text/plain" --header "X-API-KEY: FOOBAR" localhost:8080
+----
+
+:exclude-for-languages:
+
+== Next steps
+
+See the https://micronaut-projects.github.io/micronaut-security/latest/guide/[Micronaut security documentation] to learn more.
+
+common:helpWithMicronaut.adoc[]

@@ -19,11 +19,7 @@ import org.junit.jupiter.api.Test
 
 @Property(name = "spec.name", value = "MailControllerTest") // <1>
 @MicronautTest // <2>
-class MailControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var httpClient: HttpClient // <3>
+class MailControllerTest(@Client("/") val httpClient: HttpClient) { // <3>
 
     @Inject
     lateinit var beanContext: BeanContext

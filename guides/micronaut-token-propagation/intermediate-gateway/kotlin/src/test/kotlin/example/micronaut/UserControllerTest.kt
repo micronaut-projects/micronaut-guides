@@ -14,11 +14,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
 @MicronautTest // <1>
-class UserControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class UserControllerTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun testUserEndpointIsSecured() { // <3>

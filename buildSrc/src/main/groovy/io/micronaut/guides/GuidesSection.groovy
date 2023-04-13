@@ -1,11 +1,9 @@
-package io.micronaut.guides;
+package io.micronaut.guides
 
-import groovy.transform.CompileStatic;
-
-import java.util.List;
+import groovy.transform.CompileStatic
 
 @CompileStatic
-public class GuidesSection {
+class GuidesSection {
     Object category
     List<GuideMetadata> metadatas
 }

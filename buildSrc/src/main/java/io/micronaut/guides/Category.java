@@ -5,31 +5,36 @@ import io.micronaut.core.order.Ordered;
 public enum Category implements Ordered {
     GETTING_STARTED("Getting Started", 1),
     BEYOND_THE_BASICS("Beyond the Basics", 2),
-    SCHEMA_MIGRATION("Schema Migration", 3),
-    DATA_ACCESS("Data Access", 4),
-    CACHE("Cache", 5),
-    TEST("Testing", 6),
-    SECURITY("Micronaut Security",7),
-    AUTHORIZATION_CODE("Authorization Code",8),
-    CLIENT_CREDENTIALS("Client Credentials",9),
-    SECRETS_MANAGER("Secrets Manager", 10),
-    PATTERNS("Patterns", 11),
-    EMAIL("Email", 12),
-    KOTLIN("Kotlin", 13),
-    MESSAGING("Messaging", 14),
-    API("API", 15),
-    OPEN_API("OpenAPI", 16),
-    TURBO("Turbo", 17),
-    GRAPHQL("GraphQL", 18),
-    METRICS("Metrics", 19),
-    DISTRIBUTED_TRACING("Distributed Tracing", 20),
-    SERVICE_DISCOVERY("Service Discovery", 21),
-    COMMON_TASKS("Common Tasks", 22),
-    AWS("AWS", 23),
-    AWS_LAMBDA("AWS Lambda", 24),
-    AZURE("Micronaut + Microsoft Azure", 25),
-    GCP("Micronaut + Google Cloud", 26),
-    ORACLE_CLOUD("Micronaut + Oracle Cloud", 27);
+    DISTRIBUTION("Distribution", 3),
+
+    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 4),
+
+    SCHEMA_MIGRATION("Schema Migration", 5),
+    DATA_ACCESS("Data Access", 6),
+    CACHE("Cache", 7),
+    TEST("Testing", 8),
+    SECURITY("Micronaut Security",9),
+    AUTHORIZATION_CODE("Authorization Code",10),
+    CLIENT_CREDENTIALS("Client Credentials",11),
+    SECRETS_MANAGER("Secrets Manager", 12),
+    PATTERNS("Patterns", 13),
+    EMAIL("Email", 14),
+    KOTLIN("Kotlin", 15),
+    MESSAGING("Messaging", 16),
+    API("API", 17),
+    OPEN_API("OpenAPI", 18),
+    TURBO("Turbo", 19),
+    GRAPHQL("GraphQL", 20),
+    METRICS("Metrics", 21),
+    DISTRIBUTED_TRACING("Distributed Tracing", 22),
+    SERVICE_DISCOVERY("Service Discovery", 23),
+    COMMON_TASKS("Common Tasks", 24),
+    OBJECT_STORAGE("Object Storage", 25),
+    AWS("AWS", 26),
+    AWS_LAMBDA("AWS Lambda", 27),
+    AZURE("Micronaut + Microsoft Azure", 28),
+    GCP("Micronaut + Google Cloud", 29),
+    ORACLE_CLOUD("Micronaut + Oracle Cloud", 30);
 
     private final String val;
     private final int order;
@@ -47,6 +52,5 @@ public enum Category implements Ordered {
     @Override
     public int getOrder() {
         return order;
-
     }
 }

@@ -15,11 +15,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
 @MicronautTest // <1>
-internal class GraphQLControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+internal class GraphQLControllerTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun testGraphQLController() {

@@ -13,7 +13,7 @@ image::tokenpropagation.svg[]
 
 We generate a valid JWT in the gateway microservice. Then every microservice in our application is able to validate this JWT. We want every internal request to contain a valid JWT token. If we want to talk to another microservice we need to propagate the valid JWT get received.
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 common:requirements.adoc[]
 
@@ -29,7 +29,7 @@ Create the microservice:
 
 [source,bash]
 ----
-mn @cli-command@ example.micronaut.gateway --build=@build@ --lang=@lang@
+mn @gateway:cli-command@ example.micronaut.gateway --build=@build@ --lang=@lang@
 ----
 
 Add the security-jwt module to the configuration:
@@ -68,7 +68,7 @@ Create a Micronaut HTTP Declarative client:
 source:UserEchoClient[app=intermediate-gateway]
 
 <1> The `@Client` annotation is used with a service id. We will reference the exact service id in the configuration shortly.
-<2> Don't load this bean in the Test environment.
+callout:requires-not-env-test[2]
 <3> Use `@Get` annotation to define the client mapping
 <4> Supply the JWT to the HTTP Authorization header value to the `@Client` method.
 
@@ -107,7 +107,7 @@ Create the microservice:
 
 [source,bash]
 ----
-mn @cli-command@ example.micronaut.userecho --build=@build@ --lang=@lang@
+mn @userecho:cli-command@ example.micronaut.userecho --build=@build@ --lang=@lang@
 ----
 
 Add the security-jwt module to the configuration:
@@ -239,7 +239,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-After creating the native images for both microservices, start them and send the same curl requests as before to check that everything works using GraalVM native images.
+After creating the native executables for both microservices, start them and send the same curl requests as before to check that everything works using GraalVM native executables.
 
 :exclude-for-languages:
 

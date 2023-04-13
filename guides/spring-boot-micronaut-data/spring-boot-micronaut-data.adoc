@@ -1,0 +1,91 @@
+common:header-top.adoc[]
+
+common:requirements.adoc[]
+
+== Introduction
+
+In this guide, you will use https://micronaut-projects.github.io/micronaut-data/latest/guide/#jdbc[Micronaut Data JDBC] within a https://github.com/spring-projects/spring-boot[Spring Boot] application.
+
+common:completesolution.adoc[]
+
+== Generate a Spring Boot Application
+
+Generate a Spring Boot application using https://start.spring.io/#!type=@build@-project&language=java&platformVersion=2.7.3&packaging=jar&jvmVersion=17&groupId=example.micronaut&artifactId=micronautguide&name=micronautguide&description=Demo%20project%20for%20Spring%20Boot%20and%20Micronaut%20Data&packageName=example.micronaut&dependencies=web[Spring Initializr with Spring Web].
+
+== Dependencies
+
+Add the following dependencies as described in https://micronaut-projects.github.io/micronaut-spring/latest/guide/#springBootStarter[Using the Micronaut Spring Boot Starter] to use Micronaut Features within a Spring Boot application.
+
+:dependencies:
+dependency:micronaut-bom[groupId=io.micronaut,scope=annotationProcessor,pom=true,version=@micronautVersion@]
+dependency:micronaut-bom[groupId=io.micronaut,scope=implementation,pom=true,version=@micronautVersion@]
+dependency:micronaut-inject-java[groupId=io.micronaut,scope=annotationProcessor]
+dependency:jakarta.annotation-api[groupId=jakarta.annotation,scope=annotationProcessor,version=@jakarta.annotation-apiVersion@]
+dependency:jakarta.annotation-api[groupId=jakarta.annotation,scope=implementation,version=@jakarta.annotation-apiVersion@]
+dependency:jakarta.persistence-api[groupId=jakarta.persistence,scope=annotationProcessor,version=@jakarta.persistence-apiVersion@]
+dependency:jakarta.persistence-api[groupId=jakarta.persistence,scope=implementation,version=@jakarta.persistence-apiVersion@]
+dependency:micronaut-spring-boot-starter[groupId=io.micronaut.spring,scope=implementation]
+:dependencies:
+
+Moreover, add the following dependencies to use Micronaut Data:
+
+:dependencies:
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data,scope=implementation]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,scope=implementation]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly]
+:dependencies:
+
+== Configuration
+
+Add configuration for an in-memory H2 Database.
+
+resource:application.yml[]
+
+== Mapped Entities with Java Records
+
+Create a Micronaut Data Mapped Entity
+
+source:Book[]
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+<4> Annotate it with `@Nullabe` because it is a generated value.
+
+NOTE: Learn how to leverage Java records for immutable configuration, Micronaut Data Mapped Entities and Projection DTOs in the https://guides.micronaut.io/latest/micronaut-java-records.html[Micronaut Data and Java Records] guide.
+
+== JDBC Repository
+
+Next, create a repository interface to define the operations to access the database. Micronaut Data will implement the interface at compilation time.
+
+source:BookRepository[]
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+== Controller
+
+Create a controller which exposes a GET route at `/books`.
+
+source:BookController[]
+callout:rest-controller[1]
+callout:autowired[number=2,arg0=BookRepository]
+callout:get-mapping[number=3,arg0=/books,arg1=list]
+
+== Test
+
+The following test shows that you can use Micronaut Data JDBC as your persistence solution in a Spring Boot Application.
+
+test:BookControllerTest[]
+
+callout:spring-boot-test[1]
+callout:spring-boot-local-server-port[2]
+callout:autowired[number=3,arg0=TestRestTemplate]
+callout:autowired[number=4,arg0=BookRepository]
+
+common:testAppSpringBoot.adoc[]
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-spring/latest/guide/[Micronaut Spring] and https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data].
+
+common:helpWithMicronaut.adoc[]

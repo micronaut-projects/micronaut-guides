@@ -2,6 +2,8 @@ package example.micronaut;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -14,7 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FruitControllerTest extends BaseMongoDataTest {
+@MicronautTest
+class FruitControllerTest {
+
+    @Inject
+    FruitClient fruitClient;
 
     @Test
     void emptyDatabaseContainsNoFruit() {

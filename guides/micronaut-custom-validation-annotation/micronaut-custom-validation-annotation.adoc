@@ -1,0 +1,81 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Writing the application
+
+In this guide, you will code an annotation - `@E164` - to validate phone numbers.
+
+https://www.twilio.com/docs/glossary/what-e164[E-164]
+
+____
+E.164 is the international telephone numbering plan that ensures each device on the PSTN has globally unique number.
+
+This number allows phone calls and text messages can be correctly routed to individual phones in different countries. E.164 numbers are formatted [+] [country code] [subscriber number including area code] and can have a maximum of fifteen digits.
+____
+
+=== Country Code
+
+Create an enum for the country code. The following enum maps the https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf[ ITU_T recommendation for E.164 assigned country codes].
+
+source:CountryCode[]
+
+And a test for this enum:
+
+test:CountryCodeTest[]
+
+== Phone E164
+
+Create a `Utils` class to validate a phone number.
+
+source:E164Utils[]
+
+and a test for valid and invalid phones:
+
+test:E164UtilsTest[]
+
+== Custom Validation Annotation
+
+Create a custom annotation:
+
+source:E164[]
+
+== Validation Factory
+
+Create a factory that creates a `ConstraintValidator` for the annotation defined in the previous step.
+
+source:CustomValidationFactory[]
+
+callout:factory[1]
+callout:singleton[2]
+
+== Validation Messages
+
+Create a default message for the E164 constraint:
+
+source:CustomValidationMessages[]
+
+== Testing Validation
+
+Create a `Contact` object which uses the custom annotation.
+
+source:Contact[]
+
+Create a test verifies the custom annotation participates in the validation of the object.
+
+test:ContactTest[]
+callout:micronaut-test-start-application-false[1]
+callout:injection[number=2,arg0=MessageSource]
+callout:injection[number=3,arg0=Validator]
+
+common:next.adoc[]
+
+`ContactTest` uses `MessageSource`. Learn about the https://guides.micronaut.io/latest/micronaut-patterns-composite.html[composite pattern] which `MessageSource` uses.
+
+Learn about https://docs.micronaut.io/latest/guide/#beanValidation[Bean Validation] and how to https://guides.micronaut.io/latest/localized-message-source.html[localize your application].
+
+common:helpWithMicronaut.adoc[]

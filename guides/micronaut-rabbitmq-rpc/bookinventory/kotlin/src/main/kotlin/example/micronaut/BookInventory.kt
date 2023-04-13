@@ -1,6 +1,6 @@
 package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class BookInventory(val isbn: String, val stock: Int)

@@ -2,8 +2,15 @@ package example.micronaut
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
+import spock.lang.Specification
 
-class FruitControllerSpec extends BaseMongoDataSpec {
+@MicronautTest
+class FruitControllerSpec extends Specification {
+
+    @Inject
+    FruitClient fruitClient
 
     def "empty database contains no fruit"() {
         expect:

@@ -1,0 +1,129 @@
+external:micronaut-object-storage-base/start.adoc[]
+* An https://aws.amazon.com/[AWS account] with:
+** An IAM user with permissions to create and manage AWS S3 buckets.
+** The AWS CLI configured to use the IAM user above.
+
+common:aws.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Create an Amazon S3 bucket
+
+First, we are going to
+https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/create-bucket.html[create an Amazon S3 bucket]
+using the `aws` CLI:
+
+[source,bash]
+----
+aws s3api create-bucket --bucket micronaut-guide-object-storage --region=us-east-1
+----
+
+WARNING: Bucket names must be unique across all AWS accounts.
+
+[TIP]
+====
+If you want to create the bucket in a region other than `us-east-1`, you need additional parameters. For example, to
+create the bucket in the `eu-west-3` region:
+
+[source,bash]
+----
+aws s3api create-bucket \
+          --bucket micronaut-guide-object-storage \
+          --region eu-west-3 \
+          --create-bucket-configuration LocationConstraint=eu-west-3
+----
+====
+
+Then, configure the bucket in `application.yml`:
+
+resource:application.yml[tag=object-storage]
+
+== Controller API
+
+external:micronaut-object-storage-base/controller-api.adoc[]
+
+source:ProfilePicturesController[tags=begin-class|end-class]
+
+callout:controller[number=1,arg0=/pictures]
+callout:executes-on[2]
+callout:object-storage-operations[number=3,arg0=aws,arg1=AwsS3Operations]
+callout:object-storage-host-resolver[4]
+
+=== Upload endpoint
+
+Implement the upload endpoint by receiving the file from the HTTP client via `CompletedFileUpload`, and the `userId` path
+parameter. Upload it to S3 using
+https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3Operations.html[AwsS3Operations],
+and then return its `ETag` in an HTTP response header to the client:
+
+source:ProfilePicturesController[tags=upload,indent=0]
+
+callout:object-storage-key[1]
+callout:object-storage-request[2]
+callout:object-storage-upload-response[number=3,arg0=https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutObjectResponse.html,arg1=PutObjectResponse]
+<4> The upload can be customised by using Amazon's https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutObjectRequest.Builder.html[PutObjectRequest.Builder] methods.
+callout:object-storage-location[5]
+callout:object-storage-response[6]
+
+=== Download endpoint
+
+external:micronaut-object-storage-base/download-endpoint.adoc[]
+
+source:ProfilePicturesController[tags=download,indent=0]
+<1> The retrieve operation returns an `ObjectStorageEntry`, in this case an
+https://micronaut-projects.github.io/micronaut-object-storage/latest/api/io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html[AwsS3ObjectStorageEntry],
+which allows accessing the AWS-specific
+https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetObjectResponse.html[GetObjectResponse]
+object in case you need more details about the object.
+callout:object-storage-entry-to-response[number=2,arg0=AwsS3ObjectStorageEntry]
+callout:object-storage-etag[3]
+
+external:micronaut-object-storage-base/etag.adoc[]
+
+=== Delete endpoint
+
+external:micronaut-object-storage-base/delete-endpoint.adoc[]
+
+common:runapp.adoc[]
+
+common:graal-with-plugins.adoc[]
+
+== Testing
+
+We can test our application from the command line.
+
+=== Uploading a profile picture
+
+external:micronaut-object-storage-base/testing-upload.adoc[]
+
+We can use the `aws` CLI to verify that the file has actually been uploaded to an S3 bucket:
+
+[source,bash]
+----
+aws s3 ls s3://micronaut-guide-object-storage/
+----
+
+=== Download a profile picture
+
+external:micronaut-object-storage-base/testing-download.adoc[]
+
+=== Delete a profile picture
+
+[source,bash]
+----
+aws s3 ls s3://micronaut-guide-object-storage/
+----
+
+=== Cleanup
+
+Once you are done with this guide, you can remove the bucket from S3 to not leave stale resources:
+
+[source,bash]
+----
+aws s3api delete-bucket --bucket micronaut-guide-object-storage --region eu-west-3
+----
+
+external:micronaut-object-storage-base/end.adoc[]
+* Discover https://aws.amazon.com/s3/[Amazon Simple Storage Service (Amazon S3)].

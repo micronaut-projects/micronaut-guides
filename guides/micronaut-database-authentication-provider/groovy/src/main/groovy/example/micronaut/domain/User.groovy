@@ -3,9 +3,9 @@ package example.micronaut.domain
 import example.micronaut.UserState
 import grails.gorm.annotation.Entity
 import org.grails.datastore.gorm.GormEntity
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 @Entity // <1>
 class User implements GormEntity<User>, UserState { // <2>
     String email

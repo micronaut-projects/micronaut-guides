@@ -4,23 +4,7 @@ common:requirements.adoc[]
 
 common:completesolution.adoc[]
 
-common:mosquitto.adoc[]
-
-For example, in MacOS:
-
-[source,bash]
-----
-/usr/local/opt/mosquitto/sbin/mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf
-
-1646389659: mosquitto version 2.0.14 starting
-1646389659: Config loaded from /usr/local/etc/mosquitto/mosquitto.conf.
-1646389659: Starting in local only mode. Connections will only be possible from clients running on this machine.
-1646389659: Create a configuration file which defines a listener to allow remote access.
-1646389659: For more details see https://mosquitto.org/documentation/authentication-methods/
-1646389659: Opening ipv4 listen socket on port 1883.
-1646389659: Opening ipv6 listen socket on port 1883.
-1646389659: mosquitto version 2.0.14 running
-----
+common:test-resources-mosquitto.adoc[]
 
 == Writing the CLI (Command Line Interface) Application
 
@@ -37,11 +21,13 @@ common:build-lang-arguments.adoc[]
 
 common:default-package.adoc[]
 
+Rename this `micronautguide` directory to `cli`.
+
 If you use Micronaut Launch, select Micronaut Application as application type and add @cli:features-words@ features.
 
 diffLink:[app=cli]
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 ### Create an MqttPublisher
 
@@ -76,7 +62,10 @@ Replace the generated test with this:
 
 test:MicronautguideCommandTest[app=cli]
 
-Configure the MQTT server URI in configuration:
+callout:mqtt-subscriber[1]
+callout:mqtt-topic-listen[2]
+
+The MQTT server URI is configured by referencing the properties when we used when we set up Mosquitto via <<Test Resources, Test Resources>>:
 
 resource:application.yml[app=cli,tag=mqtt]
 
@@ -95,26 +84,37 @@ common:build-lang-arguments.adoc[]
 
 common:default-package.adoc[]
 
+Rename this `micronautguide` directory to `app`.
+
 If you use Micronaut Launch, select Micronaut Application as application type and add @app:features-words@ features.
 
 diffLink:[app=cli]
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
-### Configuration
+=== Configuration
 
-Configure the MQTT server URI in configuration:
+The MQTT server URI is configured by referencing the properties when we used when we set up Mosquitto via <<Test Resources, Test Resources>>:
 
 resource:application.yml[app=app,tag=mqtt]
 
-### Create Subscriber
+=== Create Subscriber
 
 source:TemperatureListener[app=app]
 
 callout:mqtt-subscriber[1]
 callout:mqtt-topic[2]
 
-== Run both applications
+=== Add test
+
+test:SubscriptionTest[app=app]
+callout:micronaut-test[1]
+callout:property[2]
+callout:requires-property[3]
+callout:mqtt-publisher[4]
+callout:mqtt-topic[5]
+
+== Running the Application
 
 === Run the Subscriber App
 
@@ -124,19 +124,11 @@ Keep it running. Once you publish a topic with the CLI application, you will see
 
 === Run the CLI
 
-==== Generate a JAR
-
-common:shade[]
-
 Run the CLI command, which will publish a temperature at startup.
 
 [source, bash]
 ----
-java -jar build/libs/micronautguide-0.1-all.jar -t 212 -s Fahrenheit
-12:00:49.668 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [cli]
-12:00:50.557 [main] TRACE i.m.m.i.AbstractMqttIntroductionAdvice - Publishing the following message to house/livingroom/temperature
-12:00:50.558 [main] TRACE i.m.m.i.AbstractMqttIntroductionAdvice - Qos = 1, Retained = false, Payload = 100.00
-Topic published
+./gradlew run --args="-t 212 -s Fahrenheit"
 ----
 
 The subscriber receives the MQTT topics, as you will see in the logs:
@@ -152,7 +144,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-Generate GraalVM native images for both the CLI and the messaging application, then execute both. Publish a temperature, and you will see it in the subscriber logs.
+Generate GraalVM native executables for both the CLI and the messaging application, then execute both. Publish a temperature, and you will see it in the subscriber logs.
 
 :exclude-for-languages:
 

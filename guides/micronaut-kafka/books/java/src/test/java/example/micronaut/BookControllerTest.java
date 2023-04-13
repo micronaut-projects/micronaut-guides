@@ -9,14 +9,9 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.micronaut.test.support.TestPropertyProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import jakarta.inject.Inject;
 import java.util.Collection;
@@ -34,36 +29,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-@Testcontainers // <1>
 @MicronautTest
-@TestInstance(PER_CLASS) // <2>
-class BookControllerTest implements TestPropertyProvider { // <3>
+@TestInstance(PER_CLASS) // <1>
+class BookControllerTest {
 
     private static final Collection<Book> received = new ConcurrentLinkedDeque<>();
 
-    @Container
-    static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:latest")); // <4>
-
     @Inject
-    AnalyticsListener analyticsListener; // <5>
+    AnalyticsListener analyticsListener; // <2>
 
     @Inject
     @Client("/")
-    HttpClient client; // <6>
+    HttpClient client; // <3>
 
     @Test
     void testMessageIsPublishedToKafkaWhenBookFound() {
         String isbn = "1491950358";
 
-        Optional<Book> result = retrieveGet("/books/" + isbn); // <7>
+        Optional<Book> result = retrieveGet("/books/" + isbn); // <4>
         assertNotNull(result);
         assertTrue(result.isPresent());
         assertEquals(isbn, result.get().getIsbn());
 
-        await().atMost(5, SECONDS).until(() -> !received.isEmpty()); // <8>
+        await().atMost(5, SECONDS).until(() -> !received.isEmpty()); // <5>
 
-        assertEquals(1, received.size()); // <9>
+        assertEquals(1, received.size()); // <6>
         Book bookFromKafka = received.iterator().next();
         assertNotNull(bookFromKafka);
         assertEquals(isbn, bookFromKafka.getIsbn());
@@ -75,16 +65,8 @@ class BookControllerTest implements TestPropertyProvider { // <3>
             retrieveGet("/books/INVALID");
         });
 
-        Thread.sleep(5_000); // <10>
+        Thread.sleep(5_000); // <7>
         assertEquals(0, received.size());
-    }
-
-    @NonNull
-    @Override
-    public Map<String, String> getProperties() {
-        return Collections.singletonMap(
-                "kafka.bootstrap.servers", kafka.getBootstrapServers() // <11>
-        );
     }
 
     @AfterEach

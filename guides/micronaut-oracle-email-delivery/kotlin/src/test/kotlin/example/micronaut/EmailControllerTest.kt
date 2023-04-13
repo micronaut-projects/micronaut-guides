@@ -30,11 +30,7 @@ import javax.mail.Message
 import javax.validation.Valid
 
 @MicronautTest // <1>
-class EmailControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
 
     var emails: MutableList<Email> = mutableListOf()
 

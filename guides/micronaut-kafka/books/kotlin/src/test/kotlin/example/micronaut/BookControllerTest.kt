@@ -9,7 +9,6 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -19,45 +18,37 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.testcontainers.containers.KafkaContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.DockerImageName
 import java.util.Optional
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.TimeUnit.SECONDS
 import jakarta.inject.Inject
 
-@Testcontainers // <1>
 @MicronautTest
-@TestInstance(PER_CLASS) // <2>
-class BookControllerTest : TestPropertyProvider { // <3>
+@TestInstance(PER_CLASS) // <1>
+class BookControllerTest {
 
     companion object {
         val received: MutableCollection<Book> = ConcurrentLinkedDeque()
     }
 
-    @Container
-    val kafka = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest")) // <4>
-
     @Inject
-    lateinit var analyticsListener: AnalyticsListener // <5>
+    lateinit var analyticsListener: AnalyticsListener // <2>
 
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <6>
+    @Inject // <3>
+    @field:Client("/") // <4>
+    lateinit var client: HttpClient // <5>
 
     @Test
     fun testMessageIsPublishedToKafkaWhenBookFound() {
         val isbn = "1491950358"
 
-        val result : Optional<Book> = retrieveGet("/books/" + isbn) as Optional<Book> // <7>
+        val result : Optional<Book> = retrieveGet("/books/" + isbn) as Optional<Book> // <6>
         assertNotNull(result)
         assertTrue(result.isPresent)
         assertEquals(isbn, result.get().isbn)
 
-        await().atMost(5, SECONDS).until { !received.isEmpty() } // <8>
-        assertEquals(1, received.size) // <9>
+        await().atMost(5, SECONDS).until { !received.isEmpty() } // <7>
+        assertEquals(1, received.size) // <8>
 
         val bookFromKafka = received.iterator().next()
         assertNotNull(bookFromKafka)
@@ -68,13 +59,8 @@ class BookControllerTest : TestPropertyProvider { // <3>
     fun testMessageIsNotPublishedToKafkaWhenBookNotFound() {
         assertThrows(HttpClientResponseException::class.java) { retrieveGet("/books/INVALID") }
 
-        Thread.sleep(5_000); // <10>
+        Thread.sleep(5_000); // <9>
         assertEquals(0, received.size);
-    }
-
-    override fun getProperties(): Map<String, String> {
-        kafka.start()
-        return mapOf("kafka.bootstrap.servers" to kafka.bootstrapServers) // <11>
     }
 
     @AfterEach

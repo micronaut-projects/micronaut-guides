@@ -3,9 +3,9 @@ package example.micronaut
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 @CompileStatic
 @EqualsAndHashCode
 @ToString

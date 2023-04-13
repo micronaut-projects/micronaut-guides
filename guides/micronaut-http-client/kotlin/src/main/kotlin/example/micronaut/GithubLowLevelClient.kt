@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono
 import java.net.URI
 
 @Singleton // <1>
-class GithubLowLevelClient(@param:Client(GithubConfiguration.GITHUB_API_URL) private val httpClient: HttpClient,  // <2>
+class GithubLowLevelClient(@param:Client(id = "github") private val httpClient: HttpClient,  // <2>
                            configuration: GithubConfiguration) {  // <3>
     private val uri: URI = UriBuilder.of("/repos")
         .path(configuration.organization)

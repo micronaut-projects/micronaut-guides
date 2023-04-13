@@ -1,7 +1,7 @@
 # Micronaut Guides Tweets CLI
 
 
-This folder contains a Micronaut CLI application which generates a list of Tweets for the guides exposed at [latest/guides.json](https://guides.micronaut.io/latest/guides.json)
+This directory contains a Micronaut CLI application which generates a list of Tweets for the guides exposed at [latest/guides.json](https://guides.micronaut.io/latest/guides.json)
 
 to generate the CLI application run. 
 

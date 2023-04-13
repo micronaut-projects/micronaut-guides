@@ -12,13 +12,9 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.Map;
@@ -27,28 +23,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @MicronautTest // <1>
-@Testcontainers // <2>
-@TestInstance(PER_CLASS) // <3>
-class BooksControllerTest implements TestPropertyProvider { // <3>
+@TestInstance(PER_CLASS) // <2>
+class BooksControllerTest { // <3>
 
     @Inject
     @Client("/")
     HttpClient httpClient; // <4>
-
-    @Container // <2>
-    static GenericContainer dynamoDBLocal =
-            new GenericContainer("amazon/dynamodb-local")
-                    .withExposedPorts(8000);
-    @NonNull
-    @Override
-    public Map<String, String> getProperties() { // <3>
-        if (!dynamoDBLocal.isRunning()) {
-            dynamoDBLocal.start();
-        }
-        return CollectionUtils.mapOf(
-                "dynamodb-local.host", "localhost",
-                        "dynamodb-local.port", dynamoDBLocal.getFirstMappedPort());
-    }
 
     private static HttpRequest<?> saveRequest(String isbn, String name) {
         return HttpRequest.POST("/books",
@@ -98,7 +78,7 @@ class BooksControllerTest implements TestPropertyProvider { // <3>
         List<Book> books = client.retrieve(HttpRequest.GET("/books"),
                 Argument.listOf(Book.class));
         assertEquals(3, books.size());
-        
+
         assertTrue(books.stream().anyMatch(it ->
                 it.getIsbn().equals(continuousDeliveryIsbn) &&
                         it.getName().equals(continuousDeliveryName)));

@@ -2,14 +2,13 @@ package example.micronaut
 
 import io.micronaut.http.HttpStatus
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import spock.lang.Specification
 
 import static io.micronaut.http.HttpStatus.CREATED
 
 @MicronautTest
-class FruitControllerSpec extends Specification implements TestPropertyProvider {
+class FruitControllerSpec extends Specification {
 
     @Inject
     FruitClient fruitClient
@@ -47,15 +46,5 @@ class FruitControllerSpec extends Specification implements TestPropertyProvider 
 
         then:
         fruits.find { it.description == 'Keeps the doctor away' }
-    }
-
-    void cleanupSpec() {
-        MongoDbUtils.closeMongoDb()
-    }
-
-    @Override
-    Map<String, String> getProperties() {
-        MongoDbUtils.startMongoDb()
-        ['mongodb.uri': MongoDbUtils.mongoDbUri]
     }
 }

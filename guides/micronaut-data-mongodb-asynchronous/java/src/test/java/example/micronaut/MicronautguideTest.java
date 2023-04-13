@@ -1,13 +1,20 @@
 package example.micronaut;
 
+import io.micronaut.runtime.EmbeddedApplication;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import jakarta.inject.Inject;
 
-class MicronautguideTest extends BaseMongoDataTest {
+@MicronautTest(transactional = false)
+class MicronautguideTest {
+
+    @Inject
+    EmbeddedApplication<?> application;
 
     @Test
     void testItWorks() {
-        Assertions.assertTrue(application.isRunning());
+        assertTrue(application.isRunning());
     }
 
 }

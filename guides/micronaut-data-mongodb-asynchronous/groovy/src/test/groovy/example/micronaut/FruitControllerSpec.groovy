@@ -2,10 +2,17 @@ package example.micronaut
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
+import spock.lang.Specification
 
-class FruitControllerSpec extends BaseMongoDataSpec {
+@MicronautTest(transactional = false) // <1>
+class FruitControllerSpec extends Specification {
 
-    def "empty database contains no fruit"() {
+    @Inject
+    FruitClient fruitClient
+
+    void "empty database contains no fruit"() {
         expect:
         fruitClient.list().empty
     }
@@ -48,7 +55,7 @@ class FruitControllerSpec extends BaseMongoDataSpec {
         fruits*.description.toSet() == ['Keeps the doctor away', 'Yellow and curved'] as Set<String>
     }
 
-    def "search works as expected"() {
+    void "search works as expected"() {
         given:
         fruitClient.save(new Fruit('apple', 'Keeps the doctor away'))
         fruitClient.save(new Fruit('pineapple', 'Delicious'))

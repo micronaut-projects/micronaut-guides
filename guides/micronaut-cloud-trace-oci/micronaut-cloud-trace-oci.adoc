@@ -1,0 +1,114 @@
+external:micronaut-cloud-trace-base/start.adoc[]
+
+common:oracle-cloud-account.adoc[]
+
+external:micronaut-cloud-trace-base/create-app.adoc[]
+
+=== Create APM Domain
+
+Open the Oracle Cloud Menu and click "Observability & Management", and then "Administration" under "Application Performance...":
+
+
+image::oraclefn/logs1.png[]
+
+Click "Create APM Domain":
+
+
+image::oraclefn/logs2.png[]
+
+
+Name your domain, choose a compartment, and enter a description.
+
+
+image::oci-tracing/create-apm-domain.png[]
+
+{empty} +
+
+Once the domain is created, view the domain details. Here you’ll need to grab a few values, so copy the data upload endpoint (#1) and public key (#2).
+
+{empty} +
+
+image::oci-tracing/endpoint.png[]
+
+{empty} +
+
+Now we have what we need to construct a URL to plug in to our application config files. The Collector URL format requires us to construct a URL by using the data upload endpoint as our base URL and generating the path based on some choices, including values from our private or public key. The format is https://docs.oracle.com/en-us/iaas/application-performance-monitoring/doc/configure-open-source-tracing-systems.html#APMGN-GUID-B5EDE254-C854-436D-B844-B986A4E077AA[documented here]. Once we’ve constructed the URL path, we can add it to our `application.yml` config.
+
+
+=== Configure Tracer
+
+Use Micronaut CLI or Launch to create your application. You will see that the necessary OpenTelemetry configuration are automatically added to your `application.yml` file. You will have to change the value of the zipkin endpoint configuration variable.
+
+resource:application.yml[tag=otel-zipkin]
+<1> The zipkin exporter URL mentioned in the previous step
+
+== Run the Application
+
+The application can be deployed to Oracle Cloud.
+
+Traces can be sent to the Oracle Cloud APM Trace Explorer outside the Oracle Cloud.
+
+This allows us to run the application locally and see the traces in the Oracle Cloud APM Trace Explorer.
+
+common:runapp-instructions.adoc[]
+
+== Traces
+
+Open the https://cloud.oracle.com/apm/apm-traces[Oracle APM Tracing Explorer]. Once the page is loaded, select the compartment that you selected in above step (#1), choose the APM domain that you created (#2), and run the query (#3).
+
+image::oci-tracing/trace-list.png[]
+
+{empty} +
+
+If your traces aren't displayed yet, give it a moment. It takes a few seconds for the traces to show up in the explorer. If no spans show up, run the query again by pressing the "Run" button.
+
+=== Get Item Counts
+
+[source, bash]
+----
+curl http://localhost:8080/store/inventory/laptop
+----
+{empty} +
+
+image::oci-tracing/inventory-item.png[]
+
+{empty} +
+
+Each span is represented by a blue bar.
+
+=== Order Item
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/store/order" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{"item":"laptop", "count":5}'
+----
+
+{empty} +
+
+image::oci-tracing/order-item.png[]
+
+{empty} +
+
+Selecting a different span will show you the labels (a.k.a. attributes/tags) and other details of the span.
+
+=== Get Inventory
+
+[source, bash]
+----
+curl http://localhost:8080/store/inventory
+----
+
+{empty} +
+
+image::oci-tracing/inventory-all.png[]
+
+{empty} +
+
+Looking at the trace, we can conclude that retrieving the items sequentially might not be the best design choice.
+
+external:micronaut-cloud-trace-base/end.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud] integration.
+

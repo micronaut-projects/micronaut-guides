@@ -10,11 +10,14 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.client.HttpClient;
+import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest
 @Property(name = "spec.name", value = "controller-isolation")
-public class ControllerIsolationTest extends BaseMongoDataTest {
+public class ControllerIsolationTest {
+
+    @Inject
+    @Client("/")
+    HttpClient httpClient;
 
     @Test
     void checkSerialization() {

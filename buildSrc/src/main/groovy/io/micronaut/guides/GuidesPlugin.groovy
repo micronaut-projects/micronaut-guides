@@ -19,7 +19,6 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Predicate
 import java.util.stream.Collectors
 
@@ -42,8 +41,6 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String KEY_DOC = "doc"
     private static final String COMMA = ","
     private static final String TASK_SUFFIX_BUILD = "Build"
-
-    private static final AtomicBoolean firstTestRunnerTask = new AtomicBoolean(true)
 
     @Override
     void apply(Project project) {
@@ -208,8 +205,6 @@ class GuidesPlugin implements Plugin<Project> {
             it.testScript.set(testScriptTask.flatMap { t -> t.scriptFile })
             it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug}"))
 
-            it.firstTask.set(firstTestRunnerTask)
-
             // We tee the script output to a file, this is the cached result
             it.outputFile.set(codeDirectory.map(d -> d.file("output.log")))
         }
@@ -372,6 +367,9 @@ class GuidesPlugin implements Plugin<Project> {
             it.guidesGenerator = projectGenerator
             it.slug.set(metadata.slug)
             it.inputDirectory.set(guidesDir.dir(metadata.slug))
+            if (metadata.base != null) {
+                it.baseInputDirectory.set(guidesDir.dir(metadata.base))
+            }
             it.outputDir.set(codeDir.map(s -> s.dir(metadata.slug)))
             it.guidesGenerator = projectGenerator
             it.metadata = metadata

@@ -1,10 +1,18 @@
 package example.micronaut
 
-class MicronautguideSpec extends BaseMongoDataSpec {
+import io.micronaut.runtime.EmbeddedApplication
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
+import spock.lang.Specification
 
-    void 'test it works'() {
+@MicronautTest(transactional = false)
+class MicronautguideSpec extends Specification {
+
+    @Inject
+    EmbeddedApplication<?> application
+
+    void "test it works"() {
         expect:
-        application.running
+        application.isRunning()
     }
-
 }
