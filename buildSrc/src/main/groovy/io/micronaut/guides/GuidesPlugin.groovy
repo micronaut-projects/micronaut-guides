@@ -388,6 +388,6 @@ class GuidesPlugin implements Plugin<Project> {
     }
 
     private static String quote(it) {
-        $/"$it"/$
+        '"' + it + '"'
     }
 }
