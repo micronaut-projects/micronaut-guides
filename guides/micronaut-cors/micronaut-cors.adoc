@@ -20,7 +20,7 @@ resource:../../../index.html[]
 
 Add a Controller, which the static website consumes via Javascript.
 
-external:hello-base/hellocontroller.adoc[]
+external:micronaut-cors/hellocontrollercors.adoc[]
 
 common:runapp.adoc[]
 
@@ -54,9 +54,28 @@ Open `http://127.0.0.1:8000/`, and you will see an error such as:
 
 image::cors.png[]
 
-=== Enable CORS Configuration
+=== Enable CORS Configuration using the CrossOrigin annotation
+Enable https://docs.micronaut.io/latest/guide/#annotationBasedCors[Annotation-based CORS Configuration]
 
-Enable https://docs.micronaut.io/latest/guide/#cors[CORS configuration]
+The @api@/io/micronaut/http/server/cors/CrossOrigin.html[@CrossOrigin] annotation enables CORS.
+
+Re-enable the `@CrossOrigin` annotation you commented out in the prior step.
+
+Restart the Micronaut application.
+
+Refresh the UI in your browser, and you should see `Hello World` and no errors in the console.
+
+Change the annotation value to a different URL (e.g. from port 8000 to 8001), restart the Micronaut application, and refresh the browser to verify that it's no longer allowed.
+
+The example shown applies to a specific endpoint in the Controller. You can move the CrossOrigin annotation from the controller method to the controller class itself. This provides a somewhat more course-grained configuration, enabling CORS for all end points defined by the controller.
+
+=== Enable CORS Configuration using application configuration
+
+For an even more course-grained CORS configuration, one can use application configuration to enable CORS for all endpoints in the application, regardless of controller.
+
+Enable https://docs.micronaut.io/latest/guide/#corsConfiguration[CORS via Application Configuration]
+
+Before proceeding, disable the annotation-based CORs configuration again, by removing our commenting out the `@CrossOrigin` annotation in the controller.
 
 resource:application.yml[tag=cors]
 
