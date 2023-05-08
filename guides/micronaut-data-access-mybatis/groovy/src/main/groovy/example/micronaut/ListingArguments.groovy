@@ -36,32 +36,32 @@ class ListingArguments {
         this.order = order
     }
 
-    Optional<Integer> getOffset() {
-        Optional.ofNullable(offset);
+    Integer getOffset() {
+        offset
     }
 
     void setOffset(@Nullable Integer offset) {
         this.offset = offset
     }
 
-    Optional<Integer> getMax() {
-        Optional.ofNullable(max)
+    Integer getMax() {
+        max
     }
 
     void setMax(@Nullable Integer max) {
         this.max = max
     }
 
-    Optional<String> getSort() {
-        Optional.ofNullable(sort)
+    String getSort() {
+        sort
     }
 
     void setSort(@Nullable String sort) {
         this.sort = sort
     }
 
-    Optional<String> getOrder() {
-        Optional.ofNullable(order)
+    String getOrder() {
+        order
     }
 
     void setOrder(@Nullable String order) {

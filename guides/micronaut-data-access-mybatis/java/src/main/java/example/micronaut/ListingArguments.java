@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.util.Optional;
-import java.util.Objects;
 
 @Serdeable
 public class ListingArguments {
@@ -37,32 +36,36 @@ public class ListingArguments {
         this.order = order;
     }
 
-    public Optional<Integer> getOffset() {
-        return Optional.ofNullable(offset);
+    @Nullable
+    public Integer getOffset() {
+        return offset;
     }
 
     public void setOffset(@Nullable Integer offset) {
         this.offset = offset;
     }
 
-    public Optional<Integer> getMax() {
-        return Optional.ofNullable(max);
+    @Nullable
+    public Integer getMax() {
+        return max;
     }
 
     public void setMax(@Nullable Integer max) {
         this.max = max;
     }
 
-    public Optional<String> getSort() {
-        return Optional.ofNullable(sort);
+    @Nullable
+    public String getSort() {
+        return sort;
     }
 
     public void setSort(@Nullable String sort) {
         this.sort = sort;
     }
 
-    public Optional<String> getOrder() {
-        return Optional.ofNullable(order);
+    @Nullable
+    public String getOrder() {
+        return order;
     }
 
     public void setOrder(@Nullable String order) {
