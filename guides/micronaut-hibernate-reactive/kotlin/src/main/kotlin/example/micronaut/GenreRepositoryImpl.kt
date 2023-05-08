@@ -7,7 +7,7 @@ import org.hibernate.reactive.stage.Stage
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import javax.persistence.PersistenceException
+import jakarta.persistence.PersistenceException
 
 
 @Singleton // <1>

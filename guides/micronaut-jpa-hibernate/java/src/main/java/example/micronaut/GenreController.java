@@ -11,7 +11,7 @@ import io.micronaut.http.annotation.Put;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;

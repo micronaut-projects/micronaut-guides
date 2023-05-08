@@ -4,9 +4,9 @@ import example.micronaut.domain.Genre
 import io.micronaut.transaction.annotation.ReadOnly
 import jakarta.inject.Singleton
 
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceException
-import javax.persistence.TypedQuery
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceException
+import jakarta.persistence.TypedQuery
 import javax.transaction.Transactional
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
