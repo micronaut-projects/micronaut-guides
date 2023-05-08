@@ -5,6 +5,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.starter.build.dependencies.Coordinate;
 import io.micronaut.starter.build.dependencies.DefaultPomDependencyVersionResolver;
+import io.micronaut.starter.build.dependencies.StarterCoordinates;
 import jakarta.inject.Singleton;
 
 import java.util.Map;
@@ -23,6 +24,6 @@ public class DefaultPomDependencyVersionResolverReplacement extends DefaultPomDe
     @Override
     @NonNull
     public Optional<Coordinate> resolve(@NonNull String artifactId) {
-        return Optional.ofNullable(coordinates.get(artifactId));
+        return Optional.ofNullable(coordinates.computeIfAbsent(artifactId, k -> StarterCoordinates.ALL_COORDINATES.get(artifactId)));
     }
 }

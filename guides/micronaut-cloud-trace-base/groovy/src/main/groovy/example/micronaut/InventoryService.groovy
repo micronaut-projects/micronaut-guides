@@ -1,7 +1,7 @@
 package example.micronaut
 
-import io.opentelemetry.extension.annotations.SpanAttribute
-import io.opentelemetry.extension.annotations.WithSpan
+import io.opentelemetry.instrumentation.annotations.SpanAttribute
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
 import jakarta.inject.Singleton

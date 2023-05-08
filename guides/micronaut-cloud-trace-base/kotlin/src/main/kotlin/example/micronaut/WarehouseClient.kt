@@ -7,8 +7,8 @@ import io.micronaut.http.annotation.QueryValue
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.tracing.annotation.ContinueSpan
 import io.micronaut.tracing.annotation.SpanTag
-import io.opentelemetry.extension.annotations.SpanAttribute
-import io.opentelemetry.extension.annotations.WithSpan
+import io.opentelemetry.instrumentation.annotations.SpanAttribute
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Client("/warehouse") // <1>
 interface WarehouseClient {
