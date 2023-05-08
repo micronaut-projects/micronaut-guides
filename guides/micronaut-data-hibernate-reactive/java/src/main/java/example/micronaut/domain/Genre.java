@@ -2,7 +2,7 @@ package example.micronaut.domain;
 
 import io.micronaut.serde.annotation.Serdeable;
 import javax.persistence.GenerationType;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;

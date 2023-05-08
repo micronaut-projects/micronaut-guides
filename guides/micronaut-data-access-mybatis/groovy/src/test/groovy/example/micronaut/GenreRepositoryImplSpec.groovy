@@ -5,7 +5,7 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
 
-import javax.validation.ConstraintViolationException
+import jakarta.validation.ConstraintViolationException
 
 @MicronautTest
 class GenreRepositoryImplSpec extends Specification {

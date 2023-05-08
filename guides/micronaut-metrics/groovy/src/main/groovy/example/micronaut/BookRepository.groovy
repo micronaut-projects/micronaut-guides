@@ -4,7 +4,7 @@ import io.micronaut.core.annotation.NonNull
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.repository.CrudRepository
 
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 import static io.micronaut.data.model.query.builder.sql.Dialect.H2
 

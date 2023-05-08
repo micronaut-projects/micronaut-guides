@@ -3,7 +3,7 @@ package example.micronaut.genre
 import example.micronaut.ListingArguments
 import example.micronaut.domain.Genre
 import java.util.Optional
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 interface GenreRepository {
 

@@ -4,9 +4,9 @@ import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.http.uri.UriBuilder
 import java.net.URI
 import java.util.Optional
-import javax.validation.constraints.Pattern
-import javax.validation.constraints.Positive
-import javax.validation.constraints.PositiveOrZero
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.PositiveOrZero
 
 @Serdeable
 class ListingArguments(

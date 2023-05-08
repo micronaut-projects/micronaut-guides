@@ -8,7 +8,7 @@ import io.micronaut.data.annotation.Relation
 import io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE
 import java.time.LocalDateTime
 import java.util.UUID
-import javax.validation.constraints.Size
+import jakarta.validation.constraints.Size
 
 @MappedEntity("GAME_STATE")
 class GameState(

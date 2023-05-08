@@ -3,7 +3,7 @@ package example.micronaut;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Introspected;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Introspected
 public class Book {

@@ -3,7 +3,7 @@ package example.micronaut;
 import io.micronaut.test.support.TestPropertyProvider;
 import org.junit.jupiter.api.io.TempDir;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;

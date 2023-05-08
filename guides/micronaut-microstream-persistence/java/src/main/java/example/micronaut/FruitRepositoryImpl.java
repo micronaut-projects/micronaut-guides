@@ -7,9 +7,9 @@ import io.micronaut.microstream.annotations.StoreParams;
 import io.micronaut.microstream.annotations.StoreReturn;
 import jakarta.inject.Singleton;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Map;
 

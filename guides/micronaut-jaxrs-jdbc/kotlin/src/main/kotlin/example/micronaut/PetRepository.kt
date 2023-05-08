@@ -4,7 +4,7 @@ import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import java.util.*
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @JdbcRepository(dialect = Dialect.MYSQL) // <1>
 interface PetRepository : CrudRepository<Pet, Long> { // <2>

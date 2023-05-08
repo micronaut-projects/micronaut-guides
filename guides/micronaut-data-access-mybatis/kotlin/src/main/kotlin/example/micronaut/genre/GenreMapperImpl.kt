@@ -4,9 +4,9 @@ import example.micronaut.domain.Genre
 import jakarta.inject.Singleton
 import org.apache.ibatis.session.SqlSession
 import org.apache.ibatis.session.SqlSessionFactory
-import javax.validation.constraints.Pattern
-import javax.validation.constraints.Positive
-import javax.validation.constraints.PositiveOrZero
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.PositiveOrZero
 
 @Singleton // <1>
 open class GenreMapperImpl(private val sqlSessionFactory: SqlSessionFactory) : GenreMapper { // <2>

@@ -5,7 +5,7 @@ import io.micronaut.core.annotation.NonNull
 import io.micronaut.data.annotation.Join
 import io.micronaut.data.repository.CrudRepository
 
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotNull
 
 import static io.micronaut.data.annotation.Join.Type.FETCH
 

@@ -3,8 +3,8 @@ package example.micronaut
 import groovy.transform.CompileStatic
 import jakarta.inject.Singleton
 
-import javax.validation.ConstraintViolation
-import javax.validation.Path
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.Path
 
 @CompileStatic
 @Singleton

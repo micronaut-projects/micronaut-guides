@@ -9,8 +9,8 @@ import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.PageableRepository
 
 import javax.transaction.Transactional
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 
 @JdbcRepository(dialect = Dialect.MYSQL) // <1>
 abstract class GenreRepository implements PageableRepository<Genre, Long> { // <2>

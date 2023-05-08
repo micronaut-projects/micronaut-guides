@@ -4,7 +4,7 @@ import io.micronaut.core.annotation.NonNull
 import groovy.transform.CompileStatic
 
 import jakarta.inject.Singleton
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
 @Singleton // <1>

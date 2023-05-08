@@ -10,7 +10,7 @@ import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import io.micronaut.http.client.annotation.Client
 import java.util.Optional
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Client("/fruits")
 interface FruitClient {

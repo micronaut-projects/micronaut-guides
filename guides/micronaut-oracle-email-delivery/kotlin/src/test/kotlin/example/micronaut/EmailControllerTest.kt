@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.function.Consumer
 import javax.mail.Message
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @MicronautTest // <1>
 class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>

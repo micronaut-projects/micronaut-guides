@@ -14,7 +14,7 @@ import jakarta.inject.Singleton
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 import java.util.function.Consumer
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Requires(property = "spec.name", value = "MailControllerTest") // <1>
 @Singleton

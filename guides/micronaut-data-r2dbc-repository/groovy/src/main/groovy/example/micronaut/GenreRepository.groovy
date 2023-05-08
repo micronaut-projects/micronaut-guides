@@ -1,7 +1,7 @@
 package example.micronaut
 
 import javax.transaction.Transactional
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 import example.micronaut.domain.Genre
 import io.micronaut.data.annotation.Id

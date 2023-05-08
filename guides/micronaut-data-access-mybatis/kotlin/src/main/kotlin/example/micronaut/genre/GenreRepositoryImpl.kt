@@ -5,7 +5,7 @@ import example.micronaut.domain.Genre
 import io.micronaut.core.annotation.NonNull
 import jakarta.inject.Singleton
 import java.util.Optional
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @Singleton // <1>
 open class GenreRepositoryImpl(private val genreMapper: GenreMapper) : GenreRepository {

@@ -8,7 +8,7 @@ import io.micronaut.serde.annotation.Serdeable
 import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonProperty
 
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
 @Serdeable // <1>

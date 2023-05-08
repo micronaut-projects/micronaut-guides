@@ -3,8 +3,8 @@ package example.micronaut
 import groovy.transform.CompileStatic
 import io.micronaut.serde.annotation.Serdeable
 
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Positive
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Positive
 
 @CompileStatic
 @Serdeable // <1>

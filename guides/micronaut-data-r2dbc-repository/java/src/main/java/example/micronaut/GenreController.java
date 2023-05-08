@@ -4,8 +4,8 @@ import io.micronaut.core.annotation.NonNull;
 import java.net.URI;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 import example.micronaut.domain.Genre;
 import io.micronaut.data.model.Page;

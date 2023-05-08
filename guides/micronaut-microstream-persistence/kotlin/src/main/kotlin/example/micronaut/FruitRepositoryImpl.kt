@@ -5,7 +5,7 @@ import io.micronaut.microstream.annotations.StoreParams
 import io.micronaut.microstream.annotations.StoreReturn
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Singleton // <1>
 open class FruitRepositoryImpl: FruitRepository {

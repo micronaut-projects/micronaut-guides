@@ -2,8 +2,8 @@ package example.micronaut;
 
 import io.micronaut.serde.annotation.Serdeable;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 @Serdeable // <1>
 public class CommandBookSave {

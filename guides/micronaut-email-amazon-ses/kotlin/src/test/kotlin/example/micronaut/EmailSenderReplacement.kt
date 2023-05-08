@@ -14,7 +14,7 @@ import software.amazon.awssdk.services.ses.model.SendEmailResponse
 import software.amazon.awssdk.services.ses.model.SesRequest
 import software.amazon.awssdk.services.ses.model.SesResponse
 import java.util.function.Consumer
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Requires(property = "spec.name", value = "MailControllerTest") // <1>
 @Singleton

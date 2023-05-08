@@ -8,8 +8,8 @@ import javax.persistence.EntityManager
 import javax.persistence.PersistenceException
 import javax.persistence.TypedQuery
 import javax.transaction.Transactional
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 
 @Singleton // <1>
 class GenreRepositoryImpl implements GenreRepository {

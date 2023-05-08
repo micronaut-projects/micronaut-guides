@@ -6,8 +6,8 @@ import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 
 import jakarta.inject.Singleton
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
 @Singleton

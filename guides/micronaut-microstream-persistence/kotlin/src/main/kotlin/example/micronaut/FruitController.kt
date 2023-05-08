@@ -11,7 +11,7 @@ import io.micronaut.http.annotation.Status
 import io.micronaut.scheduling.TaskExecutors.IO
 import io.micronaut.scheduling.annotation.ExecuteOn
 import jakarta.inject.Inject
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Controller("/fruits") // <1>
 open class FruitController {

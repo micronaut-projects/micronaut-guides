@@ -6,7 +6,7 @@ import io.micronaut.core.annotation.NonNull
 import jakarta.inject.Singleton
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Singleton // <1>
 open class MongoDbFruitRepository(

@@ -3,7 +3,7 @@ package example.micronaut;
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.core.annotation.NonNull;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @ConfigurationProperties("jwk") // <1>
 public class JwkConfigurationProperties implements JwkConfiguration {

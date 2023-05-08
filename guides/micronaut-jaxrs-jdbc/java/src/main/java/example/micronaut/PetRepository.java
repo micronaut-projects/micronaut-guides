@@ -6,8 +6,8 @@ import io.micronaut.data.repository.CrudRepository;
 import java.util.List;
 import java.util.Optional;
 import io.micronaut.core.annotation.NonNull;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @JdbcRepository(dialect = Dialect.MYSQL) // <1>
 public interface PetRepository extends CrudRepository<Pet, Long> { // <2>

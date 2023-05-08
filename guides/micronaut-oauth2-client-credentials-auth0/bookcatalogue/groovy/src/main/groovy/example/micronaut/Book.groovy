@@ -6,7 +6,7 @@ import io.micronaut.core.annotation.Creator
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.serde.annotation.Serdeable
 
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
 @EqualsAndHashCode

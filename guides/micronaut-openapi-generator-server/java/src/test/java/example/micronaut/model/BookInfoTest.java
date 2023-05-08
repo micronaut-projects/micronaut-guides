@@ -14,7 +14,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 import static org.junit.jupiter.api.Assertions.*;
 //end::imports[]

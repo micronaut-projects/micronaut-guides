@@ -10,7 +10,7 @@ import io.micronaut.http.annotation.QueryValue
 import io.micronaut.http.client.annotation.Client
 import org.reactivestreams.Publisher
 
-import javax.validation.constraints.Pattern
+import jakarta.validation.constraints.Pattern
 
 @CompileStatic
 @Header(name = 'User-Agent', value = 'https://micronautguides.com')

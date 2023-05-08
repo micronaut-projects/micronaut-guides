@@ -1,6 +1,6 @@
 package example.micronaut
 
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 interface FruitRepository {
 
