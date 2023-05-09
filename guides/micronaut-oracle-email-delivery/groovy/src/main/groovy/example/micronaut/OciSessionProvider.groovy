@@ -7,9 +7,9 @@ import io.micronaut.email.javamail.sender.MailPropertiesProvider
 import io.micronaut.email.javamail.sender.SessionProvider
 import jakarta.inject.Singleton
 
-import javax.mail.Authenticator
-import javax.mail.PasswordAuthentication
-import javax.mail.Session
+import jakarta.mail.Authenticator
+import jakarta.mail.PasswordAuthentication
+import jakarta.mail.Session
 
 @CompileStatic
 @Singleton // <1>
