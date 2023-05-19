@@ -50,7 +50,7 @@ class OrdersController {
                 ).findFirst().orElseThrow(
                         () -> new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("Item with id %s doesn't exist", x))
                 )
-        ).collect(Collectors.toList());
+        ).toList();
 
         BigDecimal total = items.stream().map(Item::price).reduce(BigDecimal::add).orElse(new BigDecimal("0"));
         Order newOrder = new Order(orders.size() + 1, order.userId(), items, null, total);
