@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +27,10 @@ class OrdersController {
     private final List<Order> orders = new ArrayList<>();
 
     @Get("/{id}")  // <3>
-    public Order findById(int id) {
+    public Optional<Order> findById(int id) {
         return orders.stream()
                 .filter(it -> it.id().equals(id))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     @Get  // <4>
