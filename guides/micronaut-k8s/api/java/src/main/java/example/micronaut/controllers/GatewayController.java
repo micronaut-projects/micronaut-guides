@@ -16,7 +16,6 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller("/api") // <1>
@@ -59,9 +58,10 @@ class GatewayController {
 
     @Get("/orders") // <8>
     List<Order> getOrders() {
-        List<Order> orders = new ArrayList<>();
-        orderClient.getOrders().forEach(x-> orders.add(new Order(x.id(), null, getUserById(x.userId()), x.items(), x.itemIds(), x.total())));
-        return orders;
+        return orderClient.getOrders()
+                .stream()
+                .map(x -> new Order(x.id(), null, getUserById(x.userId()), x.items(), x.itemIds(), x.total()))
+                .toList();
     }
 
     @Post("/orders") // <9>
