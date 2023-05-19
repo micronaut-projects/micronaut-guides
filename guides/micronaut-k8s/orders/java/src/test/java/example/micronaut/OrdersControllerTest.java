@@ -36,7 +36,7 @@ class OrdersControllerTest {
 
     @Test
     void multipleOrderInteraction() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         int userId = 1;
         List<Integer> itemIds = List.of(1, 1, 2, 3);
@@ -70,7 +70,7 @@ class OrdersControllerTest {
 
     @Test
     void itemDoesntExists() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         int userId = 1;
         List<Integer> itemIds = List.of(5);
@@ -86,7 +86,7 @@ class OrdersControllerTest {
 
     @Test
     void orderEmptyItems() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         int userId = 1;
         Order order = new Order(0, userId, null, null, null);
@@ -94,6 +94,13 @@ class OrdersControllerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("Items must be supplied"));
+    }
+
+    private static String basicAuth(Credentials credentials) {
+        return basicAuth(credentials.username(), credentials.password());
+    }
+    private static String basicAuth(String username, String password) {
+        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
     }
 
 }

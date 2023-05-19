@@ -37,19 +37,18 @@ class ItemsControllerTest {
 
         int itemId = 1;
 
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         Item item = orderItemClient.getItemsById(authHeader, itemId);
 
         assertEquals(itemId, item.id());
         assertEquals("Banana", item.name());
         assertEquals(new BigDecimal("1.5"), item.price());
-
     }
 
     @Test
     void getItems() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         List<Item> items = orderItemClient.getItems(authHeader);
 
@@ -61,4 +60,10 @@ class ItemsControllerTest {
                 .allMatch(name -> existingItemNames.stream().anyMatch(x -> x.equals(name))));
     }
 
+    private static String basicAuth(Credentials credentials) {
+        return basicAuth(credentials.username(), credentials.password());
+    }
+    private static String basicAuth(String username, String password) {
+        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+    }
 }

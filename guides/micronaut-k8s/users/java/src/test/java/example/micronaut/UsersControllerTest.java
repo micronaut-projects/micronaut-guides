@@ -36,14 +36,14 @@ class UsersControllerTest {
 
     @Test
     void getUserThatDoesntExists() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
         User retriedUser = usersClient.getById(authHeader, 100);
         assertNull(retriedUser);
     }
 
     @Test
     void multipleUserInteraction() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         String firstName = "firstName";
         String lastName = "lastName";
@@ -74,7 +74,7 @@ class UsersControllerTest {
 
     @Test
     void createSameUserTwice() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         String firstName = "SameUserFirstName";
         String lastName = "SameUserLastName";
@@ -93,6 +93,12 @@ class UsersControllerTest {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> usersClient.createUser(authHeader, user));
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("User with provided username already exists"));
+    }
 
+    private static String basicAuth(Credentials credentials) {
+        return basicAuth(credentials.username(), credentials.password());
+    }
+    private static String basicAuth(String username, String password) {
+        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
     }
 }
