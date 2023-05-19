@@ -12,10 +12,7 @@ import java.util.function.Consumer
 import jakarta.inject.Inject
 
 @MicronautTest
-class MyControllerTest {
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+class MyControllerTest(@Client("/") val client: HttpClient) {
 
     @Test
     fun testMyTeam() {

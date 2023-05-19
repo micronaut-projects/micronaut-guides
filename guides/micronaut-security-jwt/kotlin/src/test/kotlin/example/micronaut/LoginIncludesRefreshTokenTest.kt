@@ -15,11 +15,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 @MicronautTest
-class LoginIncludesRefreshTokenTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+class LoginIncludesRefreshTokenTest(@Client("/") val client: HttpClient) {
 
     @Test
     fun uponSuccessfulAuthenticationUserGetsAccessTokenAndRefreshToken() {

@@ -18,11 +18,7 @@ import java.io.FileNotFoundException
 import java.io.InputStream
 
 @MicronautTest // <1>
-class DownloadExcelTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class DownloadExcelTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     @Throws(FileNotFoundException::class)

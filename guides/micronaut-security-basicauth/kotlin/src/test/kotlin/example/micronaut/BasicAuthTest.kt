@@ -16,11 +16,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 
 @MicronautTest // <1>
-class BasicAuthTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class BasicAuthTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun verifyHttpBasicAuthWorks() {

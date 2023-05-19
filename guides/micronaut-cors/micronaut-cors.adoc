@@ -1,0 +1,82 @@
+common:header.adoc[]
+
+In this guide, you will configure https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing (CORS)] in a Micronaut application:
+
+____
+Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own from which a browser should permit loading resource
+____
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+== Static Website
+
+In a different folder, create a static website. It makes an HTTP Get Request via Javascript, and it updates an HTML element with the response.
+
+resource:../../../index.html[]
+
+Add a Controller, which the static website consumes via Javascript.
+
+external:hello-base/hellocontroller.adoc[]
+
+common:runapp.adoc[]
+
+== Run the static website
+
+Serve the static website with https://docs.oracle.com/en/java/javase/18/docs/specs/man/jwebserver.html[jwebserver]
+
+____
+The jwebserver tool provides a minimal HTTP server, designed to be used for prototyping, testing, and debugging. It serves a single directory hierarchy, and only serves static files. Only HTTP/1.1 is supported; HTTP/2 and HTTPS are not supported.
+____
+
+To use `jwebserver`, use Java 18 or greater in a terminal window. You can use https://sdkman.io[SDKMan] to get a list of available Java versions for your computer via `sdk list java`
+
+For example:
+
+[source, bash]
+----
+% sdk use java 19.0.2-amzn
+Using java version 19.0.2-amzn in this shell.
+% jwebserver
+Binding to loopback by default. For all interfaces use "-b 0.0.0.0" or "-b ::".
+Serving ... and subdirectories on 127.0.0.1 port 8000
+URL http://127.0.0.1:8000/
+----
+
+`jwebserver` serves the UI in port 8000
+
+=== CORS Error
+
+Open `http://127.0.0.1:8000/`, and you will see an error such as:
+
+image::cors.png[]
+
+=== Enable CORS Configuration
+
+Enable https://docs.micronaut.io/latest/guide/#cors[CORS configuration]
+
+resource:application.yml[tag=cors]
+
+Restart the Micronaut application.
+
+Refresh the UI in your browser, and you should see `Hello World` and no errors in the console.
+
+=== Fine-grained CORS Configuration
+
+The previous setup is a "wide open" configuration. It is best to enable CORS access only to a specific list of allowed origins.
+
+You can do that via:
+
+resource:application.yml[tags=cors|corsconfigurations]
+
+You can start the static server in a different port. For example, You could run `jwebserver -p 8001` and verify that it is not allowed. The application's configuration only allows requests with origin `127.0.0.1:8000`
+
+
+common:next.adoc[]
+
+Learn more about https://docs.micronaut.io/latest/guide/#cors[configuring CORS] with the Micronaut Framework.
+
+common:helpWithMicronaut.adoc[]

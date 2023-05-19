@@ -5,7 +5,6 @@ import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.feature.FeatureContext;
 import io.micronaut.starter.feature.Features;
 
-import java.lang.reflect.Field;
 import java.util.Set;
 
 /**

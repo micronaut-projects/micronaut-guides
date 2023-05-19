@@ -5,12 +5,14 @@ import io.micronaut.starter.options.JdkVersion
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 
+import static io.micronaut.starter.options.JdkVersion.JDK_11
+
 @CompileStatic
 class Utils {
 
     private static final String SYS_PROP_MICRONAUT_GUIDE = 'micronaut.guide'
     private static final String ENV_JDK_VERSION = 'JDK_VERSION'
-    private static final JdkVersion DEFAULT_JAVA_VERSION = JdkVersion.JDK_11
+    private static final JdkVersion DEFAULT_JAVA_VERSION = JDK_11
 
     static String singleGuide() {
         System.getProperty(SYS_PROP_MICRONAUT_GUIDE)
@@ -37,12 +39,8 @@ class Utils {
 
     static boolean skipBecauseOfJavaVersion(GuideMetadata metadata) {
         int jdkVersion = parseJdkVersion().majorVersion()
-        if ((metadata.minimumJavaVersion != null && jdkVersion < metadata.minimumJavaVersion) ||
-                (metadata.maximumJavaVersion != null && jdkVersion > metadata.maximumJavaVersion)) {
-            return true
-        } else {
-            return false
-        }
+        return (metadata.minimumJavaVersion != null && jdkVersion < metadata.minimumJavaVersion) ||
+                (metadata.maximumJavaVersion != null && jdkVersion > metadata.maximumJavaVersion)
     }
 
     static JdkVersion parseJdkVersion() {

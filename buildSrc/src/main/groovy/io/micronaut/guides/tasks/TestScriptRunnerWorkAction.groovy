@@ -21,8 +21,8 @@ abstract class TestScriptRunnerWorkAction implements WorkAction<TestScriptRunner
         File workDir = parameters.testScript.get().asFile.parentFile
         try (OutputStream file = new FileOutputStream(parameters.outputFile.get().asFile)) {
             ExecResult result = execOperations.exec(execSpec -> {
-                OutputStream oldOut = execSpec.getStandardOutput();
-                OutputStream oldErr = execSpec.getErrorOutput();
+                OutputStream oldOut = execSpec.standardOutput
+                OutputStream oldErr = execSpec.errorOutput
                 execSpec
                         .commandLine("./test.sh")
                         .setStandardOutput(new TeeOutputStream(oldOut, file))

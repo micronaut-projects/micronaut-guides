@@ -18,17 +18,13 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
 @MicronautTest // <1>
-class MetricsTest {
+class MetricsTest(@Client("/") val httpClient: HttpClient) { // <4>
 
     @Inject
     lateinit var meterRegistry: MeterRegistry // <2>
 
     @Inject
     lateinit var loggingSystem: LoggingSystem // <3>
-
-    @Inject
-    @field:Client("/")
-    lateinit var httpClient: HttpClient // <4>
 
     @Test
     fun testExpectedMeters() {

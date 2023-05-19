@@ -5,8 +5,6 @@ import io.micronaut.context.annotation.Property;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
@@ -28,16 +26,11 @@ class RefreshableScopeTest {
     @Inject
     @Client("/")
     HttpClient httpClient; // <4>
-
+    //end::imports[]
+    //tag::test[]
     @Test
     void refreshableScopeIsACustomScopeThatAllowsABeansStateToBeRefreshedViaTheRefreshEndpoint() {
-//end::imports[]        
-/*
-//tag::testheader[] 
-        String path = "/";
-//end::testheader[]
-*/
-//tag::test[]      
+
         String path = "/refreshable";
         BlockingHttpClient client = httpClient.toBlocking();
         Set<String> responses = new HashSet<>(executeRequest(client, path));

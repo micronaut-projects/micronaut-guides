@@ -5,9 +5,7 @@ import io.micronaut.core.order.Ordered;
 public enum Category implements Ordered {
     GETTING_STARTED("Getting Started", 1),
     BEYOND_THE_BASICS("Beyond the Basics", 2),
-
-    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 3),
-
+    DISTRIBUTION("Distribution", 3),
     SCHEMA_MIGRATION("Schema Migration", 4),
     DATA_ACCESS("Data Access", 5),
     CACHE("Cache", 6),
@@ -34,7 +32,10 @@ public enum Category implements Ordered {
     AZURE("Micronaut + Microsoft Azure", 27),
     GCP("Micronaut + Google Cloud", 28),
     ORACLE_CLOUD("Micronaut + Oracle Cloud", 29),
-    KUBERNETES( "Micronaut + Kubernetes", 30);
+    KUBERNETES( "Micronaut + Kubernetes", 30),
+
+    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 31);
+
 
     private final String val;
     private final int order;
@@ -52,6 +53,5 @@ public enum Category implements Ordered {
     @Override
     public int getOrder() {
         return order;
-
     }
 }

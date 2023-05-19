@@ -12,11 +12,7 @@ import java.time.Month
 import jakarta.inject.Inject
 
 @MicronautTest
-class NewsControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+class NewsControllerTest(@Client("/") val client: HttpClient) {
 
     @Timeout(5) // <1>
     @Test

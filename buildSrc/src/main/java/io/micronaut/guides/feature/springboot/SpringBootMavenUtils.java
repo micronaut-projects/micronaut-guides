@@ -3,7 +3,6 @@ package io.micronaut.guides.feature.springboot;
 import io.micronaut.guides.feature.springboot.template.genericMavenPlugin;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.maven.MavenPlugin;
-import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.template.RockerWritable;
 
 public final class SpringBootMavenUtils {

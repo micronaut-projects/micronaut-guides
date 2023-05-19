@@ -1,9 +1,9 @@
 package example.micronaut.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
+@Serdeable
 data class Genre(var name: String) {
 
     var id: Long? = null

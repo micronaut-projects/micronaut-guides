@@ -28,22 +28,23 @@ import static io.micronaut.starter.options.Language.GROOVY
 
 @CompileStatic
 class GuideAsciidocGenerator {
+
     private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
     private static final String EXTERNAL = 'external:'
     private static final String EXTERNAL_PARAMETRIZED = 'external-template:'
     private static final String COMMON_PARAMETRIZED = 'common-template:'
     private static final Pattern GUIDE_LINK_REGEX = ~/(.*)guideLink:(.*)\[(.*)](.*)/
-
-    public static final int DEFAULT_MIN_JDK = 8
-    public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
-    public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
-    public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
     private static final String CLI_MESSAGING = 'create-messaging-app'
     private static final String CLI_DEFAULT = 'create-app'
     private static final String CLI_GRPC = 'create-grpc-app'
     private static final String CLI_FUNCTION = 'create-function-app'
     private static final String CLI_CLI = 'create-cli-app'
+
+    public static final int DEFAULT_MIN_JDK = 8
+    public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
+    public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
+    public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
     public static final String DEFAULT_APP_NAME = "default"
 
     static void generate(GuideMetadata metadata, File inputDir,
@@ -457,7 +458,7 @@ class GuideAsciidocGenerator {
         String indent = extractIndent(line)
 
         String sourcePath = testFramework ? testPath(appName, name, testFramework) : mainPath(appName, name)
-        String normalizedSourcePath = (Paths.get(sourcePath)).normalize().toString();
+        String normalizedSourcePath = (Paths.get(sourcePath)).normalize()
         List<String> lines = [
                 '[source,@lang@]',
                 '.' + normalizedSourcePath,

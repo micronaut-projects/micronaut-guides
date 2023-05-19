@@ -11,11 +11,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 @MicronautTest
-class StoreControllerTest {
-
-    @Inject
-    @field:Client("/store")
-    lateinit var client: HttpClient
+class StoreControllerTest(@Client("/store") val client: HttpClient) {
 
     @Test
     fun testInventoryItem() {
