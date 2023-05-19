@@ -14,14 +14,12 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.exceptions.HttpStatusException;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-import io.micronaut.validation.Validated;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller("/api") // <1>
-@Validated
 @ExecuteOn(TaskExecutors.IO) // <2>
 class GatewayController {
 

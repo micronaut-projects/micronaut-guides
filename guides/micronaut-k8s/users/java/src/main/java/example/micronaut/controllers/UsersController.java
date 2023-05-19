@@ -9,7 +9,6 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.exceptions.HttpStatusException;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.micronaut.validation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,7 +18,6 @@ import java.util.Optional;
 
 @Controller("/users") // <1>
 @Secured(SecurityRule.IS_AUTHENTICATED) // <2>
-@Validated
 class UsersController {
     List<User> persons = new ArrayList<>();
 
