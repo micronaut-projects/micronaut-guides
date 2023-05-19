@@ -2,6 +2,7 @@ package example.micronaut.controllers;
 
 import example.micronaut.models.Item;
 import example.micronaut.models.Order;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -38,7 +39,7 @@ class OrdersController {
 
     @Post  // <5>
     public Order createOrder(@Body @Valid Order order) {
-        if (order.itemIds() == null || order.itemIds().isEmpty()) {
+        if (CollectionUtils.isEmpty(order.itemIds())) {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Items must be supplied");
         }
 
