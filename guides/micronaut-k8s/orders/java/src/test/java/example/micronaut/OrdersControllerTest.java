@@ -3,14 +3,12 @@ package example.micronaut;
 import example.micronaut.auth.Credentials;
 import example.micronaut.models.Order;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -30,8 +28,8 @@ class OrdersControllerTest {
 
     @Test
     void testUnauthorized() {
-        HttpClientException exception = assertThrows(HttpClientException.class, () -> orderItemClient.getOrders(""));
-        assertTrue(exception.getMessage().contains("Unauthorized"));
+        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> orderItemClient.getOrders(""));
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test
