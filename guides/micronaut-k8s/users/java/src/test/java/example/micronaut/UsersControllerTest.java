@@ -3,7 +3,6 @@ package example.micronaut;
 import example.micronaut.auth.Credentials;
 import example.micronaut.models.User;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -30,8 +29,8 @@ class UsersControllerTest {
 
     @Test
     void testUnauthorized() {
-        HttpClientException exception = assertThrows(HttpClientException.class, () -> usersClient.getUsers(""));
-        assertTrue(exception.getMessage().contains("Unauthorized"));
+        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> usersClient.getUsers(""));
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test
