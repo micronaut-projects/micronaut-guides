@@ -234,7 +234,7 @@ class GuideAsciidocGenerator {
     private static List<String> featuresForApp(GuideMetadata metadata,
                                                GuidesOption guidesOption,
                                                String app) {
-        List<String> features = metadata.apps.find { it.name == app }.visibleFeatures
+        List<String> features = metadata.apps.find { it.name == app }?.getVisibleFeatures(guidesOption.language) ?: []
         if (guidesOption.language == GROOVY) {
             features.remove 'graalvm'
         }
@@ -579,7 +579,7 @@ class GuideAsciidocGenerator {
         if (features) {
             featureNames = features.tokenize('|')
         } else {
-            featureNames = [] + app.features
+            featureNames = [] + app.getFeatures(guidesOption.language)
         }
 
         String featureExcludes = extractFromParametersLine(line, 'featureExcludes')

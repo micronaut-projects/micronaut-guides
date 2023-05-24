@@ -115,6 +115,9 @@ class GuideProjectGenerator implements AutoCloseable {
                             name: it.name,
                             visibleFeatures: it.features ?: [],
                             invisibleFeatures: it.invisibleFeatures ?: [],
+                            javaFeatures: it.javaFeatures ?: [],
+                            kotlinFeatures: it.kotlinFeatures ?: [],
+                            groovyFeatures: it.groovyFeatures ?: [],
                             applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                             excludeSource: it.excludeSource,
                             excludeTest: it.excludeTest,
@@ -187,7 +190,7 @@ class GuideProjectGenerator implements AutoCloseable {
             Language lang = guidesOption.language
 
             for (App app : metadata.apps) {
-                List<String> appFeatures = [] + app.features
+                List<String> appFeatures = [] + app.getFeatures(lang)
 
                 if (guidesOption.language == GROOVY ||
                         !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(javaVersion)) {
@@ -391,6 +394,9 @@ class GuideProjectGenerator implements AutoCloseable {
             App guideApp = guideApps[name]
             guideApp.visibleFeatures.addAll baseApp.visibleFeatures
             guideApp.invisibleFeatures.addAll baseApp.invisibleFeatures
+            guideApp.javaFeatures.addAll baseApp.javaFeatures
+            guideApp.kotlinFeatures.addAll baseApp.kotlinFeatures
+            guideApp.groovyFeatures.addAll baseApp.groovyFeatures
             merged << guideApp
         }
 
