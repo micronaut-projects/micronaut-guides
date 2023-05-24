@@ -2,14 +2,14 @@ package example.micronaut.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import groovy.transform.CompileStatic
-import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
+import io.micronaut.serde.annotation.Serdeable
 
 import javax.validation.constraints.NotNull
 
 @CompileStatic
-@Introspected
+@Serdeable
 class Genre {
 
     @Nullable

@@ -10,8 +10,9 @@ import io.micronaut.starter.build.gradle.GradlePlugin;
 import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.template.RockerWritable;
-
 import jakarta.inject.Singleton;
+
+import static io.micronaut.starter.application.ApplicationType.DEFAULT;
 
 @Singleton
 public class GitProperties implements Feature {
@@ -52,6 +53,6 @@ public class GitProperties implements Feature {
 
     @Override
     public boolean supports(ApplicationType applicationType) {
-        return applicationType == ApplicationType.DEFAULT;
+        return applicationType == DEFAULT;
     }
 }

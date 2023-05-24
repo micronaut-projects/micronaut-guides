@@ -8,6 +8,7 @@ import groovy.transform.Sortable
 @Sortable(includes = ['title'])
 @CompileStatic
 class Tag {
+
     String title
     int ocurrence
 
@@ -16,24 +17,18 @@ class Tag {
     }
 
     String getSlug() {
-        if ( !title ) {
+        if (!title) {
             return null
         }
-        String str = title
-        str = str.toLowerCase()
-        for ( String regex : [' ', '\\[', ']', '\''] ) {
+        String str = title.toLowerCase()
+        for (String regex : [' ', '\\[', ']', '\'']) {
             str = str.replaceAll(regex, '')
         }
-        str = str.trim()
-        URLEncoder.encode(str, 'UTF-8')
+        URLEncoder.encode(str.trim(), 'UTF-8')
     }
 
-
     @Override
-    public String toString() {
-        return "Tag{" +
-                "title='" + title + '\'' +
-                ", ocurrence=" + ocurrence +
-                '}';
+    String toString() {
+        "Tag{title='$title', ocurrence=$ocurrence"
     }
 }

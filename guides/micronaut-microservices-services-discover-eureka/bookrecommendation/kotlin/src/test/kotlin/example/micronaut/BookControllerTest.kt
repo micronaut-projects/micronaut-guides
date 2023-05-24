@@ -11,11 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 
 @MicronautTest
-class BookControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+class BookControllerTest(@Client("/") val client: HttpClient) {
 
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     @Test

@@ -1,0 +1,335 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+:exclude-for-build:maven
+
+== Building a Docker Image with the Micronaut Gradle Plugin
+
+The https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/[Micronaut Gradle Plugin] offers the following tasks to build Docker images:
+
+* `dockerBuild` - Builds a Docker Image using the Docker Gradle plugin
+* `dockerBuildNative` - Builds a Native Docker Image using GraalVM Native Image
+* `optimizedDockerBuild` - Build an optimized application and package it into a Docker image.
+* `optimizedDockerBuildNative` - Build a native image containing the optimized application and pakcage it into a Docker Image
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+== Building a Docker Image with the Micronaut Maven Plugin
+
+https://micronaut-projects.github.io/micronaut-maven-plugin/latest/[Micronaut Maven Plugin] offers several options to package your application as a Docker Image.
+
+* `docker` builds a Docker image with the application artifacts (compiled classes, resources, dependencies, etc).
+* `docker-native`: builds a Docker image with a GraalVM native image inside.
+* `docker-crac`: build a a pre-warmed, checkpointed Docker Image
+
+Moreover, you can combine AOT build optimizations with Docker packaging by including the system property `micronaut.aot.enabled`.
+
+:exclude-for-build:
+
+external:distribution-base/hellocontroller.adoc[]
+
+== Time To First Request Measurement script
+
+In this guide, we use the following script to measure time to first request of a Docker image.
+
+resource:../../../ttfr.sh[]
+
+=== Docker Image
+
+Generate a Docker Image with:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerBuild
+----
+
+[source, bash]
+----
+...
+..
+.
+Removing intermediate container 784f978688d1
+ ---> e5c1b8b8dbcb
+Successfully built e5c1b8b8dbcb
+Successfully tagged micronautguide:latest
+Created image with ID 'e5c1b8b8dbcb'.
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw package -Dpackaging=docker
+----
+
+[source, bash]
+----
+...
+..
+.
+[INFO] Built image to Docker daemon as micronautguide
+...
+[INFO] Executing tasks:
+[INFO] [==============================] 100.0% complete
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  13.467 s
+[INFO] Finished at: 2023-02-13T11:06:16+01:00
+----
+
+:exclude-for-build:
+
+Supply to image name and tag to the time to first request script:
+
+[source, bash]
+----
+./ttfr.sh micronautguide:latest
+micronautguide:latest
+...
+.
+2.473 seconds
+----
+
+=== Docker image with a GraalVM native executable inside
+
+Generate a Docker Image with:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerBuildNative
+----
+
+[source, bash]
+----
+> Task :generateResourcesConfigFile
+[native-image-plugin] Resources configuration written into /Users/sdelamo/github/micronaut-projects/micronaut-guides/build/code/micronaut-docker-image/micronaut-docker-image-gradle-java/build/native/generated/generateResourcesConfigFile/resource-config.json
+
+> Task :dockerfileNative
+Dockerfile written to: /Users/sdelamo/github/micronaut-projects/micronaut-guides/build/code/micronaut-docker-image/micronaut-docker-image-gradle-java/build/docker/native-main/DockerfileNative
+
+> Task :dockerBuildNative
+...
+Step 1/14 : FROM ghcr.io/graalvm/native-image:ol7-java17-22.3.0 AS graalvm
+ ....
+....
+....
+========================================================================================================================
+GraalVM Native Image: Generating 'application' (executable)...
+========================================================================================================================
+...
+Step 14/14 : ENTRYPOINT ["/app/application"]
+ ---> Running in 447363f48c82
+Removing intermediate container 447363f48c82
+ ---> 0b57ab829518
+Successfully built 0b57ab829518
+Successfully tagged micronautguide:latest
+Created image with ID '0b57ab829518'.
+
+BUILD SUCCESSFUL in 2m 26s
+----
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw package -Dpackaging=docker-native -Pgraalvm
+----
+
+[source, bash]
+----
+...
+..
+.
+[INFO] OK: 19 MiB in 18 packages
+[INFO] Removing intermediate container 8779752a14f2
+[INFO]  ---> ce1f4cc2a00e
+[INFO] Step 14/17 : COPY --from=builder /home/app/application /app/application
+[INFO]
+[INFO]  ---> d6910584b917
+[INFO] Step 15/17 : ARG PORT=8080
+[INFO]
+[INFO]  ---> Running in e18c65e28d66
+[INFO] Removing intermediate container e18c65e28d66
+[INFO]  ---> 3215839af33e
+[INFO] Step 16/17 : EXPOSE ${PORT}
+[INFO]
+[INFO]  ---> Running in 7e3cb6cb6c60
+[INFO] Removing intermediate container 7e3cb6cb6c60
+[INFO]  ---> 8285031d9cf1
+[INFO] Step 17/17 : ENTRYPOINT ["/app/application"]
+[INFO]
+[INFO]  ---> Running in 69ce96bc2a28
+[INFO] Removing intermediate container 69ce96bc2a28
+[INFO]  ---> cada15938fc4
+[INFO] Successfully built cada15938fc4
+[INFO] Successfully tagged micronautguide:latest
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:58 min
+[INFO] Finished at: 2023-02-13T11:11:10+01:00
+[INFO] ------------------------------------------------------------------------
+----
+
+:exclude-for-build:
+
+Run the time to first request script with the Native Docker Image:
+
+[source, bash]
+----
+./ttfr.sh micronautguide:latest
+micronautguide:latest
+...
+.
+0,047
+seconds
+----
+
+common:docker-crac.adoc[]
+
+Run the time to first request script with CRaC Docker Image:
+
+[source, bash]
+----
+./ttfr.sh micronautguide:latest
+micronautguide:latest
+...
+.
+0.462 seconds
+----
+
+=== AOT Optimized Docker Image
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew optimizedDockerBuild
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw package -Dpackaging=docker -Dmicronaut.aot.enabled=true
+----
+
+:exclude-for-build:
+
+Run the time to first request script with AOT optimized Docker Image:
+
+[source, bash]
+----
+./ttfr.sh micronautguide:latest
+micronautguide:latest
+...
+.
+2,359 seconds
+----
+
+=== AOT Optimized Docker Image with a native executable inside
+
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew optimizedDockerBuildNative
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw package -Dpackaging=docker-native -Dmicronaut.aot.enabled=true -Pgraalvm
+----
+
+:exclude-for-build:
+Run the time to first request script with AOT optimized Docker Image:
+
+[source, bash]
+----
+./ttfr.sh micronautguide:latest
+micronautguide:latest
+...
+.
+0.039 seconds
+----
+
+:exclude-for-build:
+
+== Comparisons
+
+Micronaut Framework offers many options for packaging your application as a Docker Image. As illustrated in the following chart, you can speed up your Docker Images by using the https://docs.micronaut.io/latest/guide/#graal[GraalVM integration in the Micronaut Framework], the https://micronaut-projects.github.io/micronaut-crac/latest/guide/[CRaC (Coordinated Restore at checkpoint) integration in  the Micronaut Framework],  https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_micronaut_aot_plugin[Micronaut AOT Gradle Plugin] or https://micronaut-projects.github.io/micronaut-maven-plugin/latest/examples/aot.html[Maven Plugin integration with Micronaut AOT].
+
+The following chart illustrates the speed gains you can obtain:
+
+image::docker-image-ttfr.png[]
+
+[cols="1,1"]
+|===
+|Docker Image
+|2s 473ms
+|Optimized Docker Image
+|2s 359ms
+|CRaC Docker Image
+|462ms
+|Native Docker Image
+|47ms
+|Optimized Native Docker Image
+|39ms
+|===
+
+I used the following hardware to calculate the previous benchmarks
+
+[cols="1,1"]
+|===
+|Characteristic
+|Value
+|Model Name
+|iMac Pro 2017
+|Processor
+|3GHz 10-Core Intel Xeon W
+|Memory
+|32 GB 2666 MHz DDR4
+|Total Number of Cores
+|10
+|Operating System
+|Mac OS X 10.15.7 (Mojave)
+|===
+
+common:next.adoc[]
+
+Learn more about:
+
+* https://docs.micronaut.io/latest/guide/#graal[GraalVM integration in the Micronaut Framework]
+* https://micronaut-projects.github.io/micronaut-crac/latest/guide/[Micronaut CRaC (Coordinated Restore at checkpoint)
+:exclude-for-build:maven
+* https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/[Micronaut Gradle Plugin]
+:exclude-for-build:
+:exclude-for-build:gradle
+* https://micronaut-projects.github.io/micronaut-maven-plugin/latest/[Micronaut Maven Plugin]
+
+:exclude-for-build:
+
+common:helpWithMicronaut.adoc[]

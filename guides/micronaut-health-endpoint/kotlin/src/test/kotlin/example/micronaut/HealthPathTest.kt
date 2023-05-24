@@ -15,11 +15,7 @@ import org.junit.jupiter.api.function.Executable
 
 @Property(name = "endpoints.all.path", value = "/endpoints/") // <1>
 @MicronautTest
-class HealthPathTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class HealthPathTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun healthEndpointExposedAtNonDefaultEndpointsPath() {

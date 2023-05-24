@@ -28,7 +28,7 @@ class CryptoService constructor(
     @Scheduled(fixedRate = "\${crypto.updateFrequency:1h}",
             initialDelay = "\${crypto.initialDelay:0s}") // <6>
     fun updatePrice() {
-        time.record { // <7>
+        time.recordCallable { // <7>
             try {
                 checks.increment() // <8>
                 latestPriceUsd.set(priceClient.latestInUSD().price.toInt()) // <9>

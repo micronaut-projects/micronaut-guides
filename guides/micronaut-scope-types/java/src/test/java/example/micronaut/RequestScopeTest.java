@@ -3,8 +3,6 @@ package example.micronaut;
 
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
@@ -24,17 +22,11 @@ class RequestScopeTest {
     @Inject
     @Client("/")
     HttpClient httpClient; // <2>
-
+    // end::imports[]
+// tag::test[]
     @Test
     void requestScopeScopeIsACustomScopeThatIndicatesANewInstanceOfTheBeanIsCreatedAndAssociatedWithEachHTTPRequest() {
-//end::imports[]        
-/*
-//tag::testheader[]        
-        String path = "/";
-//end::testheader[]
-*/
         String path = "/request";
-//tag::test[]        
         BlockingHttpClient client = httpClient.toBlocking();
         Set<String> responses = new HashSet<>(executeRequest(client, path));
         assertEquals(1, responses.size()); // <3>

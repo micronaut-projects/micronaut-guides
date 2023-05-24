@@ -20,7 +20,7 @@ public class GithubLowLevelClient {
     private final HttpClient httpClient;
     private final URI uri;
 
-    public GithubLowLevelClient(@Client(GithubConfiguration.GITHUB_API_URL) HttpClient httpClient,  // <2>
+    public GithubLowLevelClient(@Client(id = "github") HttpClient httpClient,  // <2>
                                 GithubConfiguration configuration) {  // <3>
         this.httpClient = httpClient;
         uri = UriBuilder.of("/repos")

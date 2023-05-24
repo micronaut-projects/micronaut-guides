@@ -14,11 +14,7 @@ import org.junit.jupiter.api.function.Executable
 
 @Property(name = "endpoints.health.disk-space.threshold", value = "999999999999999999") // <1>
 @MicronautTest
-class PoorHealthTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class PoorHealthTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun healthEndpointExposed() {

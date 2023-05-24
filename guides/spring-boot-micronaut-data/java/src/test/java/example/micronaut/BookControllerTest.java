@@ -13,10 +13,10 @@ class BookControllerTest {
     @LocalServerPort // <2>
     private int port;
 
-    @Autowired // <4>
-    private TestRestTemplate restTemplate; // <5>
+    @Autowired // <3>
+    private TestRestTemplate restTemplate;
 
-    @Autowired // <6>
+    @Autowired // <4>
     BookRepository bookRepository;
 
     @Test

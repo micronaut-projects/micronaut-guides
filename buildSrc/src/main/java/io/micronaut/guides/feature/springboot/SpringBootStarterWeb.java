@@ -6,6 +6,8 @@ import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
 import jakarta.inject.Singleton;
 
+import static io.micronaut.starter.application.ApplicationType.DEFAULT;
+
 @Singleton
 public class SpringBootStarterWeb implements SpringBootStarter {
     @Override
@@ -37,6 +39,6 @@ public class SpringBootStarterWeb implements SpringBootStarter {
 
     @Override
     public boolean supports(ApplicationType applicationType) {
-        return ApplicationType.DEFAULT == applicationType;
+        return DEFAULT == applicationType;
     }
 }

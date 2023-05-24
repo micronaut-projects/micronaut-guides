@@ -384,15 +384,14 @@ class IndexGenerator {
         return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
     }
 
-    private static String category(Object cat) {
-        String html = "<div class='category'>"
-        html += '<div class="inner">'
-        html += '<img width="100" style="margin-bottom: 30px" src="' + imageForCategory(cat) + '"/>'
-        html += '<h1 class="title title_large first-word-bold first-word-break">' + cat  + '</h1>'
-        html += '<div class="underline"></div>'
-        html += "</div>"
-        html += "</div>"
-        html
+    private static String category(cat) {
+        "<div class='category'>" +
+        '<div class="inner">' +
+        '<img width="100" style="margin-bottom: 30px" src="' + imageForCategory(cat) + '"/>' +
+        '<h1 class="title title_large first-word-bold first-word-break">' + cat + '</h1>' +
+        '<div class="underline"></div>' +
+        "</div>" +
+        "</div>"
     }
 
     static String generateGuidesJsonIndex(File guidesFolder, String metadataConfigName) {

@@ -14,11 +14,7 @@ import io.micronaut.context.annotation.Property
 
 @Property(name = "micronaut.security.enabled", value= StringUtils.FALSE)
 @MicronautTest // <1>
-class BooksControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class BooksControllerTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun testRetrieveBooks() {

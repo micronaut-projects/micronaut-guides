@@ -1,12 +1,12 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.serde.annotation.Serdeable;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
-@Introspected
+@Serdeable
 public class BookInventory {
 
     @NonNull

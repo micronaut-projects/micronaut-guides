@@ -11,11 +11,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
 @MicronautTest // <1>
-class LiquibaseEndpointTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var httpClient: HttpClient // <2>
+class LiquibaseEndpointTest(@Client("/") val httpClient: HttpClient) { // <2>
 
     @Test
     fun migrationsAreExposedViaAndEndpoint() {

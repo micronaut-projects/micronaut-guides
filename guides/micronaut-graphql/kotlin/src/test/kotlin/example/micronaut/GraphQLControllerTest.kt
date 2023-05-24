@@ -12,11 +12,7 @@ import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
 
 @MicronautTest
-class GraphQLControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class GraphQLControllerTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun testGraphQLController() {
