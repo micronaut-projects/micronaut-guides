@@ -6,7 +6,6 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.List;
 
