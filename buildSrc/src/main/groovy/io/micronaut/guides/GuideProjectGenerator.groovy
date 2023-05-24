@@ -167,8 +167,6 @@ class GuideProjectGenerator implements AutoCloseable {
             assert outputDir.mkdir()
         }
 
-        String packageAndName = BASE_PACKAGE + '.' + APP_NAME
-
         JdkVersion javaVersion = Utils.parseJdkVersion()
         if (metadata.minimumJavaVersion != null) {
             JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
@@ -208,12 +206,13 @@ class GuideProjectGenerator implements AutoCloseable {
                 File destination = destinationPath.toFile()
                 destination.mkdir()
 
+                String packageAndName = BASE_PACKAGE + '.' + app.name
                 if (app.openAPIGeneratorConfig) {
-                    OpenAPIGenerator.generate(inputDir, destination, lang, packageName , app.openAPIGeneratorConfig, testFramework, buildTool)
+                    OpenAPIGenerator.generate(inputDir, destination, lang, packageAndName , app.openAPIGeneratorConfig, testFramework, buildTool)
                     deleteEveryFileButSources(destination)
                 }
 
-                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageNameWithAppName,
+                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)
 
                 if (metadata.base) {
