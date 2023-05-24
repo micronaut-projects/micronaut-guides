@@ -7,6 +7,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 import java.util.List;
 
 @Controller("/items")  // <1>
@@ -14,10 +15,10 @@ import java.util.List;
 class ItemsController {
 
     @Get("/{id}")  // <3>
-    public Item findById(int id) {
+    public Optional<Item> findById(int id) {
         return Item.items.stream()
                 .filter(it -> it.id().equals(id))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     @Get  // <4>

@@ -3,14 +3,12 @@ package example.micronaut;
 import example.micronaut.auth.Credentials;
 import example.micronaut.models.Order;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -30,13 +28,13 @@ class OrdersControllerTest {
 
     @Test
     void testUnauthorized() {
-        HttpClientException exception = assertThrows(HttpClientException.class, () -> orderItemClient.getOrders(""));
-        assertTrue(exception.getMessage().contains("Unauthorized"));
+        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> orderItemClient.getOrders(""));
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test
     void multipleOrderInteraction() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         int userId = 1;
         List<Integer> itemIds = List.of(1, 1, 2, 3);
@@ -70,7 +68,7 @@ class OrdersControllerTest {
 
     @Test
     void itemDoesntExists() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         int userId = 1;
         List<Integer> itemIds = List.of(5);
@@ -86,7 +84,7 @@ class OrdersControllerTest {
 
     @Test
     void orderEmptyItems() {
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username() + ":" + credentials.password()).getBytes());
+        String authHeader = basicAuth(credentials);
 
         int userId = 1;
         Order order = new Order(0, userId, null, null, null);
@@ -94,6 +92,14 @@ class OrdersControllerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("Items must be supplied"));
+    }
+
+
+    private static String basicAuth(Credentials credentials) {
+        return basicAuth(credentials.username(), credentials.password());
+    }
+    private static String basicAuth(String username, String password) {
+        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
     }
 
 }

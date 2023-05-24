@@ -16,8 +16,11 @@ public class BasicAuthClientTest {
 
     @Test
     void verifyBasicAuthWorks() {
-        String credsEncoded = Base64.getEncoder().encodeToString("sherlock:password".getBytes());
-        String rsp = appClient.home("Basic " + credsEncoded); // <3>
+        String creds = basicAuth("sherlock", "password");
+        String rsp = appClient.home(creds); // <3>
         assertEquals("sherlock", rsp);
+    }
+    private static String basicAuth(String username, String password) {
+        return "Basic " + Base64.getEncoder().encodeToString(username + ":" + password).getBytes());
     }
 }

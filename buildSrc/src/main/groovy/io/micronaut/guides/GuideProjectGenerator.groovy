@@ -199,8 +199,10 @@ class GuideProjectGenerator implements AutoCloseable {
                 }
 
                 // typical guides use 'default' as name, multi-project guides have different modules
-                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
                 String folder = folderName(metadata.slug, guidesOption)
+
+                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
+
 
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
