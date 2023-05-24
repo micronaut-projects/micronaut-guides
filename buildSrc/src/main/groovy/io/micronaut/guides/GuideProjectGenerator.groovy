@@ -1,6 +1,5 @@
 package io.micronaut.guides
 
-import groovy.io.FileType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -24,11 +23,12 @@ import java.nio.file.Paths
 import java.time.LocalDate
 import java.util.regex.Pattern
 
+import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.options.JdkVersion.JDK_11
-import static io.micronaut.starter.options.JdkVersion.JDK_8
+import static io.micronaut.starter.options.JdkVersion.JDK_17
 import static io.micronaut.starter.options.Language.GROOVY
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
@@ -41,7 +41,7 @@ class GuideProjectGenerator implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_11, JDK_17]
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
@@ -83,9 +83,9 @@ class GuideProjectGenerator implements AutoCloseable {
 
         List<Category> categories = []
         for (String c : config.categories) {
-            Category cat = Category.values().find {it.toString() == c }
+            Category cat = Category.values().find { it.toString() == c }
             if (cat) {
-                categories.add(cat)
+                categories << cat
             } else if (publish && !cat) {
                 throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
             }
@@ -110,20 +110,20 @@ class GuideProjectGenerator implements AutoCloseable {
                 minimumJavaVersion: config.minimumJavaVersion,
                 maximumJavaVersion: config.maximumJavaVersion,
                 zipIncludes: config.zipIncludes ?: [],
-                apps: config.apps.collect { it -> new App(
-                        name: it.name,
-                        visibleFeatures: it.features ?: [],
-                        invisibleFeatures: it.invisibleFeatures ?: [],
-                        applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
-                        excludeSource:  it.excludeSource,
-                        excludeTest:  it.excludeTest,
-                        packageName: it.packageName,
-                        openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
-                            definitionFile: it.openAPIGeneratorConfig.definitionFile,
-                            generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
-                            properties: it.openAPIGeneratorConfig.properties ?: [:],
-                            globalProperties: it.openAPIGeneratorConfig.globalProperties ?: [:]
-                        ) : null)
+                apps: config.apps.collect { it ->
+                    new App(
+                            name: it.name,
+                            visibleFeatures: it.features ?: [],
+                            invisibleFeatures: it.invisibleFeatures ?: [],
+                            applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
+                            excludeSource: it.excludeSource,
+                            excludeTest: it.excludeTest,
+                            openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
+                                    definitionFile: it.openAPIGeneratorConfig.definitionFile,
+                                    generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
+                                    properties: it.openAPIGeneratorConfig.properties ?: [:],
+                                    globalProperties: it.openAPIGeneratorConfig.globalProperties ?: [:]
+                            ) : null)
                 }
         ))
     }
@@ -188,15 +188,7 @@ class GuideProjectGenerator implements AutoCloseable {
             TestFramework testFramework = guidesOption.testFramework
             Language lang = guidesOption.language
 
-            for (App app: metadata.apps) {
-                def packageName = BASE_PACKAGE
-                def packageNameWithAppName = packageAndName
-
-                if (app.packageName) {
-                    packageName = app.packageName
-                    packageNameWithAppName = app.packageName + "." + app.name
-                }
-
+            for (App app : metadata.apps) {
                 List<String> appFeatures = [] + app.features
 
                 if (guidesOption.language == GROOVY ||
@@ -239,7 +231,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (app.excludeTest) {
                     for (String testSource : app.excludeTest) {
-                        deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
+                        deleteFile(destination, GuideAsciidocGenerator.testPath(appName, testSource, testFramework), guidesOption)
                     }
                 }
 
@@ -416,7 +408,7 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     static void deleteEveryFileButSources(File dir) {
-        dir.eachFileRecurse(FileType.FILES) { file ->
+        dir.eachFileRecurse(FILES) { file ->
             if (!(file ==~ GROOVY_JAVA_OR_KOTLIN)) {
                 file.delete()
             }
@@ -425,19 +417,20 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     static void deleteEmptySubDirectories(File dir) {
-        for (;;) {
+        for (; ;) {
             if (deleteSubDirectories(dir) == 0) {
                 break
             }
         }
     }
+
     static int deleteSubDirectories(File dir) {
         int deleted = 0
 
         List<File> emptyDirs = []
         dir.eachDirRecurse { f ->
             if (f.listFiles().length == 0) {
-                emptyDirs.add(f)
+                emptyDirs << f
             }
         }
         emptyDirs.each { f ->
