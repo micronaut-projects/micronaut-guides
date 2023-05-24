@@ -92,8 +92,8 @@ class UsersControllerTest {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> usersClient.createUser(authHeader, user));
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("User with provided username already exists"));
-    }
 
+    }
     private static String basicAuth(Credentials credentials) {
         return basicAuth(credentials.username(), credentials.password());
     }

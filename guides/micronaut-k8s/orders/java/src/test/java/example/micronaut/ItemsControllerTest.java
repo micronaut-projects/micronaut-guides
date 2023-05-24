@@ -37,6 +37,7 @@ class ItemsControllerTest {
 
         int itemId = 1;
 
+
         String authHeader = basicAuth(credentials);
 
         Item item = orderItemClient.getItemsById(authHeader, itemId);
@@ -59,7 +60,6 @@ class ItemsControllerTest {
                 .map(Item::name)
                 .allMatch(name -> existingItemNames.stream().anyMatch(x -> x.equals(name))));
     }
-
     private static String basicAuth(Credentials credentials) {
         return basicAuth(credentials.username(), credentials.password());
     }

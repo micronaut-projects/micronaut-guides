@@ -94,6 +94,7 @@ class OrdersControllerTest {
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("Items must be supplied"));
     }
 
+
     private static String basicAuth(Credentials credentials) {
         return basicAuth(credentials.username(), credentials.password());
     }

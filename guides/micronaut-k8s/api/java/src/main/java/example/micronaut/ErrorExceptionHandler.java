@@ -10,7 +10,6 @@ import jakarta.inject.Singleton;
 
 @Singleton // <1>
 class ErrorExceptionHandler implements ExceptionHandler<HttpClientResponseException, HttpResponse<?>> {
-
     private final ErrorResponseProcessor<?> errorResponseProcessor;
 
     public ErrorExceptionHandler(ErrorResponseProcessor<?> errorResponseProcessor) {

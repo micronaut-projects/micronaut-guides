@@ -34,10 +34,9 @@ public enum Category implements Ordered {
     AZURE("Microsoft Azure", 28),
     GCP("Google Cloud", 29),
     ORACLE_CLOUD("Oracle Cloud", 30),
-
     KUBERNETES( "Kubernetes", 31),
-
     SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 32);
+
 
 
     private final String val;

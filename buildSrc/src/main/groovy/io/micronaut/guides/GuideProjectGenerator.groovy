@@ -208,12 +208,13 @@ class GuideProjectGenerator implements AutoCloseable {
                 File destination = destinationPath.toFile()
                 destination.mkdir()
 
+                String packageAndName = BASE_PACKAGE + '.' + app.name
                 if (app.openAPIGeneratorConfig) {
-                    OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig, testFramework, buildTool)
+                    OpenAPIGenerator.generate(inputDir, destination, lang, packageAndName , app.openAPIGeneratorConfig, testFramework, buildTool)
                     deleteEveryFileButSources(destination)
                 }
 
-                String packageAndName = BASE_PACKAGE + '.' + app.name
+
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)
 
