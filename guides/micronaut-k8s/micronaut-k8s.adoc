@@ -37,11 +37,11 @@ Create the `users` microservice using the https://docs.micronaut.io/latest/guide
 
 [source,bash]
 ----
-mn @users:cli-command@
-    --features=@users:features@
-    --build=@build@
-    --lang=@lang@
-    --jdk=@minJdk@
+mn @users:cli-command@          \
+    --features=@users:features@ \
+    --build=@build@             \
+    --lang=@lang@               \
+    --jdk=@minJdk@              \
     example.micronaut.users
 ----
 
@@ -114,8 +114,8 @@ resource:application.yml[app=users]
 <1> Placeholder for username that will be populated by Kubernetes.
 <2> Placeholder for password that will be populated by Kubernetes.
 
-Create a _bootstrap.yml_ file in the _resources_ directory to https://docs.micronaut.io/latest/guide/#bootstrap[enable distributed configuration].
-Add the following:
+Edit the _bootstrap.yml_ file in the _resources_ directory to https://docs.micronaut.io/latest/guide/#bootstrap[enable distributed configuration].
+Change the default contents to the following:
 
 resource:bootstrap.yml[app=users]
 <1> Set `microanut.config-client.enabled: true`  to read and resolve configuration from distributed sources.
@@ -199,11 +199,11 @@ Create the `orders` microservice using the https://docs.micronaut.io/latest/guid
 
 [source,bash]
 ----
-mn @orders:cli-command@
-  --features=@orders:features@
-  --build=@build@
-  --lang=@lang@
-  --jdk=@minJdk@
+mn @orders:cli-command@        \
+  --features=@orders:features@ \
+  --build=@build@              \
+  --lang=@lang@                \
+  --jdk=@minJdk@               \
 example.micronaut.orders
 ----
 
@@ -294,15 +294,15 @@ callout:micronaut-test[1]
 test:OrdersControllerTest[app=orders]
 callout:micronaut-test[1]
 
-Edit _application.yml_
+Edit _application.yml_ so it contains:
 
 resource:application.yml[app=orders]
 <1> Placeholder for username that will be populated by Kubernetes.
 <2> Placeholder for password that will be populated by Kubernetes.
 
-Create a _bootstrap.yml_ file in
+Edit _bootstrap.yml_ file in
 the _resources_ directory to https://docs.micronaut.io/latest/guide/#bootstrap[enable distributed configuration].
-Add the following:
+Change it to the following:
 
 resource:bootstrap.yml[app=orders]
 <1> Set `microanut.config-client.enabled: true` to read and resolve configuration from distributed sources.
@@ -387,11 +387,11 @@ Create the `api` microservice using the https://docs.micronaut.io/latest/guide/#
 
 [source,bash]
 ----
-mn @api:cli-command@
-   --features=@api:features@
-   --build=@build@
-   --lang=@lang@
-   --jdk=@minJdk@
+mn @api:cli-command@         \
+   --features=@api:features@ \
+   --build=@build@           \
+   --lang=@lang@             \
+   --jdk=@minJdk@            \
     example.micronaut.api
 ----
 
@@ -503,8 +503,7 @@ resource:application.yml[app=api]
 <1> Placeholder for username that will be populated by Kubernetes.
 <2> Placeholder for password that will be populated by Kubernetes.
 
-Create a _bootstrap.yml_ file in the _resources_ directory to https://docs.micronaut.io/latest/guide/#bootstrap[enable distributed configuration].
-Add the following:
+Edit the _bootstrap.yml_ file in the _resources_ directory to https://docs.micronaut.io/latest/guide/#bootstrap[enable distributed configuration] so it looks like the following:
 
 resource:bootstrap.yml[app=api]
 <1> Set `microanut.config-client.enabled: true` to read and resolve configuration from distributed sources.
@@ -715,6 +714,10 @@ Run the next command to check the status of the microservices:
 kubectl get services -n=micronaut-k8s
 ----
 
+==== Minikube
+
+For Minikube the output should be similar to the following:
+
 [source,text]
 ----
 NAME     TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
@@ -731,6 +734,20 @@ Run the next command to retrieve the URL of the `api` microservice:
 ----
 export API_URL=$(minikube service api -n=micronaut-k8s --url)
 ----
+
+==== Docker Desktop
+
+For Docker Desktop's Kubernetes integration the output should be similar to the following.  Notice the external-ip is `localhost`:
+
+[source,text]
+----
+NAME     TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+api      LoadBalancer   10.108.205.248   localhost     8080:31516/TCP   9m23s
+orders   NodePort       10.98.120.224    <none>        8080:31566/TCP   9m39s
+users    NodePort       10.109.155.86    <none>        8080:30545/TCP   10m
+----
+
+So for Docker Desktop the `API_URL` should be set to `http://localhost:8080`.
 
 external:micronaut-k8s/verify.adoc[]
 

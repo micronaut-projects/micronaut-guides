@@ -13,12 +13,10 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller("/orders")  // <1>
 @Secured(SecurityRule.IS_AUTHENTICATED)  // <2>

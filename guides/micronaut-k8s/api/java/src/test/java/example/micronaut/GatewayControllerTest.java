@@ -29,7 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
 @MicronautTest // <1>
 class GatewayControllerTest {
 
@@ -51,7 +50,6 @@ class GatewayControllerTest {
     UsersClient usersClient() {
         return mock(UsersClient.class);
     }
-
 
     @Test
     void getItemById() {
