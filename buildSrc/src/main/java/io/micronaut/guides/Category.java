@@ -25,16 +25,19 @@ public enum Category implements Ordered {
     METRICS("Metrics", 20),
     DISTRIBUTED_TRACING("Distributed Tracing", 21),
     SERVICE_DISCOVERY("Service Discovery", 22),
-    COMMON_TASKS("Common Tasks", 23),
-    OBJECT_STORAGE("Object Storage", 24),
-    AWS("AWS", 25),
-    AWS_LAMBDA("AWS Lambda", 26),
-    AZURE("Micronaut + Microsoft Azure", 27),
-    GCP("Micronaut + Google Cloud", 28),
-    ORACLE_CLOUD("Micronaut + Oracle Cloud", 29),
-    KUBERNETES( "Micronaut + Kubernetes", 30),
 
-    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 31);
+    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 23),
+    COMMON_TASKS("Common Tasks", 24),
+    OBJECT_STORAGE("Object Storage", 25),
+    AWS("AWS", 26),
+    AWS_LAMBDA("AWS Lambda", 27),
+    AZURE("Microsoft Azure", 28),
+    GCP("Google Cloud", 29),
+    ORACLE_CLOUD("Oracle Cloud", 30),
+
+    KUBERNETES( "Kubernetes", 31),
+
+    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 32);
 
 
     private final String val;
