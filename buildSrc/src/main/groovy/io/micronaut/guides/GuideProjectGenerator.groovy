@@ -167,8 +167,6 @@ class GuideProjectGenerator implements AutoCloseable {
             assert outputDir.mkdir()
         }
 
-        String packageAndName = BASE_PACKAGE + '.' + APP_NAME
-
         JdkVersion javaVersion = Utils.parseJdkVersion()
         if (metadata.minimumJavaVersion != null) {
             JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
@@ -201,8 +199,10 @@ class GuideProjectGenerator implements AutoCloseable {
                 }
 
                 // typical guides use 'default' as name, multi-project guides have different modules
-                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
                 String folder = folderName(metadata.slug, guidesOption)
+                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
+                String packageAndName = BASE_PACKAGE + '.' + APP_NAME
+
 
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
