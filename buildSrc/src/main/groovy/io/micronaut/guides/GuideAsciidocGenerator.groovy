@@ -33,6 +33,7 @@ class GuideAsciidocGenerator {
     private static final String CALLOUT = 'callout:'
     private static final String EXTERNAL = 'external:'
     private static final String EXTERNAL_PARAMETRIZED = 'external-template:'
+    private static final String COMMON_PARAMETRIZED = 'common-template:'
     private static final Pattern GUIDE_LINK_REGEX = ~/(.*)guideLink:(.*)\[(.*)](.*)/
     private static final String CLI_MESSAGING = 'create-messaging-app'
     private static final String CLI_DEFAULT = 'create-app'
