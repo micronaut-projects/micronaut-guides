@@ -214,7 +214,6 @@ class GuideProjectGenerator implements AutoCloseable {
                     deleteEveryFileButSources(destination)
                 }
 
-
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
                         appFeatures, buildTool, testFramework, lang, javaVersion)
 
