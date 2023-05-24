@@ -1,0 +1,105 @@
+common:header.adoc[]
+
+You are going to deploy a Docker Image containing a CRaC enabled JDK and a pre-warmed, checkpointed Micronaut application to https://cloud.google.com/run[Google Cloud Run].
+
+common:costs-gcloud.adoc[]
+
+common:requirements.adoc[]
+* You need a https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account and a GCP project.
+* A computer with x86_64 architecture.
+
+WARNING: The CRaC JDK currently requires that you are using a machine with x86_64 architecture. If you are using a different architecture, you cannot currently build a CRaC checkpointed application.
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+external:distribution-base/hellocontroller.adoc[]
+
+test:HelloControllerTest[]
+
+common:gcp.adoc[]
+
+common:gcp-billing.adoc[]
+
+common:gcp-docker.adoc[]
+
+common:docker-crac.adoc[]
+
+== Docker Push
+
+common:google-cloud-registry.adoc[]
+
+:exclude-for-build:
+
+:exclude-for-build:maven
+
+Modify your Gradle build and configure the image name for the `dockerBuildCrac` task:
+
+[source,groovy]
+----
+tasks.named("dockerBuildCrac") {
+    images = ["gcr.io/micronaut-guides-xxxxxxx/micronautguide:latest"]
+}
+----
+
+:exclude-for-build:
+
+:exclude-for-build:maven
+
+[source, bash]
+----
+./gradlew dockerPushCrac
+----
+
+:exclude-for-build:
+:exclude-for-build:gradle
+
+[source, bash]
+----
+./mvnw deploy \
+     -Dpackaging=docker-crac \
+     -Djib.to.image=gcr.io/micronaut-guides-xxxxxxx/micronautguide:latest
+----
+
+:exclude-for-build:
+
+NOTE: In the image name above, `micronaut-guides-xxxxxxx` should be replaced by your project name you created earlier in the guide.
+
+You get an output such as:
+
+[source, bash]
+----
+> Task :dockerPushCrac
+Pushing image 'gcr.io/micronaut-guides-xxxxxxx/micronautguide:latest'.
+----
+
+== Google Cloud Run Deploy
+
+You can deploy to Google Cloud Run via the CLI. Use the value you configured in your build as the image argument's value.
+
+[source, bash]
+----
+gcloud run deploy \
+    --image=gcr.io/micronaut-guides-xxxxxx/micronautguide:latest \
+    --platform managed \
+    --execution-environment=gen2 \
+    --allow-unauthenticated
+----
+
+common:google-cloud-run-deploy-json.adoc[]
+
+== Cleanup
+
+common:gcloud-run-services-delete[]
+
+common:gcloud-delete-project[]
+
+== Next steps
+
+Read more about:
+
+common:crac-next.adoc[]
+common:google-cloud-run-next.adoc[]
+
+common:helpWithMicronaut.adoc[]

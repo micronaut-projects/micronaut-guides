@@ -11,7 +11,7 @@ import io.micronaut.http.client.annotation.Client
 interface OrdersClient {
 
     @Get("/orders/{id}")
-    Order getOrderById(Integer id)
+    Order getOrderById(int id)
 
     @Post("/orders")
     Order createOrder(@Body Order order)
@@ -23,5 +23,5 @@ interface OrdersClient {
     List<Item> getItems()
 
     @Get("/items/{id}")
-    Item getItemsById(Integer id)
+    Item getItemsById(int id)
 }

@@ -68,7 +68,7 @@ class OrdersControllerTest {
         ) { orderItemClient!!.createOrder(authHeader, order) }
         assertEquals(exception.status, HttpStatus.BAD_REQUEST)
         assertTrue(
-            exception.response.getBody(String::class.java).orElse("").contains("Item with id 5 doesn't exists")
+            exception.response.getBody(String::class.java).orElse("").contains("Item with id 5 doesn't exist")
         )
     }
 

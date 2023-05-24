@@ -46,9 +46,9 @@ class GameReporterTest : TestPropertyProvider { // <3>
     @Inject
     lateinit var chessListener: ChessListener // <5>
 
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <6>
+    @Inject // <6>
+    @field:Client("/") // <7>
+    lateinit var client: HttpClient // <8>
 
     @Test
     fun testGameEndingInCheckmate() {
@@ -61,7 +61,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
         val result = startGame(blackName, whiteName)
         val gameId = result.orElseThrow { RuntimeException("Expected GameDTO id") }
 
-        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() } // <7>
+        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() } // <9>
 
         assertEquals(1, receivedGames.size)
         assertEquals(0, receivedMoves.size)
@@ -178,7 +178,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
 
     override fun getProperties(): Map<String, String> {
         kafka.start()
-        return mapOf("kafka.bootstrap.servers" to kafka.bootstrapServers) // <8>
+        return mapOf("kafka.bootstrap.servers" to kafka.bootstrapServers) // <10>
     }
 
     @AfterEach
@@ -201,11 +201,11 @@ class GameReporterTest : TestPropertyProvider { // <3>
     }
 
     private fun startGame(blackName: String, whiteName: String): Optional<String> {
-        val body = mapOf("b" to blackName, "w" to whiteName) // <9>
+        val body = mapOf("b" to blackName, "w" to whiteName) // <11>
         val request: HttpRequest<*> = HttpRequest.POST("/game/start", body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE)
         return client.toBlocking().retrieve(request,
-                Argument.of(Optional::class.java, String::class.java)) as Optional<String> // <10>
+                Argument.of(Optional::class.java, String::class.java)) as Optional<String> // <12>
     }
 
     private fun makeMove(gameId: String, player: String, move: String,
@@ -214,13 +214,13 @@ class GameReporterTest : TestPropertyProvider { // <3>
         val body = mapOf("player" to player, "move" to move, "fen" to fen, "pgn" to pgn)
         val request = HttpRequest.POST("/game/move/$gameId", body)
                 .contentType(APPLICATION_FORM_URLENCODED_TYPE)
-        client.toBlocking().exchange<Map<String, String>, Any>(request) // <11>
+        client.toBlocking().exchange<Map<String, String>, Any>(request) // <13>
 
     }
 
     private fun endGame(gameId: String, winner: String?) {
         val uri = if (winner == null) "/game/draw/$gameId" else "/game/checkmate/$gameId/$winner"
         val request: HttpRequest<Any?> = HttpRequest.POST(uri, null)
-        client.toBlocking().exchange<Any?, Any>(request) // <12>
+        client.toBlocking().exchange<Any?, Any>(request) // <14>
     }
 }

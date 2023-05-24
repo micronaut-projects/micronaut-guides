@@ -23,51 +23,51 @@ import java.util.List;
 @Controller("/api") // <1>
 @Validated
 @ExecuteOn(TaskExecutors.IO) // <2>
-public class GatewayController {
+class GatewayController {
 
     private final OrdersClient orderClient;
     private final UsersClient userClient;
 
-    public GatewayController(OrdersClient orderClient, UsersClient userClient) {
+    GatewayController(OrdersClient orderClient, UsersClient userClient) {
         this.orderClient = orderClient;
         this.userClient = userClient;
     }
 
     @Get("/users/{id}") // <3>
-    public User getUserById(@NonNull Integer id) {
+    User getUserById(int id) {
         return userClient.getById(id);
     }
 
     @Get("/orders/{id}") // <4>
-    public Order getOrdersById(@NonNull Integer id) {
+    Order getOrdersById(int id) {
         Order order = orderClient.getOrderById(id);
         return new Order(order.id(), null, getUserById(order.userId()), order.items(), order.itemIds(), order.total());
     }
 
     @Get("/items/{id}") // <5>
-    public Item getItemsById(@NonNull Integer id) {
+    Item getItemsById(int id) {
         return orderClient.getItemsById(id);
     }
 
     @Get("/users") // <6>
-    public List<User> getUsers() {
+    List<User> getUsers() {
         return userClient.getUsers();
     }
 
     @Get("/items") // <7>
-    public List<Item> getItems() {
+    List<Item> getItems() {
         return orderClient.getItems();
     }
 
     @Get("/orders") // <8>
-    public List<Order> getOrders() {
+    List<Order> getOrders() {
         List<Order> orders = new ArrayList<>();
         orderClient.getOrders().forEach(x-> orders.add(new Order(x.id(), null, getUserById(x.userId()), x.items(), x.itemIds(), x.total())));
         return orders;
     }
 
     @Post("/orders") // <9>
-    public Order createOrder(@Body @Valid Order order) {
+    Order createOrder(@Body @Valid Order order) {
         User user = getUserById(order.userId());
         if (user == null) {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, String.format("User with id %s doesn't exist", order.userId()));
@@ -77,7 +77,7 @@ public class GatewayController {
     }
 
     @Post("/users")  // <10>
-    public User createUser(@Body @NonNull User user) {
+    User createUser(@Body @NonNull User user) {
         return userClient.createUser(user);
     }
 

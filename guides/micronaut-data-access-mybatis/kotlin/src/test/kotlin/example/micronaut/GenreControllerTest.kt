@@ -23,11 +23,7 @@ import org.junit.jupiter.api.Test
 import java.util.Collections
 
 @MicronautTest // <1>
-class GenreControllerTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var httpClient: HttpClient // <2>
+class GenreControllerTest(@Client("/") val httpClient: HttpClient) { // <2>
 
     @Test
     fun supplyAnInvalidOrderTriggersValidationFailure() {

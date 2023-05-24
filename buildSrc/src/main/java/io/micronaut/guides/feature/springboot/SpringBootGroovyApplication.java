@@ -9,14 +9,10 @@ import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.CoordinateResolver;
 import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.feature.lang.groovy.GroovyApplication;
-import io.micronaut.starter.options.BuildTool;
-import io.micronaut.starter.options.Language;
-import io.micronaut.starter.options.TestFramework;
-import io.micronaut.starter.template.RockerTemplate;
 import io.micronaut.starter.template.RockerWritable;
 import jakarta.inject.Singleton;
 
-import java.util.Optional;
+import static io.micronaut.starter.options.BuildTool.MAVEN;
 
 @Singleton
 public class SpringBootGroovyApplication extends GroovyApplication implements SpringBootApplicationFeature {
@@ -36,7 +32,7 @@ public class SpringBootGroovyApplication extends GroovyApplication implements Sp
     @Override
     public void apply(GeneratorContext generatorContext) {
         super.apply(generatorContext);
-        if (generatorContext.getBuildTool() == BuildTool.MAVEN) {
+        if (generatorContext.getBuildTool() == MAVEN) {
             SpringBootMavenUtils.addJavaVersionProperty(generatorContext);
             SpringBootMavenUtils.addSpringBootMavenPlugin(generatorContext);
             addGmavenPlusMavenPlugin(generatorContext);

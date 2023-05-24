@@ -35,7 +35,7 @@ class UsersController {
     }
 
     @Get("/{id}") // <4>
-    User findById(@NotNull Integer id) {
+    User findById(int id) {
         persons.stream()
                 .filter(it -> it.id == id)
                 .findFirst().orElse(null)

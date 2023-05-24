@@ -7,9 +7,12 @@ import io.micronaut.http.client.exceptions.HttpClientException
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.Base64
 
@@ -24,10 +27,10 @@ class UsersControllerTest {
 
     @Test
     fun testUnauthorized() {
-        val exception = Assertions.assertThrows(
+        val exception = assertThrows(
             HttpClientException::class.java
         ) { usersClient!!.getUsers("") }
-        Assertions.assertTrue(exception.message!!.contains("Unauthorized"))
+        assertTrue(exception.message!!.contains("Unauthorized"))
     }
 
     @Test
@@ -35,7 +38,7 @@ class UsersControllerTest {
         val authHeader = "Basic " + Base64.getEncoder()
             .encodeToString((credentials!!.username + ":" + credentials!!.password).toByteArray())
         val retriedUser = usersClient!!.getById(authHeader, 100)
-        Assertions.assertNull(retriedUser)
+        assertNull(retriedUser)
     }
 
     @Test
@@ -50,14 +53,14 @@ class UsersControllerTest {
         assertEquals(firstName, createdUser.firstName)
         assertEquals(lastName, createdUser.lastName)
         assertEquals(username, createdUser.username)
-        Assertions.assertNotNull(createdUser.id)
+        assertNotNull(createdUser.id)
         val retriedUser = usersClient!!.getById(authHeader, createdUser.id)
         assertEquals(firstName, retriedUser!!.firstName)
         assertEquals(lastName, retriedUser.lastName)
         assertEquals(username, retriedUser.username)
         val users = usersClient!!.getUsers(authHeader)
-        Assertions.assertNotNull(users)
-        Assertions.assertNotNull(users.any {
+        assertNotNull(users)
+        assertNotNull(users.any {
             it!!.username == username
         })
     }
@@ -74,13 +77,13 @@ class UsersControllerTest {
         assertEquals(firstName, createdUser.firstName)
         assertEquals(lastName, createdUser.lastName)
         assertEquals(username, createdUser.username)
-        Assertions.assertNotNull(createdUser.id)
+        assertNotNull(createdUser.id)
         assertNotEquals(createdUser.id, 0)
-        val exception = Assertions.assertThrows(
+        val exception = assertThrows(
             HttpClientResponseException::class.java
         ) { usersClient!!.createUser(authHeader, user) }
-        Assertions.assertEquals(exception.status, HttpStatus.CONFLICT)
-        Assertions.assertTrue(
+        assertEquals(HttpStatus.CONFLICT, exception.status)
+        assertTrue(
             exception.response.getBody(String::class.java).orElse("")
                 .contains("User with provided username already exists")
         )

@@ -30,7 +30,7 @@ class UsersControllerSpec extends Specification {
         e.message.contains("Unauthorized")
     }
 
-    void "get user that doesn't exists"() {
+    void "get user that doesn't exist"() {
         String authHeader = "Basic " + Base64.getEncoder().encodeToString((credentials.username + ":" + credentials.password).getBytes())
 
         when:

@@ -11,6 +11,7 @@ ____
 You will discover how the Micronaut framework eases Kubernetes integration.
 
 external:micronaut-k8s/requirements.adoc[]
+* Local Kubernetes cluster. We will use https://minikube.sigs.k8s.io/docs/[Minikube] in this guide.
 
 common:completesolution.adoc[]
 
@@ -36,12 +37,12 @@ Create the `users` microservice using the https://docs.micronaut.io/latest/guide
 
 [source,bash]
 ----
-mn @users:cli-command@ --features=discovery-kubernetes,management,security,serialization-jackson,kubernetes example.micronaut.users --build=@build@ --lang=@lang@
+mn @users:cli-command@ --features=discovery-kubernetes,management,security,serialization-jackson,kubernetes,graalvm example.micronaut.users --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-kubernetes`, `management`, `security`, `serialization-jackson` and `kubernetes` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-kubernetes`, `management`, `security`, `serialization-jackson`, `kubernetes` and `graalvm` features.
 
 The previous command creates a directory named _users_ containing Micronaut application with a package named `example.micronaut`.
 
@@ -63,9 +64,8 @@ The previous `UsersController` controller uses a `User` object to represent the 
 :exclude-for-languages:
 
 :exclude-for-languages:java
-The previous `UsersController` controller uses `User` object to represent customer. Create the `User` class
+The `UsersController` class uses a `User` object to represent customer. Create the `User` class
 :exclude-for-languages:
-
 
 source:models/User[app=users]
 callout:serdeable[1]
@@ -116,10 +116,6 @@ resource:bootstrap.yml[app=users]
 <1> Set `microanut.config-client.enabled: true`  to read and resolve configuration from distributed sources.
 <2> Set `kubernetes.client.secrets.enabled: true` to enable Kubernetes secrets as distributed source.
 <3> Set `kubernetes.client.secrets.use-api: true` to use the Kubernetes API to fetch the configuration.
-
-common:default-dev-environment-application.adoc[]
-
-source:Application[app=users]
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
@@ -172,7 +168,7 @@ Run the `users` microservice:
 [source, bash]
 .users
 ----
-./gradlew run
+ MICRONAUT_ENVIRONMENTS=dev ./gradlew run
 ----
 
 :exclude-for-build:
@@ -182,7 +178,7 @@ Run the `users` microservice:
 [source, bash]
 .users
 ----
-./mvnw mn:run
+ MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
 ----
 
 :exclude-for-build:
@@ -198,12 +194,12 @@ Create the `orders` microservice using the https://docs.micronaut.io/latest/guid
 
 [source,bash]
 ----
-mn @orders:cli-command@ --features=discovery-kubernetes,management,security,serialization-jackson,kubernetes example.micronaut.orders --build=@build@ --lang=@lang@
+mn @orders:cli-command@ --features=discovery-kubernetes,management,security,serialization-jackson,kubernetes,graalvm example.micronaut.orders --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-kubernetes`, `management`, `security`, `serialization-jackson` and `kubernetes` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-kubernetes`, `management`, `security`, `serialization-jackson`, `kubernetes` and `graalvm` features.
 
 The previous command creates a directory named _orders_ containing a Micronaut application with a package named `example.micronaut`.
 
@@ -304,9 +300,6 @@ resource:bootstrap.yml[app=orders]
 <3> Set `kubernetes.client.secrets.use-api: true` to use Kubernetes API to fetch configuration.
 
 
-common:default-dev-environment-application.adoc[]
-source:Application[app=orders]
-
 common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.yml[app=orders]
@@ -358,7 +351,7 @@ Run the `orders` microservice:
 [source, bash]
 .orders
 ----
-./gradlew run
+MICRONAUT_ENVIRONMENTS=dev ./gradlew run
 ----
 
 :exclude-for-build:
@@ -368,7 +361,7 @@ Run the `orders` microservice:
 [source, bash]
 .orders
 ----
-./mvnw mn:run
+MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
 ----
 
 :exclude-for-build:
@@ -384,12 +377,12 @@ Create the `api` microservice using the https://docs.micronaut.io/latest/guide/#
 
 [source,bash]
 ----
-mn @api:cli-command@ --features=discovery-kubernetes,management,kubernetes,serialization-jackson,mockito example.micronaut.api --build=@build@ --lang=@lang@
+mn @api:cli-command@ --features=discovery-kubernetes,management,kubernetes,serialization-jackson,mockito,graalvm example.micronaut.api --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-kubernetes`, `management`, `kubernetes`, `serialization-jackson` and `mockito` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `discovery-kubernetes`, `management`, `kubernetes`, `serialization-jackson`, `mockito` and `graalvm` features.
 
 The previous command creates a directory named _api_ containing a Micronaut application with a package named `example.micronaut`.
 
@@ -503,11 +496,6 @@ resource:bootstrap.yml[app=api]
 <2> Set `kubernetes.client.secrets.enabled: true` to enable Kubernetes secrets as a distributed source.
 <3> Set `kubernetes.client.secrets.use-api: true` to use the  Kubernetes API to fetch configuration.
 
-
-common:default-dev-environment-application.adoc[]
-
-source:Application[app=api]
-
 common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.yml[app=api]
@@ -560,7 +548,7 @@ Run `api` microservice:
 [source, bash]
 .api
 ----
-./gradlew run
+MICRONAUT_ENVIRONMENTS=dev ./gradlew run
 ----
 
 :exclude-for-build:
@@ -570,7 +558,7 @@ Run `api` microservice:
 [source, bash]
 .api
 ----
-./mvnw mn:run
+MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
 ----
 
 :exclude-for-build:
@@ -582,53 +570,14 @@ Run `api` microservice:
 
 === Test integration between applications
 
-Run a cURL command to create a new user via the `api` microservice:
+Store the URL of the `api` microservice in the `API_URL` environment variable.
 
 [source,bash]
 ----
-curl -X "POST" "http://localhost:8080/api/users" -H 'Content-Type: application/json; charset=utf-8' -d '{ "first_name": "Nemanja", "last_name": "Mikic", "username": "nmikic" }'
+export API_URL=http://localhost:8080
 ----
 
-[source, json]
-----
-{"id":1,"username":"nmikic","first_name":"Nemanja","last_name":"Mikic"}
-----
-
-Run a cURL command to a new order via the `api` microservice:
-
-[source,bash]
-----
-curl -X "POST" "http://localhost:8080/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 1, "item_ids": [1,2] }'
-----
-
-[source, json]
-----
-{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}
-----
-
-Run a cURL command to list created orders:
-
-[source,bash]
-----
-curl "http://localhost:8080/api/orders" -H 'Content-Type: application/json; charset=utf-8'
-----
-
-[source, json]
-----
-[{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
-----
-
-We can try to place an order for a user who doesn't exist (with id 100). Run a cURL command:
-
-[source,bash]
-----
-curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 100, "item_ids": [1,2] }'
-----
-
-[source, json]
-----
-{"message":"Bad Request","_links":{"self":[{"href":"/api/orders","templated":false}]},"_embedded":{"errors":[{"message":"User with id 100 doesn't exist"}]}}
-----
+external:micronaut-k8s/verify.adoc[]
 
 == Kubernetes and the Micronaut framework
 
@@ -666,23 +615,7 @@ eval $(minikube docker-env)
 
 === Users Microservice
 
-The next command will build a container image of the `users` service with named `users`.
-
-:exclude-for-build:gradle
-
-[source,bash]
-----
-./mvnw package -Dpackaging=docker
-----
-:exclude-for-build:
-
-:exclude-for-build:maven
-
-[source,bash]
-----
-./gradlew dockerBuild
-----
-:exclude-for-build:
+external-template:micronaut-k8s/micronaut-k8s-docker.adoc[arg0=users]
 
 Edit the file named _k8s.yml_ inside the `users` microservice.
 
@@ -697,12 +630,7 @@ include::{sourceDir}/micronaut-k8s/@sourceDir@/users/k8s.yml[]
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
 
-Run the next command to create the resources described above:
-
-[source,bash]
-----
-kubectl apply -f users/k8s.yml
-----
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=users]
 
 [source,text]
 ----
@@ -712,23 +640,7 @@ service/users created
 
 === Orders Microservice
 
-The next command will build a container image of the `orders` service named `orders`.
-
-:exclude-for-build:gradle
-
-[source,bash]
-----
-./mvnw package -Dpackaging=docker
-----
-:exclude-for-build:
-
-:exclude-for-build:maven
-
-[source,bash]
-----
-./gradlew dockerBuild
-----
-:exclude-for-build:
+external-template:micronaut-k8s/micronaut-k8s-docker.adoc[arg0=orders]
 
 Edit the file named _k8s.yml_ inside the `orders` microservice.
 
@@ -743,38 +655,11 @@ include::{sourceDir}/micronaut-k8s/@sourceDir@/orders/k8s.yml[]
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
 
-Run the next command to create the resources described above:
-
-[source,bash]
-----
-kubectl apply -f orders/k8s.yml
-----
-
-[source,text]
-----
-deployment.apps/orders created
-service/orders created
-----
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=orders]
 
 === API (Gateway) Microservice
 
-The next command will build a container image of the `api` microservice named `api`.
-
-:exclude-for-build:gradle
-
-[source,bash]
-----
-./mvnw package -Dpackaging=docker
-----
-:exclude-for-build:
-
-:exclude-for-build:maven
-
-[source,bash]
-----
-./gradlew dockerBuild
-----
-:exclude-for-build:
+external-template:micronaut-k8s/micronaut-k8s-docker.adoc[arg0=api]
 
 Edit the file named _k8s.yml_ inside the `api` microservice.
 
@@ -789,22 +674,11 @@ include::{sourceDir}/micronaut-k8s/@sourceDir@/api/k8s.yml[]
 <4> Name of a service, required for service discovery.
 <5> Micronaut default port on which application is running.
 
-Run the next command to create the resources described above:
+external-template:micronaut-k8s/k8s-deploy-service.adoc[arg0=api]
 
-[source,bash]
-----
-kubectl apply -f api/k8s.yml
-----
+=== Test integration between applications deployed on Kubernetes
 
-[source,text]
-----
-deployment.apps/api created
-service/api created
-----
-
-=== Test integration between applications
-
-Run the next command to check the status of the pods you created and make sure that all have the status "Running":
+Run the next command to check status of the pods and make sure that all of them have the status "Running":
 
 [source,bash]
 ----
@@ -843,68 +717,15 @@ Run the next command to retrieve the URL of the `api` microservice:
 export API_URL=$(minikube service api -n=micronaut-k8s --url)
 ----
 
-Run a cURL command to create a user via the `api` service:
-
-[source,bash]
-----
-curl -X "POST" "$API_URL/api/users" -H 'Content-Type: application/json; charset=utf-8' -d '{ "first_name": "Nemanja", "last_name": "Mikic", "username": "nmikic" }'
-----
-
-[source, json]
-----
-{"id":1,"username":"nmikic","first_name":"Nemanja","last_name":"Mikic"}
-----
-
-Run a cURL command to create an order via the `api` microservice:
-
-[source,bash]
-----
-curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 1, "item_ids": [1,2] }'
-----
-
-[source, json]
-----
-{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}
-----
-
-Run a cURL command to list the orders:
-
-[source,bash]
-----
-curl "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8'
-----
-
-[source, json]
-----
-[{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
-----
-
-We can try to place an order with a user who doesn't exist (with id 100). Run a cURL command:
-
-[source,bash]
-----
-curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 100, "item_ids": [1,2] }'
-----
-
-[source, json]
-----
-{"message":"Bad Request","_links":{"self":[{"href":"/api/orders","templated":false}]},"_embedded":{"errors":[{"message":"User with id 100 doesn't exist"}]}}
-----
+external:micronaut-k8s/verify.adoc[]
 
 == Cleaning Up
 
-To delete all pods, services and deployments created in this guide run next command.
+To delete all resources that were created in this guide run next command.
 
 [source,bash]
 ----
-kubectl delete all --all -n micronaut-k8s
-----
-
-Run next command to delete role, service account, service, role binding and namespace.
-
-[source,bash]
-----
-kubectl delete -f auth.yml
+kubectl delete namespaces micronaut-k8s
 ----
 
 == Next steps

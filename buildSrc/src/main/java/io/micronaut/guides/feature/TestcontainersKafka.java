@@ -1,7 +1,6 @@
 package io.micronaut.guides.feature;
 
 import io.micronaut.starter.application.generator.GeneratorContext;
-
 import jakarta.inject.Singleton;
 
 @Singleton

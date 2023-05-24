@@ -1,37 +1,12 @@
 common:header.adoc[]
 
-You are going to deploy a https://www.graalvm.org/reference-manual/native-image/[GraalVM Native Executable] of  a Micronaut application to https://cloud.google.com/run[Google Cloud Run].
+common:google-cloud-registry.adoc[]
+
+The docker image runs a https://www.graalvm.org/reference-manual/native-image/[GraalVM Native Executable] of the Micronaut application.
 
 > Develop and deploy highly scalable containerized applications on a fully managed serverless platform.
 
 common:gcp-deploy-requirements2content.adoc[]
-
-== Configure Google Cloud Docker
-
-Run `auth configure-docker` via the Google Cloud CLI:
-
-[source, bash]
-----
-> gcloud auth configure-docker
-----
-
-[source, bash]
-----
-Adding credentials for all GCR repositories.
-WARNING: A long list of credential helpers may cause delays running 'docker build'. We recommend passing the registry name to configure only the registry you are using.
-After update, the following will be written to your Docker config file
- located at [~/.docker/config.json]:
- {
-  "credHelpers": {
-    "gcr.io": "gcloud",
-    "marketplace.gcr.io": "gcloud",
-    "eu.gcr.io": "gcloud",
-    "us.gcr.io": "gcloud",
-    "staging-k8s.gcr.io": "gcloud",
-    "asia.gcr.io": "gcloud"
-  }
-}
-----
 
 == Docker Push Native
 
@@ -53,7 +28,7 @@ Modify your Gradle build and configure the
 ..
 .
 dockerBuildNative {
-    images = ["gcr.io/micronaut-guides/micronautguide:latest"]
+    images = ["gcr.io/micronaut-guides-xxxxxx/micronautguide:latest"]
 }
 ----
 
@@ -67,12 +42,12 @@ common:docker-push-native-gradle.adoc[]
 ----
 ./mvnw deploy \
      -Dpackaging=docker-native \
-     -Djib.to.image=gcr.io/micronaut-guides/micronautguide:latest
+     -Djib.to.image=gcr.io/micronaut-guides-xxxxxx/micronautguide:latest
 ----
 
 :exclude-for-build:
 
-The previous URL uses the pattern: `gcr.io/PROJECT_ID/micronautguide:latest`. Change it to use your Project ID.
+The previous URL uses the pattern: `gcr.io/micronaut-guides-xxxxxx/micronautguide:latest`. Change it to use your Project ID.
 
 You get an output such as:
 
@@ -81,81 +56,25 @@ You get an output such as:
 ....
 ..
 .
-Pushing image 'gcr.io/micronaut-guides/micronautguide:latest'.
+Pushing image 'gcr.io/micronaut-guides-xxxxxx/micronautguide:latest'.
 ----
 
-== Google Cloud Deployment
+== Google Cloud Run Deploy
 
 You can deploy to Google Cloud Run via the CLI. Use the value you configured in your build as the image argument's value.
 
 [source, bash]
 ----
 gcloud run deploy \
-    --image=gcr.io/micronaut-guides/micronautguide:latest \
+    --image=gcr.io/micronaut-guides-xxxxxx/micronautguide:latest \
     --platform managed \
     --allow-unauthenticated
 ----
 
-You will see an output such as:
-
-[source, bash]
-----
-Service name (micronautguide):
-Please specify a region:
-...
-..
-.
- [22] us-central1
- [23] us-east1
- [24] us-east4
-...
-..
-.
- [29] cancel
-Please enter your numeric choice:  23
-
-To make this the default region, run `gcloud config set run/region us-east1`.
-
-Deploying container to Cloud Run service [micronautguide]
-in project [micronaut-guides] region [us-east1]
-✓ Deploying... Done.
-  ✓ Creating Revision...
-  ✓ Routing traffic...
-  ✓ Setting IAM Policy...
-Done.
-Service [micronautguide] revision [micronautguide-00002-fat] has been deployed
- and is serving 100 percent of traffic at
- https://micronautguide-li3tercjmq-ue.a.run.app
-----
-
-== Running the Application
-
-[source, bash]
-----
-curl -i https://micronautguide-li3tercjmq-ue.a.run.app/hello
-----
-
-[source]
-----
-HTTP/2 200
-content-type: text/plain
-x-cloud-trace-context: 139f91d74bfe5d24a2770fca9abef1d7
-date: Sat, 02 Oct 2021 07:18:52 GMT
-server: Google Frontend
-content-length: 11
-alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
-
-Hello World
-----
+common:google-cloud-run-deploy-plain.adoc[]
 
 == Next steps
 
-You will probably want to deploy to Google Cloud Run from your CI server. https://launch.micronaut.io[Micronaut Launch] contains feature https://micronaut.io/launch?type=DEFAULT&name=demo&package=com.example&javaVersion=JDK_11&lang=JAVA&build=GRADLE&test=JUNIT&features=github-workflow-google-cloud-run-graalvm&version=3.0.3[github-workflow-google-cloud-run-graalvm], which adds a https://github.com/features/actions[GitHub Actions] Workflow that deploys a GraalVM Native executable of a Micronaut application to Google Cloud Run from Google Container Registry.
+You will probably want to deploy to Google Cloud Run from your CI server. https://launch.micronaut.io[Micronaut Launch] contains feature https://micronaut.io/launch?type=DEFAULT&features=github-workflow-google-cloud-run-graalvm[github-workflow-google-cloud-run-graalvm], which adds a https://github.com/features/actions[GitHub Actions] Workflow that deploys a GraalVM Native executable of a Micronaut application to Google Cloud Run from Google Container Registry.
 
-Read more about:
-
-- https://cloud.google.com/container-registry[Google Cloud Container Registry]
-- https://cloud.google.com/run[Google Cloud Run]
-- https://micronaut-projects.github.io/micronaut-gcp/latest/guide/[Micronaut Google Cloud Platform (GCP)] integration.
-
-common:helpWithMicronaut.adoc[]
+common:google-cloud-run-next.adoc[]

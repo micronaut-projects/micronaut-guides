@@ -1,0 +1,142 @@
+common:header.adoc[]
+
+The application exposes some REST endpoints and stores data in a MySQL database using https://micronaut-projects.github.io/micronaut-data/latest/guide/#r2dbc[Micronaut Data R2DBC].
+
+common:r2dbc-intro.adoc[]
+
+common:requirements.adoc[]
+* https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run MySQL and to run tests using https://www.testcontainers.org[Testcontainers].
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Data Source configuration
+
+Define the R2DBC and the JDBC datasource in `src/main/resources/application.yml` (the latter is needed for Flyway migrations).
+
+resource:application.yml[tag=datasource]
+
+NOTE: Only the dialect is defined. The remainder of the values (including the database URL etc.) will automatically be populated by the https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/#modules-databases-r2dbc[Test Resources] integration, which uses https://www.testcontainers.org/[Testcontainers].
+
+When deploying to production, the https://micronaut-projects.github.io/micronaut-sql/latest/guide/configurationreference.html#io.micronaut.configuration.jdbc.hikari.DatasourceConfiguration[datasource connection properties] and https://micronaut-projects.github.io/micronaut-r2dbc/latest/guide/configurationreference.html#io.micronaut.r2dbc.DefaultBasicR2dbcProperties[r2dbc connection properties] can be specified externally (using environment variables for example).
+
+common:flyway.adoc[]
+
+resource:db/migration/V1__schema.sql[]
+
+During application startup, Flyway will execute the SQL file and create the schema needed for the application.
+
+=== Domain
+
+Create the domain entity:
+
+source:domain/Genre[]
+
+TIP: You could use a https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlAnnotations[subset of supported JPA annotations] instead by including the following `compileOnly` scoped dependency: `jakarta.persistence:jakarta.persistence-api`.
+
+=== Repository Access
+
+Next, create a repository interface to define the operations to access the database. Micronaut Data will implement the interface at compilation time:
+
+source:GenreRepository[]
+
+<1> `@R2dbcRepository` with a specific dialect.
+<2> `Genre`, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the `GenericRepository` interface.
+
+The repository extends from `ReactorPageableRepository`. It inherits the hierarchy `ReactorPageableRepository` -> `ReactorCrudRepository` -> `ReactiveStreamsCrudRepository` -> `GenericRepository`.
+
+|===
+|Repository | Description
+
+|`ReactorPageableRepository`
+| A repository that supports pagination. It provides `findAll(Pageable)` and `findAll(Sort)`.
+
+|`ReactorCrudRepository`
+| A repository interface for performing CRUD (Create, Read, Update, Delete). It provides methods such as `findAll()`, `save(Genre)`, `deleteById(Long)`, and `findById(Long)`.
+
+|`GenericRepository`
+| A root interface that features no methods but defines the entity type and ID type as generic arguments.
+
+|===
+
+=== Controller
+
+common:validation.adoc[]
+
+Create a class to encapsulate the Update operations:
+
+source:GenreUpdateCommand[]
+
+callout:serdeable[1]
+
+Create `GenreController`, a controller that exposes a resource with the common CRUD operations:
+
+source:GenreController[]
+
+callout:controller[number=1,arg0=/genres]
+callout:constructor-di[number=2,arg0=GenreRepository]
+<3> Maps a `GET` request to `/genres/{id}`, which attempts to show a genre. This illustrates the use of a URL path variable.
+<4> Returning an empty Reactor `Mono` when the genre doesn't exist makes the Micronaut framework respond with 404 (not found).
+<5> Maps a `PUT` request to `/genres`, which attempts to update a genre.
+<6> Adds `@Valid` to any method parameter that requires validation. Use a POJO supplied as a JSON payload in the request to populate command.
+<7> The `Mono.thenReturn(..)` method is used to return a `NO_CONTENT` response only if the update was successful. Headers are easily added by the `HttpResponse` API.
+<8> Maps a `GET` request to `/genres/list`, which returns a list of genres.
+<9> You can bind `Pageable` as a controller method argument. Check the examples in the following test section and read the https://micronaut-projects.github.io/micronaut-data/latest/guide/configurationreference.html#io.micronaut.data.runtime.config.DataConfiguration.PageableConfiguration[Pageable configuration] options. For example, you can configure the default page size with the configuration property `micronaut.data.pageable.default-page-size`.
+<10> Maps a `POST` request to `/genres`, which attempts to save a genre. This example uses the `Mono.map(..)` method to obtain the result of the call to `save(String name)` and map it to a HTTP `CREATED` response if the save operation was successful.
+<11> Maps a `POST` request to `/ex`, which generates an exception. This example demonstrates how to handle exceptions with `Mono.onErrorReturn(..)`, which simply returns a `NO_CONTENT` response if an error occurs. More complex use cases (like logging the exception) can be handled with `Mono.onErrorResume(..)`.
+<12> Maps a `DELETE` request to `/genres/{id}`, which attempts to remove a genre. This illustrates the use of a URL path variable. The `Mono.then()` method is called to discard the result and return an empty `Mono` only if the call to `deleteById` is successful.
+
+=== Writing Tests
+
+Create a test to verify the CRUD operations:
+
+test:GenreControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-request[3]
+callout:retrieve[4]
+callout:exchange[5]
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+== Testing Running API
+
+Save one genre, and your `genre` table will now contain an entry.
+
+[source, bash]
+----
+curl -X "POST" "http://localhost:8080/genres" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{ "name": "music" }'
+----
+
+common:test-resources-mysql-datasource.adoc[]
+
+common:mysql-datasource-without-test-resources-for-r2dbc.adoc[]
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+You can execute the `genres` endpoints exposed by the native image, for example:
+
+[source, bash]
+----
+curl localhost:8080/genres/list
+----
+
+:exclude-for-languages:
+
+== Next steps
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-data/latest/guide/#r2dbc[Micronaut Data R2DBC].
+* https://micronaut-projects.github.io/micronaut-r2dbc/latest/guide/[Micronaut R2DBC]
+* https://r2dbc.io[R2DBC]
+
+common:helpWithMicronaut.adoc[]

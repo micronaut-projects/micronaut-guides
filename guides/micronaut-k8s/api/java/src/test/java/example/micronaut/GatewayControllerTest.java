@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 
 @MicronautTest // <1>
-public class GatewayControllerTest {
+class GatewayControllerTest {
 
     @Inject
     OrdersClient ordersClient;
@@ -189,7 +189,7 @@ public class GatewayControllerTest {
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> gatewayClient.createOrder(order));
 
-        assertEquals(exception.getStatus(), HttpStatus.BAD_REQUEST);
+        assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
 
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("User with id 2 doesn't exist"));
     }
@@ -204,7 +204,7 @@ public class GatewayControllerTest {
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> gatewayClient.createUser(user));
 
-        assertEquals(exception.getStatus(), HttpStatus.BAD_REQUEST);
+        assertEquals(HttpStatus.BAD_REQUEST,exception.getStatus());
 
         assertTrue(exception.getResponse().getBody(String.class).orElse("").contains("Test error message"));
     }

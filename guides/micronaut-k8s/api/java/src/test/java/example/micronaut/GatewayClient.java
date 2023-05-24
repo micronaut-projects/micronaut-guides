@@ -14,13 +14,13 @@ import java.util.List;
 public interface GatewayClient {
 
     @Get("/api/items/{id}")
-    Item getItemById(Integer id);
+    Item getItemById(int id);
 
     @Get("/api/orders/{id}")
-    Order getOrderById(Integer id);
+    Order getOrderById(int id);
 
     @Get("/api/users/{id}")
-    User getUsersById(Integer id);
+    User getUsersById(int id);
 
     @Get("/api/users")
     List<User> getUsers();

@@ -13,7 +13,7 @@ import java.util.List;
 @Client("orders") // <1>
 public interface OrdersClient {
     @Get("/orders/{id}")
-    Order getOrderById(Integer id);
+    Order getOrderById(int id);
 
     @Post("/orders")
     Order createOrder(@Body Order order);
@@ -25,6 +25,6 @@ public interface OrdersClient {
     List<Item> getItems();
 
     @Get("/items/{id}")
-    Item getItemsById(Integer id);
+    Item getItemsById(int id);
 }
 

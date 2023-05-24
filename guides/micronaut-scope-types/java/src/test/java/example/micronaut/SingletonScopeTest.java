@@ -8,7 +8,6 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -26,13 +25,12 @@ class SingletonScopeTest {
 //end::imports[]
 /*
 //tag::testheader[]
-    @Test
-    void onlyOneInstanceOfTheBeanExistsForSingletonBeans() {
-        String path = "/";
+    @ParameterizedTest
+    @ValueSource(strings = {"/singleton"})
 //end::testheader[]
 */        
     @ParameterizedTest
-    @ValueSource(strings = {"/singleton", "/infrastructuresingleton", "/infrastructuresingleton"})
+    @ValueSource(strings = {"/singleton", "/infrastructuresingleton"})
 //tag::test[]    
     void onlyOneInstanceOfTheBeanExistsForSingletonBeans(String path) {
         BlockingHttpClient client = httpClient.toBlocking();

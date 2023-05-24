@@ -21,11 +21,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 @MicronautTest // <1>
-class JwtAuthenticationTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient // <2>
+class JwtAuthenticationTest(@Client("/") val client: HttpClient) { // <2>
 
     @Test
     fun accessingASecuredUrlWithoutAuthenticatingReturnsUnauthorized() {

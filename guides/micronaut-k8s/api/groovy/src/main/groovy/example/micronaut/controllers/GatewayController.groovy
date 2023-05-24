@@ -32,18 +32,18 @@ class GatewayController {
     }
 
     @Get("/users/{id}") // <3>
-    User getUserById(@NonNull Integer id) {
+    User getUserById(int id) {
         userClient.getById(id)
     }
 
     @Get("/orders/{id}") // <4>
-    Order getOrdersById(@NonNull Integer id) {
+    Order getOrdersById(int id) {
         def order = ordersClient.getOrderById(id)
         new Order(order.id, null, getUserById(order.userId), order.items, order.itemIds, order.total)
     }
 
     @Get("/items/{id}") // <5>
-    Item getItemsById(@NonNull Integer id) {
+    Item getItemsById(int id) {
         ordersClient.getItemsById(id)
     }
 

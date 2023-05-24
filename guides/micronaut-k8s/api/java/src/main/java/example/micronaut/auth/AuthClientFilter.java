@@ -8,11 +8,11 @@ import io.micronaut.http.filter.HttpClientFilter;
 import org.reactivestreams.Publisher;
 
 @Filter(Filter.MATCH_ALL_PATTERN)
-public class AuthClientFilter implements HttpClientFilter {
+class AuthClientFilter implements HttpClientFilter {
 
     private final Credentials credentials;
 
-    public AuthClientFilter(Credentials credentials) {
+    AuthClientFilter(Credentials credentials) {
         this.credentials = credentials;
     }
 

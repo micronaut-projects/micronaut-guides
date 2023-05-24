@@ -1,7 +1,7 @@
 package example.micronaut;
 
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.function.aws.MicronautRequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import jakarta.inject.Inject;
 import java.util.Locale;
 
-@Introspected
+@Serdeable
 public class FunctionRequestHandler
         extends MicronautRequestHandler<S3EventNotification, Void> { // <1>
     private static final Logger LOG = LoggerFactory.getLogger(FunctionRequestHandler.class);

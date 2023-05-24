@@ -20,7 +20,7 @@ import java.util.Optional;
 @Controller("/users") // <1>
 @Secured(SecurityRule.IS_AUTHENTICATED) // <2>
 @Validated
-public class UsersController {
+class UsersController {
     List<User> persons = new ArrayList<>();
 
     @Post // <3>
@@ -37,7 +37,7 @@ public class UsersController {
     }
 
     @Get("/{id}") // <4>
-    public User findById(@NotNull Integer id) {
+    public User findById(int id) {
         return persons.stream()
                 .filter(it -> it.id().equals(id))
                 .findFirst().orElse(null);
@@ -48,7 +48,7 @@ public class UsersController {
         return persons;
     }
 
-    public Optional<User> findByUsername(@NotNull String username) {
+     Optional<User> findByUsername(@NotNull String username) {
         return persons.stream()
                 .filter(it -> it.username().equals(username))
                 .findFirst();

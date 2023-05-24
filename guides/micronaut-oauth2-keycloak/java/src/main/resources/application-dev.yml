@@ -1,0 +1,21 @@
+#tag::port[]
+micronaut:
+  server:
+    port: 8081
+#end::port[]
+---
+#tag::oauth2[]
+micronaut:
+  security:
+    authentication: idtoken # <1>
+    oauth2:
+      clients:
+        keycloak: # <2>
+          client-secret: '${OAUTH_CLIENT_SECRET:secret}' # <3>
+          client-id: '${OAUTH_CLIENT_ID:myclient}' # <4>
+          openid:
+            issuer: '${OIDC_ISSUER_DOMAIN:`http://localhost:8080`}/realms/${KEYCLOAK_REALM:myrealm}/' # <5>
+    endpoints:
+      logout:
+        get-allowed: true # <6>
+#end::oauth2[]

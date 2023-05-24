@@ -12,7 +12,7 @@ import io.micronaut.security.rules.SecurityRule
 class ItemsController {
 
     @Get("/{id}")  // <3>
-    Item findById(@NonNull Integer id) {
+    Item findById(int id) {
         Item.items.stream()
                 .filter(it -> it.id == id)
                 .findFirst().orElse(null)
