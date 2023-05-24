@@ -32,8 +32,6 @@ class GuideAsciidocGenerator {
     private static final String INCLUDE_COMMONDIR = 'common:'
     private static final String CALLOUT = 'callout:'
     private static final String EXTERNAL = 'external:'
-    private static final String EXTERNAL_PARAMETRIZED = 'external-template:'
-    private static final String COMMON_PARAMETRIZED = 'common-template:'
     private static final Pattern GUIDE_LINK_REGEX = ~/(.*)guideLink:(.*)\[(.*)](.*)/
     private static final String CLI_MESSAGING = 'create-messaging-app'
     private static final String CLI_DEFAULT = 'create-app'
@@ -256,12 +254,7 @@ class GuideAsciidocGenerator {
                 include rawLine, rawLines, projectDir, true
             } else if (rawLine.startsWith(EXTERNAL) && rawLine.endsWith(']')) {
                 include rawLine, rawLines, projectDir, false
-            }else if (rawLine.startsWith(COMMON_PARAMETRIZED) && rawLine.endsWith(']')){
-                rawLines.addAll includeParametrized(rawLine, projectDir, true)
-            } else if (rawLine.startsWith(EXTERNAL_PARAMETRIZED) && rawLine.endsWith(']')){
-                rawLines.addAll includeParametrized(rawLine, projectDir, false)
-            }
-            else {
+            } else {
                 rawLines << rawLine
             }
         }
@@ -289,57 +282,7 @@ class GuideAsciidocGenerator {
 
         line
     }
-
-    private static List<String> includeParametrized(String rawLine, File projectDir, boolean snippet) {
-
-        String prefix = snippet ? COMMON_PARAMETRIZED : EXTERNAL_PARAMETRIZED
-
-        String relativePath = parseFileName(rawLine, prefix)
-                .orElseThrow(() -> new GradleException("could not parse filename from include line: " + rawLine))
-
-        if (snippet) {
-            relativePath = 'src/docs/common/snippets/common-' + relativePath
-        } else {
-            relativePath = 'guides/' + relativePath
-        }
-
-        File file = new File(projectDir, relativePath)
-
-        List<String> newLines = commonLines(file, projectDir)
-
-        String pattern = "(\\{(\\d+)(:?([UL])?)})"
-
-        // Create a Pattern object
-        Pattern r = Pattern.compile(pattern)
-
-        for (int i = 0; i < newLines.size(); i++) {
-            String line = newLines[i]
-            Matcher m = r.matcher(line)
-            while (m.find()) {
-                def replaceString = m.group(1)
-                def argNum = m.group(2)
-                String value = extractFromParametersLine(rawLine, "arg" + argNum)
-                def letter = m.group(4)
-                if (value) {
-                    switch (letter) {
-                        case 'U':
-                            line = line.replace(replaceString, value.toUpperCase())
-                            break
-                        case 'L':
-                            line = line.replace(replaceString, value.toUpperCase())
-                            break
-                       default:
-                            line = line.replace(replaceString, value)
-                           break
-                    }
-                    newLines[i] = line
-                }
-            }
-        }
-
-        newLines
-    }
-
+    
     private static void include(String rawLine, List<String> rawLines, File projectDir,
                                 boolean snippet) {
 
