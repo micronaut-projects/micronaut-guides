@@ -1,0 +1,47 @@
+Run a cURL command to create a new user via the `api` microservice:
+
+[source,bash]
+----
+curl -X "POST" "$API_URL/api/users" -H 'Content-Type: application/json; charset=utf-8' -d '{ "first_name": "Nemanja", "last_name": "Mikic", "username": "nmikic" }'
+----
+
+[source, json]
+----
+{"id":1,"username":"nmikic","first_name":"Nemanja","last_name":"Mikic"}
+----
+
+Run a cURL command to a new order via the `api` microservice:
+
+[source,bash]
+----
+curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 1, "item_ids": [1,2] }'
+----
+
+[source, json]
+----
+{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}
+----
+
+Run a cURL command to list created orders:
+
+[source,bash]
+----
+curl "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8'
+----
+
+[source, json]
+----
+[{"id":1,"user":{"first_name":"Nemanja","last_name":"Mikic","id":1,"username":"nmikic"},"items":[{"id":1,"name":"Banana","price":1.5},{"id":2,"name":"Kiwi","price":2.5}],"total":4.0}]
+----
+
+We can try to place an order for a user who doesn't exist (with id 100). Run a cURL command:
+
+[source,bash]
+----
+curl -X "POST" "$API_URL/api/orders" -H 'Content-Type: application/json; charset=utf-8' -d '{ "user_id": 100, "item_ids": [1,2] }'
+----
+
+[source, json]
+----
+{"message":"Bad Request","_links":{"self":[{"href":"/api/orders","templated":false}]},"_embedded":{"errors":[{"message":"User with id 100 doesn't exist"}]}}
+----
