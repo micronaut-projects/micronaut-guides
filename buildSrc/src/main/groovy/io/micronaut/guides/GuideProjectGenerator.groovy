@@ -233,7 +233,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (app.excludeTest) {
                     for (String testSource : app.excludeTest) {
-                        deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
+                        deleteFile(destination, GuideAsciidocGenerator.testPath(appName, testSource, testFramework), guidesOption)
                     }
                 }
 
