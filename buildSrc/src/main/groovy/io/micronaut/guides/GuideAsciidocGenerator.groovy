@@ -15,7 +15,6 @@ import org.gradle.api.GradleException
 
 import java.nio.file.Paths
 import java.util.Map.Entry
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 import static io.micronaut.starter.api.TestFramework.SPOCK
@@ -282,7 +281,7 @@ class GuideAsciidocGenerator {
 
         line
     }
-    
+
     private static void include(String rawLine, List<String> rawLines, File projectDir,
                                 boolean snippet) {
 
