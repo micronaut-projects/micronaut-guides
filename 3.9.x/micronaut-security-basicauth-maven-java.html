@@ -162,7 +162,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 3.9.1</p>
+<p>Micronaut Version: 3.9.2</p>
 </div>
 </div>
 </div>
@@ -223,7 +223,8 @@
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
     --features=security,reactor,graalvm \
-    --build=maven --lang=java</code></pre>
+    --build=maven
+    --lang=java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -573,9 +574,12 @@ If you have an existing Micronaut application and want to add the functionality 
 
     <span class="annotation">@Test</span>
     <span class="type">void</span> verifyBasicAuthWorks() {
-        <span class="predefined-type">String</span> credsEncoded = Base64.getEncoder().encodeToString(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock:password</span><span class="delimiter">&quot;</span></span>.getBytes());
-        <span class="predefined-type">String</span> rsp = appClient.home(<span class="string"><span class="delimiter">&quot;</span><span class="content">Basic </span><span class="delimiter">&quot;</span></span> + credsEncoded); <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="predefined-type">String</span> creds = basicAuth(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>);
+        <span class="predefined-type">String</span> rsp = appClient.home(creds); <i class="conum" data-value="3"></i><b>(3)</b>
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, rsp);
+    }
+    <span class="directive">private</span> <span class="directive">static</span> <span class="predefined-type">String</span> basicAuth(<span class="predefined-type">String</span> username, <span class="predefined-type">String</span> password) {
+        <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Basic </span><span class="delimiter">&quot;</span></span> + Base64.getEncoder().encodeToString(username + <span class="string"><span class="delimiter">&quot;</span><span class="content">:</span><span class="delimiter">&quot;</span></span> + password).getBytes());
     }
 }</code></pre>
 </div>

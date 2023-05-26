@@ -164,7 +164,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 3.9.1</p>
+<p>Micronaut Version: 3.9.2</p>
 </div>
 </div>
 </div>
@@ -222,7 +222,8 @@
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
     --features=azure-function \
-    --build=maven --lang=java</code></pre>
+    --build=maven
+    --lang=java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -344,59 +345,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/MicronautguideController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation</span>.*;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
-
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/micronautguide</span><span class="delimiter">&quot;</span></span>)
-<span class="directive">public</span> <span class="type">class</span> <span class="class">MicronautguideController</span> {
-
-    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN)
-    <span class="annotation">@Get</span>
-    <span class="directive">public</span> <span class="predefined-type">String</span> index() {
-        <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Example Response</span><span class="delimiter">&quot;</span></span>;
-    }
-
-    <span class="annotation">@Post</span>
-    <span class="directive">public</span> SampleReturnMessage postMethod(<span class="annotation">@Body</span> SampleInputMessage inputMessage){
-      SampleReturnMessage retMessage = <span class="keyword">new</span> SampleReturnMessage();
-      retMessage.setReturnMessage(<span class="string"><span class="delimiter">&quot;</span><span class="content">Hello </span><span class="delimiter">&quot;</span></span> + inputMessage.getName() + <span class="string"><span class="delimiter">&quot;</span><span class="content">, thank you for sending the message</span><span class="delimiter">&quot;</span></span>);
-      <span class="keyword">return</span> retMessage;
-    }
-}
-
-<span class="annotation">@Introspected</span>
-<span class="type">class</span> <span class="class">SampleInputMessage</span>{
-    <span class="directive">private</span> <span class="predefined-type">String</span> name;
-
-    <span class="directive">public</span> SampleInputMessage() {
-    }
-
-    <span class="directive">public</span> SampleInputMessage(<span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
-    }
-
-    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
-        <span class="keyword">return</span> name;
-    }
-    <span class="directive">public</span> <span class="type">void</span> setName(<span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
-    }
-}
-
-<span class="annotation">@Introspected</span>
-<span class="type">class</span> <span class="class">SampleReturnMessage</span>{
-    <span class="directive">private</span> <span class="predefined-type">String</span> returnMessage;
-    <span class="directive">public</span> <span class="predefined-type">String</span> getReturnMessage() {
-        <span class="keyword">return</span> returnMessage;
-    }
-    <span class="directive">public</span> <span class="type">void</span> setReturnMessage(<span class="predefined-type">String</span> returnMessage) {
-        <span class="local-variable">this</span>.returnMessage = returnMessage;
-    }
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in micronaut-azure-http-functions-maven-java.adoc - include::build/code/micronaut-azure-http-functions/micronaut-azure-http-functions-maven-java/src/main/java/example/micronaut/MicronautguideController.java<span class="type">[]</span></code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -429,27 +378,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/MicronautguideFunctionTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-<span class="keyword">import</span> <span class="include">com.microsoft.azure.functions.HttpStatus</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.azure.function.http.HttpRequestMessageBuilder</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpMethod</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-
-<span class="directive">public</span> <span class="type">class</span> <span class="class">MicronautguideFunctionTest</span> {
-
-    <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testFunction() <span class="directive">throws</span> <span class="exception">Exception</span> {
-        <span class="keyword">try</span> (Function function = <span class="keyword">new</span> Function()) {
-            HttpRequestMessageBuilder.AzureHttpResponseMessage response =
-                function.request(HttpMethod.GET, <span class="string"><span class="delimiter">&quot;</span><span class="content">/micronautguide</span><span class="delimiter">&quot;</span></span>)
-                        .invoke();
-
-            assertEquals(HttpStatus.OK, response.getStatus());
-        }
-    }
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in micronaut-azure-http-functions-maven-java.adoc - include::build/code/micronaut-azure-http-functions/micronaut-azure-http-functions-maven-java/src/test/java/example/micronaut/MicronautguideFunctionTest.java<span class="type">[]</span></code></pre>
 </div>
 </div>
 <div class="ulist">

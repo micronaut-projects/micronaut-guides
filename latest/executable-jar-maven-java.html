@@ -157,7 +157,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 3.9.1</p>
+<p>Micronaut Version: 3.9.2</p>
 </div>
 </div>
 </div>
@@ -349,10 +349,11 @@ PORT=8080
 DELAY=20
 
 usage() {
-  echo &quot;$0: Time to first request for native, java or docker applications&quot;
+  echo &quot;$0: Time to first request for checkpoint, native, java or docker applications&quot;
   echo &quot;&quot;
-  echo &quot;  $0 [-d|-j|-n] [-p port] ARTIFACT&quot;
+  echo &quot;  $0 [-c|-d|-j|-n] [-p port] ARTIFACT&quot;
   echo &quot;&quot;
+  echo &quot;    -c : ARTIFACT is a CRaC checkpoint&quot;
   echo &quot;    -d : ARTIFACT is a docker image (default)&quot;
   echo &quot;    -j : ARTIFACT is a fat jar&quot;
   echo &quot;    -n : ARTIFACT is a native executable&quot;
@@ -360,8 +361,9 @@ usage() {
   echo &quot;&quot;
 }
 
-while getopts 'djnp:' flag; do
+while getopts 'cdjnp:' flag; do
   case &quot;${flag}&quot; in
+    c) TYPE=&quot;crac&quot; ;;
     d) TYPE=&quot;docker&quot; ;;
     j) TYPE=&quot;java&quot; ;;
     n) TYPE=&quot;native&quot; ;;
@@ -396,7 +398,12 @@ mytime() {
   echo $mytime
 }
 
-if [[ &quot;$TYPE&quot; == &quot;java&quot; ]]; then
+if [[ &quot;$TYPE&quot; == &quot;crac&quot; ]]; then
+  java -XX:CRaCRestoreFrom=$1 &amp;
+  PID=$!
+  TTFR=$(mytime execute)
+  kill -9 $PID
+elif [[ &quot;$TYPE&quot; == &quot;java&quot; ]]; then
   java -jar $1 &amp;
   PID=$!
   TTFR=$(mytime execute)
