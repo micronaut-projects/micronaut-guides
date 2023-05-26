@@ -7,10 +7,11 @@ PORT=8080
 DELAY=20
 
 usage() {
-  echo "$0: Time to first request for native, java or docker applications"
+  echo "$0: Time to first request for checkpoint, native, java or docker applications"
   echo ""
-  echo "  $0 [-d|-j|-n] [-p port] ARTIFACT"
+  echo "  $0 [-c|-d|-j|-n] [-p port] ARTIFACT"
   echo ""
+  echo "    -c : ARTIFACT is a CRaC checkpoint"
   echo "    -d : ARTIFACT is a docker image (default)"
   echo "    -j : ARTIFACT is a fat jar"
   echo "    -n : ARTIFACT is a native executable"
@@ -18,8 +19,9 @@ usage() {
   echo ""
 }
 
-while getopts 'djnp:' flag; do
+while getopts 'cdjnp:' flag; do
   case "${flag}" in
+    c) TYPE="crac" ;;
     d) TYPE="docker" ;;
     j) TYPE="java" ;;
     n) TYPE="native" ;;
@@ -54,7 +56,12 @@ mytime() {
   echo $mytime
 }
 
-if [[ "$TYPE" == "java" ]]; then
+if [[ "$TYPE" == "crac" ]]; then
+  java -XX:CRaCRestoreFrom=$1 &
+  PID=$!
+  TTFR=$(mytime execute)
+  kill -9 $PID
+elif [[ "$TYPE" == "java" ]]; then
   java -jar $1 &
   PID=$!
   TTFR=$(mytime execute)
