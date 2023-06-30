@@ -111,6 +111,8 @@ class GuideProjectGenerator implements AutoCloseable {
                 zipIncludes: config.zipIncludes ?: [],
                 apps: config.apps.collect { it ->
                     new App(
+                            framework: it.framework,
+                            testFramework: it.testFramework?.toUpperCase(),
                             name: it.name,
                             visibleFeatures: it.features ?: [],
                             invisibleFeatures: it.invisibleFeatures ?: [],
@@ -188,7 +190,7 @@ class GuideProjectGenerator implements AutoCloseable {
             Language lang = guidesOption.language
 
             for (App app : metadata.apps) {
-                List<String> appFeatures = [] + app.features
+                List<String> appFeatures = ([] as List<String>) + app.features
 
                 if (guidesOption.language == GROOVY ||
                         !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(javaVersion)) {
@@ -212,8 +214,8 @@ class GuideProjectGenerator implements AutoCloseable {
                     deleteEveryFileButSources(destination)
                 }
 
-                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
-                        appFeatures, buildTool, testFramework, lang, javaVersion)
+                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, app.getFramework(),
+                        appFeatures, buildTool, app.testFramework ?: testFramework, lang, javaVersion)
 
                 if (metadata.base) {
                     File baseDir = new File(inputDir.parentFile, metadata.base)

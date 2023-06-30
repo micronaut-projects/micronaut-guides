@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.guides.feature.springboot.replacements;
+package io.spring.start;
 
-import io.micronaut.context.annotation.Replaces;
-import io.micronaut.guides.feature.springboot.SpringBootApplicationFeature;
-import io.micronaut.starter.application.generator.GeneratorContext;
-import io.micronaut.starter.feature.test.Spock;
-import jakarta.inject.Singleton;
+import io.micronaut.starter.application.ApplicationType;
+import io.micronaut.starter.feature.Feature;
 
-@Replaces(Spock.class)
-@Singleton
-public class SpockReplacement extends Spock  {
+public interface SpringBootStarterFeature extends Feature {
 
     @Override
-    public void doApply(GeneratorContext generatorContext) {
-        if (!SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
-            super.doApply(generatorContext);
-        }
+    default boolean supports(ApplicationType applicationType) {
+        return applicationType == ApplicationType.DEFAULT;
+    }
 
+    @Override
+    default boolean isVisible() {
+        return false;
     }
 }

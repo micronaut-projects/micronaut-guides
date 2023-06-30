@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.guides.feature.springboot.replacements;
+package io.spring.start;
 
-import io.micronaut.context.annotation.Replaces;
-import io.micronaut.guides.feature.springboot.SpringBootApplicationFeature;
-import io.micronaut.starter.application.generator.GeneratorContext;
-import io.micronaut.starter.feature.test.Junit;
-import jakarta.inject.Singleton;
+import io.micronaut.starter.feature.DefaultFeature;
 
-@Replaces(Junit.class)
-@Singleton
-public class JunitReplacement extends Junit {
+public interface SpringDefaultFeature extends DefaultFeature {
+    @Override
+    default boolean isVisible() {
+        return false;
+    }
 
     @Override
-    public void apply(GeneratorContext generatorContext) {
-        if (!SpringBootApplicationFeature.isSpringBootApplication(generatorContext)) {
-            super.apply(generatorContext);
-        }
+    default String getTargetFramework() {
+        return SpringBootFramework.FRAMEWORK_SPRING_BOOT;
     }
 }

@@ -1,10 +1,12 @@
-package io.micronaut.guides.feature.springboot;
+package io.spring.start;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
 import io.micronaut.starter.build.dependencies.MicronautDependencyUtils;
+import io.micronaut.starter.build.dependencies.Scope;
+import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.feature.database.H2;
 import io.micronaut.starter.util.VersionInfo;
 import jakarta.inject.Singleton;
@@ -15,7 +17,7 @@ import static io.micronaut.starter.application.ApplicationType.DEFAULT;
 import static io.micronaut.starter.feature.Category.DATABASE;
 
 @Singleton
-public class SpringBootMicronautData implements SpringBootApplicationFeature {
+public class SpringBootMicronautData implements Feature {
 
     public static final String MICRONAUT_VERSION = "micronaut.version";
 
@@ -50,20 +52,12 @@ public class SpringBootMicronautData implements SpringBootApplicationFeature {
     public void apply(GeneratorContext generatorContext) {
 
         String micronautVersion = VersionInfo.getMicronautVersion();
-        generatorContext.addDependency(MicronautDependencyUtils.coreDependency()
-                .artifactId("micronaut-bom")
+        generatorContext.addDependency(MicronautDependencyUtils.platformDependency()
+                .artifactId("micronaut-platform")
                 .version(micronautVersion)
                 .versionProperty(MICRONAUT_VERSION)
                 .compile()
                 .pom());
-        if (generatorContext.getBuildTool().isGradle()) {
-            generatorContext.addDependency(MicronautDependencyUtils.coreDependency()
-                    .artifactId("micronaut-bom")
-                    .version(micronautVersion)
-                    .versionProperty(MICRONAUT_VERSION)
-                    .annotationProcessor()
-                    .pom());
-        }
         generatorContext.addDependency(MicronautDependencyUtils.dataDependency()
                 .artifactId("micronaut-data-processor")
                 .version(VersionInfo.getBomVersion("micronaut.data"))
@@ -75,20 +69,16 @@ public class SpringBootMicronautData implements SpringBootApplicationFeature {
                 .annotationProcessor());
 
         generatorContext.addDependency(Dependency.builder()
-                .lookupArtifactId("jakarta.annotation-api")
-                .annotationProcessor());
+                .groupId("jakarta.annotation")
+                .artifactId("jakarta.annotation-api")
+                        .scope(Scope.COMPILE)
+                        .build());
 
         generatorContext.addDependency(Dependency.builder()
-                .lookupArtifactId("jakarta.annotation-api")
-                .compile());
-
-        generatorContext.addDependency(Dependency.builder()
-                .lookupArtifactId("jakarta.persistence-api")
-                .annotationProcessor());
-
-        generatorContext.addDependency(Dependency.builder()
-                .lookupArtifactId("jakarta.persistence-api")
-                .compile());
+                .groupId("jakarta.persistence")
+                .artifactId("jakarta.persistence-api")
+                        .scope(Scope.COMPILE)
+                .build());
 
         generatorContext.addDependency(Dependency.builder()
                 .groupId("io.micronaut.spring")

@@ -81,11 +81,11 @@ class GuidesPlugin implements Plugin<Project> {
                      (KEY_WORKFLOW)         : githubActionWorkflowTask,
                      (KEY_WORKFLOW_SNAPSHOT): githubActionSnapshotWorkflowTask,
                      (TEST_RUNNER)          : testScriptRunnerTask]
-                }).collect(Collectors.toList())
+                }).toList() as List<Map<String, TaskProvider<Task>>>
 
         List<TaskProvider<Task>> docTasks = sampleTasks.stream()
-                .map() { Map<String, TaskProvider<Task>> m -> m[KEY_DOC] }
-                .collect(Collectors.toList())
+                .map(m -> m.get(KEY_DOC))
+                .toList() as List<TaskProvider<Task>>
 
         TaskProvider<Task> sampleProjects = project.tasks.register("generateSampleProjects") { Task it ->
             it.dependsOn(docTasks)
@@ -101,8 +101,8 @@ class GuidesPlugin implements Plugin<Project> {
         }
 
         List<TaskProvider<Task>> zipTasks = sampleTasks.stream()
-                .map() { Map<String, TaskProvider<Task>> m -> m[KEY_ZIP] }
-                .collect(Collectors.toList())
+                .map(m -> m.get(KEY_ZIP))
+                .toList() as List<TaskProvider<Task>>
 
         project.tasks.register("generateCodeZip") { Task it ->
             it.group = 'guides'
@@ -111,11 +111,11 @@ class GuidesPlugin implements Plugin<Project> {
         }
 
         List<TaskProvider<Task>> workflowTasks = sampleTasks.stream()
-                .map() { Map<String, TaskProvider<Task>> m -> m[KEY_WORKFLOW] }
-                .collect(Collectors.toList())
+                .map(m -> m.get(KEY_WORKFLOW))
+                .toList() as List<TaskProvider<Task>>
         workflowTasks.addAll(sampleTasks.stream()
-                .map() { Map<String, TaskProvider<Task>> m -> m[KEY_WORKFLOW_SNAPSHOT] }
-                .collect(Collectors.toList()))
+                .map(m -> m.get(KEY_WORKFLOW_SNAPSHOT))
+                .toList())
 
         project.tasks.register("generateGithubActionWorkflows") { Task it ->
             it.group = 'guides'

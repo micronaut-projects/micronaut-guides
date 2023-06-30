@@ -3,6 +3,7 @@ package io.micronaut.guides
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import io.micronaut.starter.application.ApplicationType
+import io.micronaut.starter.api.TestFramework
 
 import java.time.LocalDate
 
@@ -39,6 +40,8 @@ class GuideMetadata {
     @ToString(includeNames = true)
     @CompileStatic
     static class App {
+        String framework
+        TestFramework testFramework
         ApplicationType applicationType
         String name
         List<String> visibleFeatures

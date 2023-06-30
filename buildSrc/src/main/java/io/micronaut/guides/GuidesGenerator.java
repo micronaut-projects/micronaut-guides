@@ -44,12 +44,13 @@ public class GuidesGenerator {
             @NonNull File directory,
             @NotNull ApplicationType type,
             @NotNull String packageAndName,
+            @Nullable String framework,
             @Nullable List<String> features,
             @Nullable BuildTool buildTool,
             @Nullable TestFramework testFramework,
             @Nullable Language lang,
             @Nullable JdkVersion javaVersion) throws IOException {
-        GeneratorContext generatorContext = createProjectGeneratorContext(type, packageAndName, features, buildTool, testFramework, lang, javaVersion);
+        GeneratorContext generatorContext = createProjectGeneratorContext(type, packageAndName, framework, features, buildTool, testFramework, lang, javaVersion);
         try {
             projectGenerator.generate(type,
                     generatorContext.getProject(),
@@ -64,6 +65,7 @@ public class GuidesGenerator {
     GeneratorContext createProjectGeneratorContext(
             ApplicationType type,
             @Pattern(regexp = "[\\w\\d-_\\.]+") String packageAndName,
+            @Nullable String framework,
             @Nullable List<String> features,
             @Nullable BuildTool buildTool,
             @Nullable TestFramework testFramework,
@@ -83,7 +85,7 @@ public class GuidesGenerator {
                         lang,
                         testFramework != null ? testFramework.toTestFramework() : null,
                         buildTool == null ? GRADLE : buildTool,
-                        javaVersion != null ? javaVersion : JDK_8),
+                        javaVersion != null ? javaVersion : JDK_8).withFramework(framework),
                 null,
                 features != null ? features : Collections.emptyList(),
                 ConsoleOutput.NOOP

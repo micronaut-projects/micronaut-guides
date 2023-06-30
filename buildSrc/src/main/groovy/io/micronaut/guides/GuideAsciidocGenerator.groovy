@@ -521,7 +521,7 @@ class GuideAsciidocGenerator {
         if (features) {
             featureNames = features.tokenize('|')
         } else {
-            featureNames = [] + app.features
+            featureNames = ([] as List<String>) + app.features
         }
 
         String featureExcludes = extractFromParametersLine(line, 'featureExcludes')
