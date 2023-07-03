@@ -67,7 +67,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public Publisher<Genre> findAll(SortingAndOrderArguments args) {
         String qlString = createQuery(args);
         return Mono.fromCompletionStage(sessionFactory.withTransaction(session -> {
-                    Stage.Query<Genre> query = session.createQuery(qlString, Genre.class);
+                    Stage.SelectionQuery<Genre> query = session.createQuery(qlString, Genre.class);
                     query.setMaxResults(args.getMax().orElseGet(applicationConfiguration::getMax));
                     args.getOffset().ifPresent(query::setFirstResult);
                     return query.getResultList();
