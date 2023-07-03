@@ -7,7 +7,7 @@ import jakarta.inject.Singleton
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceException
 import jakarta.persistence.TypedQuery
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
