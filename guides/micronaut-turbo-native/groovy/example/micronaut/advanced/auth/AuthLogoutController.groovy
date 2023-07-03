@@ -19,10 +19,10 @@ import java.security.Principal
 @Controller("/signout")
 class AuthLogoutController {
 
-    private final LogoutHandler logoutHandler
+    private final LogoutHandler<HttpRequest<?>, MutableHttpResponse<?>> logoutHandler
     private final ApplicationEventPublisher<ApplicationEvent> eventPublisher
 
-    AuthLogoutController(LogoutHandler logoutHandler, ApplicationEventPublisher<ApplicationEvent> eventPublisher) {
+    AuthLogoutController(LogoutHandler<HttpRequest<?>, MutableHttpResponse<?>> logoutHandler, ApplicationEventPublisher<ApplicationEvent> eventPublisher) {
         this.logoutHandler = logoutHandler
         this.eventPublisher = eventPublisher
     }

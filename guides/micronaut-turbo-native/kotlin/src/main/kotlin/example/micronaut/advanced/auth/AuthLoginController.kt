@@ -24,7 +24,11 @@ import reactor.core.publisher.Flux
 
 @Replaces(LoginController::class)
 @Controller("/login")
-class AuthLoginController(val authenticator: Authenticator, val loginHandler: LoginHandler, val eventPublisher: ApplicationEventPublisher<ApplicationEvent>) {
+class AuthLoginController(
+    val authenticator: Authenticator<HttpRequest<*>>,
+    val loginHandler: LoginHandler<HttpRequest<*>, MutableHttpResponse<*>>,
+    val eventPublisher: ApplicationEventPublisher<ApplicationEvent>
+) {
 
     @SingleResult
     @Post(consumes = [MediaType.TEXT_HTML, MediaType.MULTIPART_FORM_DATA], produces = [MediaType.TEXT_HTML])

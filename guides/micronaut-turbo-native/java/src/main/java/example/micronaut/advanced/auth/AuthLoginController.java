@@ -27,11 +27,15 @@ import reactor.core.publisher.Flux;
 @Controller("/login")
 class AuthLoginController {
 
-    private final Authenticator authenticator;
-    private final LoginHandler loginHandler;
+    private final Authenticator<HttpRequest<?>> authenticator;
+    private final LoginHandler<HttpRequest<?>, MutableHttpResponse<?>> loginHandler;
     private final ApplicationEventPublisher<ApplicationEvent> eventPublisher;
 
-    AuthLoginController(Authenticator authenticator, LoginHandler loginHandler, ApplicationEventPublisher<ApplicationEvent> eventPublisher) {
+    AuthLoginController(
+            Authenticator<HttpRequest<?>> authenticator,
+            LoginHandler<HttpRequest<?>, MutableHttpResponse<?>> loginHandler,
+            ApplicationEventPublisher<ApplicationEvent> eventPublisher
+    ) {
         this.authenticator = authenticator;
         this.loginHandler = loginHandler;
         this.eventPublisher = eventPublisher;
