@@ -1,7 +1,7 @@
 package example.micronaut
 
 import java.util.Optional
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 import jakarta.inject.Singleton
 
 @Singleton
