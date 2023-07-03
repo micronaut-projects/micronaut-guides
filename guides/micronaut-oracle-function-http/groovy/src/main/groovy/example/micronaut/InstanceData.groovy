@@ -3,10 +3,10 @@ package example.micronaut
 import com.oracle.bmc.core.model.Instance
 import com.oracle.bmc.core.model.Instance.LifecycleState
 import groovy.transform.CompileStatic
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
 @CompileStatic
-@Introspected
+@Serdeable
 class InstanceData {
 
     final String availabilityDomain
