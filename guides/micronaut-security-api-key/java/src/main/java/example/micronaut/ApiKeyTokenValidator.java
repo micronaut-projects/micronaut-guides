@@ -8,7 +8,7 @@ import jakarta.inject.Singleton;
 import org.reactivestreams.Publisher;
 
 @Singleton // <1>
-class ApiKeyTokenValidator implements TokenValidator  {
+class ApiKeyTokenValidator implements TokenValidator<HttpRequest<?>>  {
 
     private final ApiKeyRepository apiKeyRepository;
 
