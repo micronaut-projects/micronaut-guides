@@ -3,7 +3,7 @@ package example.micronaut
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
 import jakarta.inject.Singleton
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @Singleton // <1>
 open class CreateToDoDataFetcher(
