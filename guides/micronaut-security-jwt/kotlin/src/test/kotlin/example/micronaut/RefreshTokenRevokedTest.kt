@@ -9,8 +9,8 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.security.authentication.Authentication
 import io.micronaut.security.token.generator.RefreshTokenGenerator
-import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
-import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
+import io.micronaut.security.endpoints.TokenRefreshRequest
+import io.micronaut.security.token.render.BearerAccessRefreshToken
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -40,7 +40,7 @@ internal class RefreshTokenRevokedTest {
         val errorArgument = Argument.of(Map::class.java)
         val e = assertThrows(HttpClientResponseException::class.java) {
             client.toBlocking().exchange(
-                HttpRequest.POST("/oauth/access_token", TokenRefreshRequest(signedRefreshToken)),
+                HttpRequest.POST("/oauth/access_token", TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, signedRefreshToken)),
                 bodyArgument,
                 errorArgument)
         }
