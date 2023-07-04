@@ -48,13 +48,14 @@ class GenreRepositoryImpl implements GenreRepository {
     @ReadOnly // <3>
     List<Genre> findAll(@NotNull SortingAndOrderArguments args) {
         String qlString = 'SELECT g FROM Genre as g'
-        if (args.order.present && args.sort.present && VALID_PROPERTY_NAMES.contains(args.sort.get())) {
-            qlString += ' ORDER BY g.' + args.sort.get() + ' ' + args.order.get().toLowerCase()
+        if (args.order && args.sort && VALID_PROPERTY_NAMES.contains(args.sort)) {
+            qlString += ' ORDER BY g.' + args.sort + ' ' + args.order.toLowerCase()
         }
         TypedQuery<Genre> query = entityManager.createQuery(qlString, Genre)
-        query.maxResults = args.max.orElseGet(applicationConfiguration::getMax)
-        args.offset.ifPresent(query::setFirstResult)
-
+        query.maxResults = args.max != null ? args.max : applicationConfiguration.max
+        if (args.offset) {
+            query.firstResult = args.offset
+        }
         query.resultList
     }
 
