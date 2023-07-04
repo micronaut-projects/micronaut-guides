@@ -5,7 +5,7 @@ import io.micronaut.context.env.Environment.TEST
 import io.micronaut.context.event.StartupEvent
 import io.micronaut.runtime.event.annotation.EventListener
 import jakarta.inject.Singleton
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @Singleton // <1>
 open class DataPopulator(private val bookRepository: BookRepository) { // <2>

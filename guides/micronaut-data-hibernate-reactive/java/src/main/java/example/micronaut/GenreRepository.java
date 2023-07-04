@@ -8,7 +8,7 @@ import io.micronaut.data.exceptions.DataAccessException;
 import io.micronaut.data.repository.reactive.ReactorPageableRepository;
 import reactor.core.publisher.Mono;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

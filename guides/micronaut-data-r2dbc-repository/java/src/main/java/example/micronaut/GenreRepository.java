@@ -1,6 +1,6 @@
 package example.micronaut;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import example.micronaut.domain.Genre;
 import io.micronaut.data.annotation.Id;
