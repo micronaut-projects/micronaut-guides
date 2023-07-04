@@ -13,6 +13,5 @@ class GithubConfiguration {
 
     companion object {
         const val PREFIX = "github"
-        const val GITHUB_API_URL = "https://api.github.com"
     }
 }

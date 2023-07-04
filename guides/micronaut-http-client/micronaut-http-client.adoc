@@ -24,41 +24,44 @@ dependency:micronaut-http-client-jdk[groupId=io.micronaut]
 
 In this guide, you will consume the https://docs.github.com/en/rest[GitHub API] from a Micronaut application.
 
-In particular, we consume the https://docs.github.com/en/rest/reference/repos#list-releases[List releases] endpoint.
+In this guide, you will fetch https://github.com/micronaut-projects/micronaut-core/releases[Micronaut Core releases] via the https://docs.github.com/en/rest/reference/repos#list-releases[List releases] endpoint.
 
 ____
 This returns a list of releases, which does not include regular Git tags that have not been associated with a release.
 ____
 
-This API resource can be consumed by both authenticated and anonymous clients.
+This API resource can be consumed by both authenticated and anonymous clients. Initially, you will consume it anonymously, later we will discuss authentication.
 
-Initially, you will consume it anonymously, later we will discuss authentication.
+Create a record to parse the JSON response into an object:
 
-Modify `src/main/resources/application.yml` to create some configuration parameters.
+source:GithubRelease[]
 
-common:yaml-dependency.adoc[]
+=== Configuration
 
-resource:application.yml[tag=githubconfig]
+Modify `src/main/resources/application.properties` to create some configuration parameters.
 
-Add configuration to associate a service identifier to the GitHub API URL.
-
-resource:application.yml[tag=githubapi]
+resource:application.properties[tag=githubconfig]
 
 To encapsulate type-safe configuration retrieval, we use a https://docs.micronaut.io/latest/guide/#configurationProperties[`@ConfigurationProperties`] object:
 
 source:GithubConfiguration[]
 
-In this guide, you will fetch https://github.com/micronaut-projects/micronaut-core/releases[Micronaut Core releases].
+==== JSON Codec Configuration
 
-To consume the GitHub API, you will use Micronaut HTTP Client.
+Add configuration to treat `application/vnd.github.v3+json` as JSON.
+
+resource:application.properties[tag=jsoncodec]
+
+==== HTTP Client Service Configuration
+
+Add configuration to associate a service identifier to the GitHub API URL.
+
+resource:application.properties[tag=githubapi]
+
 
 === Low Level Client
 
 Initially, you will create a Bean which uses the low-level Client API.
-
-Create a POJO to parse the JSON response into an object:
-
-source:GithubRelease[]
 
 Create `GithubLowLevelClient`:
 
@@ -72,12 +75,6 @@ callout:http-request[4]
 <6> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
 <7> Use `retrieve` to perform an HTTP request for the given request object and convert the full HTTP response's body into the specified type. e.g. `List<GithubRelease>`.
 
-NOTE: Instead of `retrieve` we could have used `jsonStream`. You can use `jsonStream()` to stream arrays of type `application/json` or
-JSON streams of type `application/x-json-stream`. If we use `retrieve`, such as in the previous code listing, the operation will not block.
-However, it will not return until all the data has been received from the server. In the case of a JSON array that would be the whole array.
-However, if you are interested in just the first element of the array, `jsonStream` provides a better alternative since it starts streaming data from the server without needing the whole response.
-For example, `jsonStream().firstElement()` will only parse the first item in a JSON array. Hence it is more efficient.
-
 === Declarative Client
 
 It is time to take a look at support for declarative clients via the Client annotation.
@@ -90,23 +87,20 @@ source:GithubApiClient[]
 <2> GitHub API requires to set the `User-Agent` header.
 <3> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
 <4> You can use configuration parameter interpolation when you define the path of the GET endpoint.
-<5> You can return any reactive type of any implementation (RxJava, Reactor...), but it's better to use the Reactive Streams public interfaces like `Publisher`.
+callout:singleresult[5]
+<6> You can return any reactive type of any implementation (RxJava, Reactor...), but it's better to use the Reactive Streams public interfaces like `Publisher`.
 
 === Controller
 
-Create a Controller. It uses both (low-level and declarative clients). It showcases several Micronaut framework capabilities.
-
-* The Micronaut framework supports any framework that implements Reactive Streams, including RxJava, and Reactor. Thus, you can easily and efficiently compose multiple HTTP client calls without blocking (which will limit the throughput and scalability of your application).
-* The Framework enables you to consume/produce https://docs.micronaut.io/latest/guide/#clientStreaming[JSON Streams].
+Create a Controller. It uses both (low-level and declarative clients). The Micronaut framework supports Reactive Streams implementations such as https://micronaut-projects.github.io/micronaut-rxjava3/latest/guide/[RxJava] or https://micronaut-projects.github.io/micronaut-reactor/latest/guide/[Project Reactor]. Thus, you can efficiently compose multiple HTTP client calls without blocking (which will limit the throughput and scalability of your application).
 
 source:GithubController[]
 
 callout:controller[number=1,arg0=/github]
 <2> Inject beans via constructor injection.
-<3> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the index method to all requests that use an HTTP GET
-<4> The `releasesWithLowLevelClient` returns a `Mono` which may or may not emit an item. If an item is not emitted a 404 is returned.
-<5> In order to do JSON streaming you can declare a controller method that returns a `application/x-json-stream` of JSON objects.
-<6> You can return any reactive type of any implementation (RxJava, Reactor...), but it's better to use the Reactive Streams public interfaces like `Publisher`.
+<3> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to all requests that use an HTTP GET
+callout:singleresult[4]
+callout:get[number=5,arg0=fetchReleases,arg1=/releases]
 
 === Tests
 
@@ -137,8 +131,7 @@ Create a Filter:
 
 source:GithubFilter[]
 
-<1> Supply the pattern you want to match to the `@Filter` annotation.
-
+callout:client-filter[1]
 :exclude-for-languages:kotlin
 <2> The Micronaut framework will not load the bean unless configuration properties are set.
 :exclude-for-languages:
@@ -148,7 +141,8 @@ source:GithubFilter[]
 :exclude-for-languages:
 
 <3> Constructor injection of the configuration parameters.
-<4> Enhance every request sent to GitHub API providing Basic Authentication.
+callout:request-filter[5]
+<5> Enhance every request sent to GitHub API providing Basic Authentication.
 
 :exclude-for-languages:java,groovy
 
@@ -164,7 +158,7 @@ source:GithubFilterCondition[]
 
 === Configuration Parameters
 
-Add your GitHub `username` and `token` to `src/main/resource/application.yml`
+Add your GitHub `username` and `token` to `src/main/resource/application.properties`
 
 [source, yaml]
 ----
@@ -189,7 +183,7 @@ If you run again the tests, you will see the that the Filter is invoked and HTTP
 13:09:56.662 [default-nioEventLoopGroup-1-4] DEBUG i.m.h.client.netty.DefaultHttpClient - Sending HTTP GET to https://api.github.com/repos/micronaut-projects/micronaut-core/releases
 13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - User-Agent: Micronaut HTTP Client
 13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Accept: application/json
-13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Authorization: Basic xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+13:09:56.663 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - Authorization: MASKED
 13:09:56.664 [default-nioEventLoopGroup-1-4] TRACE i.m.h.client.netty.DefaultHttpClient - host: api.github.com
 -----
 
