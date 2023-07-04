@@ -22,7 +22,7 @@ import java.util.stream.Stream
 import jakarta.validation.Valid
 
 @Singleton // <1>
-class BookExcelServiceImpl : BookExcelService {
+open class BookExcelServiceImpl : BookExcelService {
 
     override fun excelFileFromBooks(bookList: List<@Valid Book>): SystemFile {
         try {
