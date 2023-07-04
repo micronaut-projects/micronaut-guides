@@ -4,6 +4,7 @@ import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
 import io.micronaut.context.annotation.Property
+import io.micronaut.http.HttpRequest
 import io.micronaut.security.token.generator.TokenGenerator
 import io.micronaut.security.token.validator.TokenValidator
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
@@ -23,8 +24,7 @@ class TokenGeneratorTest {
     lateinit var tokenGenerator: TokenGenerator
 
     @Inject
-    lateinit var tokenValidator: TokenValidator
-
+    lateinit var tokenValidator: TokenValidator<HttpRequest<Any>>
     @Test
     fun canGenerateSignedJsonWebTokens() {
 
