@@ -116,6 +116,9 @@ class GuideProjectGenerator implements AutoCloseable {
                             name: it.name,
                             visibleFeatures: it.features ?: [],
                             invisibleFeatures: it.invisibleFeatures ?: [],
+                            javaFeatures: it.javaFeatures ?: [],
+                            kotlinFeatures: it.kotlinFeatures ?: [],
+                            groovyFeatures: it.groovyFeatures ?: [],
                             applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                             excludeSource: it.excludeSource,
                             excludeTest: it.excludeTest,
@@ -168,8 +171,6 @@ class GuideProjectGenerator implements AutoCloseable {
             assert outputDir.mkdir()
         }
 
-        String packageAndName = BASE_PACKAGE + '.' + APP_NAME
-
         JdkVersion javaVersion = Utils.parseJdkVersion()
         if (metadata.minimumJavaVersion != null) {
             JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
@@ -190,8 +191,7 @@ class GuideProjectGenerator implements AutoCloseable {
             Language lang = guidesOption.language
 
             for (App app : metadata.apps) {
-                List<String> appFeatures = ([] as List<String>) + app.features
-
+                List<String> appFeatures = ([] as List<String>) + app.getFeatures(lang)
                 if (guidesOption.language == GROOVY ||
                         !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(javaVersion)) {
                     appFeatures.remove('graalvm')
@@ -202,15 +202,18 @@ class GuideProjectGenerator implements AutoCloseable {
                 }
 
                 // typical guides use 'default' as name, multi-project guides have different modules
-                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
                 String folder = folderName(metadata.slug, guidesOption)
+
+                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
+
 
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
                 destination.mkdir()
 
+                String packageAndName = BASE_PACKAGE + '.' + app.name
                 if (app.openAPIGeneratorConfig) {
-                    OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig, testFramework, buildTool)
+                    OpenAPIGenerator.generate(inputDir, destination, lang, packageAndName , app.openAPIGeneratorConfig, testFramework, buildTool)
                     deleteEveryFileButSources(destination)
                 }
 
@@ -391,6 +394,9 @@ class GuideProjectGenerator implements AutoCloseable {
             App guideApp = guideApps[name]
             guideApp.visibleFeatures.addAll baseApp.visibleFeatures
             guideApp.invisibleFeatures.addAll baseApp.invisibleFeatures
+            guideApp.javaFeatures.addAll baseApp.javaFeatures
+            guideApp.kotlinFeatures.addAll baseApp.kotlinFeatures
+            guideApp.groovyFeatures.addAll baseApp.groovyFeatures
             merged << guideApp
         }
 

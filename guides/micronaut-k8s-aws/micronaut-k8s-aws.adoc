@@ -1,0 +1,153 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will deploy three microservices on the https://aws.amazon.com/eks/[Amazon Elastic Kubernetes Service (EKS)]. We will use Kubernetes Service discovery and Distributed configuration to wire up our microservices.
+
+You will discover how the Micronaut framework eases Kubernetes integration and deployment to ECR.
+
+external:micronaut-k8s/requirements.adoc[]
+* An https://aws.amazon.com/[AWS account] with:
+** An IAM user with enough permissions to create and manage https://aws.amazon.com/eks/[EKS] and https://aws.amazon.com/ecr/[ECR].
+** The AWS CLI configured to use the IAM user above.
+* Already created EKS. For that, you can follow https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html[Getting started with Amazon EKS – AWS Management Console and AWS CLI] guide.
+
+common:jq[]
+
+external:micronaut-k8s/create-app-external-guides.adoc[]
+
+== Prepare and Deploy Microservices
+
+We will define some environment variables to make deploying process easier. In `AWS_ACCOUNT_ID` store your AWS account id and in the `AWS_REGION` variable store your AWS region, both you can find by executing commands in aws cli. We will store our EKS cluster name in `EKS_CLUSTER_NAME`. For this guide we will use `micronaut-k8s`.
+
+[source,bash]
+----
+export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query \"Account\" --output text)"
+export AWS_REGION="$(aws configure get region)"
+export EKS_CLUSTER_NAME="micronaut-k8s"
+----
+
+Run the next command to log in to Amazon Elastic Container Registry (Amazon ECR):
+
+[source,bash]
+----
+aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+----
+
+=== Users Microservice
+
+external-template:micronaut-k8s-aws/k8s-microservice.adoc[arg0=users]
+external-template:micronaut-k8s-aws/docker-microservice.adoc[arg0=users]
+
+=== Orders Microservice
+
+external-template:micronaut-k8s-aws/k8s-microservice.adoc[arg0=orders]
+external-template:micronaut-k8s-aws/docker-microservice.adoc[arg0=orders]
+
+=== API Microservice
+
+external-template:micronaut-k8s-aws/k8s-microservice.adoc[arg0=api]
+external-template:micronaut-k8s-aws/docker-microservice.adoc[arg0=api]
+
+=== Deploy Services to EKS
+
+Create a directory for `kubectl` configuration.
+
+[source,bash]
+----
+mkdir -p $HOME/.kube
+----
+
+Generate `kubectl` configuration for authentication to EKS.
+
+[source,bash]
+----
+aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+----
+
+Set `KUBECONFIG` to the created config file. This variable is consumed by `kubectl`.
+
+[source,bash]
+----
+export KUBECONFIG=$HOME/.kube/config
+----
+
+Deploy the _auth.yml_ file that we created in the guideLink:micronaut-k8s[Kubernetes and the Micronaut Framework] guide.
+
+[source,bash]
+----
+kubectl apply -f auth.yml
+----
+
+external-template:micronaut-k8s-aws/k8s-deploy-service.adoc[arg0=users]
+
+external-template:micronaut-k8s-aws/k8s-deploy-service.adoc[arg0=orders]
+
+external-template:micronaut-k8s-aws/k8s-deploy-service.adoc[arg0=api]
+
+== Test integration between applications deployed on EKS
+
+Run the next command to check status of the pods and make sure that all of them have the status "Running":
+
+[source,bash]
+----
+kubectl get pods -n=micronaut-k8s
+----
+
+[source,text]
+----
+NAME                      READY   STATUS    RESTARTS   AGE
+api-6fb4cd949f-kxxx8      1/1     Running   0          2d1h
+orders-595887ddd6-6lzp4   1/1     Running   0          2d1h
+users-df6f78cd7-lgnzx     1/1     Running   0          2d1h
+----
+
+Run the next command to check the status of the microservices:
+
+[source,bash]
+----
+kubectl get services -n=micronaut-k8s
+----
+
+[source,text]
+----
+NAME     TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)          AGE
+api      LoadBalancer   10.100.208.154   <redacted>   8080:31171/TCP   30s
+orders   NodePort       10.100.157.155   <none>                                                                    8080:30742/TCP   20m
+users    NodePort       10.100.126.97    <none>                                                                    8080:31580/TCP   20m
+----
+
+NOTE: `If EXTERNAL-IP` is in <pending> state wait a couple of seconds and then run command again. AWS will provide you a hostname instead of ip address. To access your application you will have to wait that DNS can resolve hostname that was created.
+
+Run the next command to retrieve the URL of the `api` microservice:
+
+[source,bash]
+----
+export API_URL=http://$(kubectl get svc api -n=micronaut-k8s -o json | jq -r '.status.loadBalancer.ingress[0].hostname'):8080
+----
+
+external:micronaut-k8s/verify.adoc[]
+
+== Cleaning Up
+
+To delete all resources that were created in this guide run next command.
+
+[source,bash]
+----
+kubectl delete namespaces micronaut-k8s
+----
+
+external-template:micronaut-k8s-aws/aws-delete-repository.adoc[arg0=users]
+external-template:micronaut-k8s-aws/aws-delete-repository.adoc[arg0=orders]
+external-template:micronaut-k8s-aws/aws-delete-repository.adoc[arg0=api]
+
+NOTE:
+If you were following the https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html[Getting started with Amazon EKS – AWS Management Console and AWS CLI] and you want to clean up everything, don't forget to follow
+https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html#gs-console-clean-up[Step 5: Delete resources] chapter.
+
+common:next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-kubernetes/snapshot/guide/[Micronaut Kubernetes] module.
+
+Read more about https://aws.amazon.com/eks/[Amazon Elastic Kubernetes Service (EKS)]
+

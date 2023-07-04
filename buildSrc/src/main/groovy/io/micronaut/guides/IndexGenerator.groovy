@@ -427,7 +427,7 @@ class IndexGenerator {
             guide.tags ?: [] +
             guide.languages*.toString() +
             guide.buildTools*.toString() +
-            guide.apps.collect { it.features }.flatten().unique()
+            guide.apps.collect { it.getFeatures(Language.DEFAULT_OPTION) }.flatten().unique()
         ]
             .flatten()
             .unique()
