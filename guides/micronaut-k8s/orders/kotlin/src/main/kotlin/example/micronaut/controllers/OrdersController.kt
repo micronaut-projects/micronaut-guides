@@ -12,8 +12,8 @@ import io.micronaut.http.exceptions.HttpStatusException
 import io.micronaut.security.annotation.Secured
 import io.micronaut.security.rules.SecurityRule
 import java.math.BigDecimal
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 
 @Controller("/orders") // <1>
 @Secured(SecurityRule.IS_AUTHENTICATED) // <2>
