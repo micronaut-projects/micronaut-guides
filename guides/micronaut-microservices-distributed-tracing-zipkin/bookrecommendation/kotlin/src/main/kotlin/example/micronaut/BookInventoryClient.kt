@@ -8,7 +8,6 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
-
 import jakarta.validation.constraints.NotBlank
 
 //end::packageandimports[]
