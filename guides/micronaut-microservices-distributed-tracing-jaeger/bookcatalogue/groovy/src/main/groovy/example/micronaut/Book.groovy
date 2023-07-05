@@ -3,11 +3,11 @@ package example.micronaut
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.TupleConstructor
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
 @TupleConstructor
 @EqualsAndHashCode
-@Introspected
+@Serdeable
 @CompileStatic
 class Book {
     String isbn
