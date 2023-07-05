@@ -60,7 +60,7 @@ class BooksControllerTest implements TestPropertyProvider {
 
     @Test
     void testRetrieveBooks() throws InterruptedException {
-        Book releaseIt = new Book(idGenerator.generate(), "1680502395", "Release It!");
+        Book releaseIt = new Book(idGenerator.generate(), "1680502395", "Release It!", null);
         bookRepository.save(releaseIt);
         Book continuousDelivery = new Book(idGenerator.generate(), "0321601912", "Continuous Delivery", 4);
         bookRepository.save(continuousDelivery);
@@ -69,17 +69,17 @@ class BooksControllerTest implements TestPropertyProvider {
 
         Optional<Book> result = bookRepository.findById(continuousDelivery.getId());
         assertTrue(result.isPresent());
-        assertEquals("Continuous Delivery", result.get().getName());
+        assertEquals("Continuous Delivery", result.get().name());
 
         BlockingHttpClient client = httpClient.toBlocking();
 
-        Boolean hasStock = client.retrieve(stockRequest(continuousDelivery.getIsbn()), Boolean.class);
+        Boolean hasStock = client.retrieve(stockRequest(continuousDelivery.isbn()), Boolean.class);
         assertTrue(hasStock);
-        hasStock = client.retrieve(stockRequest(buildingMicroservices.getIsbn()), Boolean.class);
+        hasStock = client.retrieve(stockRequest(buildingMicroservices.isbn()), Boolean.class);
         assertFalse(hasStock);
 
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class,
-                () -> client.retrieve(stockRequest(releaseIt.getIsbn()), Boolean.class));
+                () -> client.retrieve(stockRequest(releaseIt.isbn()), Boolean.class));
         assertEquals(HttpStatus.NOT_FOUND, e.getStatus());
 
         bookRepository.delete(releaseIt.getId());
