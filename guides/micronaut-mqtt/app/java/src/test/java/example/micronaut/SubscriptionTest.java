@@ -3,7 +3,7 @@ package example.micronaut;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.mqtt.annotation.Topic;
-import io.micronaut.mqtt.v5.annotation.MqttPublisher;
+import io.micronaut.mqtt.annotation.v5.MqttPublisher;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;

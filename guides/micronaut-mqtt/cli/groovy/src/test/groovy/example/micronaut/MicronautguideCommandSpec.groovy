@@ -7,13 +7,13 @@ import io.micronaut.context.env.Environment
 import io.micronaut.mqtt.annotation.MqttSubscriber
 import io.micronaut.mqtt.annotation.Topic
 import spock.lang.Specification
-
-import java.util.concurrent.TimeUnit
+import spock.util.concurrent.PollingConditions
 
 import static java.nio.charset.StandardCharsets.UTF_8
-import static org.awaitility.Awaitility.await
 
 class MicronautguideCommandSpec extends Specification {
+
+    PollingConditions pollingConditions = new PollingConditions()
 
     def "test with command line option"() {
         when:
@@ -33,7 +33,9 @@ class MicronautguideCommandSpec extends Specification {
         baos.toString().contains('Topic published')
 
         and:
-        await().atMost(5, TimeUnit.SECONDS).until { listener.temperature == 100.0 }
+        pollingConditions.within(5) {
+            listener.temperature == 100.0
+        }
 
         cleanup:
         ctx.close()
