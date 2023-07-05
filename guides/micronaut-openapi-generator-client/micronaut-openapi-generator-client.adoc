@@ -1,0 +1,225 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+https://www.openapis.org[OpenAPI] is a specification for describing REST APIs. Many web APIs provide definitions for the available endpoints and parameters in form of OpenAPI documents. OpenAPI infrastructure includes numerous tooling, including the OpenAPI generator.
+
+In this guide, we will use the Micronaut OpenAPI Generator to generate a client API from an OpenAPI definition file. We will generate the client for link:https://open-meteo.com[Open Meteo], however the steps
+could easily be replicated with any other API with an OpenAPI definition.
+
+After generation, we will see how to use the client inside a Micronaut application, including performing API calls in controller methods.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+
+== Generating the Micronaut Client
+
+We will generate a client for link:https://open-meteo.com[Open Meteo], an open-source weather API which offers free access for non-commercial use.
+
+To do this, we will need to download the official Open Meteo OpenAPI definition file: link:https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml[https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml].
+
+=== Create a Micronaut application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide \
+   --features=http-client,validation,reactor \
+   --build=@build@ --lang=@lang@
+----
+
+Open the generated project and create a new folder, `src/openapi` then copy the `openapi.yml` file into it, for example:
+
+[source,bash]
+----
+$ cd micronaut-guide
+$ mkdir src/openapi
+$ curl https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml -o src/openapi/openmeteo.yml
+----
+
+=== Configure client generation
+
+:exclude-for-build:maven
+
+Add the Micronaut OpenAPI plugin to your plugins section:
+
+[source, groovy]
+.build.gradle
+----
+plugins {
+  id 'io.micronaut.openapi' version '...'
+  ....
+}
+----
+
+And configure your build to generate a client:
+
+[source, groovy]
+.build.gradle
+----
+micronaut {
+  ...
+  openapi {
+    client(file("src/openapi/openmeteo.yml")) {
+      apiPackageName = "example.openmeteo.api"
+      modelPackageName = "example.openmeteo.model"
+    }
+  }
+}
+----
+
+The client code will be generated in your build directory but automatically added as a source set.
+Therefore, you can for example run `./gradlew compileJava --console=verbose` and see that the sources are generated and compiled:
+
+[source]
+----
+> Task :generateClientOpenApiApis
+...
+> Task :generateClientOpenApiModels
+...
+> Task :compileJava
+----
+
+TIP: The Micronaut OpenAPI generator supports a large number of parameters. Please refer to the https://micronaut-projects.github.io/micronaut-gradle-plugin/snapshot/#_generating_a_client[Micronaut OpenAPI Gradle plugin documentation] for all possible options.
+
+After generation finishes, you should see the following directory structure under your `build/generated/openapi` directory:
+
+[source,text]
+----
+build/generated/openapi
+├── generateClientOpenApiApis
+│   └── src
+│       └── main
+│           └── java
+│               └── example
+│                   └── openmeteo
+│                       └── api
+│                           └── WeatherForecastApisApi.java  # <1>
+└── generateClientOpenApiModels
+    └── src
+        └── main
+            └── java
+                └── example
+                    └── openmeteo
+                        └── model                                 # <2>
+                            ├── CurrentWeather.java
+                            ├── DailyResponse.java
+                            ├── HourlyProperties.java
+                            ├── HourlyResponse.java
+                            ├── V1ForecastGet200Response.java
+                            └── V1ForecastGet400Response.java
+
+----
+<1> The `example.openmeteo.api` package contains API classes.
+<2> The `example.openmeteo.model` package contains data classes, that are used in parameters or bodies of both
+requests and responses in the API.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Enable the Micronaut OpenAPI client generation in your `pom.xml` file, configure the location to the specification file and package names:
+
+[source, xml]
+.pom.xml
+----
+<properties>
+    <micronaut.openapi.generate.client>true</micronaut.openapi.generate.client>
+    <micronaut.openapi.definition>src/openapi/openmeteo.yml</micronaut.openapi.definition>
+    <micronaut.openapi.api.package.name>example.openmeteo.api</micronaut.openapi.api.package.name>
+    <micronaut.openapi.model.package.name>example.openmeteo.model</micronaut.openapi.model.package.name>
+</properties>
+----
+
+The client code will be generated in your target directory and compiled automatically alongside your regular sources.
+Therefore, you can for example run `mvn compile` and see that the sources are generated and compiled:
+
+[source]
+----
+[INFO] --- micronaut-maven-plugin:4.0.0-M5:generate-openapi-client (default-generate-openapi-client) @ default ---
+[INFO] Environment variable JAVA_POST_PROCESS_FILE not defined so the Java code may not be properly formatted. To define it, try 'export JAVA_POST_PROCESS_FILE="/usr/local/bin/clang-format -i"' (Linux/Mac)
+[INFO] NOTE: To enable file post-processing, 'enablePostProcessFile' must be set to `true` (--enable-post-process-file for CLI).
+[INFO] Generating with dryRun=false
+[INFO] OpenAPI Generator: java-micronaut-client (client)
+...
+----
+
+TIP: The Micronaut OpenAPI generator supports a large number of parameters. Please refer to https://micronaut-projects.github.io/micronaut-maven-plugin/snapshot/examples/openapi.html#generating_a_client[Micronaut OpenAPI Maven plugin documentation] for all possible options.
+
+After generation finishes, you should see the following directory structure under your `target/generated-sources/openapi` directory:
+
+[source]
+----
+target/generated-sources/openapi
+└── src
+    └── main
+        ├── java
+        │   └── example
+        │       └── openmeteo
+        │           ├── api                                     # <1>
+        │           │   └── WeatherForecastApisApi.java
+        │           └── model                                   # <2>
+        │               ├── CurrentWeather.java
+        │               ├── DailyResponse.java
+        │               ├── HourlyResponse.java
+        │               ├── V1ForecastGet200Response.java
+        │               └── V1ForecastGet400Response.java
+----
+<1> The `example.openmeteo.api` package contains API classes.
+<2> The `example.openmeteo.model` package contains data classes, that are used in parameters or bodies of both
+requests and responses in the API.
+
+:exclude-for-build:
+
+
+[NOTE]
+====
+The definition file is a document describing the OpenMeteo API according to the link:https://swagger.io/specification/[OpenAPI Specification].
+
+If you want to learn about the structure of OpenAPI specification and how to simplify the creation of a Micronaut Server
+with it, read the link:https://guides.micronaut.io/latest/micronaut-openapi-generator-server.html["Use OpenAPI Definition to Generate a Micronaut Server" guide]
+or the link:https://swagger.io/docs/specification/about/[OpenAPI guide].
+====
+
+As you can see, different API files were generated for the OpenMeteo API.
+
+If you look inside the API files, you will see that method definitions were generated corresponding to different paths and operations available in the API.
+Using Micronaut`s features, we will be able to inject a client implementation
+of this interface and use it by calling the corresponding methods without the need to worry how client-server communication is handled.
+
+== Testing the Client
+
+You can see that a weather forecast API class was generated in the project.
+This API references other types which belong to the model types which were generated automatically from the OpenAPI definition.
+
+We will show how to use the OpenMeteo API by writing a simple test using the generated Micronaut client.
+
+test:WeatherClientTest[tags=test]
+
+<1> Inject the generated client in the test
+<2> Calls the client in order to fetch weather forecast
+<3> Blocks and consumes the response
+
+== Next Steps
+
+=== Learn How to Write OpenAPI Definition and Generate Server Based on It
+Read the link:https://guides.micronaut.io/latest/micronaut-openapi-generator-server.html["Use OpenAPI Definition to Generate a Micronaut Server" Guide]
+to learn how to:
+
+* understand OpenAPI definition files and write your own definition files,
+* generate server API based on the definitions,
+* implement the functionality of the server based on the API and write comprehensive tests utilizing
+Micronaut`s features.
+
+=== Learn Micronaut
+
+To learn more about Micronaut framework and its features visit
+link:https://micronaut.io/docs/[Micronaut documentation] or read one of the several
+link:https://micronaut.io/guides/[Micronaut guides].
+
+=== Micronaut OpenAPI
+
+* Use link:https://micronaut-projects.github.io/micronaut-openapi/latest/guide[Micronaut OpenAPI] module to generate OpenAPI definition documents from controllers with Micronaut annotations.
