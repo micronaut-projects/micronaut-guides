@@ -1,6 +1,6 @@
 package example.micronaut;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
