@@ -21,6 +21,6 @@ public class BasicAuthClientTest {
         assertEquals("sherlock", rsp);
     }
     private static String basicAuth(String username, String password) {
-        return "Basic " + Base64.getEncoder().encodeToString(username + ":" + password).getBytes());
+        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
     }
 }
