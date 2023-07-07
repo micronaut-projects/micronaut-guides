@@ -8,13 +8,13 @@ import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 @MappedEntity("book") // <1>
 public record BookEntity(
     @Nullable @Id @GeneratedValue(GeneratedValue.Type.AUTO) Long id, // <2>
-    @NonNull @NotNull String name,
-    @NonNull @NotNull BookAvailability availability,
+    @NonNull @NotBlank String name,
+    @NonNull @NotBlank BookAvailability availability,
     @Nullable String author,
     @Nullable String isbn) {
 }
