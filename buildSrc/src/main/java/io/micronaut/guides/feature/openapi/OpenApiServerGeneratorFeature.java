@@ -16,39 +16,52 @@
 package io.micronaut.guides.feature.openapi;
 
 import com.fizzed.rocker.RockerModel;
-import io.micronaut.guides.feature.template.openapiClientGradle;
+import io.micronaut.guides.feature.template.openapiServerGradle;
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver;
 import jakarta.inject.Singleton;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @Singleton
-public class OpenApiClientGeneratorFeature extends AbstractOpenApiGeneratorFeature {
-    public OpenApiClientGeneratorFeature(PomDependencyVersionResolver resolver) {
+public class OpenApiServerGeneratorFeature extends AbstractOpenApiGeneratorFeature {
+    public OpenApiServerGeneratorFeature(PomDependencyVersionResolver resolver) {
         super(resolver);
     }
 
     @Override
     protected String getSimpleName() {
-        return "client";
+        return "server";
     }
 
     @Override
     protected String getKind() {
-        return "client";
+        return "server";
     }
 
     @Override
     protected String getDefinitionFile() {
-        return "src/openapi/openmeteo.yml";
+        return "src/main/resources/library-definition.yml";
     }
 
     @Override
     protected String getPackageName() {
-        return "example.openmeteo";
+        return "example.micronaut";
     }
 
     @Override
     protected RockerModel provideGradleModel() {
-        return openapiClientGradle.template(getKind(), getDefinitionFile(), getPackageName() + ".api", getPackageName() + ".model");
+        return openapiServerGradle.template(getKind(), getDefinitionFile(), getPackageName() + ".api", getPackageName() + ".model", getPackageName() + ".invoker");
     }
 
+    @Override
+    protected Map<String, String> provideMavenProperties() {
+        var allProperties = new LinkedHashMap<>(super.provideMavenProperties());
+        allProperties.putAll(Map.of(
+                "micronaut.openapi.use.reactive", "false",
+                "micronaut.openapi.server.use.auth", "true"
+        ));
+        return Collections.unmodifiableMap(allProperties);
+    }
 }

@@ -15,7 +15,7 @@
  */
 package io.micronaut.guides.feature.openapi;
 
-import io.micronaut.guides.feature.template.openapiGradle;
+import com.fizzed.rocker.RockerModel;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver;
@@ -57,17 +57,24 @@ public abstract class AbstractOpenApiGeneratorFeature implements Feature {
                     .id("io.micronaut.openapi")
                     .lookupArtifactId("micronaut-gradle-plugin")
                     .version(resolver.resolve("micronaut-gradle-plugin").get().getVersion())
-                    .extension(new RockerWritable(openapiGradle.template(getKind(), getDefinitionFile(), getPackageName() + ".api", getPackageName() + ".model")))
+                    .extension(new RockerWritable(provideGradleModel()))
                     .build());
         } else {
             // temporary fix, guides currently depend on M4
-            generatorContext.getBuildProperties().put("micronaut-maven-plugin.version", "4.0.0-M5");
-            generatorContext.getBuildProperties().putAll(Map.of(
-                    "micronaut.openapi.generate." + getKind(), "true",
-                    "micronaut.openapi.definition", getDefinitionFile(),
-                    "micronaut.openapi.api.package.name", getPackageName() + ".api",
-                    "micronaut.openapi.model.package.name", getPackageName() + ".model"
-            ));
+            generatorContext.getBuildProperties().put("micronaut-maven-plugin.version", "4.0.0-M6");
+            generatorContext.getBuildProperties().putAll(provideMavenProperties());
         }
     }
+
+    protected Map<String, String> provideMavenProperties() {
+        return Map.of(
+                "micronaut.openapi.generate." + getKind(), "true",
+                "micronaut.openapi.definition", getDefinitionFile(),
+                "micronaut.openapi.api.package.name", getPackageName() + ".api",
+                "micronaut.openapi.model.package.name", getPackageName() + ".model",
+                "micronaut.openapi.invoker.package.name", getPackageName() + ".invoker"
+        );
+    }
+
+    protected abstract RockerModel provideGradleModel();
 }
