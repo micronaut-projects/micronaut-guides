@@ -142,7 +142,7 @@ micronaut {
     server(file("src/main/resources/library-definition.yml")) { // <1>
       apiPackageName = "example.micronaut.api"
       modelPackageName = "example.micronaut.model"
-      invokerPackage = "example.micronaut.invoker"
+      invokerPackage = "example.micronaut"
       useReactive = false                                       // <2>
       useAuth = true                                            // <3>
     }
@@ -180,9 +180,8 @@ build/generated/openapi
 │           │       └── micronaut
 │           │           ├── api
 │           │           │   └── BooksApi.java       # <1>
-│           │           └── invoker
-│           │               └── annotation
-│           │                   └── HardNullable.java
+│           │           └── annotation
+│           │               └── HardNullable.java
 ├── generateServerOpenApiModels
 │   └── src
 │       └── main
@@ -210,7 +209,7 @@ Enable the Micronaut OpenAPI server generation in your `pom.xml` file, configure
     <micronaut.openapi.definition>src/main/resources/library-definition.yml</micronaut.openapi.definition> <!--2-->
     <micronaut.openapi.api.package.name>micronaut.example.api</micronaut.openapi.api.package.name> <!--3-->
     <micronaut.openapi.model.package.name>micronaut.example.model</micronaut.openapi.model.package.name> <!--4-->
-    <micronaut.openapi.invoker.package.name>micronaut.example.model</micronaut.openapi.invoker.package.name> <!--5-->
+    <micronaut.openapi.invoker.package.name>micronaut.example</micronaut.openapi.invoker.package.name> <!--5-->
     <micronaut.openapi.use.reactive>false</micronaut.openapi.use.reactive> <!--6-->
     <micronaut.openapi.server.use.auth>true</micronaut.openapi.server.use.auth><!--7-->
 </properties>
@@ -250,15 +249,15 @@ target/generated-sources/openapi
         │       └── micronaut
         │           ├── api                             # <1>
         │           │   └── BooksApi.java
-        │           ├── invoker
-        │           │   └── annotation
-        │           │       └── HardNullable.java
-        │           └── model                           # <2>
+        │           ├── annotation
+        │           │   └── HardNullable.java    # <2>
+        │           └── model                          # <3>
         │               ├── BookAvailability.java
         │               └── BookInfo.java
 ----
 <1> The api package will contain generated interfaces for our API that we will need to implement in our controller
-<2> It also generates model classes which are required by the service
+<2> Helper classes from the "invoker" package are created in the `annotation` package
+<3> It also generates model classes which are required by the service
 
 :exclude-for-build:
 
