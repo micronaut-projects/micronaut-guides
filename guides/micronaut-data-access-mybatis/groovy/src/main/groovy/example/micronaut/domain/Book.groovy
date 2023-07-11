@@ -4,8 +4,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.serde.annotation.Serdeable
-
-import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
 @Serdeable
@@ -15,17 +14,17 @@ class Book {
     Long id
 
     @NonNull
-    @NotNull
+    @NotBlank
     String name
 
     @NonNull
-    @NotNull
+    @NotBlank
     String isbn
 
     Genre genre
 
-    Book(@NonNull @NotNull String isbn,
-         @NonNull @NotNull String name,
+    Book(@NonNull @NotBlank String isbn,
+         @NonNull @NotBlank String name,
          Genre genre) {
         this.isbn = isbn
         this.name = name
