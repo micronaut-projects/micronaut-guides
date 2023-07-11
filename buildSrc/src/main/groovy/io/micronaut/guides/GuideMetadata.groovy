@@ -51,7 +51,6 @@ class GuideMetadata {
         List<String> invisibleFeatures
         List<String> excludeSource
         List<String> excludeTest
-        OpenAPIGeneratorConfig openAPIGeneratorConfig
 
         List<String> getFeatures(Language language) {
             if (language == Language.JAVA) {
@@ -80,14 +79,4 @@ class GuideMetadata {
         }
     }
 
-
-    @ToString(includeNames = true)
-    @CompileStatic
-    static class OpenAPIGeneratorConfig {
-        public static final String GENERATOR_JAVA_MICRONAUT_SERVER = "java-micronaut-server"
-        String definitionFile
-        String generatorName
-        Map<String, String> properties
-        Map<String, String> globalProperties
-    }
 }

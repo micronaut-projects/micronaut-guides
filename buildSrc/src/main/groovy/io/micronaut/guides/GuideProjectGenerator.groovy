@@ -7,7 +7,6 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.GuideMetadata.App
-import io.micronaut.guides.GuideMetadata.OpenAPIGeneratorConfig
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
@@ -121,13 +120,7 @@ class GuideProjectGenerator implements AutoCloseable {
                             groovyFeatures: it.groovyFeatures ?: [],
                             applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                             excludeSource: it.excludeSource,
-                            excludeTest: it.excludeTest,
-                            openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
-                                    definitionFile: it.openAPIGeneratorConfig.definitionFile,
-                                    generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
-                                    properties: it.openAPIGeneratorConfig.properties ?: [:],
-                                    globalProperties: it.openAPIGeneratorConfig.globalProperties ?: [:]
-                            ) : null)
+                            excludeTest: it.excludeTest)
                 }
         ))
     }
@@ -212,10 +205,6 @@ class GuideProjectGenerator implements AutoCloseable {
                 destination.mkdir()
 
                 String packageAndName = BASE_PACKAGE + '.' + app.name
-                if (app.openAPIGeneratorConfig) {
-                    OpenAPIGenerator.generate(inputDir, destination, lang, packageAndName , app.openAPIGeneratorConfig, testFramework, buildTool)
-                    deleteEveryFileButSources(destination)
-                }
 
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, app.getFramework(),
                         appFeatures, buildTool, app.testFramework ?: testFramework, lang, javaVersion)
