@@ -40,6 +40,7 @@ public class BooksController implements BooksApi {
     //end::inject[]
 
     //tag::addBook[]
+    @ExecuteOn(TaskExecutors.IO)
     public void addBook(BookInfo bookInfo) {
         bookRepository.save(bookInfo.getName(), // <3>
                 bookInfo.getAvailability(),
