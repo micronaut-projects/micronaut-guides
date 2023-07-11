@@ -1,6 +1,5 @@
 package example.micronaut
 
-import java.util.Optional
 import jakarta.annotation.PostConstruct
 import jakarta.inject.Singleton
 
@@ -18,8 +17,6 @@ class BookService {
 
     fun listAll(): List<Book> = bookStore
 
-    fun findByIsbn(isbn: String): Optional<Book> =
-            bookStore.stream()
-                    .filter { (i) -> i == isbn }
-                    .findFirst()
+    fun findByIsbn(isbn: String): Book? =
+        bookStore.firstOrNull { it.isbn == isbn }
 }

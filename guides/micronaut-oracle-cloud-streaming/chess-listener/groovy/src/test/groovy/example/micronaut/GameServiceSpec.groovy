@@ -37,6 +37,11 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
     @Inject
     GameStateRepository gameStateRepository
 
+    void setup() {
+        gameStateRepository.deleteAll()
+        gameRepository.deleteAll()
+    }
+
     void 'test game ending in checkmate'() {
         given:
         String blackName = 'b_name'
@@ -231,11 +236,6 @@ class GameServiceSpec extends Specification implements TestPropertyProvider { //
     Map<String, String> getProperties() {
         kafka.start()
         ['kafka.bootstrap.servers': kafka.bootstrapServers] // <7>
-    }
-
-    void cleanup() {
-        gameStateRepository.deleteAll()
-        gameRepository.deleteAll()
     }
 
     @KafkaClient

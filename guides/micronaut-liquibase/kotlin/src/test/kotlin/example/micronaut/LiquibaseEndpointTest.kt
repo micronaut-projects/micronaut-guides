@@ -7,7 +7,6 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -27,14 +26,14 @@ class LiquibaseEndpointTest(@Client("/") val httpClient: HttpClient) { // <2>
         assertNotNull(liquibaseReport!!.changeSets)
         assertEquals(2, liquibaseReport.changeSets!!.size)
     }
+}
 
-    @Serdeable
-    internal class LiquibaseReport {
-        var changeSets: List<ChangeSet>? = null
-    }
+@Serdeable
+class LiquibaseReport {
+    var changeSets: List<ChangeSet>? = null
+}
 
-    @Serdeable
-    internal class ChangeSet {
-        var id: String? = null
-    }
+@Serdeable
+class ChangeSet {
+    var id: String? = null
 }

@@ -43,9 +43,9 @@ abstract class AbstractRSASignatureConfiguration(jsonJwk: String) : RSASignature
 
     override fun getPublicKey(): RSAPublicKey? = pubKey
 
-    fun getJwsAlgorithm(): JWSAlgorithm = algorithm
+    open fun getJwsAlgorithm(): JWSAlgorithm = algorithm
 
-    fun getPrivateKey(): RSAPrivateKey = privKey
+    open fun getPrivateKey(): RSAPrivateKey = privKey
 
     private fun parseJWSAlgorithm(rsaKey: RSAKey): Optional<JWSAlgorithm> {
         val algorithm = rsaKey.algorithm ?: return Optional.empty()
