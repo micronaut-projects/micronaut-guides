@@ -4,7 +4,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.serde.annotation.Serdeable;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 @Serdeable
 public class Book {
@@ -13,17 +13,17 @@ public class Book {
     private Long id;
 
     @NonNull
-    @NotNull
+    @NotBlank
     private String name;
 
     @NonNull
-    @NotNull
+    @NotBlank
     private String isbn;
 
     private Genre genre;
 
-    public Book(@NonNull @NotNull String isbn,
-                @NonNull @NotNull String name,
+    public Book(@NonNull @NotBlank String isbn,
+                @NonNull @NotBlank String name,
                 Genre genre) {
         this.isbn = isbn;
         this.name = name;
