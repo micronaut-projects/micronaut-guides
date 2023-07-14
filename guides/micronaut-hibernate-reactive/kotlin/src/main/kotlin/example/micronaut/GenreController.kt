@@ -7,8 +7,8 @@ import io.micronaut.http.annotation.*
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 import java.net.URI
-import javax.persistence.PersistenceException
-import javax.validation.Valid
+import jakarta.persistence.PersistenceException
+import jakarta.validation.Valid
 
 @Controller("/genres")  // <1>
 open class GenreController(val genreRepository: GenreRepository) { // <2>

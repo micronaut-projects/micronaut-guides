@@ -1,28 +1,30 @@
 package example.micronaut.domain
 
 import example.micronaut.UserState
-import grails.gorm.annotation.Entity
-import org.grails.datastore.gorm.GormEntity
+import io.micronaut.data.annotation.MappedEntity
 import io.micronaut.serde.annotation.Serdeable
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.validation.constraints.NotBlank
 
-@Serdeable
-@Entity // <1>
-class User implements GormEntity<User>, UserState { // <2>
+@Serdeable  // <1>
+@MappedEntity // <2>
+class User implements UserState {
+    @Id // <3>
+    @GeneratedValue // <4>
+    Long id
+
+    @NotBlank
     String email
+
+    @NotBlank
     String username
+
+    @NotBlank
     String password
-    boolean enabled = true
-    boolean accountExpired = false
-    boolean accountLocked = false
-    boolean passwordExpired = false
 
-    static constraints = {
-        email nullable: false, blank: false
-        username nullable: false, blank: false, unique: true
-        password nullable: false, blank: false, password: true
-    }
-
-    static mapping = {
-        password column: '`password`'
-    }
+    boolean enabled
+    boolean accountExpired
+    boolean accountLocked
+    boolean passwordExpired
 }

@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.rabbitmq.annotation.Queue
 import io.micronaut.rabbitmq.annotation.RabbitListener
 
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
 @RabbitListener // <1>

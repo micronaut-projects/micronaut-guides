@@ -17,8 +17,8 @@ import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
 import java.net.URI
 import java.util.Optional
-import javax.validation.Valid
-import javax.validation.constraints.NotBlank
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 
 @ExecuteOn(TaskExecutors.IO) // <1>
 @Controller("/genres") // <2>

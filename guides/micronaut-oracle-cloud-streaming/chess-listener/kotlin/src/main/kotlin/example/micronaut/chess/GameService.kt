@@ -9,7 +9,7 @@ import example.micronaut.chess.repository.GameStateRepository
 import org.slf4j.LoggerFactory
 import java.util.UUID
 import jakarta.inject.Singleton
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @Singleton
 @Transactional

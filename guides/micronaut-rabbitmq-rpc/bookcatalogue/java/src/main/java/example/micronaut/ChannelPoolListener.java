@@ -11,7 +11,7 @@ import java.io.IOException;
 public class ChannelPoolListener extends ChannelInitializer {
 
     @Override
-    public void initialize(Channel channel) throws IOException {
+    public void initialize(Channel channel, String name) throws IOException {
         channel.exchangeDeclare("micronaut", BuiltinExchangeType.DIRECT, true); // <1>
 
         channel.queueDeclare("inventory", true, false, false, null); // <2>

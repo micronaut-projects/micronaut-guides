@@ -13,9 +13,9 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.*;
 
 @Singleton
@@ -97,12 +97,12 @@ public class DefaultBookRepository extends DynamoRepository<Book> implements Boo
     protected Map<String, AttributeValue> item(@NonNull Book book) {
         Map<String, AttributeValue> result = super.item(book);
         result.put(ATTRIBUTE_ID, AttributeValue.builder().s(book.getId()).build());
-        result.put(ATTRIBUTE_ISBN, AttributeValue.builder().s(book.getIsbn()).build());
-        result.put(ATTRIBUTE_NAME, AttributeValue.builder().s(book.getName()).build());
-        if (book.getStock() != null) {
-            result.put(ATTRIBUTE_STOCK, AttributeValue.builder().n(String.valueOf(book.getStock())).build());
+        result.put(ATTRIBUTE_ISBN, AttributeValue.builder().s(book.isbn()).build());
+        result.put(ATTRIBUTE_NAME, AttributeValue.builder().s(book.name()).build());
+        if (book.stock() != null) {
+            result.put(ATTRIBUTE_STOCK, AttributeValue.builder().n(String.valueOf(book.stock())).build());
         }
-        result.put(ATTRIBUTE_GSI_2_PK, AttributeValue.builder().s(PREFIX_ISBN + HASH + book.getIsbn()).build());
+        result.put(ATTRIBUTE_GSI_2_PK, AttributeValue.builder().s(PREFIX_ISBN + HASH + book.isbn()).build());
         result.put(ATTRIBUTE_GSI_2_SK, result.get(ATTRIBUTE_PK));
         return result;
     }

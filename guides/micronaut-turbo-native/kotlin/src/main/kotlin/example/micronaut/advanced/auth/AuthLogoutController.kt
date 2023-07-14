@@ -15,7 +15,10 @@ import java.security.Principal
 
 @Replaces(LogoutController::class)
 @Controller("/signout")
-class AuthLogoutController(val logoutHandler: LogoutHandler, val eventPublisher: ApplicationEventPublisher<ApplicationEvent>) {
+class AuthLogoutController(
+    val logoutHandler: LogoutHandler<HttpRequest<*>, MutableHttpResponse<*>>,
+    val eventPublisher: ApplicationEventPublisher<ApplicationEvent>
+) {
 
     @Post(consumes = [MediaType.TEXT_HTML, MediaType.APPLICATION_FORM_URLENCODED], produces = [MediaType.TEXT_HTML])
     fun logout(request: HttpRequest<*>, principal: Principal?): MutableHttpResponse<*> {

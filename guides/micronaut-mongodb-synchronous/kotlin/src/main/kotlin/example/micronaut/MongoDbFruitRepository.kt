@@ -3,7 +3,7 @@ package example.micronaut
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import jakarta.inject.Singleton
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Singleton // <1>
 open class MongoDbFruitRepository(

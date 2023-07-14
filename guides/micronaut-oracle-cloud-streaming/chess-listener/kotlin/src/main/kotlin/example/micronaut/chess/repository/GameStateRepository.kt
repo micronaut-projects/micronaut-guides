@@ -7,7 +7,7 @@ import io.micronaut.data.annotation.Join.Type.FETCH
 import io.micronaut.data.repository.CrudRepository
 import java.util.Optional
 import java.util.UUID
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotNull
 
 interface GameStateRepository : CrudRepository<GameState, UUID> {
 

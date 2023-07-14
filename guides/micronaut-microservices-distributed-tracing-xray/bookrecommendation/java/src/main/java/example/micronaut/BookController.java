@@ -20,9 +20,9 @@ public class BookController {
     @Get
     public Publisher<BookRecommendation> index() {
         return Flux.from(bookCatalogueOperations.findAll())
-                .flatMap(b -> Flux.from(bookInventoryOperations.stock(b.getIsbn()))
+                .flatMap(b -> Flux.from(bookInventoryOperations.stock(b.isbn()))
                         .filter(Boolean::booleanValue)
                         .map(rsp -> b)
-                ).map(book -> new BookRecommendation(book.getName()));
+                ).map(book -> new BookRecommendation(book.name()));
     }
 }

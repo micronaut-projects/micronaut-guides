@@ -9,7 +9,7 @@ import io.micronaut.retry.annotation.Recoverable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Client(id = "bookinventory")
 @Recoverable(api = BookInventoryOperations.class)

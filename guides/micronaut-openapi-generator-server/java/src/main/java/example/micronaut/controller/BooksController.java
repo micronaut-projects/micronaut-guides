@@ -10,40 +10,26 @@
  * Do not edit the class manually.
  */
 
+// tag::header[]
 package example.micronaut.controller;
-
 //tag::import[]
+
 import example.micronaut.BookEntity;
 import example.micronaut.BookRepository;
-import example.micronaut.BookSpecifications;
+import example.micronaut.api.BooksApi;
+import example.micronaut.model.BookInfo;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.http.annotation.*;
-import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
-import example.micronaut.model.BookInfo;
-import javax.annotation.Generated;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
-import static io.micronaut.http.HttpStatus.OK;
+import java.util.List;
 //end::import[]
 
-@Generated(value="org.openapitools.codegen.languages.JavaMicronautServerCodegen", date="2022-05-31T15:41:31.404-04:00[America/New_York]")
 @Controller
-@Tag(name = "Books", description = "The Books API")
-public class BooksController {
+public class BooksController implements BooksApi {
+//end::header[]
 
     //tag::inject[]
     private final BookRepository bookRepository; // <1>
@@ -53,30 +39,9 @@ public class BooksController {
     }
     //end::inject[]
 
-    /**
-     * Add a new book
-     *
-     * @param bookInfo  (required)
-     */
-    @Operation(
-        operationId = "addBook",
-        summary = "Add a new book",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Success"),
-            @ApiResponse(responseCode = "400", description = "Bad Request")
-        },
-        parameters = {
-            @Parameter(name = "bookInfo", required = true)
-        }
-    )
-    @Post(uri="/add")
-    @Produces(value = {})
-    @Consumes(value = {"application/json"})
-    @Secured({SecurityRule.IS_ANONYMOUS})
     //tag::addBook[]
-    @ExecuteOn(TaskExecutors.IO) // <1>
-    @Status(OK) // <2>
-    public void addBook(@Body @NotNull @Valid BookInfo bookInfo) {
+    @ExecuteOn(TaskExecutors.IO)
+    public void addBook(BookInfo bookInfo) {
         bookRepository.save(bookInfo.getName(), // <3>
                 bookInfo.getAvailability(),
                 bookInfo.getAuthor(),
@@ -84,61 +49,39 @@ public class BooksController {
     }
     //end::addBook[]
 
-    /**
-     * Search for a book
-     *
-     * @param bookName  (optional)
-     * @param authorName  (optional)
-     * @return List&lt;BookInfo&gt;
-     */
-    @Operation(
-        operationId = "search",
-        summary = "Search for a book",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Success", content = {
-                @Content(mediaType = "applicaton/json", schema = @Schema(implementation = BookInfo.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "Bad Request")
-        },
-        parameters = {
-            @Parameter(name = "bookName"),
-            @Parameter(name = "authorName")
-        }
-    )
-    @Get(uri="/search")
-    @Produces(value = {"applicaton/json"})
-    @Secured({SecurityRule.IS_ANONYMOUS})
+
     //tag::search[]
     @ExecuteOn(TaskExecutors.IO) // <1>
     public List<BookInfo> search(
-            @QueryValue(value="book-name") @Nullable @Size(min=3) String bookName,
-            @QueryValue(value="author-name") @Nullable String authorName) {
+            String bookName,
+            String authorName) {
         return searchEntities(bookName, authorName)
                 .stream()
                 .map(this::map) // <5>
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private BookInfo map(BookEntity entity) {
-        BookInfo book = new BookInfo(entity.getName(), entity.getAvailability());
-        book.setISBN(entity.getIsbn());
-        book.setAuthor(entity.getAuthor());
+        var book = new BookInfo(entity.name(), entity.availability());
+        book.setISBN(entity.isbn());
+        book.setAuthor(entity.author());
         return book;
     }
 
     @NonNull
-    private List<BookEntity> searchEntities(@Nullable String name, @Nullable String author) { // <2>
+    private List<BookEntity> searchEntities(String name, String author) { // <2>
         if (StringUtils.isEmpty(name) && StringUtils.isEmpty(author)) {
             return bookRepository.findAll();
         } else if (StringUtils.isEmpty(name)) {
-            return bookRepository.findAll(BookSpecifications.authorLike(author)); // <3>
+            return bookRepository.findAllByAuthorContains(author); // <3>
 
         } else  if (StringUtils.isEmpty(author)) {
-            return bookRepository.findAll(BookSpecifications.nameLike(name));
+            return bookRepository.findAllByNameContains(name);
         } else {
-            return bookRepository.findAll(BookSpecifications.authorLike(author)
-                    .and(BookSpecifications.nameLike(name))); // <4>
+            return bookRepository.findAllByAuthorContainsAndNameContains(author,name); // <4>
         }
     }
     //end::search[]
+//tag::footer[]
 }
+//end::footer[]

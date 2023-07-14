@@ -1,8 +1,8 @@
 package example.micronaut;
 
 import jakarta.inject.Singleton;
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

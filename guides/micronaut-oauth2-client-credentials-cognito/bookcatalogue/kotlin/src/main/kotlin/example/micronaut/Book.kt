@@ -1,6 +1,6 @@
 package example.micronaut
 
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 import io.micronaut.serde.annotation.Serdeable
 
 @Serdeable

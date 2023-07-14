@@ -2,7 +2,7 @@ package example.micronaut.context;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Context;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 @Context // <1>
 @ConfigurationProperties("micronaut") // <2>

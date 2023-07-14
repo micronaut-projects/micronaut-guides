@@ -1,9 +1,12 @@
 package example.micronaut;
 
+import io.micronaut.core.async.annotation.SingleResult;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.client.annotation.Client;
 import org.reactivestreams.Publisher;
+
+import java.util.List;
 
 import static io.micronaut.http.HttpHeaders.ACCEPT;
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
@@ -14,5 +17,6 @@ import static io.micronaut.http.HttpHeaders.USER_AGENT;
 public interface GithubApiClient {
 
     @Get("/repos/${github.organization}/${github.repo}/releases") // <4>
-    Publisher<GithubRelease> fetchReleases(); // <5>
+    @SingleResult // <5>
+    Publisher<List<GithubRelease>> fetchReleases(); // <6>
 }

@@ -2,7 +2,7 @@ package example.micronaut;
 
 import jakarta.inject.Singleton;
 import io.micronaut.core.annotation.NonNull;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;

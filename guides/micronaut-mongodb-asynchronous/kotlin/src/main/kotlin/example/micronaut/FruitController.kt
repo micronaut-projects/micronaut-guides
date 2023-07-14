@@ -8,7 +8,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Controller("/fruits") // <1>
 open class FruitController(private val fruitService: FruitRepository) { // <2>

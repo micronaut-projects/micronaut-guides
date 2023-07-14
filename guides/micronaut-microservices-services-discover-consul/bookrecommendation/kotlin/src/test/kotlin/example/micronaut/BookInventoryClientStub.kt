@@ -5,7 +5,7 @@ import io.micronaut.context.env.Environment.TEST
 import io.micronaut.retry.annotation.Fallback
 import jakarta.inject.Singleton
 import reactor.core.publisher.Mono
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @Requires(env = [TEST]) // <1>
 @Fallback

@@ -7,11 +7,11 @@ import org.hibernate.reactive.stage.Stage
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import javax.persistence.PersistenceException
+import jakarta.persistence.PersistenceException
 
 
 @Singleton // <1>
-class GenreRepositoryImpl(
+open class GenreRepositoryImpl(
     val applicationConfiguration: ApplicationConfiguration, // <2>
     sessionFactory: SessionFactory, // <3>
 ) : GenreRepository {
@@ -61,8 +61,10 @@ class GenreRepositoryImpl(
 
     private fun createQuery(args: SortingAndOrderArguments): String {
         var qlString = "SELECT g FROM Genre as g"
-        if (null != args.order && null != args.sort && VALID_PROPERTY_NAMES.contains(args.sort)) {
-            qlString += " ORDER BY g." + args.sort + ' ' + args.order!!.lowercase()
+        val order = args.order
+        val sort = args.sort
+        if (order != null && sort != null && VALID_PROPERTY_NAMES.contains(sort)) {
+            qlString += " ORDER BY g." + sort + ' ' + order.lowercase()
         }
         return qlString
     }

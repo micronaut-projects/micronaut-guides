@@ -1,8 +1,8 @@
 package example.micronaut.crypto;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
-@Introspected // <1>
+@Serdeable // <1>
 public class BitcoinPrice {
 
     private final Data data;
@@ -15,7 +15,7 @@ public class BitcoinPrice {
         return data.getPrice();
     }
 
-    @Introspected // <1>
+    @Serdeable // <1>
     public static class Data {
 
         private final float price;

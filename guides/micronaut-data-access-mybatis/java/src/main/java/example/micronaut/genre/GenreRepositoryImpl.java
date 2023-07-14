@@ -5,8 +5,8 @@ import example.micronaut.domain.Genre;
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,20 +41,20 @@ public class GenreRepositoryImpl implements GenreRepository {
     @NonNull
     public List<Genre> findAll(@NonNull @NotNull ListingArguments args) {
 
-        if (args.getMax().isPresent() && args.getSort().isPresent() && args.getOffset().isPresent() && args.getOrder().isPresent()) {
+        if (args.getMax() != null && args.getSort() != null && args.getOffset() != null && args.getOrder() != null) {
             return genreMapper.findAllByOffsetAndMaxAndSortAndOrder(
-                    args.getOffset().get(),
-                    args.getMax().get(),
-                    args.getSort().get(),
-                    args.getOrder().get());
+                    args.getOffset(),
+                    args.getMax(),
+                    args.getSort(),
+                    args.getOrder());
         }
 
-        if (args.getMax().isPresent() && args.getOffset().isPresent() && (!args.getSort().isPresent() || !args.getOrder().isPresent())) {
-            return genreMapper.findAllByOffsetAndMax(args.getOffset().get(), args.getMax().get());
+        if (args.getMax() != null && args.getOffset()!= null && (args.getSort() == null || args.getOrder() == null)) {
+            return genreMapper.findAllByOffsetAndMax(args.getOffset(), args.getMax());
         }
 
-        if ((!args.getMax().isPresent() || !args.getOffset().isPresent()) && args.getSort().isPresent() && args.getOrder().isPresent()) {
-            return genreMapper.findAllBySortAndOrder(args.getSort().get(), args.getOrder().get());
+        if ((args.getMax() == null || args.getOffset() == null) && args.getSort() != null && args.getOrder() !=null) {
+            return genreMapper.findAllBySortAndOrder(args.getSort(), args.getOrder());
         }
 
         return genreMapper.findAll();

@@ -3,10 +3,10 @@ package example.micronaut.chess.dto
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import io.micronaut.core.annotation.Creator
-import io.micronaut.core.annotation.Introspected
-import javax.validation.constraints.Size
+import io.micronaut.serde.annotation.Serdeable
+import jakarta.validation.constraints.Size
 
-@Introspected // <1>
+@Serdeable // <1>
 @JsonTypeInfo(use = NAME, property = "_className") // <2>
 class GameDTO
 

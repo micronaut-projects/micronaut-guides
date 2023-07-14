@@ -3,9 +3,11 @@ package example.micronaut;
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
+import io.micronaut.serde.annotation.Serdeable;
 
 import static io.micronaut.data.annotation.GeneratedValue.Type.AUTO;
 
+@Serdeable
 @MappedEntity // <1>
 public class Book {
 

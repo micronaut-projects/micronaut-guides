@@ -1,10 +1,10 @@
 package example.micronaut.crypto
 
 import groovy.transform.CompileStatic
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 
 @CompileStatic
-@Introspected // <1>
+@Serdeable // <1>
 class BitcoinPrice {
 
     private final Data data
@@ -18,7 +18,7 @@ class BitcoinPrice {
     }
 
     @CompileStatic
-    @Introspected // <1>
+    @Serdeable // <1>
     static class Data {
 
         final float price

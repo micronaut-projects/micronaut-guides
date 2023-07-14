@@ -14,7 +14,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import java.net.URI
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Controller("/genres") // <1>
 open class GenreController(private val genreRepository: GenreRepository) { // <2>

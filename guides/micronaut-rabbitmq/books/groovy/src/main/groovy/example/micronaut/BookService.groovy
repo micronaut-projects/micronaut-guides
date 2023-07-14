@@ -2,7 +2,7 @@ package example.micronaut
 
 import groovy.transform.CompileStatic
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 import jakarta.inject.Singleton
 
 @CompileStatic

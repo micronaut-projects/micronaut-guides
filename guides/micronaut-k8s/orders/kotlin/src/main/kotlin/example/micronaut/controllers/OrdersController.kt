@@ -12,17 +12,17 @@ import io.micronaut.http.exceptions.HttpStatusException
 import io.micronaut.security.annotation.Secured
 import io.micronaut.security.rules.SecurityRule
 import java.math.BigDecimal
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 
 @Controller("/orders") // <1>
 @Secured(SecurityRule.IS_AUTHENTICATED) // <2>
-class OrdersController {
+open class OrdersController {
 
     private val orders: MutableList<Order> = ArrayList()
 
     @Get("/{id}") // <3>
-    fun findById(id: @NotNull Int?): Order? {
+    open fun findById(id: @NotNull Int?): Order? {
         return orders.firstOrNull{ it: Order ->
             it.id == id
         }
@@ -34,7 +34,7 @@ class OrdersController {
     }
 
     @Post // <5>
-    fun createOrder(@Body order: @Valid Order): Order {
+    open fun createOrder(@Body order: @Valid Order): Order {
         if (order.itemIds.isNullOrEmpty()) {
             throw HttpStatusException(HttpStatus.BAD_REQUEST, "Items must be supplied")
         }

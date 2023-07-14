@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 
 @Singleton // <1>
-class CredentialsChecker(private val credentials: Credentials) : AuthenticationProvider {
+class CredentialsChecker(private val credentials: Credentials) : AuthenticationProvider<HttpRequest<*>> {
     override fun authenticate(
         @Nullable httpRequest: HttpRequest<*>?,
         authenticationRequest: AuthenticationRequest<*, *>

@@ -11,13 +11,13 @@ import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import io.micronaut.http.annotation.Status
 
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 import static io.micronaut.scheduling.TaskExecutors.IO
 import io.micronaut.scheduling.annotation.ExecuteOn
 
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 
 @Controller("/fruits") // <1>
 class FruitController {

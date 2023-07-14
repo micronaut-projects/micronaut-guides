@@ -14,7 +14,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import spock.lang.Specification
 
-import javax.mail.Message
+import jakarta.mail.Message
 import java.util.function.Consumer
 
 import static io.micronaut.email.BodyType.HTML

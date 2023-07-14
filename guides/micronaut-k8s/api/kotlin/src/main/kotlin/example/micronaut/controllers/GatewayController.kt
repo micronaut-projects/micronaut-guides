@@ -17,7 +17,7 @@ import io.micronaut.scheduling.annotation.ExecuteOn
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Controller("/api") // <1>
 @ExecuteOn(TaskExecutors.IO) // <2>

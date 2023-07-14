@@ -4,7 +4,7 @@ import io.micronaut.data.annotation.MappedEntity
 import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @Serdeable // <1>
 @MappedEntity // <2>

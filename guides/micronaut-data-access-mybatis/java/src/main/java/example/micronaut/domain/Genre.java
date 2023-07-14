@@ -5,7 +5,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.serde.annotation.Serdeable;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,15 +15,15 @@ public class Genre {
     @Nullable
     private Long id;
 
-    @NotNull
     @NonNull
+    @NotBlank
     private String name;
 
     @NonNull
     @JsonIgnore
     private Set<Book> books = new HashSet<>();
 
-    public Genre(@NonNull @NotNull String name) {
+    public Genre(@NonNull @NotBlank String name) {
         this.name = name;
     }
 

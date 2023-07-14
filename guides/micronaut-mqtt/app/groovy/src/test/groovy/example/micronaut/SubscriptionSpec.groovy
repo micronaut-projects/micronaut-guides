@@ -3,14 +3,13 @@ package example.micronaut
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
 import io.micronaut.mqtt.annotation.Topic
-import io.micronaut.mqtt.v5.annotation.MqttPublisher
+import io.micronaut.mqtt.annotation.v5.MqttPublisher
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
+import spock.util.concurrent.PollingConditions
 
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
 import spock.lang.Specification
-import static org.awaitility.Awaitility.await
 
 @MicronautTest // <1>
 @Property(name = "spec.name", value = "SubscriptionTest") // <2>
@@ -22,12 +21,16 @@ class SubscriptionSpec extends Specification {
     @Inject
     TemperatureListener listener
 
+    PollingConditions conditions = new PollingConditions()
+
     def "subscriptions are received"() {
         when:
         client.publishLivingroomTemperature("3.145".getBytes(StandardCharsets.UTF_8))
 
         then:
-        await().atMost(5, TimeUnit.SECONDS).until { listener.temperature == 3.145 }
+        conditions.within(5) {
+            listener.temperature == 3.145
+        }
     }
 
     @Requires(property = "spec.name", value = "SubscriptionTest") // <3>

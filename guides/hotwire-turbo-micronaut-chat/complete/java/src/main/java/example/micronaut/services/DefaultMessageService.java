@@ -9,8 +9,8 @@ import example.micronaut.repositories.MessageRepository;
 import example.micronaut.repositories.RoomRepository;
 import jakarta.inject.Singleton;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 
 @Singleton

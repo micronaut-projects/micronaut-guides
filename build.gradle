@@ -6,7 +6,7 @@ import io.micronaut.guides.GitDiffUtils
 
 plugins {
     id 'groovy'
-    id("org.asciidoctor.jvm.convert") version "3.3.2"
+    id("org.asciidoctor.jvm.convert") version "4.0.0-alpha.1"
 }
 
 apply from: "gradle/asciidoc.gradle"
@@ -25,14 +25,11 @@ ext {
     micronautVersion = new File(projectDir, 'version.txt').text.trim()
 }
 
-task cleanAsciidoctorFolder {
+task cleanAsciidoctorFolder(type: Delete) {
     group 'guides'
     description 'Cleans src/docs/asciidoc directory'
-    doLast {
-        File f = file('src/docs/asciidoc')
-        if (f.exists()) {
-            f.deleteDir()
-        }
+    delete fileTree('src/docs/asciidoc') {
+        include '*.adoc'
     }
 }
 

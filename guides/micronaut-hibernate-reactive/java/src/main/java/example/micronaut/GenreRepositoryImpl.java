@@ -8,7 +8,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -67,18 +67,22 @@ public class GenreRepositoryImpl implements GenreRepository {
     public Publisher<Genre> findAll(SortingAndOrderArguments args) {
         String qlString = createQuery(args);
         return Mono.fromCompletionStage(sessionFactory.withTransaction(session -> {
-                    Stage.Query<Genre> query = session.createQuery(qlString, Genre.class);
-                    query.setMaxResults(args.getMax().orElseGet(applicationConfiguration::getMax));
-                    args.getOffset().ifPresent(query::setFirstResult);
+                    Stage.SelectionQuery<Genre> query = session.createQuery(qlString, Genre.class);
+                    query.setMaxResults(args.max() == null ? applicationConfiguration.getMax() : args.max());
+                    if (args.offset() != null) {
+                        query.setFirstResult(args.offset());
+                    }
                     return query.getResultList();
                 }))
-            .flatMapMany(Flux::fromIterable);
+                .flatMapMany(Flux::fromIterable);
     }
 
     private String createQuery(SortingAndOrderArguments args) {
         String qlString = "SELECT g FROM Genre as g";
-        if (args.getOrder().isPresent() && args.getSort().isPresent() && VALID_PROPERTY_NAMES.contains(args.getSort().get())) {
-            qlString += " ORDER BY g." + args.getSort().get() + ' ' + args.getOrder().get().toLowerCase();
+        String order = args.order();
+        String sort = args.sort();
+        if (order != null && sort != null && VALID_PROPERTY_NAMES.contains(sort)) {
+            qlString += " ORDER BY g." + sort + ' ' + order.toLowerCase();
         }
         return qlString;
     }

@@ -2,26 +2,28 @@ package example.micronaut
 
 import example.micronaut.domain.Role
 import example.micronaut.domain.User
-import grails.gorm.transactions.Transactional
+import example.micronaut.domain.UserRole
+import example.micronaut.domain.UserRoleId
 import groovy.transform.CompileStatic
 
 import jakarta.inject.Singleton
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
+import jakarta.transaction.Transactional
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
 @Singleton
 class RegisterService {
 
-    private final RoleGormService roleGormService
-    private final UserGormService userGormService
-    private final UserRoleGormService userRoleGormService
+    private final RoleJdbcRepository roleGormService
+    private final UserJdbcRepository userGormService
+    private final UserRoleJdbcRepository userRoleGormService
     private final PasswordEncoder passwordEncoder
 
-    RegisterService(RoleGormService roleGormService,
-                    UserGormService userGormService,
+    RegisterService(RoleJdbcRepository roleGormService,
+                    UserJdbcRepository userGormService,
                     PasswordEncoder passwordEncoder,
-                    UserRoleGormService userRoleGormService) {
+                    UserRoleJdbcRepository userRoleGormService) {
         this.roleGormService = roleGormService
         this.userGormService = userGormService
         this.userRoleGormService = userRoleGormService
@@ -32,16 +34,19 @@ class RegisterService {
     void register(@Email String email, @NotBlank String username,
                   @NotBlank String rawPassword, List<String> authorities) {
 
-        User user = userGormService.findByUsername(username)
+        User user = userGormService.findByUsername(username).orElse(null)
         if (!user) {
             final String encodedPassword = passwordEncoder.encode(rawPassword)
-            user = userGormService.save(email, username, encodedPassword)
+            user = userGormService.save(new User(email: email, username: username, password: encodedPassword, enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false))
         }
 
         if (user && authorities) {
             for (String authority : authorities) {
-                Role role = roleGormService.find(authority) ?: roleGormService.save(authority)
-                userRoleGormService.find(user, role) ?: userRoleGormService.save(user, role)
+                Role role = roleGormService.findByAuthority(authority).orElseGet(() -> roleGormService.save(authority))
+                UserRoleId userRoleId = new UserRoleId(user.id, role.id)
+                if (userRoleGormService.findById(userRoleId).isEmpty()) {
+                    userRoleGormService.save(new UserRole(userRoleId))
+                }
             }
         }
     }

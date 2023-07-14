@@ -4,11 +4,7 @@ common:header-top.adoc[]
 
 https://www.openapis.org[OpenAPI] is a specification for describing REST APIs. Many web APIs provide definitions for the available endpoints and parameters in form of OpenAPI documents. OpenAPI infrastructure includes numerous tooling, including the OpenAPI generator.
 
-____
-OpenAPI Generator allows generation of API client libraries (SDK generation), server stubs, documentation and configuration automatically given an OpenAPI Spec (both 2.0 and 3.0 are supported).
-____
-
-In this guide, we will use the OpenAPI Generator to generate a client API from an OpenAPI definition file. We will generate the client for link:https://developer.twitter.com/en/docs/twitter-api[Twitter API], however the steps
+In this guide, we will use the Micronaut OpenAPI Generator to generate a client API from an OpenAPI definition file. We will generate the client for link:https://open-meteo.com[Open Meteo], however the steps
 could easily be replicated with any other API with an OpenAPI definition.
 
 After generation, we will see how to use the client inside a Micronaut application, including performing API calls in controller methods.
@@ -17,299 +13,195 @@ common:requirements.adoc[]
 
 common:completesolution.adoc[]
 
-common:install-openapi-generator.adoc[]
 
 == Generating the Micronaut Client
 
-We will generate a client for link:https://developer.twitter.com/en/docs/twitter-api[Twitter API].
+We will generate a client for link:https://open-meteo.com[Open Meteo], an open-source weather API which offers free access for non-commercial use.
 
-To do this, we will need to download the official Twitter API OpenAPI definition file: link:https://api.twitter.com/2/openapi.json[https://api.twitter.com/2/openapi.json].
-Save it as `twitter-api-definition.json` and move into the directory that you intend to use for this project.
+To do this, we will need to download the official Open Meteo OpenAPI definition file: link:https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml[https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml].
 
-To generate the Micronaut client from the JSON definition, open the terminal in the directory where the definition file and
-the OpenAPI generator executable are located, and run:
+=== Create a Micronaut application
+
+common:cli-or-launch.adoc[]
 
 [source,bash]
 ----
-java -jar openapi-generator-cli-5.4.0.jar generate \
-    -g java-micronaut-client \# <1>
-    -i twitter-api-definition.json \# <2>
-    -o ./ \# <3>
-    -p apiPackage=example.micronaut.api \# <4>
-    -p modelPackage=example.micronaut.model \# <5>
-    -p build=@build@ \# <6>
-    -p test=junit# <7>
+mn create-app example.micronaut.micronautguide \
+   --features=http-client,validation,reactor \
+   --build=@build@ --lang=@lang@
 ----
-<1> Specify that we will use the Java Micronaut client generator.
-<2> Specify our OpenAPI definition file as `twitter-api-definition.json`.
-<3> Specify the output directory to be the current directory (`./`).
-You can specify it to be a different one if you want.
-<4> We provide generator-specific properties starting with `-p`.
-We want all the API files to be generated in the `example.twitter.api` package.
-<5> We want all the models to be in the `example.twitter.model` package.
-In this package classes for data models, that are used for communication with server will be generated.
-<6> We want to use @build@ as build tool. The supported values are `gradle`, `maven` and `all`.
-If nothing is specified, both Maven and Gradle files are generated.
-<7> We want to use JUnit 5 for testing. The supported values are `junit` (JUnit 5) and `spock`.
-If nothing is specified, `junit` is used by default.
 
-After generation finishes, you should see the following directory structure:
+Open the generated project and create a new folder, `src/openapi` then copy the `openapi.yml` file into it, for example:
+
+[source,bash]
+----
+$ cd micronaut-guide
+$ mkdir src/openapi
+$ curl https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml -o src/openapi/openmeteo.yml
+----
+
+=== Configure client generation
+
+:exclude-for-build:maven
+
+Add the Micronaut OpenAPI plugin to your plugins section:
+
+[source, groovy]
+.build.gradle
+----
+plugins {
+  id 'io.micronaut.openapi' version '...'
+  ....
+}
+----
+
+And configure your build to generate a client:
+
+[source, groovy]
+.build.gradle
+----
+micronaut {
+  ...
+  openapi {
+    client(file("src/openapi/openmeteo.yml")) {
+      apiPackageName = "example.openmeteo.api"
+      modelPackageName = "example.openmeteo.model"
+    }
+  }
+}
+----
+
+The client code will be generated in your build directory but automatically added as a source set.
+Therefore, you can for example run `./gradlew compileJava --console=verbose` and see that the sources are generated and compiled:
+
+[source]
+----
+> Task :generateClientOpenApiApis
+...
+> Task :generateClientOpenApiModels
+...
+> Task :compileJava
+----
+
+TIP: The Micronaut OpenAPI generator supports a large number of parameters. Please refer to the https://micronaut-projects.github.io/micronaut-gradle-plugin/snapshot/#_generating_a_client[Micronaut OpenAPI Gradle plugin documentation] for all possible options.
+
+After generation finishes, you should see the following directory structure under your `build/generated/openapi` directory:
+
 [source,text]
 ----
-./
-├── docs
-│   └── ... # <1>
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── example/twitter/
-│   │   │       ├── api # <2>
-│   │   │       │   ├── GeneralApi.java
-│   │   │       │   ├── SpacesApi.java
-│   │   │       │   ├── TweetsApi.java
-│   │   │       │   └── UsersApi.java
-│   │   │       └── model # <3>
-│   │   │           ├── ...
-│   │   │           ├── Tweet.java
-│   │   │           ├── TweetSearchResponse.java
-│   │   │           ├── User.java
-│   │   │           └── ...
-│   │   └── resources/
-│   │       ├── application.yml # <4>
-│   │       └── logback.xml
-│   └── test/
-│       └── java/
-│           └── example/twitter/ # <5>
-│               ├── api
-│               │   ├── GeneralApiTest.java
-│               │   ├── SpacesApiTest.java
-│               │   ├── TweetsApiTest.java
-│               │   └── UsersApiTest.java
-│               └── model
-│                   └── ...
-├── README.md
-└── ...
+build/generated/openapi
+├── generateClientOpenApiApis
+│   └── src
+│       └── main
+│           └── java
+│               └── example
+│                   └── openmeteo
+│                       └── api
+│                           └── WeatherForecastApisApi.java  # <1>
+└── generateClientOpenApiModels
+    └── src
+        └── main
+            └── java
+                └── example
+                    └── openmeteo
+                        └── model                                 # <2>
+                            ├── CurrentWeather.java
+                            ├── DailyResponse.java
+                            ├── HourlyProperties.java
+                            ├── HourlyResponse.java
+                            ├── V1ForecastGet200Response.java
+                            └── V1ForecastGet400Response.java
+
 ----
-<1> The `docs/` directory contains automatically generated Markdown files with documentation about your API.
-<2> The `example.twitter.api` package contains API classes.
-<3> The `example.twitter.model` package contains data classes, that are used in parameters or bodies of both
+<1> The `example.openmeteo.api` package contains API classes.
+<2> The `example.openmeteo.model` package contains data classes, that are used in parameters or bodies of both
 requests and responses in the API.
-<4> The `application.yml` file contains the configuration of your Micronaut application. We will modify it later.
-<5> Templates for tests are generated. Test files for both APIs and models were created.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Enable the Micronaut OpenAPI client generation in your `pom.xml` file, configure the location to the specification file and package names:
+
+[source, xml]
+.pom.xml
+----
+<properties>
+    <micronaut.openapi.generate.client>true</micronaut.openapi.generate.client>
+    <micronaut.openapi.definition>src/openapi/openmeteo.yml</micronaut.openapi.definition>
+    <micronaut.openapi.api.package.name>example.openmeteo.api</micronaut.openapi.api.package.name>
+    <micronaut.openapi.model.package.name>example.openmeteo.model</micronaut.openapi.model.package.name>
+</properties>
+----
+
+The client code will be generated in your target directory and compiled automatically alongside your regular sources.
+Therefore, you can for example run `mvn compile` and see that the sources are generated and compiled:
+
+[source]
+----
+[INFO] --- micronaut-maven-plugin:4.0.0-M5:generate-openapi-client (default-generate-openapi-client) @ default ---
+[INFO] Environment variable JAVA_POST_PROCESS_FILE not defined so the Java code may not be properly formatted. To define it, try 'export JAVA_POST_PROCESS_FILE="/usr/local/bin/clang-format -i"' (Linux/Mac)
+[INFO] NOTE: To enable file post-processing, 'enablePostProcessFile' must be set to `true` (--enable-post-process-file for CLI).
+[INFO] Generating with dryRun=false
+[INFO] OpenAPI Generator: java-micronaut-client (client)
+...
+----
+
+TIP: The Micronaut OpenAPI generator supports a large number of parameters. Please refer to https://micronaut-projects.github.io/micronaut-maven-plugin/snapshot/examples/openapi.html#generating_a_client[Micronaut OpenAPI Maven plugin documentation] for all possible options.
+
+After generation finishes, you should see the following directory structure under your `target/generated-sources/openapi` directory:
+
+[source]
+----
+target/generated-sources/openapi
+└── src
+    └── main
+        ├── java
+        │   └── example
+        │       └── openmeteo
+        │           ├── api                                     # <1>
+        │           │   └── WeatherForecastApisApi.java
+        │           └── model                                   # <2>
+        │               ├── CurrentWeather.java
+        │               ├── DailyResponse.java
+        │               ├── HourlyResponse.java
+        │               ├── V1ForecastGet200Response.java
+        │               └── V1ForecastGet400Response.java
+----
+<1> The `example.openmeteo.api` package contains API classes.
+<2> The `example.openmeteo.model` package contains data classes, that are used in parameters or bodies of both
+requests and responses in the API.
+
+:exclude-for-build:
+
 
 [NOTE]
 ====
-The definition file is a document describing the Twitter API according to the link:https://swagger.io/specification/[OpenAPI Specification].
+The definition file is a document describing the OpenMeteo API according to the link:https://swagger.io/specification/[OpenAPI Specification].
 
 If you want to learn about the structure of OpenAPI specification and how to simplify the creation of a Micronaut Server
-with it, read the link:https://guides.micronaut.io/latest/micronaut-openapi-generator-server.html["Use OpenAPI Defintion to Generate a Micronaut Server" guide]
+with it, read the link:https://guides.micronaut.io/latest/micronaut-openapi-generator-server.html["Use OpenAPI Definition to Generate a Micronaut Server" guide]
 or the link:https://swagger.io/docs/specification/about/[OpenAPI guide].
 ====
 
-As you can see, four API files were generated for the Twitter API.
+As you can see, different API files were generated for the OpenMeteo API.
 
-If you look inside the API files, you will see that method definitions were generated corresponding to different
-paths and operations available in the API. Using Micronaut`s features, we will be able to inject a client implementation
-of this interface and use it by calling the corresponding methods without the need to worry how client-server communication
-is handled.
-
-[NOTE]
-=========
-If you want to view all the available parameters for micronaut server generator, run
-[source,bash]
-----
-java -jar openapi-generator-cli-5.4.0.jar config-help \
--g java-micronaut-client
-----
-=========
-
-== Configure Client Authorization
-
-In order to send requests to an API, you might be required to configure Authorization.
-
-=== Create Twitter Development Account
-
-In case of Twitter, we need to configure OAuth2 authorization. You can authorize with an API key
-via the OAuth2 authorization code flow or using a Bearer token.
-
-We will use the API key option. To get your API key, you will need to sign up for a Twitter developer account.
-To do this, follow the first 2 steps on the
-link:https://developer.twitter.com/en/docs/twitter-api/getting-started/getting-access-to-the-twitter-api["Getting Access to the Twitter API"] guide.
-Do not forget to save your `API key` and `API secret` values somewhere.
-
-[NOTE]
-====
-You can read about Twitter OAuth2 authentication in the link:https://developer.twitter.com/en/docs/authentication/oauth-2-0["Authorization" page of the Twitter API documentation].
-The documentation specifies link:https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only[authentication with Bearer token]
-and link:https://developer.twitter.com/en/docs/authentication/oauth-2-0/bearer-tokens[using an API key].
-====
-
-[NOTE]
-====
-If you forgot to save your `API key` and `API secret`, you can get a new pair:
-
-* on the Twitter developer portal, open your project settings,
-* inside project settings, open application settings,
-* find the `Keys and tokens` tab,
-* inside the tab find the `API key and secret` section and click `Regenerate` to retrieve a new pair of keys.
-====
-
-=== Configure Authorization for Micronaut Client
-
-We will modify the `application.yml` to include the following configuration:
-resource:application.yml[tag=authorization]
-<1> We add a value to the `miconaut.security.oauth2.clients`. We will add it with the key of `twitter`.
-<2> Set the authorization flow to `client_secret_basic`. This authorization was created for applications that need
-to access the resources on behalf of itself and requires an `id` and a `secret` parameter, and a token url.
-<3> Specify the url for retrieving tokens. We found it in the Twitter documentation.
-<4> Specify the `client-id` and `client-secret` parameters. You could directly put your id and secret directly as values
-in the configuration, however this highly discouraged due to security concerns. We will point to environment variables
-instead.
-<5> Specify that this authorization should be used for all requests to the Twitter api URL (starting with `api.twitter.com`). Also, set it to be used for all service ids.
-
-Before running the application we will need to set the values of `client-id` and `client-secret` using environment
-variables. To do it, paste your `API key` and `API secret` into the following command and run in terminal:
-[source,bash]
-----
-export TWITTER_AUTH_CLIENT_ID=XXXXXXXXXXXXXXXXXXXXXXXXX
-export TWITTER_AUTH_CLIENT_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-----
-
-[WARN]
-Do not forget to add these lines before running any tests or application. If you are using an IDE, there probably should
-be an option to add environment variables in the run settings. View the documentation of your specific IDE for details.
-
-Now, the client should authorize correctly, and we will be able to send requests.
+If you look inside the API files, you will see that method definitions were generated corresponding to different paths and operations available in the API.
+Using Micronaut`s features, we will be able to inject a client implementation
+of this interface and use it by calling the corresponding methods without the need to worry how client-server communication is handled.
 
 == Testing the Client
 
-You can see that four APIs were generated in the project. These APIs have paths logically distributed between them.
-You can look at link:https://developer.twitter.com/en/docs/twitter-api[Twitter API v2] documentation for description on
-each of the paths, and notice that the sections are also logically split into `Tweets`, `Users` and `Spaces`, as well.
+You can see that a weather forecast API class was generated in the project.
+This API references other types which belong to the model types which were generated automatically from the OpenAPI definition.
 
-We will show how we can use the Twitter API by writing some simple tests using the generated Micronaut client.
-First, we will use the link:https://developer.twitter.com/en/docs/twitter-api/tweets/counts/introduction[recent tweet counts API]
-to get the number of tweets about Toronto in the last 7 days. Open the `TweetsApiTest` and rewrite the contents of the file with the following:
+We will show how to use the OpenMeteo API by writing a simple test using the generated Micronaut client.
 
-test:../twitter/api/TweetsApiTest[tags=imports|class-begin|test-1|class-end]
-callout:micronaut-test-client[number=1]
-<2> Enable the test only if Twitter developer credentials are present.
-callout:injection[number=3,arg0=TweetsApi]
-<4> Use the `api` to send a request to an API path for counting tweets with a specific query. We will count tweets that mentioned `"Toronto"`.
-<5> We will verify that the data is present. Using manipulations with the generated data models we will calculate the total number of tweets and verify that there are at least `100` (which reasonably should be always true).
+test:WeatherClientTest[tags=test]
 
-Now, we will test receiving the latest `10` tweets about New York City (NYC). We will use the
-link:https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/quick-start[recent tweets lookup API].
-To test the data models, we will get multiple properties of the tweet, and also properties of the user
-who posted it. We will add the following test to the `TwetsApiTest` class:
-test:../twitter/api/TweetsApiTest[tags=test-2]
-<1> Set the search query to `"nyc"`.
-<2> Expand the query on the `author_id` property to additionally get information about the user based on their id.
-You can read about expanding in the link:https://developer.twitter.com/en/docs/twitter-api/expansions[Twitter API expansions documentation page].
-<3> Specify the fields we want to get for each tweet.
-<4> Specify the fields we want to get for users (authors of tweets).
-<5> Retrieve the response from server.
-<6> Get all the tweets from the response and verify that some common properties are present.
-<7> Get users form a separate property of the response and verify that the information is present.
-
-Finally, we will test getting multiple pages using the same
-link:https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/quick-start[recent tweets lookup API]:
-test:../twitter/api/TweetsApiTest[tags=test-3]
-<1> Retrieve the first `10` tweets that match our query.
-<2> Retrieve the next `10` tweets that match the query using the `nextToken` parameter.
-<3> Verify that the no tweets on the two pages match.
-
-We will now proceed to use the API in a simple application. However, you would probably want to also implement
-tests for all other paths of the API, if you were planning to use them in your application.
-
-common:testApp-noheader.adoc[]
-
-All the tests should run successfully.
-
-== Using Client in a Controller
-
-We will now write a controller, that will search for most frequent words in the latest tweets on
-a given topic.
-
-=== Creating an Introspected Class
-
-We will first define an object to represent the response. Create a file for `WordFrequency` class, that will have the word
-itself, and the number it occurred as properties:
-source:model/WordFrequency[]
-callout:introspected[1]
-<2> Define the two required properties and create getters for them.
-
-=== Implementing the Controller
-
-We will create the API of the controller. It will use the generated `TweetApi` client, and the `WordFrequency`
-class, which we just created.
-Create a file for `TwitterFrequentWordsController` class and paste the following:
-
-source:controller/TwitterFrequentWordsController[tags=imports|class-begin|api|class-end]
-callout:controller[number=1,arg0=/twitter-frequent-words]
-callout:injection[number=2,arg0=TweetsApi]
-callout:get[number=3,arg0=get,arg1=/twitter-frequent-words]
-callout:query-value-server[number=4,arg0=`search-query` and `words-n` parameters]
-<5> Make a request to the Twitter api and process the data using a function that we will implement next.
-
-Now add the method responsible for processing the data to the controller. There is no need to get into the details of its
-implementation, but we will leave some description for a curious reader:
-source:controller/TwitterFrequentWordsController[tags=method]
-<1> Create a method to calculate the number of occurrences for all the words.
-<2> Create a `Map` to store the number of occurrences.
-<3> Split the text of tweets on words (we will split by any non-alphabetic character), filter out all words shorter than four characters to remove articles and increment the counter for each word in the `Map`.
-<4> Sort the words by the number of occurrences, limit the number by certain amount, and convert the result to a list with instances of `WordFrequency`.
-
-common:runapp.adoc[]
-
-You can send a few requests to the path to test the application. We will use cURL for that.
-
-* The search for `20` most frequent words in tweets about `"Ukraine"` returns words representing
-relevant topics at the time (beginning of 2022):
-+
-[source,bash]
-----
-curl -i 'localhost:8080/twitter-frequent-words?words-n=20&search-query=Ukraine'
-----
-+
-[source,json]
-----
-[
-  {"word": "ukraine","numberOccurred": 40}, {"word": "https",    "numberOccurred": 15},
-  {"word": "russian","numberOccurred": 12}, {"word": "with",     "numberOccurred": 9},
-  {"word": "russia", "numberOccurred": 9},  {"word": "invasion", "numberOccurred": 7},
-  {"word": "from",   "numberOccurred": 6},  {"word": "india",    "numberOccurred": 5},
-  {"word": "that",   "numberOccurred": 5},  {"word": "about",    "numberOccurred": 5},
-  {"word": "border", "numberOccurred": 4},  {"word": "army",     "numberOccurred": 4},
-  {"word": "putin",  "numberOccurred": 4},  {"word": "people",   "numberOccurred": 4},
-  {"word": "forces", "numberOccurred": 4},  {"word": "troops",   "numberOccurred": 4},
-  {"word": "their",  "numberOccurred": 4},  {"word": "will",     "numberOccurred": 4},
-  {"word": "biden",  "numberOccurred": 4},  {"word": "just",     "numberOccurred": 3}
-]
-----
-
-* The results of search for `10` most common words in tweets containing the substring `"farm"` also seem to be reasonable:
-+
-[source,bash]
-----
-curl -i 'localhost:8081/twitter-frequent-words?words-n=10&search-query=farm'
-----
-+
-[source,json]
-----
-[
-  {"word": "farm",      "numberOccurred": 47}, {"word": "workers",   "numberOccurred": 17},
-  {"word": "https",     "numberOccurred": 16}, {"word": "hello",     "numberOccurred": 10},
-  {"word": "animal",    "numberOccurred": 9},  {"word": "redvelvet", "numberOccurred": 9},
-  {"word": "those",     "numberOccurred": 7},  {"word": "their",     "numberOccurred": 7},
-  {"word": "temporary", "numberOccurred": 6},  {"word": "revi",      "numberOccurred": 6}
-]
-----
-
-It is also highly recommended, that you implement tests for all the controllers you write, but we will skip writing
-tests for our controller in this guide.
-
-common:graal-with-plugins.adoc[]
+<1> Inject the generated client in the test
+<2> Calls the client in order to fetch weather forecast
+<3> Blocks and consumes the response
 
 == Next Steps
 

@@ -5,7 +5,7 @@ import io.micronaut.core.annotation.NonNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder as SpringSecurityPasswordEncoder
 import jakarta.inject.Singleton
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
 @Singleton // <1>

@@ -5,7 +5,7 @@ import example.micronaut.domain.Genre
 import io.micronaut.core.annotation.NonNull
 import jakarta.inject.Singleton
 import java.util.Optional
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @Singleton // <1>
 open class GenreRepositoryImpl(private val genreMapper: GenreMapper) : GenreRepository {
@@ -26,20 +26,20 @@ open class GenreRepositoryImpl(private val genreMapper: GenreMapper) : GenreRepo
 
     @NonNull
     override fun findAll(args: ListingArguments): List<Genre> {
-        if (args.getMax().isPresent && args.getSort().isPresent && args.getOffset().isPresent && args.getOrder().isPresent) {
+        if (args.max != null && args.sort != null && args.offset != null && args.order != null) {
             return genreMapper.findAllByOffsetAndMaxAndSortAndOrder(
-                    args.getOffset().get(),
-                    args.getMax().get(),
-                    args.getSort().get(),
-                    args.getOrder().get())
+                args.offset!!,
+                args.max!!,
+                args.sort!!,
+                args.order!!)
         }
 
-        if (args.getMax().isPresent && args.getOffset().isPresent && (!args.getSort().isPresent || !args.getOrder().isPresent)) {
-            return genreMapper.findAllByOffsetAndMax(args.getOffset().get(), args.getMax().get())
+        if (args.max != null && args.offset != null) {
+            return genreMapper.findAllByOffsetAndMax(args.offset!!, args.max!!)
         }
 
-        if ((!args.getMax().isPresent || !args.getOffset().isPresent) && args.getSort().isPresent && args.getOrder().isPresent) {
-            return genreMapper.findAllBySortAndOrder(args.getSort().get(), args.getOrder().get())
+        if (args.sort != null && args.order != null) {
+            return genreMapper.findAllBySortAndOrder(args.sort!!, args.order!!)
         }
 
         return genreMapper.findAll()

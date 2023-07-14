@@ -6,6 +6,8 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Map;
 
 @Controller // <1>
 public class VatController {
@@ -16,9 +18,8 @@ public class VatController {
         this.vat = vat;
     }
 
-    @Produces(MediaType.TEXT_PLAIN) // <3>
-    @Get("/vat")  // <4>
-    public BigDecimal index() {
-        return vat.getRate();
+    @Get("/vat")  // <3>
+    public Map<String, BigDecimal> index() {
+        return Collections.singletonMap("rate", vat.getRate());
     }
 }

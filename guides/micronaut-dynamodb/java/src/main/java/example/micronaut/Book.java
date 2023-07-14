@@ -3,7 +3,7 @@ package example.micronaut;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.serde.annotation.Serdeable;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Serdeable // <1>
 public class Book implements Identified {

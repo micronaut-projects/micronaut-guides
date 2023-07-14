@@ -4,9 +4,9 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.security.authentication.UsernamePasswordCredentials;
-import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest;
-import io.micronaut.security.token.jwt.render.AccessRefreshToken;
-import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
+import io.micronaut.security.endpoints.TokenRefreshRequest;
+import io.micronaut.security.token.render.AccessRefreshToken;
+import io.micronaut.security.token.render.BearerAccessRefreshToken;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class OauthAccessTokenTest {
 
         Thread.sleep(1_000); // sleep for one second to give time for the issued at `iat` Claim to change
         AccessRefreshToken refreshResponse = client.toBlocking().retrieve(HttpRequest.POST("/oauth/access_token",
-                new TokenRefreshRequest(rsp.getRefreshToken())), AccessRefreshToken.class); // <1>
+                new TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, rsp.getRefreshToken())), AccessRefreshToken.class); // <1>
 
         assertNotNull(refreshResponse.getAccessToken());
         assertNotEquals(rsp.getAccessToken(), refreshResponse.getAccessToken()); // <2>

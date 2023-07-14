@@ -8,14 +8,12 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
-import reactor.core.publisher.Flux;
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest
-public class BookControllerTest {
+class BookControllerTest {
 
     @Inject
     @Client("/")
@@ -23,10 +21,10 @@ public class BookControllerTest {
 
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     @Test
-    public void testRetrieveBooks() {
+    void testRetrieveBooks() {
         List<BookRecommendation> books = client.toBlocking()
                 .retrieve(HttpRequest.GET("/books"), Argument.listOf(BookRecommendation.class));
         assertEquals(1, books.size());
-        assertEquals("Building Microservices", books.get(0).getName());
+        assertEquals("Building Microservices", books.get(0).name());
     }
 }

@@ -56,7 +56,7 @@ class BooksControllerTest implements TestPropertyProvider {
 
     @Test
     void testRetrieveBooks() throws InterruptedException {
-        Book releaseIt = new Book(idGenerator.generate(), "1680502395", "Release It!");
+        Book releaseIt = new Book(idGenerator.generate(), "1680502395", "Release It!", null);
         bookRepository.save(releaseIt);
         Book continuousDelivery = new Book(idGenerator.generate(), "0321601912", "Continuous Delivery", 4);
         bookRepository.save(continuousDelivery);
@@ -65,16 +65,16 @@ class BooksControllerTest implements TestPropertyProvider {
 
         Optional<Book> result = bookRepository.findById(continuousDelivery.getId());
         assertTrue(result.isPresent());
-        assertEquals("Continuous Delivery", result.get().getName());
+        assertEquals("Continuous Delivery", result.get().name());
 
         HttpRequest<?> request = HttpRequest.GET("/books");
         BlockingHttpClient client = httpClient.toBlocking();
         List<BookCatalogue> books = client.retrieve(request, Argument.listOf(BookCatalogue.class));
         assertEquals(3, books.size());
         
-        assertTrue(books.stream().anyMatch(it -> it.getIsbn().equals("1491950358") && it.getName().equals("Building Microservices")));
-        assertTrue(books.stream().anyMatch(it -> it.getIsbn().equals("0321601912") && it.getName().equals("Continuous Delivery")));
-        assertTrue(books.stream().anyMatch(it -> it.getIsbn().equals("1680502395") && it.getName().equals("Release It!")));
+        assertTrue(books.stream().anyMatch(it -> it.isbn().equals("1491950358") && it.name().equals("Building Microservices")));
+        assertTrue(books.stream().anyMatch(it -> it.isbn().equals("0321601912") && it.name().equals("Continuous Delivery")));
+        assertTrue(books.stream().anyMatch(it -> it.isbn().equals("1680502395") && it.name().equals("Release It!")));
 
         bookRepository.delete(releaseIt.getId());
         bookRepository.delete(continuousDelivery.getId());

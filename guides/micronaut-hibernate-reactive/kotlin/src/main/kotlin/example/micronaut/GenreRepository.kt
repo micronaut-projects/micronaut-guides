@@ -2,7 +2,7 @@ package example.micronaut
 
 import example.micronaut.domain.Genre
 import org.reactivestreams.Publisher
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 interface GenreRepository {
     fun findById(id: Long): Publisher<Genre?>

@@ -7,9 +7,9 @@ import groovy.transform.CompileStatic
 @Singleton // <1>
 class AuthoritiesFetcherService implements AuthoritiesFetcher {
 
-    private final UserRoleGormService userRoleGormService
+    private final UserRoleJdbcRepository userRoleGormService
 
-    AuthoritiesFetcherService(UserRoleGormService userRoleGormService) { // <2>
+    AuthoritiesFetcherService(UserRoleJdbcRepository userRoleGormService) { // <2>
         this.userRoleGormService = userRoleGormService
     }
 

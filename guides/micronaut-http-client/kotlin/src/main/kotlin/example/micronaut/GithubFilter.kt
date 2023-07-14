@@ -1,18 +1,16 @@
 package example.micronaut
 
 import io.micronaut.context.annotation.Requires
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.MutableHttpRequest
-import io.micronaut.http.annotation.Filter
-import io.micronaut.http.filter.ClientFilterChain
-import io.micronaut.http.filter.HttpClientFilter
-import org.reactivestreams.Publisher
+import io.micronaut.http.annotation.ClientFilter
+import io.micronaut.http.annotation.RequestFilter
 
-@Filter("/repos/**") // <1>
+@ClientFilter("/repos/**") // <1>
 @Requires(condition = GithubFilterCondition::class) // <2>
-class GithubFilter(val configuration: GithubConfiguration) : HttpClientFilter { // <3>
+class GithubFilter(val configuration: GithubConfiguration) { // <3>
 
-    override fun doFilter(request: MutableHttpRequest<*>, chain: ClientFilterChain): Publisher<out HttpResponse<*>?> {
-        return chain.proceed(request.basicAuth(configuration.username, configuration.token)) // <4>
+    @RequestFilter // <4>
+    fun doFilter(request: MutableHttpRequest<*>) {
+        request.basicAuth(configuration.username, configuration.token) // <5>
     }
 }

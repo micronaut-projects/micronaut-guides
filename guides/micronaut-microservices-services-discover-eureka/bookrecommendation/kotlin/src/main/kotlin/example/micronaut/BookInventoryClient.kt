@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
 import reactor.core.publisher.Mono
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 //end::packageandimports[]
 
 /*

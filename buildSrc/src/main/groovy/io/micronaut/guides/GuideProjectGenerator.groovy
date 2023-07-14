@@ -7,7 +7,6 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.GuideMetadata.App
-import io.micronaut.guides.GuideMetadata.OpenAPIGeneratorConfig
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
@@ -27,7 +26,6 @@ import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.SPOCK
-import static io.micronaut.starter.options.JdkVersion.JDK_11
 import static io.micronaut.starter.options.JdkVersion.JDK_17
 import static io.micronaut.starter.options.Language.GROOVY
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
@@ -41,7 +39,7 @@ class GuideProjectGenerator implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_11, JDK_17]
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_17]
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
@@ -112,6 +110,8 @@ class GuideProjectGenerator implements AutoCloseable {
                 zipIncludes: config.zipIncludes ?: [],
                 apps: config.apps.collect { it ->
                     new App(
+                            framework: it.framework,
+                            testFramework: it.testFramework?.toUpperCase(),
                             name: it.name,
                             visibleFeatures: it.features ?: [],
                             invisibleFeatures: it.invisibleFeatures ?: [],
@@ -120,13 +120,7 @@ class GuideProjectGenerator implements AutoCloseable {
                             groovyFeatures: it.groovyFeatures ?: [],
                             applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                             excludeSource: it.excludeSource,
-                            excludeTest: it.excludeTest,
-                            openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
-                                    definitionFile: it.openAPIGeneratorConfig.definitionFile,
-                                    generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
-                                    properties: it.openAPIGeneratorConfig.properties ?: [:],
-                                    globalProperties: it.openAPIGeneratorConfig.globalProperties ?: [:]
-                            ) : null)
+                            excludeTest: it.excludeTest)
                 }
         ))
     }
@@ -190,8 +184,7 @@ class GuideProjectGenerator implements AutoCloseable {
             Language lang = guidesOption.language
 
             for (App app : metadata.apps) {
-                List<String> appFeatures = [] + app.getFeatures(lang)
-
+                List<String> appFeatures = ([] as List<String>) + app.getFeatures(lang)
                 if (guidesOption.language == GROOVY ||
                         !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(javaVersion)) {
                     appFeatures.remove('graalvm')
@@ -212,13 +205,9 @@ class GuideProjectGenerator implements AutoCloseable {
                 destination.mkdir()
 
                 String packageAndName = BASE_PACKAGE + '.' + app.name
-                if (app.openAPIGeneratorConfig) {
-                    OpenAPIGenerator.generate(inputDir, destination, lang, packageAndName , app.openAPIGeneratorConfig, testFramework, buildTool)
-                    deleteEveryFileButSources(destination)
-                }
 
-                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
-                        appFeatures, buildTool, testFramework, lang, javaVersion)
+                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, app.getFramework(),
+                        appFeatures, buildTool, app.testFramework ?: testFramework, lang, javaVersion)
 
                 if (metadata.base) {
                     File baseDir = new File(inputDir.parentFile, metadata.base)

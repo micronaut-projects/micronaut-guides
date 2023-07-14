@@ -11,8 +11,8 @@ import io.micronaut.http.annotation.QueryValue
 import io.micronaut.http.annotation.Status
 import org.reactivestreams.Publisher
 
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 
 @Controller("/fruits") // <1>
 class FruitController {

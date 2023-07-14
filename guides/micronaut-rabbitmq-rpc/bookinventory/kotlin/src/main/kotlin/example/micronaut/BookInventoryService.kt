@@ -3,13 +3,13 @@ package example.micronaut
 import io.micronaut.rabbitmq.annotation.Queue
 import io.micronaut.rabbitmq.annotation.RabbitListener
 import java.util.Optional
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @RabbitListener // <1>
-class BookInventoryService {
+open class BookInventoryService {
 
     @Queue("inventory") // <2>
-    fun stock(isbn: @NotBlank String?): Boolean? =
+    open fun stock(isbn: @NotBlank String?): Boolean? =
         bookInventoryByIsbn(isbn).map { (_, stock): BookInventory -> stock > 0 }.orElse(null)
 
     private fun bookInventoryByIsbn(isbn: String?): Optional<BookInventory> =

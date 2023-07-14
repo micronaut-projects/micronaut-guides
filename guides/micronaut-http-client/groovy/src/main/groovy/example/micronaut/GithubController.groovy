@@ -1,13 +1,10 @@
 package example.micronaut
 
-import groovy.transform.CompileStatic
-import io.micronaut.http.MediaType
+import io.micronaut.core.async.annotation.SingleResult
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import org.reactivestreams.Publisher
-import reactor.core.publisher.Mono
 
-@CompileStatic
 @Controller("/github") // <1>
 class GithubController {
 
@@ -21,12 +18,14 @@ class GithubController {
     }
 
     @Get("/releases-lowlevel") // <3>
-    Mono<List<GithubRelease>> releasesWithLowLevelClient() { // <4>
+    @SingleResult // <4>
+    Publisher<List<GithubRelease>> releasesWithLowLevelClient() {
         githubLowLevelClient.fetchReleases()
     }
 
-    @Get(uri = "/releases", produces = MediaType.APPLICATION_JSON_STREAM) // <5>
-    Publisher<GithubRelease> fetchReleases() { // <6>
+    @Get("/releases") // <5>
+    @SingleResult // <4>
+    Publisher<List<GithubRelease>> fetchReleases() {
         githubApiClient.fetchReleases()
     }
 }

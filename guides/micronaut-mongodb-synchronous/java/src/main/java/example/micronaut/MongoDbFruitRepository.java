@@ -5,8 +5,8 @@ import com.mongodb.client.MongoCollection;
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 

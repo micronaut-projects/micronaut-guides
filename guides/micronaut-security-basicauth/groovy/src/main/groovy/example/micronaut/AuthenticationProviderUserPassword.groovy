@@ -13,7 +13,7 @@ import reactor.core.publisher.FluxSink
 
 @CompileStatic
 @Singleton // <1>
-class AuthenticationProviderUserPassword implements AuthenticationProvider { // <2>
+class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> { // <2>
 
     @Override
     Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<?> httpRequest,

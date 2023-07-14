@@ -1,11 +1,7 @@
 package example.micronaut;
 
-import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Produces;
-
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +18,7 @@ public class BooksController {
     public List<BookCatalogue> index() {
         return bookRepository.findAll()
                 .stream()
-                .map(book -> new BookCatalogue(book.getIsbn(), book.getName()))
+                .map(book -> new BookCatalogue(book.isbn(), book.name()))
                 .collect(Collectors.toList());
     }
 }

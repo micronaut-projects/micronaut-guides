@@ -1,7 +1,7 @@
 package example.micronaut
 
 import io.micronaut.serde.annotation.Serdeable
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @Serdeable // <1>
 data class GenreUpdateCommand(

@@ -4,11 +4,13 @@ import groovy.transform.CompileStatic
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
+import io.micronaut.serde.annotation.Serdeable
 
 import static io.micronaut.data.annotation.GeneratedValue.Type.AUTO
 
 @CompileStatic
 @MappedEntity // <1>
+@Serdeable
 class Book {
 
     @Id // <2>

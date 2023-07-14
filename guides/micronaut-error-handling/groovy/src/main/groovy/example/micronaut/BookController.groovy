@@ -16,8 +16,8 @@ import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Produces
 import io.micronaut.views.View
 
-import javax.validation.ConstraintViolationException
-import javax.validation.Valid
+import jakarta.validation.ConstraintViolationException
+import jakarta.validation.Valid
 //end::imports[]
 
 //tag::clazz[]

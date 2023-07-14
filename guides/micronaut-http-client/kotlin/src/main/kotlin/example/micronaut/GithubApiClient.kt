@@ -1,5 +1,6 @@
 package example.micronaut
 
+import io.micronaut.core.async.annotation.SingleResult
 import io.micronaut.http.HttpHeaders.ACCEPT
 import io.micronaut.http.HttpHeaders.USER_AGENT
 import io.micronaut.http.annotation.Get
@@ -16,5 +17,6 @@ import org.reactivestreams.Publisher;
 interface GithubApiClient {
 
     @Get("/repos/\${github.organization}/\${github.repo}/releases") // <4>
-    fun fetchReleases(): Publisher<GithubRelease?>? // <5>
+    @SingleResult // <5>
+    fun fetchReleases(): Publisher<List<GithubRelease>> // <6>
 }

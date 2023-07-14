@@ -4,8 +4,8 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
 import io.micronaut.retry.annotation.Fallback;
 import reactor.core.publisher.Flux;
-import jakarta.inject.Singleton;
 import org.reactivestreams.Publisher;
+import jakarta.inject.Singleton;
 
 @Requires(env = Environment.TEST)
 @Fallback

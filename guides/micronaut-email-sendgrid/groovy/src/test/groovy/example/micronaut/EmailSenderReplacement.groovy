@@ -13,8 +13,8 @@ import jakarta.inject.Singleton
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 import java.util.function.Consumer
 
 import static io.micronaut.http.HttpStatus.ACCEPTED

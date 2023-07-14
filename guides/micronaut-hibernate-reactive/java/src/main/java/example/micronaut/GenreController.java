@@ -15,8 +15,8 @@ import io.micronaut.http.annotation.Status;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import javax.persistence.PersistenceException;
-import javax.validation.Valid;
+import jakarta.persistence.PersistenceException;
+import jakarta.validation.Valid;
 import java.net.URI;
 
 import static io.micronaut.http.HttpHeaders.LOCATION;

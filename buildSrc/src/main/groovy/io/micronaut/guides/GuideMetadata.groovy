@@ -3,6 +3,7 @@ package io.micronaut.guides
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import io.micronaut.starter.application.ApplicationType
+import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.Language
 import java.time.LocalDate
 
@@ -39,6 +40,8 @@ class GuideMetadata {
     @ToString(includeNames = true)
     @CompileStatic
     static class App {
+        String framework
+        TestFramework testFramework
         ApplicationType applicationType
         String name
         List<String> javaFeatures
@@ -48,7 +51,6 @@ class GuideMetadata {
         List<String> invisibleFeatures
         List<String> excludeSource
         List<String> excludeTest
-        OpenAPIGeneratorConfig openAPIGeneratorConfig
 
         List<String> getFeatures(Language language) {
             if (language == Language.JAVA) {
@@ -77,14 +79,4 @@ class GuideMetadata {
         }
     }
 
-
-    @ToString(includeNames = true)
-    @CompileStatic
-    static class OpenAPIGeneratorConfig {
-        public static final String GENERATOR_JAVA_MICRONAUT_SERVER = "java-micronaut-server"
-        String definitionFile
-        String generatorName
-        Map<String, String> properties
-        Map<String, String> globalProperties
-    }
 }

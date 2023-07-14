@@ -1,11 +1,12 @@
 package example.micronaut
 
+import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus.OK
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
+import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -17,20 +18,22 @@ class LiquibaseEndpointTest(@Client("/") val httpClient: HttpClient) { // <2>
     fun migrationsAreExposedViaAndEndpoint() {
         val client = httpClient.toBlocking()
 
-        val response = client.exchange(HttpRequest.GET<Any>("/liquibase"), LiquibaseReport::class.java)
+        val response = client.exchange(HttpRequest.GET<Any>("/liquibase"), Argument.listOf(LiquibaseReport::class.java))
         assertEquals(OK, response.status())
 
-        val liquibaseReport = response.body()
+        val liquibaseReport = response.body().get(0)
         assertNotNull(liquibaseReport)
         assertNotNull(liquibaseReport!!.changeSets)
         assertEquals(2, liquibaseReport.changeSets!!.size)
     }
+}
 
-    internal class LiquibaseReport {
-        var changeSets: List<ChangeSet>? = null
-    }
+@Serdeable
+class LiquibaseReport {
+    var changeSets: List<ChangeSet>? = null
+}
 
-    internal class ChangeSet {
-        var id: String? = null
-    }
+@Serdeable
+class ChangeSet {
+    var id: String? = null
 }

@@ -4,12 +4,12 @@ import example.micronaut.domain.Genre;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Singleton;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -51,13 +51,14 @@ public class GenreRepositoryImpl implements GenreRepository {
     @ReadOnly // <3>
     public List<Genre> findAll(@NotNull SortingAndOrderArguments args) {
         String qlString = "SELECT g FROM Genre as g";
-        if (args.getOrder().isPresent() && args.getSort().isPresent() && VALID_PROPERTY_NAMES.contains(args.getSort().get())) {
-            qlString += " ORDER BY g." + args.getSort().get() + ' ' + args.getOrder().get().toLowerCase();
+        if (args.order() != null && args.sort() != null && VALID_PROPERTY_NAMES.contains(args.sort())) {
+            qlString += " ORDER BY g." + args.sort() + ' ' + args.order().toLowerCase();
         }
         TypedQuery<Genre> query = entityManager.createQuery(qlString, Genre.class);
-        query.setMaxResults(args.getMax().orElseGet(applicationConfiguration::getMax));
-        args.getOffset().ifPresent(query::setFirstResult);
-
+        query.setMaxResults(args.max() != null ? args.max() : applicationConfiguration.getMax());
+        if (args.offset() != null) {
+            query.setFirstResult(args.offset());
+        }
         return query.getResultList();
     }
 

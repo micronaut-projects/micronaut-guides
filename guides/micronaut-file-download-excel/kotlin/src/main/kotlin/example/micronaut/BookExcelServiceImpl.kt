@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 import java.util.stream.Stream
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Singleton // <1>
-class BookExcelServiceImpl : BookExcelService {
+open class BookExcelServiceImpl : BookExcelService {
 
     override fun excelFileFromBooks(bookList: List<@Valid Book>): SystemFile {
         try {

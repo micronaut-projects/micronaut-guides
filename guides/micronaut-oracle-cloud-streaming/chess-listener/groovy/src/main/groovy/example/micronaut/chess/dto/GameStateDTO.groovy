@@ -2,16 +2,16 @@ package example.micronaut.chess.dto
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import groovy.transform.CompileStatic
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Size
-import javax.validation.constraints.Size
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
+import jakarta.validation.constraints.Size
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 
-@Introspected // <1>
+@Serdeable // <1>
 @JsonTypeInfo(use = NAME, property = '_className') // <2>
 @CompileStatic
 class GameStateDTO {

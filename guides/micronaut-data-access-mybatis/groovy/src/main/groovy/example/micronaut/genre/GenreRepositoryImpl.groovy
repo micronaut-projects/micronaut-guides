@@ -6,8 +6,8 @@ import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.NonNull
 import jakarta.inject.Singleton
 
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 
 @CompileStatic
 @Singleton // <1>
@@ -41,20 +41,20 @@ class GenreRepositoryImpl implements GenreRepository {
     @NonNull
     List<Genre> findAll(@NonNull @NotNull ListingArguments args) {
 
-        if (args.max.present && args.sort.present && args.offset.present && args.order.present) {
+        if (args.max != null && args.sort != null && args.offset != null && args.order != null) {
             return genreMapper.findAllByOffsetAndMaxAndSortAndOrder(
-                    args.offset.get(),
-                    args.max.get(),
-                    args.sort.get(),
-                    args.order.get())
+                    args.offset,
+                    args.max,
+                    args.sort,
+                    args.order)
         }
 
-        if (args.max.present && args.offset.present && (!args.sort.present || !args.order.present)) {
-            return genreMapper.findAllByOffsetAndMax(args.offset.get(), args.max.get());
+        if (args.max != null && args.offset!= null && (args.sort == null || args.order == null)) {
+            return genreMapper.findAllByOffsetAndMax(args.offset, args.max)
         }
 
-        if ((!args.max.present || !args.offset.present) && args.sort.present && args.order.present) {
-            return genreMapper.findAllBySortAndOrder(args.sort.get(), args.order.get());
+        if ((args.max == null || args.offset == null) && args.sort != null && args.order !=null) {
+            return genreMapper.findAllBySortAndOrder(args.sort, args.order)
         }
 
         genreMapper.findAll()

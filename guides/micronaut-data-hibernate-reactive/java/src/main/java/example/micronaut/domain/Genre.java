@@ -1,13 +1,13 @@
 package example.micronaut.domain;
 
 import io.micronaut.serde.annotation.Serdeable;
-import javax.persistence.GenerationType;
-import javax.validation.constraints.NotNull;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.GenerationType;
+import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 @Serdeable
 @Entity

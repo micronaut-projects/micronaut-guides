@@ -15,12 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Property(name = "vat.rate", value = "7.7") // <2>
 public class VatControllerTest {
 
-    @Inject
-    @Client("/")
-    public HttpClient httpClient;
-
     @Test
-    void vatExposesTheValueAddedTaxRate() {
-        assertEquals(httpClient.toBlocking().retrieve("/vat", BigDecimal.class), new BigDecimal("7.7"));
+    void vatExposesTheValueAddedTaxRate(@Client("/") HttpClient httpClient) {
+        assertEquals("{\"rate\":7.7}", httpClient.toBlocking().retrieve("/vat"));
     }
 }

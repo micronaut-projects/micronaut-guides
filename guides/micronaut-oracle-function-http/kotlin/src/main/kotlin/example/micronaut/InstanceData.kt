@@ -2,10 +2,10 @@ package example.micronaut
 
 import com.oracle.bmc.core.model.Instance
 import com.oracle.bmc.core.model.Instance.LifecycleState
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import java.util.Date
 
-@Introspected
+@Serdeable
 class InstanceData(instance: Instance) {
     val availabilityDomain: String
     val compartmentOcid: String

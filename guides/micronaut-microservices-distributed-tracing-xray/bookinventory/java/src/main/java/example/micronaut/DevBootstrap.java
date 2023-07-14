@@ -29,7 +29,7 @@ public class DevBootstrap implements ApplicationEventListener<StartupEvent> {
 
     private void seedData(){
         bookRepository.save(new Book(idGenerator.generate(), "1680502395", "Release It!", 0));
-        bookRepository.save(new Book(idGenerator.generate(), "0321601912", "Continuous Delivery"));
+        bookRepository.save(new Book(idGenerator.generate(), "0321601912", "Continuous Delivery", null));
         bookRepository.save(new Book(idGenerator.generate(), "1491950358", "Building Microservices", 4));
     }
 }

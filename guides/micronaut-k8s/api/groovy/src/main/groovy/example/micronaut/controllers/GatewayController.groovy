@@ -15,7 +15,7 @@ import io.micronaut.http.exceptions.HttpStatusException
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
 
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Controller("/api") // <1>
 @ExecuteOn(TaskExecutors.IO) // <2>

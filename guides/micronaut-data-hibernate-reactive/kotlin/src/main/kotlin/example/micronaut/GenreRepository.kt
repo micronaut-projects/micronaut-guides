@@ -6,8 +6,8 @@ import io.micronaut.data.annotation.Repository
 import io.micronaut.data.exceptions.DataAccessException
 import io.micronaut.data.repository.reactive.ReactorPageableRepository
 import reactor.core.publisher.Mono
-import javax.transaction.Transactional
-import javax.validation.constraints.NotBlank
+import jakarta.transaction.Transactional
+import jakarta.validation.constraints.NotBlank
 
 @Repository // <1>
 abstract class GenreRepository: ReactorPageableRepository<Genre, Long> { // <2>

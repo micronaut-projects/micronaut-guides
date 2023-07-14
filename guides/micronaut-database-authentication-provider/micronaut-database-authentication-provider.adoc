@@ -8,18 +8,7 @@ common:requirements.adoc[]
 
 common:completesolution.adoc[]
 
-== Writing the Application
-
-common:cli-or-launch.adoc[]
-
-[source,bash]
-----
-mn @cli-command@ --features=security-jwt,security-ldap,reactor example.micronaut.micronautguide --build=@build@ --lang=@lang@
-----
-
-common:build-lang-arguments.adoc[]
-
-If you use Micronaut Launch, select Micronaut Application as application type and add the `security-jwt`, `security-ldap`, and `reactor` features.
+common:create-app-features.adoc[]
 
 common:default-package.adoc[]
 
@@ -27,9 +16,9 @@ diffLink:[featureExcludes=spring-security-crypto]
 
 https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
-The generated `application.yml` includes configuration settings that enable security:
+The generated `application.properties` includes configuration settings that enable security:
 
-resource:application.yml[tag=security]
+resource:application.properties[tag=security]
 
 <1> Set `micronaut.security.authentication` as `bearer`
 <2> You can create a SecretSignatureConfiguration named `generator` via configuration as illustrated above. The generator signature is used to sign the issued JWT claims.
@@ -43,7 +32,7 @@ We will use the open Debian LDAP service for this guide.
 
 Create the configuration properties matching those of the LDAP Server.
 
-resource:application.yml[tag=ldap]
+resource:application.properties[tag=ldap]
 
 <1> LDAP authentication in the Micronaut framework supports configuration of one or more LDAP servers to authenticate with. You need to name each one. In this tutorial, we use `default`.
 <2> Each server has its own settings and can be enabled or disabled.
@@ -53,26 +42,24 @@ resource:application.yml[tag=ldap]
 <6> Enable group search.
 <7> Sets the base DN to search from.
 
-=== GORM
+=== Micronaut Data JDBC
 
-common:gorm.adoc[]
-
-Add GORM dependencies to the project:
+Add https://micronaut-projects.github.io/micronaut-data/latest/guide/#jdbc[Micronaut Data JDBC] dependencies to the project:
 
 :dependencies:
 
-dependency:micronaut-hibernate-validator[groupId=io.micronaut.beanvalidation]
-dependency:micronaut-hibernate-gorm[groupId=io.micronaut.groovy]
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql]
 dependency:h2[groupId=com.h2database,scope=runtimeOnly]
-dependency:tomcat-jdbc[groupId=org.apache.tomcat,scope=runtimeOnly]
 
 :dependencies:
 
 And the database configuration:
 
-resource:application.yml[tag=datasource]
+resource:application.properties[tag=datasource]
 
-==== Domain Classes
+==== Entities
 
 common:quotedomainclass.adoc[]
 
@@ -86,8 +73,10 @@ Create `User` domain class to store users within our application.
 
 source:domain/User[]
 
-callout:gorm-entity[1]
-callout:gorm-entity-ide[2]
+callout:serdeable[1]
+callout:mapped-entity[2]
+callout:mapped-entity-id[3]
+callout:generated-value[4]
 
 ===== Role
 
@@ -95,8 +84,10 @@ Create `Role` domain class to store authorities within our application.
 
 source:domain/Role[]
 
-callout:gorm-entity[1]
-callout:gorm-entity-ide[2]
+callout:serdeable[1]
+callout:mapped-entity[2]
+callout:mapped-entity-id[3]
+callout:generated-value[4]
 
 ===== UserRole
 
@@ -104,27 +95,35 @@ Create a `UserRole` which stores a many-to-many relationship between `User` and 
 
 source:domain/UserRole[]
 
-callout:gorm-entity[1]
-callout:gorm-entity-ide[2]
+callout:serdeable[1]
+callout:mapped-entity[2]
+callout:embeddedid[3]
 
-==== Data Services
+source:domain/UserRoleId[]
 
-common:gormdataservices.adoc[]
+callout:serdeable[1]
+callout:embeddable[2]
+callout:creator[3]
 
-Create various GORM Data services:
+==== JDBC Repositories
 
-source:UserGormService[]
+Create various JDBC Repositories:
 
-callout:gorm-service[1]
+source:UserJdbcRepository[]
 
-source:RoleGormService[]
+callout:jdbcrepository[1]
+callout:crudrepository[2]
 
-callout:gorm-service[1]
+source:RoleJdbcRepository[]
 
-source:UserRoleGormService[]
+callout:jdbcrepository[1]
+callout:crudrepository[2]
 
-callout:gorm-service[1]
-<2> GORM allows statically-compiled JPA-QL Queries
+source:UserRoleJdbcRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:at-query[3]
 
 === Password Encoder
 
@@ -134,9 +133,14 @@ source:PasswordEncoder[]
 
 To provide an implementation, first include a dependency to https://docs.spring.io/spring-security/site/docs/3.1.x/reference/crypto.html[Spring Security Crypto] to ease password encoding.
 
-Add the dependency:
+Add the dependencies:
+
+:dependencies:
 
 dependency:spring-security-crypto[groupId=org.springframework.security,version=@spring-security-cryptoVersion@]
+dependency:jcl-over-slf4j[groupId=org.slf4j]
+
+:dependencies:
 
 Then, write the implementation:
 
@@ -179,7 +183,7 @@ Provide an implementation:
 source:UserFetcherService[]
 
 callout:singleton[1]
-<2> `UserGormService` is injected via constructor injection.
+<2> `UserJdbcRepository` is injected via constructor injection.
 
 ==== Authorities Fetcher
 
@@ -192,7 +196,7 @@ Provide an implementation:
 source:AuthoritiesFetcherService[]
 
 callout:singleton[1]
-<2> `UserRoleGormService` is injected via constructor injection.
+<2> `UserRoleJdbcRepository` is injected via constructor injection.
 
 ==== Authentication Provider
 

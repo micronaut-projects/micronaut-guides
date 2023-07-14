@@ -2,16 +2,16 @@ package example.micronaut.chess.dto;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Creator;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
-@Introspected // <1>
+@Serdeable // <1>
 @JsonTypeInfo(use = NAME, property = "_className") // <2>
 public class GameDTO {
 
@@ -31,7 +31,7 @@ public class GameDTO {
     private final boolean draw;
 
     @Size(max = 1)
-    @NonNull
+    @Nullable
     private final Player winner;
 
     @Creator // <3>

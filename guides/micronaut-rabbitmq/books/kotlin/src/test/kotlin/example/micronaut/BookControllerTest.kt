@@ -27,8 +27,7 @@ class BookControllerTest(@Client("/") val client: HttpClient) {
     fun testMessageIsPublishedToRabbitMQWhenBookFound() {
         val result = retrieveGet("/books/1491950358")
         assertNotNull(result)
-        assertTrue(result.isPresent)
-        Mockito.verify(analyticsClient, times(1)).updateAnalytics(result.get())
+        Mockito.verify(analyticsClient, times(1)).updateAnalytics(result!!)
     }
 
     @Test
@@ -45,9 +44,10 @@ class BookControllerTest(@Client("/") val client: HttpClient) {
         return Mockito.mock(AnalyticsClient::class.java)
     }
 
-    private fun retrieveGet(url: String): Optional<Book> {
+    private fun retrieveGet(url: String): Book? {
         return client.toBlocking().retrieve(
-                HttpRequest.GET<Any>(url),
-                Argument.of(Optional::class.java, Book::class.java)) as Optional<Book>
+            HttpRequest.GET<Any>(url),
+            Argument.of(Book::class.java)
+        )
     }
 }

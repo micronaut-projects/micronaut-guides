@@ -16,7 +16,7 @@ import jakarta.inject.Named;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import javax.mail.Message;
+import jakarta.mail.Message;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

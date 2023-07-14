@@ -25,7 +25,7 @@ import static io.micronaut.security.authentication.AuthenticationFailureReason.U
 import static io.micronaut.security.authentication.AuthenticationFailureReason.USER_NOT_FOUND
 
 @Singleton
-class DelegatingAuthenticationProvider implements AuthenticationProvider {
+class DelegatingAuthenticationProvider implements AuthenticationProvider<HttpRequest<?>> {
 
     private final UserFetcher userFetcher
     private final PasswordEncoder passwordEncoder
@@ -35,7 +35,7 @@ class DelegatingAuthenticationProvider implements AuthenticationProvider {
     DelegatingAuthenticationProvider(UserFetcher userFetcher,
                                      PasswordEncoder passwordEncoder,
                                      AuthoritiesFetcher authoritiesFetcher,
-                                     @Named(TaskExecutors.IO) ExecutorService executorService) { // <1>
+                                     @Named(TaskExecutors.BLOCKING) ExecutorService executorService) { // <1>
         this.userFetcher = userFetcher
         this.passwordEncoder = passwordEncoder
         this.authoritiesFetcher = authoritiesFetcher
@@ -85,7 +85,7 @@ class DelegatingAuthenticationProvider implements AuthenticationProvider {
 
     private UserState fetchUserState(AuthenticationRequest authRequest) {
         final String username = authRequest.identity
-        userFetcher.findByUsername(username)
+        userFetcher.findByUsername(username).orElse(null)
     }
 
     private AuthenticationResponse createSuccessfulAuthenticationResponse(UserState user) {

@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 
 @Singleton // <1>
-class AuthenticationProviderUserPassword : AuthenticationProvider { // <2>
+class AuthenticationProviderUserPassword : AuthenticationProvider<HttpRequest<*>> { // <2>
 
     override fun authenticate(@Nullable httpRequest: HttpRequest<*>?,
                               authenticationRequest: AuthenticationRequest<*, *>): Publisher<AuthenticationResponse> {

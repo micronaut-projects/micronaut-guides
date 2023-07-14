@@ -4,9 +4,10 @@ import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
 import io.micronaut.context.annotation.Property
+import io.micronaut.http.HttpRequest
 import io.micronaut.security.token.generator.TokenGenerator
 import io.micronaut.security.token.jwt.generator.JwtTokenGenerator
-import io.micronaut.security.token.jwt.generator.claims.ClaimsGenerator
+import io.micronaut.security.token.claims.ClaimsGenerator
 import io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator
 import io.micronaut.security.token.validator.TokenValidator
@@ -29,8 +30,7 @@ class ValidateSecondarySignedJwtTest {
     lateinit var jwkConfiguration: JwkConfiguration
 
     @Inject
-    lateinit var tokenValidator: TokenValidator
-
+    lateinit var tokenValidator: TokenValidator<HttpRequest<Any>>
     @Test
     fun canValidateAJWebTokenSignedWithTheSecondaryJsonWebKey() {
 

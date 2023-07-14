@@ -6,8 +6,8 @@ import io.micronaut.http.HttpStatus.BAD_REQUEST
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
-import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
+import io.micronaut.security.endpoints.TokenRefreshRequest
+import io.micronaut.security.token.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -26,7 +26,7 @@ internal class UnsignedRefreshTokenTest(@Client("/") val client: HttpClient) {
         val errorArgument = Argument.of(Map::class.java)
         val e = assertThrows(HttpClientResponseException::class.java) {
             client.toBlocking().exchange(
-                HttpRequest.POST("/oauth/access_token", TokenRefreshRequest(unsignedRefreshedToken)),
+                HttpRequest.POST("/oauth/access_token", TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, unsignedRefreshedToken)),
                 bodyArgument,
                 errorArgument)
         }

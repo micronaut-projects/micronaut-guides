@@ -5,7 +5,7 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
 import java.util.Optional
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 import io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED
 import io.micronaut.security.annotation.Secured
 

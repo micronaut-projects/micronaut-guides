@@ -5,7 +5,7 @@ import io.micronaut.core.annotation.NonNull
 import io.micronaut.retry.annotation.Fallback
 import jakarta.inject.Singleton
 import reactor.core.publisher.Mono
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 import static io.micronaut.context.env.Environment.TEST
 import io.micronaut.core.util.StringUtils
 import io.micronaut.context.annotation.Property

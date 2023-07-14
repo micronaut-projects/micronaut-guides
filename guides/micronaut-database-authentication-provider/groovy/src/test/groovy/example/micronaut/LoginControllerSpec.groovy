@@ -7,7 +7,7 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.authentication.Authentication
 import io.micronaut.security.authentication.UsernamePasswordCredentials
-import io.micronaut.security.token.jwt.render.AccessRefreshToken
+import io.micronaut.security.token.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.validator.JwtTokenValidator
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import reactor.core.publisher.Flux
@@ -31,7 +31,7 @@ class LoginControllerSpec extends Specification {
     JwtTokenValidator tokenValidator
 
     @Inject
-    UserGormService userGormService
+    UserJdbcRepository userGormService
 
     void 'attempt to access /login without supplying credentials server responds BAD REQUEST'() {
         when:

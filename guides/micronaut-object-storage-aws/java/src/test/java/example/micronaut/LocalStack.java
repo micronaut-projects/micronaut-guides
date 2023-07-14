@@ -35,9 +35,10 @@ public class LocalStack {
     public static Map<String, String> getProperties() {
         return CollectionUtils.mapOf(
                 "aws.accessKeyId", accessKeyId(),
-                            "aws.secretKey", secretAccessKey(),
-                            "aws.region", getRegion(),
-                            "aws.s3.endpoint-override", getEndpoint());
+                "aws.secretKey", secretAccessKey(),
+                "aws.region", getRegion(),
+                "aws.services.s3.endpoint-override", getEndpoint()
+        );
     }
 
     public static void init() {

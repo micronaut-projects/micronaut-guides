@@ -2,16 +2,18 @@ package example.micronaut;
 
 import com.amazonaws.services.lambda.runtime.events.SecretsManagerRotationEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.aws.distributedconfiguration.KeyValueFetcher;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.function.aws.MicronautRequestHandler;
+import io.micronaut.json.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.PutSecretValueRequest;
 import jakarta.inject.Inject;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -30,7 +32,7 @@ public class FunctionRequestHandler
     public JsonWebKeyGenerator jsonWebKeyGenerator; // <2>
 
     @Inject
-    public ObjectMapper objectMapper; // <3>
+    public JsonMapper objectMapper; // <3>
 
     @Inject
     public SecretsManagerClient secretsManagerClient; // <4>
@@ -76,6 +78,8 @@ public class FunctionRequestHandler
             return Optional.of(objectMapper.writeValueAsString(newJwk));
         } catch (JsonProcessingException e) {
             LOG.warn("JsonProcessingException", e);
+        } catch (IOException e) {
+            LOG.warn("IOException", e);
         }
         return Optional.empty();
     }

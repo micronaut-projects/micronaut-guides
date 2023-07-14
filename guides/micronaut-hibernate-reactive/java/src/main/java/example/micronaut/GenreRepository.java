@@ -4,7 +4,7 @@ import example.micronaut.domain.Genre;
 import io.micronaut.core.annotation.NonNull;
 import org.reactivestreams.Publisher;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Optional;
 
 public interface GenreRepository {

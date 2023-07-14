@@ -10,7 +10,7 @@ import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 
 @Singleton
-class AuthProvider : AuthenticationProvider {
+class AuthProvider : AuthenticationProvider<HttpRequest<*>> {
 
     override fun authenticate(
         @Nullable httpRequest: HttpRequest<*>?,

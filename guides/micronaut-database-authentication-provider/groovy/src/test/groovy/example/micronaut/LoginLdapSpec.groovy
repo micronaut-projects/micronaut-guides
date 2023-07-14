@@ -6,9 +6,9 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.authentication.UsernamePasswordCredentials
-import io.micronaut.security.token.jwt.generator.claims.JwtClaims
-import io.micronaut.security.token.jwt.render.AccessRefreshToken
+import io.micronaut.security.token.render.AccessRefreshToken
 import io.micronaut.security.token.jwt.validator.JwtTokenValidator
+import io.micronaut.security.token.Claims;
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import reactor.core.publisher.Flux
 import org.reactivestreams.Publisher
@@ -82,6 +82,6 @@ class LoginLdapSpec extends Specification {
         Flux.from(authentication).blockFirst()
 
         and: 'access token contains an expiration date'
-        Flux.from(authentication).blockFirst().attributes.get(JwtClaims.EXPIRATION_TIME)
+        Flux.from(authentication).blockFirst().attributes.get(Claims.EXPIRATION_TIME)
     }
 }
