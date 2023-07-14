@@ -132,12 +132,13 @@
 <li><a href="#configure-client-generation">4.2. Configure client generation</a></li>
 </ul>
 </li>
-<li><a href="#testing-the-client">5. Testing the Client</a></li>
-<li><a href="#next-steps">6. Next Steps</a>
+<li><a href="#configuration">5. Configuration</a></li>
+<li><a href="#testing-the-client">6. Testing the Client</a></li>
+<li><a href="#next-steps">7. Next Steps</a>
 <ul class="sectlevel2">
-<li><a href="#learn-how-to-write-openapi-definition-and-generate-server-based-on-it">6.1. Learn How to Write OpenAPI Definition and Generate Server Based on It</a></li>
-<li><a href="#learn-micronaut">6.2. Learn Micronaut</a></li>
-<li><a href="#micronaut-openapi">6.3. Micronaut OpenAPI</a></li>
+<li><a href="#learn-how-to-write-openapi-definition-and-generate-server-based-on-it">7.1. Learn How to Write OpenAPI Definition and Generate Server Based on It</a></li>
+<li><a href="#learn-micronaut">7.2. Learn Micronaut</a></li>
+<li><a href="#micronaut-openapi">7.3. Micronaut OpenAPI</a></li>
 </ul>
 </li>
 </ul>
@@ -169,7 +170,7 @@
 <p><a href="https://www.openapis.org">OpenAPI</a> is a specification for describing REST APIs. Many web APIs provide definitions for the available endpoints and parameters in form of OpenAPI documents. OpenAPI infrastructure includes numerous tooling, including the OpenAPI generator.</p>
 </div>
 <div class="paragraph">
-<p>In this guide, we will use the Micronaut OpenAPI Generator to generate a client API from an OpenAPI definition file. We will generate the client for <a href="https://open-meteo.com">Open Meteo</a>, however the steps
+<p>This guide will use the Micronaut OpenAPI Generator to generate a client API from an OpenAPI definition file. We will generate the client for <a href="https://open-meteo.com">Open Meteo</a>, however the steps
 could easily be replicated with any other API with an OpenAPI definition.</p>
 </div>
 <div class="paragraph">
@@ -217,10 +218,10 @@ could easily be replicated with any other API with an OpenAPI definition.</p>
 <h2 id="generating-the-micronaut-client">4. Generating the Micronaut Client</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We will generate a client for <a href="https://open-meteo.com">Open Meteo</a>, an open-source weather API which offers free access for non-commercial use.</p>
+<p>We will generate a client for <a href="https://open-meteo.com">Open Meteo</a>, an open-source weather API offering free non-commercial access.</p>
 </div>
 <div class="paragraph">
-<p>To do this, we will need to download the official Open Meteo OpenAPI definition file: <a href="https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml">https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml</a>.</p>
+<p>To do this, we must download the <a href="https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml">official Open Meteo OpenAPI definition file</a>.</p>
 </div>
 <div class="sect2">
 <h3 id="create-a-micronaut-application">4.1. Create a Micronaut application</h3>
@@ -235,7 +236,7 @@ could easily be replicated with any other API with an OpenAPI definition.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Open the generated project and create a new folder, <code>src/openapi</code> then copy the <code>openapi.yml</code> file into it, for example:</p>
+<p>Open the generated project and create a new folder, <code>src/openapi</code>, then copy the <code>openapi.yml</code> file into it, for example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -277,8 +278,8 @@ $ curl https://raw.githubusercontent.com/open-meteo/open-meteo/main/openapi.yml 
 </div>
 </div>
 <div class="paragraph">
-<p>The client code will be generated in your build directory but automatically added as a source set.
-Therefore, you can for example run <code>./gradlew compileJava --console=verbose</code> and see that the sources are generated and compiled:</p>
+<p>Micronaut OpenAPI generator generates the client code in your build directory and adds it as a source set.
+Therefore, you can, for example run <code>./gradlew compileJava --console=verbose</code> and see that the sources are generated and compiled:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -308,13 +309,13 @@ The Micronaut OpenAPI generator supports a large number of parameters. Please re
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="text">build/generated/openapi
 ├── generateClientOpenApiApis
-│   └── src
-│       └── main
-│           └── java
-│               └── example
-│                   └── openmeteo
-│                       └── api
-│                           └── WeatherForecastApisApi.java  <i class="conum" data-value="1"></i><b>(1)</b>
+│   └── src
+│       └── main
+│           └── java
+│               └── example
+│                   └── openmeteo
+│                       └── api
+│                           └── WeatherForecastApisApi.java  <i class="conum" data-value="1"></i><b>(1)</b>
 └── generateClientOpenApiModels
     └── src
         └── main
@@ -338,7 +339,7 @@ The Micronaut OpenAPI generator supports a large number of parameters. Please re
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The <code>example.openmeteo.model</code> package contains data classes, that are used in parameters or bodies of both
+<td>The <code>example.openmeteo.model</code> package contains data classes that are used in parameters or bodies of both
 requests and responses in the API.</td>
 </tr>
 </table>
@@ -366,19 +367,34 @@ or the <a href="https://swagger.io/docs/specification/about/">OpenAPI guide</a>.
 <p>As you can see, different API files were generated for the OpenMeteo API.</p>
 </div>
 <div class="paragraph">
-<p>If you look inside the API files, you will see that method definitions were generated corresponding to different paths and operations available in the API.
-Using Micronaut`s features, we will be able to inject a client implementation
-of this interface and use it by calling the corresponding methods without the need to worry how client-server communication is handled.</p>
+<p>The API files show that method definitions were generated corresponding to different paths and operations available in the API.</p>
+</div>
+<div class="paragraph">
+<p>Using Micronaut Framework&#8217;s features, we can inject a client implementation of this interface and use it by calling the corresponding methods without worrying about how client-server communication is handled.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="testing-the-client">5. Testing the Client</h2>
+<h2 id="configuration">5. Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can see that a weather forecast API class was generated in the project.
-This API references other types which belong to the model types which were generated automatically from the OpenAPI definition.</p>
+<p>Set <code>openapi-micronaut-client-base-path</code> to <code><a href="https://api.open-meteo.com" class="bare">https://api.open-meteo.com</a></code> in configuration.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties"></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-client">6. Testing the Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Micronaut OpenAPI generator generated a weather forecast API class in the project.
+This API references other types that belong to the model types. Micronaut OpenAPI generator generated classes for those types from the OpenAPI definition.</p>
 </div>
 <div class="paragraph">
 <p>We will show how to use the OpenMeteo API by writing a simple test using the generated Micronaut client.</p>
@@ -414,7 +430,7 @@ This API references other types which belong to the model types which were gener
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Calls the client in order to fetch weather forecast</td>
+<td>Calls the client to fetch a weather forecast</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -425,10 +441,10 @@ This API references other types which belong to the model types which were gener
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">6. Next Steps</h2>
+<h2 id="next-steps">7. Next Steps</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="learn-how-to-write-openapi-definition-and-generate-server-based-on-it">6.1. Learn How to Write OpenAPI Definition and Generate Server Based on It</h3>
+<h3 id="learn-how-to-write-openapi-definition-and-generate-server-based-on-it">7.1. Learn How to Write OpenAPI Definition and Generate Server Based on It</h3>
 <div class="paragraph">
 <p>Read the <a href="https://guides.micronaut.io/latest/micronaut-openapi-generator-server.html">"Use OpenAPI Definition to Generate a Micronaut Server" Guide</a>
 to learn how to:</p>
@@ -436,28 +452,28 @@ to learn how to:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>understand OpenAPI definition files and write your own definition files,</p>
+<p>understand OpenAPI definition files and write your definition files.</p>
 </li>
 <li>
-<p>generate server API based on the definitions,</p>
+<p>generate server API based on the definitions.</p>
 </li>
 <li>
 <p>implement the functionality of the server based on the API and write comprehensive tests utilizing
-Micronaut`s features.</p>
+Micronaut Framework&#8217;s features.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="learn-micronaut">6.2. Learn Micronaut</h3>
+<h3 id="learn-micronaut">7.2. Learn Micronaut</h3>
 <div class="paragraph">
-<p>To learn more about Micronaut framework and its features visit
+<p>To learn more about Micronaut Framework and its features, visit
 <a href="https://micronaut.io/docs/">Micronaut documentation</a> or read one of the several
 <a href="https://micronaut.io/guides/">Micronaut guides</a>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="micronaut-openapi">6.3. Micronaut OpenAPI</h3>
+<h3 id="micronaut-openapi">7.3. Micronaut OpenAPI</h3>
 <div class="ulist">
 <ul>
 <li>
