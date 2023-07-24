@@ -22,9 +22,10 @@ public class HandlingFormSubmissionApplicationTest {
 	@Test
 	public void rendersForm() throws Exception {
 		mockMvc.perform(get("/greeting"))
-				.andExpect(content().string(containsString("Form")));
+				.andExpect(content().string(containsString("Form")))
+				.andExpect(content().string(containsString("name=\"id\"")))
+				.andExpect(content().string(containsString("name=\"content\"")));
 	}
-
 	@Test
 	public void submitsForm() throws Exception {
 		mockMvc.perform(post("/greeting").param("id", "12345").param("content", "Hello"))

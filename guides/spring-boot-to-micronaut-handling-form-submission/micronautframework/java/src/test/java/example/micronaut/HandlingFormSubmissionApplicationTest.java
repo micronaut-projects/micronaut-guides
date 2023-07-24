@@ -17,7 +17,10 @@ class HandlingFormSubmissionApplicationTest {
 	@Test
 	void rendersForm(@Client("/") HttpClient httpClient)  {
 		BlockingHttpClient client = httpClient.toBlocking();
-		assertTrue(client.retrieve("/greeting").contains("Form"));
+		String html = client.retrieve("/greeting");
+		assertTrue(html.contains("Form"));
+		assertTrue(html.contains("name=\"id\""));
+		assertTrue(html.contains("name=\"content\""));
 	}
 	@Test
 	void submitsForm(@Client("/") HttpClient httpClient)  {
