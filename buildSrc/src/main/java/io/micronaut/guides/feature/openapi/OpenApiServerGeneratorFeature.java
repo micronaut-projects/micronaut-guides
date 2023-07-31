@@ -52,7 +52,7 @@ public class OpenApiServerGeneratorFeature extends AbstractOpenApiGeneratorFeatu
 
     @Override
     protected RockerModel provideGradleModel() {
-        return openapiServerGradle.template(getKind(), getDefinitionFile(), getPackageName() + ".api", getPackageName() + ".model", getPackageName() + ".invoker");
+        return openapiServerGradle.template(getKind(), getDefinitionFile(), getPackageName() + ".api", getPackageName() + ".model", getPackageName() + ".invoker", null, null);
     }
 
     @Override

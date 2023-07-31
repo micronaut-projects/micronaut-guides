@@ -1,0 +1,46 @@
+@import java.util.Map;
+@import java.util.List;
+@option discardLogicWhitespace=true
+@args(List<Map<String, String>> parameterMappings, List<Map<String, String>> responseBodyMappings)
+
+<!--
+tag::openapi[]
+-->
+<plugin>
+  <groupId>io.micronaut.maven</groupId>
+  <artifactId>micronaut-maven-plugin</artifactId>
+  <version>${micronaut-maven-plugin.version}</version>
+  <configuration>
+    @if (parameterMappings != null) {
+    <parameterMappings> <!--1-->
+      @for (map: parameterMappings) {
+      <parameterMapping>
+        <name>@map.get("name")</name>
+        <location>@map.get("location")</location>
+        <mappedType>@map.get("mappedType")</mappedType>
+        @if (map.get("mappedName") != null) {
+        <mappedName>@map.get("mappedName")</mappedName>
+        }
+      </parameterMapping>
+      }
+    </parameterMappings>
+    }
+
+    @if (responseBodyMappings != null) {
+    <responseBodyMappings> <!--2-->
+      @for (map: responseBodyMappings) {
+      <responseBodyMapping>
+        <headerName>@map.get("headerName")</headerName>
+        <mappedBodyType>@map.get("mappedBodyType")</mappedBodyType>
+        @if (map.get("isListWrapper") != null) {
+        <isListWrapper>@map.get("isListWrapper")</isListWrapper>
+        }
+      </responseBodyMapping>
+      }
+    </responseBodyMappings>
+    }
+  </configuration>
+</plugin>
+<!--
+end::openapi[]
+-->

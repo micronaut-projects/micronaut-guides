@@ -1,12 +1,30 @@
-@args(String kind, String definition, String apiPackageName, String modelPackageName, String invokerPackageName)
+@import java.util.Map;
+@import java.util.List;
+@option discardLogicWhitespace=true
+@args(String kind, String definition, String apiPackageName, String modelPackageName, String invokerPackageName, List<Map<String, String>> parameterMappings, List<Map<String, String>> responseBodyMappings)
+//tag::openapi[]
+@if (parameterMappings != null) {import io.micronaut.gradle.openapi.ParameterMappingModel}
+@if (responseBodyMappings != null) {import io.micronaut.gradle.openapi.ResponseBodyMappingModel}
+
 micronaut {
   openapi {
-    @(kind)(file("@(definition)")) {
+    @(kind)(file("@(definition)")) { // <1>
       apiPackageName = "@(apiPackageName)"
       modelPackageName = "@(modelPackageName)"
-      invokerPackageName = "@(invokerPackageName)"
+      invokerPackageName = "@(invokerPackageName)" // <2>
       useReactive = false
       useAuth = true
+      @if (parameterMappings != null) {parameterMappings = [ // <3>
+        @for (map: parameterMappings) {
+        new ParameterMappingModel("@map.get("name")", ParameterMappingModel.ParameterLocation.@map.get("location"), "@map.get("mappedType")")@if(map.get("mappedName") != null){.withMappedName("@map.get("mappedName")")},
+        }
+      ]}
+      @if (responseBodyMappings != null) {responseBodyMappings = [ // <4>
+        @for (map: responseBodyMappings) {
+        new ResponseBodyMappingModel("@map.get("headerName")", "@map.get("mappedBodyType")")@if(map.get("isListWrapper") != null){.withListWrapper(@map.get("isListWrapper"))},
+        }
+      ]}
     }
   }
 }
+//end::openapi[]

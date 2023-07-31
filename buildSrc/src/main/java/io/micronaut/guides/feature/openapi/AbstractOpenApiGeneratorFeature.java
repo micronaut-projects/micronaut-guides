@@ -60,8 +60,6 @@ public abstract class AbstractOpenApiGeneratorFeature implements Feature {
                     .extension(new RockerWritable(provideGradleModel()))
                     .build());
         } else {
-            // temporary fix, guides currently depend on M4
-            generatorContext.getBuildProperties().put("micronaut-maven-plugin.version", "4.0.0-M6");
             generatorContext.getBuildProperties().putAll(provideMavenProperties());
         }
     }
