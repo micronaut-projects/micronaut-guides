@@ -1,0 +1,194 @@
+#tag::info[]
+openapi: 3.0.0
+info:
+  description: A website with recipes API
+  version: 1.0.0
+  title: Cooking Website
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: recipe # <1>
+    description: Search for recipes and create new ones
+#end::info[]
+#tag::paths[]
+paths:
+  /recipe/{name}: # <1>
+    get:
+      tags: [ recipe ]
+      summary: Get a recipe by name
+      operationId: getRecipe
+      parameters:
+        - name: name
+          description: Meal name
+          in: path
+          schema: { type: string, required: true }
+      responses:
+        200:
+          description: Success
+          headers:
+            Date:
+              $ref: '#/components/headers/Date'
+            Last-Modified:
+              $ref: '#/components/headers/Last-Modified'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+  /searchRecipes: # <2>
+    get:
+      tags: [ recipe ]
+      summary: Search for a recipe
+      operationId: search
+      parameters:
+        - $ref: '#/components/parameters/MealNameFilterParam'
+        - $ref: '#/components/parameters/IngredientNameFilterParam'
+        - $ref: '#/components/parameters/PageQueryParam'
+        - $ref: '#/components/parameters/PageSizeQueryParam'
+        - $ref: '#/components/parameters/PageSortQueryParam'
+      responses:
+        200:
+          description: Success
+          headers:
+            X-Page-Number: { $ref: '#/components/headers/X-Page-Number'}
+            X-Page-Size: { $ref: '#/components/headers/X-Page-Size' }
+            X-Total-Count: { $ref: '#/components/headers/X-Total-Count'}
+            X-Page-Count: { $ref: '#/components/headers/X-Page-Count'}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /recipe: # <3>
+    post:
+      tags: [ recipe ]
+      summary: Post a new recipe
+      operationId: addRecipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Recipe"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Bad Request
+#end::paths[]
+#tag::components[]
+components:
+  schemas:
+    Recipe: # <1>
+      description: Object containing the recipe
+      type: object
+      properties:
+        name:
+          type: string
+          description: The meal name
+          minLength: 3
+        content:
+          type: string
+          description: The recipe content describing all the required steps
+          minLength: 100
+        ingredients:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/Ingredient'
+      required: [name, content, ingredients]
+    Ingredient:
+      description: An ingredient required for a meal
+      type: object
+      properties:
+        name:
+          type: string
+          description: A common understandable name for ingredient
+          minLength: 3
+        quantity:
+          $ref: '#/components/schemas/Quantity'
+      required: [name, quantity]
+    Quantity:
+      description: An object for describing the quantity of something
+      type: object
+      properties:
+        amount:
+          type: number
+          format: float
+          minimum: 0
+        unit:
+          $ref: '#/components/schemas/MeasurementUnit'
+      required: [amount, unit]
+    MeasurementUnit:
+      description: An enum containing common measuring units for meal ingredients
+      type: string
+      nullable: false
+      enum: [ Liter, Gram, Count ]
+  parameters:
+    MealNameFilterParam: # <2>
+      name: mealName
+      description: The desired meal name
+      in: query
+      schema:
+        type: string
+    IngredientNameFilterParam:
+      name: ingredientName
+      description: The desired ingredient to be in a meal
+      in: query
+      schema:
+        type: string
+    PageQueryParam: # <3>
+      name: page
+      in: query
+      description: The page number to retrieve starting from 0.
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    PageSizeQueryParam:
+      name: size
+      in: query
+      description: The number of items per page.
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    PageSortQueryParam:
+      name: sortOrder
+      in: query
+      description: |
+        Parameter describing the sort. Allows specifying the sorting direction using the keywords {@code asc} and
+        {@code desc} after each property. For example, {@code "sort=name desc,age"} will sort by name in descending
+        order and age in ascending.
+      schema:
+        type: string
+  headers:
+    Date: # <4>
+      description: The date content was created
+      schema:
+        type: string
+        format: date-time
+    Last-Modified:
+      description: The date the content was last modified
+      schema:
+        type: string
+        format: date-time
+    X-Page-Number: # <5>
+      description: The page number of the current page
+      schema:
+        type: string
+    X-Page-Size:
+      description: The number of items per page
+      schema:
+        type: string
+    X-Total-Count:
+      description: |
+        The total number of items available in the entire collections, not just the items returned in the current page
+      schema:
+        type: string
+    X-Page-Count:
+      description: The total number of pages based on the page size and total count
+      schema:
+        type: string
+#end::components[]

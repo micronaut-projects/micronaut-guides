@@ -1,0 +1,270 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will customize micronaut build to allow using custom types for parameters and operation responses generated from an OpenAPI specification.
+
+> The link:https://oai.github.io/Documentation/start-here.html[OpenAPI Specification] defines a format for uniquely describing REST APIs that is both human- and machine-readable.
+
+=== Solution
+
+We recommend that you follow the instructions in the next sections and create the application step by step. However, you can directly get the complete solution by downloading and unzipping link:@sourceDir@.zip[@sourceDir@.zip].
+
+common:requirements.adoc[]
+
+The guide requires knowledge of Micronaut and OpenAPI. Read the  guideLink:micronaut-aws-secretsmanager[Micrioanut Server Generator With OpenAPI] guide to get familiar with OpenAPI specifications and generating micronaut servers from them.
+
+== Creating the OpenAPI specification file
+
+Create the following specification for the application:
+
+[source,yaml]
+.src/openapi/spec.yml
+----
+include::{sourceDir}/micronaut-openapi-generator-server-customization/micronaut-openapi-generator-server-customization-gradle-java/src/openapi/spec.yml[tag=info]
+----
+<1> Defines a single tag for all the recipe operations.
+
+The specification defines the following paths:
+[source,yaml]
+.src/openapi/spec.yml
+----
+include::{sourceDir}/micronaut-openapi-generator-server-customization/micronaut-openapi-generator-server-customization-gradle-java/src/openapi/spec.yml[tag=paths]
+----
+<1> Define a path for getting the content of a recipe.
+<2> Define a path to search for recipes.
+<3> Define a path to create new recipe.
+
+And the specification defines the following components:
+[source,yaml]
+.src/openapi/spec.yml
+----
+include::{sourceDir}/micronaut-openapi-generator-server-customization/micronaut-openapi-generator-server-customization-gradle-java/src/openapi/spec.yml[tag=components]
+----
+<1> Define the `Recipe`, `Ingredient` and other models required for the application.
+<2> Define filtering parameters used by the search operation.
+<3> Define pagination parameters used in the search request.
+<4> Define response headers to be used to specify the creation and modification date of the recipes.
+<5> Define the pagination headers that are used in the search response.
+
+== Configure the OpenAPI generation
+
+:exclude-for-build:maven
+
+Open your `build.gradle` file an apply the `micronaut-openapi` plugin:
+
+[source, groovy]
+.build.gradle
+----
+plugins {
+  id 'io.micronaut.openapi' version '...'
+  ....
+}
+----
+
+Next, configure your build to generate a server. To simplify the application we will configure parameter and response body mappings. They will use custom types instead of multiple parameters or the response body which allows to reduce the method signature and standardize common responses.
+
+[source,groovy]
+.build.gradle
+----
+include::{sourceDir}/micronaut-openapi-generator-server-customization/micronaut-openapi-generator-server-customization-gradle-java/build.gradle[tag=openapi]
+----
+<1> Specify the plugin to use the desired definition file.
+<2> Specify the API, model and invoker packages.
+<3> Specify the parameter mappings:
+    * The `RecipeFilter` type will be used instead of specifying 2 parameters separately: `mealName` and `ingredientName`. We will implement a custom parameter binder for the type to bind to the required query parameters.
+    * The `Pageable` type will be used instead of all the pagination query parameters. The type is bound automatically by Micronaut.
+<4> Specify the response body mappings described in details in the next section.
+    * The `DatedResponse` type will be used instead of `HttpResponse` when `Date` or `Last-Modified` response headers are required. We will create a custom body writer for the type to correctly write its fields to the response.
+    * The pagination response headers will trigger the usage of `Page` response type. It is specified as a list wrapper, as the type takes list item type as its generic parameter. Since we define custom headers, we will create a custom body writer for the type, too.
+
+NOTE: Visit the documentation of the link:https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_openapi_code_generation[OpenAPI code generation with Micronaut Gradle plugin] for more configuration information.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Enable the Micronaut OpenAPI server generation in your `pom.xml` file, configure the location to the specification file and package names:
+
+[source, xml]
+.pom.xml
+----
+<properties>
+    <micronaut.openapi.generate.server>true</micronaut.openapi.generate.client>
+    <micronaut.openapi.definition>src/openapi/spec.yml</micronaut.openapi.definition> <!--1-->
+    <micronaut.openapi.api.package.name>micronaut.example.api</micronaut.openapi.api.package.name>
+    <micronaut.openapi.model.package.name>micronaut.example.model</micronaut.openapi.model.package.name>
+    <micronaut.openapi.invoker.package.name>micronaut.example</micronaut.openapi.invoker.package.name> <!--2-->
+    <micronaut.openapi.use.reactive>false</micronaut.openapi.use.reactive>
+    <micronaut.openapi.server.use.auth>true</micronaut.openapi.server.use.auth>
+</properties>
+----
+<1> Enable server generation and specify the OpenAPI definition file location.
+<2> Configure the API, model and invoker package.
+
+To simplify the application we will configure parameter and response body mappings. They will use custom types instead of multiple parameters or the response body which allows to reduce the method signature and standardize common responses.
+
+Modify the `micronaut-maven-plugin` configuration:
+
+[source,xml]
+.pom.xml
+----
+include::{sourceDir}/micronaut-openapi-generator-server-customization/micronaut-openapi-generator-server-customization-maven-java/pom.xml[tag=openapi]
+----
+<1> Specify the parameter mappings:
+* The `RecipeFilter` type will be used instead of specifying 2 parameters separately: `mealName` and `ingredientName`. We will implement a custom parameter binder for the type to bind to the required query parameters.
+* The `Pageable` type will be used instead of all the pagination query parameters. The type is bound automatically by Micronaut.
+<2> Specify the response body mappings described in details in the next section.
+* The `DatedResponse` type will be used instead of `HttpResponse` when `Date` or `Last-Modified` response headers are required. We will create a custom body writer for the type to correctly write its fields to the response.
+* The pagination response headers will trigger the usage of `Page` response type. It is specified as a list wrapper, as the type takes list item type as its generic parameter. Since we define custom headers, we will create a custom body writer for the type, too.
+
+NOTE: Visit link:https://micronaut-projects.github.io/micronaut-maven-plugin/snapshot/examples/openapi.html#generating_a_server[Micronaut OpenAPI Maven plugin documentation] for more configuration information.
+
+:exclude-for-build:
+
+The server code will be generated in your build directory but automatically added as a source set.
+
+== Implement the Application
+
+We will create the application with the following structure:
+
+image::openapi-generator/customized-server-component-scheme.svg[]
+
+<1> The Application will use Micronaut HTTP controller to manage communication with client. This will be implemented in the generated `ComputeApi` interface that we will extend further in this guide.
+<2> The Application will use Micronaut database and integration with JDBC for database communication.
+<3> The `/recipe/{name}` operation will return a dated response. This will be implemented utilizing a custom `DatedResponse` type that was mapped from `Date` and `Last-Modified` response headers.
+<4> The `/searchRecipes` operation will utilize custom types for filtering and pagination parameters as well as `Page` as response type.
+
+=== Implement the Controller
+
+Create a class for the controller using Micronaut https://docs.micronaut.io/latest/guide/#httpServer[@Controller] annotation. The class must implement all the generated methods in `RecipeApi`:
+
+source:controller/RecipeController[]
+<1> The controller implements the `RecipeApi` that will be generated as part of build and added to sources.
+<2> The controller uses Micronaut constructor dependency injection to receive the required types from Micronaut context.
+<3> Implement the `addRecipe` method that uses the `Recipe` model generated from the OpenAPI definition.
+<4> Implement the `getRecipe` method that uses the custom `DatedResponse<~>` return type.
+<5> Implement the `search` method that uses custom parameters and return type.
+
+=== Create Custom Parameter Type
+
+Create a custom type that we use for filtering:
+
+source:filter/RecipeFilter[]
+<1> The `mealName` property that will be bound from a query parameter.
+<2> The `ingredientName` property that will be bound from a query parameter.
+
+Then implement a parameter binder for the `RecipeFilter` type:
+
+source:filter/RecipeFilterBinder[]
+<1> Override the `bind` method that will retrieve the required query parameters from the request and validate them as needed.
+
+=== Create Custom Response Body Type
+
+Create a custom type that we use for responses with dating information:
+
+source:dated/DatedResponse[]
+<1> Define a property that will hold the creation date response header.
+<2> Define a property that will hod the last update date response header.
+<3> Define a property to hold the response body.
+
+Then implement a body writer for the `DatedResponse` type:
+
+source:dated/DatedResponseBodyWriter[]
+<1> Implement the required methods, including `writeTo` which will write the body and required response headers to the response.
+
+Similarly, we will implement a body writer for the `Page` type that will write our custom pagination headers:
+source:page/PageBodyWriter[]
+<1> Write the required headers and body items to the response.
+
+=== Implement the Repository
+
+==== Configure and Define the Migration schema
+
+common:data-jdbc-postgresql-configuration[]
+
+// Define the database variable that will be used in the snippet
+
+:database: postgres
+
+common:flyway-header.adoc[]
+
+resource:application.properties[tag=flyway]
+
+common:flyway-footer.adoc[]
+
+resource:db/migration/V1__schema.sql[]
+
+<1> Create a table for storing recipes.
+<2> Create a table for ingredients related to recipes.
+
+Additionally, add a dependency to the Jakarta persistance API:
+dependency:jakarta.persistence-api[groupId=jakarta.persistence, version=3.1.0]
+
+
+==== Create Entity Types
+
+Create a type representing the Recipe table row to be used with Micornaut JDBC:
+
+source:entity/RecipeEntity[]
+<1> Define the one-to-many relation to ingredients.
+<2> Annotate the property with `@DateCreated`, so the date is filled in by Micronaut data on row creation.
+<3> Annotate the property with `@DateUpdated`, so the date is updated.
+
+Analogously, create a type representing the Ingredient table:
+
+source:entity/IngredientEntity[]
+<1> Define the many-to-one relation to recipes.
+
+==== Create the Repository
+
+common:jdbc-repository-intro[]
+
+source:repository/RecipeRepository[]
+<1> Define a method to save recipes.
+<2> Define a method to search by recipe name.
+<3> Define a method to search by ingredient name.
+<4> Define a method to get all the recipes without filtering.
+<5> Define a method to retrieve a recipe by name.
+
+==== Create Mappers for the Entities
+
+Create a utility class with method to map the entities to the models generated by OpenAPI:
+source:entity/EntityMapper[]
+<1> Map `Ingredient` to `IngredientEntity`.
+<2> Map `IngredientEntity` to `Ingredient`.
+<3> Map `Recipe` to `RecipeEntity` that maps ingredients recursively.
+<4> Map `RecipeEntity` to `Recipe` that maps ingredients recursively.
+
+== Test the Application
+
+Create a test for the controller:
+
+test:controller/RecipeControllerTest[]
+
+<1> Add some sample recipes to the repository for tests.
+<2> Test that searching with filters works correctly.
+<3> Test that retrieving recipe works correctly.
+<4> Test that searching returns correctly paginated responses.
+
+common:testApp-noheader.adoc[]
+
+All the tests should run successfully.
+
+common:graal-with-plugins.adoc[]
+
+== Next steps
+
+=== Learn More
+
+Read OpenAPI and Micronaut documentation and guides:
+
+* https://www.openapis.org[OpenAPI]
+* Definition files generation from annotated controllers with link:https://micronaut-projects.github.io/micronaut-openapi/latest/guide[Micronaut OpenAPI]
+* link:https://micronaut-projects.github.io/micronaut-data/latest/guide[Micronaut Data]
+
+=== Generate Micronaut Client
+
+You can generate a Micronaut client based on the same `library-definition.yml` file.
+
+You can follow the link:https://guides.micronaut.io/latest/micronaut-openapi-generator-client.html["Use OpenAPI Definition to Generate a Micronaut Client" Guide] for more information.
