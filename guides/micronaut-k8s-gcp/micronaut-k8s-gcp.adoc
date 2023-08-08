@@ -1,0 +1,181 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will deploy three microservices on the https://cloud.google.com/kubernetes-engine[Google Kubernetes Engine (GKE)]. We will use Kubernetes Service discovery and Distributed configuration to wire up our microservices.
+
+You will discover how the Micronaut framework eases Kubernetes integration and deployment to GKE.
+
+common:costs-gcloud.adoc[]
+
+external:micronaut-k8s/requirements.adoc[]
+common:jq[]
+* You need a https://cloud.google.com/gcp/[Google Cloud Platform (GCP)] account and a GCP project.
+
+external:micronaut-k8s/create-app-external-guides.adoc[]
+
+common:gcp.adoc[]
+
+common:gcp-billing.adoc[]
+
+common:gcp-docker.adoc[]
+
+=== Create GKE cluster
+
+In this guide we will create cluster with name `micronaut-k8s` and we will use 2x `n1-standard-2` instances for GKE nodes. In this step you can specify different number of nodes and different machine types that suits you.
+
+[source, bash]
+----
+gcloud container clusters create micronaut-k8s --machine-type n1-standard-2 --num-nodes 2
+----
+
+== Prepare and Deploy Microservices
+
+We will define some environment variables to make deploying process easier. In `GCP_PROJECT_ID` store your GCP project id.
+
+[source,bash]
+----
+export GCP_PROJECT_ID="$(gcloud config get-value project)"
+----
+
+=== Users Microservice
+
+external-template:micronaut-k8s-gcp/export-repository.adoc[arg0=users]
+external-template:micronaut-k8s-gcp/k8s-microservice.adoc[arg0=users]
+external-template:micronaut-k8s-gcp/docker-microservice.adoc[arg0=users]
+
+=== Orders Microservice
+
+external-template:micronaut-k8s-gcp/export-repository.adoc[arg0=orders]
+external-template:micronaut-k8s-gcp/k8s-microservice.adoc[arg0=orders]
+external-template:micronaut-k8s-gcp/docker-microservice.adoc[arg0=orders]
+
+=== API Microservice
+
+external-template:micronaut-k8s-gcp/export-repository.adoc[arg0=api]
+external-template:micronaut-k8s-gcp/k8s-microservice.adoc[arg0=api]
+external-template:micronaut-k8s-gcp/docker-microservice.adoc[arg0=api]
+
+=== Deploy Services to GKE
+
+Create a directory for `kubectl` configuration.
+
+[source,bash]
+----
+mkdir -p $HOME/.kube
+----
+
+Install kubectl component.
+
+[source, bash]
+----
+gcloud components install kubectl
+----
+
+Generate `kubectl` configuration for authentication to GKE.
+
+[source, bash]
+----
+gcloud container clusters get-credentials micronaut-k8s
+----
+
+Set `KUBECONFIG` to the created config file. This variable is consumed by `kubectl`.
+
+[source,bash]
+----
+export KUBECONFIG=$HOME/.kube/config
+----
+
+Deploy the _auth.yml_ file that we created in the guideLink:micronaut-k8s[Kubernetes and the Micronaut Framework] guide.
+
+[source,bash]
+----
+kubectl apply -f auth.yml
+----
+
+Create `gcpsersecret` secret that will be used for authentication to Google Cloud Container Registry. This is needed because GKE needs credentials to be able to pull microservices images.
+[source,bash]
+----
+kubectl create secret docker-registry gcpsersecret --docker-server=gcr.io \
+--docker-username=oauth3accesstoken \
+--docker-password="$(gcloud auth print-access-token)" \
+--docker-email=your@email.com
+----
+external-template:micronaut-k8s-gcp/k8s-deploy-service.adoc[arg0=users]
+
+external-template:micronaut-k8s-gcp/k8s-deploy-service.adoc[arg0=orders]
+
+external-template:micronaut-k8s-gcp/k8s-deploy-service.adoc[arg0=api]
+
+== Test integration between applications deployed on GKE
+
+Run the next command to check status of the pods and make sure that all of them have the status "Running":
+
+[source,bash]
+----
+kubectl get pods -n=micronaut-k8s
+----
+
+[source,text]
+----
+NAME                      READY   STATUS    RESTARTS   AGE
+api-6b884d9c88-hxsdk      1/1     Running   0          21s
+orders-54465f845c-k7z5t   1/1     Running   0          24s
+users-d8b46cf48-wq6sm     1/1     Running   0          29s
+----
+
+Run the next command to check the status of the microservices:
+
+[source,bash]
+----
+kubectl get services -n=micronaut-k8s
+----
+
+[source,text]
+----
+NAME     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)          AGE
+api      LoadBalancer   10.112.14.49   <redacted>       8080:31299/TCP   37s
+orders   NodePort       10.112.2.71    <none>           8080:30613/TCP   40s
+users    NodePort       10.112.2.227   <none>           8080:32718/TCP   44s
+----
+
+NOTE: `If EXTERNAL-IP` is in <pending> state wait a couple of seconds and then run command again.
+
+Run the next command to retrieve the URL of the `api` microservice:
+
+[source,bash]
+----
+export API_URL=http://$(kubectl get svc api -n=micronaut-k8s -o json | jq -r '.status.loadBalancer.ingress[0].ip'):8080
+----
+
+external:micronaut-k8s/verify.adoc[]
+
+== Cleaning Up
+
+To delete all resources that were created in this guide run next command.
+
+[source,bash]
+----
+kubectl delete namespaces micronaut-k8s
+----
+
+external-template:micronaut-k8s-gcp/gcp-delete-repository.adoc[arg0=users]
+external-template:micronaut-k8s-gcp/gcp-delete-repository.adoc[arg0=orders]
+external-template:micronaut-k8s-gcp/gcp-delete-repository.adoc[arg0=api]
+
+
+Run the next command to delete `micronaut-guide` GKE cluster:
+
+[source,bash]
+----
+gcloud container clusters delete micronaut-k8s
+----
+
+common:next.adoc[]
+
+- https://cloud.google.com/kubernetes-engine[Google Kubernetes Engine (GKE)]
+- https://cloud.google.com/container-registry[Google Cloud Container Registry]
+- https://cloud.google.com/artifact-registry[Google Cloud Artifact Registry]
+- https://micronaut-projects.github.io/micronaut-gcp/latest/guide/[Micronaut Google Cloud Platform (GCP)] integration.
+- Read more about https://micronaut-projects.github.io/micronaut-kubernetes/snapshot/guide/[Micronaut Kubernetes] module.
+
