@@ -37,12 +37,13 @@ class GenreControllerTest { // <3>
     @Test
     fun testGenreCrudOperations() {
         val genreIds = mutableListOf<Long?>()
-        var request: HttpRequest<*>? = HttpRequest.POST("/genres", mapOf(Pair("name", "DevOps"))) // <4>
+
+        var request: HttpRequest<*> = HttpRequest.POST("/genres", mapOf("name" to "DevOps")) // <4>
         var response: HttpResponse<Genre> = httpClient.toBlocking().exchange(request)
         genreIds.add(entityId(response))
         Assertions.assertEquals(HttpStatus.CREATED, response.status)
 
-        request = HttpRequest.POST("/genres", mapOf(Pair("name", "Microservices"))) // <5>
+        request = HttpRequest.POST("/genres", mapOf("name" to "Microservices")) // <5>
         response = httpClient.toBlocking().exchange(request)
         Assertions.assertEquals(HttpStatus.CREATED, response.status)
 
@@ -61,48 +62,38 @@ class GenreControllerTest { // <3>
         Assertions.assertEquals("Micro-services", genre.name)
 
         request = HttpRequest.GET<Any>("/genres/list")
-        var genres = httpClient.toBlocking()!!.retrieve(
-            request, Argument.listOf(Genre::class.java)
-        )
-        Assertions.assertEquals(2, genres.size)
+        var genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+        Assertions.assertEquals(2, genres.size, "Expected 2 genres, got $genres")
 
-        request = HttpRequest.POST("/genres/ex", mapOf(Pair("name", "Microservices"))) // <4>
-        response = httpClient.toBlocking()!!.exchange(request)
+        request = HttpRequest.POST("/genres/ex", mapOf("name" to "Microservices")) // <4>
+        response = httpClient.toBlocking().exchange(request)
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
 
         request = HttpRequest.GET<Any>("/genres/list")
-        genres = httpClient.toBlocking()!!.retrieve(
-            request, Argument.listOf(Genre::class.java)
-        )
-        Assertions.assertEquals(2, genres.size)
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+        Assertions.assertEquals(2, genres.size, "Expected 2 genres, got $genres")
 
         request = HttpRequest.GET<Any>("/genres/list?size=1")
-        genres = httpClient.toBlocking()!!.retrieve(
-            request, Argument.listOf(Genre::class.java)
-        )
-        Assertions.assertEquals(1, genres.size)
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+        Assertions.assertEquals(1, genres.size, "Expected 1 genre, got $genres")
         Assertions.assertEquals("DevOps", genres[0].name)
 
         request = HttpRequest.GET<Any>("/genres/list?size=1&sort=name,desc")
-        genres = httpClient.toBlocking()!!.retrieve(
-            request, Argument.listOf(Genre::class.java)
-        )
-        Assertions.assertEquals(1, genres.size)
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+
+        Assertions.assertEquals(1, genres.size, "Expected 1 genre, got $genres")
         Assertions.assertEquals("Micro-services", genres[0].name)
 
         request = HttpRequest.GET<Any>("/genres/list?size=1&page=10")
-        genres = httpClient.toBlocking()!!.retrieve(
-            request, Argument.listOf(Genre::class.java)
-        )
-        Assertions.assertEquals(0, genres.size)
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+        Assertions.assertEquals(0, genres.size, "Expected 0 genres, got $genres")
 
         // cleanup:
-        for (genreId in genreIds) {
+        genreIds.forEach { genreId ->
             request = HttpRequest.DELETE<Any>("/genres/$genreId")
-            response = httpClient.toBlocking()!!.exchange(request)
+            response = httpClient.toBlocking().exchange(request)
             Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
         }
-
     }
 
     private fun entityId(response: HttpResponse<*>): Long? {

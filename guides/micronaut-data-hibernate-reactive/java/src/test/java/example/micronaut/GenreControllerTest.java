@@ -43,7 +43,6 @@ public class GenreControllerTest {
 
     @Test
     public void testGenreCrudOperations() {
-
         List<Long> genreIds = new ArrayList<>();
 
         HttpRequest<?> request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <4>
@@ -75,9 +74,9 @@ public class GenreControllerTest {
         assertEquals("Micro-services", genre.getName());
 
         request = HttpRequest.GET("/genres/list");
-        List<Genre> genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        List<Genre> genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(2, genres.size());
+        assertEquals(2, genres.size(), "Expected 2 genres, received: " + genres);
 
         request = HttpRequest.POST("/genres/ex", Collections.singletonMap("name", "Microservices")); // <4>
         response = httpClient.toBlocking().exchange(request);
@@ -85,26 +84,26 @@ public class GenreControllerTest {
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
         request = HttpRequest.GET("/genres/list");
-        genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(2, genres.size());
+        assertEquals(2, genres.size(), "Expected 2 genres, received: " + genres);
 
         request = HttpRequest.GET("/genres/list?size=1");
-        genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(1, genres.size());
+        assertEquals(1, genres.size(), "Expected 1 genre, received: " + genres);
         assertEquals("DevOps", genres.get(0).getName());
 
         request = HttpRequest.GET("/genres/list?size=1&sort=name,desc");
-        genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(1, genres.size());
+        assertEquals(1, genres.size(), "Expected 1 genre, received: " + genres);
         assertEquals("Micro-services", genres.get(0).getName());
 
         request = HttpRequest.GET("/genres/list?size=1&page=2");
-        genres = httpClient.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(0, genres.size());
+        assertEquals(0, genres.size(), "Expected 0 genres, received: " + genres);
 
         // cleanup:
         for (Long genreId : genreIds) {
