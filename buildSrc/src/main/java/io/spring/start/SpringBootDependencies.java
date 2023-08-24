@@ -23,6 +23,8 @@ public final class SpringBootDependencies {
     private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_WEB = "spring-boot-starter-web";
     private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_TEST = "spring-boot-starter-test";
 
+    private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_DATA_REDIS = "spring-boot-starter-data-redis";
+
     public static final Dependency.Builder DEPENDENCY_SPRINGBOOT_STARTER = Dependency.builder()
             .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
             .artifactId(ARTIFACT_ID_SPRING_BOOT_STARTER)
@@ -31,6 +33,11 @@ public final class SpringBootDependencies {
     public static final Dependency.Builder DEPENDENCY_SPRING_BOOT_STARTER_WEB = Dependency.builder()
             .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
             .artifactId(ARTIFACT_ID_SPRING_BOOT_STARTER_WEB)
+            .compile();
+
+    public static final Dependency.Builder DEPENDENCY_SPRING_BOOT_STARTER_DATA_REDIS = Dependency.builder()
+            .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
+            .artifactId(ARTIFACT_ID_SPRING_BOOT_STARTER_DATA_REDIS)
             .compile();
     public static final Dependency.Builder DEPENDENCY_SPRINGBOOT_STARTER_TEST = Dependency.builder()
             .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
