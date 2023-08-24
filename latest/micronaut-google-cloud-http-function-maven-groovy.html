@@ -195,7 +195,7 @@
 <p>A decent text editor or IDE</p>
 </li>
 <li>
-<p>JDK 11 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+<p>JDK 17 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
 </li>
 </ul>
 </div>
@@ -305,13 +305,48 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The generated project contains a <code>Controller</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/groovy/example/micronaut/MicronautguideController.groovy</div>
+<div class="title">src/main/groovy/example/micronaut/DefaultController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">Unresolved directive <span class="keyword">in</span> micronaut-google-cloud-http-function-maven-groovy.adoc - <span class="key">include</span>::build/code/micronaut-google-cloud-http-function/micronaut-google-cloud-http-function-maven-groovy/src/main/groovy/example/micronaut/MicronautguideController.groovy<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.TupleConstructor</span>
+
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/default</span><span class="delimiter">&quot;</span></span>)
+<span class="type">class</span> <span class="class">DefaultController</span> {
+
+    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN)
+    <span class="annotation">@Get</span>
+    <span class="predefined-type">String</span> index() {
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">Example Response</span><span class="delimiter">&quot;</span></span>
+    }
+
+    <span class="annotation">@Post</span>
+    SampleReturnMessage postMethod(<span class="annotation">@Body</span> SampleInputMessage inputMessage){
+      <span class="keyword">new</span> SampleReturnMessage(<span class="key">returnMessage</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello </span><span class="inline"><span class="inline-delimiter">${</span>inputMessage.name<span class="inline-delimiter">}</span></span><span class="content">, thank you for sending the message</span><span class="delimiter">&quot;</span></span>)
+    }
+}
+
+<span class="annotation">@TupleConstructor</span>
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">SampleInputMessage</span>{
+    <span class="predefined-type">String</span> name
+}
+
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">SampleReturnMessage</span>{
+    <span class="predefined-type">String</span> returnMessage
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The previous snippet exposes two endpoints (a <code>GET</code> and a <code>POST</code> endpoint) in the <code>/micronautguide</code> path.</p>
+<p>The previous snippet exposes two endpoints (a <code>GET</code> and a <code>POST</code> endpoint) in the <code>/default</code> path.</p>
 </div>
 </div>
 </div>
@@ -418,9 +453,9 @@ Automatically add newline with <code>curl -w "\n"</code>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud functions deploy micronautguide
-    --entry-point io.micronaut.gcp.function.http.HttpFunction
-    --runtime java11
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud functions deploy micronautguide \
+    --entry-point io.micronaut.gcp.function.http.HttpFunction \
+    --runtime java17 \
     --trigger-http</code></pre>
 </div>
 </div>
@@ -432,7 +467,7 @@ Automatically add newline with <code>curl -w "\n"</code>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">YOUR_HTTP_TRIGGER_URL=$(gcloud functions describe micronautguide
+<pre class="CodeRay highlight"><code data-lang="bash">YOUR_HTTP_TRIGGER_URL=$(gcloud functions describe micronautguide \
     --format='value(httpsTrigger.url)')</code></pre>
 </div>
 </div>

@@ -712,7 +712,6 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testGenreCrudOperations() {
-
         <span class="predefined-type">List</span>&lt;<span class="predefined-type">Long</span>&gt; genreIds = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
 
         HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="4"></i><b>(4)</b>
@@ -744,9 +743,9 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micro-services</span><span class="delimiter">&quot;</span></span>, genre.getName());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list</span><span class="delimiter">&quot;</span></span>);
-        <span class="predefined-type">List</span>&lt;Genre&gt; genres = httpClient.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        <span class="predefined-type">List</span>&lt;Genre&gt; genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(<span class="integer">2</span>, genres.size());
+        assertEquals(<span class="integer">2</span>, genres.size(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Expected 2 genres, received: </span><span class="delimiter">&quot;</span></span> + genres);
 
         request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/ex</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Microservices</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="4"></i><b>(4)</b>
         response = httpClient.toBlocking().exchange(request);
@@ -754,26 +753,26 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list</span><span class="delimiter">&quot;</span></span>);
-        genres = httpClient.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(<span class="integer">2</span>, genres.size());
+        assertEquals(<span class="integer">2</span>, genres.size(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Expected 2 genres, received: </span><span class="delimiter">&quot;</span></span> + genres);
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?size=1</span><span class="delimiter">&quot;</span></span>);
-        genres = httpClient.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(<span class="integer">1</span>, genres.size());
+        assertEquals(<span class="integer">1</span>, genres.size(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Expected 1 genre, received: </span><span class="delimiter">&quot;</span></span> + genres);
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>, genres.get(<span class="integer">0</span>).getName());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?size=1&amp;sort=name,desc</span><span class="delimiter">&quot;</span></span>);
-        genres = httpClient.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(<span class="integer">1</span>, genres.size());
+        assertEquals(<span class="integer">1</span>, genres.size(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Expected 1 genre, received: </span><span class="delimiter">&quot;</span></span> + genres);
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micro-services</span><span class="delimiter">&quot;</span></span>, genres.get(<span class="integer">0</span>).getName());
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?size=1&amp;page=2</span><span class="delimiter">&quot;</span></span>);
-        genres = httpClient.toBlocking().retrieve(request, Argument.of(<span class="predefined-type">List</span>.class, Genre.class));
+        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
-        assertEquals(<span class="integer">0</span>, genres.size());
+        assertEquals(<span class="integer">0</span>, genres.size(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Expected 0 genres, received: </span><span class="delimiter">&quot;</span></span> + genres);
 
         <span class="comment">// cleanup:</span>
         <span class="keyword">for</span> (<span class="predefined-type">Long</span> genreId : genreIds) {

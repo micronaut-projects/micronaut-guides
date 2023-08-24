@@ -195,7 +195,7 @@
 <p>A decent text editor or IDE</p>
 </li>
 <li>
-<p>JDK 11 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+<p>JDK 17 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
 </li>
 </ul>
 </div>
@@ -305,13 +305,42 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>The generated project contains a <code>Controller</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/kotlin/example/micronaut/MicronautguideController.kt</div>
+<div class="title">src/main/kotlin/example/micronaut/DefaultController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">Unresolved directive in micronaut-google-cloud-http-function-maven-kotlin.adoc - include::build/code/micronaut-google-cloud-http-function/micronaut-google-cloud-http-function-maven-kotlin/src/main/kotlin/example/micronaut/MicronautguideController.kt[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Produces
+import io.micronaut.http.MediaType
+import io.micronaut.core.annotation.Introspected
+
+@Controller(&quot;/default&quot;)
+class DefaultController {
+
+    @Produces(MediaType.TEXT_PLAIN)
+    @Get
+    fun index(): String {
+        return &quot;Example Response&quot;
+    }
+
+    @Post
+    fun post(@Body inputMessage: SampleInputMessage): SampleReturnMessage {
+        return SampleReturnMessage(&quot;Hello ${inputMessage.name}, thank you for sending the message&quot;)
+    }
+}
+
+@Introspected
+data class SampleInputMessage(val name: String)
+
+@Introspected
+data class SampleReturnMessage(val returnMessage: String)</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The previous snippet exposes two endpoints (a <code>GET</code> and a <code>POST</code> endpoint) in the <code>/micronautguide</code> path.</p>
+<p>The previous snippet exposes two endpoints (a <code>GET</code> and a <code>POST</code> endpoint) in the <code>/default</code> path.</p>
 </div>
 </div>
 </div>
@@ -418,9 +447,9 @@ Automatically add newline with <code>curl -w "\n"</code>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud functions deploy micronautguide
-    --entry-point io.micronaut.gcp.function.http.HttpFunction
-    --runtime java11
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud functions deploy micronautguide \
+    --entry-point io.micronaut.gcp.function.http.HttpFunction \
+    --runtime java17 \
     --trigger-http</code></pre>
 </div>
 </div>
@@ -432,7 +461,7 @@ Automatically add newline with <code>curl -w "\n"</code>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">YOUR_HTTP_TRIGGER_URL=$(gcloud functions describe micronautguide
+<pre class="CodeRay highlight"><code data-lang="bash">YOUR_HTTP_TRIGGER_URL=$(gcloud functions describe micronautguide \
     --format='value(httpsTrigger.url)')</code></pre>
 </div>
 </div>

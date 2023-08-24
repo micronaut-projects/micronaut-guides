@@ -195,7 +195,7 @@
 <p>A decent text editor or IDE</p>
 </li>
 <li>
-<p>JDK 11 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+<p>JDK 17 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
 </li>
 </ul>
 </div>
@@ -311,13 +311,65 @@ micronaut {
 <p>The generated project contains a <code>Controller</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/java/example/micronaut/MicronautguideController.java</div>
+<div class="title">src/main/java/example/micronaut/DefaultController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in micronaut-google-cloud-http-function-gradle-java.adoc - include::build/code/micronaut-google-cloud-http-function/micronaut-google-cloud-http-function-gradle-java/src/main/java/example/micronaut/MicronautguideController.java<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation</span>.*;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
+
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/default</span><span class="delimiter">&quot;</span></span>)
+<span class="directive">public</span> <span class="type">class</span> <span class="class">DefaultController</span> {
+
+    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN)
+    <span class="annotation">@Get</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> index() {
+        <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Example Response</span><span class="delimiter">&quot;</span></span>;
+    }
+
+    <span class="annotation">@Post</span>
+    <span class="directive">public</span> SampleReturnMessage postMethod(<span class="annotation">@Body</span> SampleInputMessage inputMessage){
+      SampleReturnMessage retMessage = <span class="keyword">new</span> SampleReturnMessage();
+      retMessage.setReturnMessage(<span class="string"><span class="delimiter">&quot;</span><span class="content">Hello </span><span class="delimiter">&quot;</span></span> + inputMessage.getName() + <span class="string"><span class="delimiter">&quot;</span><span class="content">, thank you for sending the message</span><span class="delimiter">&quot;</span></span>);
+      <span class="keyword">return</span> retMessage;
+    }
+}
+
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">SampleInputMessage</span>{
+    <span class="directive">private</span> <span class="predefined-type">String</span> name;
+
+    <span class="directive">public</span> SampleInputMessage() {
+    }
+
+    <span class="directive">public</span> SampleInputMessage(<span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name;
+    }
+
+    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
+        <span class="keyword">return</span> name;
+    }
+    <span class="directive">public</span> <span class="type">void</span> setName(<span class="predefined-type">String</span> name) {
+        <span class="local-variable">this</span>.name = name;
+    }
+}
+
+<span class="annotation">@Introspected</span>
+<span class="type">class</span> <span class="class">SampleReturnMessage</span>{
+    <span class="directive">private</span> <span class="predefined-type">String</span> returnMessage;
+    <span class="directive">public</span> <span class="predefined-type">String</span> getReturnMessage() {
+        <span class="keyword">return</span> returnMessage;
+    }
+    <span class="directive">public</span> <span class="type">void</span> setReturnMessage(<span class="predefined-type">String</span> returnMessage) {
+        <span class="local-variable">this</span>.returnMessage = returnMessage;
+    }
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The previous snippet exposes two endpoints (a <code>GET</code> and a <code>POST</code> endpoint) in the <code>/micronautguide</code> path.</p>
+<p>The previous snippet exposes two endpoints (a <code>GET</code> and a <code>POST</code> endpoint) in the <code>/default</code> path.</p>
 </div>
 </div>
 </div>
@@ -424,9 +476,9 @@ Automatically add newline with <code>curl -w "\n"</code>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud functions deploy micronautguide
-    --entry-point io.micronaut.gcp.function.http.HttpFunction
-    --runtime java11
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud functions deploy micronautguide \
+    --entry-point io.micronaut.gcp.function.http.HttpFunction \
+    --runtime java17 \
     --trigger-http</code></pre>
 </div>
 </div>
@@ -438,7 +490,7 @@ Automatically add newline with <code>curl -w "\n"</code>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">YOUR_HTTP_TRIGGER_URL=$(gcloud functions describe micronautguide
+<pre class="CodeRay highlight"><code data-lang="bash">YOUR_HTTP_TRIGGER_URL=$(gcloud functions describe micronautguide \
     --format='value(httpsTrigger.url)')</code></pre>
 </div>
 </div>
