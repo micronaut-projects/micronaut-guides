@@ -18,21 +18,24 @@ import org.junit.jupiter.api.TestInstance;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MicronautTest // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
-public class GenreControllerTest {
+class GenreControllerTest {
 
     @Inject
     @Client("/")
     HttpClient httpClient; // <3>
 
     @Test
-    public void testFindNonExistingGenreReturns404() {
+    void testFindNonExistingGenreReturns404() {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -> {
             httpClient.toBlocking().exchange(HttpRequest.GET("/genres/99"));
         });
@@ -42,7 +45,7 @@ public class GenreControllerTest {
     }
 
     @Test
-    public void testGenreCrudOperations() {
+    void testGenreCrudOperations() {
         List<Long> genreIds = new ArrayList<>();
 
         HttpRequest<?> request = HttpRequest.POST("/genres", Collections.singletonMap("name", "DevOps")); // <4>
@@ -73,23 +76,17 @@ public class GenreControllerTest {
         genre = httpClient.toBlocking().retrieve(request, Genre.class);
         assertEquals("Micro-services", genre.getName());
 
-        request = HttpRequest.GET("/genres/list");
-        List<Genre> genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
-
-        assertEquals(2, genres.size(), "Expected 2 genres, received: " + genres);
+        await().until(countGenres(), equalTo(2));
 
         request = HttpRequest.POST("/genres/ex", Collections.singletonMap("name", "Microservices")); // <4>
         response = httpClient.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
-        request = HttpRequest.GET("/genres/list");
-        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
-
-        assertEquals(2, genres.size(), "Expected 2 genres, received: " + genres);
+        await().until(countGenres(), equalTo(2));
 
         request = HttpRequest.GET("/genres/list?size=1");
-        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
+        List<Genre> genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
         assertEquals(1, genres.size(), "Expected 1 genre, received: " + genres);
         assertEquals("DevOps", genres.get(0).getName());
@@ -111,6 +108,12 @@ public class GenreControllerTest {
             response = httpClient.toBlocking().exchange(request);
             assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
         }
+    }
+
+    private Callable<Integer> countGenres() {
+        return () -> httpClient
+                .toBlocking()
+                .retrieve(HttpRequest.GET("/genres/list"), Argument.listOf(Genre.class)).size();
     }
 
     protected Long entityId(HttpResponse<?> response) {

@@ -12,6 +12,8 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 
 import jakarta.inject.Inject
+import org.awaitility.Awaitility.await
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -61,20 +63,16 @@ class GenreControllerTest { // <3>
         genre = httpClient.toBlocking().retrieve(request, Genre::class.java)
         Assertions.assertEquals("Micro-services", genre.name)
 
-        request = HttpRequest.GET<Any>("/genres/list")
-        var genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
-        Assertions.assertEquals(2, genres.size, "Expected 2 genres, got $genres")
+        await().until(countEntities(), equalTo(2))
 
         request = HttpRequest.POST("/genres/ex", mapOf("name" to "Microservices")) // <4>
         response = httpClient.toBlocking().exchange(request)
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
 
-        request = HttpRequest.GET<Any>("/genres/list")
-        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
-        Assertions.assertEquals(2, genres.size, "Expected 2 genres, got $genres")
+        await().until(countEntities(), equalTo(2))
 
         request = HttpRequest.GET<Any>("/genres/list?size=1")
-        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+        var genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
         Assertions.assertEquals(1, genres.size, "Expected 1 genre, got $genres")
         Assertions.assertEquals("DevOps", genres[0].name)
 
@@ -94,6 +92,13 @@ class GenreControllerTest { // <3>
             response = httpClient.toBlocking().exchange(request)
             Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
         }
+    }
+
+    private fun countEntities() = { ->
+        httpClient
+            .toBlocking()
+            .retrieve(HttpRequest.GET<Any>("/genres/list"), Argument.listOf(Genre::class.java))
+            .size
     }
 
     private fun entityId(response: HttpResponse<*>): Long? {
