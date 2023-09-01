@@ -687,21 +687,24 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
 <span class="keyword">import</span> <span class="include">java.util.Collections</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.concurrent.Callable</span>;
 
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.awaitility.Awaitility.await</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.hamcrest.Matchers.equalTo</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertThrows</span>;
 
 <span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@TestInstance</span>(TestInstance.Lifecycle.PER_CLASS) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">GenreControllerTest</span> {
+<span class="type">class</span> <span class="class">GenreControllerTest</span> {
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
     HttpClient httpClient; <i class="conum" data-value="3"></i><b>(3)</b>
 
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testFindNonExistingGenreReturns404() {
+    <span class="type">void</span> testFindNonExistingGenreReturns404() {
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () -&gt; {
             httpClient.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/99</span><span class="delimiter">&quot;</span></span>));
         });
@@ -711,7 +714,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
     }
 
     <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testGenreCrudOperations() {
+    <span class="type">void</span> testGenreCrudOperations() {
         <span class="predefined-type">List</span>&lt;<span class="predefined-type">Long</span>&gt; genreIds = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
 
         HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="4"></i><b>(4)</b>
@@ -742,23 +745,17 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
         genre = httpClient.toBlocking().retrieve(request, Genre.class);
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micro-services</span><span class="delimiter">&quot;</span></span>, genre.getName());
 
-        request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list</span><span class="delimiter">&quot;</span></span>);
-        <span class="predefined-type">List</span>&lt;Genre&gt; genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
-
-        assertEquals(<span class="integer">2</span>, genres.size(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Expected 2 genres, received: </span><span class="delimiter">&quot;</span></span> + genres);
+        await().until(countGenres(), equalTo(<span class="integer">2</span>));
 
         request = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/ex</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Microservices</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="4"></i><b>(4)</b>
         response = httpClient.toBlocking().exchange(request);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
-        request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list</span><span class="delimiter">&quot;</span></span>);
-        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
-
-        assertEquals(<span class="integer">2</span>, genres.size(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Expected 2 genres, received: </span><span class="delimiter">&quot;</span></span> + genres);
+        await().until(countGenres(), equalTo(<span class="integer">2</span>));
 
         request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list?size=1</span><span class="delimiter">&quot;</span></span>);
-        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
+        <span class="predefined-type">List</span>&lt;Genre&gt; genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre.class));
 
         assertEquals(<span class="integer">1</span>, genres.size(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Expected 1 genre, received: </span><span class="delimiter">&quot;</span></span> + genres);
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">DevOps</span><span class="delimiter">&quot;</span></span>, genres.get(<span class="integer">0</span>).getName());
@@ -780,6 +777,12 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
             response = httpClient.toBlocking().exchange(request);
             assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
         }
+    }
+
+    <span class="directive">private</span> <span class="predefined-type">Callable</span>&lt;<span class="predefined-type">Integer</span>&gt; countGenres() {
+        <span class="keyword">return</span> () -&gt; httpClient
+                .toBlocking()
+                .retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/genres/list</span><span class="delimiter">&quot;</span></span>), Argument.listOf(Genre.class)).size();
     }
 
     <span class="directive">protected</span> <span class="predefined-type">Long</span> entityId(HttpResponse&lt;?&gt; response) {

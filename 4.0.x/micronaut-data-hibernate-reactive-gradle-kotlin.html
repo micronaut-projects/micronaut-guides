@@ -624,6 +624,8 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 
 import jakarta.inject.Inject
+import org.awaitility.Awaitility.await
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -673,20 +675,16 @@ class GenreControllerTest { <i class="conum" data-value="3"></i><b>(3)</b>
         genre = httpClient.toBlocking().retrieve(request, Genre::class.java)
         Assertions.assertEquals(&quot;Micro-services&quot;, genre.name)
 
-        request = HttpRequest.GET&lt;Any&gt;(&quot;/genres/list&quot;)
-        var genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
-        Assertions.assertEquals(2, genres.size, &quot;Expected 2 genres, got $genres&quot;)
+        await().until(countEntities(), equalTo(2))
 
         request = HttpRequest.POST(&quot;/genres/ex&quot;, mapOf(&quot;name&quot; to &quot;Microservices&quot;)) <i class="conum" data-value="4"></i><b>(4)</b>
         response = httpClient.toBlocking().exchange(request)
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
 
-        request = HttpRequest.GET&lt;Any&gt;(&quot;/genres/list&quot;)
-        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
-        Assertions.assertEquals(2, genres.size, &quot;Expected 2 genres, got $genres&quot;)
+        await().until(countEntities(), equalTo(2))
 
         request = HttpRequest.GET&lt;Any&gt;(&quot;/genres/list?size=1&quot;)
-        genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
+        var genres = httpClient.toBlocking().retrieve(request, Argument.listOf(Genre::class.java))
         Assertions.assertEquals(1, genres.size, &quot;Expected 1 genre, got $genres&quot;)
         Assertions.assertEquals(&quot;DevOps&quot;, genres[0].name)
 
@@ -706,6 +704,13 @@ class GenreControllerTest { <i class="conum" data-value="3"></i><b>(3)</b>
             response = httpClient.toBlocking().exchange(request)
             Assertions.assertEquals(HttpStatus.NO_CONTENT, response.status)
         }
+    }
+
+    private fun countEntities() = { -&gt;
+        httpClient
+            .toBlocking()
+            .retrieve(HttpRequest.GET&lt;Any&gt;(&quot;/genres/list&quot;), Argument.listOf(Genre::class.java))
+            .size
     }
 
     private fun entityId(response: HttpResponse&lt;*&gt;): Long? {
