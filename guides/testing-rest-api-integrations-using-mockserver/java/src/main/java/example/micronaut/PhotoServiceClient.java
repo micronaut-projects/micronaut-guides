@@ -8,6 +8,7 @@ import java.util.List;
 
 @Client(id = "photosapi")
 interface PhotoServiceClient {
+
     @Get("/albums/{albumId}/photos")
     List<Photo> getPhotos(@PathVariable Long albumId);
 }
