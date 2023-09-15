@@ -321,11 +321,10 @@ class TeamConfiguration  {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">    @Test
     fun testTeamConfiguration() {
-        val names = Arrays.asList(&quot;Nirav Assar&quot;, &quot;Lionel Messi&quot;)
-        val items: MutableMap&lt;String, Any&gt; = HashMap()
-        items[&quot;team.name&quot;] = &quot;evolution&quot;
-        items[&quot;team.color&quot;] = &quot;green&quot;
-        items[&quot;team.player-names&quot;] = names
+        val names = listOf(&quot;Nirav Assar&quot;, &quot;Lionel Messi&quot;)
+        val items = mapOf(&quot;team.name&quot; to &quot;evolution&quot;,
+            &quot;team.color&quot; to &quot;green&quot;,
+            &quot;team.player-names&quot; to names)
 
         val ctx = ApplicationContext.run(items) <i class="conum" data-value="1"></i><b>(1)</b>
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
@@ -333,7 +332,10 @@ class TeamConfiguration  {
         assertEquals(&quot;evolution&quot;, teamConfiguration.name)
         assertEquals(&quot;green&quot;, teamConfiguration.color)
         assertEquals(names.size, teamConfiguration.playerNames!!.size)
-        names.forEach(Consumer { name: String? -&gt; assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
+
+        names.forEach {
+            assertTrue(teamConfiguration.playerNames!!.contains(it))
+        }
 
         ctx.close()
     }</code></pre>
@@ -502,14 +504,13 @@ class TeamConfiguration  {
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">    @Test
     fun testTeamConfigurationBuilder() {
-        val names = Arrays.asList(&quot;Nirav Assar&quot;, &quot;Lionel Messi&quot;)
-        val items: MutableMap&lt;String, Any&gt; = HashMap()
-        items[&quot;team.name&quot;] = &quot;evolution&quot;
-        items[&quot;team.color&quot;] = &quot;green&quot;
-        items[&quot;team.team-admin.manager&quot;] = &quot;Jerry Jones&quot; <i class="conum" data-value="1"></i><b>(1)</b>
-        items[&quot;team.team-admin.coach&quot;] = &quot;Tommy O'Neill&quot;
-        items[&quot;team.team-admin.president&quot;] = &quot;Mark Scanell&quot;
-        items[&quot;team.player-names&quot;] = names
+        val names = listOf(&quot;Nirav Assar&quot;, &quot;Lionel Messi&quot;)
+        val items = mapOf(&quot;team.name&quot; to &quot;evolution&quot;,
+            &quot;team.color&quot; to &quot;green&quot;,
+            &quot;team.team-admin.manager&quot; to &quot;Jerry Jones&quot;, <i class="conum" data-value="1"></i><b>(1)</b>
+            &quot;team.team-admin.coach&quot; to &quot;Tommy O'Neill&quot;,
+            &quot;team.team-admin.president&quot; to &quot;Mark Scanell&quot;,
+            &quot;team.player-names&quot; to names)
 
         val ctx = ApplicationContext.run(items)
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
