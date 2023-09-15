@@ -9,8 +9,9 @@ import java.util.Optional;
 
 @Repository // <1>
 public interface ProductRepository extends JpaRepository<Product, Long> { // <2>
-  Optional<Product> findByCode(String code);
 
-  @Query("update Product p set p.price = :price where p.code = :productCode") // <3>
-  void updateProductPrice(String productCode, BigDecimal price);
+    Optional<Product> findByCode(String code);
+
+    @Query("update Product p set p.price = :price where p.code = :productCode") // <3>
+    void updateProductPrice(String productCode, BigDecimal price);
 }

@@ -13,9 +13,11 @@ import static org.awaitility.Awaitility.await;
 
 @MicronautTest(transactional = false) // <1>
 class ProductPriceChangedEventHandlerTest {
+
     @Test
-    void shouldHandleProductPriceChangedEvent(ProductPriceChangesClient productPriceChangesClient,
-                                              ProductRepository productRepository
+    void shouldHandleProductPriceChangedEvent(
+            ProductPriceChangesClient productPriceChangesClient,
+            ProductRepository productRepository
     ) {
         Product product = new Product(null, "P100", "Product One", BigDecimal.TEN);
         Long id = productRepository.save(product).getId(); // <2>

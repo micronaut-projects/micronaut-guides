@@ -6,6 +6,7 @@ import io.micronaut.configuration.kafka.annotation.Topic;
 
 @KafkaClient
 public interface ProductPriceChangesClient {
+
     @Topic("product-price-changes")
-    public void send(@KafkaKey String productCode, ProductPriceChangedEvent event);
+    void send(@KafkaKey String productCode, ProductPriceChangedEvent event);
 }

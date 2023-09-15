@@ -13,18 +13,18 @@ import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST;
 @Transactional // <2>
 class ProductPriceChangedEventHandler {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ProductPriceChangedEventHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProductPriceChangedEventHandler.class);
 
-  private final ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-  ProductPriceChangedEventHandler(ProductRepository productRepository) { // <3>
-    this.productRepository = productRepository;
-  }
+    ProductPriceChangedEventHandler(ProductRepository productRepository) { // <3>
+        this.productRepository = productRepository;
+    }
 
-  @Topic("product-price-changes") // <4>
-  @KafkaListener(offsetReset = EARLIEST, groupId = "demo") // <5>
-  public void handle(ProductPriceChangedEvent event) {
-    LOG.info("Received a ProductPriceChangedEvent with productCode:{}: ", event.productCode());
-    productRepository.updateProductPrice(event.productCode(), event.price());
-  }
+    @Topic("product-price-changes") // <4>
+    @KafkaListener(offsetReset = EARLIEST, groupId = "demo") // <5>
+    public void handle(ProductPriceChangedEvent event) {
+        LOG.info("Received a ProductPriceChangedEvent with productCode:{}: ", event.productCode());
+        productRepository.updateProductPrice(event.productCode(), event.price());
+    }
 }
