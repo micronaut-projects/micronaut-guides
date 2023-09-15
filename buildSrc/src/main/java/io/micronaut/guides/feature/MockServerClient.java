@@ -10,10 +10,14 @@ import io.micronaut.starter.feature.database.TestContainers;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class MockServer implements Feature {
+public class MockServerClient implements Feature {
+
+    public static final String ARTIFACT_ID_MOCKSERVER_CLIENT_JAVA = "mockserver-client-java";
+    public static final String ARTIFACT_ID_TEST_CONTAINERS_MOCKSERVER = "mockserver";
+
     @Override
     public @NonNull String getName() {
-        return "mock-server";
+        return "mockserver-client-java";
     }
 
     @Override
@@ -23,15 +27,18 @@ public class MockServer implements Feature {
 
     @Override
     public @Nullable String getThirdPartyDocumentation() {
-        return "https://www.mock-server.com";
+        return "https://www.mock-server.com/mock_server/mockserver_clients.html#java-mockserver-client";
     }
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        if (generatorContext.getFeatures().hasFeature(TestContainers.class)) {
-            generatorContext.addDependency(Dependency.builder().groupId(TestContainers.TESTCONTAINERS_GROUP_ID).artifactId("mockserver").test().build());
-        }
+        addDependencies(generatorContext);
+    }
 
-        generatorContext.addDependency(Dependency.builder().groupId("org.mock-server").artifactId("mockserver-netty").version("5.15.0").test().build());
+    protected void addDependencies(GeneratorContext generatorContext) {
+        if (generatorContext.getFeatures().hasFeature(TestContainers.class)) {
+            generatorContext.addDependency(Dependency.builder().groupId(TestContainers.TESTCONTAINERS_GROUP_ID).artifactId(ARTIFACT_ID_TEST_CONTAINERS_MOCKSERVER).test().build());
+        }
+        generatorContext.addDependency(Dependency.builder().lookupArtifactId(ARTIFACT_ID_MOCKSERVER_CLIENT_JAVA).test());
     }
 }
