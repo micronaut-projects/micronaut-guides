@@ -1,0 +1,185 @@
+common:header-top.adoc[]
+
+In this guide you will learn how to
+
+* Create a Micronaut application with https://www.confluent.io/lp/apache-kafka/[Kafka] integration.
+* Implement a Kafka Listener and persist data in https://www.mysql.com[MySQL] database
+* Test the Kafka Listener using https://testcontainers.com[Testcontainers] and http://www.awaitility.org[Awaitility].
+
+common:requirements.adoc[]
+
+common:docker-testcontainers.adoc[]
+
+common:completesolution.adoc[]
+
+== What we are going to achieve in this guide
+We are going to create a Micronaut project with *Kafka*, *Micronaut Data JPA* and *MySQL*,
+where we implement a Kafka Listener which receives an event payload and persists the event data in the database.
+Then we will test this Kafka Listener using the Testcontainers Kafka
+and MySQL modules in conjunction with http://www.awaitility.org/[Awaitility].
+
+
+The generated application has http://www.awaitility.org[Awaitility] library as test dependency
+which we can use for asserting the expectations of an asynchronous process flow.
+
+common:create-app-features-testcontainers.adoc[]
+
+== Testcontainers Dependencies
+
+The generated application contains the following Testcontainers dependencies:
+
+dependency:testcontainers[groupId=org.testcontainers,scope=test]
+
+dependency:kafka[groupId=org.testcontainers,scope=test]
+
+dependency:mysql[groupId=org.testcontainers,scope=test]
+
+== Datasource Configuration
+
+The generated application contains the following configuration:
+
+resource:application.properties[app=testcontainers,tag=datasource]
+
+NOTE: Note the configuration does not contain any database URL, username or password. It does not contain the Kafka bootstrap servers' location either. We will configure them in the test or via Micronaut Test Resources.
+
+== Getting Started
+
+We are going to implement a Kafka Listener listening to a topic named `product-price-changes`
+and upon receiving a message we are going to extract product code and price from the event payload
+and update the price of that product in the MySQL database.
+
+== Create JPA entity
+
+First let us start with creating a JPA entity *Product.java*.
+
+source:Product[app=testcontainers]
+
+== Create Micronaut Data JPA repository
+
+Let us create a Micronaut Data JPA repository interface for the *Product* entity and
+add methods to find a product for a given code and update the price for the given product code as follows:
+
+source:ProductRepository[app=testcontainers]
+
+callout:repository[1]
+callout:jparepository[2]
+callout:at-query[3]
+
+== Create the event payload java bean
+
+Let us create a domain object named ProductPriceChangedEvent as a record representing the structure of the event payload
+that we are going to receive from the Kafka topic.
+
+source:ProductPriceChangedEvent[app=testcontainers]
+
+callout:serdeable[1]
+
+== Implement Kafka Listener
+
+Finally, let us implement the Kafka listener which handles the messages received from the *product-price-changes* topic
+and updates the product price in the database.
+
+common:kafka-listener[]
+
+source:ProductPriceChangedEventHandler[app=testcontainers]
+
+callout:singleton[1]
+callout:transactional[2]
+callout:constructor-di[number=3,arg0=ProductRepository]
+callout:kafka-topic-listener[4]
+callout:kafka-listener-offset-reset-earliest[5]
+
+Let us assume that there is an agreement between the sender and receiver that the payload will be sent in the following JSON format:
+
+[source,json]
+----
+{
+  "productCode": "P100",
+  "price": 25.00
+}
+----
+
+== Testing
+
+=== Write Test for Kafka Listener
+We are going to write a test for the Kafka event listener *ProductPriceChangedEventHandler*
+by sending a message to the product-price-changes topic and verify the updated product price in the database.
+
+But in order to successfully start our Micronaut context we need Kafka and the MySQL database up and running
+and configure the Micronaut context to talk to them.
+
+Create a `@KafkaClient` to simplify publishing events in the test.
+
+test:ProductPriceChangesClient[app=testcontainers]
+
+callout:kafka-client.adoc[1]
+callout:kafka-topic-publisher.adoc[2]
+callout:kafka-key.adoc[3]
+
+We will use the Testcontainers library to spin up a Kafka and the MySQL database instances as Docker containers
+and configure the application to talk to them as follows:
+
+test:ProductPriceChangedEventHandlerTest[app=testcontainers]
+
+callout:micronaut-test-transactional-false[1]
+<2> Annotate the class with `@Property` to supply the driver class name configuration to the test.
+<3> We have configured the https://java.testcontainers.org/modules/databases/jdbc/[Testcontainers special JDBC URL] to spin up a MySQL container and configure it as a DataSource with Micronaut application context.
+callout:test-containers-disabled-without-docker[4]
+callout:test-instance-per-class[5]
+callout:test-property-provider[6]
+<7> We have used the Testcontainers JUnit 5 Extension annotations *@Testcontainers* and *@Container* to spin up a Kafka container and registered the *bootstrap-servers* location using *TestPropertyProvider* mechanism.
+<8> We have created a Product record in the database before sending the event.
+<9> During the test, we sent a message to the *product-price-changes* topic using *KafkaTemplate* with productCode as key and *ProductPriceChangedEvent* instance as value.
+<10> As Kafka message processing is an asynchronous process, we are using the *Awaitility* library to check whether the product price is updated in the database to the expected value or not with an interval of 3 seconds waiting up to a maximum of 10 seconds. If the message is consumed and processed within 10 seconds the test will pass, otherwise the test will fail.
+Let us understand what is going on in this test.
+
+common:testApp.adoc[]
+
+You should see the Kafka and MySQL Docker containers are started and all tests should PASS.
+
+You can also notice that after the tests are executed the containers are stopped and removed automatically.
+
+== Testing Kafka integration with Test Resources
+
+common:test-resources.adoc[]
+
+=== Removing Testcontainers Dependencies
+
+Remove the <<testcontainers-dependencies,Testcontainers dependencies>> from your build files.
+
+=== Configure Test Resources
+
+common:install-test-resources.adoc[]
+
+=== Test Resources Kafka
+
+common:test-resources-kafka-test-or-dev.adoc[]
+
+=== Simpler Test with Test Resources
+
+Thanks to Test Resources, we can simplify the test as follows:
+
+test:ProductPriceChangedEventHandlerTest[app=testresources]
+
+If you run the test, you will see a MySQL container and Kafka container being started by Test Resources through integration with Testcontainers to provide throwaway containers for testing.
+
+common:test-resources-benefits.adoc[]
+
+== Summary
+
+We have learned how to test Kafka message listeners using a real Kafka instance with Testcontainers
+and verified the expected result using Awaitility. If we are using Kafka and MySQL in production,
+it is often the best approach to test with real Kafka and MySQL instances in order to allow our test suite to provide us
+with more confidence about the correctness of our code.
+
+
+== Next Steps
+
+Learn more about:
+
+* https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut Kafka]
+* https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/#modules-kafka[Micronaut Test Resources]
+* http://testcontainers.com[Testcontainers].
+* http://www.awaitility.org/[Awaitility]
+
+common:helpWithMicronaut.adoc[]
