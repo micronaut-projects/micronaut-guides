@@ -4,18 +4,15 @@ import io.micronaut.context.ApplicationContext
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.util.Arrays
-import java.util.function.Consumer
 
 class TeamConfigurationTest {
     //tag::teamConfigSpecNoBuilder[]
     @Test
     fun testTeamConfiguration() {
-        val names = Arrays.asList("Nirav Assar", "Lionel Messi")
-        val items: MutableMap<String, Any> = HashMap()
-        items["team.name"] = "evolution"
-        items["team.color"] = "green"
-        items["team.player-names"] = names
+        val names = listOf("Nirav Assar", "Lionel Messi")
+        val items = mapOf("team.name" to "evolution",
+            "team.color" to "green",
+            "team.player-names" to names)
 
         val ctx = ApplicationContext.run(items) // <1>
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
@@ -23,7 +20,10 @@ class TeamConfigurationTest {
         assertEquals("evolution", teamConfiguration.name)
         assertEquals("green", teamConfiguration.color)
         assertEquals(names.size, teamConfiguration.playerNames!!.size)
-        names.forEach(Consumer { name: String? -> assertTrue(teamConfiguration.playerNames!!.contains(name!!)) })
+
+        names.forEach {
+            assertTrue(teamConfiguration.playerNames!!.contains(it))
+        }
 
         ctx.close()
     }
@@ -42,14 +42,13 @@ class TeamConfigurationTest {
     //tag::teamConfigSpecBuilder[]
     @Test
     fun testTeamConfigurationBuilder() {
-        val names = Arrays.asList("Nirav Assar", "Lionel Messi")
-        val items: MutableMap<String, Any> = HashMap()
-        items["team.name"] = "evolution"
-        items["team.color"] = "green"
-        items["team.team-admin.manager"] = "Jerry Jones" // <1>
-        items["team.team-admin.coach"] = "Tommy O'Neill"
-        items["team.team-admin.president"] = "Mark Scanell"
-        items["team.player-names"] = names
+        val names = listOf("Nirav Assar", "Lionel Messi")
+        val items = mapOf("team.name" to "evolution",
+            "team.color" to "green",
+            "team.team-admin.manager" to "Jerry Jones", // <1>
+            "team.team-admin.coach" to "Tommy O'Neill",
+            "team.team-admin.president" to "Mark Scanell",
+            "team.player-names" to names)
 
         val ctx = ApplicationContext.run(items)
         val teamConfiguration = ctx.getBean(TeamConfiguration::class.java)
