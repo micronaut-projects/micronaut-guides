@@ -3,16 +3,15 @@ package io.micronaut.guides.feature;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
-import io.micronaut.starter.build.dependencies.Dependency;
+import io.micronaut.starter.build.dependencies.MicronautDependencyUtils;
 import io.micronaut.starter.feature.Feature;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class JakartaPersistenceApi implements Feature {
-
+public class MicronautDataSpringJdbc implements Feature {
     @Override
     public @NonNull String getName() {
-        return "jakarta-persistence-api";
+        return "micronaut-data-spring-jdbc";
     }
 
     @Override
@@ -22,6 +21,6 @@ public class JakartaPersistenceApi implements Feature {
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(Dependency.builder().groupId("jakarta.persistence").artifactId("jakarta.persistence-api").compileOnly().build());
+        generatorContext.addDependency(MicronautDependencyUtils.dataDependency().artifactId("micronaut-data-spring-jdbc").compile());
     }
 }

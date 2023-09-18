@@ -1,0 +1,288 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide you will learn how to:
+
+* Replace an https://www.h2database.com/html/main.html[H2] in-memory database that is used for testing with the same type of database that you use in production.
+* How to use the special https://java.testcontainers.org/modules/databases/jdbc/[Testcontainers JDBC URL] to use database containers.
+* Use the https://java.testcontainers.org/test_framework_integration/junit_5/[Testcontainers JUnit 5] Extension to initialize database.
+* Test https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data] repositories.
+
+common:requirements.adoc[]
+
+common:docker-testcontainers.adoc[]
+
+common:completesolution.adoc[]
+
+== What we are going to achieve in this guide
+
+We are going to create a sample Micronaut application using *Micronaut Data JPA* and *PostgreSQL*.
+
+We will take a look at the common practice of using an https://www.h2database.com/html/main.html[H2] in-memory database for testing and
+understand the downsides of this approach. Then we will learn how we can replace this approach
+by testing with the same type of database (PostgreSQL in our case) that we use in production
+using Testcontainers JDBC URL. Finally, we will look into how we can simplify testing with https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources].
+
+== Getting Started
+
+common:create-app-features-h2.adoc[]
+
+== Create Entity
+
+First let us start with creating a JPA entity *Product.java*.
+
+source:Product[app=h2]
+
+callout:jpa-table[1]
+callout:jpa-entity[2]
+callout:jpa-id[3]
+callout:jpa-column[4]
+
+== Micronaut Data Repository
+
+Let us create a Micronaut Data `@Repository` interface for the *Product* entity.
+
+source:ProductRepository[app=h2,tags=clazz|close]]
+
+callout:repository[1]
+callout:jparepository[2]
+
+== Testing with H2 in-memory database
+
+One of the approaches for testing database repositories is using lightweight databases such as https://www.h2database.com/html/main.html[H2] or https://hsqldb.org[HSQL]
+as in-memory databases while using a different database like https://www.postgresql.org[PostgreSQL], https://www.mysql.com[MySQL] or https://www.oracle.com/uk/database[Oracle] in production.
+
+The drawbacks of using a different database for testing are:
+
+* The test database might not support all the features of your production database
+* The SQL query syntax might not be compatible with both in-memory database and your production database.
+* Testing with a different database than what you use for production will not give you complete confidence in your test suite.
+
+But still, in-memory databases like https://www.h2database.com/html/main.html[H2] are being predominantly used for testing because of their ease of use.
+
+=== Datasource Configuration
+
+To use H2, add the following configuration to define your datasource.
+
+resource:application.properties[app=h2,tag=datasource]
+
+=== H2 Dependency
+
+Add the H2 driver dependency:
+
+dependency:h2[groupId=com.h2database,scope=testRuntimeOnly]
+
+=== Seed Data
+
+We will load the seed data in the tests:
+
+testResource:sql/seed-data.sql[app=h2]
+
+Create a utils class which we will use in the tests.
+
+test:SqlUtils[app=h2]
+
+=== ProductRepository Test
+
+Let us see how we can write tests for our *ProductRepository* using https://www.h2database.com/html/main.html[H2].
+
+test:ProductRepositoryTest[app=h2]
+
+If you run this test, the application uses the https://www.h2database.com/html/main.html[H2] in-memory database.
+
+The test loads the sample data required for our test, calls the repository method, and asserts the expected result.
+
+But the challenge comes when we want to use features supported only by our production database,
+but not by https://www.h2database.com/html/main.html[H2] database.
+
+For example, let us imagine we want to implement a feature where we want to create a new product if a product with a given code does not already exist; otherwise, don’t create a new product.
+
+In PostgreSQL we can implement this using the following query:
+
+[source,sql]
+----
+INSERT INTO products(id, code, name) VALUES(?,?,?) ON CONFLICT DO NOTHING;
+----
+
+But the same query doesn't work with https://www.h2database.com/html/main.html[H2] by default.
+When you execute the above query with https://www.h2database.com/html/main.html[H2] then you will get the following exception:
+
+[source,shell]
+----
+Caused by: org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "INSERT INTO products (id, code, name) VALUES (?, ?, ?) ON[*] CONFLICT DO NOTHING";"
+----
+
+You can run https://www.h2database.com/html/main.html[H2] with PostgreSQL compatibility mode to support PostgreSQL syntax
+but still not all the features are supported by https://www.h2database.com/html/main.html[H2].
+
+The inverse scenario is also possible where some query works fine with https://www.h2database.com/html/main.html[H2] but not in PostgreSQL.
+For example, https://www.h2database.com/html/main.html[H2] supports the *ROWNUM()* function where PostgreSQL doesn't.
+So even if you write tests for repositories using https://www.h2database.com/html/main.html[H2] database there is no guarantee that your code works
+in the same way with the production database, and you will need to verify after deploying your application
+which defeats the whole purpose of writing automated tests.
+
+Now, let us see how simple it is to replace the https://www.h2database.com/html/main.html[H2] database with a real Postgres database for testing using Testcontainers.
+
+== ProductRepository
+
+Modify the repository to add a method which uses `ON CONFLICT DO NOTHING`:
+
+source:ProductRepository[app=postgresql,tags=clazz|methods|close]]
+
+callout:repository[1]
+callout:jparepository[2]
+callout:at-query[3]
+
+== Testing using Testcontainers
+
+=== PostgreSQL Configuration
+
+Replace the Datasource configuration with the PostgreSQL configuration.
+
+resource:application.properties[app=postgresql,tag=datasource]
+
+We disable schema generation with `jpa.default.properties.hibernate.hbm2ddl.auto=none`. We will use a https://java.testcontainers.org/modules/databases/jdbc/#using-a-classpath-init-script[classpath init script with Testcontainers] instead to load the following SQL file.
+
+testResource:sql/init-db.sql[app=postgresql]
+
+=== PostgreSQL Driver dependency
+
+Remove <<h2-dependency, H2 Dependency>> and add the PostgreSQL driver dependency instead:
+
+dependency:postgresql[groupId=org.postgresql,scope=testRuntimeOnly]
+
+=== Testcontainers Dependencies
+
+Add the Testcontainers dependencies:
+
+dependency:testcontainers[groupId=org.testcontainers,scope=test]
+
+dependency:postgresql[groupId=org.testcontainers,scope=test]
+
+=== Testcontainers JDBC URL
+
+Use https://www.testcontainers.org/modules/databases/jdbc/[Testcontainers *special JDBC URL*] as the data source URL in the test.
+
+test:ProductRepositoryWithJdbcUrlTest[app=postgresql]
+
+callout:micronaut-test-transactional-false[1]
+callout:property-driver-class[1]
+callout:property-jdbc-url[1]
+
+Now if you run the test, you can see in the console logs that our test is using a PostgreSQL database
+instead of the https://www.h2database.com/html/main.html[H2] in-memory database. *It is as simple as that!*
+
+Let us understand how this test works.
+
+If we have Testcontainers and the appropriate JDBC driver on the classpath, we can simply use
+the special JDBC connection URLs to get a fresh containerized instance of the database each time
+the application starts up.
+
+The actual PostgreSQL JDBC URL looks like: *jdbc:postgresql://localhost:5432/postgres*
+
+To get the special JDBC URL, insert *tc:* after *jdbc:* as follows.
+(Note that the hostname, port and database name will be ignored;
+so you can leave these as-is or set them to any value.)
+
+[source]
+----
+jdbc:tc:postgresql:///db
+----
+
+We can also indicate which version of PostgreSQL database to use by specifying the Docker image tag after *postgresql* as follows:
+
+[source]
+----
+jdbc:tc:postgresql:15.2-alpine:///db
+----
+
+Here we have appended the tag *15.2-alpine* to *postgresql* so that our test will use a PostgreSQL container
+created from *postgres:15.2-alpine* image.
+
+You can also initialize the database using a SQL script by passing *TC_INITSCRIPT* parameter as follows:
+
+[source]
+----
+jdbc:tc:postgresql:15.2-alpine:///db?TC_INITSCRIPT=sql/init-db.sql
+----
+
+Testcontainers will automatically execute the SQL script that was specified using the *TC_INITSCRIPT* parameter.
+However, ideally you should be using a proper database migration tool like https://guides.micronaut.io/latest/micronaut-flyway.html[*Flyway*] or https://guides.micronaut.io/latest/micronaut-liquibase.html[*Liquibase*].
+
+The special JDBC URL also works for other databases such as *MySQL*, *PostGIS*, *YugabyteDB*, *CockroachDB* etc.
+
+=== Initializing the database container using Testcontainers and JUnit
+
+If using special JDBC URL doesn't meet your needs, or you need more control over the container creation,
+then you can use the JUnit 5 Testcontainers Extension as follows:
+
+test:ProductRepositoryTest[app=postgresql]
+
+callout:micronaut-test-transactional-false[1]
+callout:test-containers-disabled-without-docker[2]
+callout:test-instance-per-class[3]
+callout:test-property-provider[4]
+
+We have used the Testcontainers JUnit 5 extension annotations *@Testcontainers* and *@Container*
+to start *PostgreSQLContainer* and register the data source properties for the Test using
+the dynamic property registration through the *TestPropertyProvider* API.
+
+== Testing with Test Resources
+
+common:test-resources.adoc[]
+
+=== Removing Testcontainers Dependencies
+
+Remove the <<testcontainers-dependencies,Testcontainers dependencies>> from your build files.
+
+=== Configure Test Resources
+
+common:install-test-resources.adoc[]
+
+common:test-resources-postgres.adoc[]
+
+=== Simpler Test with Test Resources
+
+Thanks to Test Resources, we can simplify the test as follows:
+
+test:ProductRepositoryTest[app=postgresqltestresources]
+
+callout:micronaut-test-transactional-false[1]
+callout:property-init-script-path[2]
+
+If you run the test, you will see a PostgreSQL container being started by Test Resources through integration with Testcontainers to provide throwaway containers for testing.
+
+common:test-resources-benefits.adoc[]
+
+== Micronaut Data JDBC
+
+https://micronaut-projects.github.io/micronaut-data/latest/guide/#jdbc[Micronaut Data JDBC] goes one step further, you have
+to specify the dialect in the `JdbcRepository` annotation. Micronaut Data JDBC pre-computes native SQL queries for the specified dialect, providing a repository implementation that is a simple data mapper between a native result set and an entity.
+
+A Micronaut JDBC repository for this sample application would look like:
+
+source:ProductRepository[app=jdbc]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:at-query[3]
+
+== Summary
+We have looked into how to test Micronaut Data JPA repositories using https://www.h2database.com/html/main.html[H2] in-memory database and talked about
+the drawbacks of using different (in-memory) databases for testing while using a different type of database
+in production.
+
+Then we learned about how simply we can replace https://www.h2database.com/html/main.html[H2] database with a real database for testing using
+Testcontainers special JDBC URL. We also looked at using Testcontainers JUnit 5 extension annotations
+to spin up the database for testing which gives more control over the lifecycle of the database container.
+
+We learned that Micronaut Test Resources streamlines testing with throwaway containers through its integration with Testcontainers.
+
+== Further Reading
+* https://www.testcontainers.org/modules/databases/postgres/[Testcontainers Postgres Module]
+* https://www.testcontainers.org/modules/databases/jdbc/[Testcontainers JDBC Support]
+* https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/#modules-kafka[Micronaut Test Resources]
+* http://testcontainers.com[Testcontainers]
+
+common:helpWithMicronaut.adoc[]
