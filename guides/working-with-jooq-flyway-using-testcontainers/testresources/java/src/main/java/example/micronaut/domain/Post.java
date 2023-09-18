@@ -10,4 +10,5 @@ public record Post(
         User createdBy,
         List<Comment> comments,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt) {}
+        LocalDateTime updatedAt
+) {}

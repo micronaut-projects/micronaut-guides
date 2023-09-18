@@ -11,6 +11,7 @@ import org.jooq.DSLContext;
 
 @Singleton // <1>
 class UserRepository {
+
     private final DSLContext dsl;
 
     UserRepository(DSLContext dsl) { // <2>

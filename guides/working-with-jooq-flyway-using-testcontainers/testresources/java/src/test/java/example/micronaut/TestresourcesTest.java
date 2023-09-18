@@ -17,5 +17,4 @@ class TestresourcesTest {
     void testItWorks() {
         Assertions.assertTrue(application.isRunning());
     }
-
 }

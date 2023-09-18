@@ -14,6 +14,7 @@ class UserRepositoryTest extends AbstractTest {
 
     @Inject
     UserRepository repository;
+
     @Test
     void shouldCreateUserSuccessfully() {
         User user = new User(null, "John", "john@gmail.com");

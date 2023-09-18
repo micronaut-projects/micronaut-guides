@@ -32,6 +32,4 @@ class UserRepositoryTest {
         assertThat(user.name()).isEqualTo("Siva");
         assertThat(user.email()).isEqualTo("siva@gmail.com");
     }
-
-
 }

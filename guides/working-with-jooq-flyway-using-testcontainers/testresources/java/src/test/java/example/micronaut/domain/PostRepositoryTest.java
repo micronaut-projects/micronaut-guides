@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false) // <1>
 class PostRepositoryTest {
+
     @Test
     void shouldGetPostById(PostRepository repository) {
         Optional<Post> postOptional = repository.getPostById(1L);

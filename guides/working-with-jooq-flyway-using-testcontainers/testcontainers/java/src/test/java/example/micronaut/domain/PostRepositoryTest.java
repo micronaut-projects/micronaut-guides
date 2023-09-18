@@ -1,7 +1,6 @@
 package example.micronaut.domain;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -13,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
 @Testcontainers(disabledWithoutDocker = true) // <3>
 class PostRepositoryTest extends AbstractTest {
+
     @Test
     void shouldGetPostById(PostRepository repository) {
         Optional<Post> postOptional = repository.getPostById(1L);

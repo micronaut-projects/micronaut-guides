@@ -22,5 +22,4 @@ class TestcontainersTest extends AbstractTest {
     void testItWorks() {
         Assertions.assertTrue(application.isRunning());
     }
-
 }
