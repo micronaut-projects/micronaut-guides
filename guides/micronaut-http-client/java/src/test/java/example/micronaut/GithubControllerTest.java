@@ -52,11 +52,11 @@ class GithubControllerTest {
     private static void assertReleases(BlockingHttpClient client, String path) {
         HttpRequest<Object> request = HttpRequest.GET(path);
 
-        HttpResponse<List<GithubRelease>> rsp = client.exchange(request, // <3>
-                Argument.listOf(GithubRelease.class)); // <4>
+        HttpResponse<List<GithubRelease>> rsp = client.exchange(request, // <4>
+                Argument.listOf(GithubRelease.class)); // <5>
 
-        assertEquals(HttpStatus.OK, rsp.getStatus());   // <5>
-        assertReleases(rsp.body()); // <6>
+        assertEquals(HttpStatus.OK, rsp.getStatus());   // <6>
+        assertReleases(rsp.body()); // <7>
     }
 
     private static void assertReleases(List<GithubRelease> releases) {
@@ -78,7 +78,7 @@ class GithubControllerTest {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
         Optional<String> coreReleases() {
-            return resourceLoader.getResourceAsStream("releases.json")
+            return resourceLoader.getResourceAsStream("releases.json") // <3>
                     .flatMap(inputStream -> {
                         try {
                             return Optional.of(new String(inputStream.readAllBytes(), UTF_8));

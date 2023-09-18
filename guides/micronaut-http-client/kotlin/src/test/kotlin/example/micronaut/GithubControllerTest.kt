@@ -42,12 +42,12 @@ class GithubControllerTest {
 
     fun assertReleases(client: BlockingHttpClient, path: String) {
         val request : HttpRequest<Any> = HttpRequest.GET(path)
-        val rsp = client.exchange(request, // <3>
-            Argument.listOf(GithubRelease::class.java)) // <4>
-        assertEquals(HttpStatus.OK, rsp.status)   // <5>
+        val rsp = client.exchange(request, // <4>
+            Argument.listOf(GithubRelease::class.java)) // <5>
+        assertEquals(HttpStatus.OK, rsp.status)   // <6>
         val releases = rsp.body()
         assertNotNull(releases)
-        assertReleases(releases.toList()) // <6>
+        assertReleases(releases.toList()) // <7>
     }
 
     fun assertReleases(releases: List<GithubRelease>) {
@@ -63,7 +63,7 @@ class GithubControllerTest {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
         fun coreReleases() : String {
-            return resourceLoader.getResource("releases.json").orElseThrow().readText()
+            return resourceLoader.getResource("releases.json").orElseThrow().readText() // <3>
         }
     }
 
