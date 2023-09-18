@@ -23,6 +23,8 @@ class UserRepositoryTest extends AbstractTest {
         assertThat(savedUser.id()).isNotNull();
         assertThat(savedUser.name()).isEqualTo("John");
         assertThat(savedUser.email()).isEqualTo("john@gmail.com");
+
+        repository.deleteUser(savedUser.id());
     }
 
     @Test

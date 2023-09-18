@@ -208,6 +208,14 @@ then it will give you a compiler error preventing you from making mistakes at th
 
 == Tests
 
+== Testcontainers Dependencies
+
+The generated application contains the following Testcontainers dependencies:
+
+dependency:testcontainers[groupId=org.testcontainers,scope=test]
+
+dependency:postgresql[groupId=org.testcontainers,scope=test]
+
 === Test Seed Data
 
 Before writing the tests, let's create an SQL script to set up the test data by
@@ -275,6 +283,34 @@ callout:test-containers-disabled-without-docker[3]
 common:testApp.adoc[]
 
 You should see all tests PASS. You can also notice that after tests are executed, the containers are stopped and removed automatically.
+
+== Testing with Test Resources
+
+common:test-resources.adoc[]
+
+=== Removing Testcontainers Dependencies
+
+Remove the <<testcontainers-dependencies,Testcontainers dependencies>> from your build files.
+
+=== Configure Test Resources
+
+common:install-test-resources.adoc[]
+
+=== Test Resources PostgreSQL
+
+common:test-resources-postgresql-test-or-dev.adoc[]
+
+=== Simpler Test with Test Resources
+
+Thanks to Test Resources, we can simplify the test, no need for an abstract class, as follows:
+
+test:domain/UserRepositoryTest[app=testresources]
+
+callout:micronaut-test-transactional-false[1]
+
+If you run the test, you will see a PostgreSQL container being started by Test Resources through integration with Testcontainers to provide throwaway containers for testing.
+
+common:test-resources-benefits.adoc[]
 
 == Summary
 

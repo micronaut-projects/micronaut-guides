@@ -8,7 +8,7 @@ import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.template.RockerWritable;
-import io.micronaut.guides.feature.template.testcontainersJooqCodegenMavenPlugin;
+import io.micronaut.guides.feature.template.testcontainersjooqcodegenmavenplugin;
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -34,7 +34,7 @@ public class TestContainersJooqCodegenMavenPlugin implements Feature {
             generatorContext.addBuildPlugin(MavenPlugin.builder()
                     .groupId("org.testcontainers")
                     .artifactId("testcontainers-jooq-codegen-maven-plugin")
-                    .extension(new RockerWritable(testcontainersJooqCodegenMavenPlugin.template(generatorContext.getProject(), "42.6.0")))
+                    .extension(new RockerWritable(testcontainersjooqcodegenmavenplugin.template(generatorContext.getProject(), "42.6.0")))
                     .build());
         }
     }
