@@ -11,15 +11,11 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
 import io.micronaut.http.client.BlockingHttpClient
 import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.StreamingHttpClient
 import io.micronaut.runtime.server.EmbeddedServer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import java.io.BufferedReader
-import java.io.InputStream
-import java.util.*
 import java.util.regex.Pattern
 
 class GithubControllerTest {
@@ -66,19 +62,8 @@ class GithubControllerTest {
     class GithubReleases(val resourceLoader : ResourceLoader) {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
-        fun coreReleases() : Optional<String> {
-            return resourceLoader.getResourceAsStream("releases.json").map(this::inputStreamToString)
-        }
-
-        fun inputStreamToString(inputStream: InputStream) : String {
-            val reader = BufferedReader(inputStream.reader())
-            var content: String
-            try {
-                content = reader.readText()
-            } finally {
-                reader.close()
-            }
-            return content
+        fun coreReleases() : String {
+            return resourceLoader.getResource("releases.json").orElseThrow().readText()
         }
     }
 
