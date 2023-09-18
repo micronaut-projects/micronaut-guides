@@ -18,7 +18,7 @@ import spock.lang.Specification
 
 class GithubControllerSpec extends Specification {
     private static Pattern MICRONAUT_RELEASE =
-            Pattern.compile("[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?")
+            Pattern.compile("Micronaut (Core |Framework )?v?\\d+.\\d+.\\d+( (RC|M)\\d)?")
 
     void "verify GithubReleases can Be fetched With Low Level Http Client"(String path) {
         given:
