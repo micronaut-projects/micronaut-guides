@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.context.annotation.Property;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -18,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest(startApplication = false) // <1>
 class ProductRepositoryTest {
+
     @Inject
     Connection connection;
 
@@ -46,5 +46,4 @@ class ProductRepositoryTest {
         Optional<Product> optionalProduct = productRepository.findById(product.getId());
         assertTrue(optionalProduct.isEmpty());
     }
-
 }

@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 @Property(name = "datasources.default.url",
         value = "jdbc:tc:postgresql:15.2-alpine:///db?TC_INITSCRIPT=sql/init-db.sql") // <3>
 class ProductRepositoryWithJdbcUrlTest {
+
     @Inject
     Connection connection;
 

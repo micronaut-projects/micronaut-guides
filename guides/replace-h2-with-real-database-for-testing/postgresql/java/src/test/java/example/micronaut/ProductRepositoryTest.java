@@ -28,6 +28,7 @@ import org.testcontainers.utility.MountableFile;
 @Testcontainers(disabledWithoutDocker = true) // <2>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <3>
 class ProductRepositoryTest implements TestPropertyProvider {  // <4>
+
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
             "postgres:15.2-alpine"
@@ -72,5 +73,4 @@ class ProductRepositoryTest implements TestPropertyProvider {  // <4>
         Optional<Product> optionalProduct = productRepository.findById(product.getId());
         assertTrue(optionalProduct.isEmpty());
     }
-
 }

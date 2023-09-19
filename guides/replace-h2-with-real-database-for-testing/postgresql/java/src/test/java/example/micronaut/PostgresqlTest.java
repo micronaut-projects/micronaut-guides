@@ -17,5 +17,4 @@ class PostgresqlTest {
     void testItWorks() {
         Assertions.assertTrue(application.isRunning());
     }
-
 }

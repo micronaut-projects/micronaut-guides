@@ -7,6 +7,7 @@ import io.micronaut.data.repository.CrudRepository;
 
 @JdbcRepository(dialect = Dialect.POSTGRES) // <1>
 interface ProductRepository extends CrudRepository<Product, Long> { // <2>
+
     default void createProductIfNotExists(Product product) {
         createProductIfNotExists(product.getId(), product.getCode(), product.getName());
     }

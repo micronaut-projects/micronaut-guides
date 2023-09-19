@@ -8,6 +8,7 @@ import io.micronaut.data.jpa.repository.JpaRepository;
 @Repository // <1>
 interface ProductRepository extends JpaRepository<Product, Long> { // <2>
 //end::clazz[]
+
 //tag::method[]
     default void createProductIfNotExists(Product product) {
         createProductIfNotExists(product.getId(), product.getCode(), product.getName());

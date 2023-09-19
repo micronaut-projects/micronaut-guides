@@ -17,5 +17,4 @@ class H2Test {
     void testItWorks() {
         Assertions.assertTrue(application.isRunning());
     }
-
 }

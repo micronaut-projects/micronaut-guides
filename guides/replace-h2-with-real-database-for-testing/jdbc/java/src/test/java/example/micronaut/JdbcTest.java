@@ -17,5 +17,4 @@ class JdbcTest {
     void testItWorks() {
         Assertions.assertTrue(application.isRunning());
     }
-
 }

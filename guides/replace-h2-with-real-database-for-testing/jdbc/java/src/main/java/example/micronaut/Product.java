@@ -5,6 +5,7 @@ import io.micronaut.data.annotation.MappedEntity;
 
 @MappedEntity("products") // <1>
 public class Product {
+
     @Id // <2>
     private Long id;
 

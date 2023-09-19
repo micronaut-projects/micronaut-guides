@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.util.Optional;
 
 public final class SqlUtils {
+
     private SqlUtils() {
     }
 
@@ -20,12 +21,11 @@ public final class SqlUtils {
                             String path) throws IOException, SQLException {
         Optional<URL> resource = resourceLoader.getResource(path);
         if (resource.isPresent()) {
-            try (InputStream in = resource.get().openStream()) {
+            try (InputStream in = resource.get().openStream();
+                 Statement statement = connection.createStatement()
+            ) {
                 String sql = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-                try(Statement statement = connection.createStatement()) {
-                    statement.execute(sql);
-                }
+                statement.execute(sql);
             }
         }
-    }
-}
+    }}

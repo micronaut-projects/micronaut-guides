@@ -17,5 +17,4 @@ class PostgresqltestresourcesTest {
     void testItWorks() {
         Assertions.assertTrue(application.isRunning());
     }
-
 }

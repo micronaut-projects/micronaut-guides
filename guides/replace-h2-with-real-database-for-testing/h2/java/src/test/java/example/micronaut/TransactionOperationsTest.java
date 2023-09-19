@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest
 public class TransactionOperationsTest {
+
     @Inject
     BeanContext beanContext;
 
