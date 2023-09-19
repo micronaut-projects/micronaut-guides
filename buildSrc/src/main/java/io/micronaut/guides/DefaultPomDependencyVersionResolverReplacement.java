@@ -8,6 +8,7 @@ import io.micronaut.starter.build.dependencies.DefaultPomDependencyVersionResolv
 import io.micronaut.starter.build.dependencies.StarterCoordinates;
 import jakarta.inject.Singleton;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,12 +19,20 @@ import static io.micronaut.starter.build.dependencies.CoordinatesUtils.readCoord
 public class DefaultPomDependencyVersionResolverReplacement extends DefaultPomDependencyVersionResolver {
     private final Map<String, Coordinate> coordinates;
     public DefaultPomDependencyVersionResolverReplacement(ResourceResolver resourceResolver) {
-        coordinates = readCoordinates(resourceResolver.getResources("classpath:pom.xml"));
+        Map<String, Coordinate> coordinateMap = new HashMap<>();
+        coordinateMap.putAll(StarterCoordinates.ALL_COORDINATES);
+        coordinateMap.putAll(readCoordinates(resourceResolver.getResources("classpath:pom.xml")));
+        this.coordinates = coordinateMap;
+    }
+
+    @NonNull
+    public Map<String, Coordinate> getCoordinates() {
+        return coordinates;
     }
 
     @Override
     @NonNull
     public Optional<Coordinate> resolve(@NonNull String artifactId) {
-        return Optional.ofNullable(coordinates.computeIfAbsent(artifactId, k -> StarterCoordinates.ALL_COORDINATES.get(artifactId)));
+        return Optional.ofNullable(coordinates.get(artifactId));
     }
 }
