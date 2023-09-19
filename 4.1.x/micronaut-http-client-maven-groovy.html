@@ -627,7 +627,7 @@ github.repo=micronaut-core</code></pre>
 
 <span class="type">class</span> <span class="class">GithubControllerSpec</span> <span class="directive">extends</span> Specification {
     <span class="directive">private</span> <span class="directive">static</span> <span class="predefined-type">Pattern</span> MICRONAUT_RELEASE =
-            <span class="predefined-type">Pattern</span>.compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?</span><span class="delimiter">&quot;</span></span>)
+            <span class="predefined-type">Pattern</span>.compile(<span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut (Core |Framework )?v?</span><span class="char">\\</span><span class="content">d+.</span><span class="char">\\</span><span class="content">d+.</span><span class="char">\\</span><span class="content">d+( (RC|M)</span><span class="char">\\</span><span class="content">d)?</span><span class="delimiter">&quot;</span></span>)
 
     <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">verify GithubReleases can Be fetched With Low Level Http Client</span><span class="delimiter">&quot;</span></span>(<span class="predefined-type">String</span> path) {
         <span class="key">given</span>:
@@ -650,14 +650,14 @@ github.repo=micronaut-core</code></pre>
                 .createBean(HttpClient, embeddedServer.getURL())
         BlockingHttpClient client = httpClient.toBlocking()
         HttpRequest&lt;?&gt; request = HttpRequest.GET(path)
-        HttpResponse&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; rsp = client.exchange(request, <i class="conum" data-value="3"></i><b>(3)</b>
-                Argument.listOf(GithubRelease)) <i class="conum" data-value="4"></i><b>(4)</b>
+        HttpResponse&lt;<span class="predefined-type">List</span>&lt;GithubRelease&gt;&gt; rsp = client.exchange(request, <i class="conum" data-value="4"></i><b>(4)</b>
+                Argument.listOf(GithubRelease)) <i class="conum" data-value="5"></i><b>(5)</b>
 
         <span class="key">then</span>:
-        HttpStatus.OK == rsp.getStatus()   <i class="conum" data-value="5"></i><b>(5)</b>
+        HttpStatus.OK == rsp.getStatus()   <i class="conum" data-value="6"></i><b>(6)</b>
 
         <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;GithubRelease&gt; releases = rsp.body() <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="predefined-type">List</span>&lt;GithubRelease&gt; releases = rsp.body() <i class="conum" data-value="7"></i><b>(7)</b>
 
         <span class="key">then</span>:
         releases
@@ -686,7 +686,7 @@ github.repo=micronaut-core</code></pre>
         <span class="annotation">@Produces</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">application/vnd.github.v3+json</span><span class="delimiter">&quot;</span></span>)
         <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/repos/micronaut-projects/micronaut-core/releases</span><span class="delimiter">&quot;</span></span>)
         Optional&lt;<span class="predefined-type">String</span>&gt; coreReleases() {
-            resourceLoader.getResourceAsStream(<span class="string"><span class="delimiter">&quot;</span><span class="content">releases.json</span><span class="delimiter">&quot;</span></span>)
+            resourceLoader.getResourceAsStream(<span class="string"><span class="delimiter">&quot;</span><span class="content">releases.json</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
                     .map(inputStream -&gt; inputStream.text)
         }
     }
@@ -705,18 +705,22 @@ github.repo=micronaut-core</code></pre>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
+<td>Create a sample <code>releases.json</code> file in <code>src/test/resources</code> directory. To get some test data call github api with curl or provide a few entries yourself.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Micronaut HTTP Client simplifies binding a JSON array to a list of POJOs by using <code>Argument::listOf</code>.</td>
+<td>Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Use <code>status</code> to check the HTTP status code.</td>
+<td>Micronaut HTTP Client simplifies binding a JSON array to a list of POJOs by using <code>Argument::listOf</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Use <code>status</code> to check the HTTP status code.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
 <td>Use <code>.body()</code> to retrieve the parsed payload.</td>
 </tr>
 </table>

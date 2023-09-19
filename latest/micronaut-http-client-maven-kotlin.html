@@ -606,20 +606,16 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
 import io.micronaut.http.client.BlockingHttpClient
 import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.StreamingHttpClient
 import io.micronaut.runtime.server.EmbeddedServer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import java.io.BufferedReader
-import java.io.InputStream
-import java.util.*
 import java.util.regex.Pattern
 
 class GithubControllerTest {
     val MICRONAUT_RELEASE =
-            Pattern.compile(&quot;[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?&quot;)
+            Pattern.compile(&quot;Micronaut (Core |Framework )?v?\\d+.\\d+.\\d+( (RC|M)\\d)?&quot;)
 
     @Test
     fun verifyGithubReleasesCanBeFetchedWithLowLevelHttpClient() {
@@ -641,12 +637,12 @@ class GithubControllerTest {
 
     fun assertReleases(client: BlockingHttpClient, path: String) {
         val request : HttpRequest&lt;Any&gt; = HttpRequest.GET(path)
-        val rsp = client.exchange(request, <i class="conum" data-value="3"></i><b>(3)</b>
-            Argument.listOf(GithubRelease::class.java)) <i class="conum" data-value="4"></i><b>(4)</b>
-        assertEquals(HttpStatus.OK, rsp.status)   <i class="conum" data-value="5"></i><b>(5)</b>
+        val rsp = client.exchange(request, <i class="conum" data-value="4"></i><b>(4)</b>
+            Argument.listOf(GithubRelease::class.java)) <i class="conum" data-value="5"></i><b>(5)</b>
+        assertEquals(HttpStatus.OK, rsp.status)   <i class="conum" data-value="6"></i><b>(6)</b>
         val releases = rsp.body()
         assertNotNull(releases)
-        assertReleases(releases.toList()) <i class="conum" data-value="6"></i><b>(6)</b>
+        assertReleases(releases.toList()) <i class="conum" data-value="7"></i><b>(7)</b>
     }
 
     fun assertReleases(releases: List&lt;GithubRelease&gt;) {
@@ -661,19 +657,8 @@ class GithubControllerTest {
     class GithubReleases(val resourceLoader : ResourceLoader) {
         @Produces(&quot;application/vnd.github.v3+json&quot;)
         @Get(&quot;/repos/micronaut-projects/micronaut-core/releases&quot;)
-        fun coreReleases() : Optional&lt;String&gt; {
-            return resourceLoader.getResourceAsStream(&quot;releases.json&quot;).map(this::inputStreamToString)
-        }
-
-        fun inputStreamToString(inputStream: InputStream) : String {
-            val reader = BufferedReader(inputStream.reader())
-            var content: String
-            try {
-                content = reader.readText()
-            } finally {
-                reader.close()
-            }
-            return content
+        fun coreReleases() : String {
+            return resourceLoader.getResource(&quot;releases.json&quot;).orElseThrow().readText() <i class="conum" data-value="3"></i><b>(3)</b>
         }
     }
 
@@ -692,18 +677,22 @@ class GithubControllerTest {
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
+<td>Create a sample <code>releases.json</code> file in <code>src/test/resources</code> directory. To get some test data call github api with curl or provide a few entries yourself.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Micronaut HTTP Client simplifies binding a JSON array to a list of POJOs by using <code>Argument::listOf</code>.</td>
+<td>Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of <code>retrieve</code> you should use the <code>exchange</code> method.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Use <code>status</code> to check the HTTP status code.</td>
+<td>Micronaut HTTP Client simplifies binding a JSON array to a list of POJOs by using <code>Argument::listOf</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Use <code>status</code> to check the HTTP status code.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
 <td>Use <code>.body()</code> to retrieve the parsed payload.</td>
 </tr>
 </table>
