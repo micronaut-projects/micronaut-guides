@@ -12,13 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @MicronautTest
 class ConferenceControllerTest {
-
-    @Inject
-    @Client("/")
-    HttpClient client;
-
     @Test
-    void testHello() {
+    void testHello(@Client("/") HttpClient client) {
         HttpRequest<?> request = HttpRequest.GET("/conferences/random");
         String body = client.toBlocking().retrieve(request);
         assertNotNull(body);

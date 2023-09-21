@@ -18,7 +18,7 @@ import spock.lang.Specification
 
 class GithubControllerSpec extends Specification {
     private static Pattern MICRONAUT_RELEASE =
-            Pattern.compile("[Micronaut|Micronaut Framework] [0-9].[0-9].[0-9]([0-9])?( (RC|M)[0-9])?")
+            Pattern.compile("Micronaut (Core |Framework )?v?\\d+.\\d+.\\d+( (RC|M)\\d)?")
 
     void "verify GithubReleases can Be fetched With Low Level Http Client"(String path) {
         given:
@@ -41,14 +41,14 @@ class GithubControllerSpec extends Specification {
                 .createBean(HttpClient, embeddedServer.getURL())
         BlockingHttpClient client = httpClient.toBlocking()
         HttpRequest<?> request = HttpRequest.GET(path)
-        HttpResponse<List<GithubRelease>> rsp = client.exchange(request, // <3>
-                Argument.listOf(GithubRelease)) // <4>
+        HttpResponse<List<GithubRelease>> rsp = client.exchange(request, // <4>
+                Argument.listOf(GithubRelease)) // <5>
 
         then:
-        HttpStatus.OK == rsp.getStatus()   // <5>
+        HttpStatus.OK == rsp.getStatus()   // <6>
 
         when:
-        List<GithubRelease> releases = rsp.body() // <6>
+        List<GithubRelease> releases = rsp.body() // <7>
 
         then:
         releases
@@ -77,7 +77,7 @@ class GithubControllerSpec extends Specification {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
         Optional<String> coreReleases() {
-            resourceLoader.getResourceAsStream("releases.json")
+            resourceLoader.getResourceAsStream("releases.json") // <3>
                     .map(inputStream -> inputStream.text)
         }
     }

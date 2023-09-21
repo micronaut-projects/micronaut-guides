@@ -1,0 +1,336 @@
+common:header-top.adoc[]
+
+## About this Guide
+
+In this guide, you will learn how to
+
+* Create a Micronaut application with https://www.jooq.org/[jOOQ] support
+* Generate jOOQ code using https://testcontainers.com[Testcontainers], https://flywaydb.org/[Flyway] and Maven Plugin
+* Implement basic database operations using jOOQ
+* Implement logic to load complex object graph using jOOQ
+* Test the jOOQ persistence layer using Testcontainers
+
+common:requirements.adoc[]
+
+common:docker-testcontainers.adoc[]
+
+common:completesolution.adoc[]
+
+== What we are going to achieve in this guide
+We are going to create a Micronaut project using https://www.jooq.org/[jOOQ] together with https://www.postgresql.org/[PostgreSQL].
+We will create our database tables by using https://flywaydb.org/[Flyway] Database migrations.
+We will configure https://github.com/testcontainers/testcontainers-jooq-codegen-maven-plugin[testcontainers-jooq-codegen-maven-plugin] to generate jOOQ code using Testcontainers and Flyway
+migration scripts.
+
+We will implement our persistence layer repositories using jOOQ to manage Users, Posts, and Comments.
+Then we will test the repositories using Micronaut testing support and Testcontainers PostgreSQL module.
+
+common:create-app-features-testcontainers.adoc[]
+
+== Getting Started
+
+https://www.jooq.org[*jOOQ (jOOQ Object Oriented Querying)*] is a popular open-source library that provides a fluent API for building typesafe SQL queries.
+
+In order to leverage the benefits of TypeSafe DSL provided by jOOQ, we need to generate Java code from our database tables, views, and other objects, which will allow us to interact with the database using a fluent and intuitive API.
+
+[TIP]
+To learn more about how jOOQ code-generator will help you, please read
+https://blog.jooq.org/why-you-should-use-jooq-with-code-generation/[Why You Should Use jOOQ With Code Generation].
+
+In production-grade applications, it is highly recommended to use a database migration tool such as
+*Flyway* or *Liquibase* to apply any changes to the database.
+
+So, the usual process of building and testing the application by generating jOOQ java code from the database is:
+
+* Create an instance of database using Testcontainers
+* Apply Flyway or Liquibase database migrations
+* Run jOOQ code-generator to generate Java code from the database objects.
+* Run integration tests
+
+The jOOQ code generation can be automated as part of the Maven build process using the
+https://github.com/testcontainers/testcontainers-jooq-codegen-maven-plugin[testcontainers-jooq-codegen-maven-plugin].
+
+[NOTE]
+You can also use the official jOOQ code generator maven plugin by using *jooq-codegen-maven*, *groovy-maven-plugin* and *flyway-maven-plugin*
+together as described in https://blog.jooq.org/using-testcontainers-to-generate-jooq-code/.
+
+With jOOQ, https://www.jooq.org/doc/latest/manual/coming-from-jpa/from-jpa-database-first/[the database comes first].
+So, let's start with creating our database structure using Flyway migration scripts.
+
+== Configuration
+
+=== Data Source Configuration
+
+resource:application.properties[app=testcontainers,tag=datasource]
+
+Please note that the configuration does not specify the JDBC URL, username, or password. We will supply them dynamically in our tests or via Test Resources.
+
+=== Flyway Configuration
+
+common:flyway-intro.adoc[]
+
+resource:application.properties[app=testcontainers,tag=flyway]
+
+common:flyway-configuration-intro-end.adoc[]
+
+== Create Flyway database migration scripts
+
+In our sample application, we have users, posts and comments tables.
+Let's create our first migration script following the Flyway naming convention.
+
+Create `src/main/resources/db/migration/V1__create_tables.sql` file as follows:
+
+resource:db/migration/V1__create_tables.sql[app=testcontainers]
+
+Note that at the end of the SQL script, we have set our database sequence values to start with 101
+so that we can insert some sample data along with primary key values for testing.
+
+:exclude-for-build:gradle
+
+== Configure jOOQ code generation using Maven plugin
+
+Configure the https://github.com/testcontainers/testcontainers-jooq-codegen-maven-plugin[*testcontainers-jooq-codegen-maven-plugin*] in `pom.xml` as follows:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+ ...
+    <properties>
+...
+        <testcontainers-jooq-codegen-maven-plugin.version>0.0.2</testcontainers-jooq-codegen-maven-plugin.version>
+    </properties>
+...
+    <build>
+        <plugins>
+...
+            <plugin>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-jooq-codegen-maven-plugin</artifactId>
+                <version>${testcontainers-jooq-codegen-maven-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${testcontainers.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>42.6.0</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>generate-jooq-sources</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <database>
+                                <type>POSTGRES</type>
+                                <containerImage>postgres:15.3-alpine</containerImage>
+                            </database>
+                            <flyway>
+                                <locations>
+                                    filesystem:src/main/resources/db/migration
+                                </locations>
+                            </flyway>
+                            <jooq>
+                                <generator>
+                                    <database>
+                                        <includes>.*</includes>
+                                        <excludes>flyway_schema_history</excludes>
+                                        <inputSchema>public</inputSchema>
+                                    </database>
+                                    <target>
+                                        <packageName>example.micronaut.jooq</packageName>
+                                        <directory>target/generated-sources/jooq</directory>
+                                    </target>
+                                </generator>
+                            </jooq>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            ...
+        </plugins>
+    </build>
+</project>
+----
+
+Let's understand the plugin configuration.
+
+* As we are using PostgreSQL database, we have configured the postgres JDBC driver and Testcontainers postgresql libraries as dependencies of the plugin.
+* Under `<configuration>/<database>` section, we have configured the type of the database, POSTGRES, that we want to use it for our code generation, and specified the Docker image name, `postgres:15.3-alpine`, which will be used to create the database instance.
+* Under `<configuration>/<flyway>` section we have specified the location of Flyway migration scripts path.
+* We have also configured the *packageName* and *target* location for the generated code. You can configure all the configuration options supported by the official *jooq-code-generator* plugin.
+
+The plugin uses Testcontainers to spin up an instance of PostgreSQL container, apply Flyway migrations
+and then generate the java code using jOOQ code generation tool.
+
+With this configuration in place, now if you run `./mvnw package` then you can find
+the generated code under the `target/generated-sources/jooq` directory.
+
+:exclude-for-build:
+
+== Create model classes
+
+We may want to create our own model classes to represent the data structures that
+we want to return for various use-cases. Imagine we are building a REST API,
+and we may want to return responses with only a subset of column values from our tables.
+
+So, let's create User, Post and Comment classes as follows:
+
+source:domain/User[app=testcontainers]
+
+source:domain/Post[app=testcontainers]
+
+source:domain/Comment[app=testcontainers]
+
+== Implementing basic database operations using jOOQ
+
+Let's implement methods to create a new user and get user by email using jOOQ as follows:
+
+source:domain/UserRepository[app=testcontainers]
+
+callout:singleton[1]
+<2> Use constructor injection to inject a bean of type `org.jooq.DSLContext`. https://micronaut-projects.github.io/micronaut-sql/latest/guide/#jooq[Micronaut SQL jOOQ] integration registers `DSLContext` singletons so that you can inject them into your application.
+
+You can see jOOQ DSL looks very similar to SQL but written in Java. By using jOOQ generated code,
+we can keep our code in-sync with the database structure and also benefit from the type safety.
+
+For example, the where condition `where(USERS.EMAIL.equalIgnoreCase(email))` expects a String for
+the email value. If you try to pass any non-string value like `where(USERS.EMAIL.equalIgnoreCase(123))`
+then it will give you a compiler error preventing you from making mistakes at the compilation time itself rather than at runtime.
+
+== Tests
+
+== Testcontainers Dependencies
+
+The generated application contains the following Testcontainers dependencies:
+
+dependency:testcontainers[groupId=org.testcontainers,scope=test]
+
+dependency:postgresql[groupId=org.testcontainers,scope=test]
+
+=== Test Seed Data
+
+Before writing the tests, let's create an SQL script to set up the test data by
+creating `src/test/resources/db/testmigration/V99__test_data.sql` file as follows:
+
+testResource:db/testmigration/V99__test_data.sql[app=testcontainers]
+
+Load the test seed data by adding the following configuration in `src/test/resources/application-test.properties`.
+
+testResource:application-test.properties[app=testcontainers]
+
+=== AbstractTest class
+
+Create an abstract class to simplify the dynamic configuration of the database connection
+
+test:domain/AbstractTest[app=testcontainers]
+
+callout:test-property-provider[1]
+callout:testcontainers-at-container-static[2]
+
+=== Write repository test
+
+In order to test the repository, we need to have a running Postgres database instance.
+We will extend from `AbstractTest` to easily start a Postgres database and write the tests
+as follows:
+
+test:domain/UserRepositoryTest[app=testcontainers]
+
+callout:micronaut-test-start-application-false[1]
+callout:test-instance-per-class[2]
+callout:test-containers-disabled-without-docker[3]
+
+The tests invoke the UserRepository methods and verified the expected return values.
+
+== Fetching complex object trees using jOOQ
+
+So far we have seen using jOOQ to perform very basic database operations.
+But jOOQ shines when it comes to querying the database with complex queries, stored procedures, etc.
+
+In our database model, we have Many-To-One relationship from Post-to-User, One-To-Many relationship from Post-to-Comment.
+
+Let us see how we can get a `Post` for a given `postId` along with the created user and its comments
+using jOOQ powerful *MULTISET* feature using a single query.
+
+source:domain/PostRepository[app=testcontainers]
+
+callout:singleton[1]
+
+We have used jOOQ's https://www.jooq.org/doc/latest/manual/sql-building/column-expressions/nested-records/[Nested records support] for
+loading the ManyToOne association of Post-to-User and https://www.jooq.org/doc/latest/manual/sql-building/column-expressions/multiset-value-constructor/[MULTISET] feature for loading OneToMany association of Post-to-Comments.
+
+To learn more about https://blog.jooq.org/jooq-3-15s-new-multiset-operator-will-change-how-you-think-about-sql/[jOOQ's MULTISET feature].
+
+[TIP]
+From jOOQ 3.19, fetching the associations using MULTISET is further simplified using https://www.jooq.org/doc/dev/manual/sql-building/sql-statements/select-statement/implicit-path-correlation/[implicit path correlations feature].
+
+We can write integration test for `PostRepository` as follows:
+
+test:domain/PostRepositoryTest[app=testcontainers]
+
+callout:micronaut-test-start-application-false[1]
+callout:test-instance-per-class[2]
+callout:test-containers-disabled-without-docker[3]
+
+common:testApp.adoc[]
+
+You should see all tests PASS. You can also notice that after tests are executed, the containers are stopped and removed automatically.
+
+== Testing with Test Resources
+
+common:test-resources.adoc[]
+
+=== Removing Testcontainers Dependencies
+
+Remove the <<testcontainers-dependencies,Testcontainers dependencies>> from your build files.
+
+=== Configure Test Resources
+
+common:install-test-resources.adoc[]
+
+=== Test Resources PostgreSQL
+
+common:test-resources-postgresql-test-or-dev.adoc[]
+
+=== Simpler Test with Test Resources
+
+Thanks to Test Resources, we can simplify the test, no need for an abstract class, as follows:
+
+test:domain/UserRepositoryTest[app=testresources]
+
+callout:micronaut-test-transactional-false[1]
+
+If you run the test, you will see a PostgreSQL container being started by Test Resources through integration with Testcontainers to provide throwaway containers for testing.
+
+common:test-resources-benefits.adoc[]
+
+== Summary
+
+The Testcontainers library helped us to generate java code from the database using
+jOOQ code generator tool, and we are able to write tests by using the same type of database,
+PostgreSQL, that we use in production as opposed to using mocks or in-memory databases.
+
+As we are always generating the code from the current state of the database,
+we can ensure that our code is in sync with the database changes, and we are free to do
+any code refactoring and still ensure that the application is working as expected.
+
+
+== Next Steps
+
+Learn more about:
+
+* https://micronaut-projects.github.io/micronaut-sql/latest/guide/[Micronaut SQL]
+* https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources]
+* http://testcontainers.com[Testcontainers].
+* https://www.jooq.org/[jOOQ]
+* https://www.jooq.org/doc/latest/manual/code-generation/[jOOQ Code Generation]
+
+common:helpWithMicronaut.adoc[]
