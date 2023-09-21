@@ -34,10 +34,12 @@ public enum Category implements Ordered {
     AWS("AWS", 27),
     AWS_LAMBDA("AWS Lambda", 28),
     AZURE("Microsoft Azure", 29),
+
     GCP("Google Cloud", 30),
-    ORACLE_CLOUD("Oracle Cloud", 31),
-    KUBERNETES( "Kubernetes", 32),
-    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 33);
+    GOOGLE_CLOUD_RUN("Google Cloud Run", 31),
+    ORACLE_CLOUD("Oracle Cloud", 32),
+    KUBERNETES( "Kubernetes", 33),
+    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 34);
 
 
 
