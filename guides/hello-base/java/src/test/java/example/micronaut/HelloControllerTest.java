@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -20,7 +21,7 @@ public class HelloControllerTest {
 
     @Test
     public void testHello() {
-        HttpRequest<String> request = HttpRequest.GET("/hello");  // <3>
+        HttpRequest<String> request = HttpRequest.GET("/hello").accept(MediaType.TEXT_PLAIN);  // <3>
         String body = client.toBlocking().retrieve(request);
 
         assertNotNull(body);
