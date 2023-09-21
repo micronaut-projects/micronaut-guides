@@ -136,12 +136,20 @@
 <ul class="sectlevel2">
 <li><a href="#cloud-sdk">5.1. Cloud SDK</a></li>
 <li><a href="#google-cloud-platform-project">5.2. Google Cloud Platform Project</a></li>
+<li><a href="#enable-billing">5.3. Enable billing</a></li>
+<li><a href="#enable-the-google-cloud-container-registry-api">5.4. Enable the Google Cloud Container Registry API</a></li>
 </ul>
 </li>
 <li><a href="#docker-push-native">6. Docker Push Native</a></li>
 <li><a href="#google-cloud-run-deploy">7. Google Cloud Run Deploy</a></li>
 <li><a href="#running-the-application">8. Running the Application</a></li>
-<li><a href="#next-steps">9. Next steps</a></li>
+<li><a href="#cleanup">9. Cleanup</a>
+<ul class="sectlevel2">
+<li><a href="#deleting-the-cloud-run-service">9.1. Deleting the Cloud Run Service</a></li>
+<li><a href="#deleting-the-project">9.2. Deleting the project</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">10. Next steps</a></li>
 </ul>
 
                     </div>
@@ -171,10 +179,7 @@
 <p>In this guide, we will create a Micronaut application written in Java.</p>
 </div>
 <div class="paragraph">
-<p>Push the Docker image of your application to <a href="https://cloud.google.com/container-registry">Google Cloud Container Registry</a> or to <a href="https://cloud.google.com/artifact-registry">Google Cloud Artifact Registry</a>.</p>
-</div>
-<div class="paragraph">
-<p>The docker image runs a <a href="https://www.graalvm.org/reference-manual/native-image/">GraalVM Native Executable</a> of the Micronaut application.</p>
+<p>We will deploy the application to <a href="https://cloud.google.com/run">Google Cloud Run</a>.</p>
 </div>
 <div class="quoteblock">
 <blockquote>
@@ -182,6 +187,12 @@
 <p>Develop and deploy highly scalable containerized applications on a fully managed serverless platform.</p>
 </div>
 </blockquote>
+</div>
+<div class="paragraph">
+<p>Push the Docker image of your application to <a href="https://cloud.google.com/container-registry">Google Cloud Container Registry</a> or to <a href="https://cloud.google.com/artifact-registry">Google Cloud Artifact Registry</a>.</p>
+</div>
+<div class="paragraph">
+<p>The docker image runs a <a href="https://www.graalvm.org/reference-manual/native-image/">GraalVM Native Executable</a> of the Micronaut application.</p>
 </div>
 </div>
 </div>
@@ -316,6 +327,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
@@ -332,7 +344,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> testHello() {
-        HttpRequest&lt;<span class="predefined-type">String</span>&gt; request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/hello</span><span class="delimiter">&quot;</span></span>);  <i class="conum" data-value="3"></i><b>(3)</b>
+        HttpRequest&lt;?&gt; request = HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/hello</span><span class="delimiter">&quot;</span></span>).accept(MediaType.TEXT_PLAIN);  <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="predefined-type">String</span> body = client.toBlocking().retrieve(request);
 
         assertNotNull(body);
@@ -427,26 +439,50 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="enable-billing">5.3. Enable billing</h3>
+<div class="paragraph">
+<p>Ensure you have a billing account created, and if not create one via the <a href="https://console.cloud.google.com/billing">Google Cloud Platform Console</a>.</p>
+</div>
+<div class="paragraph">
+<p>To get a list of your billing accounts, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">❯ gcloud beta billing accounts list
+ACCOUNT_ID            NAME                  OPEN   MASTER_ACCOUNT_ID
+XXXXXX-XXXXXX-XXXXXX  My Billing Account    True</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can then attach a billing account to your project:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">&gt; gcloud beta billing projects link micronaut-guides-xxxxxxx --billing-account=XXXXXX-XXXXXX-XXXXXX
+billingAccountName: billingAccounts/XXXXXX-XXXXXX-XXXXXX
+billingEnabled: true
+name: projects/micronaut-guides-xxxxxxx/billingInfo
+projectId: micronaut-guides-xxxxxxx</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enable-the-google-cloud-container-registry-api">5.4. Enable the Google Cloud Container Registry API</h3>
+<div class="paragraph">
+<p>We need somewhere to store our docker images, so we need to enable the Google Cloud Container Registry API for your project via the Google Cloud CLI:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud services enable containerregistry.googleapis.com</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="docker-push-native">6. Docker Push Native</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>Before attempting to push the image, make sure you run GraalVM JDK.</p>
-</div>
-<div class="paragraph">
-<p>The easiest way to install GraalVM on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
-</div>
-<div class="listingblock">
-<div class="title">Java 17</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 17.0.8-graal</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>For installation on Windows, or for manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
-</div>
 <div class="paragraph">
 <p>Push the Docker image of your application to <a href="https://cloud.google.com/container-registry">Google Cloud Container Registry</a>.</p>
 </div>
@@ -488,7 +524,7 @@ Pushing image 'gcr.io/micronaut-guides-xxxxxx/micronautguide:latest'.</code></pr
 <h2 id="google-cloud-run-deploy">7. Google Cloud Run Deploy</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can deploy to Google Cloud Run via the CLI. Use the value you configured in your build as the image argument&#8217;s value.</p>
+<p>You can <a href="https://cloud.google.com/sdk/gcloud/reference/run/deploy">deploy to Google Cloud Run via the CLI</a>. Use the value you configured in your build as the image argument&#8217;s value.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -555,7 +591,85 @@ Hello World</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">9. Next steps</h2>
+<h2 id="cleanup">9. Cleanup</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="deleting-the-cloud-run-service">9.1. Deleting the Cloud Run Service</h3>
+<div class="paragraph">
+<p>Use the command <a href="https://cloud.google.com/sdk/gcloud/reference/run/services/delete">gcloud run service delete</a> to delete the service.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>gcloud run services delete micronautguide</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deleting-the-project">9.2. Deleting the project</h3>
+<div class="paragraph">
+<p>The easiest way to eliminate billing is to delete the project you created for the tutorial.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Deleting a project has the following consequences:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If you used an existing project, you&#8217;ll also delete any other work you&#8217;ve done in the project.</p>
+</li>
+<li>
+<p>You can&#8217;t reuse the project ID of a deleted project. If you created a custom project ID that you plan to use in the future, you should delete the resources inside the project instead. This ensures that URLs that use the project ID, such as an appspot.com URL, remain available.</p>
+</li>
+<li>
+<p>If you are exploring multiple tutorials and quickstarts, reusing projects instead of deleting them prevents you from exceeding project quota limits.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="via-the-cli">9.2.1. Via the CLI</h4>
+<div class="paragraph">
+<p>To delete the project using the Cloud SDK, run the following command, replacing <code>YOUR_PROJECT_ID</code> with the project ID:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects delete YOUR_PROJECT_ID</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="via-the-cloud-platform-console">9.2.2. Via the Cloud Platform Console</h4>
+<div class="paragraph">
+<p>In the Cloud Platform Console, <a href="https://console.cloud.google.com/iam-admin/projects">go to the Projects page</a>.</p>
+</div>
+<div class="paragraph">
+<p>In the project list, select the project you want to delete and click Delete project. After selecting the checkbox next to the project name, click <code>Delete project</code></p>
+</div>
+<div class="paragraph">
+<p>In the dialog, type the project ID, and then click Shut down to delete the project.</p>
+</div>
+<div class="paragraph">
+<p>Deleting or turning off specific resources</p>
+</div>
+<div class="paragraph">
+<p>You can individually delete or turn off some of the resources that you created during the tutorial.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>You will probably want to deploy to Google Cloud Run from your CI server. <a href="https://launch.micronaut.io">Micronaut Launch</a> contains feature <a href="https://micronaut.io/launch?type=DEFAULT&amp;features=github-workflow-google-cloud-run-graalvm">github-workflow-google-cloud-run-graalvm</a>, which adds a <a href="https://github.com/features/actions">GitHub Actions</a> Workflow that deploys a GraalVM Native executable of a Micronaut application to Google Cloud Run from Google Container Registry.</p>
