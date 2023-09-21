@@ -2,17 +2,15 @@ package example.micronaut;
 
 import io.micronaut.core.annotation.Nullable;
 import jakarta.annotation.Nonnull;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Every country code in the world.
@@ -292,25 +290,14 @@ public enum CountryCode {
         return this.countryName;
     }
 
-    private static final List<String> CODES = new ArrayList<>();
     private static final String PLUS_SIGN = "+";
 
-    private static final Map<String, List<CountryCode>> COUNTRYCODESBYCODE = new HashMap<>();
+    private static final Map<String, List<CountryCode>> COUNTRYCODESBYCODE =
+            Arrays.stream(CountryCode.values())
+                    .collect(Collectors.groupingBy(CountryCode::getCode));
 
-    static {
-        Set<String> uniquecodes = new HashSet<>();
-        for (CountryCode value : EnumSet.allOf(CountryCode.class)) {
-            List<CountryCode> countryCodes = COUNTRYCODESBYCODE.containsKey(value.toString()) ?
-                    COUNTRYCODESBYCODE.get(value.toString()) :
-                    new ArrayList<>();
-            countryCodes.add(value);
-            COUNTRYCODESBYCODE.put(value.toString(), countryCodes);
-            uniquecodes.add(value.toString());
-        }
-        CODES.addAll(uniquecodes);
-        CODES.sort((Comparator<String>) (s1, s2) -> Integer.compare(s2.length(), s1.length()));
-
-    }
+    private static final List<String> CODES = COUNTRYCODESBYCODE.keySet().stream()
+            .sorted(Comparator.comparing(String::length).reversed()).toList();
 
     /**
      *
