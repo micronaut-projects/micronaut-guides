@@ -286,17 +286,15 @@ If you have an existing Micronaut application and want to add the functionality 
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">jakarta.annotation.Nonnull</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>;
 <span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
+<span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
 <span class="keyword">import</span> <span class="include">java.util.Comparator</span>;
-<span class="keyword">import</span> <span class="include">java.util.EnumSet</span>;
-<span class="keyword">import</span> <span class="include">java.util.HashMap</span>;
-<span class="keyword">import</span> <span class="include">java.util.HashSet</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 <span class="keyword">import</span> <span class="include">java.util.Map</span>;
-<span class="keyword">import</span> <span class="include">java.util.Set</span>;
+<span class="keyword">import</span> <span class="include">java.util.stream.Collectors</span>;
 
 <span class="comment">/**
  * Every country code in the world.
@@ -576,25 +574,14 @@ If you have an existing Micronaut application and want to add the functionality 
         <span class="keyword">return</span> <span class="local-variable">this</span>.countryName;
     }
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; CODES = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
     <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> PLUS_SIGN = <span class="string"><span class="delimiter">&quot;</span><span class="content">+</span><span class="delimiter">&quot;</span></span>;
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">List</span>&lt;CountryCode&gt;&gt; COUNTRYCODESBYCODE = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;();
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">List</span>&lt;CountryCode&gt;&gt; COUNTRYCODESBYCODE =
+            <span class="predefined-type">Arrays</span>.stream(CountryCode.values())
+                    .collect(Collectors.groupingBy(CountryCode::getCode));
 
-    <span class="directive">static</span> {
-        <span class="predefined-type">Set</span>&lt;<span class="predefined-type">String</span>&gt; uniquecodes = <span class="keyword">new</span> <span class="predefined-type">HashSet</span>&lt;&gt;();
-        <span class="keyword">for</span> (CountryCode value : <span class="predefined-type">EnumSet</span>.allOf(CountryCode.class)) {
-            <span class="predefined-type">List</span>&lt;CountryCode&gt; countryCodes = COUNTRYCODESBYCODE.containsKey(value.toString()) ?
-                    COUNTRYCODESBYCODE.get(value.toString()) :
-                    <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
-            countryCodes.add(value);
-            COUNTRYCODESBYCODE.put(value.toString(), countryCodes);
-            uniquecodes.add(value.toString());
-        }
-        CODES.addAll(uniquecodes);
-        CODES.sort((<span class="predefined-type">Comparator</span>&lt;<span class="predefined-type">String</span>&gt;) (s1, s2) -&gt; <span class="predefined-type">Integer</span>.compare(s2.length(), s1.length()));
-
-    }
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; CODES = COUNTRYCODESBYCODE.keySet().stream()
+            .sorted(<span class="predefined-type">Comparator</span>.comparing(<span class="predefined-type">String</span>::length).reversed()).toList();
 
     <span class="comment">/**
      *
