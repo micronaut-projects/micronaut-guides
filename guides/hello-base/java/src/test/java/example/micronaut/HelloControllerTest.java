@@ -21,7 +21,7 @@ public class HelloControllerTest {
 
     @Test
     public void testHello() {
-        HttpRequest<String> request = HttpRequest.GET("/hello").accept(MediaType.TEXT_PLAIN);  // <3>
+        HttpRequest<?> request = HttpRequest.GET("/hello").accept(MediaType.TEXT_PLAIN);  // <3>
         String body = client.toBlocking().retrieve(request);
 
         assertNotNull(body);
