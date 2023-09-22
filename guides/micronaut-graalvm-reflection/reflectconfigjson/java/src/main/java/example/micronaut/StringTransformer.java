@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 
 @Singleton // <1>
 public class StringTransformer {
+
     private static final Logger LOG = LoggerFactory.getLogger(StringTransformer.class);
 
     String transform(String input, String className, String methodName) {

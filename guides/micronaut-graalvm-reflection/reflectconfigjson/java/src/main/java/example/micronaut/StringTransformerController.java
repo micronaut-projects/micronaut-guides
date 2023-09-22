@@ -8,6 +8,7 @@ import io.micronaut.http.annotation.QueryValue;
 
 @Controller("/transformer") // <1>
 public class StringTransformerController {
+
     private final StringTransformer transformer;
 
     public StringTransformerController(StringTransformer transformer) {  // <2>
@@ -29,5 +30,4 @@ public class StringTransformerController {
         String methodName = "reverse";
         return transformer.transform(q, className, methodName);
     }
-
 }

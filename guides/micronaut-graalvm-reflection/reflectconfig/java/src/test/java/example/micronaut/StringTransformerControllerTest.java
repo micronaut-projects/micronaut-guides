@@ -35,5 +35,4 @@ class StringTransformerControllerTest {
                 .queryParam("q", "hello")
                 .build();
     }
-
 }
