@@ -1,0 +1,32 @@
+GraalVM provides a https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/#tracing-agent[Tracing Agent] to easily gather metadata and prepare configuration files.
+
+:exclude-for-build:maven
+
+https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#agent-support[Native tests integrate with the agent]. If you execute:
+
+`./gradlew -Pagent nativeTest`.
+
+____
+It runs the tests on JVM with the native-image agent, collects the metadata and uses it for testing on native-image.
+____
+
+A `reflect-config.json` file is generated in the `build/native/agent-output/test` directory.
+
+[source, bash]
+----
+build/native
+├── agent-output
+│   └── test
+│       ├── agent-extracted-predefined-classes
+│       ├── jni-config.json
+│       ├── predefined-classes-config.json
+│       ├── proxy-config.json
+│       ├── reflect-config.json
+│       ├── resource-config.json
+│       └── serialization-config.json
+----
+
+From that file, we will only include the entries related to the `StringCapitalizer` and `StringReverser` classes which appear in `reflect-config-json`.
+
+:exclude-for-build:
+

@@ -1,0 +1,172 @@
+common:header.adoc[]
+
+In this tutorial, you are going to learn how to use https://www.graalvm.org/latest/reference-manual/native-image/dynamic-features/Reflection/[Reflection in Native Image] within a Micronaut application.
+
+____
+Java reflection support (the java.lang.reflect.* API) enables Java code to examine its own classes, methods, fields and their properties at run time.
+
+Native Image has partial support for reflection and needs to know ahead-of-time the reflectively accessed program elements.
+____
+
+Micronaut Framework internals do not use reflection. However, you may want to use reflection in your application or use a Java library that uses reflection.
+
+In this tutorial, you will create a Micronaut application that uses reflection, and you will see how to configure it to work with Native Image.
+
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Create the Application
+
+common:cli-or-launch.adoc[]
+
+== Reflection Example
+
+=== Classes
+
+Create two classes to transform a `java.lang.String`. You will invoke them via https://www.oracle.com/technical-resources/articles/java/javareflection.html[Java Reflection].
+
+source:StringReverser[app=reflectconfigjson]
+
+source:StringCapitalizer[app=reflectconfigjson]
+
+=== Singleton
+
+Create a singleton class that transform a `java.lang.String` via reflection.
+
+source:StringTransformer[app=reflectconfigjson]
+
+callout:singleton[1]
+
+=== Controller
+
+Create a controller, which exposes two routes, and calls the `StringTransformer` passing it a class name and method name.
+
+source:StringTransformerController[app=reflectconfigjson]
+
+callout:controller[number=1,arg0=/transformer]
+callout:constructor-di[number=2,arg0=StringTransformer]
+callout:produces[3]
+callout:query-value-server[number=4,arg0=q]
+
+=== Tests
+
+Write a test which should pass both for JIT or Native Image.
+
+test:StringTransformerControllerTest[app=reflectconfigjson]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:uri-builder[3]
+
+common:testApp.adoc[]
+
+common:nativetest.adoc[]
+
+==== Test Failures
+
+Test will fail you will see something like:
+
+[source,bash]
+----
+ JUnit Jupiter:StringTransformerControllerTest:reverse(HttpClient)
+    MethodSource [className = 'example.micronaut.StringTransformerControllerTest', methodName = 'reverse', methodParameterTypes = 'io.micronaut.http.client.HttpClient']
+    => org.opentest4j.AssertionFailedError: expected: <olleh> but was: <hello>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+       org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+       org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+       org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1141)
+       example.micronaut.StringTransformerControllerTest.reverse(StringTransformerControllerTest.java:29)
+       java.base@17.0.8/java.lang.reflect.Method.invoke(Method.java:568)
+       io.micronaut.test.extensions.junit5.MicronautJunit5Extension$2.proceed(MicronautJunit5Extension.java:142)
+       io.micronaut.test.extensions.AbstractMicronautExtension.interceptEach(AbstractMicronautExtension.java:155)
+       [...]
+
+Test run finished after 74 ms
+[         3 containers found      ]
+[         0 containers skipped    ]
+[         3 containers started    ]
+[         0 containers aborted    ]
+[         3 containers successful ]
+[         0 containers failed     ]
+[         3 tests found           ]
+[         0 tests skipped         ]
+[         3 tests started         ]
+[         0 tests aborted         ]
+[         1 tests successful      ]
+[         2 tests failed          ]
+
+
+FAILURE: Build failed with an exception.
+----
+
+== Handling Reflection
+
+**You can use https://www.graalvm.org/latest/reference-manual/native-image/dynamic-features/Reflection/[Reflection in Native Image]**. GraalVM analysis attempts to automatic detection of reflection usages.
+If automatic analysis fails, you can provide manually the program elements reflectively accessed at run time.
+
+You will see learn how to do this several ways with Micronaut Framework
+
+=== Generating Reflection Metadata with GraalVM Tracing Agent
+
+common:graalvm-tracing-agent.adoc[]
+
+=== reflect-config.json
+
+Reflection metadata can be provided to the native-image builder by providing JSON files stored in the `META-INF/native-image/<group.id>/<artifact.id>` project directory.
+
+Create a new file `src/main/resources/META-INF/native-image/example.micronaut.micronautguide/reflect-config.json`:
+
+resource:META-INF/native-image/example.micronaut.micronautguide/reflect-config.json[app=reflectconfigjson]
+
+If you execute the <<native-tests, Native Tests>> again, they will pass.
+
+=== @ReflectionConfig
+
+Delete the JSON file you created in the previous step. Replace it with a class with `@ReflectConfig` annotations.
+
+source:GraalConfig[app=reflectconfig]
+
+callout:reflectionconfig[1]
+
+common:graalvm-annotation-processor.adoc[]
+
+If you execute the <<native-tests, Native Tests>> again, they will pass.
+
+=== @ReflectiveAccess
+
+If you can access the code, as in this example, you can annotate the class or method being accessed with reflection with `@ReflectiveAccess`.
+
+Delete the `GraalConfig` class and annotate `StringReverser` and `StringCapitalizer` methods with `@ReflectiveAccess`.
+
+source:StringReverser[app=reflectiveaccess]
+
+source:StringCapitalizer[app=reflectiveaccess]
+
+callout:reflective-access[1]
+
+If you execute the <<native-tests, Native Tests>> again, they will pass.
+
+== Next steps
+
+Learn more about:
+
+- https://docs.micronaut.io/latest/guide/#graal[Micronaut for GraalVM]
+- https://www.graalvm.org/latest/reference-manual/native-image/dynamic-features/Reflection/#configuration-with-features[Reflection in Native Image]
+- https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/[Collect Metadata with the Tracing Agent]
+
+=== Docker and GraalVM
+
+- https://guides.micronaut.io/latest/micronaut-docker-image.html[Builing a Docker Image of your Micronaut Application].
+
+=== GraalVM Cloud deployment Guides
+
+- https://guides.micronaut.io/latest/micronaut-graalvm-native-image-google-cloud-platform-cloud-run.html[Deploy a GraalVM Native Executable to Google Cloud Run]
+- Deploy a GraalVM Native Executable of an https://guides.micronaut.io/latest/mn-application-aws-lambda-graalvm.html[application] or a https://guides.micronaut.io/latest/mn-serverless-function-aws-lambda-graalvm.html[function] to AWS Lambda
+
+
+
+common:helpWithMicronaut.adoc[]
