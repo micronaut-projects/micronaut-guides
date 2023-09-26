@@ -157,7 +157,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 4.1.1</p>
+<p>Micronaut Version: 4.1.2</p>
 </div>
 </div>
 </div>
@@ -307,99 +307,25 @@ open class HomeController {
 <div class="title">src/test/kotlin/example/micronaut/HomeControllerTest.kt</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut;
-import com.amazonaws.services.lambda.runtime.*
-
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import io.micronaut.function.aws.proxy.payload1.ApiGatewayProxyRequestEventFunction
+import io.micronaut.function.aws.proxy.MockLambdaContext
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import io.micronaut.http.HttpMethod
 
-class FunctionRequestHandlerTest {
+class HomeControllerTest {
 
     @Test
-    fun testFunctionRequestHandler() {
+    fun testHandler() {
         val handler = ApiGatewayProxyRequestEventFunction()
         val request = APIGatewayProxyRequestEvent()
         request.httpMethod = &quot;GET&quot;
         request.path = &quot;/&quot;
-        val response = handler.handleRequest(request, lambdaContext)
+        val response = handler.handleRequest(request, MockLambdaContext())
+
         assertEquals(200, response.statusCode)
         assertEquals(&quot;{\&quot;message\&quot;:\&quot;Hello World\&quot;}&quot;, response.body)
         handler.applicationContext.close()
-    }
-
-    val lambdaContext = object : Context {
-        override fun getAwsRequestId(): String {
-            return &quot;&quot;
-        }
-
-        override fun getLogGroupName(): String {
-            return &quot;&quot;
-        }
-
-        override fun getLogStreamName(): String {
-            return &quot;&quot;
-        }
-
-        override fun getFunctionName(): String {
-            return &quot;&quot;
-        }
-
-        override fun getFunctionVersion(): String {
-            return &quot;&quot;
-        }
-
-        override fun getInvokedFunctionArn(): String {
-            return &quot;&quot;
-        }
-
-        override fun getIdentity(): CognitoIdentity {
-            return object : CognitoIdentity {
-                override fun getIdentityId(): String {
-                    return &quot;&quot;
-                }
-
-                override fun getIdentityPoolId(): String {
-                    return &quot;&quot;
-                }
-            }
-        }
-
-        override fun getClientContext(): ClientContext {
-            return object : ClientContext {
-                override fun getClient(): Client {
-                    TODO(&quot;Not yet implemented&quot;)
-                }
-
-                override fun getCustom(): MutableMap&lt;String, String&gt; {
-                    return mutableMapOf()
-                }
-
-                override fun getEnvironment(): MutableMap&lt;String, String&gt; {
-                    return mutableMapOf()
-                }
-            }
-        }
-
-        override fun getRemainingTimeInMillis(): Int {
-            return 0
-        }
-
-        override fun getMemoryLimitInMB(): Int {
-            return 0
-        }
-
-        override fun getLogger(): LambdaLogger {
-            return object : LambdaLogger {
-                override fun log(message: String?) {
-                }
-                override fun log(message: ByteArray?) {
-                }
-            }
-        }
-
     }
 }</code></pre>
 </div>

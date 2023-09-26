@@ -155,7 +155,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 4.1.1</p>
+<p>Micronaut Version: 4.1.2</p>
 </div>
 </div>
 </div>
@@ -288,13 +288,9 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/test/groovy/example/micronaut/HomeControllerSpec.groovy</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.ClientContext</span>
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.CognitoIdentity</span>
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.Context</span>
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.LambdaLogger</span>
 <span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.function.aws.proxy.payload1.ApiGatewayProxyRequestEventFunction</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.function.aws.proxy.MockLambdaContext</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpMethod</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>
 <span class="keyword">import</span> <span class="include">spock.lang.AutoCleanup</span>
@@ -312,69 +308,13 @@ If you have an existing Micronaut application and want to add the functionality 
         request.httpMethod = HttpMethod.GET.toString()
 
         <span class="key">when</span>:
-        APIGatewayProxyResponseEvent response = handler.handleRequest(request, lambdaContext)
+        <span class="keyword">def</span> response = handler.handleRequest(request, <span class="keyword">new</span> MockLambdaContext())
+
         <span class="key">then</span>:
         HttpStatus.OK.code == response.statusCode.intValue()
         <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">message</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">Hello World</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span> == response.getBody()
     }
 
-   <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Context</span> lambdaContext = <span class="keyword">new</span> <span class="predefined-type">Context</span>() {
-
-        <span class="annotation">@Override</span>
-        <span class="predefined-type">String</span> getAwsRequestId() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="predefined-type">String</span> getLogGroupName() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="predefined-type">String</span> getLogStreamName() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="predefined-type">String</span> getFunctionName() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="predefined-type">String</span> getFunctionVersion() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="predefined-type">String</span> getInvokedFunctionArn() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-
-        <span class="annotation">@Override</span>
-        CognitoIdentity getIdentity() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-
-        <span class="annotation">@Override</span>
-        ClientContext getClientContext() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="type">int</span> getRemainingTimeInMillis() {
-            <span class="keyword">return</span> <span class="integer">0</span>
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="type">int</span> getMemoryLimitInMB() {
-            <span class="keyword">return</span> <span class="integer">0</span>
-        }
-
-        <span class="annotation">@Override</span>
-        LambdaLogger getLogger() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-    }
 }</code></pre>
 </div>
 </div>

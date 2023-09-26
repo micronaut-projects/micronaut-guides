@@ -155,7 +155,7 @@
 <p>Authors: Sergio del Amo</p>
 </div>
 <div class="paragraph">
-<p>Micronaut Version: 4.1.1</p>
+<p>Micronaut Version: 4.1.2</p>
 </div>
 </div>
 </div>
@@ -290,14 +290,9 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/test/java/example/micronaut/HomeControllerTest.java</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.ClientContext</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.CognitoIdentity</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.Context</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.LambdaLogger</span>;
-
 <span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.function.aws.proxy.payload1.ApiGatewayProxyRequestEventFunction</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.function.aws.proxy.MockLambdaContext</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpMethod</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.AfterAll</span>;
@@ -306,15 +301,15 @@ If you have an existing Micronaut application and want to add the functionality 
 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 
-<span class="directive">public</span> <span class="type">class</span> <span class="class">HomeControllerTest</span> {
+<span class="type">class</span> <span class="class">HomeControllerTest</span> {
     <span class="directive">private</span> <span class="directive">static</span> ApiGatewayProxyRequestEventFunction handler;
 
     <span class="annotation">@BeforeAll</span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> setupSpec() {
+    <span class="directive">static</span> <span class="type">void</span> setupSpec() {
         handler = <span class="keyword">new</span> ApiGatewayProxyRequestEventFunction();
     }
     <span class="annotation">@AfterAll</span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> cleanupSpec() {
+    <span class="directive">static</span> <span class="type">void</span> cleanupSpec() {
         handler.getApplicationContext().close();
     }
 
@@ -323,68 +318,11 @@ If you have an existing Micronaut application and want to add the functionality 
         APIGatewayProxyRequestEvent request = <span class="keyword">new</span> APIGatewayProxyRequestEvent();
         request.setPath(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>);
         request.setHttpMethod(HttpMethod.GET.toString());
-        APIGatewayProxyResponseEvent response = handler.handleRequest(request, lambdaContext);
+        <span class="type">var</span> response = handler.handleRequest(request, <span class="keyword">new</span> MockLambdaContext());
+
         assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
         assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">message</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">Hello World</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span>,  response.getBody());
     }
-
-   <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Context</span> lambdaContext = <span class="keyword">new</span> <span class="predefined-type">Context</span>() {
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="predefined-type">String</span> getAwsRequestId() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="predefined-type">String</span> getLogGroupName() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="predefined-type">String</span> getLogStreamName() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="predefined-type">String</span> getFunctionName() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="predefined-type">String</span> getFunctionVersion() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="predefined-type">String</span> getInvokedFunctionArn() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> CognitoIdentity getIdentity() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> ClientContext getClientContext() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="type">int</span> getRemainingTimeInMillis() {
-            <span class="keyword">return</span> <span class="integer">0</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> <span class="type">int</span> getMemoryLimitInMB() {
-            <span class="keyword">return</span> <span class="integer">0</span>;
-        }
-
-        <span class="annotation">@Override</span>
-        <span class="directive">public</span> LambdaLogger getLogger() {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-        }
-    };
 }</code></pre>
 </div>
 </div>
