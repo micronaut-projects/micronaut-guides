@@ -50,6 +50,52 @@ callout:constructor-di[number=2,arg0=StringTransformer]
 callout:produces[3]
 callout:query-value-server[number=4,arg0=q]
 
+common:runapp.adoc[]
+
+You can execute the endpoint exposed by application:
+
+[source, bash]
+----
+curl "localhost:8080/transformer/capitalize?q=Hello"
+----
+
+As expected, the output is:
+
+[source]
+----
+HELLO
+----
+
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+== Invoke the Native Image
+
+You can execute the endpoint exposed by the native executable:
+
+[source, bash]
+----
+curl "localhost:8080/transformer/capitalize?q=Hello"
+----
+
+[source]
+----
+Hello
+----
+
+Transformation does not work the native executable. The response is `Hello` instead of the expected `HELLO`.
+
+You will see an ERROR log in the native image execution logs:
+
+[source, bash]
+----
+ ERROR example.micronaut.StringTransformer - Class not found: example.micronaut.StringCapitalizer
+----
+
+In the next sections, you wil provide the necessary reflection metadata.
+
 === Tests
 
 Write a test which should pass both for JIT or Native Image.
