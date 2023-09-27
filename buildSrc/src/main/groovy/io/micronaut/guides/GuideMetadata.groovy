@@ -45,7 +45,7 @@ class GuideMetadata {
         if (this.categories == null) {
             return this.tags
         }
-        Set<String> categoriesAsTags = this.categories.stream().map(cat -> cat.name().toLowerCase()).collect(Collectors.toSet());
+        Set<String> categoriesAsTags = this.categories.collect { cat -> cat.name().toLowerCase() } as Set
         if (this.tags == null) {
             return categoriesAsTags as List<String>
         }
