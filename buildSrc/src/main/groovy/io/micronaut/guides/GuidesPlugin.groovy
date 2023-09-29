@@ -435,13 +435,17 @@ class GuidesPlugin implements Plugin<Project> {
         '"' + it + '"'
     }
 
+    private static String sys(String name) {
+        System.getProperty(name)
+    }
+
     private static boolean isGraalVMJava() {
-        (System.getProperty("java.home") != null && Files.exists(Paths.get("${System.getProperty("java.home")}/lib/graalvm")))
-                || Arrays.asList("jvmci.Compiler", "java.vendor.version", "java.vendor")
-                .stream()
-                .anyMatch(propertyName -> {
-                    String value = System.getProperty(propertyName)
-                    value != null && value.toLowerCase(Locale.ENGLISH).contains("graal")
-                })
+        (
+                sys("java.home") != null && Files.exists(Paths.get("${sys("java.home")}/lib/graalvm"))
+        ) || [
+                "jvmci.Compiler",
+                "java.vendor.version",
+                "java.vendor"
+        ].any { sys(it)?.toLowerCase(Locale.ENGLISH)?.contains("graal") }
     }
 }
