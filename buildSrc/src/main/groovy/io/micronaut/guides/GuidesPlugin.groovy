@@ -21,6 +21,8 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.function.Predicate
 import java.util.stream.Collectors
 
@@ -434,11 +436,12 @@ class GuidesPlugin implements Plugin<Project> {
     }
 
     private static boolean isGraalVMJava() {
-        return Arrays.asList("jvmci.Compiler", "java.vendor.version", "java.vendor")
+        (System.getProperty("java.home") != null && Files.exists(Paths.get("${System.getProperty("java.home")}/lib/graalvm")))
+                || Arrays.asList("jvmci.Compiler", "java.vendor.version", "java.vendor")
                 .stream()
                 .anyMatch(propertyName -> {
                     String value = System.getProperty(propertyName)
-                    return value != null && value.toLowerCase(Locale.ENGLISH).contains("graal");
+                    value != null && value.toLowerCase(Locale.ENGLISH).contains("graal")
                 })
     }
 }
