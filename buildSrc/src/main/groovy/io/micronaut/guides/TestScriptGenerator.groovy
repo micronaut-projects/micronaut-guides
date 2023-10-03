@@ -2,12 +2,13 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import io.micronaut.starter.options.BuildTool
-
 import java.util.stream.Collectors
-
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.GRADLE
 import static io.micronaut.starter.options.BuildTool.MAVEN
+import io.micronaut.starter.api.TestFramework
+import io.micronaut.starter.options.Language
+import io.micronaut.starter.options.BuildTool
 
 @CompileStatic
 class TestScriptGenerator {
@@ -84,6 +85,13 @@ exit 0
         generateTestScript(output, script)
     }
 
+    static void generateNativeTestScript(File output,
+                                   List<GuideMetadata> metadatas,
+                                   boolean stopIfFailure) {
+        String script = generateScript(metadatas, stopIfFailure, true)
+        generateTestScript(output, script, 'native-test.sh')
+    }
+
     static void generateTestScript(File output, String script, String scriptFileName = "test.sh") {
         File testScript = new File(output, scriptFileName)
         testScript.createNewFile()
@@ -91,8 +99,25 @@ exit 0
         testScript.executable = true
     }
 
+    static boolean supportsNativeTest(GuideMetadata.App app, GuidesOption guidesOption) {
+        isMicronautFramework(app) &&
+        guidesOption.buildTool.isGradle() && // right now we don't support Maven native tests without adding a profile
+        supportsNativeTest(guidesOption.language) &&
+        guidesOption.testFramework == TestFramework.JUNIT
+
+    }
+
+    static boolean isMicronautFramework(GuideMetadata.App app) {
+        !app.framework || app.framework == "Micronaut"
+    }
+
+    static boolean supportsNativeTest(Language language) {
+        language != Language.GROOVY
+    }
+
     static String generateScript(List<GuideMetadata> metadatas,
-                                 boolean stopIfFailure) {
+                                 boolean stopIfFailure,
+                                 boolean nativeTest = false) {
         StringBuilder bashScript = new StringBuilder('''\
 #!/usr/bin/env bash
 set -e
@@ -116,13 +141,17 @@ EXIT_STATUS=0
                     continue
                 }
                 if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
-                    bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool)
+                    if (!nativeTest || supportsNativeTest(metadata.apps.find { it.name == DEFAULT_APP_NAME }, guidesOption)) {
+                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, nativeTest)
+                    }
                 } else {
                     bashScript << """\
 cd $folder
 """
                     for (GuideMetadata.App app : metadata.apps) {
-                        bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool)
+                        if (!nativeTest || supportsNativeTest(app, guidesOption)) {
+                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, nativeTest)
+                        }
                     }
                     bashScript << """\
 cd ..
@@ -152,21 +181,35 @@ fi
         bashScript
     }
 
-    private static String scriptForFolder(String nestedFolder, String folder,
-                                          boolean stopIfFailure, BuildTool buildTool) {
+    private static String scriptForFolder(String nestedFolder,
+                                          String folder,
+                                          boolean stopIfFailure,
+                                          BuildTool buildTool,
+                                          boolean nativeTest = false) {
+        String testcopy = nativeTest ? "native tests" : "tests"
         String bashScript = """\
 cd $nestedFolder
 echo "-------------------------------------------------"
-echo "Executing '$folder' tests"
+echo "Executing '$folder' $testcopy"
+"""
+if (nativeTest) {
+bashScript += """\
+${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\\\$?
+"""
+} else {
+bashScript += """\
 ${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
 echo "Stopping shared test resources service (if created)"
 ${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
+"""
+}
+bashScript += """\
 cd ..
 """
         if (stopIfFailure) {
             bashScript += """\
 if [ \$EXIT_STATUS -ne 0 ]; then
-  echo "'$folder' tests failed => exit \$EXIT_STATUS"
+  echo "'$folder' $testcopy failed => exit \$EXIT_STATUS"
   exit \$EXIT_STATUS
 fi
 """
@@ -174,7 +217,7 @@ fi
             bashScript += """\
 if [ \$EXIT_STATUS -ne 0 ]; then
   FAILED_PROJECTS=("\${FAILED_PROJECTS[@]}" $folder)
-  echo "'$folder' tests failed => exit \$EXIT_STATUS"
+  echo "'$folder' $testcopy failed => exit \$EXIT_STATUS"
 fi
 EXIT_STATUS=0
 """

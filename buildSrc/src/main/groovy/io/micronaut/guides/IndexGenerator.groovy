@@ -384,11 +384,14 @@ class IndexGenerator {
         return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
     }
 
-    private static String category(cat) {
-        "<div class='category'>" +
+    private static String category(Object cat) {
+        String h1 = cat instanceof Category ?
+                '<a href="./tag-' + cat.name().toLowerCase() + '.html\">' + cat.toString() + '</a>' :
+                cat.toString().replace("_", " ")
+        '<div class="category">' +
         '<div class="inner">' +
         '<img width="100" style="margin-bottom: 30px" src="' + imageForCategory(cat) + '"/>' +
-        '<h1 class="title title_large first-word-bold first-word-break">' + cat + '</h1>' +
+        '<h1 class="title title_large first-word-bold first-word-break">' + h1 + '</h1>' +
         '<div class="underline"></div>' +
         "</div>" +
         "</div>"

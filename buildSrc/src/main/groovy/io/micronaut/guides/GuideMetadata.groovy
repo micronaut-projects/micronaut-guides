@@ -6,6 +6,7 @@ import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.Language
 import java.time.LocalDate
+import java.util.stream.Collectors
 
 @ToString(includeNames = true)
 @CompileStatic
@@ -36,6 +37,23 @@ class GuideMetadata {
     List<String> zipIncludes
 
     List<App> apps
+
+    List<String> getTags() {
+        if (this.tags == null && this.categories == null) {
+            return Collections.emptyList()
+        }
+        if (this.categories == null) {
+            return this.tags
+        }
+        Set<String> categoriesAsTags = this.categories.collect { cat -> cat.name().toLowerCase() } as Set
+        if (this.tags == null) {
+            return categoriesAsTags as List<String>
+        }
+         Set<String> result = new HashSet<>()
+         result.addAll(this.tags)
+         result.addAll(categoriesAsTags)
+         result as List<String>
+    }
 
     @ToString(includeNames = true)
     @CompileStatic

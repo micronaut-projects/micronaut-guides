@@ -1,0 +1,71 @@
+:exclude-for-languages:groovy
+
+== Native Tests
+
+:exclude-for-build:maven
+
+The `io.micronaut.application` https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/[Micronaut Gradle Plugin] automatically integrates with GraalVM by applying
+the https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#testing-support[Gradle plugin for GraalVM Native Image building].
+
+____
+This plugin supports running tests on the JUnit Platform as native images. This means that tests will be compiled and executed as native code.
+____
+
+To execute the tests, execute:
+
+[source, bash]
+----
+./gradlew nativeTest
+----
+
+Then open `build/reports/tests/test/index.html` in a browser to see the results.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+The https://graalvm.github.io/native-build-tools/latest/maven-plugin.html[Maven plugin for GraalVM Native Image building] allows you to https://graalvm.github.io/native-build-tools/latest/maven-plugin.html#testing-support[run native tests].
+
+____
+This plugin supports running tests on the JUnit Platform as native images. This means that tests will be compiled and executed as native code.
+____
+
+First, add the following profile to `pom.xml`:
+
+[source, xml]
+----
+ <profile>
+      <id>native</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <executions>
+              <execution>
+                <id>test-native</id>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <phase>test</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+----
+
+Then, to execute the native tests, execute:
+
+[source, bash]
+----
+./mvnw -Pnative test
+----
+
+:exclude-for-build:
+
+INFO: A test may be disabled within a GraalVM native image via the https://junit.org/junit5/docs/current/user-guide/#writing-tests-conditional-execution-native@DisabledInNativeImage[@DisabledInNativeImage] annotation.
+
+:exclude-for-languages:
