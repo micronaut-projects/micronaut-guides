@@ -16,7 +16,6 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -65,7 +64,6 @@ class ProductRepositoryTest implements TestPropertyProvider {  // <4>
         assertEquals(2, products.size());
     }
 
-    @Disabled("https://github.com/micronaut-projects/micronaut-data/pull/2520")
     @Test
     void shouldNotCreateAProductWithDuplicateCode() {
         Product product = new Product(3L, "p101", "Test Product");
