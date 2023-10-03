@@ -4,7 +4,6 @@ import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -29,6 +28,7 @@ class ProductRepositoryTest {
 
     @BeforeEach
     void setUp() throws IOException, SQLException {
+        SqlUtils.load(connection, resourceLoader, "sql/init-db.sql");
         SqlUtils.load(connection, resourceLoader, "sql/seed-data.sql");
     }
 
@@ -38,7 +38,6 @@ class ProductRepositoryTest {
         assertEquals(2, products.size());
     }
 
-    @Disabled("https://github.com/micronaut-projects/micronaut-data/pull/2520")
     @Test
     void shouldNotCreateAProductWithDuplicateCode() {
         Product product = new Product(3L, "p101", "Test Product");
