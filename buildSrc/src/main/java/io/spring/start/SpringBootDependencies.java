@@ -23,6 +23,8 @@ public final class SpringBootDependencies {
     private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_WEB = "spring-boot-starter-web";
     private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_TEST = "spring-boot-starter-test";
 
+    private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_JOOQ = "spring-boot-starter-jooq";
+
     public static final Dependency.Builder DEPENDENCY_SPRINGBOOT_STARTER = Dependency.builder()
             .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
             .artifactId(ARTIFACT_ID_SPRING_BOOT_STARTER)
@@ -36,6 +38,14 @@ public final class SpringBootDependencies {
             .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
             .artifactId(ARTIFACT_ID_SPRING_BOOT_STARTER_TEST)
             .test();
+
+    public static final Dependency.Builder DEPENDENCY_SPRINGBOOT_STARTER_JOOQ = Dependency.builder()
+            .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
+            .artifactId(ARTIFACT_ID_SPRING_BOOT_STARTER_JOOQ)
+            .compile();
+
+
+
 
     private SpringBootDependencies() {
     }
