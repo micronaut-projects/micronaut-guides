@@ -1071,7 +1071,6 @@ the dynamic property registration through the <strong>TestPropertyProvider</stro
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions</span>.*;
 
 <span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">datasources.default.init-script-path</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">classpath:sql/init-db.sql</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="type">class</span> <span class="class">ProductRepositoryTest</span> {
 
     <span class="annotation">@Inject</span>
@@ -1085,6 +1084,7 @@ the dynamic property registration through the <strong>TestPropertyProvider</stro
 
     <span class="annotation">@BeforeEach</span>
     <span class="type">void</span> setUp() <span class="directive">throws</span> <span class="exception">IOException</span>, <span class="exception">SQLException</span> {
+        SqlUtils.load(connection, resourceLoader, <span class="string"><span class="delimiter">&quot;</span><span class="content">sql/init-db.sql</span><span class="delimiter">&quot;</span></span>);
         SqlUtils.load(connection, resourceLoader, <span class="string"><span class="delimiter">&quot;</span><span class="content">sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>);
     }
 
@@ -1110,10 +1110,6 @@ the dynamic property registration through the <strong>TestPropertyProvider</stro
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. By default, each <code>@Test</code> method will be wrapped in a transaction that will be rolled back when the test finishes. This behaviour is is changed by setting <code>transaction</code> to <code>false</code>.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Annotate the class with <code>@Property</code> to supply a path to a SQL file on classpath, which will be executed at container startup.</td>
 </tr>
 </table>
 </div>
