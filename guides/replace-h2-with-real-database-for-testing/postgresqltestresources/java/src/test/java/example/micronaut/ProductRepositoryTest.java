@@ -16,7 +16,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest(startApplication = false) // <1>
-@Property(name = "datasources.default.init-script-path", value = "classpath:sql/init-db.sql") // <2>
 class ProductRepositoryTest {
 
     @Inject
@@ -30,6 +29,7 @@ class ProductRepositoryTest {
 
     @BeforeEach
     void setUp() throws IOException, SQLException {
+        SqlUtils.load(connection, resourceLoader, "sql/init-db.sql");
         SqlUtils.load(connection, resourceLoader, "sql/seed-data.sql");
     }
 
