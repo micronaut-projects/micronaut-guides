@@ -11,7 +11,7 @@ import java.util.stream.Collectors
 @ToString(includeNames = true)
 @CompileStatic
 class GuideMetadata {
-
+    private static final String MICRONAUT_PREFIX = "micronaut-"
     String asciidoctor
     String slug
     String title
@@ -38,21 +38,25 @@ class GuideMetadata {
 
     List<App> apps
 
+
     List<String> getTags() {
-        if (this.tags == null && this.categories == null) {
-            return Collections.emptyList()
+
+        Set<String> tagsList = new HashSet<>()
+        if (this.tags != null) {
+            tagsList.addAll(this.tags)
         }
-        if (this.categories == null) {
-            return this.tags
+        for (App app : this.apps) {
+            for (String featureName : app.javaFeatures + app.kotlinFeatures + app.groovyFeatures + app.visibleFeatures + app.invisibleFeatures) {
+                if (featureName.startsWith(MICRONAUT_PREFIX)) {
+                    tagsList.add(featureName.substring(MICRONAUT_PREFIX.length()))
+                } else {
+                    tagsList.add(featureName)
+                }
+            }
         }
         Set<String> categoriesAsTags = this.categories.collect { cat -> cat.name().toLowerCase() } as Set
-        if (this.tags == null) {
-            return categoriesAsTags as List<String>
-        }
-         Set<String> result = new HashSet<>()
-         result.addAll(this.tags)
-         result.addAll(categoriesAsTags)
-         result as List<String>
+        tagsList.addAll(categoriesAsTags)
+        tagsList as List<String>
     }
 
     @ToString(includeNames = true)
