@@ -38,7 +38,6 @@ class GuideMetadata {
 
     List<App> apps
 
-
     List<String> getTags() {
 
         Set<String> tagsList = new HashSet<>()
