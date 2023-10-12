@@ -1,0 +1,79 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:micronaut-views-thymeleaf.adoc[]
+
+=== API Response
+
+For this guide, we will use a publicly available REST API https://jsonplaceholder.typicode.com/[jsonplaceholder.typicode.com] as a 3rd party *Photo API*.
+
+Create a `Photo` record to map the API response:
+
+source:Photo[]
+
+callout:serdeable[1]
+callout:reflective-access[2]
+
+Thymeleaf accesses `Photo` via reflection. By adding the `@ReflectiveAccess` annotation, the Micronaut Graal annotation processor generates the necessary reflection metadata to generate a Native Image with https://graalvm.org[GraalVM].
+
+=== HTTP Client
+
+Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client]:
+
+source:PhotosClient[]
+
+callout:client[1]
+callout:get[number=2,arg0=findById,arg1=/photos/{id}]
+callout:pathvariable[3]
+
+=== HTTP Client Configuration
+
+We used `photos` as the HTTP Client identifier.
+
+Configure the `micronaut.http.services.photos.url` to point the client identifier to https://jsonplaceholder.typicode.com/[jsonplaceholder.typicode.com]
+
+resource:application.properties[tag=clienturl]
+
+=== Controller
+
+Create a controller, which invokes the declarative HTTP client:
+
+source:PhotosController[]
+
+callout:controller[number=1,arg0=/photos]
+callout:constructor-di[number=2,arg0=PhotosClient]
+callout:produces-html[3]
+callout:executes-on[4]
+callout:view[5]
+callout:get[number=6,arg0=findById,arg1=/photos/{id}]
+callout:pathvariable[7]
+
+=== Thymeleaf template
+
+Create a Thymeleaf template in `src/main/resources/views/photos/show.html`:
+
+resource:views/photos/show.html[]
+
+=== Tests
+
+Write a test that verifies the application renders the HTML page.
+
+test:PhotosControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+
+common:testApp.adoc[]
+
+common:nativetest.adoc[]
+
+common:next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-views/latest/guide/[Micronaut Views].
+
+common:helpWithMicronaut.adoc[]
