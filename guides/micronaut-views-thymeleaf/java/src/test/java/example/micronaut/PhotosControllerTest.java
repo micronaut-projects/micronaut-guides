@@ -11,10 +11,13 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest // <1>
 class PhotosControllerTest {
+
     @Test
     void photoTest(@Client("/") HttpClient httpClient) { // <2>
         BlockingHttpClient client = httpClient.toBlocking();
