@@ -194,7 +194,7 @@ echo "Executing '$folder' $testcopy"
 """
 if (nativeTest) {
 bashScript += """\
-${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\\\$?
+${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
 """
 } else {
 bashScript += """\
