@@ -1,4 +1,5 @@
 package example.micronaut;
+
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import org.junit.jupiter.api.AfterAll;
@@ -7,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FunctionRequestHandlerTest {
+class FunctionRequestHandlerTest {
 
     private static FunctionRequestHandler handler;
 
@@ -24,7 +25,7 @@ public class FunctionRequestHandlerTest {
     }
 
     @Test
-    public void testHandler() {
+    void testHandler() {
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
         request.setHttpMethod("GET");
         request.setPath("/");

@@ -1,4 +1,5 @@
 package example.micronaut
+
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

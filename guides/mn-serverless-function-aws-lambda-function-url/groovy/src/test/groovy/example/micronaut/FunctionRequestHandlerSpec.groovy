@@ -1,4 +1,5 @@
 package example.micronaut
+
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import spock.lang.AutoCleanup
@@ -14,14 +15,14 @@ class FunctionRequestHandlerSpec extends Specification {
     void "test Handler"() {
         given:
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent()
-        request.setHttpMethod("GET")
-        request.setPath("/")
+        request.httpMethod = "GET"
+        request.path = "/"
 
         when:
         APIGatewayProxyResponseEvent response = handler.execute(request)
 
         then:
-        200 == response.getStatusCode().intValue()
-        "{\"message\":\"Hello World\"}" == response.body
+        response.getStatusCode().intValue() == 200
+        response.body == '{"message":"Hello World"}'
     }
 }
