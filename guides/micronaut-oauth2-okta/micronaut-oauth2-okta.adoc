@@ -4,11 +4,7 @@ common:requirements.adoc[]
 
 common:completesolution.adoc[]
 
-common:create-app.adoc[]
-
-common:micronaut-views-thymeleaf.adoc[]
-
-=== OAuth 2.0
+== OAuth 2.0
 
 Sign up at https://developer.okta.com[developer.okta.com] and create a Web application with the following characteristics:
 
@@ -19,6 +15,10 @@ Sign up at https://developer.okta.com[developer.okta.com] and create a Web appli
 
 image::okta-app.png[]
 
+common:create-app.adoc[]
+
+=== Security Dependencies
+
 To use OAuth 2.0 integration, add the following dependency:
 
 dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
@@ -27,18 +27,21 @@ Also add JWT https://micronaut-projects.github.io/micronaut-security/latest/guid
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
+common:micronaut-views-thymeleaf.adoc[]
+
+=== Configuration
+
 Add the following OAuth2 Configuration:
 
-common:yaml-dependency.adoc[]
-
-resource:application.yml[tag=oauth2]
+resource:application.properties[tag=oauth2]
 
 callout:authentication-idtoken[number=1,arg0=Okta]
 <2> The provider identifier should match the last part of the URL you entered as a redirect URL `/oauth/callback/okta`
-<3> Client Secret. See previous screenshot.
-<4> Client ID. See previous screenshot.
-<5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
-<6> Accept GET request to the `/logout` endpoint.
+<3> Client ID & Client Secret. See previous screenshot.
+<4> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
+<5> Accept GET request to the `/logout` endpoint.
+
+==== Environment Variables
 
 The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OIDC_ISSUER_DOMAIN` and `OIDC_ISSUER_AUTHSERVERID` environment variables.
 
@@ -48,9 +51,12 @@ export OAUTH_CLIENT_ID=XXXXXXXXXX
 export OAUTH_CLIENT_SECRET=YYYYYYYYYY
 export OIDC_ISSUER_DOMAIN=https://dev-XXXXX.oktapreview.com
 export OIDC_ISSUER_AUTHSERVERID=default
+export OAUTH_ISSUER=https://dev-XXXXX.oktapreview.com/oauth2/default
 ----
 
 Check OKTA https://developer.okta.com/docs/api/resources/oidc#well-knownopenid-configuration[.well-known/openid-configuration documentation].
+
+=== Authorization Code Grant
 
 We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
 
@@ -66,6 +72,8 @@ callout:controller[number=1,arg0=/]
 callout:secured-anonymous[number=2]
 <3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
 <4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
+
+=== Thymleaf Template
 
 Create a thymeleaf template:
 
