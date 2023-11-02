@@ -1,10 +1,6 @@
 common:header-top.adoc[]
 
-Please read about https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support] to learn more about different Lambda runtime, Triggers, and Handlers, and how to integrate with a Micronaut application.
-
-If you want to respond to triggers such as queue events, S3 events, or single endpoints, you should opt to code your Micronaut functions as Serverless functions.
-
-In this guide, we will deploy a Micronaut serverless function to AWS Lambda.
+In this guide, **we will deploy a Micronaut serverless function to AWS Lambda Java 17 runtime and invoke it with a https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html[Lambda function URL]**.
 
 common:gettingStarted.adoc[]
 
@@ -18,24 +14,26 @@ common:cli-or-launch.adoc[]
 
 [source,bash]
 ----
-mn create-function-app example.micronaut.micronautguide --features=aws-lambda --build=@build@ --lang=@lang@
+mn create-function-app example.micronaut.micronautguide --features=@features@ --build=@build@ --lang=@lang@
 ----
 
 common:build-lang-arguments.adoc[]
 
-If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add the `aws-lambda` feature.
+If you use https://launch.micronaut.io[Micronaut Launch], select _serverless function_ as application type and add the `aws-lambda` and `aws-lambda-function-url` features.
 
 common:default-package.adoc[]
 
 https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
-The application contains a class extending https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler]
+== Handler
+
+Create  a class extending https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler] and define input and output types.
 
 source:FunctionRequestHandler[]
 
-* The class extends https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler] and defines input and output types.
+== Handler Test
 
-An included test shows how to verify the function behaviour:
+Write a test which verifies the function behaviour:
 
 test:FunctionRequestHandlerTest[]
 
@@ -50,6 +48,10 @@ common:testApp.adoc[]
 Create a Lambda Function. As a runtime, select Java 17 (Correto).
 
 image::create-function.png[]
+
+Enable **function URLs** and set `Auth Type` as `NONE`.
+
+image::enable-function-url.png[]
 
 === Upload Code
 
@@ -67,7 +69,19 @@ As Handler, set:
 
 image::handler-2.png[]
 
-common:lambda-test.adoc[]
+=== Obtain the Function URL
+
+You can obtain the Function URL in the AWS Console:
+
+image:aws-lambda-function-url.png[]
+
+Invoke it, via a cURL command:
+
+[source, bash]
+----
+% curl -i https://xxxxxxxx.lambda-url.xxxx.on.aws/
+{"message":"Hello World"}
+----
 
 common:next.adoc[]
 
