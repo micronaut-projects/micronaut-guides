@@ -181,6 +181,11 @@ fi
         bashScript
     }
 
+    // Return the Gradle command to run the tests.  If java is 17 or higher, use --no-daemon (so kapt properties are picked up if required)
+    private static String gradleCmd(String task, boolean quiet = true) {
+        "./gradlew ${Runtime.version().feature() > 17 ? '--no-daemon' : ''} ${quiet ? '-q' : ''} $task"
+    }
+
     private static String scriptForFolder(String nestedFolder,
                                           String folder,
                                           boolean stopIfFailure,
@@ -194,13 +199,13 @@ echo "Executing '$folder' $testcopy"
 """
 if (nativeTest) {
 bashScript += """\
-${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
+${buildTool == MAVEN ? './mvnw -Pnative test' : gradleCmd("nativeTest", false) } || EXIT_STATUS=\$?
 """
 } else {
 bashScript += """\
-${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
+${buildTool == MAVEN ? './mvnw -q test' : gradleCmd("test") } || EXIT_STATUS=\$?
 echo "Stopping shared test resources service (if created)"
-${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
+${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : gradleCmd('stopTestResourcesService') } > /dev/null 2>&1 || true
 """
 }
 bashScript += """\
