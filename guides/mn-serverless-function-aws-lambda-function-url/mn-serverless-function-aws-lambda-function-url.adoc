@@ -1,0 +1,94 @@
+common:header-top.adoc[]
+
+In this guide, **we will deploy a Micronaut serverless function to AWS Lambda Java 17 runtime and invoke it with a https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html[Lambda function URL]**.
+
+common:gettingStarted.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Writing the Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app example.micronaut.micronautguide --features=@features@ --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select _serverless function_ as application type and add the `aws-lambda` and `aws-lambda-function-url` features.
+
+common:default-package.adoc[]
+
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+
+== Handler
+
+Create  a class extending https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestHandler.html[MicronautRequestHandler] and define input and output types.
+
+source:FunctionRequestHandler[]
+
+== Handler Test
+
+Write a test which verifies the function behaviour:
+
+test:FunctionRequestHandlerTest[]
+
+* When you instantiate the Handler, the application context starts.
+* Remember to close your application context when you end your test. You can use your handler to obtain it.
+* Invoke the `execute` method of the handler.
+
+common:testApp.adoc[]
+
+== Lambda
+
+Create a Lambda Function. As a runtime, select Java 17 (Correto).
+
+image::create-function.png[]
+
+Enable **function URLs** and set `Auth Type` as `NONE`.
+
+image::enable-function-url.png[]
+
+=== Upload Code
+
+common:executable-jar.adoc[]
+
+Upload it:
+
+image::upload-function-code.png[]
+
+=== Handler
+
+As Handler, set:
+
+`example.micronaut.FunctionRequestHandler`
+
+image::handler-2.png[]
+
+=== Obtain the Function URL
+
+You can obtain the Function URL in the AWS Console:
+
+image:aws-lambda-function-url.png[]
+
+Invoke it, via a cURL command:
+
+[source, bash]
+----
+% curl -i https://xxxxxxxx.lambda-url.xxxx.on.aws/
+{"message":"Hello World"}
+----
+
+common:next.adoc[]
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support]
+
+* https://aws.amazon.com/lambda/[AWS Lambda]
+
+common:helpWithMicronaut.adoc[]

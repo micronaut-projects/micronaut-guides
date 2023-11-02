@@ -218,13 +218,27 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (app.excludeSource) {
                     for (String mainSource : app.excludeSource) {
-                        deleteFile(destination, GuideAsciidocGenerator.mainPath(appName, mainSource), guidesOption)
+                        File f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(appName, mainSource), guidesOption)
+                        if (f.exists()) {
+                            f.delete()
+                        }
+                        f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(EMPTY_STRING, mainSource), guidesOption)
+                        if (f.exists()) {
+                            f.delete()
+                        }
                     }
                 }
 
                 if (app.excludeTest) {
                     for (String testSource : app.excludeTest) {
-                        deleteFile(destination, GuideAsciidocGenerator.testPath(appName, testSource, testFramework), guidesOption)
+                        File f = fileToDelete(destination, GuideAsciidocGenerator.testPath(appName, testSource, testFramework), guidesOption)
+                        if (f.exists()) {
+                            f.delete()
+                        }
+                        f = fileToDelete(destination, GuideAsciidocGenerator.testPath(EMPTY_STRING, testSource, testFramework), guidesOption)
+                        if (f.exists()) {
+                            f.delete()
+                        }
                     }
                 }
 
@@ -261,12 +275,15 @@ class GuideProjectGenerator implements AutoCloseable {
         }
     }
 
-    private static void deleteFile(File destination, String path, GuidesOption guidesOption) {
+    private static File fileToDelete(File destination, String path, GuidesOption guidesOption) {
         Paths.get(destination.absolutePath, path
                 .replace("@lang@", guidesOption.language.toString())
                 .replace("@languageextension@", guidesOption.language.extension))
                 .toFile()
-                .delete()
+    }
+
+    private static void deleteFile(File destination, String path, GuidesOption guidesOption) {
+        fileToDelete(destination, path, guidesOption).delete()
     }
 
     private static void copyFile(File inputDir, File destinationRoot, String filePath) {
