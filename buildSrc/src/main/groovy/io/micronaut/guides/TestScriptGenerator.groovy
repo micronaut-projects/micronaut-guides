@@ -124,6 +124,11 @@ set -e
 
 FAILED_PROJECTS=()
 EXIT_STATUS=0
+
+kill_kotlin_daemon () {
+  echo "Killing KotlinCompile daemon to pick up fresh properties (due to kapt and java > 17)"
+  jps | grep KotlinCompile | cut -d' ' -f1 | xargs kill -9
+}
 ''')
 
         metadatas.sort { it.slug }
@@ -141,8 +146,10 @@ EXIT_STATUS=0
                     continue
                 }
                 if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
-                    if (!nativeTest || supportsNativeTest(metadata.apps.find { it.name == DEFAULT_APP_NAME }, guidesOption)) {
-                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, nativeTest)
+                    def defaultApp = metadata.apps.find { it.name == DEFAULT_APP_NAME }
+                    if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
+                        def features = defaultApp.getFeatures(guidesOption.language)
+                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest)
                     }
                 } else {
                     bashScript << """\
@@ -150,7 +157,8 @@ cd $folder
 """
                     for (GuideMetadata.App app : metadata.apps) {
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
-                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, nativeTest)
+                            def features = app.getFeatures(guidesOption.language)
+                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest)
                         }
                     }
                     bashScript << """\
@@ -183,20 +191,24 @@ fi
 
     // Return the Gradle command to run the tests.  If java is 17 or higher, use --no-daemon (so kapt properties are picked up if required)
     private static String gradleCmd(String task, boolean quiet = true) {
-        "./gradlew ${Runtime.version().feature() > 17 ? '--no-daemon' : ''} ${quiet ? '-q' : ''} $task"
+        "./gradlew ${quiet ? '-q' : ''} $task"
     }
 
     private static String scriptForFolder(String nestedFolder,
                                           String folder,
                                           boolean stopIfFailure,
                                           BuildTool buildTool,
-                                          boolean nativeTest = false) {
+                                          boolean noDaemon,
+                                          boolean nativeTest) {
         String testcopy = nativeTest ? "native tests" : "tests"
         String bashScript = """\
 cd $nestedFolder
 echo "-------------------------------------------------"
 echo "Executing '$folder' $testcopy"
 """
+if (noDaemon) {
+    bashScript += "kill_kotlin_daemon\n"
+}
 if (nativeTest) {
 bashScript += """\
 ${buildTool == MAVEN ? './mvnw -Pnative test' : gradleCmd("nativeTest", false) } || EXIT_STATUS=\$?
@@ -207,6 +219,9 @@ ${buildTool == MAVEN ? './mvnw -q test' : gradleCmd("test") } || EXIT_STATUS=\$?
 echo "Stopping shared test resources service (if created)"
 ${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : gradleCmd('stopTestResourcesService') } > /dev/null 2>&1 || true
 """
+}
+if (noDaemon) {
+    bashScript += "kill_kotlin_daemon\n"
 }
 bashScript += """\
 cd ..
