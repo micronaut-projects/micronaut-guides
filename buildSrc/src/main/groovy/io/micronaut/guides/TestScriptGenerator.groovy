@@ -218,9 +218,9 @@ echo "Stopping shared test resources service (if created)"
 ${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
 """
 }
-//if (noDaemon) {
+if (noDaemon) {
     bashScript += "kill_kotlin_daemon\n"
-//}
+}
 bashScript += """\
 cd ..
 """
