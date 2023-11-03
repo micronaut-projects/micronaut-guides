@@ -127,7 +127,10 @@ EXIT_STATUS=0
 
 kill_kotlin_daemon () {
   echo "Killing KotlinCompile daemon to pick up fresh properties (due to kapt and java > 17)"
-  jps | grep KotlinCompile | cut -d' ' -f1 | xargs kill -9
+  for daemon in $(jps | grep KotlinCompile | cut -d' ' -f1); do
+    echo "Killing $daemon"
+    kill -9 $daemon
+  done
 }
 ''')
 
@@ -213,14 +216,11 @@ bashScript += """\
 ${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
 echo "Stopping shared test resources service (if created)"
 ${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
-echo "-------"
-jps
-echo "-------"
 """
 }
-if (noDaemon) {
+//if (noDaemon) {
     bashScript += "kill_kotlin_daemon\n"
-}
+//}
 bashScript += """\
 cd ..
 """
