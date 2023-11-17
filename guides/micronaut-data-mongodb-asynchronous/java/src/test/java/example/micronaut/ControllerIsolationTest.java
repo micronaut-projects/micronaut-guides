@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(transactional = false) // <1>
 @Property(name = "spec.name", value = "controller-isolation")
-public class ControllerIsolationTest {
+class ControllerIsolationTest {
 
     @Inject
     @Client("/")
