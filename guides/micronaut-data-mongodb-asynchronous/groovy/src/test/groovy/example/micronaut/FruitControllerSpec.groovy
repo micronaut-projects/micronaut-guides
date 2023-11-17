@@ -3,6 +3,8 @@ package example.micronaut
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import reactor.core.publisher.Flux
+
 import jakarta.inject.Inject
 import spock.lang.Specification
 
@@ -11,6 +13,13 @@ class FruitControllerSpec extends Specification {
 
     @Inject
     FruitClient fruitClient
+
+    @Inject
+    FruitRepository fruitRepository
+
+    def cleanup() { // <2>
+        Flux.from(fruitRepository.deleteAll()).blockFirst();
+    }
 
     void "empty database contains no fruit"() {
         expect:

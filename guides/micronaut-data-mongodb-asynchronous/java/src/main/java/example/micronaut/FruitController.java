@@ -1,6 +1,7 @@
 package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.async.annotation.SingleResult;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -9,10 +10,9 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.annotation.Status;
-import org.reactivestreams.Publisher;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 
@@ -32,11 +32,13 @@ class FruitController {
 
     @Post // <4>
     @Status(HttpStatus.CREATED) // <5>
+    @SingleResult
     Publisher<Fruit> save(@NonNull @NotNull @Valid Fruit fruit) { // <6>
         return fruitService.save(fruit);
     }
 
     @Put
+    @SingleResult
     Publisher<Fruit> update(@NonNull @NotNull @Valid Fruit fruit) {
         return fruitService.save(fruit);
     }
