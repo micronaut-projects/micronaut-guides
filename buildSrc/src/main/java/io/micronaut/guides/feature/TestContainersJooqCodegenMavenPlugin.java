@@ -31,6 +31,8 @@ public class TestContainersJooqCodegenMavenPlugin implements Feature {
 
             BuildProperties buildProperties = generatorContext.getBuildProperties();
             buildProperties.put("testcontainers-jooq-codegen-maven-plugin.version", "0.0.2");
+            buildProperties.put("testcontainers.version", "1.18.3");
+
             generatorContext.addBuildPlugin(MavenPlugin.builder()
                     .groupId("org.testcontainers")
                     .artifactId("testcontainers-jooq-codegen-maven-plugin")
