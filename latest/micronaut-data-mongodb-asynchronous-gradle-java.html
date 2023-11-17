@@ -194,7 +194,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=yaml,data-mongodb-reactive,reactor,testcontainers \
+    --features=yaml,data-mongodb-reactive,reactor \
     --build=gradle \
     --lang=java \
     --test=junit</code></pre>
@@ -216,7 +216,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>data-mongodb-reactive</code>, <code>reactor</code>, and <code>testcontainers</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>data-mongodb-reactive</code>, and <code>reactor</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -225,7 +225,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=data-mongodb-reactive&amp;features=reactor&amp;features=testcontainers&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=data-mongodb-reactive&amp;features=reactor&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -463,6 +463,7 @@ This will allow you to keep business logic out of the controller, and to test th
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.async.annotation.SingleResult</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
@@ -471,10 +472,9 @@ This will allow you to keep business logic out of the controller, and to test th
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Put</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.QueryValue</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Status</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.validation.Valid</span>;
 <span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
+<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
@@ -494,11 +494,13 @@ This will allow you to keep business logic out of the controller, and to test th
 
     <span class="annotation">@Post</span> <i class="conum" data-value="4"></i><b>(4)</b>
     <span class="annotation">@Status</span>(HttpStatus.CREATED) <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="annotation">@SingleResult</span>
     Publisher&lt;Fruit&gt; save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit) { <i class="conum" data-value="6"></i><b>(6)</b>
         <span class="keyword">return</span> fruitService.save(fruit);
     }
 
     <span class="annotation">@Put</span>
+    <span class="annotation">@SingleResult</span>
     Publisher&lt;Fruit&gt; update(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit) {
         <span class="keyword">return</span> fruitService.save(fruit);
     }
@@ -573,8 +575,8 @@ This will allow you to keep business logic out of the controller, and to test th
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Put</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.QueryValue</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
-
 <span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
+
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
@@ -669,7 +671,9 @@ Transaction mode is not supported when the synchronous transaction manager is cr
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.AfterEach</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 
 <span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
@@ -687,6 +691,14 @@ Transaction mode is not supported when the synchronous transaction manager is cr
     <span class="annotation">@Inject</span>
     FruitClient fruitClient;
 
+    <span class="annotation">@Inject</span>
+    FruitRepository fruitRepository;
+
+    <span class="annotation">@AfterEach</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="type">void</span> cleanup() {
+        Flux.from(fruitRepository.deleteAll()).blockFirst();
+    }
+
     <span class="annotation">@Test</span>
     <span class="type">void</span> emptyDatabaseContainsNoFruit() {
         assertEquals(<span class="integer">0</span>, StreamSupport.stream(fruitClient.list().spliterator(), <span class="predefined-constant">false</span>).count());
@@ -699,8 +711,7 @@ Transaction mode is not supported when the synchronous transaction manager is cr
         Fruit banana = response.getBody().get();
 
         <span class="predefined-type">Iterable</span>&lt;Fruit&gt; fruits = fruitClient.list();
-
-        <span class="predefined-type">List</span>&lt;Fruit&gt; fruitList = StreamSupport.stream(fruits.spliterator(), <span class="predefined-constant">false</span>).collect(Collectors.toList());
+        <span class="predefined-type">List</span>&lt;Fruit&gt; fruitList = StreamSupport.stream(fruits.spliterator(), <span class="predefined-constant">false</span>).toList();
         assertEquals(<span class="integer">1</span>, fruitList.size());
         assertEquals(banana.getName(), fruitList.get(<span class="integer">0</span>).getName());
         assertNull(fruitList.get(<span class="integer">0</span>).getDescription());
@@ -745,6 +756,10 @@ Transaction mode is not supported when the synchronous transaction manager is cr
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. By default, each <code>@Test</code> method will be wrapped in a transaction that will be rolled back when the test finishes. This behaviour is is changed by setting <code>transaction</code> to <code>false</code>.</td>
 </tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Clean up the database after each test method execution.</td>
+</tr>
 </table>
 </div>
 <div class="paragraph">
@@ -770,7 +785,7 @@ Transaction mode is not supported when the synchronous transaction manager is cr
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">org.jetbrains.annotations.NotNull</span>;
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
@@ -784,7 +799,7 @@ Transaction mode is not supported when the synchronous transaction manager is cr
 
 <span class="annotation">@MicronautTest</span>(transactional = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">controller-isolation</span><span class="delimiter">&quot;</span></span>)
-<span class="directive">public</span> <span class="type">class</span> <span class="class">ControllerIsolationTest</span> {
+<span class="type">class</span> <span class="class">ControllerIsolationTest</span> {
 
     <span class="annotation">@Inject</span>
     <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)

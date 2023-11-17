@@ -194,7 +194,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=yaml,data-mongodb-reactive,reactor,testcontainers \
+    --features=yaml,data-mongodb-reactive,reactor \
     --build=gradle \
     --lang=groovy \
     --test=spock</code></pre>
@@ -216,7 +216,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>data-mongodb-reactive</code>, <code>reactor</code>, and <code>testcontainers</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>data-mongodb-reactive</code>, and <code>reactor</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -225,7 +225,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=data-mongodb-reactive&amp;features=reactor&amp;features=testcontainers&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=data-mongodb-reactive&amp;features=reactor&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -435,6 +435,7 @@ This will allow you to keep business logic out of the controller, and to test th
 <pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+<span class="keyword">import</span> <span class="include">io.micronaut.core.async.annotation.SingleResult</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
@@ -464,11 +465,13 @@ This will allow you to keep business logic out of the controller, and to test th
 
     <span class="annotation">@Post</span> <i class="conum" data-value="4"></i><b>(4)</b>
     <span class="annotation">@Status</span>(HttpStatus.CREATED) <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="annotation">@SingleResult</span>
     Publisher&lt;Fruit&gt; save(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit) { <i class="conum" data-value="6"></i><b>(6)</b>
         fruitService.save(fruit)
     }
 
     <span class="annotation">@Put</span>
+    <span class="annotation">@SingleResult</span>
     Publisher&lt;Fruit&gt; update(<span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Fruit fruit) {
         fruitService.save(fruit)
     }
@@ -632,6 +635,8 @@ Transaction mode is not supported when the synchronous transaction manager is cr
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
+
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
 <span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
 
@@ -640,6 +645,13 @@ Transaction mode is not supported when the synchronous transaction manager is cr
 
     <span class="annotation">@Inject</span>
     FruitClient fruitClient
+
+    <span class="annotation">@Inject</span>
+    FruitRepository fruitRepository
+
+    <span class="keyword">def</span> <span class="function">cleanup</span>() { <i class="conum" data-value="2"></i><b>(2)</b>
+        Flux.from(fruitRepository.deleteAll()).blockFirst();
+    }
 
     <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">empty database contains no fruit</span><span class="delimiter">&quot;</span></span>() {
         <span class="key">expect</span>:
@@ -706,6 +718,10 @@ Transaction mode is not supported when the synchronous transaction manager is cr
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. By default, each <code>@Test</code> method will be wrapped in a transaction that will be rolled back when the test finishes. This behaviour is is changed by setting <code>transaction</code> to <code>false</code>.</td>
 </tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Clean up the database after each test method execution.</td>
+</tr>
 </table>
 </div>
 <div class="paragraph">
@@ -730,7 +746,7 @@ Transaction mode is not supported when the synchronous transaction manager is cr
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
-<span class="keyword">import</span> <span class="include">org.jetbrains.annotations.NotNull</span>
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>
 <span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
