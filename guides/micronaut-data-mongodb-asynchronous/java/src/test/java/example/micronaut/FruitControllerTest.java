@@ -45,7 +45,7 @@ class FruitControllerTest {
 
         Iterable<Fruit> fruits = fruitClient.list();
         List<Fruit> fruitList = StreamSupport.stream(fruits.spliterator(), false).toList();
-        assertEquals(1, fruitList.size(), "Eeeek! There should be exactly one fruit in the database, got " + fruitList.stream().map(Fruit::toString).collect(Collectors.joining(",")));
+        assertEquals(1, fruitList.size());
         assertEquals(banana.getName(), fruitList.get(0).getName());
         assertNull(fruitList.get(0).getDescription());
 
