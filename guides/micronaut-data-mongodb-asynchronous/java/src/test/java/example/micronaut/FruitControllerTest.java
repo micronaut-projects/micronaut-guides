@@ -4,7 +4,11 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +26,14 @@ class FruitControllerTest {
     @Inject
     FruitClient fruitClient;
 
+    @Inject
+    FruitRepository fruitRepository;
+
+    @AfterEach // <2>
+    void cleanup() {
+        Flux.from(fruitRepository.deleteAll()).blockFirst();
+    }
+
     @Test
     void emptyDatabaseContainsNoFruit() {
         assertEquals(0, StreamSupport.stream(fruitClient.list().spliterator(), false).count());
@@ -34,9 +46,8 @@ class FruitControllerTest {
         Fruit banana = response.getBody().get();
 
         Iterable<Fruit> fruits = fruitClient.list();
-
-        List<Fruit> fruitList = StreamSupport.stream(fruits.spliterator(), false).collect(Collectors.toList());
-        assertEquals(1, fruitList.size());
+        List<Fruit> fruitList = StreamSupport.stream(fruits.spliterator(), false).toList();
+        assertEquals(1, fruitList.size(), "Eeeek! There should be exactly one fruit in the database, got " + fruitList.stream().map(Fruit::toString).collect(Collectors.joining(",")));
         assertEquals(banana.getName(), fruitList.get(0).getName());
         assertNull(fruitList.get(0).getDescription());
 
