@@ -1,21 +1,11 @@
 package example.micronaut;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.io.ResourceLoader;
+import io.micronaut.test.annotation.Sql;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -23,10 +13,19 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @MicronautTest(startApplication = false) // <1>
 @Testcontainers(disabledWithoutDocker = true) // <2>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <3>
-class ProductRepositoryTest implements TestPropertyProvider {  // <4>
+@Sql(scripts = "classpath:sql/seed-data.sql", phase = Sql.Phase.BEFORE_EACH) // <4>
+class ProductRepositoryTest implements TestPropertyProvider {  // <5>
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
@@ -34,7 +33,7 @@ class ProductRepositoryTest implements TestPropertyProvider {  // <4>
     ).withCopyFileToContainer(MountableFile.forClasspathResource("sql/init-db.sql"), "/docker-entrypoint-initdb.d/init-db.sql");
 
     @Override
-    public @NonNull Map<String, String> getProperties() { // <4>
+    public @NonNull Map<String, String> getProperties() { // <5>
         if (!postgres.isRunning()) {
             postgres.start();
         }
@@ -52,11 +51,6 @@ class ProductRepositoryTest implements TestPropertyProvider {  // <4>
 
     @Inject
     ProductRepository productRepository;
-
-    @BeforeEach
-    void setUp() throws IOException, SQLException {
-        SqlUtils.load(connection, resourceLoader, "sql/seed-data.sql");
-    }
 
     @Test
     void shouldGetAllProducts() {

@@ -80,15 +80,13 @@ We will load the seed data in the tests:
 
 testResource:sql/seed-data.sql[app=h2]
 
-Create a utils class which we will use in the tests.
-
-test:SqlUtils[app=h2]
-
 === ProductRepository Test
 
 Let us see how we can write tests for our *ProductRepository* using https://www.h2database.com/html/main.html[H2].
 
 test:ProductRepositoryTest[app=h2]
+
+callout:seed-db[1]
 
 If you run this test, the application uses the https://www.h2database.com/html/main.html[H2] in-memory database.
 
@@ -168,8 +166,9 @@ Use https://www.testcontainers.org/modules/databases/jdbc/[Testcontainers *speci
 test:ProductRepositoryWithJdbcUrlTest[app=postgresql]
 
 callout:micronaut-test-transactional-false[1]
-callout:property-driver-class[1]
-callout:property-jdbc-url[1]
+callout:property-driver-class[2]
+callout:property-jdbc-url[3]
+callout:seed-db[4]
 
 Now if you run the test, you can see in the console logs that our test is using a PostgreSQL database
 instead of the https://www.h2database.com/html/main.html[H2] in-memory database. *It is as simple as that!*
@@ -223,7 +222,8 @@ test:ProductRepositoryTest[app=postgresql]
 callout:micronaut-test-transactional-false[1]
 callout:test-containers-disabled-without-docker[2]
 callout:test-instance-per-class[3]
-callout:test-property-provider[4]
+callout:seed-db[4]
+callout:test-property-provider[5]
 
 We have used the Testcontainers JUnit 5 extension annotations *@Testcontainers* and *@Container*
 to start *PostgreSQLContainer* and register the data source properties for the Test using
@@ -250,6 +250,7 @@ Thanks to Test Resources, we can simplify the test as follows:
 test:ProductRepositoryTest[app=postgresqltestresources]
 
 callout:micronaut-test-transactional-false[1]
+callout:seed-db[2]
 
 If you run the test, you will see a PostgreSQL container being started by Test Resources through integration with Testcontainers to provide throwaway containers for testing.
 
