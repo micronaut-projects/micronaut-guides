@@ -1,20 +1,22 @@
 package example.micronaut;
 
 import io.micronaut.core.io.ResourceLoader;
+import io.micronaut.test.annotation.Sql;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false) // <1>
+@Sql(scripts = {"classpath:sql/init-db.sql", "classpath:sql/seed-data.sql"},
+        phase = Sql.Phase.BEFORE_EACH)
 class ProductRepositoryTest {
 
     @Inject
@@ -25,12 +27,6 @@ class ProductRepositoryTest {
 
     @Inject
     ProductRepository productRepository;
-
-    @BeforeEach
-    void setUp() throws IOException, SQLException {
-        SqlUtils.load(connection, resourceLoader, "sql/init-db.sql");
-        SqlUtils.load(connection, resourceLoader, "sql/seed-data.sql");
-    }
 
     @Test
     void shouldGetAllProducts() {
