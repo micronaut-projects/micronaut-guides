@@ -124,6 +124,14 @@ set -e
 
 FAILED_PROJECTS=()
 EXIT_STATUS=0
+
+kill_kotlin_daemon () {
+  echo "Killing KotlinCompile daemon to pick up fresh properties (due to kapt and java > 17)"
+  for daemon in $(jps | grep KotlinCompile | cut -d' ' -f1); do
+    echo "Killing $daemon"
+    kill -9 $daemon
+  done
+}
 ''')
 
         metadatas.sort { it.slug }
@@ -141,8 +149,10 @@ EXIT_STATUS=0
                     continue
                 }
                 if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
-                    if (!nativeTest || supportsNativeTest(metadata.apps.find { it.name == DEFAULT_APP_NAME }, guidesOption)) {
-                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, nativeTest)
+                    def defaultApp = metadata.apps.find { it.name == DEFAULT_APP_NAME }
+                    if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
+                        def features = defaultApp.getFeatures(guidesOption.language)
+                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest)
                     }
                 } else {
                     bashScript << """\
@@ -150,7 +160,8 @@ cd $folder
 """
                     for (GuideMetadata.App app : metadata.apps) {
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
-                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, nativeTest)
+                            def features = app.getFeatures(guidesOption.language)
+                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest)
                         }
                     }
                     bashScript << """\
@@ -185,13 +196,17 @@ fi
                                           String folder,
                                           boolean stopIfFailure,
                                           BuildTool buildTool,
-                                          boolean nativeTest = false) {
+                                          boolean noDaemon,
+                                          boolean nativeTest) {
         String testcopy = nativeTest ? "native tests" : "tests"
         String bashScript = """\
 cd $nestedFolder
 echo "-------------------------------------------------"
 echo "Executing '$folder' $testcopy"
 """
+if (noDaemon) {
+    bashScript += "kill_kotlin_daemon\n"
+}
 if (nativeTest) {
 bashScript += """\
 ${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
@@ -202,6 +217,9 @@ ${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\
 echo "Stopping shared test resources service (if created)"
 ${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
 """
+}
+if (noDaemon) {
+    bashScript += "kill_kotlin_daemon\n"
 }
 bashScript += """\
 cd ..
