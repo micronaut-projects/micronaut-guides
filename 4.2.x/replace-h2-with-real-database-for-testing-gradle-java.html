@@ -483,46 +483,6 @@ datasources.default.password=</code></pre>
 <span class="class">insert</span> <span class="class">into</span> products(id, code, name) <span class="keyword">values</span>(<span class="integer">2</span>, <span class="string"><span class="delimiter">'</span><span class="content">p102</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Sony TV</span><span class="delimiter">'</span></span>);</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Create a utils class which we will use in the tests.</p>
-</div>
-<div class="listingblock">
-<div class="title">h2/src/test/java/example/micronaut/SqlUtils.java</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-
-<span class="keyword">import</span> <span class="include">io.micronaut.core.io.ResourceLoader</span>;
-
-<span class="keyword">import</span> <span class="include">java.io.IOException</span>;
-<span class="keyword">import</span> <span class="include">java.io.InputStream</span>;
-<span class="keyword">import</span> <span class="include">java.net.URL</span>;
-<span class="keyword">import</span> <span class="include">java.nio.charset.StandardCharsets</span>;
-<span class="keyword">import</span> <span class="include">java.sql.Connection</span>;
-<span class="keyword">import</span> <span class="include">java.sql.SQLException</span>;
-<span class="keyword">import</span> <span class="include">java.sql.Statement</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
-
-<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">SqlUtils</span> {
-
-    <span class="directive">private</span> SqlUtils() {
-    }
-
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> load(<span class="predefined-type">Connection</span> connection,
-                            ResourceLoader resourceLoader,
-                            <span class="predefined-type">String</span> path) <span class="directive">throws</span> <span class="exception">IOException</span>, <span class="exception">SQLException</span> {
-        Optional&lt;<span class="predefined-type">URL</span>&gt; resource = resourceLoader.getResource(path);
-        <span class="keyword">if</span> (resource.isPresent()) {
-            <span class="keyword">try</span> (<span class="predefined-type">InputStream</span> in = resource.get().openStream();
-                 <span class="predefined-type">Statement</span> statement = connection.createStatement()
-            ) {
-                <span class="predefined-type">String</span> sql = <span class="keyword">new</span> <span class="predefined-type">String</span>(in.readAllBytes(), StandardCharsets.UTF_8);
-                statement.execute(sql);
-            }
-        }
-    }
-}</code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="productrepository-test">9.4. ProductRepository Test</h3>
@@ -534,19 +494,19 @@ datasources.default.password=</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-
-<span class="keyword">import</span> <span class="include">java.io.IOException</span>;
-<span class="keyword">import</span> <span class="include">java.sql.Connection</span>;
-<span class="keyword">import</span> <span class="include">java.sql.SQLException</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.io.ResourceLoader</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.annotation.Sql</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.BeforeEach</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
+<span class="keyword">import</span> <span class="include">java.sql.Connection</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+
 <span class="annotation">@MicronautTest</span>
+<span class="annotation">@Sql</span>(scripts = <span class="string"><span class="delimiter">&quot;</span><span class="content">classpath:sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>, phase = Sql.Phase.BEFORE_EACH) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">ProductRepositoryTest</span> {
 
     <span class="annotation">@Inject</span>
@@ -555,11 +515,6 @@ datasources.default.password=</code></pre>
     <span class="annotation">@Inject</span>
     ResourceLoader resourceLoader;
 
-    <span class="annotation">@BeforeEach</span>
-    <span class="type">void</span> setUp() <span class="directive">throws</span> <span class="exception">IOException</span>, <span class="exception">SQLException</span> {
-        SqlUtils.load(connection, resourceLoader, <span class="string"><span class="delimiter">&quot;</span><span class="content">sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>);
-    }
-
     <span class="annotation">@Test</span>
     <span class="type">void</span> shouldGetAllProducts(ProductRepository productRepository) {
         <span class="predefined-type">List</span>&lt;Product&gt; products = productRepository.findAll();
@@ -567,6 +522,14 @@ datasources.default.password=</code></pre>
     }
 }</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Seed the database using the <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/#sql"><code>@Sql</code></a> annotation from micronaut-test.</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>If you run this test, the application uses the <a href="https://www.h2database.com/html/main.html">H2</a> in-memory database.</p>
@@ -736,25 +699,24 @@ datasources.default.driver-class-name=org.postgresql.Driver</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-
-<span class="keyword">import</span> <span class="include">java.io.IOException</span>;
-<span class="keyword">import</span> <span class="include">java.sql.Connection</span>;
-<span class="keyword">import</span> <span class="include">java.sql.SQLException</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
-
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.io.ResourceLoader</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.annotation.Sql</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.BeforeEach</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">java.sql.Connection</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 
 <span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">datasources.default.driver-class-name</span><span class="delimiter">&quot;</span></span>,
         value = <span class="string"><span class="delimiter">&quot;</span><span class="content">org.testcontainers.jdbc.ContainerDatabaseDriver</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">datasources.default.url</span><span class="delimiter">&quot;</span></span>,
         value = <span class="string"><span class="delimiter">&quot;</span><span class="content">jdbc:tc:postgresql:15.2-alpine:///db?TC_INITSCRIPT=sql/init-db.sql</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="annotation">@Sql</span>(scripts = <span class="string"><span class="delimiter">&quot;</span><span class="content">classpath:sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>, phase = Sql.Phase.BEFORE_EACH) <i class="conum" data-value="4"></i><b>(4)</b>
 <span class="type">class</span> <span class="class">ProductRepositoryWithJdbcUrlTest</span> {
 
     <span class="annotation">@Inject</span>
@@ -762,11 +724,6 @@ datasources.default.driver-class-name=org.postgresql.Driver</code></pre>
 
     <span class="annotation">@Inject</span>
     ResourceLoader resourceLoader;
-
-    <span class="annotation">@BeforeEach</span>
-    <span class="type">void</span> setUp() <span class="directive">throws</span> <span class="exception">IOException</span>, <span class="exception">SQLException</span> {
-        SqlUtils.load(connection, resourceLoader, <span class="string"><span class="delimiter">&quot;</span><span class="content">sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>);
-    }
 
     <span class="annotation">@Test</span>
     <span class="type">void</span> shouldGetAllProducts(ProductRepository productRepository) {
@@ -789,6 +746,10 @@ datasources.default.driver-class-name=org.postgresql.Driver</code></pre>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>Annotate the class with <code>@Property</code> to supply the datasource url which we supply via the <a href="https://java.testcontainers.org/modules/databases/jdbc/">Testcontainers special JDBC URL</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Seed the database using the <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/#sql"><code>@Sql</code></a> annotation from micronaut-test.</td>
 </tr>
 </table>
 </div>
@@ -856,22 +817,12 @@ then you can use the JUnit 5 Testcontainers Extension as follows:</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-
-<span class="keyword">import</span> <span class="include">java.io.IOException</span>;
-<span class="keyword">import</span> <span class="include">java.sql.Connection</span>;
-<span class="keyword">import</span> <span class="include">java.sql.SQLException</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
-
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.io.ResourceLoader</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.annotation.Sql</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.support.TestPropertyProvider</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.BeforeEach</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
 <span class="keyword">import</span> <span class="include">org.testcontainers.containers.PostgreSQLContainer</span>;
@@ -879,10 +830,19 @@ then you can use the JUnit 5 Testcontainers Extension as follows:</p>
 <span class="keyword">import</span> <span class="include">org.testcontainers.junit.jupiter.Testcontainers</span>;
 <span class="keyword">import</span> <span class="include">org.testcontainers.utility.MountableFile</span>;
 
+<span class="keyword">import</span> <span class="include">java.sql.Connection</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+
 <span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="annotation">@Testcontainers</span>(disabledWithoutDocker = <span class="predefined-constant">true</span>) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="annotation">@TestInstance</span>(TestInstance.Lifecycle.PER_CLASS) <i class="conum" data-value="3"></i><b>(3)</b>
-<span class="type">class</span> <span class="class">ProductRepositoryTest</span> <span class="directive">implements</span> TestPropertyProvider {  <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="annotation">@Sql</span>(scripts = <span class="string"><span class="delimiter">&quot;</span><span class="content">classpath:sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>, phase = Sql.Phase.BEFORE_EACH) <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="type">class</span> <span class="class">ProductRepositoryTest</span> <span class="directive">implements</span> TestPropertyProvider {  <i class="conum" data-value="5"></i><b>(5)</b>
 
     <span class="annotation">@Container</span>
     <span class="directive">static</span> PostgreSQLContainer&lt;?&gt; postgres = <span class="keyword">new</span> PostgreSQLContainer&lt;&gt;(
@@ -890,7 +850,7 @@ then you can use the JUnit 5 Testcontainers Extension as follows:</p>
     ).withCopyFileToContainer(MountableFile.forClasspathResource(<span class="string"><span class="delimiter">&quot;</span><span class="content">sql/init-db.sql</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">/docker-entrypoint-initdb.d/init-db.sql</span><span class="delimiter">&quot;</span></span>);
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="annotation">@NonNull</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() { <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="directive">public</span> <span class="annotation">@NonNull</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() { <i class="conum" data-value="5"></i><b>(5)</b>
         <span class="keyword">if</span> (!postgres.isRunning()) {
             postgres.start();
         }
@@ -908,11 +868,6 @@ then you can use the JUnit 5 Testcontainers Extension as follows:</p>
 
     <span class="annotation">@Inject</span>
     ProductRepository productRepository;
-
-    <span class="annotation">@BeforeEach</span>
-    <span class="type">void</span> setUp() <span class="directive">throws</span> <span class="exception">IOException</span>, <span class="exception">SQLException</span> {
-        SqlUtils.load(connection, resourceLoader, <span class="string"><span class="delimiter">&quot;</span><span class="content">sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>);
-    }
 
     <span class="annotation">@Test</span>
     <span class="type">void</span> shouldGetAllProducts() {
@@ -946,6 +901,10 @@ then you can use the JUnit 5 Testcontainers Extension as follows:</p>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Seed the database using the <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/#sql"><code>@Sql</code></a> annotation from micronaut-test.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
 <td>When you need dynamic properties definition, implement the <code>TestPropertyProvider</code> interface. Override the method <code>.getProperties()</code> and return the properties you want to expose to the application.</td>
 </tr>
 </table>
@@ -1004,22 +963,23 @@ the dynamic property registration through the <strong>TestPropertyProvider</stro
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.io.ResourceLoader</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.annotation.Sql</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.BeforeEach</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
 
-<span class="keyword">import</span> <span class="include">java.io.IOException</span>;
 <span class="keyword">import</span> <span class="include">java.sql.Connection</span>;
-<span class="keyword">import</span> <span class="include">java.sql.SQLException</span>;
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 <span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions</span>.*;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
 
 <span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@Sql</span>(scripts = {<span class="string"><span class="delimiter">&quot;</span><span class="content">classpath:sql/init-db.sql</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">classpath:sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>},
+        phase = Sql.Phase.BEFORE_EACH) <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="type">class</span> <span class="class">ProductRepositoryTest</span> {
 
     <span class="annotation">@Inject</span>
@@ -1030,12 +990,6 @@ the dynamic property registration through the <strong>TestPropertyProvider</stro
 
     <span class="annotation">@Inject</span>
     ProductRepository productRepository;
-
-    <span class="annotation">@BeforeEach</span>
-    <span class="type">void</span> setUp() <span class="directive">throws</span> <span class="exception">IOException</span>, <span class="exception">SQLException</span> {
-        SqlUtils.load(connection, resourceLoader, <span class="string"><span class="delimiter">&quot;</span><span class="content">sql/init-db.sql</span><span class="delimiter">&quot;</span></span>);
-        SqlUtils.load(connection, resourceLoader, <span class="string"><span class="delimiter">&quot;</span><span class="content">sql/seed-data.sql</span><span class="delimiter">&quot;</span></span>);
-    }
 
     <span class="annotation">@Test</span>
     <span class="type">void</span> shouldGetAllProducts() {
@@ -1059,6 +1013,10 @@ the dynamic property registration through the <strong>TestPropertyProvider</stro
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. By default, each <code>@Test</code> method will be wrapped in a transaction that will be rolled back when the test finishes. This behaviour is is changed by setting <code>transaction</code> to <code>false</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Seed the database using the <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/#sql"><code>@Sql</code></a> annotation from micronaut-test.</td>
 </tr>
 </table>
 </div>
