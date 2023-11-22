@@ -18,7 +18,8 @@ It has a transitive dependency to https://github.com/CRaC/org.crac[org.crac:crac
 
 == Create Resources
 
-One limitation of CRaC is that you cannot have open files or sockets upon checkpoint creation. When you use Micronaut CRaC, you will write resources to close files and connections, dump cache, etc.
+One limitation of CRaC is that you cannot have open files or sockets when a checkpoint is created.
+To support this with Micronaut CRaC, you will write resources to close files and connections, dump cache, etc.
 
 You will use the Micronaut CRaC API `OrderedResource`.
 
@@ -27,7 +28,7 @@ You will use the Micronaut CRaC API `OrderedResource`.
 public interface OrderedResource extends org.crac.Resource, io.micronaut.core.order.Ordered { }
 ----
 
-Micronaut CRaC automatically registers beans of type `OrderedResources` in CRaC Context.
+Micronaut CRaC automatically registers beans of type `OrderedResources` in the CRaC Context.
 
 You could create such a bean: 
 
@@ -37,7 +38,8 @@ callout:singleton[1]
 
 == Checkpoint Simulator
 
-CRaC only works with Linux. To ease testing and development in operating systems which don't support CRac, Micronaut CRaC includes the https://micronaut-projects.github.io/micronaut-crac/latest/guide/#checkpointSimulator[`CheckpointSimulator` API]:
+CRaC only works with Linux.
+To ease testing and development in operating systems which don't support CRaC, Micronaut CRaC includes the https://micronaut-projects.github.io/micronaut-crac/latest/guide/#checkpointSimulator[`CheckpointSimulator` API].
 
 ____
 With CRaC, you run your application to a point and then "checkpoint" it. This calls the app to close all its sockets and file handles, and then dumps the memory to disk. When it restarts from this snapshot, it calls the app again to say it’s been restored, and one can re-open files and network connections.
@@ -49,10 +51,10 @@ Given a controller such as:
 
 source:HelloWorldController[]
 
-callout:controller[1]
-callout:get-generic[number=2]
+callout:controller[number=1,arg0=/]
+callout:get-generic[2]
 
-To simplify testing, I wrote a utility class that allows you to run a test scenario before and after the checkpoint.
+To simplify testing, we create a utility class that allows you to run a test scenario before and after the checkpoint.
 
 test:CheckpointTestUtils[]
 
