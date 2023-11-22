@@ -1,0 +1,115 @@
+common:header.adoc[]
+
+common:crac.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Micronaut CRaC Dependency
+
+Add the Micronaut CRaC dependency:
+
+dependency:micronaut-crac[groupId=io.micronaut.crac]
+
+It has a transitive dependency to https://github.com/CRaC/org.crac[org.crac:crac].
+
+== Create Resources
+
+One limitation of CRaC is that you cannot have open files or sockets when a checkpoint is created.
+To support this with Micronaut CRaC, you will write resources to close files and connections, dump cache, etc.
+
+You will use the Micronaut CRaC API `OrderedResource`.
+
+[source, java]
+----
+public interface OrderedResource extends org.crac.Resource, io.micronaut.core.order.Ordered { }
+----
+
+Micronaut CRaC automatically registers beans of type `OrderedResources` in the CRaC Context.
+
+You could create such a bean: 
+
+source:LoggingResource[]
+
+callout:singleton[1]
+
+== Checkpoint Simulator
+
+CRaC only works with Linux.
+To ease testing and development in operating systems which don't support CRaC, Micronaut CRaC includes the https://micronaut-projects.github.io/micronaut-crac/latest/guide/#checkpointSimulator[`CheckpointSimulator` API].
+
+____
+With CRaC, you run your application to a point and then "checkpoint" it. This calls the app to close all its sockets and file handles, and then dumps the memory to disk. When it restarts from this snapshot, it calls the app again to say it’s been restored, and one can re-open files and network connections.
+
+The simulator allows you to synthesise these two calls (before checkpoint and after restore), so that under a test you can check your service works again after it was closed and recreated.
+____
+
+Given a controller such as:
+
+source:HelloWorldController[]
+
+callout:controller[number=1,arg0=/]
+callout:get-generic[2]
+
+To simplify testing, we create a utility class that allows you to run a test scenario before and after the checkpoint.
+
+test:CheckpointTestUtils[]
+
+You could write a test for the previous controller:
+
+test:HelloWorldControllerTest[]
+
+== Refreshable beans and CRaC
+
+Micronaut CRaC ships with several built-in beans of type `OrderedResource`. One of them is the https://micronaut-projects.github.io/micronaut-crac/latest/api/io/micronaut/crac/resources/RefreshEventResource.html[`RefreshEventResource`].  `RefreshEventResource`
+emits a `RefreshEvent`, causing beans in the `@Refreshable` scope to be invalidated before a checkpoint.
+
+Given a controller such as:
+
+source:TimeController[]
+
+callout:refreshable[1]
+callout:controller[number=2,arg0=/time]
+callout:get-generic[number=3]
+
+The following test verifies the `TimeController` is offloaded prior to a checkpoint.
+
+test:TimeControllerTest[]
+
+== Eagerly initialize Singletons
+
+When you use CRaC, you should use https://docs.micronaut.io/latest/guide/#eagerInit[eager initialization] to ensure the application is fully loaded before the checkpoint is taken.
+
+Modify your application class:
+
+source:Application[]
+
+You can test eager initialization:
+
+test:Clock[]
+
+test:EagerlyInitializedTest[]
+
+== Info endpoint
+
+The info endpoint includes a `crac` section, which shows the restore time and uptime since restore, both in milliseconds.
+
+To expose the https://docs.micronaut.io/latest/guide/#infoEndpoint[info endpoint], you need the following dependency on your classpath.
+
+dependency:micronaut-management[]
+
+The following test verifies the `crac` section is present in the info endpoint.
+
+test:InfoEndpointTest[]
+
+The previous test shows -1 since the application has yet to be restored.
+
+common:next.adoc[]
+
+Learn more about:
+
+* https://micronaut-projects.github.io/micronaut-crac/latest/guide/[Micronaut CRaC (Coordinated Restore at checkpoint)
+* https://docs.azul.com/core/crac/crac-introduction[CRaC Introduction]
