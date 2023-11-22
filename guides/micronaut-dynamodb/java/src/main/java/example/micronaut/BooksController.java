@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 
-@ExecuteOn(TaskExecutors.IO) // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <1>
 @Controller("/books") // <2>
 public class BooksController {
 

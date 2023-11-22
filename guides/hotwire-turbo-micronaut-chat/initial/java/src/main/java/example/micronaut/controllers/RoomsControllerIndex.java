@@ -20,7 +20,7 @@ public class RoomsControllerIndex extends RoomsController {
         super(roomRepository);
     }
 
-    @ExecuteOn(TaskExecutors.IO) // <3>
+    @ExecuteOn(TaskExecutors.BLOCKING) // <3>
     @View("/rooms/index") // <4>
     @Get // <5>
     @Produces(MediaType.TEXT_HTML) // <6>

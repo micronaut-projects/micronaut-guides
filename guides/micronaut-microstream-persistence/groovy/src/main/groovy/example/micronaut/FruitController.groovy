@@ -13,7 +13,7 @@ import io.micronaut.http.annotation.Status
 
 import jakarta.validation.constraints.NotBlank
 
-import static io.micronaut.scheduling.TaskExecutors.IO
+import static io.micronaut.scheduling.TaskExecutors.BLOCKING
 import io.micronaut.scheduling.annotation.ExecuteOn
 
 import jakarta.validation.Valid
@@ -33,14 +33,14 @@ class FruitController {
         fruitRepository.list()
     }
 
-    @ExecuteOn(IO)
+    @ExecuteOn(BLOCKING)
     @Post // <4>
     @Status(HttpStatus.CREATED) // <5>
     Fruit create(@NonNull @NotNull @Valid @Body FruitCommand fruit) { // <6>
         fruitRepository.create(fruit)
     }
 
-    @ExecuteOn(IO)
+    @ExecuteOn(BLOCKING)
     @Put
     Fruit update(@NonNull @NotNull @Valid @Body FruitCommand fruit) {
         fruitRepository.update(fruit)
@@ -51,7 +51,7 @@ class FruitController {
         fruitRepository.find(name)
     }
 
-    @ExecuteOn(IO)
+    @ExecuteOn(BLOCKING)
     @Delete
     @Status(HttpStatus.NO_CONTENT)
     void delete(@NonNull @NotNull @Valid @Body FruitCommand fruit) {

@@ -28,7 +28,7 @@ import java.util.Optional;
 
 //tag::begin-class[]
 @Controller(ProfilePicturesController.PREFIX) // <1>
-@ExecuteOn(TaskExecutors.IO) // <2>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 public class ProfilePicturesController implements ProfilePicturesApi {
 
     static final String PREFIX = "/pictures";

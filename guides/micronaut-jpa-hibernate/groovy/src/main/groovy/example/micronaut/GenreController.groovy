@@ -18,7 +18,7 @@ import jakarta.validation.Valid
 import static io.micronaut.http.HttpHeaders.LOCATION
 
 @CompileStatic
-@ExecuteOn(TaskExecutors.IO)  // <1>
+@ExecuteOn(TaskExecutors.BLOCKING)  // <1>
 @Controller('/genres')  // <2>
 class GenreController {
 

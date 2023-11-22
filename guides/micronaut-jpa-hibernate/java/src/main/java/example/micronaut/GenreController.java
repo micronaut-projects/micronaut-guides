@@ -18,7 +18,7 @@ import java.util.List;
 
 import static io.micronaut.http.HttpHeaders.LOCATION;
 
-@ExecuteOn(TaskExecutors.IO)  // <1>
+@ExecuteOn(TaskExecutors.BLOCKING)  // <1>
 @Controller("/genres")  // <2>
 class GenreController {
 

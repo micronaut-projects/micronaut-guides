@@ -9,7 +9,7 @@ import io.micronaut.scheduling.annotation.ExecuteOn
 import jakarta.validation.constraints.NotBlank
 
 @Controller("/things")
-@ExecuteOn(TaskExecutors.IO)
+@ExecuteOn(TaskExecutors.BLOCKING)
 class ThingController(private val thingRepository: ThingRepository) {
 
     @Get

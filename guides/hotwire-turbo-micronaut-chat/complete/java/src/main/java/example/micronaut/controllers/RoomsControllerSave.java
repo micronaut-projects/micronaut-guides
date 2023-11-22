@@ -18,7 +18,7 @@ public class RoomsControllerSave extends RoomsController {
         super(roomRepository);
     }
 
-    @ExecuteOn(TaskExecutors.IO) // <3>
+    @ExecuteOn(TaskExecutors.BLOCKING) // <3>
     @Produces(MediaType.TEXT_HTML) // <4>
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED) // <5>
     @Post // <6>

@@ -40,7 +40,7 @@ public class BooksController implements BooksApi {
     //end::inject[]
 
     //tag::addBook[]
-    @ExecuteOn(TaskExecutors.IO)
+    @ExecuteOn(TaskExecutors.BLOCKING)
     public void addBook(BookInfo bookInfo) {
         bookRepository.save(bookInfo.getName(), // <3>
                 bookInfo.getAvailability(),
@@ -51,7 +51,7 @@ public class BooksController implements BooksApi {
 
 
     //tag::search[]
-    @ExecuteOn(TaskExecutors.IO) // <1>
+    @ExecuteOn(TaskExecutors.BLOCKING) // <1>
     public List<BookInfo> search(
             String bookName,
             String authorName) {

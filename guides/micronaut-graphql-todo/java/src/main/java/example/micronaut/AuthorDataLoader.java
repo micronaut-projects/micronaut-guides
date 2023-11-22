@@ -22,7 +22,7 @@ public class AuthorDataLoader implements MappedBatchLoader<Long, Author> {
 
     public AuthorDataLoader(
             AuthorRepository authorRepository,
-            @Named(TaskExecutors.IO) ExecutorService executor // <2>
+            @Named(TaskExecutors.BLOCKING) ExecutorService executor // <2>
     ) {
         this.authorRepository = authorRepository;
         this.executor = executor;

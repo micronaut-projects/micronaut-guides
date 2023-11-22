@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-@ExecuteOn(TaskExecutors.IO) // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <1>
 @Controller("/rooms") // <2>
 class MessagesControllerSave extends ApplicationController {
     private static final Logger LOG = LoggerFactory.getLogger(MessagesControllerSave.class);

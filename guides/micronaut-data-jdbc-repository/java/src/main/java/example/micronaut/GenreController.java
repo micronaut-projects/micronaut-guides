@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-@ExecuteOn(TaskExecutors.IO)  // <1>
+@ExecuteOn(TaskExecutors.BLOCKING)  // <1>
 @Controller("/genres")  // <2>
 public class GenreController {
 

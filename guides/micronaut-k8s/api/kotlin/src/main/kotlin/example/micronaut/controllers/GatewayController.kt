@@ -20,7 +20,7 @@ import reactor.core.scheduler.Schedulers
 import jakarta.validation.Valid
 
 @Controller("/api") // <1>
-@ExecuteOn(TaskExecutors.IO) // <2>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 class GatewayController(ordersClient: OrdersClient, usersClient: UsersClient) {
 
     private val ordersClient: OrdersClient

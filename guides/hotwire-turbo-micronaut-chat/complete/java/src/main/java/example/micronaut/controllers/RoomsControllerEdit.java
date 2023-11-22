@@ -19,7 +19,7 @@ public class RoomsControllerEdit extends RoomsController {
         super(roomRepository);
     }
 
-    @ExecuteOn(TaskExecutors.IO)
+    @ExecuteOn(TaskExecutors.BLOCKING)
     @View("/rooms/edit")
     @Get("/{id}/edit")
     @Produces(MediaType.TEXT_HTML)
