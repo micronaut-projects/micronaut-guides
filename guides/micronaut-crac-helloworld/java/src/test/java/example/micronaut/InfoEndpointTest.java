@@ -8,12 +8,17 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
+
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 @Property(name = "endpoints.info.enabled", value = StringUtils.TRUE)
 @Property(name = "endpoints.info.sensitive", value = StringUtils.FALSE)
 @MicronautTest
-public class InfoEndpointTest {
+class InfoEndpointTest {
 
     @Test
     void cracInformationIsExposedInTheInfoEndpointExposed(@Client("/") HttpClient client) {

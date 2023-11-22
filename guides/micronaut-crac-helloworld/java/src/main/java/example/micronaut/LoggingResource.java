@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 @Singleton // <1>
 public class LoggingResource implements OrderedResource  {
+
     private static final Logger LOG = LoggerFactory.getLogger(LoggingResource.class);
+
     @Override
     public void beforeCheckpoint(Context<? extends Resource> context) throws Exception {
         LOG.info("before checkpoint");

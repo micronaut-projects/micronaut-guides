@@ -12,7 +12,9 @@ import java.util.Map;
 @Refreshable // <1>
 @Controller("/time") // <1>
 class TimeController {
+
     private final String time;
+
     TimeController() {
         time = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
     }

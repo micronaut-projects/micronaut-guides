@@ -9,6 +9,7 @@ import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EagerlyInitializedTest {
+
     @Test
     void singletonsAreEagerlyInitialized() throws InterruptedException {
         ApplicationContext ctx = ApplicationContext.run();
@@ -16,5 +17,4 @@ class EagerlyInitializedTest {
         assertTrue(ctx.getBean(Clock.class).getNow().isBefore(LocalDateTime.now().minusSeconds(3)));
         ctx.close();
     }
-
 }

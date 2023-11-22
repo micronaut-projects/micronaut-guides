@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Singleton
 class Clock {
+
     private final LocalDateTime now;
 
     Clock() {

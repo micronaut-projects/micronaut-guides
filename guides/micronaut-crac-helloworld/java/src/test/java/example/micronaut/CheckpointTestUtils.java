@@ -5,6 +5,7 @@ import io.micronaut.crac.test.CheckpointSimulator;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.runtime.server.EmbeddedServer;
+
 import java.util.function.Function;
 
 public class CheckpointTestUtils {
