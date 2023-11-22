@@ -6,6 +6,7 @@ import jakarta.inject.Singleton;
 
 @Singleton // <1>
 public class ServerStartupEventListener implements ApplicationEventListener<ServerStartupEvent> { // <2>
+
     private final MessageRepository messageRepository;
 
     public ServerStartupEventListener(MessageRepository messageRepository) { // <3>
