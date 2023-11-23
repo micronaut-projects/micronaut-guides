@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService
 @Singleton // <1>
 class AuthorDataLoader(
     private val authorRepository: AuthorRepository,
-    @Named(TaskExecutors.IO) val executor: ExecutorService // <2>
+    @Named(TaskExecutors.BLOCKING) val executor: ExecutorService // <2>
 ) : MappedBatchLoader<Long, Author> {
 
     override fun load(keys: MutableSet<Long>): CompletionStage<Map<Long, Author>> =

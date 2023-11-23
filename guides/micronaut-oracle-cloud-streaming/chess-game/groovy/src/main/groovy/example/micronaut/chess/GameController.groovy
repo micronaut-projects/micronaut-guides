@@ -18,7 +18,7 @@ import static io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED
 import static io.micronaut.http.MediaType.TEXT_PLAIN
 
 @Controller('/game') // <1>
-@ExecuteOn(TaskExecutors.IO) // <2>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 @CompileStatic
 class GameController {
 

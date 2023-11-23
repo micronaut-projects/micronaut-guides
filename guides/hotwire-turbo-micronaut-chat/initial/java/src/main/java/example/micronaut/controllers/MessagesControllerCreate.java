@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-@ExecuteOn(TaskExecutors.IO) // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <1>
 @Controller("/rooms") // <2>
 class MessagesControllerCreate extends ApplicationController {
     private final RoomRepository roomRepository;

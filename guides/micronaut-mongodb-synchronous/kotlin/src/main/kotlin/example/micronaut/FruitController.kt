@@ -10,7 +10,7 @@ import io.micronaut.scheduling.annotation.ExecuteOn
 import jakarta.validation.Valid
 
 @Controller("/fruits") // <1>
-@ExecuteOn(TaskExecutors.IO) // <2>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 open class FruitController(private val fruitService: FruitRepository) { // <3>
 
     @Get // <4>

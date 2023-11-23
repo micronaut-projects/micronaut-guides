@@ -10,7 +10,7 @@ import io.micrometer.core.annotation.Counted
 import java.util.Optional
 
 @Controller("/books") // <1>
-@ExecuteOn(TaskExecutors.IO) // <2>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 open class BookController(private val bookRepository: BookRepository) { // <3>
 
     @Get// <4>

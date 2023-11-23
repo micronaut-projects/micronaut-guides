@@ -8,7 +8,7 @@ import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
 import java.util.Random
 
-@ExecuteOn(TaskExecutors.IO) // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <1>
 @Controller("/warehouse") // <2>
 class WarehouseController {
 

@@ -16,7 +16,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 
-import static io.micronaut.scheduling.TaskExecutors.IO;
+import static io.micronaut.scheduling.TaskExecutors.BLOCKING;
 
 @Controller("/fruits") // <1>
 class FruitController {
@@ -32,7 +32,7 @@ class FruitController {
         return fruitRepository.list();
     }
 
-    @ExecuteOn(IO)
+    @ExecuteOn(BLOCKING)
     @Post // <4>
     @Status(HttpStatus.CREATED) // <5>
     Fruit create(@NonNull @NotNull @Valid @Body FruitCommand fruit) { // <6>
@@ -49,7 +49,7 @@ class FruitController {
         return fruitRepository.find(name);
     }
 
-    @ExecuteOn(IO)
+    @ExecuteOn(BLOCKING)
     @Delete
     @Status(HttpStatus.NO_CONTENT)
     void delete(@NonNull @Valid @Body FruitCommand fruit) {

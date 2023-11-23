@@ -15,7 +15,7 @@ import java.util.List;
 import static io.micronaut.http.HttpStatus.CREATED;
 
 @Controller("/fruits") // <1>
-@ExecuteOn(TaskExecutors.IO)  // <2>
+@ExecuteOn(TaskExecutors.BLOCKING)  // <2>
 class FruitController {
 
     private final FruitRepository fruitService;

@@ -24,7 +24,7 @@ class BookController {
         this.valueAddedTaxConfiguration = valueAddedTaxConfiguration;
     }
 
-    @ExecuteOn(TaskExecutors.IO) // <3>
+    @ExecuteOn(TaskExecutors.BLOCKING) // <3>
     @Get // <4>
     List<BookForSale> index() { // <5>
         return bookRepository.find()

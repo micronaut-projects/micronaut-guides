@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Optional;
 
-@ExecuteOn(TaskExecutors.IO)
+@ExecuteOn(TaskExecutors.BLOCKING)
 @Controller("/rooms")
 class MessagesControllerSave extends ApplicationController {
     private static final Logger LOG = LoggerFactory.getLogger(MessagesControllerSave.class);

@@ -19,7 +19,7 @@ import io.micronaut.scheduling.annotation.ExecuteOn
 import java.io.IOException
 import java.time.LocalDateTime
 
-@ExecuteOn(TaskExecutors.IO) // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <1>
 @Controller("/email") // <2>
 class EmailController(private val emailSender: EmailSender<*, *>) { // <3>
 

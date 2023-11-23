@@ -18,7 +18,7 @@ public class RoomsControllerShow extends RoomsController {
         super(roomRepository);
     }
 
-    @ExecuteOn(TaskExecutors.IO) // <3>
+    @ExecuteOn(TaskExecutors.BLOCKING) // <3>
     @View("/rooms/show") // <4>
     @Get("/{id}") // <5>
     @Produces(MediaType.TEXT_HTML) // <6>

@@ -21,7 +21,7 @@ import static io.micronaut.http.MediaType.MULTIPART_FORM_DATA;
 import static io.micronaut.http.MediaType.TEXT_PLAIN;
 import static java.util.Collections.singletonMap;
 
-@ExecuteOn(TaskExecutors.IO) // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <1>
 @Controller("/email") // <2>
 class EmailController {
 

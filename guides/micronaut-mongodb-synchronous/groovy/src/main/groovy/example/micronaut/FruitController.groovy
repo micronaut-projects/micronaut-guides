@@ -16,7 +16,7 @@ import static io.micronaut.http.HttpStatus.CREATED
 
 @CompileStatic
 @Controller('/fruits') // <1>
-@ExecuteOn(TaskExecutors.IO) // <2>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 class FruitController {
 
     private final FruitRepository fruitService

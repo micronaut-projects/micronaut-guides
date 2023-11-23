@@ -18,7 +18,7 @@ import io.micronaut.scheduling.annotation.ExecuteOn
 import jakarta.validation.Valid
 
 @Controller("/api") // <1>
-@ExecuteOn(TaskExecutors.IO) // <2>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 class GatewayController {
 
     private final OrdersClient ordersClient

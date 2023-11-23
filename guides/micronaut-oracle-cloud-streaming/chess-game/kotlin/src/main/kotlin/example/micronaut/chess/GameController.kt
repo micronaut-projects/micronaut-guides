@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono
 import java.util.UUID
 
 @Controller("/game") // <1>
-@ExecuteOn(TaskExecutors.IO) // <2>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 class GameController(private val gameReporter: GameReporter) {
 
     @Post(value = "/start", // <3>

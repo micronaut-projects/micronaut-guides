@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller("/fruits") // <1>
-@ExecuteOn(TaskExecutors.IO)  // <2>
+@ExecuteOn(TaskExecutors.BLOCKING)  // <2>
 class FruitController {
 
     private final FruitService fruitService;

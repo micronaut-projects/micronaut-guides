@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller("/things")
-@ExecuteOn(TaskExecutors.IO)
+@ExecuteOn(TaskExecutors.BLOCKING)
 class ThingController {
 
     private final ThingRepository thingRepository;

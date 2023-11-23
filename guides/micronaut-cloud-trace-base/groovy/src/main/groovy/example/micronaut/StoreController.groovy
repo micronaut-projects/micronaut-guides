@@ -16,7 +16,7 @@ import java.util.HashMap
 import java.util.List
 import java.util.Map
 
-@ExecuteOn(TaskExecutors.IO)
+@ExecuteOn(TaskExecutors.BLOCKING)
 @Controller('/store')
 class StoreController {
     private final InventoryService inventory
