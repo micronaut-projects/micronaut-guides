@@ -597,7 +597,7 @@ import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import io.micronaut.http.annotation.Status
-import io.micronaut.scheduling.TaskExecutors.IO
+import io.micronaut.scheduling.TaskExecutors.BLOCKING
 import io.micronaut.scheduling.annotation.ExecuteOn
 import jakarta.inject.Inject
 import jakarta.validation.Valid
@@ -611,19 +611,20 @@ open class FruitController {
     @Get <i class="conum" data-value="3"></i><b>(3)</b>
     fun list() = fruitRepository.list()
 
-    @ExecuteOn(IO)
+    @ExecuteOn(BLOCKING)
     @Post <i class="conum" data-value="4"></i><b>(4)</b>
     @Status(HttpStatus.CREATED) <i class="conum" data-value="5"></i><b>(5)</b>
     open fun create(@Valid @Body fruit: FruitCommand) <i class="conum" data-value="6"></i><b>(6)</b>
         = fruitRepository.create(fruit)
 
+    @ExecuteOn(BLOCKING)
     @Put
     open fun update(@Valid @Body fruit: FruitCommand) = fruitRepository.update(fruit)
 
     @Get(&quot;/{name}&quot;) <i class="conum" data-value="7"></i><b>(7)</b>
     fun find(@PathVariable name: String): Fruit? = fruitRepository.find(name)
 
-    @ExecuteOn(IO)
+    @ExecuteOn(BLOCKING)
     @Delete
     @Status(HttpStatus.NO_CONTENT)
     open fun delete(@Valid @Body fruit: FruitCommand) = fruitRepository.delete(fruit)
