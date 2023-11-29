@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Property(name = "micronaut.http.client.follow-redirects", value = StringUtils.FALSE)
 @MicronautTest
 class HomeControllerTest {
+
     @Test
     void homeRendersHtml(@Client("/")HttpClient httpClient) {
         BlockingHttpClient client = httpClient.toBlocking();

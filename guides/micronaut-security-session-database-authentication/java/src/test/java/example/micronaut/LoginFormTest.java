@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @MicronautTest(startApplication = false)
 class LoginFormTest {
+
     @Inject
     BeanContext beanContext;
 

@@ -56,5 +56,4 @@ class LogoutFormViewModelProcessorTest {
             return Optional.of("admin");
         }
     }
-
 }

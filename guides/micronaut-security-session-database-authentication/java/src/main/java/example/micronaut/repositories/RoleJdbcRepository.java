@@ -8,6 +8,8 @@ import java.util.Optional;
 
 @JdbcRepository(dialect = Dialect.POSTGRES) // <1>
 public interface RoleJdbcRepository extends CrudRepository<Role, Long> { // <2>
+
     Role save(String authority);
+
     Optional<Role> findByAuthority(String authority);
 }

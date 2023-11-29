@@ -28,6 +28,7 @@ import java.util.Map;
 @Secured(SecurityRule.IS_ANONYMOUS) // <1>
 @Controller(UserController.PATH) // <2>
 public class UserController {
+
     public static final String PATH = "/user";
     private static final String PATH_AUTH = "/auth";
     private static final String PATH_AUTH_FAILED = "/authFailed";

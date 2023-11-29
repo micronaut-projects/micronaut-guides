@@ -11,5 +11,6 @@ import java.util.Optional;
 
 @JdbcRepository(dialect = Dialect.POSTGRES) // <1>
 public interface UserJdbcRepository extends CrudRepository<User, Long> { // <2>
+
     Optional<User> findByUsername(@NonNull @NotBlank String username);
 }

@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Singleton // <1>
 class LogoutFormViewModelProcessor  implements ViewModelProcessor<Map<String, Object>> { // <2>
+
     private static final String MODEL_KEY = "logoutForm";
 
     private final SecurityService securityService;
@@ -52,5 +53,4 @@ class LogoutFormViewModelProcessor  implements ViewModelProcessor<Map<String, Ob
             }
         }
     }
-
 }

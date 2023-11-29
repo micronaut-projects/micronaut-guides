@@ -12,8 +12,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PasswordMatch {
+
     String MESSAGE = "example.micronaut.constraints.PasswordMatch.message";
+
     String message() default "{" + MESSAGE + "}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

@@ -7,6 +7,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 @Introspected // <2>
 public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, SignUpForm> {
+
     @Override
     public boolean isValid(SignUpForm value, ConstraintValidatorContext context) {
         if (value.password() == null && value.repeatPassword() == null) {

@@ -20,6 +20,7 @@ public record User(@Nullable
                    boolean accountExpired,
                    boolean accountLocked,
                    boolean passwordExpired) implements UserState {
+
     @Override
     public String getUsername() {
         return username;

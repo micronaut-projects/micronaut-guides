@@ -12,6 +12,7 @@ import java.util.List;
 
 @JdbcRepository(dialect = Dialect.POSTGRES) // <1>
 public interface UserRoleJdbcRepository extends CrudRepository<UserRole, UserRoleId> { // <2>
+
     @Query("""
     SELECT authority FROM role 
     INNER JOIN user_role ON user_role.id_role_id = role.id 

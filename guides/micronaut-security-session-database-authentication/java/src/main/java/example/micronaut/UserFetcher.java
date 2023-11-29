@@ -6,5 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.Optional;
 
 interface UserFetcher {
+
     Optional<UserState> findByUsername(@NotBlank @NonNull String username);
 }
