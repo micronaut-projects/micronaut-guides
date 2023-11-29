@@ -16,7 +16,7 @@ public interface UserRoleJdbcRepository extends CrudRepository<UserRole, UserRol
     @Query("""
     SELECT authority FROM role 
     INNER JOIN user_role ON user_role.id_role_id = role.id 
-    INNER JOIN \"user\" user_ ON user_role.id_user_id = user_.id 
+    INNER JOIN "user" user_ ON user_role.id_user_id = user_.id 
     WHERE user_.username = :username""") // <3>
     List<String> findAllAuthoritiesByUsername(@NotBlank String username);
 }
