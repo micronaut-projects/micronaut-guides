@@ -100,7 +100,7 @@ public class UserController {
     }
 
     @Error(exception = ConstraintViolationException.class) // <12>
-    public HttpResponse<?> onConstraintVioliationException(HttpRequest<?> request, ConstraintViolationException ex) { //<13>
+    public HttpResponse<?> onConstraintViolationException(HttpRequest<?> request, ConstraintViolationException ex) { //<13>
         if (request.getPath().equals(PATH_SIGNUP)) {
             return request.getBody(SignUpForm.class)
                     .map(signUpForm -> HttpResponse.ok()
