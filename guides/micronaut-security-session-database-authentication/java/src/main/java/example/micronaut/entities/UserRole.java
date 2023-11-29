@@ -2,7 +2,6 @@ package example.micronaut.entities;
 
 import io.micronaut.data.annotation.EmbeddedId;
 import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.data.annotation.Transient;
 
 @MappedEntity // <1>
 public class UserRole {

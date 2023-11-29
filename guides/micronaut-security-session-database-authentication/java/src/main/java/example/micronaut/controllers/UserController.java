@@ -2,7 +2,6 @@ package example.micronaut.controllers;
 
 import example.micronaut.RegisterService;
 import example.micronaut.exceptions.UserAlreadyExistsException;
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
