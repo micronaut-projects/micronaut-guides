@@ -1,0 +1,322 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, we will create a Micronaut application written in @language@ with session and database authentication.
+
+The following sequence illustrates the authentication flow:
+
+image::session_based_auth.svg[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:data-jdbc-postgresql-configuration[]
+
+common:flyway-header.adoc[]
+
+resource:application.properties[tag=flyway]
+
+common:flyway-footer.adoc[]
+
+resource:db/migration/V1__schema.sql[]
+
+common:security-session.adoc[]
+
+== Security Configuration
+
+Add this configuration to `application.properties`:
+
+resource:application.properties[tag=security]
+
+<1> Set `micronaut.security.authentication` to `session`. It sets the necessary beans for login and logout using session based authentication.
+<2> After the user logs in, redirect them to the Home page.
+<3> If the login fails, redirect them to /user/authFailed
+
+common:micronaut-validation[]
+
+common:reactor.adoc[]
+
+== Entities
+
+=== Role
+
+Create `Role` domain class to store authorities within our application.
+
+source:entities/Role[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:constraints[4]
+
+=== User
+
+Create a `UserState` interface to model the user state.
+
+source:UserState[]
+
+Create `User` domain class to store users within our application.
+
+source:entities/User[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:constraints[4]
+
+=== UserRole
+
+The `UserRole` table uses a composite key which we model with `UserRoleId`.
+
+source:entities/UserRoleId[]
+
+callout:embeddable[1]
+callout:relation[2]
+
+Create a `UserRole` which stores a many-to-many relationship between `User` and `Role`.
+
+source:entities/UserRole[]
+
+callout:mapped-entity[1]
+callout:embeddedid[2]
+
+== Repositories
+
+=== Role Repository
+
+Create a repository for the `Role` entity.
+
+source:repositories/RoleJdbcRepository[]
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+=== User Repository
+
+Create a repository for the `User` entity.
+
+source:repositories/UserJdbcRepository[]
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+=== User Role Repository
+
+Create a repository for the `UserRole` entity.
+
+source:repositories/UserRoleJdbcRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:at-query[3]
+
+== Password Encoder
+
+Create an interface to handle password encoding:
+
+source:PasswordEncoder[]
+
+To provide an implementation, first include a dependency to https://docs.spring.io/spring-security/site/docs/3.1.x/reference/crypto.html[Spring Security Crypto] to ease password encoding.
+
+Add the dependencies:
+
+:dependencies:
+
+dependency:spring-security-crypto[groupId=org.springframework.security,version=@spring-security-cryptoVersion@]
+dependency:jcl-over-slf4j[groupId=org.slf4j]
+
+:dependencies:
+
+Then, write the implementation:
+
+source:BCryptPasswordEncoderService[]
+
+callout:singleton[1]
+
+=== Register Service
+
+Create a service to register a user.
+
+Create `RegisterService`
+
+source:RegisterService[]
+callout:singleton[1]
+callout:transactional[2]
+
+If the user already exists, we throw an `UserAlreadyExistsException`.
+
+source:exceptions/UserAlreadyExistsException[]
+
+== Delegating Authentication Provider
+
+We will set up a https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/authentication/AuthenticationProvider.html[AuthenticationProvider] a described in the next diagram.
+
+image::delegating_authentication_provider.svg[]
+
+Next, we create interfaces and implementations for each of the pieces of the previous diagram.
+
+=== User Fetcher
+
+Create an interface to retrieve a `UserState` given a username.
+
+source:UserFetcher[]
+
+Provide an implementation:
+
+source:UserFetcherService[]
+
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=UserJdbcRepository]
+
+=== Authorities Fetcher
+
+Create an interface to retrieve roles given a username.
+
+source:AuthoritiesFetcher[]
+
+Provide an implementation:
+
+source:AuthoritiesFetcherService[]
+
+callout:singleton[1]
+callout:constructor-di[number=2,arg0=UserRoleJdbcRepository]
+
+=== Authentication Provider
+
+Create an authentication provider which uses the interfaces you wrote in the previous sections.
+
+source:DelegatingAuthenticationProvider[]
+callout:singleton[1]
+callout:blocking-executor-service[2]
+callout:subscribeOn[3]
+
+common:micronaut-views-thymeleaf.adoc[]
+
+common:micronaut-views-fieldset.adoc[]
+
+common:micronaut-views-fieldset-thymeleaf-fragments.adoc[]
+
+== View Model Processor
+
+Create a https://micronaut-projects.github.io/micronaut-views/latest/guide/#model[ViewModelProcessor] to add a logout form to the model
+if the user is authenticated.
+
+source:LogoutFormViewModelProcessor[]
+callout:singleton[1]
+callout:view-model-processor[2]
+callout:form-generator[3]
+
+== Login Form
+
+Create a Java Record to model the login form:
+
+source:controllers/LoginForm[]
+callout:serdeable[1]
+callout:constraints[2]
+callout:input-password[3]
+
+== SignUp Form
+
+Create a Java Record to model the signup form:
+
+source:controllers/SignUpForm[]
+<1> `PasswordMatch` is a custom constraint annotation which we will create shortly.
+callout:serdeable[2]
+callout:constraints[3]
+callout:input-password[4]
+
+=== Custom Validation Annotation
+
+Create the `PasswordMatch` annotation:
+
+source:constraints/PasswordMatch[]
+
+=== Validation Factory
+
+Creates validator for `PasswordMatch` and `SignUpForm`:
+
+source:constraints/PasswordMatchValidator[]
+callout:introspected
+
+=== Validation Messages
+
+Create a default message for the `PasswordMatch` constraint:
+
+source:constraints/PasswordMatchMessages[]
+
+callout:singleton[]
+
+
+== Controllers
+
+=== HomeController
+
+Create a controller to render an HTML Page in the root of the application:
+
+source:controllers/HomeController[]
+
+callout:controller[number=1,arg0=/]
+callout:produces-html[2]
+callout:secured-anonymous[number=3]
+callout:get-generic[4]
+callout:view[5]
+
+It uses the following Thymeleaf template:
+
+resource:views/home.html[]
+
+=== UserController
+
+Create a controller to render the login and signup pages:
+
+source:controllers/UserController[]
+
+callout:secured-anonymous[number=1]
+callout:controller[number=2,arg0=/user]
+callout:form-generator[3]
+callout:produces-html[4]
+callout:get[number=5,arg0=auth,arg1=/auth]
+callout:view[6]
+callout:get[number=7,arg0=authFailed,arg1=/authFailed]
+callout:executes-on[8]
+callout:consumes[9]
+callout:post[number=10,arg0=signUpSave,arg1=/signUp]
+callout:get[number=11,arg0=signUp,arg1=/signUp]
+callout:on-error[12]
+callout:on-error-request[13]
+
+The `UserController` controller uses the following templates for the login form:
+
+resource:views/user/auth.html[]
+
+The `UserController` uses the following templates for the signup form:
+
+resource:views/user/signup.html[]
+
+common:runapp.adoc[]
+
+You can register a user, sign in and logout:
+
+image::databaseAuthentication.gif[]
+
+== GraalVM Reflection Metadata
+
+Thymleaf access via Reflection several class of Micronaut Views.
+
+common:reflect-config-json.adoc[]
+
+resource:META-INF/native-image/example.micronaut.micronautguide/reflect-config.json[]
+
+common:graal-with-plugins.adoc[]
+
+common:next.adoc[]
+
+Learn more about:
+
+* https://micronaut-projects.github.io/micronaut-security/latest/guide/[Micronaut Security].
+* https://micronaut-projects.github.io/micronaut-views/latest/guide/[Micronaut Views].
+* https://micronaut-projects.github.io/micronaut-validation/latest/guide/[Micronaut Validation].
+
+common:helpWithMicronaut.adoc[]
