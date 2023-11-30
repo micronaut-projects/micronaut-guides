@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@MicronautTest
+@MicronautTest(transactional = false)
 class UserControllerTest {
     @Test
     void signupForm(@Client("/") HttpClient httpClient) {
