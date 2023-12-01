@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Visualize with Swagger-UI an OpenAPI specification of your Micronaut Application</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronauttwittercard.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Visualize with Swagger-UI an OpenAPI specification of your Micronaut Application"/>
+    <meta name="twitter:description" content="Learn how to generate an OpenAPI Specification of your Micronaut Application at build time and visualize it Swagger-UI"/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-openapi-swagger-ui.html">Visualize with Swagger-UI an OpenAPI specification of your Micronaut Application</a> » <span class="breadcrumb_last" aria-current="page">maven | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#micronaut-openapi">4.1. Micronaut OpenAPI</a></li>
+<li><a href="#latest-guide-controller">4.2. Latest Guide Controller</a></li>
+<li><a href="#openapispecification">4.3. @OpenApiSpecification</a></li>
+<li><a href="#openapi-generated-at-compile-time">4.4. OpenAPI Generated at compile-time</a></li>
+<li><a href="#expose-the-openapi-specification">4.5. Expose the OpenAPI Specification</a></li>
+<li><a href="#swagger-ui">4.6. Swagger UI</a></li>
+<li><a href="#expose-swagger-ui">4.7. Expose Swagger-UI</a></li>
+<li><a href="#home-controller">4.8. Home Controller</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">5. Testing the Application</a></li>
+<li><a href="#running-the-application">6. Running the Application</a></li>
+<li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">7. Generate a Micronaut Application Native Executable with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#graalvm-installation">7.1. GraalVM installation</a></li>
+<li><a href="#native-executable-generation">7.2. Native executable generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">8. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Visualize with Swagger-UI an OpenAPI specification of your Micronaut Application</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to generate an OpenAPI Specification of your Micronaut Application at build time and visualize it Swagger-UI</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.2.0</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Intellij IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 17 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-openapi-swagger-ui-maven-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+    --features=openapi,swagger-ui,validation \
+    --build=maven \
+    --lang=java \
+    --test=junit</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>openapi</code>, <code>swagger-ui</code>, and <code>validation</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=openapi&amp;features=swagger-ui&amp;features=validation&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="micronaut-openapi">4.1. Micronaut OpenAPI</h3>
+<div class="paragraph">
+<p>To use <a href="https://micronaut-projects.github.io/micronaut-openapi/latest/guide/">Micronaut OpenAPI</a>, add the <code>micronaut-openapi</code> annotation processor and the
+<a href="https://micronaut-projects.github.io/micronaut-openapi/latest/guide/#micronautOpenApiAnnotations">Micronaut OpenAPI annotations</a> as compile only dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="comment">&lt;!-- Add the following to your annotationProcessorPaths element --&gt;</span>
+<span class="tag">&lt;path&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut.openapi<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-openapi<span class="tag">&lt;/artifactId&gt;</span>
+<span class="tag">&lt;/path&gt;</span>
+<span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.micronaut.openapi<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>micronaut-openapi-annotations<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>micronaut-openapi-annotations</code> dependency brings the Swagger annotations dependency transitively.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="latest-guide-controller">4.2. Latest Guide Controller</h3>
+<div class="paragraph">
+<p>First, let&#8217;s create a controller that exposes the <a href="https://guides.micronaut.io">Micronaut Guides</a> information.</p>
+</div>
+<div class="sect3">
+<h4 id="guides-model">4.2.1. Guides Model</h4>
+<div class="paragraph">
+<p>We support different build tools per guide:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/BuildTool.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="directive">public</span> <span class="type">enum</span> BuildTool {
+
+    GRADLE, MAVEN
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A guide may be written in multiple languages:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Language.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="directive">public</span> <span class="type">enum</span> Language {
+
+    GROOVY,
+    JAVA,
+    KOTLIN
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Thus, we have several options per guide:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Option.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>;
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
+
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> record <span class="predefined-type">Option</span>(<span class="annotation">@NotNull</span> Language language, <i class="conum" data-value="2"></i><b>(2)</b>
+                     <span class="annotation">@NotNull</span> BuildTool buildTool, <i class="conum" data-value="2"></i><b>(2)</b>
+                     <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> url) { <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>jakarta.validation.constraints</code> Constraints to ensure the data matches your expectations.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The following Java record represents a Micronaut Guide:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Guide.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
+<span class="keyword">import</span> <span class="include">io.swagger.v3.oas.annotations.media.Schema</span>;
+<span class="keyword">import</span> <span class="include">jakarta.validation.Valid</span>;
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>;
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.Size</span>;
+<span class="keyword">import</span> <span class="include">java.time.LocalDate</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> record Guide(<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> title,
+                    <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> intro,
+                    <span class="annotation">@NotNull</span> <span class="annotation">@Size</span>(min = <span class="integer">1</span>) <span class="predefined-type">List</span>&lt;<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span>&gt; authors, <i class="conum" data-value="2"></i><b>(2)</b>
+                    <span class="annotation">@Nullable</span> <span class="predefined-type">List</span>&lt;<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span>&gt; tags,
+                    <span class="annotation">@NotNull</span> <span class="annotation">@Size</span>(min = <span class="integer">1</span>) <span class="predefined-type">List</span>&lt;<span class="annotation">@NotBlank</span> <span class="predefined-type">String</span>&gt; categories,
+                    <span class="annotation">@Schema</span>(format = <span class="string"><span class="delimiter">&quot;</span><span class="content">yyyy-MM-dd</span><span class="delimiter">&quot;</span></span>, example = <span class="string"><span class="delimiter">&quot;</span><span class="content">2018-05-23</span><span class="delimiter">&quot;</span></span>) <span class="annotation">@NotNull</span> LocalDate publicationDate, <i class="conum" data-value="3"></i><b>(3)</b>
+                    <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> slug,
+                    <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> url,
+                    <span class="annotation">@NotNull</span> <span class="annotation">@Size</span>(min = <span class="integer">1</span>) <span class="predefined-type">List</span>&lt;<span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> <span class="predefined-type">Option</span>&gt; options) {
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>jakarta.validation.constraints</code> Constraints to ensure the data matches your expectations.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>You can use the swagger annotation <code>@Schema</code> to customize the generated OpenAPI specification.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="controller">4.2.2. Controller</h4>
+<div class="paragraph">
+<p>Let&#8217;s create a controller for which we will generate an OpenAPI Specification at build time.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/LatestGuidesController.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+<span class="keyword">import</span> <span class="include">java.time.LocalDate</span>;
+<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/latest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">LatestGuidesController</span> {
+
+    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;Guide&gt; GUIDES = <span class="predefined-type">Collections</span>.singletonList(
+            <span class="keyword">new</span> Guide(<span class="string"><span class="delimiter">&quot;</span><span class="content">Creating your first Micronaut application</span><span class="delimiter">&quot;</span></span>,
+                    <span class="string"><span class="delimiter">&quot;</span><span class="content">Learn how to create a Hello World Micronaut application with a controller and a functional test.</span><span class="delimiter">&quot;</span></span>,
+                    <span class="predefined-type">List</span>.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">Iván López</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sergio dle Amo</span><span class="delimiter">&quot;</span></span>),
+                    <span class="predefined-type">List</span>.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">junit</span><span class="delimiter">&quot;</span></span>,<span class="string"><span class="delimiter">&quot;</span><span class="content">getting_started</span><span class="delimiter">&quot;</span></span>,<span class="string"><span class="delimiter">&quot;</span><span class="content">graalvm</span><span class="delimiter">&quot;</span></span>),
+                    <span class="predefined-type">List</span>.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">Getting Started</span><span class="delimiter">&quot;</span></span>),
+                    LocalDate.of(<span class="integer">2018</span>, <span class="integer">5</span>, <span class="integer">23</span>),
+                    <span class="string"><span class="delimiter">&quot;</span><span class="content">creating-your-first-micronaut-app</span><span class="delimiter">&quot;</span></span>,
+                    <span class="string"><span class="delimiter">&quot;</span><span class="content">https://guides.micronaut.io/latest/creating-your-first-micronaut-app.html</span><span class="delimiter">&quot;</span></span>,
+                    <span class="predefined-type">List</span>.of(<span class="keyword">new</span> <span class="predefined-type">Option</span>(Language.JAVA, BuildTool.GRADLE, <span class="string"><span class="delimiter">&quot;</span><span class="content">https://guides.micronaut.io/latest/creating-your-first-micronaut-app-gradle-java.html</span><span class="delimiter">&quot;</span></span>),
+                            <span class="keyword">new</span> <span class="predefined-type">Option</span>(Language.GROOVY, BuildTool.GRADLE, <span class="string"><span class="delimiter">&quot;</span><span class="content">https://guides.micronaut.io/latest/creating-your-first-micronaut-app-gradle-groovy.html</span><span class="delimiter">&quot;</span></span>),
+                            <span class="keyword">new</span> <span class="predefined-type">Option</span>(Language.KOTLIN, BuildTool.GRADLE, <span class="string"><span class="delimiter">&quot;</span><span class="content">https://guides.micronaut.io/latest/creating-your-first-micronaut-app-gradle-kotlin.html</span><span class="delimiter">&quot;</span></span>),
+                            <span class="keyword">new</span> <span class="predefined-type">Option</span>(Language.JAVA, BuildTool.MAVEN, <span class="string"><span class="delimiter">&quot;</span><span class="content">https://guides.micronaut.io/latest/creating-your-first-micronaut-app-maven-java.html</span><span class="delimiter">&quot;</span></span>),
+                            <span class="keyword">new</span> <span class="predefined-type">Option</span>(Language.GROOVY, BuildTool.MAVEN, <span class="string"><span class="delimiter">&quot;</span><span class="content">https://guides.micronaut.io/latest/creating-your-first-micronaut-app-maven-groovy.html</span><span class="delimiter">&quot;</span></span>),
+                            <span class="keyword">new</span> <span class="predefined-type">Option</span>(Language.KOTLIN, BuildTool.MAVEN, <span class="string"><span class="delimiter">&quot;</span><span class="content">https://guides.micronaut.io/latest/creating-your-first-micronaut-app-maven-kotlin.html</span><span class="delimiter">&quot;</span></span>)
+                            ))
+    );
+
+    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/guides.json</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="predefined-type">List</span>&lt;Guide&gt; latestGuides() {
+        <span class="keyword">return</span> GUIDES;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We could test such a controller with:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/LatestGuidesControllerTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">java.net.URI</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">LatestGuidesControllerTest</span> {
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> guidesEndpoint(<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) HttpClient httpClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+        BlockingHttpClient client = httpClient.toBlocking();
+        <span class="predefined-type">URI</span> uri = UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/latest</span><span class="delimiter">&quot;</span></span>).path(<span class="string"><span class="delimiter">&quot;</span><span class="content">guides.json</span><span class="delimiter">&quot;</span></span>).build();
+        HttpRequest&lt;?&gt; request = HttpRequest.GET(uri);
+        <span class="predefined-type">String</span> json = assertDoesNotThrow(() -&gt; client.retrieve(request));
+        assertTrue(json.contains(<span class="string"><span class="delimiter">&quot;</span><span class="content">2018-05-23</span><span class="delimiter">&quot;</span></span>));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="openapispecification">4.3. @OpenApiSpecification</h3>
+<div class="paragraph">
+<p>The Micronaut OpenAPI integration requires a class to be annotated with <code>@OpenApiSpecification</code>. Modify <code>Application.java</code> and annotate it.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Application.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.runtime.Micronaut</span>;
+<span class="keyword">import</span> <span class="include">io.swagger.v3.oas.annotations</span>.*;
+<span class="keyword">import</span> <span class="include">io.swagger.v3.oas.annotations.info</span>.*;
+<span class="keyword">import</span> <span class="include">io.swagger.v3.oas.annotations.servers.Server</span>;
+
+<span class="annotation">@OpenAPIDefinition</span>(
+    info = <span class="annotation">@Info</span>(
+            title = <span class="string"><span class="delimiter">&quot;</span><span class="content">micronaut-guides</span><span class="delimiter">&quot;</span></span>,
+            version = <span class="string"><span class="delimiter">&quot;</span><span class="content">1.0</span><span class="delimiter">&quot;</span></span>
+    ), servers = <span class="annotation">@Server</span>(url = <span class="string"><span class="delimiter">&quot;</span><span class="content">https://guides.micronaut.io</span><span class="delimiter">&quot;</span></span>)
+) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">Application</span> {
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
+        Micronaut.run(Application.class, args);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="openapi-generated-at-compile-time">4.4. OpenAPI Generated at compile-time</h3>
+<div class="paragraph">
+<p>By adding the <code>@OpenApiSpecification</code> annotation to <code>Application</code>, an OpenAPI specification is generated at compile-time. You can test it as follows:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/OpenApiGeneratedTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.io.ResourceLoader</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+
+<span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">OpenApiGeneratedTest</span> {
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> buildGeneratesOpenApi(ResourceLoader resourceLoader) {
+        assertTrue(resourceLoader.getResource(<span class="string"><span class="delimiter">&quot;</span><span class="content">META-INF/swagger/micronaut-guides-1.0.yml</span><span class="delimiter">&quot;</span></span>).isPresent());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context. This test does not need the embedded server. Set <code>startApplication</code> to <code>false</code> to avoid starting it.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="expose-the-openapi-specification">4.5. Expose the OpenAPI Specification</h3>
+<div class="paragraph">
+<p>We can expose the OpenAPI specification generated at compile-time as a static resource with the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swagger/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can test the OpenAPI specification is available:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/OpenApiExposedTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">OpenApiExposedTest</span> {
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> openApi(<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) HttpClient httpClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+        BlockingHttpClient client = httpClient.toBlocking();
+        assertDoesNotThrow(() -&gt; client.exchange(<span class="string"><span class="delimiter">&quot;</span><span class="content">/swagger/micronaut-guides-1.0.yml</span><span class="delimiter">&quot;</span></span>));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="swagger-ui">4.6. Swagger UI</h3>
+<div class="paragraph">
+<p>To simplify the visualization of the OpenAPI specification, we are going to use <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Swagger UI allows anyone — be it your development team or your end consumers — to visualize and interact with the API’s resources without having any of the implementation logic in place. It’s automatically generated from your OpenAPI (formerly known as Swagger) Specification, with the visual documentation making it easy for back end implementation and client side consumption.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>To generate Swagger-UI HTML, create an <code>openapi.properties</code> file in the root of your project and add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">swagger-ui.enabled=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can write a test to verify that Swagger-UI HTML is generated at compile-time.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/SwaggerUIGeneratedTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in micronaut-openapi-swagger-ui-maven-java.adoc - include::build/code/micronaut-openapi-swagger-ui/micronaut-openapi-swagger-ui-maven-java/src/test/java/example/micronaut/SwaggerUIGeneratedTest.java<span class="type">[]</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context. This test does not need the embedded server. Set <code>startApplication</code> to <code>false</code> to avoid starting it.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="expose-swagger-ui">4.7. Expose Swagger-UI</h3>
+<div class="paragraph">
+<p>We can expose the Swagger-UI HTML generated at compile-time as a static resource with the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">micronaut.router.static-resources.swagger-ui.paths=classpath:META-INF/swagger/views/swagger-ui
+micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can test the Swagger-UI is available:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/SwaggerUITest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in micronaut-openapi-swagger-ui-maven-java.adoc - include::build/code/micronaut-openapi-swagger-ui/micronaut-openapi-swagger-ui-maven-java/src/test/java/example/micronaut/SwaggerUITest.java<span class="type">[]</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="home-controller">4.8. Home Controller</h3>
+<div class="paragraph">
+<p>Next, create a controller that redirects to the swagger-ui endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/HomeController.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>;
+<span class="keyword">import</span> <span class="include">io.swagger.v3.oas.annotations.Hidden</span>;
+<span class="keyword">import</span> <span class="include">java.net.URI</span>;
+
+<span class="annotation">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">HomeController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> <span class="directive">static</span> <span class="predefined-type">URI</span> SWAGGER_UI = UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/swagger-ui</span><span class="delimiter">&quot;</span></span>).path(<span class="string"><span class="delimiter">&quot;</span><span class="content">index.html</span><span class="delimiter">&quot;</span></span>).build();
+
+    <span class="annotation">@Get</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@Hidden</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    HttpResponse&lt;?&gt; home() {
+        <span class="keyword">return</span> HttpResponse.seeOther(SWAGGER_UI);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the method to an HTTP GET request.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>If you annotate a route with the swagger annotation <code>@Hidden</code>, the compile-time generated OpenAPI specification does not include it.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Write a test that verifies the redirection and checks that the endpoint is not included in the OpenAPI specification:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/HomeControllerTest.java</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.core.util.StringUtils</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpHeaders</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions</span>.*;
+
+<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">micronaut.http.client.follow-redirects</span><span class="delimiter">&quot;</span></span>, value = StringUtils.FALSE) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="type">class</span> <span class="class">HomeControllerTest</span> {
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> testRedirectionToSwaggerUi(<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) HttpClient httpClient) {  <i class="conum" data-value="3"></i><b>(3)</b>
+        BlockingHttpClient client = httpClient.toBlocking();
+        HttpResponse&lt;?&gt; response = assertDoesNotThrow(() -&gt; client.exchange(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>));
+        assertEquals(HttpStatus.SEE_OTHER, response.getStatus());
+        assertNotNull(response.getHeaders().get(HttpHeaders.LOCATION));
+        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">/swagger-ui/index.html</span><span class="delimiter">&quot;</span></span>, response.getHeaders().get(HttpHeaders.LOCATION));
+    }
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> homeControllerIsHidden(<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) HttpClient httpClient) {
+        BlockingHttpClient client = httpClient.toBlocking();
+        <span class="predefined-type">String</span> yml = assertDoesNotThrow(() -&gt; client.retrieve(<span class="string"><span class="delimiter">&quot;</span><span class="content">/swagger/micronaut-guides-1.0.yml</span><span class="delimiter">&quot;</span></span>));
+        assertFalse(yml.contains(<span class="string"><span class="delimiter">&quot;</span><span class="content">operationId: home</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@Property</code> to supply configuration to the test.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The root endpoint is not included in the OpenAPI specification.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./mvnw test</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">6. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./mvnw mn:run</code> command, which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>If you go to <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code>, you will see the SwaggerUI visualization of the compile-time generated OpenAPI Specification</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-executable-with-graalvm">7. Generate a Micronaut Application Native Executable with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native executable of our Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling native executables ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="graalvm-installation">7.1. GraalVM installation</h3>
+<div class="paragraph">
+<p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 17</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 17.0.8-graal</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Java 17</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sdk use java 17.0.8-graal</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the <a href="https://github.com/graalvm/graalvm-ce-builds/releases/">GraalVM Community Edition</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 17</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 17.0.8-graalce</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Java 17</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sdk use java 17.0.8-graalce</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-executable-generation">7.2. Native executable generation</h3>
+<div class="paragraph">
+<p>To generate a native executable using Maven, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./mvnw package -Dpackaging=native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native executable is created in the <code>target</code> directory and can be run with <code>target/micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you go to <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code>, you will see the SwaggerUI visualization of the compile-time generated OpenAPI Specification</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>© 2023 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
