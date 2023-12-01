@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest // <1>
 class LatestGuidesControllerTest {
+
     @Test
     void guidesEndpoint(@Client("/") HttpClient httpClient) { // <2>
         BlockingHttpClient client = httpClient.toBlocking();

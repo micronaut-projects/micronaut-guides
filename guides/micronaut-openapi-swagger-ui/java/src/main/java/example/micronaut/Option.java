@@ -6,6 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 @Serdeable // <1>
 public record Option(@NotNull Language language, // <2>
-                    @NotNull BuildTool buildTool, // <2>
-                    @NotBlank String url) { // <2>
+                     @NotNull BuildTool buildTool, // <2>
+                     @NotBlank String url) { // <2>
 }

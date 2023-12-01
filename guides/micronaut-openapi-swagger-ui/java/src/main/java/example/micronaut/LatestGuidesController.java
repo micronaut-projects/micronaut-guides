@@ -8,6 +8,7 @@ import java.util.List;
 
 @Controller("/latest") // <1>
 class LatestGuidesController {
+
     private static final List<Guide> GUIDES = Collections.singletonList(
             new Guide("Creating your first Micronaut application",
                     "Learn how to create a Hello World Micronaut application with a controller and a functional test.",

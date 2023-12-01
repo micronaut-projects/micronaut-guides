@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @MicronautTest // <1>
 class SwaggerUiTest {
+
     @Test
     void openApi(@Client("/") HttpClient httpClient) { // <2>
         BlockingHttpClient client = httpClient.toBlocking();

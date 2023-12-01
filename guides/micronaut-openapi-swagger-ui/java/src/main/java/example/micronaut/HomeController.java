@@ -10,12 +10,11 @@ import java.net.URI;
 @Controller // <1>
 class HomeController {
 
-    private final static URI SWAGGER_UI = UriBuilder.of("/swagger-ui").path("index.html").build();;
+    private final static URI SWAGGER_UI = UriBuilder.of("/swagger-ui").path("index.html").build();
 
     @Get // <2>
     @Hidden // <3>
     HttpResponse<?> home() {
         return HttpResponse.seeOther(SWAGGER_UI);
     }
-
 }
