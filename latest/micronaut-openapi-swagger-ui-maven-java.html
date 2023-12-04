@@ -609,9 +609,24 @@ micronaut.router.static-resources.swagger.mapping=/swagger/**</code></pre>
 <p>You can write a test to verify that Swagger-UI HTML is generated at compile-time.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/java/example/micronaut/SwaggerUIGeneratedTest.java</div>
+<div class="title">src/test/java/example/micronaut/SwaggerUiGeneratedTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in micronaut-openapi-swagger-ui-maven-java.adoc - include::build/code/micronaut-openapi-swagger-ui/micronaut-openapi-swagger-ui-maven-java/src/test/java/example/micronaut/SwaggerUIGeneratedTest.java<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.io.ResourceLoader</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+
+<span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">SwaggerUiGeneratedTest</span> {
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> buildGeneratesOpenApi(ResourceLoader resourceLoader) {
+        assertTrue(resourceLoader.getResource(<span class="string"><span class="delimiter">&quot;</span><span class="content">META-INF/swagger/views/swagger-ui/index.html</span><span class="delimiter">&quot;</span></span>).isPresent());
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -639,9 +654,27 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 <p>You can test the Swagger-UI is available:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/java/example/micronaut/SwaggerUITest.java</div>
+<div class="title">src/test/java/example/micronaut/SwaggerUiTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in micronaut-openapi-swagger-ui-maven-java.adoc - include::build/code/micronaut-openapi-swagger-ui/micronaut-openapi-swagger-ui-maven-java/src/test/java/example/micronaut/SwaggerUITest.java<span class="type">[]</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.BlockingHttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
+<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>;
+
+<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="type">class</span> <span class="class">SwaggerUiTest</span> {
+
+    <span class="annotation">@Test</span>
+    <span class="type">void</span> openApi(<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>) HttpClient httpClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+        BlockingHttpClient client = httpClient.toBlocking();
+        assertDoesNotThrow(() -&gt; client.exchange(<span class="string"><span class="delimiter">&quot;</span><span class="content">/swagger-ui/index.html</span><span class="delimiter">&quot;</span></span>));
+    }
+}</code></pre>
 </div>
 </div>
 <div class="colist arabic">
