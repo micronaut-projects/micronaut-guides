@@ -2,9 +2,6 @@ package example.micronaut;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.http.HttpHeaders;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
@@ -16,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Property(name = "micronaut.http.client.follow-redirects", value = StringUtils.FALSE) // <1>
 @MicronautTest // <2>
 class HomeControllerTest {
+
     @Test
     void homeControllerIsHidden(@Client("/") HttpClient httpClient) {
         BlockingHttpClient client = httpClient.toBlocking();
