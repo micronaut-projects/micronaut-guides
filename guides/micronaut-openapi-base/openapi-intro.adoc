@@ -1,0 +1,76 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+:leveloffset: +1
+
+common:openapi-dependencies.adoc[]
+
+== Latest Guide Controller
+
+First, let's create a controller that exposes the https://guides.micronaut.io[Micronaut Guides] information.
+
+=== Guides Model
+
+We support different build tools per guide:
+
+source:BuildTool[]
+
+A guide may be written in multiple languages:
+
+source:Language[]
+
+Thus, we have several options per guide:
+
+source:Option[]
+callout:serdeable[1]
+callout:constraints[2]
+
+The following Java record represents a Micronaut Guide:
+
+source:Guide[]
+callout:serdeable[1]
+callout:constraints[2]
+callout:swagger-schema[3]
+
+=== Controller
+
+Let's create a controller for which we will generate an OpenAPI Specification at build time.
+
+source:LatestGuidesController[]
+
+We could test such a controller with:
+
+test:LatestGuidesControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+
+== @OpenApiSpecification
+
+The Micronaut OpenAPI integration requires a class to be annotated with `@OpenApiSpecification`. Modify `Application.java` and annotate it.
+
+source:Application[]
+
+== OpenAPI Generated at compile-time
+
+By adding the `@OpenApiSpecification` annotation to `Application`, an OpenAPI specification is generated at compile-time. You can test it as follows:
+
+test:OpenApiGeneratedTest[]
+callout:micronaut-test-start-application-false[1]
+
+== Expose the OpenAPI Specification
+
+We can expose the OpenAPI specification generated at compile-time as a static resource with the following configuration:
+
+resource:application.properties[tag=static-resources-swagger]
+
+You can test the OpenAPI specification is available:
+
+test:OpenApiExposedTest[]
+callout:micronaut-test[1]
+callout:http-client[2]
