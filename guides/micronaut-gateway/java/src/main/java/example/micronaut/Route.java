@@ -7,9 +7,10 @@ import io.micronaut.core.order.Ordered;
 import java.util.List;
 
 public interface Route extends Named, Ordered {
+
     @NonNull
     String getUri();
 
     @NonNull
-    List<? extends Predicate> getPredicates();
+    List<? extends RoutePredicate> getPredicates();
 }

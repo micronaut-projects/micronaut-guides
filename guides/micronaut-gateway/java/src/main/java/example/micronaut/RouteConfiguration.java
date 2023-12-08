@@ -45,9 +45,9 @@ public class RouteConfiguration implements Route {
     }
 
     @Override
-    public List<? extends Predicate> getPredicates() {
+    public List<? extends RoutePredicate> getPredicates() {
         Object path = predicates.get("path");
-        return List.of((ConfigurationPredicate) () -> path != null ? path.toString() : null);
+        return List.of((ConfigurationRoutePredicate) () -> path != null ? path.toString() : null);
     }
 
     public void setPredicates(@MapFormat(transformation = MapFormat.MapTransformation.FLAT) Map<String, Object> predicates) {

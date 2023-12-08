@@ -23,8 +23,8 @@ public class DefaultRouteMatcher implements RouteMatcher {
     @NonNull
     public Optional<Route> matches(@NonNull HttpRequest<?> request) {
         for (Route route : routes) {
-            for (Predicate predicate : route.getPredicates()) {
-                if (matches(predicate, request)) {
+            for (RoutePredicate predicate : route.getPredicates()) {
+                if (predicate.test(request)) {
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("route {} matched", route.getName());
                     }
@@ -33,23 +33,5 @@ public class DefaultRouteMatcher implements RouteMatcher {
             }
         }
         return Optional.empty();
-    }
-
-    private boolean matches(@NonNull Route route, @NonNull HttpRequest<?> request) {
-        for (Predicate predicate : route.getPredicates()) {
-            if (matches(predicate, request)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean matches(@NonNull Predicate predicate, @NonNull HttpRequest<?> request) {
-        if (predicate instanceof ConfigurationPredicate configurationPredicate) {
-            if (configurationPredicate.getPath() != null) {
-                return request.getPath().startsWith(configurationPredicate.getPath());
-            }
-        }
-        return false;
     }
 }

@@ -13,12 +13,12 @@ import io.micronaut.http.uri.UriBuilder;
 import org.reactivestreams.Publisher;
 import java.net.URI;
 
-@Filter(ServerFilter.MATCH_ALL_PATTERN) // <1>
+@Filter(ServerFilter.MATCH_ALL_PATTERN)
 class GatewayFilter implements HttpServerFilter {
     private final RouteMatcher routeMatcher;
     private final ProxyHttpClient proxyHttpClient;
 
-    GatewayFilter(RouteMatcher routeMatcher, // <1>
+    GatewayFilter(RouteMatcher routeMatcher,
                   ProxyHttpClient proxyHttpClient) {
         this.routeMatcher = routeMatcher;
         this.proxyHttpClient = proxyHttpClient;
@@ -30,6 +30,7 @@ class GatewayFilter implements HttpServerFilter {
                 .map(route -> proxyHttpClient.proxy(mutate(route, request)))
                 .orElseGet(() -> chain.proceed(request));
     }
+
     @NonNull
     private MutableHttpRequest<?> mutate(@NonNull Route route, @NonNull HttpRequest<?> request) {
         MutableHttpRequest<?> mutableHttpRequest = request.mutate();

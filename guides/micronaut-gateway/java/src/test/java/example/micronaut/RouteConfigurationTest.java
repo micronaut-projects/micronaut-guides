@@ -38,6 +38,6 @@ class RouteConfigurationTest {
         assertTrue(routes.stream().anyMatch(route -> route.getName().equals("micronaut")));
         assertTrue(routes.stream().allMatch(route -> route.getPredicates() != null));
         assertTrue(routes.stream().allMatch(route -> route.getPredicates() != null && route.getPredicates().size() == 1));
-        assertTrue(routes.stream().allMatch(route -> route.getPredicates() != null && route.getPredicates().size() == 1 && ((ConfigurationPredicate) route.getPredicates().get(0)).getPath() != null));
+        assertTrue(routes.stream().allMatch(route -> route.getPredicates() != null && route.getPredicates().size() == 1 && ((ConfigurationRoutePredicate) route.getPredicates().get(0)).getPath() != null));
     }
 }
