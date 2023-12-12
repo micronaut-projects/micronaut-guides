@@ -17,14 +17,23 @@ class MessageControllerTest {
     @Test
     void contentNegotiation(@Client("/") HttpClient httpClient) { // <2>
         BlockingHttpClient client = httpClient.toBlocking();
-        String expected = """
+
+        String expectedJson = """
                 {"message":"Hello World"}""";
         String json = assertDoesNotThrow(() -> client.retrieve(HttpRequest.GET("/")
                 .accept(MediaType.APPLICATION_JSON))); // <3>
-        assertEquals(expected, json);
+        assertEquals(expectedJson, json);
+
+        String expectedHtml = """
+                <!DOCTYPE html>
+                <html lang="en">
+                <body>
+                <h1>Hello World</h1>
+                </body>
+                </html>
+                """;
         String html = assertDoesNotThrow(() -> client.retrieve(HttpRequest.GET("/")
                 .accept(MediaType.TEXT_HTML)));
-        assertTrue(html.contains("<!DOCTYPE html>"));
-        assertTrue(html.contains("<h1>Hello World</h1>"));
+        assertEquals(expectedHtml, html);
     }
 }
