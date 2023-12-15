@@ -273,6 +273,7 @@ If you have an existing Micronaut application and want to add the functionality 
  * @see &lt;a href=&quot;https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf&quot;&gt;LIST OF ITU-T RECOMMENDATION E.164 ASSIGNED COUNTRY CODES&lt;/a&gt;
  */</span>
 <span class="directive">public</span> <span class="type">enum</span> CountryCode {
+
     AFGHANISTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">93</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Afghanistan</span><span class="delimiter">&quot;</span></span>),
     ALBANIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">355</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Albania (Republic of)</span><span class="delimiter">&quot;</span></span>),
     ALGERIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">213</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Algeria (People's Democratic Republic of)</span><span class="delimiter">&quot;</span></span>),
@@ -513,16 +514,8 @@ If you have an existing Micronaut application and want to add the functionality 
     ZAMBIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">260</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Zambia (Republic of)</span><span class="delimiter">&quot;</span></span>),
     ZIMBABWE(<span class="string"><span class="delimiter">&quot;</span><span class="content">263</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Zimbabwe (Republic of)</span><span class="delimiter">&quot;</span></span>);
 
-    <span class="directive">private</span> <span class="predefined-type">String</span> code;
-    <span class="directive">private</span> <span class="predefined-type">String</span> countryName;
-
-    <span class="comment">/**
-     * Constructor for countries whose name matches their enum.
-     * @param code country code
-     */</span>
-    CountryCode(<span class="predefined-type">String</span> code) {
-        <span class="local-variable">this</span>.code = code;
-    }
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> code;
+    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> countryName;
 
     <span class="comment">/**
      * Constructor for countries whose name does not match the enum.
@@ -617,6 +610,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
 
 <span class="type">class</span> <span class="class">CountryCodeTest</span> {
+
     <span class="annotation">@Test</span>
     <span class="type">void</span> preferredNameGetsUsed() {
         <span class="predefined-type">String</span> name = CountryCode.YEMEN.getCountryName();
@@ -703,6 +697,7 @@ If you have an existing Micronaut application and want to add the functionality 
  * Utility methods to ease {@link E164} validation.
  */</span>
 <span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">E164Utils</span> {
+
     <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="type">int</span> MAX_NUMBER_OF_DIGITS = <span class="integer">15</span>;
     <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> PLUS_SIGN = <span class="string"><span class="delimiter">&quot;</span><span class="content">+</span><span class="delimiter">&quot;</span></span>;
 
@@ -858,12 +853,14 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/main/java/example/micronaut/CustomValidationFactory.java</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+
 <span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Factory</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.validation.validator.constraints.ConstraintValidator</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
 
 <span class="annotation">@Factory</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">CustomValidationFactory</span> {
+
     <span class="comment">/**
      * @return A {@link ConstraintValidator} implementation of a {@link E164} constraint for type {@link String}.
      */</span>
@@ -907,6 +904,7 @@ If you have an existing Micronaut application and want to add the functionality 
  */</span>
 <span class="annotation">@Singleton</span>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">CustomValidationMessages</span> <span class="directive">extends</span> StaticMessageSource {
+
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> E164_MESSAGE = <span class="string"><span class="delimiter">&quot;</span><span class="content">must be a phone in E.164 format</span><span class="delimiter">&quot;</span></span>;
     <span class="comment">/**
      * The message suffix to use.
@@ -969,7 +967,6 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.MessageSource</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
 <span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
@@ -977,20 +974,15 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="keyword">import</span> <span class="include">jakarta.validation.ConstraintViolation</span>;
 <span class="keyword">import</span> <span class="include">jakarta.validation.Validator</span>;
 
-<span class="keyword">import</span> <span class="include">java.util.Locale</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 <span class="keyword">import</span> <span class="include">java.util.Set</span>;
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertFalse</span>;
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
 
 <span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">class</span> <span class="class">ContactTest</span> {
-    <span class="annotation">@Inject</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    MessageSource messageSource;
 
-    <span class="annotation">@Inject</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Inject</span> <i class="conum" data-value="2"></i><b>(2)</b>
     <span class="predefined-type">Validator</span> validator;
 
     <span class="annotation">@Test</span>
@@ -999,16 +991,11 @@ If you have an existing Micronaut application and want to add the functionality 
         <span class="predefined-type">Set</span>&lt;ConstraintViolation&lt;Contact&gt;&gt; violationSet = validator.validate(<span class="keyword">new</span> Contact(<span class="string"><span class="delimiter">&quot;</span><span class="content">+1-4155552671</span><span class="delimiter">&quot;</span></span>));
         assertFalse(violationSet.isEmpty());
         <span class="predefined-type">String</span> template = <span class="string"><span class="delimiter">&quot;</span><span class="content">{example.micronaut.E164.message}</span><span class="delimiter">&quot;</span></span>;
-        assertTrue(violationSet.stream().anyMatch(violation -&gt; violation.getMessageTemplate().equals(template)));
-        assertTrue(violationSet.stream().anyMatch(violation -&gt; violation.getInvalidValue().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">+1-4155552671</span><span class="delimiter">&quot;</span></span>)));
-
-        violationSet.stream().filter(violation -&gt; violation.getMessage().equals(template))
-                .findFirst()
-                .ifPresent(violation -&gt; {
-                    Optional&lt;<span class="predefined-type">String</span>&gt; message = messageSource.getMessage(violation.getMessage(), <span class="predefined-type">Locale</span>.ENGLISH);
-                    assertTrue(message.isPresent());
-                    assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">must be a phone in E.164 format</span><span class="delimiter">&quot;</span></span>, message.get());
-                });
+        assertTrue(violationSet.stream().anyMatch(violation -&gt;
+                violation.getMessageTemplate().equals(template)
+                        &amp;&amp; violation.getInvalidValue().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">+1-4155552671</span><span class="delimiter">&quot;</span></span>)
+                        &amp;&amp; violation.getMessage().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">must be a phone in E.164 format</span><span class="delimiter">&quot;</span></span>))
+        );
     }
 }</code></pre>
 </div>
@@ -1021,10 +1008,6 @@ If you have an existing Micronaut application and want to add the functionality 
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Injection for <code>MessageSource</code>.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>Injection for <code>Validator</code>.</td>
 </tr>
 </table>
@@ -1036,9 +1019,6 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="sectionbody">
 <div class="paragraph">
 <p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
-</div>
-<div class="paragraph">
-<p><code>ContactTest</code> uses <code>MessageSource</code>. Learn about the <a href="https://guides.micronaut.io/latest/micronaut-patterns-composite.html">composite pattern</a> which <code>MessageSource</code> uses.</p>
 </div>
 <div class="paragraph">
 <p>Learn about <a href="https://docs.micronaut.io/latest/guide/#beanValidation">Bean Validation</a> and how to <a href="https://guides.micronaut.io/latest/localized-message-source.html">localize your application</a>.</p>
