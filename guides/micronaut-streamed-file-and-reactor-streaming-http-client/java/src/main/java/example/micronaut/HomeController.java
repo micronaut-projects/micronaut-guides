@@ -44,7 +44,6 @@ class HomeController implements AutoCloseable {
         }
         this.reactorStreamingHttpClient = ReactorStreamingHttpClient.create(url); // <2>
 
-
     }
 
     @Get("{?q}") // <3>
