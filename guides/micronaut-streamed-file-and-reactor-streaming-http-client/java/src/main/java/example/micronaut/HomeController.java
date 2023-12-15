@@ -10,7 +10,6 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.server.types.files.StreamedFile;
-import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.reactor.http.client.ReactorStreamingHttpClient;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -26,14 +25,7 @@ import java.net.URL;
 class HomeController implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(HomeController.class);
     private final ReactorStreamingHttpClient reactorStreamingHttpClient;
-    private static final URI DEFAULT_URI = UriBuilder.of("https://github.com")
-            .path("micronaut-projects")
-            .path("micronaut-guides")
-            .path("blob")
-            .path("e347b0449e3856d10ee98ae396124c3f60e05fe2")
-            .path("micronaut5K.png")
-            .queryParam("raw", StringUtils.TRUE)
-            .build();
+    private static final URI DEFAULT_URI = URI.create("https://guides.micronaut.io/micronaut5K.png");
     HomeController() {
         String urlStr = "https://guides.micronaut.io/";
         URL url;
