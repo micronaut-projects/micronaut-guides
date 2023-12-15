@@ -1,10 +1,12 @@
 package example.micronaut;
+
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.validation.validator.constraints.ConstraintValidator;
 import jakarta.inject.Singleton;
 
 @Factory // <1>
 class CustomValidationFactory {
+
     /**
      * @return A {@link ConstraintValidator} implementation of a {@link E164} constraint for type {@link String}.
      */

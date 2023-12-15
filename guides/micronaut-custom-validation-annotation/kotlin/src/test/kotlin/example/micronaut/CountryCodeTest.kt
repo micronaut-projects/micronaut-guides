@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class CountryCodeTest {
+
     @Test
     fun preferredNameGetsUsed() {
         val name = CountryCode.YEMEN.countryName
@@ -26,7 +27,7 @@ class CountryCodeTest {
 
     @Test
     fun countryCodeGetCodesReturnEveryCodeWithLongestCodesFirst() {
-        Assertions.assertTrue(CountryCode.CODES[0].length > 1)
+        assertTrue(CountryCode.CODES[0].length > 1)
     }
 
     @Test
@@ -69,5 +70,4 @@ class CountryCodeTest {
             )
         )
     }
-
 }

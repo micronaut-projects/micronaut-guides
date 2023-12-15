@@ -25,5 +25,4 @@ class ContactTest(private val validator: Validator) { // <2>
                             it.message == "must be a phone in E.164 format"
                 })
     }
-
 }

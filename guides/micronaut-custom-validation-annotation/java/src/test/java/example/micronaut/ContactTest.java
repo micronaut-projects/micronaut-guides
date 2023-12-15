@@ -7,16 +7,14 @@ import org.junit.jupiter.api.Test;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
-import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false) // <1>
 class ContactTest {
+
     @Inject // <2>
     Validator validator;
 

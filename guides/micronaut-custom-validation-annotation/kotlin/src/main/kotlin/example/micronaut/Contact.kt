@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank
 
 @Introspected
 class Contact(
+
     @field:E164
     @field:NotBlank
     @field:NonNull

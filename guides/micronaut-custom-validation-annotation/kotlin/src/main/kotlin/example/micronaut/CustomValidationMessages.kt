@@ -4,7 +4,8 @@ import io.micronaut.context.StaticMessageSource
 import jakarta.inject.Singleton
 
 @Singleton
-class CustomValidationMessages() : StaticMessageSource() {
+class CustomValidationMessages : StaticMessageSource() {
+
     init {
         addMessage(E164::class.java.getName() + MESSAGE_SUFFIX, E164_MESSAGE)
     }
@@ -13,5 +14,4 @@ class CustomValidationMessages() : StaticMessageSource() {
         private const val E164_MESSAGE = "must be a phone in E.164 format"
         private const val MESSAGE_SUFFIX = ".message"
     }
-
 }

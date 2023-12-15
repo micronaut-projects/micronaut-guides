@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  * @see <a href="https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf">LIST OF ITU-T RECOMMENDATION E.164 ASSIGNED COUNTRY CODES</a>
  */
 public enum CountryCode {
+
     AFGHANISTAN("93", "Afghanistan"),
     ALBANIA("355", "Albania (Republic of)"),
     ALGERIA("213", "Algeria (People's Democratic Republic of)"),
@@ -257,16 +258,8 @@ public enum CountryCode {
     ZAMBIA("260", "Zambia (Republic of)"),
     ZIMBABWE("263", "Zimbabwe (Republic of)");
 
-    private String code;
-    private String countryName;
-
-    /**
-     * Constructor for countries whose name matches their enum.
-     * @param code country code
-     */
-    CountryCode(String code) {
-        this.code = code;
-    }
+    private final String code;
+    private final String countryName;
 
     /**
      * Constructor for countries whose name does not match the enum.
