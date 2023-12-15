@@ -27,10 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @MicronautTest // <1>
 class HomeControllerTest {
 
+    private final HexFormat hexFormat = HexFormat.of();
+
     @DisabledInNativeImage
     @Test
     void downloadFile(@Client("/") HttpClient httpClient, // <2>
-                      ResourceLoader resourceLoader) // <3>
+                      ResourceLoader resourceLoader)
             throws URISyntaxException, IOException, NoSuchAlgorithmException {
         Optional<URL> resource = resourceLoader.getResource("micronaut5K.png");
         assertTrue(resource.isPresent());
@@ -38,14 +40,14 @@ class HomeControllerTest {
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] expectedEncodedHash = digest.digest(expectedByteArray);
-        String expected = HexFormat.of().formatHex(expectedEncodedHash);
+        String expected = hexFormat.formatHex(expectedEncodedHash);
 
         BlockingHttpClient client = httpClient.toBlocking();
         HttpResponse<byte[]> resp = assertDoesNotThrow(() -> client.exchange(HttpRequest.GET("/"), byte[].class));
         byte[] responseBytes = resp.body();
 
         byte[] responseEncodedHash = digest.digest(responseBytes);
-        String response = HexFormat.of().formatHex(responseEncodedHash);
+        String response = hexFormat.formatHex(responseEncodedHash);
         assertEquals(expected, response);
     }
 }
