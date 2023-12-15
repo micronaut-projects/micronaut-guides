@@ -2,9 +2,7 @@ package example.micronaut;
 
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -14,6 +12,7 @@ import io.micronaut.reactor.http.client.ReactorStreamingHttpClient;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -23,9 +22,12 @@ import java.net.URL;
 
 @Controller // <1>
 class HomeController implements AutoCloseable {
+
     private static final Logger LOG = LoggerFactory.getLogger(HomeController.class);
-    private final ReactorStreamingHttpClient reactorStreamingHttpClient;
     private static final URI DEFAULT_URI = URI.create("https://guides.micronaut.io/micronaut5K.png");
+
+    private final ReactorStreamingHttpClient reactorStreamingHttpClient;
+
     HomeController() {
         String urlStr = "https://guides.micronaut.io/";
         URL url;
@@ -35,7 +37,6 @@ class HomeController implements AutoCloseable {
             throw new ConfigurationException("malformed URL" + urlStr);
         }
         this.reactorStreamingHttpClient = ReactorStreamingHttpClient.create(url); // <2>
-
     }
 
     @Get("{?q}") // <3>
@@ -55,7 +56,7 @@ class HomeController implements AutoCloseable {
 
     private void dataStreamToOutputStream(HttpRequest<?> request,
                                           PipedOutputStream outputStream,
-                                          Runnable finallyRunnable) throws IOException {
+                                          Runnable finallyRunnable) {
         reactorStreamingHttpClient.dataStream(request) // <5>
                 .doOnNext(byteBuffer -> {
                     LOG.trace("Saving byte array");
@@ -80,7 +81,7 @@ class HomeController implements AutoCloseable {
 
     @PreDestroy // <6>
     @Override
-    public void close() throws Exception {
+    public void close() {
         if (reactorStreamingHttpClient != null) {
             reactorStreamingHttpClient.close();
         }

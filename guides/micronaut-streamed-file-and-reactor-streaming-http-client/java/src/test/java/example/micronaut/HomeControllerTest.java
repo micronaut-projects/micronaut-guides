@@ -8,6 +8,8 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,10 +17,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest // <1>
 class HomeControllerTest {
@@ -34,26 +38,14 @@ class HomeControllerTest {
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] expectedEncodedHash = digest.digest(expectedByteArray);
-        String expected = bytesToHex(expectedEncodedHash);
+        String expected = HexFormat.of().formatHex(expectedEncodedHash);
 
         BlockingHttpClient client = httpClient.toBlocking();
         HttpResponse<byte[]> resp = assertDoesNotThrow(() -> client.exchange(HttpRequest.GET("/"), byte[].class));
         byte[] responseBytes = resp.body();
 
         byte[] responseEncodedHash = digest.digest(responseBytes);
-        String response = bytesToHex(responseEncodedHash);
+        String response = HexFormat.of().formatHex(responseEncodedHash);
         assertEquals(expected, response);
-    }
-
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
     }
 }
