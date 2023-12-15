@@ -7,6 +7,7 @@ import io.micronaut.core.util.StringUtils;
  * Utility methods to ease {@link E164} validation.
  */
 public final class E164Utils {
+
     private static final int MAX_NUMBER_OF_DIGITS = 15;
     private static final String PLUS_SIGN = "+";
 

@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CountryCodeTest {
+
     @Test
     void preferredNameGetsUsed() {
         String name = CountryCode.YEMEN.getCountryName();

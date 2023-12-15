@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
  */
 @Singleton
 public class CustomValidationMessages extends StaticMessageSource {
+
     public static final String E164_MESSAGE = "must be a phone in E.164 format";
     /**
      * The message suffix to use.

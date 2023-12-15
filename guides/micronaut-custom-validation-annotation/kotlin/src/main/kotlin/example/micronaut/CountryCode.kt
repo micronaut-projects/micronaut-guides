@@ -1,22 +1,10 @@
-package example.micronaut;
-
-import io.micronaut.core.annotation.Nullable;
-import jakarta.annotation.Nonnull;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+package example.micronaut
 
 /**
  * Every country code in the world.
  * @see <a href="https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf">LIST OF ITU-T RECOMMENDATION E.164 ASSIGNED COUNTRY CODES</a>
  */
-public enum CountryCode {
+enum class CountryCode(val code: String, val countryName: String) {
 
     AFGHANISTAN("93", "Afghanistan"),
     ALBANIA("355", "Albania (Republic of)"),
@@ -258,80 +246,23 @@ public enum CountryCode {
     ZAMBIA("260", "Zambia (Republic of)"),
     ZIMBABWE("263", "Zimbabwe (Republic of)");
 
-    private final String code;
-    private final String countryName;
-
-    /**
-     * Constructor for countries whose name does not match the enum.
-     * @param code country code
-     * @param countryName full country name
-     */
-    CountryCode(String code, String countryName) {
-        this.code = code;
-        this.countryName = countryName;
+    override fun toString(): String {
+        return code
     }
 
-    public String getCode() {
-        return this.code;
-    }
+    companion object {
+        private const val PLUS_SIGN = "+"
 
-    /**
-     * Country name.
-     * @return country name
-     */
-    public String getCountryName() {
-        return this.countryName;
-    }
+        val COUNTRYCODESBYCODE = CountryCode.values().groupBy { it.code }
 
-    private static final String PLUS_SIGN = "+";
+        val CODES = COUNTRYCODESBYCODE.keys
+            .sortedByDescending { it.length }
+            .toList()
 
-    private static final Map<String, List<CountryCode>> COUNTRYCODESBYCODE =
-            Arrays.stream(CountryCode.values())
-                    .collect(Collectors.groupingBy(CountryCode::getCode));
-
-    private static final List<String> CODES = COUNTRYCODESBYCODE.keySet().stream()
-            .sorted(Comparator.comparing(String::length).reversed()).toList();
-
-    /**
-     *
-     * @param code Country code
-     * @return a List of {@link CountryCode} for a found code or an empty list
-     */
-    @NotNull
-    @Nonnull
-    public static List<CountryCode> countryCodesByCode(@Nonnull @NotBlank String code) {
-        if (COUNTRYCODESBYCODE.containsKey(code)) {
-            return COUNTRYCODESBYCODE.get(code);
+        fun parseCountryCode(number: String): String? {
+            val phone = if (number.startsWith(PLUS_SIGN)) number.substring(1) else number
+            return CODES.find { phone.startsWith(it) }
         }
-        return new ArrayList<>();
-    }
 
-    /**
-     *
-     * @return Country codes ordered from codes of longer length to less length.
-     */
-    public static List<String> getCodes() {
-        return CODES;
-    }
-
-    /**
-     *
-     * @param number Phone number
-     * @return the Country code found in the phone number or {@code null} if not found.
-     */
-    @Nullable
-    public static String parseCountryCode(@Nonnull @NotBlank String number) {
-        String phone = number.startsWith(PLUS_SIGN) ? number.substring(1) : number;
-        for (String code : getCodes()) {
-            if (phone.startsWith(code)) {
-                return code;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return this.code;
     }
 }
