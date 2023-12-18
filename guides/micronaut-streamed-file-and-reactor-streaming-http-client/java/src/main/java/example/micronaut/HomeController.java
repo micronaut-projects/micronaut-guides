@@ -2,6 +2,7 @@ package example.micronaut;
 
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.io.buffer.ByteBuffer;
+import io.micronaut.core.io.buffer.ReferenceCounted;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -36,7 +37,11 @@ class HomeController implements AutoCloseable {
     @Get // <3>
     Flux<ByteBuffer<?>> download() {
         HttpRequest<?> request = HttpRequest.GET(DEFAULT_URI);
-        return reactorStreamingHttpClient.dataStream(request);  // <4>
+        return reactorStreamingHttpClient.dataStream(request).doOnNext(bb -> {
+            if (bb instanceof ReferenceCounted rc) {
+                rc.retain();
+            }
+        });  // <4>
     }
 
     @PreDestroy // <6>
