@@ -41,10 +41,10 @@ class HomeController implements AutoCloseable {
             if (bb instanceof ReferenceCounted rc) {
                 rc.retain();
             }
-        });  // <4>
+        }); // <4>
     }
 
-    @PreDestroy // <6>
+    @PreDestroy // <5>
     @Override
     public void close() {
         if (reactorStreamingHttpClient != null) {
