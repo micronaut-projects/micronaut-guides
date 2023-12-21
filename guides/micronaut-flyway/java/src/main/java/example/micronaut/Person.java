@@ -1,6 +1,10 @@
-//tag::clazz1[]
 package example.micronaut;
-
+/*
+//tag::package[]
+package example.micronaut;
+//end::package[]
+*/
+//tag::clazz1[]
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.annotation.GeneratedValue;
