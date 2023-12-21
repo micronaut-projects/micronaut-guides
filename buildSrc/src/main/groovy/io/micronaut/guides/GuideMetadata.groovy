@@ -45,7 +45,7 @@ class GuideMetadata {
             tagsList.addAll(this.tags)
         }
         for (App app : this.apps) {
-            for (String featureName : app.javaFeatures + app.kotlinFeatures + app.groovyFeatures + app.visibleFeatures + app.invisibleFeatures) {
+            for (String featureName : app.javaFeatures + app.kotlinFeatures + app.groovyFeatures + app.visibleFeatures) {
                 if (featureName.startsWith(MICRONAUT_PREFIX)) {
                     tagsList.add(featureName.substring(MICRONAUT_PREFIX.length()))
                 } else {
@@ -61,6 +61,7 @@ class GuideMetadata {
     @ToString(includeNames = true)
     @CompileStatic
     static class App {
+        private static final String FEATURE_SPOTLESS = "spotless"
         String framework
         TestFramework testFramework
         ApplicationType applicationType
@@ -75,15 +76,24 @@ class GuideMetadata {
 
         List<String> getFeatures(Language language) {
             if (language == Language.JAVA) {
-                return visibleFeatures + invisibleFeatures + javaFeatures
+                return visibleFeatures + getInvisibleFeatures() + javaFeatures
             }
             if (language == Language.KOTLIN) {
-                return visibleFeatures + invisibleFeatures + kotlinFeatures
+                return visibleFeatures + getInvisibleFeatures() + kotlinFeatures
             }
             if (language == Language.GROOVY) {
-                return visibleFeatures + invisibleFeatures + groovyFeatures
+                return visibleFeatures + getInvisibleFeatures() + groovyFeatures
             }
-            visibleFeatures + invisibleFeatures
+            visibleFeatures + getInvisibleFeatures()
+        }
+
+        List<String> getInvisibleFeatures() {
+            List<String> result = new ArrayList<>()
+            if (invisibleFeatures) {
+                result.addAll(result)
+            }
+            result.add(FEATURE_SPOTLESS)
+            result
         }
 
         List<String> getVisibleFeatures(Language language) {

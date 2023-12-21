@@ -213,7 +213,7 @@ ${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_
 """
 } else {
 bashScript += """\
-${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
+${buildTool == MAVEN ? './mvnw -q test spotless:check' : './gradlew -q check' } || EXIT_STATUS=\$?
 echo "Stopping shared test resources service (if created)"
 ${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
 """
