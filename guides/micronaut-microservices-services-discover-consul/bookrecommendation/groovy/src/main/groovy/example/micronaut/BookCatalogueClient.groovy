@@ -1,11 +1,16 @@
-//tag::packageandimports[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//end::package[]
+*/
+//tag::imports[]
 
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
 import org.reactivestreams.Publisher
-//end::packageandimports[]
+//end::imports[]
 
 /*
 //tag::harcoded[]

@@ -2,6 +2,9 @@ package io.micronaut.guides.spotless;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.guides.feature.Geb;
+import io.micronaut.guides.spotless.templates.spotlessGradle;
+import io.micronaut.guides.spotless.templates.spotlessMaven;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.BuildPlugin;
@@ -10,15 +13,16 @@ import io.micronaut.starter.build.gradle.GradlePlugin;
 import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.feature.Category;
 import io.micronaut.starter.feature.Feature;
+import io.micronaut.starter.feature.FeaturePhase;
 import io.micronaut.starter.options.BuildTool;
+import io.micronaut.starter.options.Language;
 import io.micronaut.starter.template.BinaryTemplate;
 import io.micronaut.starter.template.RockerWritable;
-import io.micronaut.guides.spotless.templates.spotlessGradle;
-import io.micronaut.guides.spotless.templates.spotlessMaven;
 import io.micronaut.starter.template.Template;
 import jakarta.inject.Singleton;
 
-import javax.swing.text.html.Option;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -36,6 +40,11 @@ public class Spotless implements Feature {
     @Override
     public String getTitle() {
         return "Spotless";
+    }
+
+    @Override
+    public int getOrder() {
+        return FeaturePhase.BUILD_PLUGIN.getOrder();
     }
 
     @Override
@@ -66,15 +75,25 @@ public class Spotless implements Feature {
                 .extension(new RockerWritable(spotlessMaven.template(coordinate.getGroupId(),
                         coordinate.getArtifactId(),
                         coordinate.getVersion(),
-                        generatorContext.getLanguage())))
+                        languages(generatorContext))))
                 .build();
     }
+
+    private List<Language> languages(GeneratorContext generatorContext) {
+        List<Language> languages = new ArrayList<>();
+        languages.add(generatorContext.getLanguage());
+        if (generatorContext.hasFeature(Geb.class)) {
+            languages.add(Language.GROOVY);
+        }
+        return languages;
+    }
+
 
     private GradlePlugin gradleBuildPlugin(GeneratorContext generatorContext) {
         return GradlePlugin.builder()
                 .id("com.diffplug.spotless")
                 .lookupArtifactId("spotless-plugin-gradle")
-                .extension(new RockerWritable(spotlessGradle.template(generatorContext.getLanguage())))
+                .extension(new RockerWritable(spotlessGradle.template(languages(generatorContext))))
                 .build();
     }
 

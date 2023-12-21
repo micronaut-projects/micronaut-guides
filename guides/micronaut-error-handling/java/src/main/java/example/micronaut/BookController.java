@@ -1,7 +1,9 @@
+package example.micronaut;
+/*
 //tag::package[]
 package example.micronaut;
 //end::package[]
-
+*/
 //tag::imports[]
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
