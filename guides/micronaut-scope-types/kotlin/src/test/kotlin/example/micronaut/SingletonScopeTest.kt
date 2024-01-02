@@ -1,5 +1,10 @@
-//tag::imports[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//tag::package[]
+*/
+//tag::imports[]
 
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest

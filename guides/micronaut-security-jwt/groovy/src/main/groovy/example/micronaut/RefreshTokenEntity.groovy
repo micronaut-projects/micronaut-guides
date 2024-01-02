@@ -1,5 +1,10 @@
-//tag::clazzwithoutsettersandgetters[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//tag::package[]
+*/
+//tag::clazzwithoutsettersandgetters[]
 
 import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.NonNull
