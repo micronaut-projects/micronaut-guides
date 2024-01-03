@@ -29,6 +29,7 @@ import java.util.function.Function;
 
 @FunctionBean("requestfunction") // <1>
 public class RequestFunction implements Function<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> { // <2>
+
     private static final Logger LOG = LoggerFactory.getLogger(RequestFunction.class);
 
     @Inject // <3>
