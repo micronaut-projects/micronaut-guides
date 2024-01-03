@@ -275,7 +275,7 @@ class GuideProjectGenerator implements AutoCloseable {
     private static String licenseHeaderText() {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         URL resource = classLoader.getResource(LICENSEHEADER)
-        resource.text
+        resource.text.replace('$YEAR', "${LocalDate.now().year}")
     }
 
     private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
