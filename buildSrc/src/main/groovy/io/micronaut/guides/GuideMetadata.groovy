@@ -90,7 +90,7 @@ class GuideMetadata {
         List<String> getInvisibleFeatures() {
             List<String> result = new ArrayList<>()
             if (invisibleFeatures) {
-                result.addAll(result)
+                result.addAll(invisibleFeatures)
             }
             result.add(FEATURE_SPOTLESS)
             result
