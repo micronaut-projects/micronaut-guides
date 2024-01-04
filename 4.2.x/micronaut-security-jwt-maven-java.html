@@ -127,6 +127,7 @@
 </li>
 <li><a href="#next-steps">10. Next steps</a></li>
 <li><a href="#help-with-the-micronaut-framework">11. Help with the Micronaut Framework</a></li>
+<li><a href="#license">12. License</a></li>
 </ul>
 
                     </div>
@@ -244,7 +245,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=security-jwt&amp;features=data-jdbc&amp;features=reactor&amp;features=graalvm&amp;features=validation&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=security-jwt&amp;features=data-jdbc&amp;features=reactor&amp;features=graalvm&amp;features=validation&amp;features=spotless&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -778,6 +779,94 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 <div class="title">src/main/java/example/micronaut/RefreshTokenEntity.java</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+*/
+
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.DateCreated</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.GeneratedValue</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Id</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.MappedEntity</span>;
+
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>;
+<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
+<span class="keyword">import</span> <span class="include">java.time.Instant</span>;
+
+<span class="annotation">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="type">class</span> <span class="class">RefreshTokenEntity</span> {
+
+    <span class="annotation">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="annotation">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@NonNull</span>
+    <span class="directive">private</span> <span class="predefined-type">Long</span> id;
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">private</span> <span class="predefined-type">String</span> username;
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotBlank</span>
+    <span class="directive">private</span> <span class="predefined-type">String</span> refreshToken;
+
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotNull</span>
+    <span class="directive">private</span> <span class="predefined-type">Boolean</span> revoked;
+
+    <span class="annotation">@DateCreated</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="annotation">@NonNull</span>
+    <span class="annotation">@NotNull</span>
+    <span class="directive">private</span> Instant dateCreated;
+
+    <span class="directive">public</span> RefreshTokenEntity() {
+    }
+
+    <span class="comment">// getters and setters...</span>
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
+        <span class="keyword">return</span> id;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setId(<span class="annotation">@NonNull</span> <span class="predefined-type">Long</span> id) {
+        <span class="local-variable">this</span>.id = id;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getUsername() {
+        <span class="keyword">return</span> username;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setUsername(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> username) {
+        <span class="local-variable">this</span>.username = username;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">String</span> getRefreshToken() {
+        <span class="keyword">return</span> refreshToken;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setRefreshToken(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> refreshToken) {
+        <span class="local-variable">this</span>.refreshToken = refreshToken;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> <span class="predefined-type">Boolean</span> getRevoked() {
+        <span class="keyword">return</span> revoked;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setRevoked(<span class="annotation">@NonNull</span> <span class="predefined-type">Boolean</span> revoked) {
+        <span class="local-variable">this</span>.revoked = revoked;
+    }
+
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span> Instant getDateCreated() {
+        <span class="keyword">return</span> dateCreated;
+    }
+
+    <span class="directive">public</span> <span class="type">void</span> setDateCreated(<span class="annotation">@NonNull</span> Instant dateCreated) {
+        <span class="local-variable">this</span>.dateCreated = dateCreated;
+    }
+}
+
 
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.DateCreated</span>;
@@ -1451,6 +1540,23 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="paragraph">
 <p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">12. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
 
             </div>
         </div>
@@ -1506,7 +1612,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
                 <div id="text-5" class="widget widget_text">
                     <div class="textwidget">
                         <p>
-                            <small>© 2024 MICRONAUT FOUNDATION. ALL RIGHTS RESERVED</small>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing and media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
                         </p>
                     </div>
                 </div>
