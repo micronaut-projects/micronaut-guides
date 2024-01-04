@@ -1,5 +1,10 @@
-//tag::clazzwithoutsettersandgetters[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//tag::package[]
+*/
+//tag::clazzwithoutsettersandgetters[]
 
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.GeneratedValue

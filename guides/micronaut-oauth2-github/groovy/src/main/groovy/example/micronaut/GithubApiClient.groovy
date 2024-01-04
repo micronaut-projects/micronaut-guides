@@ -1,5 +1,10 @@
-//tag::clazz[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//end::package[]
+*/
+//tag::clazz[]
 
 import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.Nullable

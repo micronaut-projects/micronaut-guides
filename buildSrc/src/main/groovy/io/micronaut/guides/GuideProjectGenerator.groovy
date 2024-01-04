@@ -1,8 +1,10 @@
 package io.micronaut.guides
 
+import groovy.io.FileType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
@@ -32,6 +34,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
 class GuideProjectGenerator implements AutoCloseable {
+    private static final String EXTENSION_JAVA = ".java"
+    private static final String EXTENSION_GROOVY = ".groovy"
+    private static final String EXTENSION_KT = ".kt"
 
     public static final String DEFAULT_APP_NAME = 'default'
 
@@ -40,6 +45,7 @@ class GuideProjectGenerator implements AutoCloseable {
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
     private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_17]
+    public static final String LICENSEHEADER = "LICENSEHEADER"
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
@@ -110,6 +116,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 zipIncludes: config.zipIncludes ?: [],
                 apps: config.apps.collect { it ->
                     new App(
+                            validateLicense: it.validateLicense == null ? true : it.validateLicense,
                             framework: it.framework,
                             testFramework: it.testFramework?.toUpperCase(),
                             name: it.name,
@@ -248,8 +255,28 @@ class GuideProjectGenerator implements AutoCloseable {
                         copyFile(inputDir, destinationRoot, zipInclude)
                     }
                 }
+                addLicenses(new File(outputDir.absolutePath, folder))
             }
         }
+    }
+
+    void addLicenses(File folder) {
+        String licenseHeader = licenseHeaderText()
+        folder.eachFileRecurse (FILES) { file ->
+            if (
+                    (file.path.endsWith(EXTENSION_JAVA) || file.path.endsWith(EXTENSION_GROOVY) || file.path.endsWith(EXTENSION_KT))
+                    && !file.text.contains("Licensed under")
+            ) {
+                file.text = licenseHeader + file.text
+            }
+        }
+    }
+
+    @Memoized
+    private static String licenseHeaderText() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        URL resource = classLoader.getResource(LICENSEHEADER)
+        resource.text.replace('$YEAR', "${LocalDate.now().year}")
     }
 
     private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
@@ -398,6 +425,7 @@ class GuideProjectGenerator implements AutoCloseable {
         for (String name : inBoth) {
             App baseApp = baseApps[name]
             App guideApp = guideApps[name]
+            guideApp.validateLicense = baseApp.validateLicense
             guideApp.visibleFeatures.addAll baseApp.visibleFeatures
             guideApp.invisibleFeatures.addAll baseApp.invisibleFeatures
             guideApp.javaFeatures.addAll baseApp.javaFeatures

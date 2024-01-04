@@ -1,6 +1,9 @@
+package example.micronaut
+/*
 //tag::package[]
 package example.micronaut
 //end::package[]
+*/
 
 //tag::imports[]
 import groovy.transform.CompileStatic
