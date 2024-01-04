@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//tag::packageandimports[]
 package example.micronaut;
+/*
+//tag::package[]
+package example.micronaut;
+//end::package[]
+*/
+//tag::imports[]
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.annotation.Consumes;
@@ -26,7 +31,7 @@ import reactor.core.publisher.Mono;
 import jakarta.validation.constraints.NotBlank;
 
 import static io.micronaut.http.MediaType.TEXT_PLAIN;
-//end::packageandimports[]
+//end::imports[]
 
 /*
 //tag::harcoded[]

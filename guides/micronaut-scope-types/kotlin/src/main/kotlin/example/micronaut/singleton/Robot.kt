@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package example.micronaut.singleton
+/*
 //tag::pkg[]
 package example.micronaut.singleton
 //end::pkg[]
+*/
 
 //tag::clazz[]
 import jakarta.inject.Singleton

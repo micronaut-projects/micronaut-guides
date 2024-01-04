@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package example.micronaut
+/*
 //tag::package[]
 package example.micronaut
 //end::package[]
+*/
 
 //tag::imports[]
 import io.micronaut.http.HttpRequest

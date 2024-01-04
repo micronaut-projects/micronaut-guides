@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//tag::clazzwithoutsettersandgetters[]
 package example.micronaut;
+/*
+//tag::package[]
+package example.micronaut;
+//tag::package[]
+*/
+//tag::clazzwithoutsettersandgetters[]
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.data.annotation.DateCreated;

@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//tag::imports[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//tag::package[]
+*/
+//tag::imports[]
 
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
@@ -24,7 +29,6 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-
 
 @MicronautTest // <1>
 class PrototypeScopeTest(@Client("/") val httpClient: HttpClient) { // <2>

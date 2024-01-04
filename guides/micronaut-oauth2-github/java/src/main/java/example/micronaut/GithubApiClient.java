@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//tag::clazz[]
 package example.micronaut;
+/*
+//tag::package[]
+package example.micronaut;
+//end::package[]
+*/
+//tag::clazz[]
 
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpHeaders;

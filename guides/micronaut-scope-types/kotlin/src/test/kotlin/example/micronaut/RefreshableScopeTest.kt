@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//tag::imports[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//tag::package[]
+*/
+//tag::imports[]
 
 import io.micronaut.context.annotation.Property
 import io.micronaut.core.type.Argument
@@ -26,7 +31,6 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-
 
 @Property(name = "endpoints.refresh.enabled", value = StringUtils.TRUE) // <1>
 @Property(name = "endpoints.refresh.sensitive", value = StringUtils.FALSE) // <2>

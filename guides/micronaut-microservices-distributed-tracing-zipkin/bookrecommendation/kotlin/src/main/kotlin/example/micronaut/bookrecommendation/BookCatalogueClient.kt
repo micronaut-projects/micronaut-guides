@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//tag::packageandimports[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//end::package[]
+*/
+//tag::imports[]
 
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.retry.annotation.Recoverable
 import org.reactivestreams.Publisher
 
-//end::packageandimports[]
+//end::imports[]
 //tag::harcoded[]
 @Client("http://localhost:8081") // <1>
 @Recoverable(api = BookCatalogueOperations::class)
