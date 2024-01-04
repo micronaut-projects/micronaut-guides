@@ -1,6 +1,9 @@
+package example.micronaut.singleton;
+/*
 //tag::pkg[]
 package example.micronaut.singleton;
 //end::pkg[]
+*/
 
 //tag::imports[]
 import io.micronaut.http.annotation.Controller;

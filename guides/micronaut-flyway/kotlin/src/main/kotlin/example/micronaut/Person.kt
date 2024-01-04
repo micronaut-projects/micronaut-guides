@@ -1,6 +1,10 @@
+package example.micronaut;
+/*
+//tag::package[]
+package example.micronaut;
+//end::package[]
+*/
 //tag::clazz1[]
-package example.micronaut
-
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity

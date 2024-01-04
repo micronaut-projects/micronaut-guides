@@ -1,5 +1,10 @@
-//tag::imports[]
 package example.micronaut;
+/*
+//tag::pkg[]
+package example.micronaut;
+//end::pkg[]
+*/
+//tag::imports[]
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.core.type.Argument;

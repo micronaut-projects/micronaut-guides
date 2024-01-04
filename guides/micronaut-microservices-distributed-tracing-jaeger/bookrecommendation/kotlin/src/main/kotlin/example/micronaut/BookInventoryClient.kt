@@ -1,5 +1,10 @@
-//tag::packageandimports[]
 package example.micronaut
+/*
+//tag::package[]
+package example.micronaut
+//end::package[]
+*/
+//tag::imports[]
 
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Consumes
@@ -10,7 +15,7 @@ import org.reactivestreams.Publisher
 import reactor.core.publisher.Mono
 import jakarta.validation.constraints.NotBlank
 
-//end::packageandimports[]
+//end::imports[]
 //tag::harcoded[]
 @Client("http://localhost:8082") // <1>
 @Recoverable(api = BookInventoryOperations::class)

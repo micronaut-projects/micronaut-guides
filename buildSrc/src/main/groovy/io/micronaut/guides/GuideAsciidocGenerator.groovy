@@ -2,6 +2,7 @@ package io.micronaut.guides
 
 import com.fizzed.rocker.Rocker
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.util.StringUtils
@@ -46,6 +47,7 @@ class GuideAsciidocGenerator {
     public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
     public static final String DEFAULT_APP_NAME = "default"
+    private static final String COMMON_LICENSE = "common:license.adoc[]"
 
     static void generate(GuideMetadata metadata, File inputDir,
                          File asciidocDir, File projectDir) {
@@ -58,8 +60,11 @@ class GuideAsciidocGenerator {
 
         File asciidocFile = new File(inputDir, metadata.asciidoctor)
         assert asciidocFile.exists()
+        List<String> allLines = asciidocFile.readLines()
+        allLines.add("")
+        allLines.add(COMMON_LICENSE)
 
-        List<String> rawLinesExpanded = expandMacros(asciidocFile.readLines(), projectDir)
+        List<String> rawLinesExpanded = expandMacros(allLines, projectDir)
 
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
@@ -243,7 +248,6 @@ class GuideAsciidocGenerator {
 
     private static List<String> expandMacros(List<String> lines, File projectDir) {
         List<String> rawLines = []
-
         for (String rawLine : lines) {
 
             if (findInlineMacro(rawLine, 'guideLink:')) {
@@ -473,7 +477,12 @@ class GuideAsciidocGenerator {
                 lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${attrs}]\n".toString()
             }
         } else {
-            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${indent}]".toString()
+            List<String> attributes = new ArrayList<>()
+            attributes.add("lines=${numberOfLinesInLicenseHeader()}..-1".toString())
+            if (StringUtils.isNotEmpty(indent)) {
+                attributes.add(indent)
+            }
+            lines << "include::{sourceDir}/$slug/@sourceDir@/${sourcePath}[${String.join(";", attributes)}]".toString()
         }
 
         lines << '----'
@@ -681,5 +690,12 @@ class GuideAsciidocGenerator {
             PomDependencyVersionResolver pomDependencyVersionResolver = context.getBean(PomDependencyVersionResolver)
             return pomDependencyVersionResolver.getCoordinates()
         }
+    }
+
+    @Memoized
+    private static int numberOfLinesInLicenseHeader() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader()
+        URL resource = classLoader.getResource(GuideProjectGenerator.LICENSEHEADER)
+        resource.readLines().size() + 1
     }
 }
