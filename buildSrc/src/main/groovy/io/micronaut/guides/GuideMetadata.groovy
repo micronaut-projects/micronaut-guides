@@ -61,6 +61,7 @@ class GuideMetadata {
     @ToString(includeNames = true)
     @CompileStatic
     static class App {
+        boolean validateLicense = true
         private static final String FEATURE_SPOTLESS = "spotless"
         String framework
         TestFramework testFramework
@@ -88,12 +89,15 @@ class GuideMetadata {
         }
 
         List<String> getInvisibleFeatures() {
-            List<String> result = new ArrayList<>()
-            if (invisibleFeatures) {
-                result.addAll(invisibleFeatures)
+            if (validateLicense) {
+                List<String> result = new ArrayList<>()
+                if (invisibleFeatures) {
+                    result.addAll(invisibleFeatures)
+                }
+                result.add(FEATURE_SPOTLESS)
+                return result
             }
-            result.add(FEATURE_SPOTLESS)
-            result
+            return invisibleFeatures
         }
 
         List<String> getVisibleFeatures(Language language) {

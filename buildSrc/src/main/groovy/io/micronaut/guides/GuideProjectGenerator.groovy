@@ -116,6 +116,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 zipIncludes: config.zipIncludes ?: [],
                 apps: config.apps.collect { it ->
                     new App(
+                            validateLicense: it.validateLicense == null ? true : it.validateLicense,
                             framework: it.framework,
                             testFramework: it.testFramework?.toUpperCase(),
                             name: it.name,
@@ -424,6 +425,7 @@ class GuideProjectGenerator implements AutoCloseable {
         for (String name : inBoth) {
             App baseApp = baseApps[name]
             App guideApp = guideApps[name]
+            guideApp.validateLicense = baseApp.validateLicense
             guideApp.visibleFeatures.addAll baseApp.visibleFeatures
             guideApp.invisibleFeatures.addAll baseApp.invisibleFeatures
             guideApp.javaFeatures.addAll baseApp.javaFeatures
