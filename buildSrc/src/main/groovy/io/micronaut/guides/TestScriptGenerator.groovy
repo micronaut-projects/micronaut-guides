@@ -152,7 +152,7 @@ kill_kotlin_daemon () {
                     def defaultApp = metadata.apps.find { it.name == DEFAULT_APP_NAME }
                     if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
                         def features = defaultApp.getFeatures(guidesOption.language)
-                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest)
+                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense)
                     }
                 } else {
                     bashScript << """\
@@ -161,7 +161,7 @@ cd $folder
                     for (GuideMetadata.App app : metadata.apps) {
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
                             def features = app.getFeatures(guidesOption.language)
-                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest)
+                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense)
                         }
                     }
                     bashScript << """\
@@ -197,7 +197,8 @@ fi
                                           boolean stopIfFailure,
                                           BuildTool buildTool,
                                           boolean noDaemon,
-                                          boolean nativeTest) {
+                                          boolean nativeTest,
+                                          boolean validateLicense) {
         String testcopy = nativeTest ? "native tests" : "tests"
         String bashScript = """\
 cd $nestedFolder
@@ -212,8 +213,9 @@ bashScript += """\
 ${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
 """
 } else {
+String mavenCommand = validateLicense ? './mvnw -q test spotless:check' : './mvnw -q test'
 bashScript += """\
-${buildTool == MAVEN ? './mvnw -q test' : './gradlew -q test' } || EXIT_STATUS=\$?
+${buildTool == MAVEN ? mavenCommand : './gradlew -q check' } || EXIT_STATUS=\$?
 echo "Stopping shared test resources service (if created)"
 ${buildTool == MAVEN ? './mvnw -q mn:stop-testresources-service' : './gradlew -q stopTestResourcesService'} > /dev/null 2>&1 || true
 """
