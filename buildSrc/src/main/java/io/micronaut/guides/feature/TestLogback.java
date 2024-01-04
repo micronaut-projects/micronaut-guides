@@ -5,13 +5,13 @@ import io.micronaut.starter.build.dependencies.Scope;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class OpenapiAdoc extends AbstractFeature {
-    protected OpenapiAdoc() {
-        super("openapi-adoc", "micronaut-openapi-adoc", Scope.ANNOTATION_PROCESSOR);
+public class TestLogback extends AbstractFeature {
+    public TestLogback() {
+        super("test-logback", "logback-classic", Scope.TEST);
     }
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        addDependencyWithoutLookup(generatorContext, "io.micronaut.openapi");
+        addDependencyWithoutLookup(generatorContext, "ch.qos.logback");
     }
 }

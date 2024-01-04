@@ -15,6 +15,8 @@
  */
 package example.micronaut;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.BlockingHttpClient;
@@ -22,6 +24,7 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,14 +32,24 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HelloControllerTest {
 
     @Test
-    public void testHello(@Client("/") HttpClient httpClient,  // <2>
-                          LoggingHeadersFilterOverride filter) {
+    public void testHelloFilterLogging(@Client("/") HttpClient httpClient) { // <2>
+        MemoryAppender appender = new MemoryAppender();
+        Logger l = (Logger) LoggerFactory.getLogger(LoggingHeadersFilter.class);
+        l.addAppender(appender);
+        appender.start();
         BlockingHttpClient client = httpClient.toBlocking();
         assertDoesNotThrow(() -> client.retrieve(HttpRequest.GET("/")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer x")
                 .header("foo", "bar")));
-        assertFalse(filter.getHeaders().containsKey(HttpHeaders.AUTHORIZATION));
-        assertTrue(filter.getHeaders().containsKey("foo"));
-        filter.clear();
+        assertTrue(appender.getEvents()
+                .stream()
+                .map(ILoggingEvent::getFormattedMessage)
+                .anyMatch(it -> it.equals("GET / H foo:bar")));
+        assertTrue(appender.getEvents()
+                .stream()
+                .map(ILoggingEvent::getFormattedMessage)
+                .noneMatch(it -> it.equals("GET / H Authorization:Bearer x")));
+        appender.stop();
     }
+
 }

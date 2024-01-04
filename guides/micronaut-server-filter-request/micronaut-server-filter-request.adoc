@@ -6,21 +6,28 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
+== Logback
+
+Configure https://logback.qos.ch[Logback] to log the package `example.micronaut` with `TRACE` level.
+
+[source, xml]
+----
+<configuration>
+    ...
+    <logger name="example.micronaut" level="TRACE"/>
+</configuration>
+
+----
 
 == ServerFilter
 
+Create a filter which logs the non-sensitive HTTP Request headers.
+
 source:LoggingHeadersFilter[]
 
-== Test
-
-Create a class that extends the filter class and which we use in the test.
-
-test:LoggingHeadersFilterReplacement[]
-
-Create a unit test which verifies the sensitive headers are not logged.
-
-test:LoggingHeadersFilterTest[]
-
+callout:server-filter-match-all[1]
+callout:at-request-filter[2]
+callout:filter-implementing-order[3]
 
 == Controller
 
@@ -32,19 +39,44 @@ callout:controller[number=1,arg0=/]
 callout:get-generic[2]
 callout:json-bydefault[3]
 
-== Function Test
+common:runapp.adoc[]
 
-Create a controller test which verifies the filter does not log the sensitive headers.
+[source,bash]
+----
+curl localhost:8080 -H "X-Request-Id: 1234"
+----
+
+You will see in the logs:
+
+[source, bash]
+----
+... TRACE e.micronaut.LoggingHeadersFilter - GET / H Host:localhost:8080
+... TRACE e.micronaut.LoggingHeadersFilter - GET / H User-Agent:curl/8.4.0
+... TRACE e.micronaut.LoggingHeadersFilter - GET / H Accept:*/*
+... TRACE e.micronaut.LoggingHeadersFilter - GET / H X-Request-Id:1234
+----
+
+== Tests
+
+common:logback-test.adoc[]
+
+=== Write tests
+
+Create a `MemoryAppender` to ease testing.
+
+test:MemoryAppender[]
+
+Create a test which verifies the filter logs only the non-sensitive headers.
+
+test:HelloControllerTest[]
+callout:micronaut-test[1]
+callout:http-client[2]
 
 common:testApp.adoc[]
 
-common:runapp.adoc[]
-
-Visit http://localhost:8080/pdf/download and the browser downloads a PDF.
-
 common:next.adoc[]
 
-Learn more about https://github.com/LibrePDF/OpenPDF[OpenPDF].
+Learn more about https://docs.micronaut.io/latest/guide/#filtermethods[Filter Methods].
 
 common:helpWithMicronaut.adoc[]
 

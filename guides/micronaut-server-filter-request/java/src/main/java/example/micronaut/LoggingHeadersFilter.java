@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 package example.micronaut;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
+
 import io.micronaut.core.order.Ordered;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
@@ -27,39 +26,26 @@ import org.slf4j.LoggerFactory;
 
 import static io.micronaut.http.annotation.Filter.MATCH_ALL_PATTERN;
 
-@ServerFilter(MATCH_ALL_PATTERN)
+@ServerFilter(MATCH_ALL_PATTERN) // <1>
 class LoggingHeadersFilter implements Ordered {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoggingHeadersFilter.class);
 
-    @RequestFilter
+    @RequestFilter // <2>
     void filterRequest(HttpRequest<?> request) {
         if (LOG.isTraceEnabled()) {
-            logHeaders(request);
-        }
-    }
-
-    void logHeaders(@NonNull HttpHeaders headers) {
-        for (String headerName : headers.names()) {
-            if (headerName.equalsIgnoreCase(HttpHeaders.AUTHORIZATION)) {
-                continue;
+            HttpHeaders headers = request.getHeaders();
+            for (String headerName : headers.names()) {
+                if (headerName.equalsIgnoreCase(HttpHeaders.AUTHORIZATION)) {
+                    continue;
+                }
+                LOG.trace("{} {} H {}:{}", request.getMethod(), request.getPath(), headerName, headers.get(headerName));
             }
-            log(headerName, headers.get(headerName));
         }
-    }
-
-    protected void log(@NonNull String headerName,
-                       @Nullable String headerValue) {
-        LOG.trace("H {}:{}", headerName, headerValue);
-    }
-
-    private void logHeaders(@NonNull HttpRequest<?> request) {
-        LOG.trace("{} {} uri {}", request.getMethod(), request.getPath(), request.getUri().toString());
-        logHeaders(request.getHeaders());
     }
 
     @Override
-    public int getOrder() {
+    public int getOrder() { // <3>
         return ServerFilterPhase.FIRST.order();
     }
 }
