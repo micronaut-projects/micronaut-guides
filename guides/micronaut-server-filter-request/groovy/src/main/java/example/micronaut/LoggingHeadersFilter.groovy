@@ -28,7 +28,7 @@ import static io.micronaut.http.annotation.Filter.MATCH_ALL_PATTERN
 
 @ServerFilter(MATCH_ALL_PATTERN) // <1>
 class LoggingHeadersFilter implements Ordered {
-    private static final Logger LOG = LoggerFactory.getLogger(LoggingHeadersFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoggingHeadersFilter.class)
 
     @RequestFilter // <2>
     void filterRequest(HttpRequest<?> request) {
@@ -45,6 +45,6 @@ class LoggingHeadersFilter implements Ordered {
 
     @Override
     int getOrder() { // <3>
-        ServerFilterPhase.FIRST.order();
+        ServerFilterPhase.FIRST.order()
     }
 }
