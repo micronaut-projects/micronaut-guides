@@ -36,7 +36,7 @@ class HelloControllerSpec extends Specification {
     @Inject
     HttpClient httpClient // <2>
 
-    void "invoking hello controller logs headers"() { // <2>
+    void "invoking hello controller logs headers"() {
         given:
         MemoryAppender appender = new MemoryAppender()
         Logger l = (Logger) LoggerFactory.getLogger(LoggingHeadersFilter.class)
