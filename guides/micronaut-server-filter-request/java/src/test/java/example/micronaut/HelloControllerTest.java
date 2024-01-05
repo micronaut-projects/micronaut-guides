@@ -26,13 +26,14 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest // <1>
-public class HelloControllerTest {
+class HelloControllerTest {
 
     @Test
-    public void testHelloFilterLogging(@Client("/") HttpClient httpClient) { // <2>
+    void testHelloFilterLogging(@Client("/") HttpClient httpClient) { // <2>
         MemoryAppender appender = new MemoryAppender();
         Logger l = (Logger) LoggerFactory.getLogger(LoggingHeadersFilter.class);
         l.addAppender(appender);
@@ -51,5 +52,4 @@ public class HelloControllerTest {
                 .noneMatch(it -> it.equals("GET / H Authorization:Bearer x")));
         appender.stop();
     }
-
 }
