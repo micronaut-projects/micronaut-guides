@@ -22,7 +22,5 @@ import io.micronaut.http.annotation.Get
 class HelloController {
 
     @Get // <2>
-    fun index(): Map<String, Any> {
-        return mapOf("message" to "Hello World") // <3>
-    }
+    fun index() = mapOf("message" to "Hello World") // <3>
 }
