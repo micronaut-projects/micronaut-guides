@@ -24,16 +24,19 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoggingHeadersFilterTest extends LoggingHeadersFilter {
+
     @Test
     void sensistiveHeadersAreNotLogged() {
-        Map<String, String> headersMap = Map.of("host", "micronaut-foo-bar-yyyy-uc.a.run.app",
+        Map<String, String> headersMap = Map.of(
+                "host", "micronaut-foo-bar-yyyy-uc.a.run.app",
                 "accept", "application/json",
                 "authorization", "Bearer yyy",
                 "content-type", "application/json",
                 "content-length", "523",
                 "x-forwarded-for", "107.178.207.38",
                 "x-forwarded-proto", "https",
-                "forwarded:for", "\"107.178.207.38\";proto=https");
+                "forwarded:for", "\"107.178.207.38\";proto=https"
+        );
         HttpHeaders headers = new SimpleHttpHeaders(headersMap, null);
         LoggingHeadersFilterOverride filter = new LoggingHeadersFilterOverride();
         filter.logHeaders(headers);
@@ -41,6 +44,5 @@ class LoggingHeadersFilterTest extends LoggingHeadersFilter {
         assertFalse(filter.getHeaders().containsKey("authorization"));
         assertTrue(filter.getHeaders().containsKey("host"));
         filter.clear();
-
     }
 }

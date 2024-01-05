@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package example.micronaut;
+
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.order.Ordered;
