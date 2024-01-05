@@ -49,7 +49,7 @@ class HelloControllerTest {
         assertTrue(appender.getEvents()
                 .stream()
                 .map(ILoggingEvent::getFormattedMessage)
-                .noneMatch(it -> it.equals("GET / H Authorization:Bearer x")));
+                .noneMatch(it -> it.toLowerCase().contains("authorization")));
         appender.stop();
     }
 }
