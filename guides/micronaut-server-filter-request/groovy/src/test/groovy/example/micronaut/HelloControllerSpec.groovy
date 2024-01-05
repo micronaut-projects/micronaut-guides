@@ -16,24 +16,25 @@
 package example.micronaut
 
 import ch.qos.logback.classic.Logger
-import ch.qos.logback.classic.spi.ILoggingEvent
 import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.BlockingHttpClient
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
 
+import jakarta.inject.Inject
 import org.slf4j.LoggerFactory
-
+import spock.lang.Shared
 import spock.lang.Specification
+
 @MicronautTest // <1>
 class HelloControllerSpec extends Specification {
 
     @Shared
     @Client("/")
     @Inject
-    HttpClient client // <2>
+    HttpClient httpClient // <2>
 
     void "invoking hello controller logs headers"() { // <2>
         given:
@@ -44,19 +45,14 @@ class HelloControllerSpec extends Specification {
         BlockingHttpClient client = httpClient.toBlocking()
 
         when:
-        assertDoesNotThrow(() -> client.retrieve(HttpRequest.GET("/")
+        client.retrieve(HttpRequest.GET("/")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer x")
-                .header("foo", "bar")))
+                .header("foo", "bar"))
 
         then:
-        appender.events
-                .stream()
-                .map(ILoggingEvent::getFormattedMessage)
-                .anyMatch(it -> it.equals("GET / H foo:bar"))
-        appender.events
-                .stream()
-                .map(ILoggingEvent::getFormattedMessage)
-                .noneMatch(it -> it.toLowerCase().contains("authorization"))
+        noExceptionThrown()
+        appender.events.formattedMessage.any { it == "GET / H foo:bar" }
+        appender.events.formattedMessage.every { !it.toLowerCase().contains("authorization") }
 
         cleanup:
         appender.stop()
