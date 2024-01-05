@@ -23,9 +23,7 @@ class MemoryAppender : AppenderBase<ILoggingEvent>() {
     private val events = mutableListOf<ILoggingEvent>()
 
     override fun append(e: ILoggingEvent) {
-        synchronized(events) {
-            events.add(e)
-        }
+        events.add(e)
     }
 
     fun getEvents() = events
