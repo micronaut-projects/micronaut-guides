@@ -21,56 +21,54 @@ import spock.lang.Specification
 
 class ThingRepositorySpec extends Specification {
 
-    void testFindAll() {
-        given:
-        ApplicationContext applicationContext = ApplicationContext.run()
-        ThingRepository thingRepository = applicationContext.getBean(ThingRepository.class)
+    private ApplicationContext applicationContext
+    private ThingRepository thingRepository
 
+    void setup() {
+        applicationContext = ApplicationContext.run()
+        thingRepository = applicationContext.getBean(ThingRepository)
+    }
+
+    void testFindAll() {
         // clear out existing data; safe because each
         // test runs in a transaction that's rolled back
         when:
         thingRepository.deleteAll()
 
         then:
-        0 == thingRepository.count()
+        0L == thingRepository.count()
 
         when:
-        thingRepository.saveAll(Arrays.asList(
-                new Thing("t1"),
-                new Thing("t2"),
-                new Thing("t3")))
+        thingRepository.saveAll([
+                new Thing('t1'),
+                new Thing('t2'),
+                new Thing('t3')
+        ])
         List<Thing> things = thingRepository.findAll()
 
         then:
         3 == things.size()
-        Arrays.asList("t1", "t2", "t3") ==
-                things.stream()
-                        .map(Thing::getName)
-                        .sorted()
-                        .toList()
-        cleanup:
-        applicationContext.close()
+        ['t1', 't2', 't3'] == things*.name.sort()
     }
 
     void testFindByName() {
-        given:
-        ApplicationContext applicationContext = ApplicationContext.run()
-        ThingRepository thingRepository = applicationContext.getBean(ThingRepository.class)
-        String name = UUID.randomUUID().toString()
         when:
-        Thing thing = thingRepository.findByName(name).orElse(null);
+        String name = UUID.randomUUID()
+        Thing thing = thingRepository.findByName(name).orElse(null)
+
         then:
         !thing
 
         when:
-        thingRepository.save(new Thing(name));
-        thing = thingRepository.findByName(name).orElse(null);
+        thingRepository.save(new Thing(name))
+        thing = thingRepository.findByName(name).orElse(null)
 
         then:
         thing
         name == thing.name
+    }
 
-        cleanup:
-        applicationContext.close()
+    void cleanup() {
+        applicationContext?.close()
     }
 }

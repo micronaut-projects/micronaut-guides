@@ -18,13 +18,14 @@ package example.micronaut
 import example.micronaut.domain.Thing
 import example.micronaut.repository.ThingRepository
 import io.micronaut.context.annotation.Requires
+import io.micronaut.context.env.Environment.TEST
 import io.micronaut.context.event.StartupEvent
 import io.micronaut.runtime.event.annotation.EventListener
 import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 
 @Singleton
-@Requires(notEnv = ["test"])
+@Requires(notEnv = [TEST])
 open class DataPopulator(private val thingRepository: ThingRepository) {
 
     @EventListener
@@ -34,8 +35,9 @@ open class DataPopulator(private val thingRepository: ThingRepository) {
         thingRepository.deleteAll()
 
         // create data
-        val fred = Thing("Fred")
-        val barney = Thing("Barney")
-        thingRepository.saveAll(listOf(fred, barney))
+        thingRepository.saveAll(listOf(
+                Thing("Fred"),
+                Thing("Barney"))
+        )
     }
 }

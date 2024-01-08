@@ -17,47 +17,54 @@ package example.micronaut.repository;
 
 import example.micronaut.domain.Thing;
 import io.micronaut.context.ApplicationContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ThingRepositoryTest {
 
+    private ApplicationContext applicationContext;
+    private ThingRepository thingRepository;
+
+    @BeforeEach
+    void setup() {
+        applicationContext = ApplicationContext.run();
+        thingRepository = applicationContext.getBean(ThingRepository.class);
+    }
+
     @Test
     void testFindAll() {
-        ApplicationContext applicationContext = ApplicationContext.run();
-        ThingRepository thingRepository = applicationContext.getBean(ThingRepository.class);
 
         // clear out existing data; safe because each
         // test runs in a transaction that's rolled back
         thingRepository.deleteAll();
         assertEquals(0, thingRepository.count());
 
-        thingRepository.saveAll(Arrays.asList(
+        thingRepository.saveAll(List.of(
                 new Thing("t1"),
                 new Thing("t2"),
-                new Thing("t3")));
+                new Thing("t3"))
+        );
 
         List<Thing> things = thingRepository.findAll();
         assertEquals(3, things.size());
         assertEquals(
-                Arrays.asList("t1", "t2", "t3"),
+                List.of("t1", "t2", "t3"),
                 things.stream()
                         .map(Thing::getName)
                         .sorted()
-                        .collect(Collectors.toList()));
-        applicationContext.close();
+                        .toList());
     }
 
     @Test
     void testFindByName() {
-        ApplicationContext applicationContext = ApplicationContext.run();
-        ThingRepository thingRepository = applicationContext.getBean(ThingRepository.class);
 
         String name = UUID.randomUUID().toString();
 
@@ -68,6 +75,12 @@ class ThingRepositoryTest {
         thing = thingRepository.findByName(name).orElse(null);
         assertNotNull(thing);
         assertEquals(name, thing.getName());
-        applicationContext.close();
+    }
+
+    @AfterEach
+    void cleanup() {
+        if (applicationContext != null) {
+            applicationContext.close();
+        }
     }
 }

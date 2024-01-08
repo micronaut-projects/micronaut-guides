@@ -31,5 +31,5 @@ class ThingController(private val thingRepository: ThingRepository) {
     fun all(): List<Thing> = thingRepository.findAll()
 
     @Get("/{name}")
-    fun byName(name: @NotBlank String?) = thingRepository.findByName(name)
+    fun byName(@NotBlank name: String) = thingRepository.findByName(name)
 }
