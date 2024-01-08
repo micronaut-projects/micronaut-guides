@@ -16,12 +16,12 @@
 package example.micronaut
 
 import io.micronaut.core.order.Ordered
-import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.annotation.Filter
 import io.micronaut.http.annotation.RequestFilter
 import io.micronaut.http.annotation.ServerFilter
 import io.micronaut.http.filter.ServerFilterPhase
+import io.micronaut.http.util.HttpHeadersUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -30,15 +30,7 @@ class LoggingHeadersFilter : Ordered {
 
     @RequestFilter // <2>
     fun filterRequest(request: HttpRequest<*>) {
-        if (LOG.isTraceEnabled) {
-            val headers = request.headers
-            for (headerName in headers.names()) {
-                if (headerName.equals(HttpHeaders.AUTHORIZATION, ignoreCase = true)) {
-                    continue
-                }
-                LOG.trace("{} {} H {}:{}", request.method, request.path, headerName, headers[headerName])
-            }
-        }
+        HttpHeadersUtil.trace(LOG, request.headers)
     }
 
     override fun getOrder() = ServerFilterPhase.FIRST.order() // <3>

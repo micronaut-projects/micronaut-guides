@@ -51,8 +51,9 @@ class HelloControllerSpec extends Specification {
 
         then:
         noExceptionThrown()
-        appender.events.formattedMessage.any { it == "GET / H foo:bar" }
-        appender.events.formattedMessage.every { !it.toLowerCase().contains("authorization") }
+        appender.events.formattedMessage.any { it == "foo: bar" }
+        appender.events.formattedMessage.every { it != "Authorization: Bearer x" }
+        appender.events.formattedMessage.any { it == "Authorization: *MASKED*" }
 
         cleanup:
         appender.stop()

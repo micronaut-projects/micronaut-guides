@@ -48,13 +48,21 @@ class HelloControllerTest {
         assertTrue(appender.getEvents()
             .stream()
             .map { obj: ILoggingEvent -> obj.formattedMessage }
-            .anyMatch { it == "GET / H foo:bar" }
+            .anyMatch { it == "foo: bar" }
         )
+
         assertTrue(appender.getEvents()
             .stream()
             .map { obj: ILoggingEvent -> obj.formattedMessage }
-            .noneMatch { it.contains("Authorization", true) }
+            .anyMatch { it == "Authorization: *MASKED*" }
         )
+
+        assertTrue(appender.getEvents()
+            .stream()
+            .map { obj: ILoggingEvent -> obj.formattedMessage }
+            .noneMatch() { it == "Authorization: Bearer x" }
+        )
+
         appender.stop()
     }
 }
