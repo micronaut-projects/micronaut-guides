@@ -15,12 +15,9 @@
  */
 package example.micronaut.repository;
 
-import com.github.dockerjava.api.model.Info;
 import example.micronaut.domain.Thing;
 import io.micronaut.context.ApplicationContext;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
-import org.testcontainers.DockerClientFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,24 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ThingRepositoryTest {
 
-    /**
-     * WARN  t.gvenzl/oracle-xe:21-slim-faststart - The architecture 'amd64' for image 'gvenzl/oracle-xe:21-slim-faststart'
-     * (ID sha256:395e7780aaba5f8c33082bf533a17a4bffdb7bcdd58034702a1634fcbd3d1137) does not match the Docker server architecture 'arm64'.
-     * This will cause the container to execute much more slowly due to emulation and may lead to timeout failures.
-     */
-    boolean dockerArchitecture() {
-        Info info = DockerClientFactory.instance().getInfo();
-        String architecture = info.getArchitecture();
-        if (architecture == null) {
-            return true;
-        }
-        return architecture.equals("x86_64");
-    }
-
-    @EnabledIf("dockerArchitecture")
     @Test
     void testFindAll() {
-        ApplicationContext applicationContext = ApplicationContext.run(Oracle.getConfiguration());
+        ApplicationContext applicationContext = ApplicationContext.run();
         ThingRepository thingRepository = applicationContext.getBean(ThingRepository.class);
 
         // clear out existing data; safe because each
@@ -72,10 +54,9 @@ class ThingRepositoryTest {
         applicationContext.close();
     }
 
-    @EnabledIf("dockerArchitecture")
     @Test
     void testFindByName() {
-        ApplicationContext applicationContext = ApplicationContext.run(Oracle.getConfiguration());
+        ApplicationContext applicationContext = ApplicationContext.run();
         ThingRepository thingRepository = applicationContext.getBean(ThingRepository.class);
 
         String name = UUID.randomUUID().toString();
