@@ -7,10 +7,10 @@ import io.micronaut.views.View;
 import java.util.Collections;
 import java.util.Map;
 
-@Controller
+@Controller // <1>
 class HomeController {
-    @Get
-    @View("index.html")
+    @Get // <2>
+    @View("index.html") // <3>
     Map<String, Object> index() {
         return Collections.emptyMap();
     }
