@@ -22,11 +22,12 @@ import io.micronaut.context.annotation.Requires
 import io.micronaut.context.event.StartupEvent
 import io.micronaut.runtime.event.annotation.EventListener
 import jakarta.inject.Singleton
-
 import jakarta.transaction.Transactional
 
+import static io.micronaut.context.env.Environment.TEST
+
 @Singleton
-@Requires(notEnv = 'test')
+@Requires(notEnv = TEST)
 @CompileStatic
 class DataPopulator {
 
@@ -43,8 +44,9 @@ class DataPopulator {
         thingRepository.deleteAll()
 
         // create data
-        Thing fred = new Thing('Fred')
-        Thing barney = new Thing('Barney')
-        thingRepository.saveAll([fred, barney])
+        thingRepository.saveAll([
+                new Thing('Fred'),
+                new Thing('Barney')
+        ])
     }
 }

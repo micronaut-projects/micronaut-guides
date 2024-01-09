@@ -2,11 +2,11 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
-import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.api.TestFramework
+import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.Language
+
 import java.time.LocalDate
-import java.util.stream.Collectors
 
 @ToString(includeNames = true)
 @CompileStatic
