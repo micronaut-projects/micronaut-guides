@@ -21,7 +21,7 @@ import io.micronaut.mqtt.annotation.Topic
 import io.micronaut.mqtt.annotation.v5.MqttPublisher
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
-import org.awaitility.Awaitility
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -30,29 +30,30 @@ import java.util.concurrent.TimeUnit
 
 @MicronautTest // <1>
 @Property(name = "spec.name", value = "SubscriptionTest") // <2>
-internal class SubscriptionTest {
+class SubscriptionTest {
 
     @Inject
-    var client: TemperatureClient? = null
+    lateinit var client: TemperatureClient
 
     @Inject
-    var listener: TemperatureListener? = null
+    lateinit var listener: TemperatureListener
 
     @Test
     fun checkSubscriptionsAreReceived() {
-        client!!.publishLivingroomTemperature("3.145".toByteArray(StandardCharsets.UTF_8))
-        Awaitility.await().atMost(5, TimeUnit.SECONDS)
+        client.publishLivingroomTemperature("3.145".toByteArray(StandardCharsets.UTF_8))
+        await().atMost(5, TimeUnit.SECONDS)
             .untilAsserted {
                 Assertions.assertEquals(
                     BigDecimal("3.145"),
-                    listener!!.temperature
+                    listener.temperature
                 )
             }
     }
 
     @Requires(property = "spec.name", value = "SubscriptionTest") // <3>
     @MqttPublisher // <4>
-    internal interface TemperatureClient {
+    interface TemperatureClient {
+
         @Topic("house/livingroom/temperature") // <5>
         fun publishLivingroomTemperature(data: ByteArray?)
     }
