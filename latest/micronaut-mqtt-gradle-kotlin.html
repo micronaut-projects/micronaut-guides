@@ -698,7 +698,7 @@ import io.micronaut.mqtt.annotation.Topic
 import io.micronaut.mqtt.annotation.v5.MqttPublisher
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
-import org.awaitility.Awaitility
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -707,29 +707,30 @@ import java.util.concurrent.TimeUnit
 
 @MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
 @Property(name = &quot;spec.name&quot;, value = &quot;SubscriptionTest&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
-internal class SubscriptionTest {
+class SubscriptionTest {
 
     @Inject
-    var client: TemperatureClient? = null
+    lateinit var client: TemperatureClient
 
     @Inject
-    var listener: TemperatureListener? = null
+    lateinit var listener: TemperatureListener
 
     @Test
     fun checkSubscriptionsAreReceived() {
-        client!!.publishLivingroomTemperature(&quot;3.145&quot;.toByteArray(StandardCharsets.UTF_8))
-        Awaitility.await().atMost(5, TimeUnit.SECONDS)
+        client.publishLivingroomTemperature(&quot;3.145&quot;.toByteArray(StandardCharsets.UTF_8))
+        await().atMost(5, TimeUnit.SECONDS)
             .untilAsserted {
                 Assertions.assertEquals(
                     BigDecimal(&quot;3.145&quot;),
-                    listener!!.temperature
+                    listener.temperature
                 )
             }
     }
 
     @Requires(property = &quot;spec.name&quot;, value = &quot;SubscriptionTest&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
     @MqttPublisher <i class="conum" data-value="4"></i><b>(4)</b>
-    internal interface TemperatureClient {
+    interface TemperatureClient {
+
         @Topic(&quot;house/livingroom/temperature&quot;) <i class="conum" data-value="5"></i><b>(5)</b>
         fun publishLivingroomTemperature(data: ByteArray?)
     }
@@ -950,7 +951,7 @@ All guides are released with an <a href="https://www.apache.org/licenses/LICENSE
                 <div id="text-14" class="widget widget_text">
                     <div class="textwidget">
                         <p>
-                            <img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
                         </p>
                     </div>
                 </div>
