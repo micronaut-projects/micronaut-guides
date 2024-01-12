@@ -44,19 +44,17 @@ class FunctionRequestHandlerTest {
     @Test
     public void testHandler() throws IOException {
         JsonMapper jsonMapper = handler.getApplicationContext().getBean(JsonMapper.class);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (InputStream inputStream = createInputStreamRequest(jsonMapper)) {
-            handler.execute(inputStream, baos); // <3>
-            assertEquals("""
-                {"statusCode":200,"body":"{\\"message\\":\\"Hello World\\"}"}""", baos.toString());
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (InputStream inputStream = createInputStreamRequest(jsonMapper)) {
+                handler.execute(inputStream, baos); // <3>
+                assertEquals("""
+                        {"statusCode":200,"body":"{\\"message\\":\\"Hello World\\"}"}""", baos.toString());
+            }
         }
-
     }
 
     private InputStream createInputStreamRequest(JsonMapper jsonMapper) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        jsonMapper.writeValue(outputStream, createRequest());
-        return new ByteArrayInputStream(outputStream.toByteArray());
+        return new ByteArrayInputStream(jsonMapper.writeValueAsBytes(createRequest()));
     }
 
     private APIGatewayProxyRequestEvent createRequest() {
