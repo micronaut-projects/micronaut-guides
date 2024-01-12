@@ -24,6 +24,7 @@ import io.micronaut.function.aws.runtime.AbstractRequestStreamHandlerMicronautLa
 import java.net.MalformedURLException;
 
 class FunctionLambdaRuntime extends AbstractRequestStreamHandlerMicronautLambdaRuntime<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
     public static void main(String[] args) {
         try {
             new FunctionLambdaRuntime().run(args);
