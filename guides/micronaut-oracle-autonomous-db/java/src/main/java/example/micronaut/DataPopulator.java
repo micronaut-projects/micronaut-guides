@@ -21,17 +21,19 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Singleton;
-
 import jakarta.transaction.Transactional;
-import java.util.Arrays;
+
+import java.util.List;
+
+import static io.micronaut.context.env.Environment.TEST;
 
 @Singleton
-@Requires(notEnv = "test")
-public class DataPopulator {
+@Requires(notEnv = TEST)
+class DataPopulator {
 
     private final ThingRepository thingRepository;
 
-    public DataPopulator(ThingRepository thingRepository) {
+    DataPopulator(ThingRepository thingRepository) {
         this.thingRepository = thingRepository;
     }
 
@@ -42,8 +44,9 @@ public class DataPopulator {
         thingRepository.deleteAll();
 
         // create data
-        Thing fred = new Thing("Fred");
-        Thing barney = new Thing("Barney");
-        thingRepository.saveAll(Arrays.asList(fred, barney));
+        thingRepository.saveAll(List.of(
+                new Thing("Fred"),
+                new Thing("Barney")
+        ));
     }
 }

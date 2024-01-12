@@ -16,11 +16,12 @@
 package example.micronaut.domain
 
 import groovy.transform.CompileStatic
-import io.micronaut.core.annotation.Creator
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
+import io.micronaut.serde.annotation.Serdeable
 
+@Serdeable
 @MappedEntity
 @CompileStatic
 class Thing {
@@ -31,7 +32,6 @@ class Thing {
 
     final String name
 
-    @Creator
     Thing(String name) {
         this.name = name
     }

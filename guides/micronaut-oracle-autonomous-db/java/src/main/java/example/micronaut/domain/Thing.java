@@ -15,11 +15,12 @@
  */
 package example.micronaut.domain;
 
-import io.micronaut.core.annotation.Creator;
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
+import io.micronaut.serde.annotation.Serdeable;
 
+@Serdeable
 @MappedEntity
 public class Thing {
 
@@ -29,7 +30,6 @@ public class Thing {
 
     private final String name;
 
-    @Creator
     public Thing(String name) {
         this.name = name;
     }
