@@ -45,7 +45,7 @@ class FunctionRequestHandlerTest {
     }
 
     @Test
-    public void testHandler() throws IOException {
+    void testHandler() throws IOException {
         JsonMapper jsonMapper = handler.getApplicationContext().getBean(JsonMapper.class);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (InputStream inputStream = createInputStreamRequest(jsonMapper)) {
