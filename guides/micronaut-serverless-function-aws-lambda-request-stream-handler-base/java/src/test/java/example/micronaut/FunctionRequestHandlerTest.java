@@ -47,12 +47,11 @@ class FunctionRequestHandlerTest {
     @Test
     void testHandler() throws IOException {
         JsonMapper jsonMapper = handler.getApplicationContext().getBean(JsonMapper.class);
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            try (InputStream inputStream = createInputStreamRequest(jsonMapper)) {
-                handler.execute(inputStream, baos); // <3>
-                assertEquals("""
-                        {"statusCode":200,"body":"{\\"message\\":\\"Hello World\\"}"}""", baos.toString());
-            }
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             InputStream inputStream = createInputStreamRequest(jsonMapper)) {
+            handler.execute(inputStream, baos); // <3>
+            assertEquals("""
+                    {"statusCode":200,"body":"{\\"message\\":\\"Hello World\\"}"}""", baos.toString());
         }
     }
 
