@@ -15,6 +15,8 @@
  */
 package example.micronaut;
 
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.io.Writable;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -22,11 +24,10 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
+import java.io.Writer;
+import java.nio.charset.Charset;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -36,21 +37,25 @@ class PDFController {
 
     @ExecuteOn(TaskExecutors.BLOCKING) // <2>
     @Get("/download") // <3>
-    HttpResponse<byte[]> download() throws IOException {
+    HttpResponse<Writable> download() throws IOException { // <4>
         return download("example.pdf");
     }
 
-    private HttpResponse<byte[]> download(String filename) throws IOException {
-        return HttpResponse.ok(pdfBytes())
+    private HttpResponse<Writable> download(String filename) throws IOException {
+        return HttpResponse.ok(pdfWritable())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF);
     }
 
-    private byte[] pdfBytes() throws IOException {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            generatePDF(outputStream);
-            return outputStream.toByteArray();
-        }
+    private Writable pdfWritable() {
+        return new Writable() {
+            public void writeTo(OutputStream outputStream, @Nullable Charset charset) throws IOException {
+                generatePDF(outputStream);
+            }
+
+            public void writeTo(Writer out) {
+            }
+        };
     }
 
     private void generatePDF(OutputStream outputStream) {
