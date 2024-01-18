@@ -17,7 +17,6 @@ package example.micronaut
 
 import io.micronaut.context.event.BeanCreatedEvent
 import io.micronaut.context.event.BeanCreatedEventListener
-import io.micronaut.core.annotation.NonNull
 import jakarta.inject.Singleton
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
@@ -29,7 +28,7 @@ import java.net.URISyntaxException
 @Singleton // <1>
 class SqsClientBuilderListener(private val sqsConfig: SqsConfig) // <3>
     : BeanCreatedEventListener<SqsClientBuilder> { // <2>
-    override fun onCreated(event: @NonNull BeanCreatedEvent<SqsClientBuilder>): SqsClientBuilder {
+    override fun onCreated(event: BeanCreatedEvent<SqsClientBuilder>): SqsClientBuilder {
         val builder = event.bean
         try {
             return builder
