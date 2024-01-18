@@ -21,8 +21,9 @@ import jakarta.inject.Singleton
 import software.amazon.awssdk.services.sqs.SqsClient
 import software.amazon.awssdk.services.sqs.model.CreateQueueRequest
 
-@Singleton
-class SqsClientCreatedEventListener : BeanCreatedEventListener<SqsClient> {
+@Singleton // <1>
+class SqsClientCreatedEventListener : BeanCreatedEventListener<SqsClient> { // <2>
+
     override fun onCreated(event: BeanCreatedEvent<SqsClient>): SqsClient {
         val client = event.bean
         if (client.listQueues().queueUrls().stream().noneMatch { it: String -> it.contains(QUEUE_NAME) }) {
