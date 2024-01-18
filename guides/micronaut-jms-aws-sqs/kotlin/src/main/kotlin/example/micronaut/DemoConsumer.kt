@@ -28,7 +28,7 @@ class DemoConsumer {
 
     @Queue(value = "demo_queue") // <2>
     fun receive(@MessageBody body: String?) {  // <3>
-        LOGGER.info("Message has been consumed. Message body: {}", body)
+        LOG.info("Message has been consumed. Message body: {}", body)
         messageCount.incrementAndGet()
     }
 
@@ -37,6 +37,6 @@ class DemoConsumer {
     }
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(DemoConsumer::class.java)
+        private val LOG = LoggerFactory.getLogger(DemoConsumer::class.java)
     }
 }
