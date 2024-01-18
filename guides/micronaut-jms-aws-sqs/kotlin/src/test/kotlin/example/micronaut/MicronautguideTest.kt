@@ -33,13 +33,14 @@ import org.testcontainers.utility.DockerImageName
 @MicronautTest // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
 internal class MicronautguideTest : TestPropertyProvider { // <3>
+
     @Inject
     @field:Client("/")
     lateinit var httpClient : HttpClient
 
     @Inject
     lateinit var demoConsumer: DemoConsumer
-    
+
     override fun getProperties(): @NonNull MutableMap<String, String> {
         if (!localstack.isRunning) {
             localstack.start()

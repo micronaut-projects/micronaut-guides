@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @JMSListener(CONNECTION_FACTORY_BEAN_NAME) // <1>
 class DemoConsumer {
+
     private val messageCount = AtomicInteger(0)
 
     @Queue(value = "demo_queue") // <2>

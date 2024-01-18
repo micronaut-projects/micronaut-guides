@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @MicronautTest // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
 class MicronautguideTest implements TestPropertyProvider { // <3>
+
     private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:latest");
     private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
             .withServices(LocalStackContainer.Service.SQS);

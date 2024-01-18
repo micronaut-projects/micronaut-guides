@@ -28,6 +28,7 @@ import java.net.URISyntaxException
 @Singleton // <1>
 class SqsClientBuilderListener(private val sqsConfig: SqsConfig) // <3>
     : BeanCreatedEventListener<SqsClientBuilder> { // <2>
+
     override fun onCreated(event: BeanCreatedEvent<SqsClientBuilder>): SqsClientBuilder {
         val builder = event.bean
         try {
