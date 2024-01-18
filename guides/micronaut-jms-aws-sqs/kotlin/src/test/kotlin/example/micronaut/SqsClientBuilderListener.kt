@@ -33,7 +33,7 @@ class SqsClientBuilderListener(private val sqsConfig: SqsConfig) // <3>
         val builder = event.bean
         try {
             return builder
-                .endpointOverride(URI(sqsConfig.sqs.endpointOverride))
+                .endpointOverride(URI(sqsConfig.sqs.endpointOverride!!))
                 .credentialsProvider(
                     StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(sqsConfig.accessKeyId, sqsConfig.secretKey)

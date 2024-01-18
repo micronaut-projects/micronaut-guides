@@ -33,9 +33,7 @@ class DemoConsumer {
         messageCount.incrementAndGet()
     }
 
-    fun getMessageCount(): Int {
-        return messageCount.toInt()
-    }
+    fun getMessageCount() = messageCount.toInt()
 
     companion object {
         private val LOG = LoggerFactory.getLogger(DemoConsumer::class.java)
