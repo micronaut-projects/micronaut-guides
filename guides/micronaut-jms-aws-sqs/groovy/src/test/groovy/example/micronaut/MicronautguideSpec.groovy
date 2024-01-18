@@ -30,7 +30,7 @@ import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
 @MicronautTest // <1>
-class MicronautguideTest extends Specification implements TestPropertyProvider { // <3>
+class MicronautguideSpec extends Specification implements TestPropertyProvider { // <3>
     private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:latest")
     @AutoCleanup
     @Shared
