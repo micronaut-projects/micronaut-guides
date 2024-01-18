@@ -5,8 +5,6 @@ common:requirements.adoc[]
 ** An IAM user with enough permissions to create and manage a queue instances in SQS.
 ** The AWS CLI configured to use the IAM user above.
 
-common:aws.adoc[]
-
 common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
@@ -36,9 +34,43 @@ source:DemoConsumer[]
 Let’s create a Controller with an endpoint that we will call to verify that message has been sent by the JMS Producer (`DemoProducer`) and then finally received and consumed by the JMS Consumer (`DemoConsumer`).
 source:DemoController[]
 callout:controller[number=1,arg0=/]
-<2> Injects `DemoProducer` bean.
+callout:constructor-di[number=2,arg0=DemoProducer]
 <3> Maps a `GET` request to `/demo` path, which attempts to publish a message to a SQS queue instance.
 <4> Calls `send` method on `DemoProducer` instances providing the message payload.
+
+== Testing
+
+common:localstack.adoc[]
+
+common:localstack-dependencies.adoc[]
+
+First, we create a configuration properties object to encapsulate the configuration of the SQS client, which we will provide via LocalStack.
+
+test:SqsConfig[]
+callout:configuration-properties[1]
+
+Create a `BeanCreatedEventListener` to override the SQS client endpoint with the LocalStack endpoint.
+
+test:SqsClientBuilderListener[]
+callout:singleton[1]
+callout:bean-created-event-listener[2]
+callout:constructor-di[number=3,arg0=SqsConfig]
+
+Create a `BeanCreatedEventListener` to create a SQS queue named `demo_queue`.
+
+test:SqsClientCreatedEventListener[]
+callout:singleton[1]
+callout:bean-created-event-listener[2]
+
+Create a test using the https://java.testcontainers.org/modules/localstack/[Testcontainers LocalStack] module to start a LocalStack container and verify that the message has been sent and received.
+
+test:MicronautguideTest[]
+
+callout:micronaut-test[1]
+callout:test-instance-per-class[2]
+callout:test-property-provider[3]
+
+common:aws.adoc[]
 
 == Creating a queue instance in Amazon Simple Queue Service (Amazon SQS)
 
@@ -52,33 +84,16 @@ aws sqs create-queue --queue-name demo_queue
 ----
 Copy and save the response of the command. You will need the `QueueUrl` to delete the queue after you finish with it.
 
-== Update the Application configuration to use AWS
-
-=== Add the AWS IAM user access key and secret key placeholders to the Application Configuration
-[,diff]
-.src/main/resources/application.yml
-----
-micronaut:
-  application:
-    name: demo
-  jms:
-    sqs:
-      enabled: true
-+ aws:
-+  access-key-id: ${AWS_ACCESS_KEY_ID}
-+  secret-key: ${AWS_SECRET_KEY}
-----
-
 == Running the Application
 
 With almost everything in place, you can start the application and try it out. First, set environment variables to configure the queue connection. Then you can start the app.
 
-Create environment variables for `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_KEY`, which will be used in the Micronaut app's `application.yml`:
+Create environment variables for `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`, as defined in https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials-chain.html[AWS SDK Java v2 - Credential settings retrieval order]:
 
 [source,bash]
 ----
 export AWS_ACCESS_KEY_ID=<the access key from the AWS configuratipn step>
-export AWS_SECRET_KEY=<the secret key from the AWS configuratipn step>
+export AWS_SECRET_ACCESS_KEY=<the secret key from the AWS configuratipn step>
 ----
 
 [NOTE]

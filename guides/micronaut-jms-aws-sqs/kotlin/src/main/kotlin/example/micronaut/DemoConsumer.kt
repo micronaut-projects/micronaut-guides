@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class DemoConsumer {
     private val messageCount = AtomicInteger(0)
 
-    @Queue(value = "demo_queue", concurrency = "1-3") // <2>
+    @Queue(value = "demo_queue") // <2>
     fun receive(@MessageBody body: String?) {  // <3>
         LOGGER.info("Message has been consumed. Message body: {}", body)
         messageCount.incrementAndGet()

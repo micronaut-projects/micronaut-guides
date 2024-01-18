@@ -31,7 +31,7 @@ public class DemoConsumer {
 
     private final AtomicInteger messageCount = new AtomicInteger(0);
 
-    @Queue(value = "demo_queue", concurrency = "1-3")  // <2>
+    @Queue(value = "demo_queue")  // <2>
     public void receive(@MessageBody String body) {  // <3>
         LOGGER.info("Message has been consumed. Message body: {}", body);
         messageCount.incrementAndGet();

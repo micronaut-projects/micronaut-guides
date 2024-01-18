@@ -28,12 +28,12 @@ import software.amazon.awssdk.services.sqs.SqsClientBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-@Singleton
-class SqsClientBuilderListener implements BeanCreatedEventListener<SqsClientBuilder> {
+@Singleton // <1>
+class SqsClientBuilderListener implements BeanCreatedEventListener<SqsClientBuilder> { // <2>
 
     private final SqsConfig sqsConfig;
 
-    SqsClientBuilderListener(SqsConfig sqsConfig) {
+    SqsClientBuilderListener(SqsConfig sqsConfig) { // <3>
         this.sqsConfig = sqsConfig;
     }
 

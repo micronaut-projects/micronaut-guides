@@ -35,9 +35,9 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@MicronautTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MicronautguideTest implements TestPropertyProvider {
+@MicronautTest // <1>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
+class MicronautguideTest implements TestPropertyProvider { // <3>
     private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:latest");
     private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
             .withServices(LocalStackContainer.Service.SQS);
