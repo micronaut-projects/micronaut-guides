@@ -24,19 +24,18 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @JMSListener(CONNECTION_FACTORY_BEAN_NAME) // <1>
 class DemoConsumer {
+
     private val messageCount = AtomicInteger(0)
 
-    @Queue(value = "demo_queue", concurrency = "1-3") // <2>
+    @Queue(value = "demo_queue") // <2>
     fun receive(@MessageBody body: String?) {  // <3>
-        LOGGER.info("Message has been consumed. Message body: {}", body)
+        LOG.info("Message has been consumed. Message body: {}", body)
         messageCount.incrementAndGet()
     }
 
-    fun getMessageCount(): Int {
-        return messageCount.toInt()
-    }
+    fun getMessageCount() = messageCount.toInt()
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(DemoConsumer::class.java)
+        private val LOG = LoggerFactory.getLogger(DemoConsumer::class.java)
     }
 }

@@ -27,13 +27,14 @@ import static io.micronaut.jms.sqs.configuration.SqsConfiguration.CONNECTION_FAC
 
 @JMSListener(CONNECTION_FACTORY_BEAN_NAME)  // <1>
 public class DemoConsumer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DemoConsumer.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(DemoConsumer.class);
 
     private final AtomicInteger messageCount = new AtomicInteger(0);
 
-    @Queue(value = "demo_queue", concurrency = "1-3")  // <2>
+    @Queue(value = "demo_queue")  // <2>
     public void receive(@MessageBody String body) {  // <3>
-        LOGGER.info("Message has been consumed. Message body: {}", body);
+        LOG.info("Message has been consumed. Message body: {}", body);
         messageCount.incrementAndGet();
     }
 

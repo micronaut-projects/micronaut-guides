@@ -22,21 +22,36 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.Collections;
 import java.util.Map;
 
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Testcontainers(disabledWithoutDocker = true)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@MicronautTest
-class MicronautguideTest implements TestPropertyProvider {
+@MicronautTest // <1>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
+class MicronautguideTest implements TestPropertyProvider { // <3>
 
+    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:latest");
+    private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
+            .withServices(LocalStackContainer.Service.SQS);
+
+    @Override
+    public @NonNull Map<String, String> getProperties() {
+        if (!localstack.isRunning()) {
+            localstack.start();
+        }
+        return Map.of("aws.access-key-id", localstack.getAccessKey(),
+                "aws.secret-key", localstack.getSecretKey(),
+                "aws.region", localstack.getRegion(),
+                "aws.services.sqs.endpoint-override", localstack.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
+    }
     @Inject
     @Client("/")
     HttpClient httpClient;
@@ -46,26 +61,9 @@ class MicronautguideTest implements TestPropertyProvider {
 
     @Test
     void testItWorks() {
-        int messageCount = demoConsumer.getMessageCount();
-        Assertions.assertTrue(messageCount == 0);
-
+        assertEquals(0, demoConsumer.getMessageCount());
         httpClient.toBlocking().exchange(HttpRequest.POST("/demo", Collections.emptyMap()));
-        messageCount = demoConsumer.getMessageCount();
-        while (messageCount == 0) {
-            messageCount = demoConsumer.getMessageCount();
-        }
-
-        Assertions.assertTrue(messageCount == 1);
-    }
-
-    @AfterAll
-    static void afterAll() {
-        LocalStack.close();
-    }
-
-    @Override
-    @NonNull
-    public Map<String, String> getProperties() {
-        return LocalStack.getProperties();
+        await().until(() -> demoConsumer.getMessageCount(), equalTo(1));
+        assertEquals(1, demoConsumer.getMessageCount());
     }
 }

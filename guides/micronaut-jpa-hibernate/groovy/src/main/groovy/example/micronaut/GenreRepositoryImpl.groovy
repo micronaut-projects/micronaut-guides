@@ -17,12 +17,12 @@ package example.micronaut
 
 import example.micronaut.domain.Genre
 import io.micronaut.transaction.annotation.ReadOnly
+import io.micronaut.transaction.annotation.Transactional
 import jakarta.inject.Singleton
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceException
 import jakarta.persistence.TypedQuery
-import jakarta.transaction.Transactional
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
