@@ -8,38 +8,38 @@ common:completesolution.adoc[]
 
 common:create-app.adoc[]
 
-=== Data Source configuration
+=== Data Source Dependencies
 
 Add the following dependencies:
 
 :dependencies:
 
 dependency:micronaut-hibernate-jpa[groupId=io.micronaut.sql,callout=1]
-dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=2]
-dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=3]
-dependency:jakarta.persistence-api[groupId=jakarta.persistence,version=2.2.3,callout=4]
+dependency:micronaut-data-tx-hibernate[groupId=io.micronaut.data,callout=2]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=3]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=4]
 
 :dependencies:
 
 <1> Configures Hibernate/JPA EntityManagerFactory beans.
-<2> Configures SQL DataSource instances using Hikari Connection Pool.
-<3> Add dependency to in-memory H2 Database.
-<4> Add dependency to Jakarta Persistence API.
+<2> Adds Micronaut Data Transaction Hibernate dependency.
+<3> Configures SQL DataSource instances using Hikari Connection Pool.
+<4> Add dependency to in-memory H2 Database.
 
-Define the data source in `src/main/resources/application.yml`.
+=== Data Source configuration
 
-common:yaml-dependency.adoc[]
+Define the data source in `src/main/resources/application.properties`.
 
-resource:application.yml[tag=datasource]
+resource:application.properties[tag=datasource]
 
 NOTE: This way of defining the datasource properties means that we can externalize the configuration, for example for production environment, and also provide a default value for development. If the environment variables are not defined the Micronaut framework will use the default values. +
 Also keep in mind that it is necessary to escape the `:` in the connection URL using backticks ```.
 
 === JPA configuration
 
-Add the next snippet to `src/main/resources/application.yml` to configure JPA:
+Add the next snippet to `src/main/resources/application.properties` to configure JPA:
 
-resource:application.yml[tag=jpa]
+resource:application.properties[tag=jpa]
 
 === Domain
 
@@ -65,34 +65,31 @@ source:ApplicationConfigurationProperties[]
 
 callout:configuration-properties[1]
 
-You can override `max` if you add to your `src/main/resources/application.yml`:
+You can override `max` if you add to your `src/main/resources/application.properties`:
 
-resource:application.yml[tag=application]
+resource:application.properties[tag=application]
+
+=== Validation
+
+common:validation.adoc[]
 
 === Repository Access
 
-To mark the transaction demarcations, we use the https://jakarta.ee/specifications/transactions/2.0/apidocs/jakarta/transaction/transactional[Jakarta jakarta.transaction.Transactional annotation].
-
-To use it, you have to include the `micronaut-data-processor` dependency in your annotation processor configuration:
-
-dependency:micronaut-data-hibernate-jpa[groupId=io.micronaut.data,scope=annotationProcessor]
-
-Next, create a repository interface to define the operations to access the database:
+Next, create a repository interface to define the operations to access the database.
 
 source:GenreRepository[]
 
-The implementation:
+common:transaction-demarcations.adoc[]
+
+Write the implementation:
 
 source:GenreRepositoryImpl[]
 
 callout:singleton[1]
 <2> Easily inject an `EntityManager`.
-<3> All database access needs to be wrapped inside a transaction. As the method only reads data from the database, annotate it with `@ReadOnly`.
-<4> This method modifies the database, thus it is annotated with `@Transactional`.
+callout:transactional[3]
 
 === Controller
-
-common:validation.adoc[]
 
 Create two classes to encapsulate Save and Update operations:
 
@@ -106,7 +103,7 @@ Create a POJO to encapsulate Sorting and Pagination:
 
 source:SortingAndOrderArguments[]
 
-<1> Use `jakarta.validation.constraints` Constraints to ensure the incoming data matches your expectations.
+<1> Use `javax.validation.constraints` Constraints to ensure the incoming data matches your expectations.
 
 Create `GenreController`, a controller which exposes a resource with the common CRUD operations:
 
@@ -161,7 +158,7 @@ Add PostgreSQL driver dependency:
 
 dependency:postgresql[groupId=org.postgresql,scope=runtimeOnly]
 
-To use PostgreSQL, set up several environment variables which match those defined in `application.yml`:
+To use PostgreSQL, set up several environment variables which match those defined in `application.properties`:
 
 [source,bash]
 ----
