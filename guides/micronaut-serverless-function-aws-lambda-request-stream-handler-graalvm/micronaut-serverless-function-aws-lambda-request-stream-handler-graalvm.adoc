@@ -1,0 +1,106 @@
+common:header-top.adoc[]
+
+In this guide, we will deploy a Micronaut serverless function to AWS Lambda using a https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html#java-handler-interfaces[`RequestStreamHandler`].
+
+common:gettingStarted.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== Writing the Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn create-function-app example.micronaut.micronautguide \
+    --features=@features@ \
+    --build=@build@ \
+    --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+If you use https://launch.micronaut.io[Micronaut Launch], select serverless function as application type and add the `aws-lambda` feature.
+
+common:default-package.adoc[]
+
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+
+=== RequestStreamHandler
+
+https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html#java-handler-interfaces[AWS Lambda `RequestStreamHandler`]
+____
+To use your own serialization, implement the RequestStreamHandler interface. With this interface, Lambda passes your handler an input stream and output stream. The handler reads bytes from the input stream, writes to the output stream, and returns void.
+____
+
+
+The application contains a class extending https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestStreamHandler.html[MicronautRequestStreamHandler]
+
+Replace the generated `FunctionRequestHandler.java` with the following:
+
+source:FunctionRequestHandler[]
+
+<1> The class extends https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestStreamHandler.html[MicronautRequestStreamHandler]
+<2> It specifies a function name.
+
+You will use `MicronautRequestStreamHandler` in combination of a class annotated with `@FunctionBean` which implements one of the interfaces from the `java.util.function` package.
+
+source:RequestFunction[]
+
+<1> The class is annotated with `@FunctionBean`. It specifies `requestfunction` as an annotation value, which matches what we set in `FunctionRequestHandler.`.
+<2> It implements `java.util.function.Function`, which accepts a single argument and returns a single result. We use `APIGatewayProxyRequestEvent` and `APIGatewayProxyResponseEvent` from the https://github.com/aws/aws-lambda-java-libs/tree/main/aws-lambda-java-events[AWS Lambda Java Events] library.
+callout:field-injection[3]
+
+=== Tests
+
+You can test the handler behaves as expected, as shown in the following example:
+
+test:FunctionRequestHandlerTest[]
+
+<1> When you instantiate the Handler, the application context starts.
+<2> Remember to close your application context when you end your test. You can use your handler to obtain it.
+<3> Invoke the `execute` method of the handler.
+
+common:testApp.adoc[]
+
+common:lambda-custom-runtime.adoc[]
+
+=== LambdaRuntime
+
+Create a class that will be the entry point of the GraalVM native image.
+
+source:FunctionLambdaRuntime[]
+
+=== Build GraalVM Native Executable
+
+common:build-native-lambda.adoc[]
+
+Once you have a ZIP file, upload it
+
+image::lambda-custom-runtime-uploadcode.png[]
+
+=== Handler
+
+The handler used is the one created at `FunctionLambdaRuntime`.
+
+Thus, you don't need to specify the handler in the AWS Lambda console.
+
+However, I like to specify it in the console as well:
+
+`example.micronaut.FunctionRequestHandler`
+
+image::lambda-custom-runtime-functionrequest-handler.png[]
+
+common:lambda-test.adoc[]
+
+common:next.adoc[]
+
+Read more about:
+
+* https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda[Micronaut AWS Lambda Support]
+
+* https://aws.amazon.com/lambda/[AWS Lambda]
+
+common:helpWithMicronaut.adoc[]
