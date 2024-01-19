@@ -22,46 +22,49 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
-import org.junit.jupiter.api.AfterAll
+import org.awaitility.Awaitility
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.testcontainers.junit.jupiter.Testcontainers
-import java.util.*
+import org.testcontainers.containers.localstack.LocalStackContainer
+import org.testcontainers.utility.DockerImageName
 
-@Testcontainers(disabledWithoutDocker = true)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@MicronautTest
-internal class MicronautguideTest : TestPropertyProvider {
+@MicronautTest // <1>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
+internal class MicronautguideTest : TestPropertyProvider { // <3>
 
     @Inject
     @field:Client("/")
-    lateinit var client : HttpClient
+    lateinit var httpClient : HttpClient
 
     @Inject
     lateinit var demoConsumer: DemoConsumer
 
+    override fun getProperties(): @NonNull MutableMap<String, String> {
+        if (!localstack.isRunning) {
+            localstack.start()
+        }
+        return mapOf(
+            "aws.access-key-id" to localstack.accessKey,
+            "aws.secret-key" to localstack.secretKey,
+            "aws.region" to localstack.region,
+            "aws.services.sqs.endpoint-override" to localstack.getEndpointOverride(LocalStackContainer.Service.SQS)
+                .toString()
+        ).toMutableMap()
+    }
+
     @Test
     fun testItWorks() {
-        var messageCount = demoConsumer.getMessageCount()
-        Assertions.assertTrue(messageCount == 0)
-
-        client.toBlocking().exchange<Any, Any>(HttpRequest.POST("/demo", emptyMap<Any, Any>()))
-        messageCount = demoConsumer.getMessageCount()
-        while (messageCount == 0) {
-            messageCount = demoConsumer.getMessageCount()
-        }
-        Assertions.assertTrue(messageCount == 1)
+        Assertions.assertEquals(0, demoConsumer.getMessageCount())
+        httpClient.toBlocking().exchange<Map<Any, Any>, Any>(HttpRequest.POST("/demo", emptyMap()))
+        Awaitility.await().until({ demoConsumer.getMessageCount() }, Matchers.equalTo(1))
+        Assertions.assertEquals(1, demoConsumer.getMessageCount())
     }
 
-    @NonNull
-    override fun getProperties(): Map<String, String> {
-        return LocalStackUtil.properties
+    companion object {
+        private val localstackImage: DockerImageName = DockerImageName.parse("localstack/localstack:latest")
+        private val localstack: LocalStackContainer = LocalStackContainer(localstackImage)
+            .withServices(LocalStackContainer.Service.SQS)
     }
-
-    @AfterAll
-    fun afterAll() {
-        LocalStackUtil.close()
-    }
-
 }
