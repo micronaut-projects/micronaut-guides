@@ -1,12 +1,13 @@
 package example.micronaut;
 
 import example.micronaut.domain.Genre;
+import io.micronaut.transaction.annotation.ReadOnly;
+import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Singleton;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
@@ -28,13 +29,13 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
-    @Transactional // <3>
+    @ReadOnly // <3>
     public Optional<Genre> findById(long id) {
         return Optional.ofNullable(entityManager.find(Genre.class, id));
     }
 
     @Override
-    @Transactional // <3>
+    @Transactional // <4>
     public Genre save(@NotBlank String name) {
         Genre genre = new Genre(name);
         entityManager.persist(genre);
@@ -42,12 +43,12 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
-    @Transactional // <3>
+    @Transactional // <4>
     public void deleteById(long id) {
         findById(id).ifPresent(entityManager::remove);
     }
 
-    @Transactional // <3>
+    @ReadOnly // <3>
     public List<Genre> findAll(@NotNull SortingAndOrderArguments args) {
         String qlString = "SELECT g FROM Genre as g";
         if (args.order() != null && args.sort() != null && VALID_PROPERTY_NAMES.contains(args.sort())) {
@@ -62,7 +63,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
-    @Transactional // <3>
+    @Transactional // <4>
     public int update(long id, @NotBlank String name) {
         return entityManager.createQuery("UPDATE Genre g SET name = :name where id = :id")
                 .setParameter("name", name)
@@ -71,7 +72,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     }
 
     @Override
-    @Transactional // <3>
+    @Transactional // <4>
     public Genre saveWithException(@NotBlank String name) {
         save(name);
         throw new PersistenceException();
