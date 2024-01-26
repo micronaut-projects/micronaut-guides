@@ -39,5 +39,4 @@ class GraphQLDataFetchers(private val dbRepository: DbRepository) { // <1>
                 .firstOrNull {author: Author -> (author.id == authorBook.id) }
         }
     }
-
 }

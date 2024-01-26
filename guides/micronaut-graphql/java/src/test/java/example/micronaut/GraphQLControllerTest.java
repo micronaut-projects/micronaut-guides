@@ -29,8 +29,11 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest
+@SuppressWarnings("unchecked")
 class GraphQLControllerTest {
 
     @Inject
@@ -39,20 +42,41 @@ class GraphQLControllerTest {
 
     @Test
     void testGraphQLController() {
-        String query = "{ \"query\": \"{ bookById(id:\\\"book-1\\\") { name, pageCount, author { firstName, lastName} } }\" }";
+        Map<String, Object> body = makeRequest("book-1");
+        assertNotNull(body);
 
-        HttpRequest<String> request = HttpRequest.POST("/graphql", query);
-        HttpResponse<Map> rsp = client.toBlocking().exchange(request, Argument.of(Map.class));
-        assertEquals(HttpStatus.OK, rsp.status());
-        assertNotNull(rsp.body());
+        Map<String, Object> bookInfo = (Map<String, Object>) body.get("data");
+        assertTrue(bookInfo.containsKey("bookById"));
 
-        Map bookInfo = (Map) rsp.getBody(Map.class).get().get("data");
-        Map bookById = (Map) bookInfo.get("bookById");
+        Map<String, Object> bookById = (Map<String, Object>) bookInfo.get("bookById");
+
         assertEquals("Harry Potter and the Philosopher's Stone", bookById.get("name"));
         assertEquals(223, bookById.get("pageCount"));
 
-        Map author = (Map) bookById.get("author");
+        Map<String, Object> author = (Map<String, Object>) bookById.get("author");
         assertEquals("Joanne", author.get("firstName"));
         assertEquals("Rowling", author.get("lastName"));
+    }
+
+    @Test
+    void testGraphQLControllerEmptyResponse() {
+        Map<String, Object> body = makeRequest("missing-id");
+        assertNotNull(body);
+
+        Map<String, Object> bookInfo = (Map<String, Object>) body.get("data");
+        assertTrue(bookInfo.containsKey("bookById"));
+
+        Map<String, Object> bookById = (Map<String, Object>) bookInfo.get("bookById");
+        assertNull(bookById);
+    }
+
+    private Map<String, Object> makeRequest(String id) {
+        String query = """
+        { "query": "{ bookById(id:\\"%s\\") { name, pageCount, author { firstName, lastName} } }" }""".formatted(id);
+
+        HttpRequest<String> request = HttpRequest.POST("/graphql", query);
+        HttpResponse<Map<String, Object>> rsp = client.toBlocking().exchange(request, Argument.mapOf(String.class, Object.class));
+        assertEquals(HttpStatus.OK, rsp.status());
+        return rsp.body();
     }
 }

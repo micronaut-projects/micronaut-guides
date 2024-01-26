@@ -50,5 +50,4 @@ public class GraphQLDataFetchers {
                     .orElse(null);
         };
     }
-
 }
