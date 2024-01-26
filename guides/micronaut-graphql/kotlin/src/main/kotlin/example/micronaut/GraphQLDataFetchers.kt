@@ -17,7 +17,6 @@ package example.micronaut
 
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
-import java.util.function.Predicate
 import jakarta.inject.Singleton
 
 @Singleton

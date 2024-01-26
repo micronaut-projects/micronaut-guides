@@ -15,7 +15,6 @@
  */
 package example.micronaut
 
-import java.util.stream.Collectors
 import jakarta.inject.Singleton
 
 @Singleton
