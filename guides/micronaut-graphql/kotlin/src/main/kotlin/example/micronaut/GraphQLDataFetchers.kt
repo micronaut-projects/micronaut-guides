@@ -17,7 +17,6 @@ package example.micronaut
 
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
-import java.util.function.Predicate
 import jakarta.inject.Singleton
 
 @Singleton
@@ -39,5 +38,4 @@ class GraphQLDataFetchers(private val dbRepository: DbRepository) { // <1>
                 .firstOrNull {author: Author -> (author.id == authorBook.id) }
         }
     }
-
 }

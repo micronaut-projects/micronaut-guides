@@ -34,24 +34,32 @@ class GraphQLControllerSpec extends Specification {
     HttpClient client
 
     void 'test graphQL controller'() {
-        given:
-        String query = '{ "query": "{ bookById(id:\\"book-1\\") { name, pageCount, author { firstName, lastName} } }" }'
-
         when:
-        HttpRequest request = HttpRequest.POST('/graphql', query)
-        HttpResponse<Map> rsp = client.toBlocking().exchange(request, Argument.of(Map))
+        def body = makeRequest("book-1")
 
         then:
-        rsp.status() == HttpStatus.OK
-        rsp.body()
+        body.data.bookById.name == "Harry Potter and the Philosopher's Stone"
+        body.data.bookById.pageCount == 223
+        body.data.bookById.author.firstName == 'Joanne'
+        body.data.bookById.author.lastName == 'Rowling'
+    }
 
-        and:
-        Map bookInfo = rsp.getBody(Map).get()
-        bookInfo.data.bookById
-        bookInfo.data.bookById.name == "Harry Potter and the Philosopher's Stone"
-        bookInfo.data.bookById.pageCount == 223
-        bookInfo.data.bookById.author
-        bookInfo.data.bookById.author.firstName == 'Joanne'
-        bookInfo.data.bookById.author.lastName == 'Rowling'
+    void 'test graphQL controller empty response'() {
+        when:
+        def body = makeRequest("missing-id")
+
+        then:
+        body.data.containsKey("bookById")
+        body.data.bookById == null
+    }
+
+    private Map<String, Object> makeRequest(String id) {
+        String query = """{ "query": "{ bookById(id:\\"$id\\") { name, pageCount, author { firstName, lastName} } }" }"""
+        HttpRequest<String> request = HttpRequest.POST('/graphql', query)
+        HttpResponse<Map<String, Object>> rsp = client.toBlocking().exchange(request, Argument.mapOf(String, Object))
+
+        assert rsp.status() == HttpStatus.OK
+        assert rsp.body()
+        rsp.body()
     }
 }

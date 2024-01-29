@@ -15,19 +15,14 @@
  */
 package example.micronaut
 
+import groovy.transform.Immutable
 import io.micronaut.core.annotation.Introspected
 
 @Introspected
+@Immutable
 class Author {
 
-    final String id
-    final String firstName
-    final String lastName
-
-    Author(String id, String firstName, String lastName) {
-        this.id = id
-        this.firstName = firstName
-        this.lastName = lastName
-    }
-
+    String id
+    String firstName
+    String lastName
 }
