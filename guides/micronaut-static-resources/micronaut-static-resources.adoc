@@ -1,0 +1,89 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:micronaut-views-thymeleaf.adoc[]
+
+=== Thymeleaf template
+
+Create a Thymeleaf template in `src/main/resources/views/index.html`:
+
+resource:views/index.html[]
+
+<1> Include the CSS file from our static assets
+<2> Include a PNG from our static assets
+<3> Use the `th:text` attribute to set the element's text
+
+== Message service
+
+Create an interface which describes our message service.
+
+source:MessageService[]
+
+And then create a default implementation of the service.
+
+source:MyMessageService[]
+callout:singleton[1]
+
+== Controller
+
+Create a controller that takes a name and generates our templated HTML page.
+
+source:MainController[]]
+callout:controller[number=1,arg0=/]
+callout:injection[number=2,arg0=MessageService]
+callout:view[3]
+callout:get[number=4,arg0=sayHello,arg1=/hello/{name}]
+callout:constraints[5]
+
+== Assets
+
+Then create a static CSS file in `src/main/resources/static/css/style.css`:
+
+resource:static/css/style.css[]
+
+And a static PNG file in `src/main/resources/static/images/micronaut_stacked_black.png`:
+
+image:micronaut_stacked_black.png[width=253]
+
+We can then add a static-mapping to our `application.properties` so that any missing requests are attempted to be resolved from the static assets:
+
+resource:application.properties[tag=assets]
+
+- The first line matches any request to the server that does not match a controller route.
+- The second line defines that the classpath inside a root static directory should be searched for the resource.
+
+This means that a request to `/css/style.css` will be resolved to `src/main/resources/static/css/style.css` (if that resource exists and there is no matching controller path).
+
+== Testing
+
+Create a test that verifies the MessageService is working as expected.
+
+test:MessageServiceTest[]
+
+callout:micronaut-test[1]
+<2> Inject the `MessageService` bean.
+
+And another that verifies the generated HTML contains the expected text.
+
+test:MainControllerTest[]
+callout:micronaut-test[1]
+callout:http-client[2]
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+Visit http://localhost:8080/hello/Micronaut and the browser displays our templated HTML page with styling and an image.
+
+common:next.adoc[]
+
+Learn more about https://docs.micronaut.io/latest/guide/index.html#staticResources[static resources in the Micronaut Framework]
+
+View other https://guides.micronaut.io/latest/tag-static-resources.html[guides tagged with static-resources]
+
+common:helpWithMicronaut.adoc[]
