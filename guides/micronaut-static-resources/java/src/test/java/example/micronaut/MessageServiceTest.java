@@ -37,8 +37,8 @@ class MessageServiceTest {
     @Test
     void testValidationWithNull() {
         ConstraintViolationException exception = assertThrows(ConstraintViolationException.class, () -> service.sayHello(null));
-        assertEquals(2, exception.getConstraintViolations().size());
-        assertEquals("sayHello.name: must not be null, sayHello.name: must not be blank", exception.getLocalizedMessage());
+        assertEquals(1, exception.getConstraintViolations().size());
+        assertEquals("sayHello.name: must not be blank", exception.getLocalizedMessage());
     }
 
     @Test

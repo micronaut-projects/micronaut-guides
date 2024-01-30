@@ -20,7 +20,6 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.views.View;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.Map;
 
@@ -37,7 +36,7 @@ class MainController {
 
     @View("index.html") // <3>
     @Get(value = "/hello/{name}", produces = TEXT_HTML) // <4>
-    Map<String, String> index(@NonNull @NotNull @NotBlank String name) { // <5>
+    Map<String, String> index(@NonNull @NotBlank String name) { // <5>
         return Map.of("message", messageService.sayHello(name));
     }
 }

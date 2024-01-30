@@ -18,13 +18,12 @@ package example.micronaut;
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Singleton // <1>
 class MyMessageService implements MessageService {
 
     @Override
-    public String sayHello(@NonNull @NotNull @NotBlank String name) {
+    public String sayHello(@NonNull @NotBlank String name) {
         return "Hello %s!".formatted(name);
     }
 }

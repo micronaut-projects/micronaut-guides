@@ -17,9 +17,8 @@ package example.micronaut;
 
 import io.micronaut.core.annotation.NonNull;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 interface MessageService {
 
-    String sayHello(@NonNull @NotNull @NotBlank String name);
+    String sayHello(@NonNull @NotBlank String name);
 }
