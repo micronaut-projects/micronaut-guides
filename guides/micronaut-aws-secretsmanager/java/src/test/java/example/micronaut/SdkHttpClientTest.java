@@ -15,6 +15,8 @@
  */
 package example.micronaut;
 
+import io.micronaut.context.annotation.Property;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import software.amazon.awssdk.http.SdkHttpClient;
 import jakarta.inject.Inject;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Property(name = "micronaut.config-client.enabled", value = StringUtils.FALSE)
 @MicronautTest(startApplication = false)
 public class SdkHttpClientTest {
     @Inject

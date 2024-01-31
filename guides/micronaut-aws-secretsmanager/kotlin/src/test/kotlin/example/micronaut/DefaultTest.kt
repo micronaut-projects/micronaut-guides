@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut;
+package example.micronaut
 
-import io.micronaut.context.annotation.Property;
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
-import jakarta.inject.Inject;
+import io.micronaut.context.annotation.Property
+import io.micronaut.core.util.StringUtils
+import io.micronaut.runtime.EmbeddedApplication
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
+@MicronautTest
 @Property(name = "micronaut.config-client.enabled", value = StringUtils.FALSE)
-@MicronautTest(startApplication = false)
-public class SecretsManagerClientTest {
+class DefaultTest {
+
     @Inject
-    ApplicationContext applicationContext;
+    lateinit var application: EmbeddedApplication<*>
 
     @Test
-    void testBeanOfTypeSecretsManagerClientExists() {
-        assertTrue(applicationContext.containsBean(SecretsManagerClient.class));
+    fun testItWorks() {
+        assertTrue(application.isRunning)
     }
 }

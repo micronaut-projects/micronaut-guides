@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut;
+package example.micronaut
 
-import io.micronaut.runtime.EmbeddedApplication;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import jakarta.inject.Inject;
+import io.micronaut.context.annotation.Property
+import io.micronaut.core.util.StringUtils
+import io.micronaut.runtime.EmbeddedApplication
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import jakarta.inject.Inject
+import spock.lang.Specification
 
 @MicronautTest
-class MicronautguideTest {
+@Property(name = "micronaut.config-client.enabled", value = StringUtils.FALSE)
+class DefaultSpec extends Specification {
 
     @Inject
-    EmbeddedApplication<?> application;
+    EmbeddedApplication application
 
-    @Test
     void testItWorks() {
-        assertTrue(application.isRunning());
+        expect:
+        application.isRunning()
     }
-
 }
