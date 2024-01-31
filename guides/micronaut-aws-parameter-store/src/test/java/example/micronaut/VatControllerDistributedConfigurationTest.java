@@ -44,7 +44,7 @@ class VatControllerDistributedConfigurationTest implements TestPropertyProvider 
 
     private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:latest");
     private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
-            .withServices(LocalStackContainer.Service.SECRETSMANAGER);
+            .withServices(LocalStackContainer.Service.SSM);
 
     @Override
     public @NonNull Map<String, String> getProperties() {
@@ -52,7 +52,7 @@ class VatControllerDistributedConfigurationTest implements TestPropertyProvider 
             localstack.start();
         }
         try (SsmClient ssmClient = SsmClient.builder()
-                .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.SECRETSMANAGER))
+                .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.SSM))
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(localstack.getAccessKey(), localstack.getSecretKey())))
                 .build()
         ) {
@@ -70,7 +70,7 @@ class VatControllerDistributedConfigurationTest implements TestPropertyProvider 
         return Map.of("aws.access-key-id", localstack.getAccessKey(),
                 "aws.secret-key", localstack.getSecretKey(),
                 "aws.region", localstack.getRegion(),
-                "aws.services.ssm.endpoint-override", localstack.getEndpointOverride(LocalStackContainer.Service.SECRETSMANAGER).toString());
+                "aws.services.ssm.endpoint-override", localstack.getEndpointOverride(LocalStackContainer.Service.SSM).toString());
     }
 
     @Test
