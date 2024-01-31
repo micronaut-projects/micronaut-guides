@@ -15,7 +15,6 @@
  */
 package example.micronaut;
 
-import io.micronaut.context.annotation.Property;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.client.BlockingHttpClient;
@@ -37,7 +36,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Property(name = "spec.name", value = "VatControllerDistributedConfigurationTest")
 @MicronautTest(environments = Environment.AMAZON_EC2) // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
 class VatControllerDistributedConfigurationTest implements TestPropertyProvider { // <3>

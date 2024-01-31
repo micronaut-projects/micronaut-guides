@@ -39,7 +39,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Property(name = "spec.name", value = "VatControllerDistributedConfigurationTest")
 @MicronautTest(environments = {Environment.AMAZON_EC2, "ch"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Property(name = "aws.distributed-configuration.search-active-environments", value = StringUtils.TRUE)
