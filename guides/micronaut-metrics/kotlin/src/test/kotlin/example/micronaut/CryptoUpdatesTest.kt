@@ -43,10 +43,10 @@ class CryptoUpdatesTest {
     fun beforeAll() {
 
         kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer::class.java,
-                mapOf("spec.name" to "MetricsTestKucoin"))
+            mapOf("spec.name" to "MetricsTestKucoin"))
 
         embeddedServer = ApplicationContext.run(EmbeddedServer::class.java,
-                mapOf("micronaut.http.services.kucoin.url" to "http://localhost:" + kucoinEmbeddedServer.getPort()))
+            mapOf("micronaut.http.services.kucoin.url" to "http://localhost:" + kucoinEmbeddedServer.getPort()))
     }
 
     @AfterAll
@@ -59,6 +59,7 @@ class CryptoUpdatesTest {
     fun testCryptoUpdates() {
         val cryptoService = embeddedServer.applicationContext.getBean(CryptoService::class.java)
         val meterRegistry = embeddedServer.applicationContext.getBean(MeterRegistry::class.java)
+
         val counter = meterRegistry.counter("bitcoin.price.checks")
         val timer = meterRegistry.timer("bitcoin.price.time")
 
@@ -67,7 +68,7 @@ class CryptoUpdatesTest {
 
         val checks = 3
 
-        for (i in 0 until checks) {
+        repeat(3) {
             cryptoService.updatePrice()
         }
 
@@ -79,23 +80,19 @@ class CryptoUpdatesTest {
     @Controller
     class MockKucoinController {
 
-        private val RESPONSE = """
-{
-   "code":"200000",
-   "data":{
-      "time":1654865889872,
-      "sequence":"1630823934334",
-      "price":"29670.4",
-      "size":"0.00008436",
-      "bestBid":"29666.4",
-      "bestBidSize":"0.16848947",
-      "bestAsk":"29666.5",
-      "bestAskSize":"2.37840044"
-   }
-}
-"""
-
         @Get("/api/v1/market/orderbook/level1")
-        fun latest(@QueryValue symbol: String?) = RESPONSE
+        fun latest(@QueryValue symbol: String?) = """{
+                                 |  "code":"200000",
+                                 |  "data":{
+                                 |     "time":1654865889872,
+                                 |     "sequence":"1630823934334",
+                                 |     "price":"29670.4",
+                                 |     "size":"0.00008436",
+                                 |     "bestBid":"29666.4",
+                                 |     "bestBidSize":"0.16848947",
+                                 |     "bestAsk":"29666.5",
+                                 |     "bestAskSize":"2.37840044"
+                                 |  }
+                                 |}""".trimMargin()
     }
 }

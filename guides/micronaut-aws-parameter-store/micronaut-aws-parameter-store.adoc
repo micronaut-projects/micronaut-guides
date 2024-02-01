@@ -49,11 +49,13 @@ dependency:micronaut-aws-parameter-store[groupId=io.micronaut.aws]
 
 common:enable-distributed-configuration.adoc[]
 
+common:distributed-configuration-search.adoc[]
+
 === Enable Distributed Configuration with AWS Parameter Store
 
 Add the following configuration to enable distributed configuration with AWS Parameter Store:
 
-resource:bootstrap.yml[tag=parameterstore]
+resource:bootstrap.properties[tag=parameterstore]
 
 <1> With `aws.client.system-manager.parameterstore.enabled` enable distributed configuration with AWS Parameter Store.
 
@@ -103,7 +105,7 @@ You will get an output such as:
 ----
 06:41:44.364 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
 06:41:44.377 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
-06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap-test.yml
+06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap-test.properties
 06:41:46.425 [main] DEBUG i.m.d.c.c.DistributedPropertySourceLocator - Resolving configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
 06:41:47.811 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
 06:41:47.813 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application, pagination requested: false
@@ -166,7 +168,7 @@ You will get an output such as:
 ----
 06:41:44.364 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
 06:41:44.377 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
-06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap-test.yml
+06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap-test.properties
 06:41:46.425 [main] DEBUG i.m.d.c.c.DistributedPropertySourceLocator - Resolving configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
 06:41:47.811 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
 06:41:47.813 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application, pagination requested: false
@@ -206,6 +208,13 @@ AWS Parameter Store is specially powerful in combination with https://docs.micro
 ----
 aws ssm put-parameter --name /config/micronautguide_ch/vat/country --value=Switzerland --type String
 aws ssm put-parameter --name /config/micronautguide_ch/vat/rate --value=7.7 --type String
+----
+
+Enable search for active environments:
+
+[source, properties]
+----
+aws.distributed-configuration.search-active-environments=true
 ----
 
 Set the environment to use `ec2` and `ch`.

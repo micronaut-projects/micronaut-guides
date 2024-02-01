@@ -44,8 +44,8 @@ public class CryptoService {
         meterRegistry.gauge("bitcoin.price.latest", latestPriceUsd); // <5>
     }
 
-    @Scheduled(fixedRate = "${crypto.updateFrequency:1h}",
-            initialDelay = "${crypto.initialDelay:0s}") // <6>
+    @Scheduled(fixedRate = "${crypto.update-frequency:1h}",
+            initialDelay = "${crypto.initial-delay:0s}") // <6>
     public void updatePrice() {
         time.record(() -> { // <7>
             try {
