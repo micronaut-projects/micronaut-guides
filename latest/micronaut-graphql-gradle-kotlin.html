@@ -102,10 +102,11 @@
 <li><a href="#graphql">5. GraphQL</a>
 <ul class="sectlevel2">
 <li><a href="#describe-your-schema">5.1. Describe your schema</a></li>
-<li><a href="#book-and-author-classes">5.2. Book and Author classes</a></li>
-<li><a href="#data-repository">5.3. Data repository</a></li>
-<li><a href="#data-fetchers">5.4. Data Fetchers</a></li>
-<li><a href="#factory">5.5. Factory</a></li>
+<li><a href="#configure-jackson">5.2. Configure Jackson</a></li>
+<li><a href="#book-and-author-classes">5.3. Book and Author classes</a></li>
+<li><a href="#data-repository">5.4. Data repository</a></li>
+<li><a href="#data-fetchers">5.5. Data Fetchers</a></li>
+<li><a href="#factory">5.6. Factory</a></li>
 </ul>
 </li>
 <li><a href="#running-the-application">6. Running the Application</a></li>
@@ -285,7 +286,23 @@ type Author { <i class="conum" data-value="3"></i><b>(3)</b>
 </div>
 </div>
 <div class="sect2">
-<h3 id="book-and-author-classes">5.2. Book and Author classes</h3>
+<h3 id="configure-jackson">5.2. Configure Jackson</h3>
+<div class="paragraph">
+<p>For Jackson serialization with GraphQL it&#8217;s necessary to add the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties">jackson.serialization-inclusion=ALWAYS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This prevents Jackson from removing null or empty values from the response.
+These are often required by GraphQL clients.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="book-and-author-classes">5.3. Book and Author classes</h3>
 <div class="paragraph">
 <p>Create <code>Book</code> and <code>Author</code> classes that will mimic the data we want to expose:</p>
 </div>
@@ -313,7 +330,7 @@ class Author(val id: String, val firstName: String, val lastName: String)</code>
 </div>
 </div>
 <div class="sect2">
-<h3 id="data-repository">5.3. Data repository</h3>
+<h3 id="data-repository">5.4. Data repository</h3>
 <div class="paragraph">
 <p>To keep this example simple, instead of retrieving the information from a database we will keep it in memory and just return it from there. In a real-world example you will use any external storage: relational database, SQL database, etc.</p>
 </div>
@@ -325,7 +342,6 @@ class Author(val id: String, val firstName: String, val lastName: String)</code>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
-import java.util.stream.Collectors
 import jakarta.inject.Singleton
 
 @Singleton
@@ -359,7 +375,7 @@ class DbRepository {
 </div>
 </div>
 <div class="sect2">
-<h3 id="data-fetchers">5.4. Data Fetchers</h3>
+<h3 id="data-fetchers">5.5. Data Fetchers</h3>
 <div class="paragraph">
 <p>With a Data Fetcher we bind the GraphQL schema, and our domain model and execute the appropiate queries in our datastore
 to retrieve the requested data.</p>
@@ -374,7 +390,6 @@ to retrieve the requested data.</p>
 
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
-import java.util.function.Predicate
 import jakarta.inject.Singleton
 
 @Singleton
@@ -396,7 +411,6 @@ class GraphQLDataFetchers(private val dbRepository: DbRepository) { <i class="co
                 .firstOrNull {author: Author -&gt; (author.id == authorBook.id) }
         }
     }
-
 }</code></pre>
 </div>
 </div>
@@ -434,7 +448,7 @@ class GraphQLDataFetchers(private val dbRepository: DbRepository) { <i class="co
 </div>
 </div>
 <div class="sect2">
-<h3 id="factory">5.5. Factory</h3>
+<h3 id="factory">5.6. Factory</h3>
 <div class="paragraph">
 <p>Create the following factory that will bind the GraphQL schema to the code and types.</p>
 </div>
@@ -613,29 +627,55 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
 
 @MicronautTest
-class GraphQLControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+class GraphQLControllerTest(@Client(&quot;/&quot;) private val client: HttpClient) {
 
     @Test
     fun testGraphQLController() {
-        val query = &quot;{ \&quot;query\&quot;: \&quot;{ bookById(id:\\\&quot;book-1\\\&quot;) { name, pageCount, author { firstName, lastName} } }\&quot; }&quot;
-        val request: HttpRequest&lt;String&gt; = HttpRequest.POST(&quot;/graphql&quot;, query)
+        val body = makeRequest(&quot;book-1&quot;)
+        assertNotNull(body)
 
-        val rsp = client.toBlocking().exchange(request, Argument.of(Map::class.java))
-        assertEquals(HttpStatus.OK, rsp.status())
-        assertNotNull(rsp.body())
+        val bookInfo = body[&quot;data&quot;] as Map&lt;*, *&gt;
+        assertTrue(bookInfo.containsKey(&quot;bookById&quot;))
 
-        val bookInfo = rsp.getBody(Map::class.java).get()[&quot;data&quot;] as Map&lt;*, *&gt;
-        val bookById = bookInfo[&quot;bookById&quot;] as Map&lt;*, *&gt;?
-        assertEquals(&quot;Harry Potter and the Philosopher's Stone&quot;, bookById!![&quot;name&quot;])
+        val bookById = bookInfo[&quot;bookById&quot;] as Map&lt;*, *&gt;
+
+        assertEquals(&quot;Harry Potter and the Philosopher's Stone&quot;, bookById[&quot;name&quot;])
         assertEquals(223, bookById[&quot;pageCount&quot;])
 
-        val author = bookById[&quot;author&quot;] as Map&lt;*, *&gt;?
-        assertEquals(&quot;Joanne&quot;, author!![&quot;firstName&quot;])
+        val author = bookById[&quot;author&quot;] as Map&lt;*, *&gt;
+        assertEquals(&quot;Joanne&quot;, author[&quot;firstName&quot;])
         assertEquals(&quot;Rowling&quot;, author[&quot;lastName&quot;])
+    }
+
+    @Test
+    fun testGraphQLControllerEmptyResponse() {
+        val body = makeRequest(&quot;missing-id&quot;)
+        assertNotNull(body)
+
+        val bookInfo = body[&quot;data&quot;] as Map&lt;*, *&gt;
+        assertTrue(bookInfo.containsKey(&quot;bookById&quot;))
+
+        val bookById = bookInfo[&quot;bookById&quot;]
+        assertNull(bookById)
+    }
+
+    private fun makeRequest(id: String): Map&lt;String, Any&gt; {
+        val query = &quot;&quot;&quot;{ &quot;query&quot;: &quot;{ bookById(id:\&quot;$id\&quot;) { name, pageCount, author { firstName, lastName} } }&quot; }&quot;&quot;&quot;
+
+        val request: HttpRequest&lt;String&gt; = HttpRequest.POST(&quot;/graphql&quot;, query)
+        val rsp = client.toBlocking().exchange(
+            request, Argument.mapOf(
+                String::class.java,
+                Any::class.java
+            )
+        )
+        assertEquals(HttpStatus.OK, rsp.status())
+        return rsp.body()
     }
 }</code></pre>
 </div>
@@ -663,24 +703,10 @@ GraphiQL is the GraphQL integrated development environment, and it helps to exec
 <div class="paragraph">
 <p>It should only be used for development, so it&#8217;s not enabled by default. Add the following configuration to enable it:</p>
 </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
-</div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">graphql</span>:
-  <span class="key">graphiql</span>:
-    <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties">graphql.graphiql.enabled=true</code></pre>
 </div>
 </div>
 <div class="paragraph">

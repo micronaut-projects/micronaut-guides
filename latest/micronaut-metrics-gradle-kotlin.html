@@ -203,7 +203,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=yaml,micrometer-annotation,data-jdbc,flyway,graalvm,validation,http-client \
+    --features=micrometer-annotation,data-jdbc,flyway,graalvm,validation,http-client \
     --build=gradle \
     --lang=kotlin \
     --test=junit</code></pre>
@@ -225,7 +225,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>micrometer-annotation</code>, <code>data-jdbc</code>, <code>flyway</code>, <code>graalvm</code>, <code>validation</code>, and <code>http-client</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>micrometer-annotation</code>, <code>data-jdbc</code>, <code>flyway</code>, <code>graalvm</code>, <code>validation</code>, and <code>http-client</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -234,7 +234,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=micrometer-annotation&amp;features=data-jdbc&amp;features=flyway&amp;features=graalvm&amp;features=validation&amp;features=http-client&amp;features=spotless&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=micrometer-annotation&amp;features=data-jdbc&amp;features=flyway&amp;features=graalvm&amp;features=validation&amp;features=http-client&amp;features=spotless&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -248,41 +248,21 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>Several groups of metrics are enabled by default; these include system metrics (JVM info, uptime, etc.), as well as metrics tracking web requests, DataSource activity, and others. Overall metrics can be enabled or disabled, and groups can be individually enabled or disabled in configuration.</p>
 </div>
 <div class="paragraph">
-<p>Add the following to <code>application.yml</code>:</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
+<p>Add the following to <code>application.properties</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">metrics</span>:
-    <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="key">binders</span>: <i class="conum" data-value="2"></i><b>(2)</b>
-      <span class="key">files</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">jdbc</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">jvm</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">logback</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">processor</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">uptime</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">web</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+micronaut.metrics.enabled=true
+<i class="conum" data-value="2"></i><b>(2)</b>
+micronaut.metrics.binders.files.enabled=true
+micronaut.metrics.binders.jdbc.enabled=true
+micronaut.metrics.binders.jvm.enabled=true
+micronaut.metrics.binders.logback.enabled=true
+micronaut.metrics.binders.processor.enabled=true
+micronaut.metrics.binders.uptime.enabled=true
+micronaut.metrics.binders.web.enabled=true</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -345,25 +325,11 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="paragraph">
 <p>We will enable Flyway in the Micronaut configuration file and configure it to perform migrations on one of the defined data sources.</p>
 </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
-</div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">flyway</span>:
-  <span class="key">datasources</span>:
-    <span class="key">default</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+flyway.datasources.default.enabled=true</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -678,28 +644,21 @@ abstract class PriceClient {
 <div class="sect3">
 <h4 id="http-service-configuration">4.9.3. HTTP Service Configuration</h4>
 <div class="paragraph">
-<p>Modify <code>application.yml</code> to configure the URL for the <code>kucoin</code> Service ID:</p>
+<p>Modify <code>application.properties</code> to configure the URL for the <code>kucoin</code> Service ID:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">http</span>:
-    <span class="key">services</span>:
-      <span class="key">kucoin</span>: <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="key">urls</span>:
-          - <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.kucoin.com</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<i class="conum" data-value="2"></i><b>(2)</b>
+micronaut.http.services.kucoin.url=https://api.kucoin.com</code></pre>
 </div>
 </div>
 <div class="colist arabic">
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The ID we used with <code>@Client</code></td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The URL for the <code>kucoin</code> service</td>
+<td>The ID we used with <code>@Client</code> and the URL for the <code>kucoin</code> service</td>
 </tr>
 </table>
 </div>
@@ -739,8 +698,8 @@ class CryptoService constructor(
         meterRegistry.gauge(&quot;bitcoin.price.latest&quot;, latestPriceUsd) <i class="conum" data-value="5"></i><b>(5)</b>
     }
 
-    @Scheduled(fixedRate = &quot;\${crypto.updateFrequency:1h}&quot;,
-            initialDelay = &quot;\${crypto.initialDelay:0s}&quot;) <i class="conum" data-value="6"></i><b>(6)</b>
+    @Scheduled(fixedRate = &quot;\${crypto.update-frequency:1h}&quot;,
+            initialDelay = &quot;\${crypto.initial-delay:0s}&quot;) <i class="conum" data-value="6"></i><b>(6)</b>
     fun updatePrice() {
         time.recordCallable { <i class="conum" data-value="7"></i><b>(7)</b>
             try {
@@ -802,13 +761,13 @@ class CryptoService constructor(
 <h2 id="testing-the-application">5. Testing the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Create the <code>src/test/resources/application-test.yml</code> configuration file for tests.</p>
+<p>Create the <code>src/test/resources/application-test.properties</code> configuration file for tests.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/resources/application-test.yml</div>
+<div class="title">src/test/resources/application-test.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">crypto</span>:
-  <span class="key">initialDelay</span>: <span class="string"><span class="content">10h </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+crypto.initial-delay=10h</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1026,10 +985,10 @@ class CryptoUpdatesTest {
     fun beforeAll() {
 
         kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer::class.java,
-                mapOf(&quot;spec.name&quot; to &quot;MetricsTestKucoin&quot;))
+            mapOf(&quot;spec.name&quot; to &quot;MetricsTestKucoin&quot;))
 
         embeddedServer = ApplicationContext.run(EmbeddedServer::class.java,
-                mapOf(&quot;micronaut.http.services.kucoin.url&quot; to &quot;http://localhost:&quot; + kucoinEmbeddedServer.getPort()))
+            mapOf(&quot;micronaut.http.services.kucoin.url&quot; to &quot;http://localhost:&quot; + kucoinEmbeddedServer.getPort()))
     }
 
     @AfterAll
@@ -1042,6 +1001,7 @@ class CryptoUpdatesTest {
     fun testCryptoUpdates() {
         val cryptoService = embeddedServer.applicationContext.getBean(CryptoService::class.java)
         val meterRegistry = embeddedServer.applicationContext.getBean(MeterRegistry::class.java)
+
         val counter = meterRegistry.counter(&quot;bitcoin.price.checks&quot;)
         val timer = meterRegistry.timer(&quot;bitcoin.price.time&quot;)
 
@@ -1050,7 +1010,7 @@ class CryptoUpdatesTest {
 
         val checks = 3
 
-        for (i in 0 until checks) {
+        repeat(3) {
             cryptoService.updatePrice()
         }
 
@@ -1062,24 +1022,20 @@ class CryptoUpdatesTest {
     @Controller
     class MockKucoinController {
 
-        private val RESPONSE = &quot;&quot;&quot;
-{
-   &quot;code&quot;:&quot;200000&quot;,
-   &quot;data&quot;:{
-      &quot;time&quot;:1654865889872,
-      &quot;sequence&quot;:&quot;1630823934334&quot;,
-      &quot;price&quot;:&quot;29670.4&quot;,
-      &quot;size&quot;:&quot;0.00008436&quot;,
-      &quot;bestBid&quot;:&quot;29666.4&quot;,
-      &quot;bestBidSize&quot;:&quot;0.16848947&quot;,
-      &quot;bestAsk&quot;:&quot;29666.5&quot;,
-      &quot;bestAskSize&quot;:&quot;2.37840044&quot;
-   }
-}
-&quot;&quot;&quot;
-
         @Get(&quot;/api/v1/market/orderbook/level1&quot;)
-        fun latest(@QueryValue symbol: String?) = RESPONSE
+        fun latest(@QueryValue symbol: String?) = &quot;&quot;&quot;{
+                                 |  &quot;code&quot;:&quot;200000&quot;,
+                                 |  &quot;data&quot;:{
+                                 |     &quot;time&quot;:1654865889872,
+                                 |     &quot;sequence&quot;:&quot;1630823934334&quot;,
+                                 |     &quot;price&quot;:&quot;29670.4&quot;,
+                                 |     &quot;size&quot;:&quot;0.00008436&quot;,
+                                 |     &quot;bestBid&quot;:&quot;29666.4&quot;,
+                                 |     &quot;bestBidSize&quot;:&quot;0.16848947&quot;,
+                                 |     &quot;bestAsk&quot;:&quot;29666.5&quot;,
+                                 |     &quot;bestAskSize&quot;:&quot;2.37840044&quot;
+                                 |  }
+                                 |}&quot;&quot;&quot;.trimMargin()
     }
 }</code></pre>
 </div>

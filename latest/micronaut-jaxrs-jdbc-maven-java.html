@@ -214,7 +214,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=yaml,jax-rs,data-jdbc,mysql,flyway,graalvm,serialization-jackson,validation \
+    --features=jax-rs,data-jdbc,mysql,flyway,graalvm,serialization-jackson,validation \
     --build=maven \
     --lang=java \
     --test=junit</code></pre>
@@ -236,7 +236,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>jax-rs</code>, <code>data-jdbc</code>, <code>mysql</code>, <code>flyway</code>, <code>graalvm</code>, <code>serialization-jackson</code>, and <code>validation</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>jax-rs</code>, <code>data-jdbc</code>, <code>mysql</code>, <code>flyway</code>, <code>graalvm</code>, <code>serialization-jackson</code>, and <code>validation</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -245,7 +245,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=jax-rs&amp;features=data-jdbc&amp;features=mysql&amp;features=flyway&amp;features=graalvm&amp;features=serialization-jackson&amp;features=validation&amp;features=spotless&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=jax-rs&amp;features=data-jdbc&amp;features=mysql&amp;features=flyway&amp;features=graalvm&amp;features=serialization-jackson&amp;features=validation&amp;features=spotless&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -256,28 +256,14 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="sect2">
 <h3 id="data-source-configuration">4.1. Data Source configuration</h3>
 <div class="paragraph">
-<p>Define the datasource in <code>src/main/resources/application.yml</code>.</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
+<p>Define the datasource in <code>src/main/resources/application.properties</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
-  <span class="key">default</span>:
-    <span class="key">db-type</span>: <span class="string"><span class="content">mysql</span></span>
-    <span class="key">dialect</span>: <span class="string"><span class="content">MYSQL</span></span>
-    <span class="key">driver-class-name</span>: <span class="string"><span class="content">com.mysql.cj.jdbc.Driver</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties">datasources.default.db-type=MYSQL
+datasources.default.dialect=MYSQL
+datasources.default.driver-class-name=com.mysql.cj.jdbc.Driver</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -317,25 +303,11 @@ This way of defining the datasource properties enables us to externalize the con
 <div class="paragraph">
 <p>We will enable Flyway in the Micronaut configuration file and configure it to perform migrations on one of the defined data sources.</p>
 </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
-</div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">flyway</span>:
-  <span class="key">datasources</span>:
-    <span class="key">default</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+flyway.datasources.default.enabled=true</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1026,9 +998,7 @@ This can be achieved by adding a configuration specific to that environment like
 <div class="listingblock">
 <div class="title">src/main/resources/application-prod.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">datasources</span>:
-  <span class="key">default</span>:
-    <span class="key">url</span>: <span class="string"><span class="content">jdbc:mysql://production-database/exampleDB?generateSimpleParameterMetadata=true&amp;zeroDateTimeBehavior=convertToNull&amp;verifyServerCertificate=false&amp;useSSL=false</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="yaml"><span class="error">Unresolved directive in micronaut-jaxrs-jdbc-maven-java.adoc - include::build/code/micronaut-jaxrs-jdbc/micronaut-jaxrs-jdbc-maven-java/src/main/resources/application-prod.yml[tag=prod-datasource]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">

@@ -197,7 +197,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=yaml,micrometer-annotation,data-jdbc,flyway,validation,http-client \
+    --features=micrometer-annotation,data-jdbc,flyway,validation,http-client \
     --build=gradle \
     --lang=groovy \
     --test=spock</code></pre>
@@ -219,7 +219,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>micrometer-annotation</code>, <code>data-jdbc</code>, <code>flyway</code>, <code>validation</code>, and <code>http-client</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>micrometer-annotation</code>, <code>data-jdbc</code>, <code>flyway</code>, <code>validation</code>, and <code>http-client</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -228,7 +228,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=yaml&amp;features=micrometer-annotation&amp;features=data-jdbc&amp;features=flyway&amp;features=validation&amp;features=http-client&amp;features=spotless&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=micrometer-annotation&amp;features=data-jdbc&amp;features=flyway&amp;features=validation&amp;features=http-client&amp;features=spotless&amp;lang=GROOVY&amp;build=GRADLE&amp;test=SPOCK&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -242,41 +242,21 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>Several groups of metrics are enabled by default; these include system metrics (JVM info, uptime, etc.), as well as metrics tracking web requests, DataSource activity, and others. Overall metrics can be enabled or disabled, and groups can be individually enabled or disabled in configuration.</p>
 </div>
 <div class="paragraph">
-<p>Add the following to <code>application.yml</code>:</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
+<p>Add the following to <code>application.properties</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">metrics</span>:
-    <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="key">binders</span>: <i class="conum" data-value="2"></i><b>(2)</b>
-      <span class="key">files</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">jdbc</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">jvm</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">logback</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">processor</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">uptime</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span>
-      <span class="key">web</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true</span></span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+micronaut.metrics.enabled=true
+<i class="conum" data-value="2"></i><b>(2)</b>
+micronaut.metrics.binders.files.enabled=true
+micronaut.metrics.binders.jdbc.enabled=true
+micronaut.metrics.binders.jvm.enabled=true
+micronaut.metrics.binders.logback.enabled=true
+micronaut.metrics.binders.processor.enabled=true
+micronaut.metrics.binders.uptime.enabled=true
+micronaut.metrics.binders.web.enabled=true</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -339,25 +319,11 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="paragraph">
 <p>We will enable Flyway in the Micronaut configuration file and configure it to perform migrations on one of the defined data sources.</p>
 </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
-</div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">flyway</span>:
-  <span class="key">datasources</span>:
-    <span class="key">default</span>:
-      <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+flyway.datasources.default.enabled=true</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -726,28 +692,21 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <div class="sect3">
 <h4 id="http-service-configuration">4.9.3. HTTP Service Configuration</h4>
 <div class="paragraph">
-<p>Modify <code>application.yml</code> to configure the URL for the <code>kucoin</code> Service ID:</p>
+<p>Modify <code>application.properties</code> to configure the URL for the <code>kucoin</code> Service ID:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">http</span>:
-    <span class="key">services</span>:
-      <span class="key">kucoin</span>: <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="key">urls</span>:
-          - <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.kucoin.com</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<i class="conum" data-value="2"></i><b>(2)</b>
+micronaut.http.services.kucoin.url=https://api.kucoin.com</code></pre>
 </div>
 </div>
 <div class="colist arabic">
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The ID we used with <code>@Client</code></td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The URL for the <code>kucoin</code> service</td>
+<td>The ID we used with <code>@Client</code> and the URL for the <code>kucoin</code> service</td>
 </tr>
 </table>
 </div>
@@ -791,8 +750,8 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
         meterRegistry.gauge(<span class="string"><span class="delimiter">'</span><span class="content">bitcoin.price.latest</span><span class="delimiter">'</span></span>, latestPriceUsd) <i class="conum" data-value="5"></i><b>(5)</b>
     }
 
-    <span class="annotation">@Scheduled</span>(fixedRate = <span class="string"><span class="delimiter">'</span><span class="content">${crypto.updateFrequency:1h}</span><span class="delimiter">'</span></span>,
-            initialDelay = <span class="string"><span class="delimiter">'</span><span class="content">${crypto.initialDelay:0s}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="annotation">@Scheduled</span>(fixedRate = <span class="string"><span class="delimiter">'</span><span class="content">${crypto.update-frequency:1h}</span><span class="delimiter">'</span></span>,
+            initialDelay = <span class="string"><span class="delimiter">'</span><span class="content">${crypto.initial-delay:0s}</span><span class="delimiter">'</span></span>) <i class="conum" data-value="6"></i><b>(6)</b>
     <span class="type">void</span> updatePrice() {
         time.record(() -&gt; { <i class="conum" data-value="7"></i><b>(7)</b>
             <span class="keyword">try</span> {
@@ -854,13 +813,13 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
 <h2 id="testing-the-application">5. Testing the Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Create the <code>src/test/resources/application-test.yml</code> configuration file for tests.</p>
+<p>Create the <code>src/test/resources/application-test.properties</code> configuration file for tests.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/test/resources/application-test.yml</div>
+<div class="title">src/test/resources/application-test.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">crypto</span>:
-  <span class="key">initialDelay</span>: <span class="string"><span class="content">10h </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+crypto.initial-delay=10h</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1098,7 +1057,7 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
     <span class="annotation">@Shared</span>
     <span class="annotation">@AutoCleanup</span>
     EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer,
-            [<span class="string"><span class="delimiter">'</span><span class="content">micronaut.http.services.kocoin.url</span><span class="delimiter">'</span></span>: <span class="string"><span class="delimiter">'</span><span class="content">http://localhost:</span><span class="delimiter">'</span></span> + kucoinEmbeddedServer.port])
+            [<span class="string"><span class="delimiter">'</span><span class="content">micronaut.http.services.kucoin.url</span><span class="delimiter">'</span></span>: <span class="string"><span class="delimiter">'</span><span class="content">http://localhost:</span><span class="delimiter">'</span></span> + kucoinEmbeddedServer.port])
 
     <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">test crypto updates</span><span class="delimiter">'</span></span>() {
         <span class="key">given</span>:
@@ -1110,17 +1069,17 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
         <span class="predefined-type">Timer</span> timer = meterRegistry.timer(<span class="string"><span class="delimiter">'</span><span class="content">bitcoin.price.time</span><span class="delimiter">'</span></span>)
 
         <span class="key">then</span>:
-        <span class="integer">0</span> == counter.count()
-        <span class="integer">0</span> == timer.totalTime(MILLISECONDS)
+        counter.count() == <span class="integer">0</span>
+        timer.totalTime(MILLISECONDS) == <span class="integer">0</span>
 
         <span class="key">when</span>:
         <span class="type">int</span> checks = <span class="integer">3</span>
-        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="integer">0</span>; i &lt; checks; i++) {
+        checks.times {
             cryptoService.updatePrice()
         }
 
         <span class="key">then</span>:
-        checks == counter.count()
+        counter.count() == checks
         timer.totalTime(MILLISECONDS) &gt; <span class="integer">0</span>
     }
 
@@ -1128,21 +1087,19 @@ Configuring multiple data sources is as simple as enabling Flyway for each one. 
     <span class="annotation">@Controller</span>
     <span class="directive">static</span> <span class="type">class</span> <span class="class">MockKucoinController</span> {
 
-        <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> RESPONSE = <span class="string"><span class="delimiter">'''</span><span class="content">\
-</span><span class="content">{
-   &quot;code&quot;:&quot;200000&quot;,
-   &quot;data&quot;:{
-      &quot;time&quot;:1654865889872,
-      &quot;sequence&quot;:&quot;1630823934334&quot;,
-      &quot;price&quot;:&quot;29670.4&quot;,
-      &quot;size&quot;:&quot;0.00008436&quot;,
-      &quot;bestBid&quot;:&quot;29666.4&quot;,
-      &quot;bestBidSize&quot;:&quot;0.16848947&quot;,
-      &quot;bestAsk&quot;:&quot;29666.5&quot;,
-      &quot;bestAskSize&quot;:&quot;2.37840044&quot;
-   }
-}
-</span><span class="delimiter">'''</span></span>
+        <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> RESPONSE = <span class="string"><span class="delimiter">'''</span><span class="content">{
+                                                 |  &quot;code&quot;:&quot;200000&quot;,
+                                                 |  &quot;data&quot;:{
+                                                 |    &quot;time&quot;:1654865889872,
+                                                 |    &quot;sequence&quot;:&quot;1630823934334&quot;,
+                                                 |    &quot;price&quot;:&quot;29670.4&quot;,
+                                                 |    &quot;size&quot;:&quot;0.00008436&quot;,
+                                                 |    &quot;bestBid&quot;:&quot;29666.4&quot;,
+                                                 |    &quot;bestBidSize&quot;:&quot;0.16848947&quot;,
+                                                 |    &quot;bestAsk&quot;:&quot;29666.5&quot;,
+                                                 |    &quot;bestAskSize&quot;:&quot;2.37840044&quot;
+                                                 |  }
+                                                 |}</span><span class="delimiter">'''</span></span>.stripMargin()
 
         <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/api/v1/market/orderbook/level1</span><span class="delimiter">'</span></span>)
         <span class="predefined-type">String</span> latest(<span class="annotation">@QueryValue</span> <span class="predefined-type">String</span> symbol) {
