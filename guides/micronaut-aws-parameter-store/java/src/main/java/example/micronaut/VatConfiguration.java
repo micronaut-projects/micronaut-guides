@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 
 @ConfigurationProperties("vat") // <1>
 public class VatConfiguration implements Vat { // <2>
+
     @NonNull
     @NotNull
     private BigDecimal rate;

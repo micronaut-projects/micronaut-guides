@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 @Factory
 @BootstrapContextCompatible
 class SsmAsyncClientFactory {
+
     private final SsmConfig config;
 
     SsmAsyncClientFactory(SsmConfig config) {
