@@ -37,7 +37,11 @@ abstract class TestScriptRunnerTask extends DefaultTask {
 
     @TaskAction
     void runScript() {
-        WorkQueue queue = workerExecutor.noIsolation()
+        WorkQueue queue = workerExecutor.processIsolation(workerSpec -> {
+            workerSpec.forkOptions(options -> {
+                options.environment("JAVA_HOME", System.getProperty("java.home"))
+            });
+        })
 
         queue.submit(TestScriptRunnerWorkAction) { parameters ->
             parameters.testScript.set(testScript)
