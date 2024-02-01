@@ -20,5 +20,4 @@ class DefaultTest {
     void testItWorks() {
         Assertions.assertTrue(application.isRunning());
     }
-
 }

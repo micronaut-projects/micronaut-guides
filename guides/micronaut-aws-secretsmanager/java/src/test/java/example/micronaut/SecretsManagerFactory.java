@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 @Factory
 @BootstrapContextCompatible
 class SecretsManagerFactory {
+
     private final SecretsManagerConfig secretsManagerConfig;
 
     SecretsManagerFactory(SecretsManagerConfig secretsManagerConfig) {

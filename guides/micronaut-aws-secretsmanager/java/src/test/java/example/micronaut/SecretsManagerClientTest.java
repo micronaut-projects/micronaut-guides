@@ -15,18 +15,20 @@
  */
 package example.micronaut;
 
+import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.context.ApplicationContext;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
-import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Property(name = "micronaut.config-client.enabled", value = StringUtils.FALSE)
 @MicronautTest(startApplication = false)
-public class SecretsManagerClientTest {
+class SecretsManagerClientTest {
+
     @Inject
     ApplicationContext applicationContext;
 
