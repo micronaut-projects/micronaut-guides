@@ -48,6 +48,7 @@ abstract class TestScriptRunnerTask extends DefaultTask {
         WorkQueue queue = workerExecutor.processIsolation(workerSpec -> {
             workerSpec.forkOptions(options -> {
                 options.environment(buildEnvironment)
+                options.maxHeapSize = "5G"
             });
         })
 
