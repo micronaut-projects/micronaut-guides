@@ -21,6 +21,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 
+import java.math.RoundingMode
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.function.Predicate
@@ -34,6 +35,7 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static final String TASK_SUFFIX_GENERATE_PROJECTS = "GenerateProjects"
     private static final List<Integer> JAVA_MATRIX = [8, 11, 17]
+    private static final int NUMBER_OF_GROUPS = 4
     private static final List<String> FINALIZED_TASKS = ['generateTestScript',
                                                          'generateGuidesIndex',
                                                          'generateGuidesJsonMetadata',
@@ -99,6 +101,16 @@ class GuidesPlugin implements Plugin<Project> {
             it.finalizedBy(FINALIZED_TASKS.stream().map(n -> project.tasks.named(n)).collect(Collectors.toList()))
             it.group = 'guides'
             it.description = 'Generates guide applications at build/code'
+        }
+
+        int groupSize = (sampleTasks.size() / NUMBER_OF_GROUPS).setScale(0, RoundingMode.UP).toInteger()
+
+        sampleTasks.collate(groupSize, true).eachWithIndex { List<Map<String, TaskProvider<Task>>> tasks, int i ->
+            project.tasks.register("runGuideTestsGroup${i + 1}") { Task it ->
+                it.group = 'guides'
+                it.description = "Runs group ${i + 1} of the Guide test scripts (${tasks.size()} guides in this group)"
+                it.dependsOn(sampleTasks.collect { it[TEST_RUNNER] })
+            }
         }
 
         project.tasks.register("runAllGuideTests") { Task it ->
