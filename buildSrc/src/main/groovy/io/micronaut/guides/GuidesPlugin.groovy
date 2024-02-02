@@ -109,7 +109,7 @@ class GuidesPlugin implements Plugin<Project> {
             project.tasks.register("runGuideTestsGroup${i + 1}") { Task it ->
                 it.group = 'guides'
                 it.description = "Runs group ${i + 1} of the Guide test scripts (${tasks.size()} guides in this group)"
-                it.dependsOn(sampleTasks.collect { it[TEST_RUNNER] })
+                it.dependsOn(tasks.collect { it[TEST_RUNNER] })
             }
         }
 
