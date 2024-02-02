@@ -126,7 +126,7 @@ FAILED_PROJECTS=()
 EXIT_STATUS=0
 
 echo "-------------------------------------------------"
-echo " Currently running docker containers
+echo " Currently running docker containers"
 echo "-------------------------------------------------"
 docker ps
 echo "-------------------------------------------------"
