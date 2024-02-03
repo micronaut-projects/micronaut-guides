@@ -12,6 +12,8 @@ jobs:
   test_matrix:
     name: Generate Guide Test Matrix
     runs-on: ubuntu-latest
+    outputs:
+      groups: ${{ steps.test_matrix_step.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
@@ -20,9 +22,14 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
       - name: Generate Guide Test Matrix
+        id: test_matrix_step
         run: |
-          groups=$(./gradlew testGroupMatrix | grep "Groups: " | sed 's/Groups\: \(.+\)/\1/g')
-            echo "groups=$groups" >> $GITHUB_OUTPUT
+          echo "Searching for groups..."
+          gradleTasks=$(./gradlew tasks | grep "Run group of guide tests" | sed 's/\(.*\) - Run group of guide tests/\"\1\"/' | tr '\n' ',' | sed 's/.$//')
+          tasksEntry="\"group_test_tasks\":[$(echo $gradleTasks)]"
+          matrixValue="{$(echo $nativeTestTasksEntry)}"
+          echo "Created matrix: $matrixValue"
+          echo "matrix=$matrixValue" >> $GITHUB_OUTPUT
   alltests:
     name: Guide Tests Group ${{ matrix.group }} - Java ${{ matrix.java }}
     needs: test_matrix
@@ -30,7 +37,7 @@ jobs:
     strategy:
       matrix:
         java: ["17", "21"]
-        group: ${{ fromJson(needs.test_matrix.outputs.groups) }}
+        group: ${{ fromJson(needs.test_matrix.outputs.matrix).group_test_tasks }}
     env:
       JDK_VERSION: ${{ matrix.java }}
     steps:

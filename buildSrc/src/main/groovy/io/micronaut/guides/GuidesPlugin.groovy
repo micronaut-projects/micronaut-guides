@@ -1,6 +1,5 @@
 package io.micronaut.guides
 
-import groovy.json.JsonBuilder
 import groovy.transform.CompileStatic
 import io.micronaut.core.util.CollectionUtils
 import io.micronaut.guides.GuideMetadata.App
@@ -105,17 +104,10 @@ class GuidesPlugin implements Plugin<Project> {
         }
 
         int groupSize = (sampleTasks.size() / NUMBER_OF_GROUPS).setScale(0, RoundingMode.UP).toInteger()
-        project.tasks.register("testGroupMatrix") { Task it ->
-            it.group = 'guides'
-            it.description = "Displays the json for a github matrix for the guide tests"
-            it.doLast {
-                project.logger.lifecycle("Groups: ${new JsonBuilder((1..NUMBER_OF_GROUPS)*.toString()).toString()}")
-            }
-        }
         sampleTasks.collate(groupSize, true).eachWithIndex { List<Map<String, TaskProvider<Task>>> tasks, int i ->
-            project.tasks.register("runGuideTestsGroup${i + 1}") { Task it ->
+            project.tasks.register("testsGroup${i + 1}") { Task it ->
                 it.group = 'guides'
-                it.description = "Runs group ${i + 1} of the Guide test scripts (${tasks.size()} guides in this group)"
+                it.description = "Run group of guide tests"
                 it.dependsOn(tasks.collect { it[TEST_RUNNER] })
             }
         }
