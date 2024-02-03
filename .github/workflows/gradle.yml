@@ -9,13 +9,28 @@ on:
       - master
       - '[1-9]+.[0-9]+.x'
 jobs:
+  test_matrix:
+    name: Generate Guide Test Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+      - name: Generate Guide Test Matrix
+        run: |
+          groups=$(./gradlew testGroupMatrix | grep "Groups: " | sed 's/Groups\: \(.+\)/\1/g')
+            echo "groups=$groups" >> $GITHUB_OUTPUT
   alltests:
     name: Guide Tests Group ${{ matrix.group }} - Java ${{ matrix.java }}
+    needs: test_matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
         java: ["17", "21"]
-        group: ["1", "2", "3", "4"]
+        group: ${{ fromJson(needs.test_matrix.outputs.groups) }}
     env:
       JDK_VERSION: ${{ matrix.java }}
     steps:
