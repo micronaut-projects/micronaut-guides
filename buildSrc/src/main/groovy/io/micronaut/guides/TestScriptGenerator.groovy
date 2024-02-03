@@ -125,12 +125,6 @@ set -e
 FAILED_PROJECTS=()
 EXIT_STATUS=0
 
-echo "-------------------------------------------------"
-echo " Currently running docker containers"
-echo "-------------------------------------------------"
-docker ps
-echo "-------------------------------------------------"
-
 kill_kotlin_daemon () {
   echo "Killing KotlinCompile daemon to pick up fresh properties (due to kapt and java > 17)"
   for daemon in $(jps | grep KotlinCompile | cut -d' ' -f1); do

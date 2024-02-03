@@ -35,7 +35,6 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static final String TASK_SUFFIX_GENERATE_PROJECTS = "GenerateProjects"
     private static final List<Integer> JAVA_MATRIX = [8, 11, 17]
-    private static final int NUMBER_OF_GROUPS = 5
     private static final List<String> FINALIZED_TASKS = ['generateTestScript',
                                                          'generateGuidesIndex',
                                                          'generateGuidesJsonMetadata',
@@ -53,6 +52,11 @@ class GuidesPlugin implements Plugin<Project> {
         GuideProjectGenerator projectGenerator = new GuideProjectGenerator()
         Directory guidesDir = project.layout.projectDirectory.dir("guides")
         Provider<Directory> codeDir = project.layout.buildDirectory.dir("code")
+        Properties testProps = guidesDir.file("tests.properties").asFile.withInputStream { inputStream ->
+            new Properties().tap {
+                load(inputStream)
+            }
+        } as Properties
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(
                 guidesDir.asFile,
                 project.extensions.extraProperties.get("metadataConfigName").toString())
@@ -103,7 +107,9 @@ class GuidesPlugin implements Plugin<Project> {
             it.description = 'Generates guide applications at build/code'
         }
 
-        int groupSize = (sampleTasks.size() / NUMBER_OF_GROUPS).setScale(0, RoundingMode.UP).toInteger()
+        int groupSize = (sampleTasks.size() / Integer.parseInt(testProps.get("numberOfTestGroups") as String))
+                .setScale(0, RoundingMode.UP).toInteger()
+
         sampleTasks.collate(groupSize, true).eachWithIndex { List<Map<String, TaskProvider<Task>>> tasks, int i ->
             project.tasks.register("testsGroup${i + 1}") { Task it ->
                 it.group = 'guides'
