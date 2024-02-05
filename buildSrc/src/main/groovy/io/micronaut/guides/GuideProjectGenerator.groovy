@@ -1,6 +1,5 @@
 package io.micronaut.guides
 
-import groovy.io.FileType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -115,6 +114,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 minimumJavaVersion: config.minimumJavaVersion,
                 maximumJavaVersion: config.maximumJavaVersion,
                 zipIncludes: config.zipIncludes ?: [],
+                env: config.env ?: [:],
                 apps: config.apps.collect { it ->
                     new App(
                             validateLicense: it.validateLicense == null ? true : it.validateLicense,
@@ -128,7 +128,8 @@ class GuideProjectGenerator implements AutoCloseable {
                             groovyFeatures: it.groovyFeatures ?: [],
                             applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                             excludeSource: it.excludeSource,
-                            excludeTest: it.excludeTest)
+                            excludeTest: it.excludeTest,
+                    )
                 }
         ))
     }
@@ -405,6 +406,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.minimumJavaVersion = metadata.minimumJavaVersion ?: base.minimumJavaVersion
         merged.maximumJavaVersion = metadata.maximumJavaVersion ?: base.maximumJavaVersion
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
+        merged.env = metadata.env ?: base.env
         merged.apps = mergeApps(base, metadata)
 
         merged
