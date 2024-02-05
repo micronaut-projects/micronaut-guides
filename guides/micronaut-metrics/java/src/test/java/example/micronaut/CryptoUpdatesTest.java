@@ -83,24 +83,24 @@ public class CryptoUpdatesTest {
     @Requires(property = "spec.name", value = "MetricsTestKucoin")
     @Controller
     static class MockKucoinController {
-        private static final String RESPONSE = "" +
-                "{" +
-                "   'code':'200000'," +
-                "   'data':{" +
-                "      'time':1654865889872," +
-                "      'sequence':'1630823934334'," +
-                "      'price':'29670.4'," +
-                "      'size':'0.00008436'," +
-                "      'bestBid':'29666.4'," +
-                "      'bestBidSize':'0.16848947'," +
-                "      'bestAsk':'29666.5'," +
-                "      'bestAskSize':'2.37840044'" +
-                "   }" +
-                "}";
+        private static final String RESPONSE = """
+                {
+                "code":"200000",
+                   "data":{
+                      "time":1654865889872,
+                      "sequence":"1630823934334",
+                      "price":"29670.4",
+                      "size":"0.00008436",
+                      "bestBid":"29666.4",
+                      "bestBidSize":"0.16848947",
+                      "bestAsk":"29666.5",
+                      "bestAskSize":"2.37840044"
+                   }
+                }""";
 
         @Get("/api/v1/market/orderbook/level1")
         String latest(@QueryValue String symbol) {
-            return RESPONSE.replaceAll("'", "\"");
+            return RESPONSE;
         }
     }
 }
