@@ -15,14 +15,15 @@
  */
 package example.micronaut;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.security.authentication.AuthenticationException;
 import io.micronaut.security.authentication.AuthenticationFailed;
-import io.micronaut.security.authentication.AuthenticationProvider;
 import io.micronaut.security.authentication.AuthenticationRequest;
 import io.micronaut.security.authentication.AuthenticationResponse;
+import io.micronaut.security.authentication.provider.HttpRequestReactiveAuthenticationProvider;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
@@ -42,7 +43,7 @@ import static io.micronaut.security.authentication.AuthenticationFailureReason.U
 import static io.micronaut.security.authentication.AuthenticationFailureReason.USER_NOT_FOUND;
 
 @Singleton // <1>
-class DelegatingAuthenticationProvider implements AuthenticationProvider<HttpRequest<?>> {
+class DelegatingAuthenticationProvider implements HttpRequestReactiveAuthenticationProvider<HttpRequest<?>> {
 
     private final UserFetcher userFetcher;
     private final PasswordEncoder passwordEncoder;
@@ -60,8 +61,9 @@ class DelegatingAuthenticationProvider implements AuthenticationProvider<HttpReq
     }
 
     @Override
-    public Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<?> httpRequest,
-                                                          AuthenticationRequest<?, ?> authenticationRequest) {
+    @NonNull
+    public  Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<HttpRequest<?>> requestContext,
+                                                           @NonNull AuthenticationRequest<String, String> authenticationRequest) {
         return Flux.<AuthenticationResponse>create(emitter -> {
             UserState user = fetchUserState(authenticationRequest);
             AuthenticationFailed authenticationFailed = validate(user, authenticationRequest);
