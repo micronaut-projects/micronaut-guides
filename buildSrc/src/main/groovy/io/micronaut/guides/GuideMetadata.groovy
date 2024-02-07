@@ -36,6 +36,8 @@ class GuideMetadata {
 
     List<String> zipIncludes
 
+    Map<String, String> env
+
     List<App> apps
 
     List<String> getTags() {

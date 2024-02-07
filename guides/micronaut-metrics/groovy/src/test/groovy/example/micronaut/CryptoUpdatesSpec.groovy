@@ -41,7 +41,7 @@ class CryptoUpdatesSpec extends Specification {
     @Shared
     @AutoCleanup
     EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer,
-            ['micronaut.http.services.kocoin.url': 'http://localhost:' + kucoinEmbeddedServer.port])
+            ['micronaut.http.services.kucoin.url': 'http://localhost:' + kucoinEmbeddedServer.port])
 
     void 'test crypto updates'() {
         given:
@@ -53,17 +53,17 @@ class CryptoUpdatesSpec extends Specification {
         Timer timer = meterRegistry.timer('bitcoin.price.time')
 
         then:
-        0 == counter.count()
-        0 == timer.totalTime(MILLISECONDS)
+        counter.count() == 0
+        timer.totalTime(MILLISECONDS) == 0
 
         when:
         int checks = 3
-        for (int i = 0; i < checks; i++) {
+        checks.times {
             cryptoService.updatePrice()
         }
 
         then:
-        checks == counter.count()
+        counter.count() == checks
         timer.totalTime(MILLISECONDS) > 0
     }
 
@@ -71,21 +71,19 @@ class CryptoUpdatesSpec extends Specification {
     @Controller
     static class MockKucoinController {
 
-        private static final String RESPONSE = '''\
-{
-   "code":"200000",
-   "data":{
-      "time":1654865889872,
-      "sequence":"1630823934334",
-      "price":"29670.4",
-      "size":"0.00008436",
-      "bestBid":"29666.4",
-      "bestBidSize":"0.16848947",
-      "bestAsk":"29666.5",
-      "bestAskSize":"2.37840044"
-   }
-}
-'''
+        private static final String RESPONSE = '''{
+                                                 |  "code":"200000",
+                                                 |  "data":{
+                                                 |    "time":1654865889872,
+                                                 |    "sequence":"1630823934334",
+                                                 |    "price":"29670.4",
+                                                 |    "size":"0.00008436",
+                                                 |    "bestBid":"29666.4",
+                                                 |    "bestBidSize":"0.16848947",
+                                                 |    "bestAsk":"29666.5",
+                                                 |    "bestAskSize":"2.37840044"
+                                                 |  }
+                                                 |}'''.stripMargin()
 
         @Get('/api/v1/market/orderbook/level1')
         String latest(@QueryValue String symbol) {

@@ -25,17 +25,14 @@ import io.micronaut.http.annotation.Produces
 import io.micronaut.http.annotation.Controller
 
 @Controller
-class ClientIdController(@Named("companyauthserver") oauthClientConfiguration: OauthClientConfiguration) {
-    private val oauthClientConfiguration: OauthClientConfiguration
+class ClientIdController(
+    @Named("companyauthserver") private val oauthClientConfiguration: OauthClientConfiguration
+) {
 
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Produces(MediaType.TEXT_PLAIN)
     @Get
     fun index(): String {
-        return oauthClientConfiguration.getClientId()
-    }
-
-    init {
-        this.oauthClientConfiguration = oauthClientConfiguration
+        return oauthClientConfiguration.clientId
     }
 }
