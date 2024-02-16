@@ -27,7 +27,7 @@ import jakarta.validation.constraints.NotBlank
 @Repository // <1>
 abstract class GenreRepository: ReactorPageableRepository<Genre, Long> { // <2>
 
-    fun save(@NotBlank name: String): Mono<Genre?> {
+    open fun save(@NotBlank name: String): Mono<Genre?> {
         return save(Genre(id = null, name = name))
     }
 
@@ -39,7 +39,7 @@ abstract class GenreRepository: ReactorPageableRepository<Genre, Long> { // <2>
             }
     }
 
-    fun update(@Id id: Long, @NotBlank name: String): Mono<Genre> {
+    open fun update(@Id id: Long, @NotBlank name: String): Mono<Genre> {
         return update(Genre(id = id, name = name))
     }
 }
