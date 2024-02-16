@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017-2024 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package example.micronaut;
 
 import io.micronaut.core.annotation.Nullable;
@@ -17,6 +32,7 @@ import java.util.stream.Collectors;
  * @see <a href="https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf">LIST OF ITU-T RECOMMENDATION E.164 ASSIGNED COUNTRY CODES</a>
  */
 public enum CountryCode {
+
     AFGHANISTAN("93", "Afghanistan"),
     ALBANIA("355", "Albania (Republic of)"),
     ALGERIA("213", "Algeria (People's Democratic Republic of)"),
@@ -257,16 +273,8 @@ public enum CountryCode {
     ZAMBIA("260", "Zambia (Republic of)"),
     ZIMBABWE("263", "Zimbabwe (Republic of)");
 
-    private String code;
-    private String countryName;
-
-    /**
-     * Constructor for countries whose name matches their enum.
-     * @param code country code
-     */
-    CountryCode(String code) {
-        this.code = code;
-    }
+    private final String code;
+    private final String countryName;
 
     /**
      * Constructor for countries whose name does not match the enum.

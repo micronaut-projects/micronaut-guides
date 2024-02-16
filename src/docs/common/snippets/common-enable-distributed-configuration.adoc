@@ -1,28 +1,30 @@
 === Enable Distributed Configuration
 
-Create a `bootstrap.yml` file in the `resources` directory to https://docs.micronaut.io/latest/guide/#bootstrap[enable distributed configuration].
+Create a `bootstrap.properties` file in the `resources` directory to https://docs.micronaut.io/latest/guide/#bootstrap[enable distributed configuration].
 Add the following:
 
-resource:bootstrap.yml[tag=distributedconfiguration]
+resource:bootstrap.properties[tag=distributedconfiguration]
 
-<1> Set the application name in `bootstrap.yml` instead of `application.yml` so that it is available when reading configuration from distributed sources.
+<1> Set the application name in `bootstrap.properties` instead of `application.properties` so that it is available when reading configuration from distributed sources.
 properties
-<2> Set `microanut.config-client.enabled: true` which is used to read and resolve configuration from distributed sources.
+<2> Set `micronaut.config-client.enabled=true` which is used to read and resolve configuration from distributed sources.
 
 === Clean up Application Configuration
 
-If `application.yml` sets `micronaut.application.name`, remove it. You moved it to `bootstrap.yml`.
+If `application.properties` sets `micronaut.application.name`, remove it. You moved it to `bootstrap.properties`.
 
 [,diff]
-.src/main/resources/application.yml
+.src/main/resources/application.properties
 ----
-- micronaut:
--  application:
--    name: micronautguide
+micronaut.application.name=micronautguide
 ----
 
 === Disable Distributed Configuration for Test
 
-To disable distributed configuration for tests, create a `bootstrap-test.yml` file:
+You can disable distributed configuration in a test by annotating a test with:
 
-testResource:bootstrap-test.yml[]
+[source, java]
+----
+@Property(name = "micronaut.config-client.enabled", value = StringUtils.FALSE)
+@MicronautTest
+----

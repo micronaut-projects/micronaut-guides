@@ -3,6 +3,7 @@ package io.micronaut.guides
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
@@ -27,11 +28,15 @@ import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.options.JdkVersion.JDK_17
+import static io.micronaut.starter.options.JdkVersion.JDK_21
 import static io.micronaut.starter.options.Language.GROOVY
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
 class GuideProjectGenerator implements AutoCloseable {
+    private static final String EXTENSION_JAVA = ".java"
+    private static final String EXTENSION_GROOVY = ".groovy"
+    private static final String EXTENSION_KT = ".kt"
 
     public static final String DEFAULT_APP_NAME = 'default'
 
@@ -39,7 +44,8 @@ class GuideProjectGenerator implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_17]
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_17, JDK_21]
+    public static final String LICENSEHEADER = "LICENSEHEADER"
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
@@ -108,8 +114,10 @@ class GuideProjectGenerator implements AutoCloseable {
                 minimumJavaVersion: config.minimumJavaVersion,
                 maximumJavaVersion: config.maximumJavaVersion,
                 zipIncludes: config.zipIncludes ?: [],
+                env: config.env ?: [:],
                 apps: config.apps.collect { it ->
                     new App(
+                            validateLicense: it.validateLicense == null ? true : it.validateLicense,
                             framework: it.framework,
                             testFramework: it.testFramework?.toUpperCase(),
                             name: it.name,
@@ -120,7 +128,8 @@ class GuideProjectGenerator implements AutoCloseable {
                             groovyFeatures: it.groovyFeatures ?: [],
                             applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
                             excludeSource: it.excludeSource,
-                            excludeTest: it.excludeTest)
+                            excludeTest: it.excludeTest,
+                    )
                 }
         ))
     }
@@ -248,8 +257,28 @@ class GuideProjectGenerator implements AutoCloseable {
                         copyFile(inputDir, destinationRoot, zipInclude)
                     }
                 }
+                addLicenses(new File(outputDir.absolutePath, folder))
             }
         }
+    }
+
+    void addLicenses(File folder) {
+        String licenseHeader = licenseHeaderText()
+        folder.eachFileRecurse (FILES) { file ->
+            if (
+                    (file.path.endsWith(EXTENSION_JAVA) || file.path.endsWith(EXTENSION_GROOVY) || file.path.endsWith(EXTENSION_KT))
+                    && !file.text.contains("Licensed under")
+            ) {
+                file.text = licenseHeader + file.text
+            }
+        }
+    }
+
+    @Memoized
+    private static String licenseHeaderText() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        URL resource = classLoader.getResource(LICENSEHEADER)
+        resource.text.replace('$YEAR', "${LocalDate.now().year}")
     }
 
     private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
@@ -377,6 +406,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.minimumJavaVersion = metadata.minimumJavaVersion ?: base.minimumJavaVersion
         merged.maximumJavaVersion = metadata.maximumJavaVersion ?: base.maximumJavaVersion
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
+        merged.env = metadata.env ?: base.env
         merged.apps = mergeApps(base, metadata)
 
         merged
@@ -398,6 +428,7 @@ class GuideProjectGenerator implements AutoCloseable {
         for (String name : inBoth) {
             App baseApp = baseApps[name]
             App guideApp = guideApps[name]
+            guideApp.validateLicense = baseApp.validateLicense
             guideApp.visibleFeatures.addAll baseApp.visibleFeatures
             guideApp.invisibleFeatures.addAll baseApp.invisibleFeatures
             guideApp.javaFeatures.addAll baseApp.javaFeatures

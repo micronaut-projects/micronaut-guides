@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017-2024 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package example.micronaut
 
 import example.micronaut.crypto.CryptoService
@@ -26,7 +41,7 @@ class CryptoUpdatesSpec extends Specification {
     @Shared
     @AutoCleanup
     EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer,
-            ['micronaut.http.services.kocoin.url': 'http://localhost:' + kucoinEmbeddedServer.port])
+            ['micronaut.http.services.kucoin.url': 'http://localhost:' + kucoinEmbeddedServer.port])
 
     void 'test crypto updates'() {
         given:
@@ -38,17 +53,17 @@ class CryptoUpdatesSpec extends Specification {
         Timer timer = meterRegistry.timer('bitcoin.price.time')
 
         then:
-        0 == counter.count()
-        0 == timer.totalTime(MILLISECONDS)
+        counter.count() == 0
+        timer.totalTime(MILLISECONDS) == 0
 
         when:
         int checks = 3
-        for (int i = 0; i < checks; i++) {
+        checks.times {
             cryptoService.updatePrice()
         }
 
         then:
-        checks == counter.count()
+        counter.count() == checks
         timer.totalTime(MILLISECONDS) > 0
     }
 
@@ -56,21 +71,19 @@ class CryptoUpdatesSpec extends Specification {
     @Controller
     static class MockKucoinController {
 
-        private static final String RESPONSE = '''\
-{
-   "code":"200000",
-   "data":{
-      "time":1654865889872,
-      "sequence":"1630823934334",
-      "price":"29670.4",
-      "size":"0.00008436",
-      "bestBid":"29666.4",
-      "bestBidSize":"0.16848947",
-      "bestAsk":"29666.5",
-      "bestAskSize":"2.37840044"
-   }
-}
-'''
+        private static final String RESPONSE = '''{
+                                                 |  "code":"200000",
+                                                 |  "data":{
+                                                 |    "time":1654865889872,
+                                                 |    "sequence":"1630823934334",
+                                                 |    "price":"29670.4",
+                                                 |    "size":"0.00008436",
+                                                 |    "bestBid":"29666.4",
+                                                 |    "bestBidSize":"0.16848947",
+                                                 |    "bestAsk":"29666.5",
+                                                 |    "bestAskSize":"2.37840044"
+                                                 |  }
+                                                 |}'''.stripMargin()
 
         @Get('/api/v1/market/orderbook/level1')
         String latest(@QueryValue String symbol) {

@@ -1,0 +1,83 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Logback
+
+Configure https://logback.qos.ch[Logback] to log the package `example.micronaut` with `TRACE` level.
+
+[source, xml]
+----
+<configuration>
+    ...
+    <logger name="example.micronaut" level="TRACE"/>
+</configuration>
+
+----
+
+== ServerFilter
+
+Create a filter which logs the non-sensitive HTTP Request headers.
+
+source:LoggingHeadersFilter[]
+
+callout:server-filter-match-all[1]
+callout:at-request-filter[2]
+callout:filter-implementing-order[3]
+
+== Controller
+
+Create a controller which responds a JSON object: `{"message":"Hello World"}`.
+
+source:HelloController[]
+
+callout:controller[number=1,arg0=/]
+callout:get-generic[2]
+callout:json-bydefault[3]
+
+common:runapp.adoc[]
+
+[source,bash]
+----
+curl localhost:8080 -H "X-Request-Id: 1234"
+----
+
+You will see in the logs:
+
+[source, bash]
+----
+... TRACE e.micronaut.LoggingHeadersFilter - Host: localhost:8080
+... TRACE e.micronaut.LoggingHeadersFilter - User-Agent: curl/8.4.0
+... TRACE e.micronaut.LoggingHeadersFilter - Accept: */*
+... TRACE e.micronaut.LoggingHeadersFilter - X-Request-Id: 1234
+----
+
+== Tests
+
+common:logback-test.adoc[]
+
+=== Write tests
+
+Create a `MemoryAppender` to ease testing.
+
+test:MemoryAppender[]
+
+Create a test that verifies the filter logs HTTP header. It masks sensitive HTTP headers.
+
+test:HelloControllerTest[]
+callout:micronaut-test[1]
+callout:http-client[2]
+
+common:testApp.adoc[]
+
+common:next.adoc[]
+
+Learn more about https://docs.micronaut.io/latest/guide/#filtermethods[Filter Methods].
+
+common:helpWithMicronaut.adoc[]
+
+

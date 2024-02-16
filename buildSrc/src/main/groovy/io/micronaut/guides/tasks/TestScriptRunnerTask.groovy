@@ -4,7 +4,9 @@ import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
@@ -29,6 +31,9 @@ abstract class TestScriptRunnerTask extends DefaultTask {
     @PathSensitive(RELATIVE)
     abstract DirectoryProperty getGuideSourceDirectory()
 
+    @Input
+    abstract MapProperty<String, String> getEnvironment()
+
     @OutputFile
     abstract RegularFileProperty getOutputFile()
 
@@ -37,7 +42,15 @@ abstract class TestScriptRunnerTask extends DefaultTask {
 
     @TaskAction
     void runScript() {
-        WorkQueue queue = workerExecutor.noIsolation()
+        Map<String, String> buildEnvironment = environment.get() + [ JAVA_HOME: System.getProperty("java.home") ]
+        logger.lifecycle("Running test script ${testScript.get()} with environment $buildEnvironment")
+
+        WorkQueue queue = workerExecutor.processIsolation(workerSpec -> {
+            workerSpec.forkOptions(options -> {
+                options.environment(buildEnvironment)
+                options.maxHeapSize = "5G"
+            });
+        })
 
         queue.submit(TestScriptRunnerWorkAction) { parameters ->
             parameters.testScript.set(testScript)

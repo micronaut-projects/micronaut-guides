@@ -2,11 +2,11 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
-import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.api.TestFramework
+import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.Language
+
 import java.time.LocalDate
-import java.util.stream.Collectors
 
 @ToString(includeNames = true)
 @CompileStatic
@@ -36,6 +36,8 @@ class GuideMetadata {
 
     List<String> zipIncludes
 
+    Map<String, String> env
+
     List<App> apps
 
     List<String> getTags() {
@@ -45,7 +47,7 @@ class GuideMetadata {
             tagsList.addAll(this.tags)
         }
         for (App app : this.apps) {
-            for (String featureName : app.javaFeatures + app.kotlinFeatures + app.groovyFeatures + app.visibleFeatures + app.invisibleFeatures) {
+            for (String featureName : app.javaFeatures + app.kotlinFeatures + app.groovyFeatures + app.visibleFeatures) {
                 if (featureName.startsWith(MICRONAUT_PREFIX)) {
                     tagsList.add(featureName.substring(MICRONAUT_PREFIX.length()))
                 } else {
@@ -61,6 +63,8 @@ class GuideMetadata {
     @ToString(includeNames = true)
     @CompileStatic
     static class App {
+        boolean validateLicense = true
+        private static final String FEATURE_SPOTLESS = "spotless"
         String framework
         TestFramework testFramework
         ApplicationType applicationType
@@ -75,15 +79,27 @@ class GuideMetadata {
 
         List<String> getFeatures(Language language) {
             if (language == Language.JAVA) {
-                return visibleFeatures + invisibleFeatures + javaFeatures
+                return visibleFeatures + getInvisibleFeatures() + javaFeatures
             }
             if (language == Language.KOTLIN) {
-                return visibleFeatures + invisibleFeatures + kotlinFeatures
+                return visibleFeatures + getInvisibleFeatures() + kotlinFeatures
             }
             if (language == Language.GROOVY) {
-                return visibleFeatures + invisibleFeatures + groovyFeatures
+                return visibleFeatures + getInvisibleFeatures() + groovyFeatures
             }
-            visibleFeatures + invisibleFeatures
+            visibleFeatures + getInvisibleFeatures()
+        }
+
+        List<String> getInvisibleFeatures() {
+            if (validateLicense) {
+                List<String> result = new ArrayList<>()
+                if (invisibleFeatures) {
+                    result.addAll(invisibleFeatures)
+                }
+                result.add(FEATURE_SPOTLESS)
+                return result
+            }
+            return invisibleFeatures
         }
 
         List<String> getVisibleFeatures(Language language) {
