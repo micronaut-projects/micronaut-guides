@@ -294,7 +294,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="sect2">
 <h3 id="authentication-provider">4.2. Authentication Provider</h3>
 <div class="paragraph">
-<p>To keep this guide simple, create a naive <code>AuthenticationProvider</code> to simulate user&#8217;s authentication.</p>
+<p>To keep this guide simple, create a naive reactive <code>AuthenticationProvider</code> to simulate user&#8217;s authentication.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/AuthenticationProviderUserPassword.kt</div>
@@ -302,28 +302,28 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.security.authentication.AuthenticationProvider
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
+import io.micronaut.security.authentication.provider.HttpRequestReactiveAuthenticationProvider
 import jakarta.inject.Singleton
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class AuthenticationProviderUserPassword : AuthenticationProvider&lt;HttpRequest&lt;*&gt;&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+class AuthenticationProviderUserPassword&lt;B&gt; : HttpRequestReactiveAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
 
-    override fun authenticate(httpRequest: HttpRequest&lt;*&gt;?,
-                              authenticationRequest: AuthenticationRequest&lt;*, *&gt;): Publisher&lt;AuthenticationResponse&gt; {
-        return Flux.create({ emitter: FluxSink&lt;AuthenticationResponse&gt; -&gt;
-            if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;) {
-                emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
-                emitter.complete()
-            } else {
-                emitter.error(AuthenticationResponse.exception())
-            }
-        }, FluxSink.OverflowStrategy.ERROR)
-    }
+    override fun authenticate(
+        httpRequest: HttpRequest&lt;B&gt;?,
+        authenticationRequest: AuthenticationRequest&lt;String, String&gt;
+    ) : Publisher&lt;AuthenticationResponse&gt; = Flux.create({ emitter: FluxSink&lt;AuthenticationResponse&gt; -&gt;
+        if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;) {
+            emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
+            emitter.complete()
+        } else {
+            emitter.error(AuthenticationResponse.exception())
+        }
+    }, FluxSink.OverflowStrategy.ERROR)
 }</code></pre>
 </div>
 </div>
@@ -335,7 +335,7 @@ class AuthenticationProviderUserPassword : AuthenticationProvider&lt;HttpRequest
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.AuthenticationProvider</code>.</td>
+<td>A reactive Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.provider.HttpRequestReactiveAuthenticationProvider</code>.</td>
 </tr>
 </table>
 </div>

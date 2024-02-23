@@ -196,7 +196,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=security,reactor,graalvm \
+    --features=security,graalvm \
     --build=gradle \
     --lang=kotlin \
     --test=junit</code></pre>
@@ -218,7 +218,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>security</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>security</code>, and <code>graalvm</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -227,7 +227,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=security&amp;features=reactor&amp;features=graalvm&amp;features=spotless&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
+If you have an existing Micronaut application and want to add the functionality described here, you can <a href="https://micronaut.io/launch?features=security&amp;features=graalvm&amp;features=spotless&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">view the dependency and configuration changes from the specified features</a> and apply those changes to your application.
 </td>
 </tr>
 </table>
@@ -246,26 +246,22 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.security.authentication.AuthenticationProvider
+import io.micronaut.security.authentication.AuthenticationFailureReason
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider
 import jakarta.inject.Singleton
-import org.reactivestreams.Publisher
-import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class AuthenticationProviderUserPassword : AuthenticationProvider&lt;HttpRequest&lt;*&gt;&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
-    override fun authenticate(httpRequest: HttpRequest&lt;*&gt;?,
-                              authenticationRequest: AuthenticationRequest&lt;*, *&gt;): Publisher&lt;AuthenticationResponse&gt; {
-        return Flux.create({ emitter: FluxSink&lt;AuthenticationResponse&gt; -&gt;
-            if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;) {
-                emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
-                emitter.complete()
-            } else {
-                emitter.error(AuthenticationResponse.exception())
-            }
-        }, FluxSink.OverflowStrategy.ERROR)
+class AuthenticationProviderUserPassword&lt;B&gt; : HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    override fun authenticate(
+        httpRequest: HttpRequest&lt;B&gt;?,
+        authenticationRequest: AuthenticationRequest&lt;String, String&gt;
+    ): AuthenticationResponse {
+        return if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;)
+            AuthenticationResponse.success(authenticationRequest.identity) else
+            AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
     }
 }</code></pre>
 </div>
@@ -278,7 +274,7 @@ class AuthenticationProviderUserPassword : AuthenticationProvider&lt;HttpRequest
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.AuthenticationProvider</code>.</td>
+<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</code>.</td>
 </tr>
 </table>
 </div>

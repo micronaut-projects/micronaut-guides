@@ -239,31 +239,22 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationProvider</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailureReason</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</span>;
 <span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>;
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span> <span class="directive">implements</span> AuthenticationProvider&lt;HttpRequest&lt;?&gt;&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
-
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest,
-                                                          AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
-        <span class="keyword">return</span> Flux.create(emitter -&gt; {
-            <span class="keyword">if</span> ((authenticationRequest.getIdentity().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>) || authenticationRequest.getIdentity().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">watson</span><span class="delimiter">&quot;</span></span>)) &amp;&amp;
-                    authenticationRequest.getSecret().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>)) {
-                emitter.next(AuthenticationResponse.success((<span class="predefined-type">String</span>) authenticationRequest.getIdentity()));
-                emitter.complete();
-            } <span class="keyword">else</span> {
-                emitter.error(AuthenticationResponse.exception());
-            }
-        }, FluxSink.OverflowStrategy.ERROR);
+<span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span>&lt;B&gt; <span class="directive">implements</span> HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="directive">public</span> AuthenticationResponse authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;B&gt; httpRequest,
+                                               <span class="annotation">@NonNull</span> AuthenticationRequest&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; authenticationRequest) {
+        <span class="keyword">return</span> (authenticationRequest.getIdentity().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>)  || authenticationRequest.getIdentity().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">watson</span><span class="delimiter">&quot;</span></span>)) &amp;&amp; authenticationRequest.getSecret().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>)
+                ? AuthenticationResponse.success(authenticationRequest.getIdentity())
+                : AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH);
     }
 }</code></pre>
 </div>
@@ -276,7 +267,7 @@ implementation(<span class="string"><span class="delimiter">&quot;</span><span c
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.AuthenticationProvider</code>.</td>
+<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</code>.</td>
 </tr>
 </table>
 </div>

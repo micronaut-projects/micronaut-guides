@@ -291,27 +291,22 @@ micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENE
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.security.authentication.AuthenticationProvider
+import io.micronaut.security.authentication.AuthenticationFailureReason
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider
 import jakarta.inject.Singleton
-import org.reactivestreams.Publisher
-import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class AuthenticationProviderUserPassword : AuthenticationProvider&lt;HttpRequest&lt;*&gt;&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+class AuthenticationProviderUserPassword&lt;B&gt; : HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
 
-    override fun authenticate(httpRequest: HttpRequest&lt;*&gt;?,
-                              authenticationRequest: AuthenticationRequest&lt;*, *&gt;): Publisher&lt;AuthenticationResponse&gt; {
-        return Flux.create({ emitter: FluxSink&lt;AuthenticationResponse&gt; -&gt;
-            if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;) {
-                emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
-                emitter.complete()
-            } else {
-                emitter.error(AuthenticationResponse.exception())
-            }
-        }, FluxSink.OverflowStrategy.ERROR)
+    override fun authenticate(
+        httpRequest: HttpRequest&lt;B&gt;?,
+        authenticationRequest: AuthenticationRequest&lt;String, String&gt;
+    ): AuthenticationResponse {
+        return if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;)
+            AuthenticationResponse.success(authenticationRequest.identity) else
+            AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
     }
 }</code></pre>
 </div>
@@ -324,7 +319,7 @@ class AuthenticationProviderUserPassword : AuthenticationProvider&lt;HttpRequest
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.AuthenticationProvider</code>.</td>
+<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</code>.</td>
 </tr>
 </table>
 </div>

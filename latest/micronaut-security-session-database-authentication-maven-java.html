@@ -1272,14 +1272,15 @@ micronaut.security.redirect.login-failure=/user/authFailed</code></pre>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
 
+<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationException</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailed</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationProvider</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>;
 <span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>;
+<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.provider.HttpRequestReactiveAuthenticationProvider</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>;
 <span class="keyword">import</span> <span class="include">reactor.core.scheduler.Scheduler</span>;
@@ -1299,7 +1300,7 @@ micronaut.security.redirect.login-failure=/user/authFailed</code></pre>
 <span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailureReason.USER_NOT_FOUND</span>;
 
 <span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">DelegatingAuthenticationProvider</span> <span class="directive">implements</span> AuthenticationProvider&lt;HttpRequest&lt;?&gt;&gt; {
+<span class="type">class</span> <span class="class">DelegatingAuthenticationProvider</span>&lt;B&gt; <span class="directive">implements</span> HttpRequestReactiveAuthenticationProvider&lt;B&gt; {
 
     <span class="directive">private</span> <span class="directive">final</span> UserFetcher userFetcher;
     <span class="directive">private</span> <span class="directive">final</span> PasswordEncoder passwordEncoder;
@@ -1317,8 +1318,11 @@ micronaut.security.redirect.login-failure=/user/authFailed</code></pre>
     }
 
     <span class="annotation">@Override</span>
-    <span class="directive">public</span> Publisher&lt;AuthenticationResponse&gt; authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;?&gt; httpRequest,
-                                                          AuthenticationRequest&lt;?, ?&gt; authenticationRequest) {
+    <span class="annotation">@NonNull</span>
+    <span class="directive">public</span>  Publisher&lt;AuthenticationResponse&gt; authenticate(
+            <span class="annotation">@Nullable</span> HttpRequest&lt;B&gt; requestContext,
+            <span class="annotation">@NonNull</span> AuthenticationRequest&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; authenticationRequest
+    ) {
         <span class="keyword">return</span> Flux.&lt;AuthenticationResponse&gt;create(emitter -&gt; {
             UserState user = fetchUserState(authenticationRequest);
             AuthenticationFailed authenticationFailed = validate(user, authenticationRequest);

@@ -423,29 +423,23 @@ class Credentials{
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.auth
 
-import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.HttpRequest
-import io.micronaut.security.authentication.AuthenticationProvider
+import io.micronaut.security.authentication.AuthenticationFailureReason
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider
 import jakarta.inject.Singleton
-import org.reactivestreams.Publisher
-import reactor.core.publisher.Mono
-import reactor.core.publisher.MonoSink
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class CredentialsChecker(private val credentials: Credentials) : AuthenticationProvider&lt;HttpRequest&lt;*&gt;&gt; {
+class AuthenticationProviderUserPassword&lt;B&gt;(private val credentials: Credentials) : HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+
     override fun authenticate(
-        @Nullable httpRequest: HttpRequest&lt;*&gt;?,
-        authenticationRequest: AuthenticationRequest&lt;*, *&gt;
-    ): Publisher&lt;AuthenticationResponse&gt; {
-        return Mono.create { emitter: MonoSink&lt;AuthenticationResponse&gt; -&gt;
-            if (authenticationRequest.identity == credentials.username &amp;&amp; authenticationRequest.secret == credentials.password) {
-                emitter.success(AuthenticationResponse.success(authenticationRequest.identity as String))
-            } else {
-                emitter.error(AuthenticationResponse.exception())
-            }
-        }
+        httpRequest: HttpRequest&lt;B&gt;?,
+        authenticationRequest: AuthenticationRequest&lt;String, String&gt;
+    ): AuthenticationResponse {
+        return if (authenticationRequest.identity == credentials.username &amp;&amp; authenticationRequest.secret == credentials.password)
+            AuthenticationResponse.success(authenticationRequest.identity) else
+            AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
     }
 }</code></pre>
 </div>
@@ -1114,29 +1108,23 @@ class Credentials{
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut.auth
 
-import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.HttpRequest
-import io.micronaut.security.authentication.AuthenticationProvider
+import io.micronaut.security.authentication.AuthenticationFailureReason
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider
 import jakarta.inject.Singleton
-import org.reactivestreams.Publisher
-import reactor.core.publisher.Mono
-import reactor.core.publisher.MonoSink
 
 @Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class CredentialsChecker(private val credentials: Credentials) : AuthenticationProvider&lt;HttpRequest&lt;*&gt;&gt; {
+class AuthenticationProviderUserPassword&lt;B&gt;(private val credentials: Credentials) : HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+
     override fun authenticate(
-        @Nullable httpRequest: HttpRequest&lt;*&gt;?,
-        authenticationRequest: AuthenticationRequest&lt;*, *&gt;
-    ): Publisher&lt;AuthenticationResponse&gt; {
-        return Mono.create { emitter: MonoSink&lt;AuthenticationResponse&gt; -&gt;
-            if (authenticationRequest.identity == credentials.username &amp;&amp; authenticationRequest.secret == credentials.password) {
-                emitter.success(AuthenticationResponse.success(authenticationRequest.identity as String))
-            } else {
-                emitter.error(AuthenticationResponse.exception())
-            }
-        }
+        httpRequest: HttpRequest&lt;B&gt;?,
+        authenticationRequest: AuthenticationRequest&lt;String, String&gt;
+    ): AuthenticationResponse {
+        return if (authenticationRequest.identity == credentials.username &amp;&amp; authenticationRequest.secret == credentials.password)
+            AuthenticationResponse.success(authenticationRequest.identity) else
+            AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
     }
 }</code></pre>
 </div>
