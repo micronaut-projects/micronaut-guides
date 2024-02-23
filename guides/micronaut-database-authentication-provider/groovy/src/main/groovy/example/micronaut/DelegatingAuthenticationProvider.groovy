@@ -41,7 +41,7 @@ import static io.micronaut.security.authentication.AuthenticationFailureReason.U
 import static io.micronaut.security.authentication.AuthenticationFailureReason.USER_NOT_FOUND
 
 @Singleton
-class DelegatingAuthenticationProvider<T> implements HttpRequestReactiveAuthenticationProvider<T> {
+class DelegatingAuthenticationProvider<B> implements HttpRequestReactiveAuthenticationProvider<B> {
 
     private final UserFetcher userFetcher
     private final PasswordEncoder passwordEncoder
@@ -61,7 +61,7 @@ class DelegatingAuthenticationProvider<T> implements HttpRequestReactiveAuthenti
     @Override
     @NonNull
      Publisher<AuthenticationResponse> authenticate(
-            @Nullable HttpRequest<T> requestContext,
+            @Nullable HttpRequest<B> requestContext,
             @NonNull AuthenticationRequest<String, String> authenticationRequest
     ) {
         Flux.create({ emitter ->

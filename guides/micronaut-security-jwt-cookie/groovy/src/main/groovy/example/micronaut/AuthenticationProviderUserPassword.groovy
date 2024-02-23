@@ -26,10 +26,10 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 
 @Singleton // <1>
-class AuthenticationProviderUserPassword<T> implements HttpRequestReactiveAuthenticationProvider<T> { // <2>
+class AuthenticationProviderUserPassword<B> implements HttpRequestReactiveAuthenticationProvider<B> { // <2>
 
     @Override
-    Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<T> httpRequest,
+    Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<B> httpRequest,
                                                    AuthenticationRequest<String, String> authenticationRequest) {
         Flux.create(emitter -> {
             if (authenticationRequest.identity == "sherlock" && authenticationRequest.secret == "password") {
