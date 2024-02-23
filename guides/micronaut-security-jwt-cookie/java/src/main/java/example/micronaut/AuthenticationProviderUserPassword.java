@@ -30,7 +30,10 @@ import reactor.core.publisher.FluxSink;
 public class AuthenticationProviderUserPassword<B> implements HttpRequestReactiveAuthenticationProvider<B> { // <2>
 
     @Override
-    public @NonNull Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<B> requestContext, @NonNull AuthenticationRequest<String, String> authenticationRequest) {
+    public @NonNull Publisher<AuthenticationResponse> authenticate(
+            @Nullable HttpRequest<B> requestContext,
+            @NonNull AuthenticationRequest<String, String> authenticationRequest
+    ) {
         return Flux.create(emitter -> {
             if (authenticationRequest.getIdentity().equals("sherlock") &&
                     authenticationRequest.getSecret().equals("password")) {

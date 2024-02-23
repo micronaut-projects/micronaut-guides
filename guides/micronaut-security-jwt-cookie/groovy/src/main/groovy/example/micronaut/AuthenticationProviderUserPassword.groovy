@@ -15,6 +15,7 @@
  */
 package example.micronaut
 
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.HttpRequest
 import io.micronaut.security.authentication.AuthenticationRequest
@@ -29,8 +30,10 @@ import reactor.core.publisher.FluxSink
 class AuthenticationProviderUserPassword<B> implements HttpRequestReactiveAuthenticationProvider<B> { // <2>
 
     @Override
-    Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<B> httpRequest,
-                                                   AuthenticationRequest<String, String> authenticationRequest) {
+    Publisher<AuthenticationResponse> authenticate(
+            @Nullable HttpRequest<B> httpRequest,
+            @NonNull AuthenticationRequest<String, String> authenticationRequest
+    ) {
         Flux.create(emitter -> {
             if (authenticationRequest.identity == "sherlock" && authenticationRequest.secret == "password") {
                 emitter.next(AuthenticationResponse.success((String) authenticationRequest.identity))
