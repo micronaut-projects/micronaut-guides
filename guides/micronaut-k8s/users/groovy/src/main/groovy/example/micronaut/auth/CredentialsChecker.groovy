@@ -27,18 +27,13 @@ import jakarta.inject.Singleton
 
 @Singleton // <1>
 class CredentialsChecker<B> implements HttpRequestAuthenticationProvider<B> { // <2>
-
     private final Credentials credentials
-
     CredentialsChecker(Credentials credentials) {
         this.credentials = credentials
     }
-
-    AuthenticationResponse authenticate(
-            @Nullable HttpRequest<B> httpRequest,
-            @NonNull AuthenticationRequest<String, String> authenticationRequest
-    ) {
-        return (authenticationRequest.getIdentity() == credentials.username && authenticationRequest.getSecret() == credentials.password)
+    AuthenticationResponse authenticate(@Nullable HttpRequest<B> httpRequest,
+                                        @NonNull AuthenticationRequest<String, String> authenticationRequest) {
+        return( authenticationRequest.getIdentity() == credentials.username && authenticationRequest.getSecret() == credentials.password)
                 ? AuthenticationResponse.success(authenticationRequest.getIdentity())
                 : AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
     }
