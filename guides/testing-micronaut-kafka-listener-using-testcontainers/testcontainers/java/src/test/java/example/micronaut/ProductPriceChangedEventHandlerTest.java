@@ -38,7 +38,7 @@ import static org.awaitility.Awaitility.await;
 
 @MicronautTest(transactional = false) // <1>
 @Property(name = "datasources.default.driver-class-name", value = "org.testcontainers.jdbc.ContainerDatabaseDriver") // <2>
-@Property(name = "datasources.default.url", value = "jdbc:tc:mysql:8.0.32:///db") // <3>
+@Property(name = "datasources.default.url", value = "jdbc:tc:mysql:8:///db") // <3>
 @Testcontainers(disabledWithoutDocker = true) // <4>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <5>
 class ProductPriceChangedEventHandlerTest implements TestPropertyProvider {  // <6>
