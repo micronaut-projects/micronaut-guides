@@ -15,29 +15,25 @@
  */
 package example.micronaut
 
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.HttpRequest
-import io.micronaut.security.authentication.AuthenticationProvider
+import io.micronaut.security.authentication.AuthenticationFailureReason
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider
 import jakarta.inject.Singleton
-import org.reactivestreams.Publisher
-import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
 
 @Singleton // <1>
-class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> { // <2>
+class AuthenticationProviderUserPassword<B> implements HttpRequestAuthenticationProvider<B> { // <2>
 
     @Override
-    Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<?> httpRequest,
-                                                   AuthenticationRequest<?, ?> authenticationRequest) {
-        Flux.create(emitter -> {
-            if (authenticationRequest.identity == "sherlock" && authenticationRequest.secret == "password") {
-                emitter.next(AuthenticationResponse.success((String) authenticationRequest.identity))
-                emitter.complete()
-            } else {
-                emitter.error(AuthenticationResponse.exception())
-            }
-        }, FluxSink.OverflowStrategy.ERROR)
+    AuthenticationResponse authenticate(
+            @Nullable HttpRequest<B> httpRequest,
+            @NonNull AuthenticationRequest<String, String> authenticationRequest
+    ) {
+        return authenticationRequest.identity == "sherlock" && authenticationRequest.secret == "password"
+                ? AuthenticationResponse.success(authenticationRequest.getIdentity())
+                : AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
     }
 }
