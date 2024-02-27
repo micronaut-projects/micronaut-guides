@@ -52,9 +52,6 @@ class AuthenticationSpec extends GebSpec {
         LoginPage loginPage = browser.page LoginPage
         loginPage.login('foo', 'foo')
 
-        // TODO: Remove this debug
-        println "Page source = ${driver.pageSource}"
-
         then: 'the user is still in the login form'
         at LoginPage
 
