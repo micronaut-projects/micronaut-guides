@@ -497,7 +497,7 @@ To read more about body definitions, see the
         <span class="key">name</span>: <span class="string"><span class="content">{type: string}</span></span>
         <span class="key">availability</span>: <span class="string"><span class="content">{$ref: &quot;#/components/schemas/BookAvailability&quot;} </span></span><i class="conum" data-value="3"></i><b>(3)</b>
         <span class="key">author</span>: <span class="string"><span class="content">{type: string, minLength: 3}</span></span>
-        <span class="key">ISBN</span>: <span class="string"><span class="content">{type: string, pattern: &quot;[0-9]{13}&quot;}</span></span>
+        <span class="key">isbn</span>: <span class="string"><span class="content">{type: string, pattern: &quot;[0-9]{13}&quot;}</span></span>
       <span class="key">required</span>: <span class="string"><span class="content">[&quot;name&quot;, &quot;availability&quot;]</span></span>
     <span class="key">BookAvailability</span>: <i class="conum" data-value="4"></i><b>(4)</b>
       <span class="key">type</span>: <span class="string"><span class="content">string</span></span>
@@ -1114,7 +1114,7 @@ We will now implement them in the controller.</p>
 
 <span class="directive">private</span> BookInfo map(BookEntity entity) {
     <span class="type">var</span> book = <span class="keyword">new</span> BookInfo(entity.name(), entity.availability());
-    book.setISBN(entity.isbn());
+    book.setIsbn(entity.isbn());
     book.setAuthor(entity.author());
     <span class="keyword">return</span> book;
 }
@@ -1169,7 +1169,7 @@ We will now implement them in the controller.</p>
     bookRepository.save(bookInfo.getName(), <i class="conum" data-value="3"></i><b>(3)</b>
             bookInfo.getAvailability(),
             bookInfo.getAuthor(),
-            bookInfo.getISBN());
+            bookInfo.getIsbn());
 }</code></pre>
 </div>
 </div>
@@ -1375,15 +1375,15 @@ We will use it to test the validations manually.</td>
     <span class="annotation">@Test</span>
     <span class="directive">public</span> <span class="type">void</span> ISBNTest() {
         BookInfo bookInfo = <span class="keyword">new</span> BookInfo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Alice's Adventures in Wonderland</span><span class="delimiter">&quot;</span></span>, BookAvailability.AVAILABLE)
-                .ISBN(<span class="predefined-constant">null</span>);
+                .isbn(<span class="predefined-constant">null</span>);
         assertTrue(validator.validate(bookInfo).isEmpty());
 
         bookInfo = <span class="keyword">new</span> BookInfo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Alice's Adventures in Wonderland</span><span class="delimiter">&quot;</span></span>, BookAvailability.AVAILABLE)
-                .ISBN(<span class="string"><span class="delimiter">&quot;</span><span class="content">9783161484100</span><span class="delimiter">&quot;</span></span>);
+                .isbn(<span class="string"><span class="delimiter">&quot;</span><span class="content">9783161484100</span><span class="delimiter">&quot;</span></span>);
         assertTrue(validator.validate(bookInfo).isEmpty()); <i class="conum" data-value="3"></i><b>(3)</b>
 
         bookInfo = <span class="keyword">new</span> BookInfo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Alice's Adventures in Wonderland</span><span class="delimiter">&quot;</span></span>, BookAvailability.AVAILABLE)
-                .ISBN(<span class="string"><span class="delimiter">&quot;</span><span class="content">9783161 84100</span><span class="delimiter">&quot;</span></span>);
+                .isbn(<span class="string"><span class="delimiter">&quot;</span><span class="content">9783161 84100</span><span class="delimiter">&quot;</span></span>);
         assertFalse(validator.validate(bookInfo).isEmpty()); <i class="conum" data-value="4"></i><b>(4)</b>
     }</code></pre>
 </div>
@@ -1426,7 +1426,7 @@ We will use it to test the validations manually.</td>
     <span class="directive">public</span> <span class="type">void</span> bookInfoJsonSerialization() {
         BookInfo requiredBookInfo = <span class="keyword">new</span> BookInfo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Alice's Adventures in Wonderland</span><span class="delimiter">&quot;</span></span>, BookAvailability.AVAILABLE)
                 .author(<span class="string"><span class="delimiter">&quot;</span><span class="content">Lewis Carroll</span><span class="delimiter">&quot;</span></span>)
-                .ISBN(<span class="string"><span class="delimiter">&quot;</span><span class="content">9783161484100</span><span class="delimiter">&quot;</span></span>);
+                .isbn(<span class="string"><span class="delimiter">&quot;</span><span class="content">9783161484100</span><span class="delimiter">&quot;</span></span>);
 
         BookInfo bookInfo = httpClient.toBlocking().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">&quot;</span><span class="content">/bookinfo</span><span class="delimiter">&quot;</span></span>), BookInfo.class); <i class="conum" data-value="5"></i><b>(5)</b>
         assertEquals(requiredBookInfo, bookInfo);
@@ -1440,7 +1440,7 @@ We will use it to test the validations manually.</td>
         BookInfo index() { <i class="conum" data-value="4"></i><b>(4)</b>
             <span class="keyword">return</span> <span class="keyword">new</span> BookInfo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Alice's Adventures in Wonderland</span><span class="delimiter">&quot;</span></span>, BookAvailability.AVAILABLE)
                     .author(<span class="string"><span class="delimiter">&quot;</span><span class="content">Lewis Carroll</span><span class="delimiter">&quot;</span></span>)
-                    .ISBN(<span class="string"><span class="delimiter">&quot;</span><span class="content">9783161484100</span><span class="delimiter">&quot;</span></span>);
+                    .isbn(<span class="string"><span class="delimiter">&quot;</span><span class="content">9783161484100</span><span class="delimiter">&quot;</span></span>);
         }
     }</code></pre>
 </div>
@@ -1514,7 +1514,7 @@ from running during other tests.</td>
     <span class="type">void</span> addBookClientApiTest() {
         <span class="type">var</span> body = <span class="keyword">new</span> BookInfo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>, BookAvailability.AVAILABLE);
         body.setAuthor(<span class="string"><span class="delimiter">&quot;</span><span class="content">Sam Newman</span><span class="delimiter">&quot;</span></span>);
-        body.setISBN(<span class="string"><span class="delimiter">&quot;</span><span class="content">9781492034025</span><span class="delimiter">&quot;</span></span>);
+        body.setIsbn(<span class="string"><span class="delimiter">&quot;</span><span class="content">9781492034025</span><span class="delimiter">&quot;</span></span>);
         <span class="type">var</span> response = client.toBlocking()
                 .exchange(HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/add</span><span class="delimiter">&quot;</span></span>, body)); <i class="conum" data-value="3"></i><b>(3)</b>
         assertEquals(HttpStatus.OK, response.status()); <i class="conum" data-value="4"></i><b>(4)</b>
