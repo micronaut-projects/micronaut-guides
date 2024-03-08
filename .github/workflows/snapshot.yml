@@ -1,37 +1,65 @@
-name: Test SNAPSHOT
+name: Test SNAPSHOT Guides
 on:
   schedule:
     - cron: '0 5 * * 1-5'
 jobs:
+  test_matrix:
+    name: Generate Guide Test Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.test_matrix_step.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+      - uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Generate Guide Test Matrix
+        id: test_matrix_step
+        run: |
+          echo "Searching for groups..."
+          gradleTasks=$(./gradlew tasks | grep "Run group of guide tests" | sed 's/\(.*\) - Run group of guide tests/\"\1\"/' | tr '\n' ',' | sed 's/.$//')
+          tasksEntry="\"group_test_tasks\":[$(echo $gradleTasks)]"
+          matrixValue="{$(echo $tasksEntry)}"
+          echo "Created matrix: $matrixValue"
+          echo "matrix=$matrixValue" >> $GITHUB_OUTPUT
   alltests:
+    name: Running SNAPSHOT ${{ matrix.group }} with Java ${{ matrix.java }}
+    needs: test_matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
         java: ["17", "21"]
+        group: ${{ fromJson(needs.test_matrix.outputs.matrix).group_test_tasks }}
     env:
       JDK_VERSION: ${{ matrix.java }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
+          distribution: 'adopt'
           java-version: ${{ matrix.java }}
       - name: Use next snapshot patch version
         run: ./increment_version.sh -p
       - name: Run All Guide Tests
-        run: './gradlew runAllGuideTests'
+        run: './gradlew ${{ matrix.group }}'
         env:
-          AWS_ACCESS_KEY_ID: XXX
-          AWS_SECRET_ACCESS_KEY: YYY
-          AWS_REGION: us-east-1
           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
