@@ -40,7 +40,7 @@ public class BooksControllerTest {
     void addBookClientApiTest() {
         var body = new BookInfo("Building Microservices", BookAvailability.AVAILABLE);
         body.setAuthor("Sam Newman");
-        body.setISBN("9781492034025");
+        body.setIsbn("9781492034025");
         var response = client.toBlocking()
                 .exchange(HttpRequest.POST("/add", body)); // <3>
         assertEquals(HttpStatus.OK, response.status()); // <4>

@@ -84,15 +84,15 @@ public class BookInfoTest {
     @Test
     public void ISBNTest() {
         BookInfo bookInfo = new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
-                .ISBN(null);
+                .isbn(null);
         assertTrue(validator.validate(bookInfo).isEmpty());
 
         bookInfo = new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
-                .ISBN("9783161484100");
+                .isbn("9783161484100");
         assertTrue(validator.validate(bookInfo).isEmpty()); // <3>
 
         bookInfo = new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
-                .ISBN("9783161 84100");
+                .isbn("9783161 84100");
         assertFalse(validator.validate(bookInfo).isEmpty()); // <4>
     }
     //end::otherProperties[]
@@ -106,7 +106,7 @@ public class BookInfoTest {
     public void bookInfoJsonSerialization() {
         BookInfo requiredBookInfo = new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
                 .author("Lewis Carroll")
-                .ISBN("9783161484100");
+                .isbn("9783161484100");
 
         BookInfo bookInfo = httpClient.toBlocking().retrieve(HttpRequest.GET("/bookinfo"), BookInfo.class); // <5>
         assertEquals(requiredBookInfo, bookInfo);
@@ -120,7 +120,7 @@ public class BookInfoTest {
         BookInfo index() { // <4>
             return new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)
                     .author("Lewis Carroll")
-                    .ISBN("9783161484100");
+                    .isbn("9783161484100");
         }
     }
     //end::jsonSerialization[]
