@@ -19,15 +19,24 @@ import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.filter.FilterChain;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.security.authentication.Authentication;
+import io.micronaut.security.filters.SecurityFilter;
 import io.micronaut.security.utils.SecurityService;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
 
 import java.util.Optional;
 
@@ -48,27 +57,19 @@ class LogoutFormViewModelProcessorTest {
     }
 
     @Requires(property = "spec.name", value = "LogoutFormViewModelProcessorTest")
-    @Replaces(SecurityService.class)
-    @Singleton
-    static class SecurityServiceReplacement implements SecurityService {
+    @Filter(Filter.MATCH_ALL_PATTERN)
+    @Replaces(SecurityFilter.class)
+    static class SecurityFilterMock implements HttpServerFilter {
+
         @Override
-        public boolean isAuthenticated() {
-            return username().isPresent();
+        public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
+            request.setAttribute(SecurityFilter.AUTHENTICATION, Authentication.build("admin"));
+            return chain.proceed(request);
         }
 
         @Override
-        public boolean hasRole(String role) {
-            return false;
-        }
-
-        @Override
-        public Optional<Authentication> getAuthentication() {
-            return username().map(Authentication::build);
-        }
-
-        @Override
-        public Optional<String> username() {
-            return Optional.of("admin");
+        public int getOrder() {
+            return ServerFilterPhase.SECURITY.before();
         }
     }
 }
