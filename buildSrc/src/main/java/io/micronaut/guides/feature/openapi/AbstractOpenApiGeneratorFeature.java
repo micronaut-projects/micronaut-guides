@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2021 the original author or authors.
+ * Copyright 2003-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 package io.micronaut.guides.feature.openapi;
 
 import com.fizzed.rocker.RockerModel;
-import io.micronaut.core.version.SemanticVersion;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver;
 import io.micronaut.starter.build.gradle.GradlePlugin;
 import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.template.RockerWritable;
-import io.micronaut.starter.util.VersionInfo;
 
 import java.util.Map;
 
@@ -62,10 +60,6 @@ public abstract class AbstractOpenApiGeneratorFeature implements Feature {
                     .extension(new RockerWritable(provideGradleModel()))
                     .build());
         } else {
-            if (!SemanticVersion.isAtLeast(VersionInfo.getMicronautVersion(), "4.4.1")) {
-                // temporary fix for openapi generator (until Micronaut 4.4.1 is out)
-                generatorContext.getBuildProperties().put("micronaut-maven-plugin.version", "4.5.3");
-            }
             generatorContext.getBuildProperties().putAll(provideMavenProperties());
         }
     }
