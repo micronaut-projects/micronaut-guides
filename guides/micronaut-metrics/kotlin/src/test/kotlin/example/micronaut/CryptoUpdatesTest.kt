@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017-2024 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package example.micronaut
 
 import example.micronaut.crypto.CryptoService
@@ -28,10 +43,10 @@ class CryptoUpdatesTest {
     fun beforeAll() {
 
         kucoinEmbeddedServer = ApplicationContext.run(EmbeddedServer::class.java,
-                mapOf("spec.name" to "MetricsTestKucoin"))
+            mapOf("spec.name" to "MetricsTestKucoin"))
 
         embeddedServer = ApplicationContext.run(EmbeddedServer::class.java,
-                mapOf("micronaut.http.services.kucoin.url" to "http://localhost:" + kucoinEmbeddedServer.getPort()))
+            mapOf("micronaut.http.services.kucoin.url" to "http://localhost:" + kucoinEmbeddedServer.getPort()))
     }
 
     @AfterAll
@@ -44,6 +59,7 @@ class CryptoUpdatesTest {
     fun testCryptoUpdates() {
         val cryptoService = embeddedServer.applicationContext.getBean(CryptoService::class.java)
         val meterRegistry = embeddedServer.applicationContext.getBean(MeterRegistry::class.java)
+
         val counter = meterRegistry.counter("bitcoin.price.checks")
         val timer = meterRegistry.timer("bitcoin.price.time")
 
@@ -52,7 +68,7 @@ class CryptoUpdatesTest {
 
         val checks = 3
 
-        for (i in 0 until checks) {
+        repeat(3) {
             cryptoService.updatePrice()
         }
 
@@ -64,23 +80,19 @@ class CryptoUpdatesTest {
     @Controller
     class MockKucoinController {
 
-        private val RESPONSE = """
-{
-   "code":"200000",
-   "data":{
-      "time":1654865889872,
-      "sequence":"1630823934334",
-      "price":"29670.4",
-      "size":"0.00008436",
-      "bestBid":"29666.4",
-      "bestBidSize":"0.16848947",
-      "bestAsk":"29666.5",
-      "bestAskSize":"2.37840044"
-   }
-}
-"""
-
         @Get("/api/v1/market/orderbook/level1")
-        fun latest(@QueryValue symbol: String?) = RESPONSE
+        fun latest(@QueryValue symbol: String?) = """{
+                                 |  "code":"200000",
+                                 |  "data":{
+                                 |     "time":1654865889872,
+                                 |     "sequence":"1630823934334",
+                                 |     "price":"29670.4",
+                                 |     "size":"0.00008436",
+                                 |     "bestBid":"29666.4",
+                                 |     "bestBidSize":"0.16848947",
+                                 |     "bestAsk":"29666.5",
+                                 |     "bestAskSize":"2.37840044"
+                                 |  }
+                                 |}""".trimMargin()
     }
 }
