@@ -13,6 +13,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,30 +30,32 @@ class BookControllerTest {
     @Test
     void multitenancyRequest(@Client("/") HttpClient httpClient, // <3>
                              BookRepository bookRepository) {
-        bookRepository.save(new Book(null, "Building Microservices with Micronaut", "micronaut"));
-        bookRepository.save(new Book(null, "Introducing Micronaut", "micronaut"));
-
-        bookRepository.save(new Book(null, "Grails 3 - Step by Step", "grails"));
-        bookRepository.save(new Book(null, "Falando de Grail", "grails"));
-        bookRepository.save(new Book(null, "Grails Goodness Notebook", "grails"));
-
         BlockingHttpClient client = httpClient.toBlocking();
-        HttpRequest<?> mnRequest = HttpRequest.GET("/books").header("tenantId", "micronaut");
-        Argument<List<Book>> responseArgument = Argument.listOf(Book.class);
-        HttpResponse<List<Book>> response = assertDoesNotThrow(() -> client.exchange(mnRequest, responseArgument));
-        assertEquals(HttpStatus.OK, response.getStatus());
-        List<Book> books = response.body();
+        save(bookRepository, client,  "Building Microservices with Micronaut", "micronaut");
+        save(bookRepository, client, "Introducing Micronaut", "micronaut");
+        save(bookRepository, client, "Grails 3 - Step by Step", "grails");
+        save(bookRepository, client, "Falando de Grail", "grails");
+        save(bookRepository, client, "Grails Goodness Notebook", "grails");
+
+        List<Book> books = fetchBooks(client, "micronaut");
         assertNotNull(books);
         assertEquals(2, books.size());
 
-        HttpRequest<?> grailsRequest = HttpRequest.GET("/books").header("tenantId", "grails");
-        response = assertDoesNotThrow(() -> client.exchange(grailsRequest, responseArgument));
-        assertEquals(HttpStatus.OK, response.getStatus());
-        books = response.body();
+        books = fetchBooks(client, "grails");
         assertNotNull(books);
         assertEquals(3, books.size());
-
         bookRepository.deleteAll();
     }
 
+    List<Book> fetchBooks(BlockingHttpClient client, String framework) {
+        HttpRequest<?> request = HttpRequest.GET("/books").header("tenantId", framework);
+        Argument<List<Book>> responseArgument = Argument.listOf(Book.class);
+        HttpResponse<List<Book>> response = assertDoesNotThrow(() -> client.exchange(request, responseArgument));
+        assertEquals(HttpStatus.OK, response.getStatus());
+        return response.body();
+    }
+
+    void save(BookRepository bookRepository, BlockingHttpClient client, String title, String framework) {
+        bookRepository.save(new Book(null, title, framework));
+    }
 }
