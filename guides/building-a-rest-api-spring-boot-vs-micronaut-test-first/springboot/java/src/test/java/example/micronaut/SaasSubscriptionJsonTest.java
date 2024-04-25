@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest // <1>
 class SaasSubscriptionJsonTest {
+
     @Autowired // <2>
     private JacksonTester<SaasSubscription> json; // <3>
 
