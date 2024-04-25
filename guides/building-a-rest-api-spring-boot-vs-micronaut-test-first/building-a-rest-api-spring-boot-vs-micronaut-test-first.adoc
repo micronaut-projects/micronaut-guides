@@ -1,0 +1,63 @@
+common:header-top.adoc[]
+
+== Sample Project
+
+You can link:@sourceDir@.zip[download a sample application] with the code examples in this article.
+
+== Introduction
+
+This guide compares how to test Serialization in a Micronaut Framework and Spring Boot applications.
+
+This guide is the first tutorial of https://guides.micronaut.io/latest/tag-building_a_rest_api.html[Building a Rest API] - a series of tutorials comparing how to develop a REST API with Micronaut Framework and Spring Boot.
+
+== Record
+
+The application we will build is a REST API for Software as a Service (Saas) subscriptions. The application serializes and deserializes the following Java record from/to JSON.
+
+source:SaasSubscription[app=springboot]
+
+Micronaut Supports Serialization with Jackson Databind or with https://micronaut-projects.github.io/micronaut-serialization/latest/guide/[Micronaut Serialization].
+If you use Micronaut Jackson Databind, the above record will be identical in Micronaut Framework and Spring Boot.
+
+=== Micronaut Serialization
+If you use Micronaut Serialization, you must opt in the class to be subject to Serialization, which you can easily do by annotating them with `@Serdeable`.
+
+source:SaasSubscription[app=micronautframeworkserde]
+callout:serdeable[1]
+
+== Expected JSON
+
+We want the deserialize from a JSON object, such as into the Java record:
+
+testResource:expected.json[app=micronautframeworkjacksondatabind]
+
+In the Micronaut application, we add this test resource to `src/test/resources/`. In the Spring Boot application, we add it to `src/test/resources/example/micronaut`. Both applications use `example/micronaut` as the app's package.
+
+== Tests
+
+In this tutorial, we use https://joel-costigliola.github.io/assertj/[AssertJ] in the tests. Moreover, we use https://github.com/json-path/JsonPath[Jayway JsonPath] - a Java DSL for reading JSON documents.
+
+=== Spring Boot Test
+
+common:spring-boot-test-slicing.adoc[]
+
+The following tests verify Serialization and deserialization:
+
+test:SaasSubscriptionJsonTest[app=springboot]
+
+callout:spring-boot-json-test[1]
+callout:autowired[number=2,arg0=JacksonTester]
+callout:jackson-tester[number=3]
+
+=== Micronaut Framework Test
+
+Micronaut application context startup is fast. In your tests, you will not test slicing. Instead, you will use `@MicronautTest`. The only customization you can specify with `@MicronautTest' is whether to start an embedded server or not.
+
+test:SaasSubscriptionJsonTest[app=micronautframeworkjacksondatabind]
+
+callout:micronaut-test-transactional-false[1]
+callout:junit5-method-parameters-injection[2]
+
+== Conclusion
+
+As shown in this tutorial, testing Serialization in Micronaut Framework and Spring Boot is similar. The main difference is the lack of need of test slicing in Micronaut Framework.
