@@ -43,7 +43,7 @@ class SaasSubscriptionControllerGetTest {
     void shouldNotReturnASaasSubscriptionWithAnUnknownId() {
         BlockingHttpClient client = httpClient.toBlocking();
         HttpClientResponseException thrown = catchThrowableOfType(() -> // <3>
-                httpClient.toBlocking().exchange("/subscriptions/1000", String.class), HttpClientResponseException.class);
+                client.exchange("/subscriptions/1000", String.class), HttpClientResponseException.class);
         assertThat(thrown.getStatus().getCode()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
         assertThat(thrown.getResponse().getBody()).isEmpty();
     }
