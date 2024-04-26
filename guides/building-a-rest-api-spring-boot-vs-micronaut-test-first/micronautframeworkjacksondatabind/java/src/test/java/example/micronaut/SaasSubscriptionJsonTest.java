@@ -61,18 +61,17 @@ class SaasSubscriptionJsonTest {
     }
 
     private static String getResourceAsString(ResourceLoader resourceLoader, String resourceName) {
-        Optional<InputStream> optionalStream = resourceLoader.getResourceAsStream(resourceName);
-        String result = "";
-
-        if (optionalStream.isPresent()) {
-            try (InputStream stream = optionalStream.get();
-                 Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
-                 BufferedReader bufferedReader = new BufferedReader(reader)) {
-                result = bufferedReader.lines().collect(Collectors.joining("\n"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
+        return resourceLoader.getResourceAsStream(resourceName)
+                .flatMap(stream -> {
+                    try (InputStream is = stream;
+                         Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
+                         BufferedReader bufferedReader = new BufferedReader(reader)) {
+                        return Optional.of(bufferedReader.lines().collect(Collectors.joining("\n")));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return Optional.empty();
+                })
+                .orElse("");
     }
 }
