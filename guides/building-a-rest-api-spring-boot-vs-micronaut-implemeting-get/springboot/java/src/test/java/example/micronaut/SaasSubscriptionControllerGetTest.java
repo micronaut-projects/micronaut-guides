@@ -13,8 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
 class SaasSubscriptionControllerGetTest {
+
     @Autowired // <2>
-    TestRestTemplate restTemplate;
+    TestRestTemplate restTemplate; // <3>
 
     @Test
     void shouldReturnASaasSubscriptionWhenDataIsSaved() {

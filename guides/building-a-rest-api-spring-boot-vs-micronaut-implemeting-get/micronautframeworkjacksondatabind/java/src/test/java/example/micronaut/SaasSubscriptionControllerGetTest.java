@@ -11,11 +11,13 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowableOfType;
 
 @MicronautTest
 class SaasSubscriptionControllerGetTest {
+
     @Inject
     @Client("/")
     HttpClient httpClient;

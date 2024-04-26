@@ -7,6 +7,7 @@ import io.micronaut.http.annotation.PathVariable;
 
 @Controller("/subscriptions") // <1>
 class SaasSubscriptionController {
+
     @Get("/{id}") // <2>
     HttpResponse<SaasSubscription> findById(@PathVariable Long id) { // <3>
         if (id.equals(99L)) {

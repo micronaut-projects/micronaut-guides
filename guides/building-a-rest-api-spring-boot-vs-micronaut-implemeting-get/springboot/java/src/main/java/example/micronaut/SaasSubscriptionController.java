@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController // <1>
-@RequestMapping("/subscriptions") // <1>
+@RequestMapping("/subscriptions") // <2>
 class SaasSubscriptionController {
+
     @GetMapping("/{id}") // <3>
     private ResponseEntity<SaasSubscription> findById(@PathVariable Long id) { // <4>
         if (id.equals(99L)) {

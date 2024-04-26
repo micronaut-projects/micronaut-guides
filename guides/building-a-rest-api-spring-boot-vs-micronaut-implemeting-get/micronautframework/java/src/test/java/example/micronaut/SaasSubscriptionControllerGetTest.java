@@ -16,9 +16,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.catchThrowableOfType;
 
 @MicronautTest // <1>
 class SaasSubscriptionControllerGetTest {
+
     @Inject
     @Client("/")
-    HttpClient httpClient; // <1>
+    HttpClient httpClient; // <2>
 
     @Test
     void shouldReturnASaasSubscriptionWhenDataIsSaved() {
