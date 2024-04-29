@@ -13,13 +13,15 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowableOfType;
+import io.micronaut.test.annotation.Sql;
 
-@MicronautTest // <1>
+@Sql(value = {"classpath:schema.sql", "classpath:data.sql"}) // <1>
+@MicronautTest // <2>
 class SaasSubscriptionControllerGetTest {
 
     @Inject
     @Client("/")
-    HttpClient httpClient; // <2>
+    HttpClient httpClient; // <3>
 
     @Test
     void shouldReturnASaasSubscriptionWhenDataIsSaved() {
@@ -43,7 +45,7 @@ class SaasSubscriptionControllerGetTest {
     @Test
     void shouldNotReturnASaasSubscriptionWithAnUnknownId() {
         BlockingHttpClient client = httpClient.toBlocking();
-        HttpClientResponseException thrown = catchThrowableOfType(() -> // <3>
+        HttpClientResponseException thrown = catchThrowableOfType(() -> // <4>
                 client.exchange("/subscriptions/1000", String.class), HttpClientResponseException.class);
         assertThat(thrown.getStatus().getCode()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
         assertThat(thrown.getResponse().getBody()).isEmpty();

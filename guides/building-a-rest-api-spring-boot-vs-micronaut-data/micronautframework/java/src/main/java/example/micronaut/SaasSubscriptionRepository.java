@@ -15,7 +15,10 @@
  */
 package example.micronaut;
 
-import org.springframework.data.annotation.Id;
+import io.micronaut.data.jdbc.annotation.JdbcRepository;
+import io.micronaut.data.model.query.builder.sql.Dialect;
+import io.micronaut.data.repository.CrudRepository;
 
-record SaasSubscription(@Id Long id, String name, Integer cents) {
+@JdbcRepository(dialect = Dialect.H2) // <1>
+interface SaasSubscriptionRepository extends CrudRepository<SaasSubscription, Long> { // <2>
 }

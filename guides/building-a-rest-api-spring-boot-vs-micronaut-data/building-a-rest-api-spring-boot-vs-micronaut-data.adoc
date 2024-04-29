@@ -6,43 +6,114 @@ You can link:@sourceDir@.zip[download a sample application] with the code exampl
 
 == Introduction
 
-This guide compares how to test implement a GET in a Micronaut Framework and Spring Boot applications.
+This guide compares how to power a GET endpoint with a persistence layer in a Micronaut Framework and Spring Boot applications.
 
-This guide is the second tutorial of https://guides.micronaut.io/latest/tag-building_a_rest_api.html[Building a Rest API] - a series of tutorials comparing how to develop a REST API with Micronaut Framework and Spring Boot.
+The Spring Boot application uses https://spring.io/projects/spring-data[Spring Data] and https://www.h2database.com/html/main.html[H2]. The Micronaut application uses https://micronaut-projects.github.io/micronaut-data/snapshot/guide/[Micronaut Data] and H2.
+
+This guide is the third tutorial of https://guides.micronaut.io/latest/tag-building_a_rest_api.html[Building a Rest API] - a series of tutorials comparing how to develop a REST API with Micronaut Framework and Spring Boot.
+
+Micronaut Data is a database access toolkit that uses Ahead of Time (AoT) compilation to pre-compute queries for repository interfaces that are then executed by a thin, lightweight runtime layer.
+
+=== Micronaut Data vs Spring Data
+
+Micronaut Data improves on Spring Data in the following ways:
+
+* **No runtime model** - Spring Data maintains a runtime metamodel that uses reflection to model relationships between entities. This model consumes significant memory and memory requirements grow as your application size grows. The problem is worse when combined with Hibernate which maintains its own metamodel as you end up with duplicate meta-models.
+
+* **No query translation** - Spring Data uses regular expressions and pattern matching in combination with runtime generated proxies to translate a method definition on a Java interface into a query at runtime. No such runtime translation exists in Micronaut Data and this work is carried out by the Micronaut compiler at compilation time.
+
+* **No Reflection or Runtime Proxies** - Micronaut Data uses no reflection or runtime proxies, resulting in better performance, smaller stack traces and reduced memory consumption due to a complete lack of reflection caches (Note that the backing implementation, for example Hibernate, may use reflection).
+
+* **Type Safety** - Micronaut Data will actively check at compile time that a repository method can be implemented and fail compilation if it cannot.
+
+== Dependencies
+
+=== Spring Boot Data and H2
+
+To use Spring Data JDBC and H2 add the following dependencies:
+
+:dependencies:
+
+dependency:spring-data-jdbc[groupId=org.springframework.data]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly]
+
+:dependencies:
+
+=== Micronaut Data and H2
+
+To use Micronaut Data JDBC and H2 add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly]
+
+:dependencies:
+
+Please note the addition of the `micronaut-data-processor` in the annotation processor classpath. Micronaut Data does a lot of work at compilation, which leads to applications with better performance and a reduced memory consumption.
+
+== Entities
+
+We modified the `SaasSubscription` Java Record. We use it as a persistence entity.
+
+=== Spring Boot
+
+For Spring Data, we added the `@Id` annotation.
+
+source:SaasSubscription[app=springboot]
+
+=== Micronaut
+
+For Micronaut Framework, the entity is annotated with `@MappedEntity`.
+
+source:SaasSubscription[app=micronautframework]
+
+callout:serdeable[1]
+callout:mapped-entity[2]
+callout:mapped-entity-id[3]
+
+== SQL
+
+https://docs.spring.io/spring-boot/docs/2.1.x/reference/html/howto-database-initialization.html#howto-initialize-a-database-using-spring-jdbc[Spring Boot loads SQL from the standard root classpath locations: `schema.sql` and `data.sql`]. Micronaut Framework recommends you manage your database schema with https://micronaut-projects.github.io/micronaut-liquibase/snapshot/guide[Liquibase] or https://micronaut-projects.github.io/micronaut-flyway/snapshot/guide[Flyway].
+However, to keep applications as close as possible, we will create the database schema with an SQL file in the Micronaut application. https://micronaut-projects.github.io/micronaut-test/4.3.0/guide/#sql[Micronaut Test supports loading SQL before tests] seamlessly.
+To keep both apps as close as possible,
+
+We will use two SQL files in the tests:
+
+- `src/main/resources/schema.sql`.
+- `src/main/resources/data.sql`.
+
+=== SQL Schema
+
+testResource:schema.sql[app=micronautframework]
+
+=== Sample Data
+
+testResource:data.sql[app=micronautframework]
+
+== Repository
+
+Both Micronaut Data and Spring Data enable developers to use the repository pattern. You write an interface and the framework provides the implementation.
+
+=== Spring Boot Repository
+
+source:SaasSubscriptionRepository[app=springboot]
+
+=== Micronaut Repository
+
+Because Micronaut Data works at build-time, you have to specify the dialect.
+
+source:SaasSubscriptionRepository[app=micronautframework]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
 
 == Controller
 
-To implement a GET `/subscriptions/{id}` endpoint, you need to create a controller in both frameworks.
-
-The API is quite similar:
-
-[.left-stripes-even,cols="1h,2*"]
-.Comparison between Spring Boot and Micronaut Framework
-|===
-| | Spring Boot | Micronaut
-
-| Mark a bean as a controller
-| Annotate with `@RestController` and `@RequestMapping`
-| Annotate with `@Controller`
-
-| Identify a method as a GET endpoint
-| Annotate with `@GetMapping`
-| Annotate with `@Get`
-
-| Identify a method parameter as a path variable
-| Annotate with Spring's `@PathVariable`
-| Annotate with Micronaut's `@PathVariable`
-
-| Respond HTTP Responses with a status code and a body
-| Return a `ResponseEntity`
-| Return an `HttpResponse`
-|===
-
-NOTE: Another important difference is the controller's method visibility. **Micronaut Framework does not use reflection (which leads to better performance and better integration with technologies such as GraalVM)**. Thus, it requires the controller's methods to be public, protected, or package-private (no modifier). Throughout these tutorials, Micronaut controllers' methods use package-private.
+We modified the controller we wrote in the previous tutorial to inject the repository. We use constructor injection in both applications.
 
 === Spring Boot Controller
-
-This is the Spring Boot controller:
 
 source:SaasSubscriptionController[app=springboot]
 
@@ -53,8 +124,6 @@ callout:spring-boot-path-variable[number=4]
 
 === Micronaut Controller
 
-This is the Micronaut controller:
-
 source:SaasSubscriptionController[app=micronautframework]
 
 callout:controller[number=1,arg0=/subscriptions]
@@ -62,49 +131,22 @@ callout:get[number=2,arg0=findById,arg1=/subscriptions/{id}]
 callout:pathvariable[3]
 callout:http-response[4]
 
-==== Without HTTPResponse
-
-NOTE: The default HTTP Status code in a Micronaut controller method is 200. However, when a Micronaut controller's method returns null, the application responds with a 404 status code.
-
-Thus, you could simplify the previous controller as:
-
-source:SaasSubscriptionController[app=micronautframeworkjacksondatabind]
-
-callout:controller[number=1,arg0=/subscriptions]
-callout:get[number=2,arg0=findById,arg1=/]
-callout:pathvariable[3]
-callout:returning-null[4]
-
-=== Route Compile-Time Validation
-
-common:route-compile-time-validation.adoc[]
-
-For example, if you replace the `@Get("/{id}")` annotation with `@Get("/{identifier}")`, the application fails to compile.
 
 == Tests
 
 common:assertj-and-json-path.adoc[]
 
-=== Spring Boot Test
-
-We could write a test in Spring Boot using https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/web/client/TestRestTemplate.html[`TestRestTemplate`].
-
-test:SaasSubscriptionControllerGetTest[app=springboot]
-
-callout:spring-boot-test[1]
-callout:autowired[number=2,arg0=TestRestTemplate]
-callout:spring-boot-test-rest-template[number=3]
-
 === Micronaut Test
 
-The main difference with the Spring Boot Test, is that we use the https://docs.micronaut.io/4.4.6/guide/#httpClient[Micronaut HTTP Client] to test the embedded server.
+The Spring boot tests are identical to those in the previous tutorial. In the Micronaut Test, we need to annotate the test with `@Sql` to load the SQL files before the tests.
 
 test:SaasSubscriptionControllerGetTest[app=micronautframework]
 
-callout:micronaut-test[1]
-callout:http-client[2]
-callout:http-client-response-exception[3]
+callout:micronaut-test-sql[1]
+callout:micronaut-test[2]
+callout:http-client[3]
+callout:http-client-response-exception[4]
 
 == Conclusion
 
-Defining routes is extremely similar in both frameworks. However, Micronaut Framework provides compile-time validation of routes and a reflection-free approach to do it.
+Adding a persistence layer is easy in both frameworks, and the API is almost identical. However, Micronaut Data's compile-time/reflection-free approach results in better performance, smaller stack traces, and reduced memory consumption.
