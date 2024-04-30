@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController // <1>
 @RequestMapping("/subscriptions") // <2>
 class SaasSubscriptionController {
+
     private final SaasSubscriptionRepository repository;
 
     private SaasSubscriptionController(SaasSubscriptionRepository repository) {

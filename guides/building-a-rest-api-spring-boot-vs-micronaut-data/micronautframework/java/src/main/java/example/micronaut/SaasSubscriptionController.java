@@ -22,6 +22,7 @@ import io.micronaut.http.annotation.PathVariable;
 
 @Controller("/subscriptions") // <1>
 class SaasSubscriptionController {
+
     private final SaasSubscriptionRepository repository;
 
     SaasSubscriptionController(SaasSubscriptionRepository repository) {
