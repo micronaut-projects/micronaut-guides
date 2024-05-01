@@ -16,7 +16,10 @@
 package example.micronaut;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -24,6 +27,7 @@ import java.net.URI;
 @RestController // <1>
 @RequestMapping("/subscriptions") // <2>
 public class SaasSubscriptionPostController {
+
     private final SaasSubscriptionRepository repository;
 
     private SaasSubscriptionPostController(SaasSubscriptionRepository repository) { // <3>

@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
 class SaasSubscriptionPostControllerTest {
+
     @Autowired // <2>
     TestRestTemplate restTemplate;  // <3>
 
@@ -50,5 +51,4 @@ class SaasSubscriptionPostControllerTest {
         Integer cents = documentContext.read("$.cents");
         assertThat(cents).isEqualTo(2500);
     }
-
 }

@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @MicronautTest // <1>
 class SaasSubscriptionPostControllerTest {
+
     @Test
     void shouldCreateANewSaasSubscription(@Client("/") HttpClient httpClient) { // <2>
         BlockingHttpClient client = httpClient.toBlocking();
