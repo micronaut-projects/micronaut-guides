@@ -1,0 +1,92 @@
+common:header-top.adoc[]
+
+== Sample Project
+
+You can link:@sourceDir@.zip[download a sample application] with the code examples in this article.
+
+== Introduction
+
+This guide compares how to write a POST endpoint backed by a persistence layer in a Micronaut Framework and Spring Boot applications.
+
+The Spring Boot application uses https://spring.io/projects/spring-data[Spring Data] and https://www.h2database.com/html/main.html[H2]. The Micronaut application uses https://micronaut-projects.github.io/micronaut-data/snapshot/guide/[Micronaut Data] and H2.
+Micronaut Data is a database access toolkit that uses Ahead of Time (AoT) compilation to pre-compute queries for repository interfaces that are then executed by a thin, lightweight runtime layer.
+
+This guide is the fourth tutorial of https://guides.micronaut.io/latest/tag-building_a_rest_api.html[Building a Rest API] - a series of tutorials comparing how to develop a REST API with Micronaut Framework and Spring Boot.
+
+== Controller
+
+The controller receives a POST request with a JSON body, the repository persists the `SaasSubscription`, and then it returns
+a 201 response with a `Location` HTTP Header.
+
+As you will see, both controllers are almost identical, with similar annotations, as we discussed in the https://guides.micronaut.io/latest/guides/building-a-rest-api-spring-boot-vs-micronaut-implemeting-get.html[second guide] of this series.
+
+The new APIs used in the following controllers are similar:
+
+[.left-stripes-even,cols="1h,2*"]
+.Comparison between Spring Boot and Micronaut Framework
+|===
+| | Spring Boot | Micronaut
+
+
+| Identify a method as a POST endpoint
+| `@PostMapping`
+| `@Post`
+
+| Read and deserialize the request body to a method parameter
+| `@RequestBody`
+| `@Body`
+
+| Fluid ApI to build a URI
+| `UriComponentsBuilder`
+| `UriBuilder`
+|===
+
+=== Spring Boot Controller
+
+source:SaasSubscriptionPostController[app=springboot]
+
+callout:spring-boot-rest-controller[1]
+callout:spring-boot-request-mapping[2]
+callout:constructor-di[number=3,arg0=SaasSubscriptionRepository]
+callout:spring-boot-post-mapping[number=4,arg0=findById,arg1=/subscriptions/{id}]
+callout:spring-boot-request-body[5]
+
+
+=== Micronaut Controller
+
+source:SaasSubscriptionPostController[app=micronautframework]
+
+callout:controller[number=1,arg0=/subscriptions]
+callout:constructor-di[number=2,arg0=SaasSubscriptionRepository]
+callout:post[number=3,arg0=findById,arg1=/subscriptions/{id}]
+callout:body[4]
+callout:uri-builder[5]
+
+== Tests
+
+common:assertj-and-json-path.adoc[]
+
+The test saves a subscription and then uses the response `Location` header to fetch the saved subscription. It then compares if the GET response matches what we sent in the POST request.
+
+=== Spring Boot Test
+
+The following test shows that retrieving the status code or the location header from a `ResponseEntity` is easy.
+
+test:SaasSubscriptionPostControllerTest[app=springboot]
+
+callout:spring-boot-test[1]
+callout:autowired[number=2,arg0=TestRestTemplate]
+callout:spring-boot-test-rest-template[number=3]
+
+=== Micronaut Test
+
+The following test shows that retrieving the status code or the location header from a `HttpResponse` is easy.
+
+test:SaasSubscriptionPostControllerTest[app=micronautframework]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+
+== Conclusion
+
+As you see in this guide, the code to write a POST endpoint backed by a persistence layer in Micronaut Framework and Spring Boot applications is very similar. However, the Micronaut compile-time approach does not require reflection or proxies, leading to faster and more efficient applications.
