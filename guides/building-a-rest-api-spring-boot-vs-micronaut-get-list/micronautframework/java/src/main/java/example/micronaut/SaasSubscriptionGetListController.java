@@ -18,13 +18,12 @@ package example.micronaut;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
 import io.micronaut.data.model.Sort;
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.PathVariable;
 
 @Controller("/subscriptions") // <1>
 class SaasSubscriptionGetListController {
+
     private static final Sort CENTS = Sort.of(Sort.Order.asc("cents"));
     private final SaasSubscriptionRepository repository;
 

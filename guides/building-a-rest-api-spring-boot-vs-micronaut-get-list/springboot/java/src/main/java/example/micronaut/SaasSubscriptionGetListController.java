@@ -20,15 +20,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController // <1>
 @RequestMapping("/subscriptions") // <2>
 public class SaasSubscriptionGetListController {
+
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "cents");
     private final SaasSubscriptionRepository repository;
 
