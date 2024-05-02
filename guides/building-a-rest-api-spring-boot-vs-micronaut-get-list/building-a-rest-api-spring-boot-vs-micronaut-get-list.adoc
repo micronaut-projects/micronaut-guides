@@ -1,0 +1,121 @@
+common:header-top.adoc[]
+
+== Sample Project
+
+You can link:@sourceDir@.zip[download a sample application] with the code examples in this article.
+
+== Introduction
+
+This guide compares how to write a POST endpoint backed by a persistence layer in a Micronaut Framework and Spring Boot applications.
+
+The Spring Boot application uses https://spring.io/projects/spring-data[Spring Data] and https://www.h2database.com/html/main.html[H2]. The Micronaut application uses https://micronaut-projects.github.io/micronaut-data/snapshot/guide/[Micronaut Data] and H2.
+Micronaut Data is a database access toolkit that uses Ahead of Time (AoT) compilation to pre-compute queries for repository interfaces that are then executed by a thin, lightweight runtime layer.
+
+This guide is the fourth tutorial of https://guides.micronaut.io/latest/tag-building_a_rest_api.html[Building a Rest API] - a series of tutorials comparing how to develop a REST API with Micronaut Framework and Spring Boot.
+
+== Pagination
+
+When returning multiple records you need some control over paging the data.
+https://micronaut-projects.github.io/micronaut-data/snapshot/guide/#pagination[Micronaut Data] includes the ability to specify pagination requirements with the https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/domain/Pageable.html[Pageable] type.
+The same concepts exists in Spring Data with https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/domain/Pageable.html[org.springframework.data.domain.Pageable].
+
+== Repository
+
+Micronaut Data and Spring Data enhance the repository pattern by providing a paginated interfaces from which you can extend.
+
+Spring Data package is `org.springframework.data.repository` and Micronaut Data package is `io.micronaut.data.repository`.
+
+|===
+| | Spring Data | Micronaut Data
+
+| Created, Read, Update, Delegate Operations
+| `CrudRepository`
+| `CrudRepository`
+
+| Paginated Operations
+| `PagingAndSortingRepository`
+| `PageableRepository`
+
+|===
+
+=== Spring Boot
+
+The repository in the Spring Boot applications extends from both `CrudRepository` and `PagingAndSortingRepository`.
+
+source:SaasSubscriptionRepository[app=springboot]
+
+=== Micronaut
+
+The repository in the Micronaut application extends from both `PageableRepository`.
+
+source:SaasSubscriptionRepository[app=micronautframework]
+
+callout:jdbcrepository[1]
+callout:pageable-repository[2]
+
+== Controller
+
+Both frameworks simplify the creation of paginated endpoints by allowing the binding of `Pageable` as a controller method parameter.
+
+=== Spring Boot Controller
+
+In the Spring Boot application, we build a `PageRequest`, a basic Java Bean implementation of Pageable, with the `Pageable` parameter and then pass it to the repository.
+
+source:SaasSubscriptionGetListController[app=springboot]
+
+callout:spring-boot-rest-controller[1]
+callout:spring-boot-request-mapping[2]
+callout:constructor-di[number=3,arg0=SaasSubscriptionRepository]
+callout:spring-boot-get-mapping[number=4,arg0=findAll,arg1=/subscriptions]
+
+=== Micronaut Controller
+
+In the Micronaut application, we pass a `Pageable` instance to the repository.
+
+source:SaasSubscriptionGetListController[app=micronautframework]
+
+callout:controller[number=1,arg0=/subscriptions]
+callout:constructor-di[number=2,arg0=SaasSubscriptionRepository]
+callout:get[number=3,arg0=findAll,arg1=/subscriptions]
+callout:pageable[4]
+<5> `PageableRepository` provides a `findAll` method which takes a `Pageable` parameter.
+
+== Tests
+
+common:assertj-and-json-path.adoc[]
+
+common:jsonsmart.adoc[]
+
+=== See Data
+
+The seed data used in the tests is the same for both applications. We modified it to contain multiple entries.
+
+testResource:data.sql[app=springboot]
+
+=== Spring Boot Test
+
+The following tests verify the following scenarios:
+
+- Returning a list specifying the sorting
+- Returning a list with the default sorting
+- Returning a list specifying no pageable parameters
+
+test:SaasSubscriptionGetListControllerTest[app=springboot]
+
+callout:spring-boot-test[1]
+callout:autowired[number=2,arg0=TestRestTemplate]
+callout:spring-boot-test-rest-template[number=3]
+
+=== Micronaut Test
+
+The Micronaut Test is almost identical to the previous Spring Boot test. The main difference is that the Micronaut Test uses the built-in `HttpClient` instead of `TestRestTemplate` and `HttpResponse` instead of `ResponseEntity`.
+
+test:SaasSubscriptionGetListControllerTest[app=micronautframework]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+
+== Conclusion
+
+Adding pagination to the persistence layer is easy in both frameworks, and the API is almost identical. However, Micronaut Data's compile-time/reflection-free approach results in better performance, smaller stack traces, and reduced memory consumption.
+
