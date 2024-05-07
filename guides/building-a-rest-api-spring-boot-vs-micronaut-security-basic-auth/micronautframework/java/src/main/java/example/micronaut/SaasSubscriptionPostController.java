@@ -21,11 +21,9 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.serde.annotation.Serdeable;
 
 import java.net.URI;
 import java.security.Principal;
-import java.util.Map;
 
 @Controller("/subscriptions") // <1>
 @Secured("SAAS_SUBSCRIPTION_OWNER") // <2>
