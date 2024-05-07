@@ -32,6 +32,7 @@ import java.util.Optional;
 
 @Singleton // <1>
 class AppAuthenticationProvider<B> implements HttpRequestAuthenticationProvider<B> {
+
     private static final String KEY_PASSWORD = "password";
     private final Map<String, Authentication> users;
     private final PasswordEncoder passwordEncoder;

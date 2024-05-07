@@ -28,6 +28,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.catchThrowableOfType;
 
 @MicronautTest // <1>
 class SecurityTest {
+
     @Test
     void shouldNotAllowAccessToSaasSubscriptionsTheyDoNotOwn(@Client("/") HttpClient httpClient) { // <2>
         HttpRequest<?> request = HttpRequest.GET("/subscriptions/102")

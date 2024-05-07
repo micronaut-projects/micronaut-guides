@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
 class SecurityTest {
+
     @Autowired // <2>
     TestRestTemplate restTemplate; // <3>
 

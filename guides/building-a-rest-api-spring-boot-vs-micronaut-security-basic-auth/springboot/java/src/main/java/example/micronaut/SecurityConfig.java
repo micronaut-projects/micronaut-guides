@@ -30,6 +30,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration // <1>
 class SecurityConfig {
+
     private static final String ROLE_SAAS_SUBSCRIPTION_OWNER = "SAAS_SUBSCRIPTION_OWNER";
     private static final String ROLE_NON_OWNER = "NON-OWNER";
 

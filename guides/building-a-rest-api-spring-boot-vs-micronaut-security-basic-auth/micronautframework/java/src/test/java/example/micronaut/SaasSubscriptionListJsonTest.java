@@ -61,7 +61,7 @@ class SaasSubscriptionListJsonTest {
            {
                "id":100,
                "name": "Advanced",
-               "cents":2900, 
+               "cents":2900,
                 "owner": "sarah1"
            }
            """;

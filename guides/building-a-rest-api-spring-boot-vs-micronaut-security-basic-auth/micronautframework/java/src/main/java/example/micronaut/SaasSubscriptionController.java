@@ -25,7 +25,9 @@ import io.micronaut.security.annotation.Secured;
 @Controller("/subscriptions") // <1>
 @Secured("SAAS_SUBSCRIPTION_OWNER") // <2>
 class SaasSubscriptionController {
+
     private final SaasSubscriptionRepository repository;
+
     SaasSubscriptionController(SaasSubscriptionRepository repository) { // <3>
         this.repository = repository;
     }

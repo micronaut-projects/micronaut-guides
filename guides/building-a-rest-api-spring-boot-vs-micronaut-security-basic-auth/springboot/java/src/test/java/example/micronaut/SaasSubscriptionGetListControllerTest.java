@@ -86,5 +86,4 @@ class SaasSubscriptionGetListControllerTest {
         JSONArray cents = documentContext.read("$..cents");
         assertThat(cents).containsExactlyInAnyOrder(1400, 2900, 4900);
     }
-
 }

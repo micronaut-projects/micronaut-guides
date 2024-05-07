@@ -25,6 +25,8 @@ import java.util.Optional;
 
 @JdbcRepository(dialect = Dialect.H2) // <1>
 interface SaasSubscriptionRepository extends PageableRepository<SaasSubscription, Long> { // <2>
+
     Optional<SaasSubscription> findByIdAndOwner(Long id, String owner);
+
     Page<SaasSubscription> findByOwner(String owner, Pageable pageRequest);
 }
