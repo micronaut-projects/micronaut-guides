@@ -113,6 +113,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 skipMavenTests: config.skipMavenTests ?: false,
                 minimumJavaVersion: config.minimumJavaVersion,
                 maximumJavaVersion: config.maximumJavaVersion,
+                skips: (config.skips.collect { new GuideMetadata.Skip(it[0], it[1]) } ?: []).toSet(),
                 zipIncludes: config.zipIncludes ?: [],
                 env: config.env ?: [:],
                 apps: config.apps.collect { it ->
@@ -334,8 +335,12 @@ class GuideProjectGenerator implements AutoCloseable {
         List<GuidesOption> guidesOptionList = []
 
         for (BuildTool buildTool : BuildTool.values()) {
-            if (buildTools.contains(buildTool.toString())) {
+            if (buildTools.contains(buildTool.toString()) && !guideMetadata.shouldSkip(buildTool)) {
                 for (Language language : Language.values()) {
+                    if (guideMetadata.shouldSkip(buildTool, language)) {
+                        LOG.info("Skipping index guide for $buildTool and $language")
+                        continue
+                    }
                     if (languages.contains(language.toString())) {
                         guidesOptionList << createGuidesOption(buildTool, language, testFramework)
                     }
@@ -405,6 +410,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.skipMavenTests = base.skipMavenTests || metadata.skipMavenTests
         merged.minimumJavaVersion = metadata.minimumJavaVersion ?: base.minimumJavaVersion
         merged.maximumJavaVersion = metadata.maximumJavaVersion ?: base.maximumJavaVersion
+        merged.skips = metadata.skips + base.skips
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
         merged.env = metadata.env ?: base.env
         merged.apps = mergeApps(base, metadata)

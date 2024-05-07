@@ -1,7 +1,6 @@
 package io.micronaut.guides
 
 import groovy.transform.CompileStatic
-import io.micronaut.starter.options.BuildTool
 import java.util.stream.Collectors
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.GRADLE
@@ -142,12 +141,6 @@ kill_kotlin_daemon () {
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
                 BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE
-                if (buildTool == MAVEN && metadata.skipMavenTests) {
-                    continue
-                }
-                if (buildTool == GRADLE && metadata.skipGradleTests) {
-                    continue
-                }
                 if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
                     def defaultApp = metadata.apps.find { it.name == DEFAULT_APP_NAME }
                     if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
