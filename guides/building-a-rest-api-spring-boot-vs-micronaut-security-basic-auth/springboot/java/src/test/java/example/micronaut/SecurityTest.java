@@ -39,7 +39,7 @@ class SecurityTest {
     }
 
     @Test
-    void shouldRejectUsersWhoAreNotSubscriptionOwners() { // <2>
+    void shouldRejectUsersWhoAreNotSubscriptionOwners() {
         ResponseEntity<String> response = restTemplate
                 .withBasicAuth("john-owns-no-subscriptions", "qrs456")
                 .getForEntity("/subscriptions/99", String.class);
