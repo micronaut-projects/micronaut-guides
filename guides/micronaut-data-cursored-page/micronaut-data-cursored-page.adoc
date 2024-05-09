@@ -1,0 +1,92 @@
+common:header.adoc[]
+
+This guide uses Micronaut Data's https://micronaut-projects.github.io/micronaut-data/latest/guide/#cursored-pagination[Cursored Pagination] to traverse data.
+
+Micronaut Data Cursor-page pagination is inspired by https://jakarta.ee/specifications/data/1.0/data-1.0.0-rc1#_cursor_based_pagination[Jakarta Data's Cursor-based pagination].
+____
+Cursor-based pagination aims to reduce missed and duplicate results across pages by querying relative to the observed values of entity properties that constitute the sorting criteria
+____
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+== Writing the Application
+
+We will create a Micronaut Data JDBC with an H2 database application that exposes a REST API.
+
+=== Data Source Dependencies
+
+Add the following dependencies:
+
+:dependencies:
+
+dependency:micronaut-data-processor[groupId=io.micronaut.data,scope=annotationProcessor]
+dependency:micronaut-data-jdbc[groupId=io.micronaut.data]
+dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql]
+dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=4]
+
+:dependencies:
+
+<1> Configures Hibernate/JPA EntityManagerFactory beans.
+<2> Adds Micronaut Data Transaction Hibernate dependency.
+<3> Configures SQL DataSource instances using Hikari Connection Pool.
+<4> Add dependency to in-memory H2 Database.
+
+:dependencies:
+
+And the database configuration:
+
+resource:application.properties[tag=datasource]
+
+== Writing the Application
+
+=== Entities
+
+Add the following entity:
+
+source:Fruit[]
+
+callout:serdeable[1]
+callout:mapped-entity[2]
+callout:mapped-entity-id[3]
+callout:generated-value[4]
+
+=== Repository
+
+Add a repository interface. Micronaut Data provides an implementation of the interface at compilation time. You can use https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/model/CursoredPageable.html[CursoredPageable] as a method parameter and https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/model/CursoredPage.html[CursoredPage] as a return type.
+
+
+source:FruitRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+<3> The signature defines a https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/model/CursoredPageable.html[CursoredPageable] parameter and https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/model/CursoredPage.html[CursoredPage] return type.
+
+=== Controller
+
+Create a controller that uses the repository's method with Cursor Pagination capabilities.
+
+source:FruitController[]
+
+callout:controller[number=1,arg0=/fruits]
+callout:constructor-di[number=2,arg0=FruitRepository]
+callout:get-generic[number=3]
+<4> The code uses `CursoredPage::hasNext` and `CursorPage::nextPageable` to traverse the data.
+
+=== Tests
+
+The following test verifies the controller fetches every entity.
+
+test:FruitControllerTest[]
+
+callout:micronaut-test-transactional-false[1]
+callout:http-client[2]
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#cursored-pagination[Micronaut Data's Cursored Pagination] support.
+
+common:helpWithMicronaut.adoc[]
