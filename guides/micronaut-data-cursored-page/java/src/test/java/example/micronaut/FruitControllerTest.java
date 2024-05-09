@@ -29,11 +29,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@MicronautTest(transactional = false)
+@MicronautTest(transactional = false) // <1>
 class FruitControllerTest {
 
     @Test
-    void itIsPossibleToNavigateWithCursoredPage(@Client("/") HttpClient httpClient,
+    void itIsPossibleToNavigateWithCursoredPage(@Client("/") HttpClient httpClient, // <2>
                                                 FruitRepository repository) {
         List<Fruit> data = List.of(
                 new Fruit(null, "apple"),
