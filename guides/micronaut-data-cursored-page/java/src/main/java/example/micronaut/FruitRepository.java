@@ -23,5 +23,6 @@ import io.micronaut.data.repository.CrudRepository;
 
 @JdbcRepository(dialect = Dialect.H2) // <1>
 public interface FruitRepository extends CrudRepository<Fruit, Long> { // <2>
+
     CursoredPage<Fruit> find(CursoredPageable pageable); // <3>
 }

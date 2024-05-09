@@ -26,6 +26,7 @@ import java.util.List;
 
 @Controller("/fruits") // <1>
 class FruitController {
+
     private static final Sort SORT = Sort.of(Sort.Order.asc("name"));
 
     private final FruitRepository repository;
