@@ -204,7 +204,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app --features=graalvm,oracle-function example.micronaut.micronautguide --build=gradle --lang=kotlin --jdk=17</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app --features=graalvm,oracle-function,oracle-cloud-httpclient-netty example.micronaut.micronautguide --build=gradle --lang=kotlin --jdk=17</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -220,7 +220,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
-<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the <code>graalvm</code> and <code>oracle-function</code> features.</p>
+<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the <code>graalvm</code>, <code>oracle-function</code> and <code>oracle-cloud-httpclient-netty</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
@@ -255,12 +255,12 @@ import jakarta.inject.Inject
 import jakarta.inject.Singleton
 
 @Singleton
+@ReflectiveAccess <i class="conum" data-value="1"></i><b>(1)</b>
 class Function : OciFunction() {
 
     @Inject
     lateinit var tenantIdProvider : TenancyIdProvider
 
-    @ReflectiveAccess <i class="conum" data-value="1"></i><b>(1)</b>
     fun handleRequest() : String {
         val tenancyId = tenantIdProvider.tenancyId
         return &quot;Your tenancy is: $tenancyId&quot;
@@ -871,26 +871,18 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <p>Depending on the Micronaut version you&#8217;re using, you might also need to update some properties in your build script to update the Docker configuration.</p>
 </div>
 <div class="paragraph">
-<p>In your <code>build.gradle</code>, if the <code>graalvmNative</code> block includes <code>--static</code> in the <code>args</code> list, replace it with <code>-H:+StaticExecutableWithDynamicLibC</code>. Also change the base image to <code>frolvlad/alpine-glibc:alpine-3.12</code> in the <code>dockerfileNative</code> block:</p>
+<p>In your <code>build.gradle</code>, if the <code>graalvmNative</code> block includes <code>--static</code> in the <code>args</code> list, replace it with <code>-H:+StaticExecutableWithDynamicLibC</code>.</p>
 </div>
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">graalvmNative {
-    binaries {
-        main {
-            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">-H:+StaticExecutableWithDynamicLibC</span><span class="delimiter">'</span></span>)
-            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">-Dfn.handler=example.micronaut.Function::handleRequest</span><span class="delimiter">'</span></span>)
-            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">--initialize-at-build-time=example.micronaut</span><span class="delimiter">'</span></span>)
-        }
+    binaries.configureEach {
+        buildArgs.addAll(
+             <span class="string"><span class="delimiter">&quot;</span><span class="content">-H:+StaticExecutableWithDynamicLibC</span><span class="delimiter">&quot;</span></span>,
+             <span class="string"><span class="delimiter">&quot;</span><span class="content">-Dfn.handler=example.micronaut.Function::handleRequest</span><span class="delimiter">&quot;</span></span>,
+        )
     }
-}
-
-dockerfileNative {
-    args(<span class="string"><span class="delimiter">&quot;</span><span class="content">-XX:MaximumHeapSizePercent=80</span><span class="delimiter">&quot;</span></span>)
-    buildStrategy.set(ORACLE_FUNCTION)
-    defaultCommand.set(<span class="string"><span class="delimiter">&quot;</span><span class="content">example.micronaut.Function::handleRequest</span><span class="delimiter">&quot;</span></span>)
-    baseImage(<span class="string"><span class="delimiter">'</span><span class="content">frolvlad/alpine-glibc:alpine-3.12</span><span class="delimiter">'</span></span>)
 }</code></pre>
 </div>
 </div>

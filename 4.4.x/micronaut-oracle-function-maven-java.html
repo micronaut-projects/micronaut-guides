@@ -204,7 +204,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app --features=graalvm,oracle-function example.micronaut.micronautguide --build=maven --lang=java --jdk=17</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app --features=graalvm,oracle-function,oracle-cloud-httpclient-netty example.micronaut.micronautguide --build=maven --lang=java --jdk=17</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -220,7 +220,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle is used as 
 </table>
 </div>
 <div class="paragraph">
-<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the <code>graalvm</code> and <code>oracle-function</code> features.</p>
+<p>If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "Function Application for Serverless" as application type, JDK version 11 or higher, and add the <code>graalvm</code>, <code>oracle-function</code> and <code>oracle-cloud-httpclient-netty</code> features.</p>
 </div>
 <div class="paragraph">
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
@@ -256,12 +256,12 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="keyword">import</span> <span class="include">java.util.Date</span>;
 
 <span class="annotation">@Singleton</span>
+<span class="annotation">@ReflectiveAccess</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="directive">public</span> <span class="type">class</span> <span class="class">Function</span> <span class="directive">extends</span> OciFunction {
 
     <span class="annotation">@Inject</span>
     TenancyIdProvider tenantIdProvider;
 
-    <span class="annotation">@ReflectiveAccess</span> <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="directive">public</span> <span class="predefined-type">String</span> handleRequest() {
         <span class="predefined-type">String</span> tenancyId = tenantIdProvider.getTenancyId();
         <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Your tenancy is: </span><span class="delimiter">&quot;</span></span> + tenancyId;
@@ -852,7 +852,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <p>Depending on the Micronaut version you&#8217;re using, you might also need to update some properties in your build script to update the Docker configuration.</p>
 </div>
 <div class="paragraph">
-<p>In your <code>pom.xml</code>, if the <code>nativeImageBuildArgs</code> block in the configuration section of the <code>micronaut-maven-plugin</code> plugin includes an <code>arg</code> with value <code>--static</code>, replace it with <code>-H:+StaticExecutableWithDynamicLibC</code>. Also change the base image to <code>frolvlad/alpine-glibc:alpine-3.12</code> in a new <code>baseImageRun</code> element:</p>
+<p>In your <code>pom.xml</code>, if the <code>nativeImageBuildArgs</code> block in the configuration section of the <code>micronaut-maven-plugin</code> plugin includes an <code>arg</code> with value <code>--static</code>, replace it with <code>-H:+StaticExecutableWithDynamicLibC</code>.</p>
 </div>
 <div class="listingblock">
 <div class="title">pom.xml</div>
@@ -860,17 +860,15 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;plugin&gt;</span>
   <span class="tag">&lt;groupId&gt;</span>io.micronaut.build<span class="tag">&lt;/groupId&gt;</span>
   <span class="tag">&lt;artifactId&gt;</span>micronaut-maven-plugin<span class="tag">&lt;/artifactId&gt;</span>
-  <span class="tag">&lt;configuration&gt;</span>
-    <span class="tag">&lt;baseImageRun&gt;</span>frolvlad/alpine-glibc:alpine-3.12<span class="tag">&lt;/baseImageRun&gt;</span>
-    <span class="tag">&lt;nativeImageBuildArgs&gt;</span>
-      <span class="tag">&lt;arg&gt;</span>-H:+StaticExecutableWithDynamicLibC<span class="tag">&lt;/arg&gt;</span>
-      <span class="tag">&lt;arg&gt;</span>-Dfn.handler=${exec.mainClass}::handleRequest<span class="tag">&lt;/arg&gt;</span>
-      <span class="tag">&lt;arg&gt;</span>--initialize-at-build-time=example.micronaut<span class="tag">&lt;/arg&gt;</span>
-    <span class="tag">&lt;/nativeImageBuildArgs&gt;</span>
-    <span class="tag">&lt;appArguments&gt;</span>
-      <span class="tag">&lt;arg&gt;</span>${exec.mainClass}::handleRequest<span class="tag">&lt;/arg&gt;</span>
-    <span class="tag">&lt;/appArguments&gt;</span>
-  <span class="tag">&lt;/configuration&gt;</span>
+   <span class="tag">&lt;configuration&gt;</span>
+      <span class="tag">&lt;nativeImageBuildArgs&gt;</span>
+        <span class="tag">&lt;arg&gt;</span>-H:+StaticExecutableWithDynamicLibC<span class="tag">&lt;/arg&gt;</span>
+        <span class="tag">&lt;arg&gt;</span>-Dfn.handler=${function.entrypoint}<span class="tag">&lt;/arg&gt;</span>
+      <span class="tag">&lt;/nativeImageBuildArgs&gt;</span>
+      <span class="tag">&lt;appArguments&gt;</span>
+        <span class="tag">&lt;arg&gt;</span>${function.entrypoint}<span class="tag">&lt;/arg&gt;</span>
+      <span class="tag">&lt;/appArguments&gt;</span>
+    <span class="tag">&lt;/configuration&gt;</span>
 <span class="tag">&lt;/plugin&gt;</span></code></pre>
 </div>
 </div>
