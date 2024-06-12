@@ -19,8 +19,9 @@ import com.nimbusds.jwt.JWT
 import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.SignedJWT
 import io.micronaut.context.annotation.Property
+import io.micronaut.http.HttpRequest
 import io.micronaut.security.token.generator.TokenGenerator
-import io.micronaut.security.token.validator.TokenValidator
+import io.micronaut.security.token.jwt.validator.JsonWebTokenValidator
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
@@ -35,7 +36,7 @@ class TokenGeneratorSpec extends Specification {
     TokenGenerator tokenGenerator
 
     @Inject
-    TokenValidator tokenValidator
+    JsonWebTokenValidator<JWT, HttpRequest<?>> tokenValidator
 
     void canGenerateSignedJsonWebTokens() {
 
@@ -59,7 +60,7 @@ class TokenGeneratorSpec extends Specification {
         jwt instanceof SignedJWT
 
         when:
-        tokenValidator.validateToken(jwtString, null)
+        tokenValidator.validate(jwtString, null)
 
         then:
         1 == jwt.JWTClaimsSet.claims.keySet().size()

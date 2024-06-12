@@ -28,8 +28,8 @@ open class CreateToDoDataFetcher(
 
     @Transactional
     override fun get(env: DataFetchingEnvironment): ToDo {
-        val title = env.getArgument<String>("title")
-        val username = env.getArgument<String>("author")
+        val title = env.getArgument<String>("title")!!
+        val username = env.getArgument<String>("author")!!
         val author = authorRepository.findOrCreate(username) // <3>
         val toDo = ToDo(title, author.id!!)
         return toDoRepository.save(toDo) // <4>
