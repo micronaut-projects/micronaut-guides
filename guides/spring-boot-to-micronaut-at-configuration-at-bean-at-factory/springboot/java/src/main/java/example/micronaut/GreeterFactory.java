@@ -3,7 +3,7 @@ package example.micronaut;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration // <1>
 class GreeterFactory {
 
     @Bean
