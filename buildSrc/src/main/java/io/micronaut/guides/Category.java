@@ -40,7 +40,8 @@ public enum Category implements Ordered {
     GOOGLE_CLOUD_RUN("Google Cloud Run", 34),
     ORACLE_CLOUD("Oracle Cloud", 35),
     KUBERNETES( "Kubernetes", 36),
-    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 37);
+    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 37),
+    BUILDING_A_REST_API("Building a REST API - Spring Boot to Micronaut Framework", 38);
 
     private final String val;
     private final int order;
