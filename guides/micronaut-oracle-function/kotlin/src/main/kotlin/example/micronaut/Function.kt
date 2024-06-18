@@ -22,12 +22,12 @@ import jakarta.inject.Inject
 import jakarta.inject.Singleton
 
 @Singleton
+@ReflectiveAccess // <1>
 class Function : OciFunction() {
 
     @Inject
     lateinit var tenantIdProvider : TenancyIdProvider
 
-    @ReflectiveAccess // <1>
     fun handleRequest() : String {
         val tenancyId = tenantIdProvider.tenancyId
         return "Your tenancy is: $tenancyId"

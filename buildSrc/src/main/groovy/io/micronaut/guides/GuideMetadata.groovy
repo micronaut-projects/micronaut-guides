@@ -1,9 +1,12 @@
 package io.micronaut.guides
 
+import groovy.transform.Canonical
 import groovy.transform.CompileStatic
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
+import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
 import java.time.LocalDate
@@ -36,6 +39,8 @@ class GuideMetadata {
 
     List<String> zipIncludes
 
+    Set<Skip> skips
+
     Map<String, String> env
 
     List<App> apps
@@ -58,6 +63,38 @@ class GuideMetadata {
         Set<String> categoriesAsTags = this.categories.collect { cat -> cat.name().toLowerCase() } as Set
         tagsList.addAll(categoriesAsTags)
         tagsList as List<String>
+    }
+
+    boolean shouldSkip(BuildTool buildTool) {
+        if (buildTool == BuildTool.GRADLE) {
+            return skipGradleTests
+        }
+        if (buildTool == BuildTool.MAVEN) {
+            return skipMavenTests
+        }
+        false
+    }
+
+    boolean shouldSkip(BuildTool buildTool, Language language) {
+        return skips.contains(new Skip(buildTool, language))
+    }
+
+    @Canonical
+    @CompileStatic
+    static class Skip {
+
+        final BuildTool buildTool
+        final Language language
+
+        Skip(String buildTool, String language) {
+            this.buildTool = BuildTool.valueOf(buildTool.toUpperCase())
+            this.language = Language.valueOf(language.toUpperCase())
+        }
+
+        Skip(BuildTool buildTool, Language language) {
+            this.buildTool = buildTool
+            this.language = language
+        }
     }
 
     @ToString(includeNames = true)
