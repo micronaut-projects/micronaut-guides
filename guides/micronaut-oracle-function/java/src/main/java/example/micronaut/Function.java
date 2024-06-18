@@ -23,12 +23,12 @@ import jakarta.inject.Singleton;
 import java.util.Date;
 
 @Singleton
+@ReflectiveAccess // <1>
 public class Function extends OciFunction {
 
     @Inject
     TenancyIdProvider tenantIdProvider;
 
-    @ReflectiveAccess // <1>
     public String handleRequest() {
         String tenancyId = tenantIdProvider.getTenancyId();
         return "Your tenancy is: " + tenancyId;
