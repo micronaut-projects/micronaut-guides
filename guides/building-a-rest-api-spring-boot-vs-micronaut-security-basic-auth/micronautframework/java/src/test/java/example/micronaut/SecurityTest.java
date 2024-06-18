@@ -21,11 +21,13 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.test.annotation.Sql;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowableOfType;
 
+@Sql(value = {"classpath:schema.sql", "classpath:data.sql"})
 @MicronautTest // <1>
 class SecurityTest {
 
