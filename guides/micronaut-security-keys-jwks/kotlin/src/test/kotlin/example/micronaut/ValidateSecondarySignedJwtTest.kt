@@ -25,7 +25,7 @@ import io.micronaut.security.token.jwt.generator.JwtTokenGenerator
 import io.micronaut.security.token.claims.ClaimsGenerator
 import io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator
-import io.micronaut.security.token.validator.TokenValidator
+import io.micronaut.security.token.jwt.validator.JsonWebTokenValidator
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -45,7 +45,7 @@ class ValidateSecondarySignedJwtTest {
     lateinit var jwkConfiguration: JwkConfiguration
 
     @Inject
-    lateinit var tokenValidator: TokenValidator<HttpRequest<Any>>
+    lateinit var tokenValidator: JsonWebTokenValidator<JWT, HttpRequest<Any>>
     @Test
     fun canValidateAJWebTokenSignedWithTheSecondaryJsonWebKey() {
 
@@ -60,7 +60,7 @@ class ValidateSecondarySignedJwtTest {
         val jwt = JWTParser.parse(jwtString)
         assertTrue(jwt is SignedJWT)
 
-        tokenValidator.validateToken(jwtString, null)
+        tokenValidator.validate(jwtString, null)
     }
 
     internal class MockSignatureGenerator(jwkConfiguration: JwkConfiguration) :

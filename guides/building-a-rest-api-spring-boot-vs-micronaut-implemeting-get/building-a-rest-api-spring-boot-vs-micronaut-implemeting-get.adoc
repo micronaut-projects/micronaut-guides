@@ -1,0 +1,110 @@
+common:header-top.adoc[]
+
+== Sample Project
+
+You can link:@sourceDir@.zip[download a sample application] with the code examples in this article.
+
+== Introduction
+
+This guide compares how to test implement a GET in a Micronaut Framework and Spring Boot applications.
+
+This guide is the second tutorial of https://guides.micronaut.io/latest/tag-building_a_rest_api.html[Building a Rest API] - a series of tutorials comparing how to develop a REST API with Micronaut Framework and Spring Boot.
+
+== Controller
+
+To implement a GET `/subscriptions/{id}` endpoint, you need to create a controller in both frameworks.
+
+The API is quite similar:
+
+[.left-stripes-even,cols="1h,2*"]
+.Comparison between Spring Boot and Micronaut Framework
+|===
+| | Spring Boot | Micronaut
+
+| Mark a bean as a controller
+| Annotate with `@RestController` and `@RequestMapping`
+| Annotate with `@Controller`
+
+| Identify a method as a GET endpoint
+| Annotate with `@GetMapping`
+| Annotate with `@Get`
+
+| Identify a method parameter as a path variable
+| Annotate with Spring's `@PathVariable`
+| Annotate with Micronaut's `@PathVariable`
+
+| Respond HTTP Responses with a status code and a body
+| Return a `ResponseEntity`
+| Return an `HttpResponse`
+|===
+
+NOTE: Another important difference is the controller's method visibility. **Micronaut Framework does not use reflection (which leads to better performance and better integration with technologies such as GraalVM)**. Thus, it requires the controller's methods to be public, protected, or package-private (no modifier). Throughout these tutorials, Micronaut controllers' methods use package-private.
+
+=== Spring Boot Controller
+
+This is the Spring Boot controller:
+
+source:SaasSubscriptionController[app=springboot]
+
+callout:spring-boot-rest-controller[1]
+callout:spring-boot-request-mapping[2]
+callout:spring-boot-get-mapping[number=3,arg0=findById,arg1=/subscriptions/{id}]
+callout:spring-boot-path-variable[number=4]
+
+=== Micronaut Controller
+
+This is the Micronaut controller:
+
+source:SaasSubscriptionController[app=micronautframework]
+
+callout:controller[number=1,arg0=/subscriptions]
+callout:get[number=2,arg0=findById,arg1=/subscriptions/{id}]
+callout:pathvariable[3]
+callout:http-response[4]
+
+==== Without HTTPResponse
+
+NOTE: The default HTTP Status code in a Micronaut controller method is 200. However, when a Micronaut controller's method returns null, the application responds with a 404 status code.
+
+Thus, you could simplify the previous controller as:
+
+source:SaasSubscriptionController[app=micronautframeworkjacksondatabind]
+
+callout:controller[number=1,arg0=/subscriptions]
+callout:get[number=2,arg0=findById,arg1=/]
+callout:pathvariable[3]
+callout:returning-null[4]
+
+=== Route Compile-Time Validation
+
+common:route-compile-time-validation.adoc[]
+
+For example, if you replace the `@Get("/{id}")` annotation with `@Get("/{identifier}")`, the application fails to compile.
+
+== Tests
+
+common:assertj-and-json-path.adoc[]
+
+=== Spring Boot Test
+
+We could write a test in Spring Boot using https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/web/client/TestRestTemplate.html[`TestRestTemplate`].
+
+test:SaasSubscriptionControllerGetTest[app=springboot]
+
+callout:spring-boot-test[1]
+callout:autowired[number=2,arg0=TestRestTemplate]
+callout:spring-boot-test-rest-template[number=3]
+
+=== Micronaut Test
+
+The main difference with the Spring Boot Test, is that we use the https://docs.micronaut.io/4.4.6/guide/#httpClient[Micronaut HTTP Client] to test the embedded server.
+
+test:SaasSubscriptionControllerGetTest[app=micronautframework]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-client-response-exception[3]
+
+== Conclusion
+
+Defining routes is extremely similar in both frameworks. However, Micronaut Framework provides compile-time validation of routes and a reflection-free approach to do it.
