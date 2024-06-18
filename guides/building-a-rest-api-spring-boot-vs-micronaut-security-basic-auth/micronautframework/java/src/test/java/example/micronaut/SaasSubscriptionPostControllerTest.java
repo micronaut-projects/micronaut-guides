@@ -25,6 +25,7 @@ import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.test.annotation.Sql;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -33,6 +34,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Sql(value = {"classpath:schema.sql", "classpath:data.sql"})
 @MicronautTest // <1>
 class SaasSubscriptionPostControllerTest {
 
