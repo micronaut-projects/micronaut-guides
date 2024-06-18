@@ -24,12 +24,12 @@ import jakarta.inject.Singleton
 
 @CompileStatic
 @Singleton
+@ReflectiveAccess // <1>
 class Function extends OciFunction {
 
     @Inject
     TenancyIdProvider tenantIdProvider
 
-    @ReflectiveAccess // <1>
     String handleRequest() {
         String tenancyId = tenantIdProvider.tenancyId
         return "Your tenancy is: $tenancyId"

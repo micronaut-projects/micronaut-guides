@@ -25,7 +25,7 @@ class CompleteToDoDataFetcher(
 ) : DataFetcher<Boolean> {
 
     override fun get(env: DataFetchingEnvironment): Boolean {
-        val id = env.getArgument<String>("id").toLong()
+        val id = env.getArgument<String>("id")!!.toLong()
 
         return toDoRepository
             .findById(id) // <3>

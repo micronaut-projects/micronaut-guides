@@ -21,7 +21,7 @@ import com.nimbusds.jwt.SignedJWT
 import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.security.token.generator.TokenGenerator
-import io.micronaut.security.token.validator.TokenValidator
+import io.micronaut.security.token.jwt.validator.JsonWebTokenValidator
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -39,7 +39,7 @@ class TokenGeneratorTest {
     lateinit var tokenGenerator: TokenGenerator
 
     @Inject
-    lateinit var tokenValidator: TokenValidator<HttpRequest<Any>>
+    lateinit var tokenValidator: JsonWebTokenValidator<JWT, HttpRequest<Any>>
     @Test
     fun canGenerateSignedJsonWebTokens() {
 
@@ -52,7 +52,7 @@ class TokenGeneratorTest {
         val jwt = JWTParser.parse(jwtString)
         assertTrue(jwt is SignedJWT)
 
-        tokenValidator.validateToken(jwtString, null)
+        tokenValidator.validate(jwtString, null)
 
         assertEquals(1, jwt.jwtClaimsSet.claims.keys.size)
         assertEquals("sergio", jwt.jwtClaimsSet.subject)
