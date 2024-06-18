@@ -11,4 +11,3 @@ public class JsonPath extends AbstractFeature {
         super("json-path", TEST);
     }
 }
-
