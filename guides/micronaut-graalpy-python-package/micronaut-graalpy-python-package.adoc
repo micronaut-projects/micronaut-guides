@@ -1,0 +1,113 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Application
+
+`Application.@languageextension@` is used when running the application via Maven or via deployment. You can also run the main class directly within your IDE if it is configured correctly.
+
+source:Application[]
+
+=== GraalPy Maven Plugin
+Insert a `<packages>` element into the GraalPy Maven Plugin `<configuration>` element, specifying the Python packages to download and install as shown below:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <build>
+    <plugins>
+      ...
+      <plugin>
+        <groupId>org.graalvm.python</groupId>
+        <artifactId>graalpy-maven-plugin</artifactId>
+        <version>${graalpy-maven-plugin.version}</version>
+        ...
+        <configuration>
+          <packages>
+            <!-- specify python packages as if used with pip -->
+            <package>pygal==3.0.4</package>
+          </packages>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+----
+
+Adding `<package>pygal==3.0.4</package>` instructs the plugin to download and install the Python https://www.pygal.org/en/stable/[Pygal] package at build time.
+The package is included in the Java resources and becomes available to GraalPy.
+
+=== Python code
+We are going to use the https://www.pygal.org/en/stable/documentation/types/bar.html#stacked[StackedBar] class from https://www.pygal.org/en/stable/[Pygal] package to render a graph
+in https://www.pygal.org/en/3.0.0/documentation/output.html#svg[Svg] format.
+
+=== Java binding
+Python code can be accessed programmatically using the https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/package-summary.html[GraalVM SDK Polyglot API],
+which enables you to embed Python into your applications.
+
+In order to make it work, we first need a Java interface providing the intended binding to Python.
+
+Create a Java interface with the following code:
+source:PygalModule[]
+<1> The @api@/io/micronaut/graal/graalpy/annotations/GraalPyModuleBean.html[@GraalPyModuleBean] annotation indicates that the bean created from the interface
+is intended to import the `pygal` Python package and expose it to the Java code using the https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Value.html#target-type-mapping-heading[Target type mapping].
+<2> Java method matching the `StackedBar` Python class constructor.
+<3> Java interface with methods matching functions from the `StackedBar` Python class we want to use.
+<4> Java method matching the `StackedBar.add(title, values)` Python function.
+<5> Java method matching the `StackedBar.render()` Python function.
+<6> Java interface with methods matching functions from the `Svg` Python class we want to use.
+<7> Java method matching the `Svg.decode()` Python function.
+
+=== Controller
+To create a microservice that provides the graph rendered by `Pygal` you also need a controller.
+
+Create a controller:
+source:PygalController[]
+
+callout:controller[number=1,arg0=/pygal]
+<2> Field holding the `PygalModule` bean.
+<3> Inject the PygalModule bean.
+callout:get[number=4,arg0=index,arg1=/pygal]
+<5> By default, a Micronaut response uses `application/json` as Content-Type. We are returning `svg/xml`, so we have to set it.
+<6> Use the `PygalModule` bean to create a `PygalModule.StackedBar` instance.
+<7> Add graph title and data.
+<8> Render the graph.
+<9> Return the graphs `svg/xml` representation decoded as a string.
+
+=== Test
+
+Create a test to verify that when you make a GET request to `/pygal` you get the `svg/xml` response:
+
+test:PygalControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-request[3]
+
+=== Native Executable metadata
+The https://www.graalvm.org/[GraalVM] Native Image compilation requires metadata to properly run code that uses https://www.graalvm.org/latest/reference-manual/native-image/metadata/#dynamic-proxy[dynamic proxies].
+
+For the case that also a native executable has to be generated, create a proxy configuration file:
+resource:META-INF/native-image/proxy-config.json[]
+
+common:testApp.adoc[]
+common:runapp.adoc[]
+
+Open `http://localhost:8080/pygal` in a web browser of your choice execute the endpoint. You should see a stacked bar chart.
+
+common:graal-with-plugins.adoc[]
+
+Open `http://localhost:8080/pygal` in a web browser of your choice to execute the endpoint exposed by the native executable. You should see a stacked bar chart.
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-test/latest/guide/[Micronaut testing].
+
+common:helpWithMicronaut.adoc[]
