@@ -140,7 +140,7 @@ kill_kotlin_daemon () {
 """
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE
+                BuildTool buildTool = folder.containsIgnoreCase(MAVEN.toString()) ? MAVEN : GRADLE
                 if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
                     if (metadata.shouldSkip(buildTool)) {
                         continue
