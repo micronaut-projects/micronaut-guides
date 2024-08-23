@@ -155,6 +155,9 @@ kill_kotlin_daemon () {
 cd $folder
 """
                     for (GuideMetadata.App app : metadata.apps) {
+                        if (metadata.shouldSkip(buildTool)) {
+                            continue
+                        }
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
                             def features = app.getFeatures(guidesOption.language)
                             bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense)
