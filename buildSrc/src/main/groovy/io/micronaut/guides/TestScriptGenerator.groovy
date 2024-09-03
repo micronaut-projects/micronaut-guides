@@ -140,7 +140,7 @@ kill_kotlin_daemon () {
 """
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE
+                BuildTool buildTool = folder.containsIgnoreCase(MAVEN.toString()) ? MAVEN : GRADLE
                 if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
                     if (metadata.shouldSkip(buildTool)) {
                         continue
@@ -155,6 +155,9 @@ kill_kotlin_daemon () {
 cd $folder
 """
                     for (GuideMetadata.App app : metadata.apps) {
+                        if (metadata.shouldSkip(buildTool)) {
+                            continue
+                        }
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
                             def features = app.getFeatures(guidesOption.language)
                             bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense)
