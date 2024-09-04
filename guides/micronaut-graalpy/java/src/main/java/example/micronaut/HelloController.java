@@ -23,15 +23,15 @@ import io.micronaut.http.annotation.Produces;
 @Controller("/hello") // <1>
 class HelloController {
 
-    private final HelloModule hello; // <2>
+    private final HelloModule hello;
 
-    HelloController(HelloModule hello) {
+    HelloController(HelloModule hello) {  // <2>
         this.hello = hello;
     }
 
-    @Get // <4>
-    @Produces(MediaType.TEXT_PLAIN) // <5>
+    @Get // <3>
+    @Produces(MediaType.TEXT_PLAIN) // <4>
     String index() {
-        return hello.hello("World"); // <6>
+        return hello.hello("World"); // <5>
     }
 }
