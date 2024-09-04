@@ -24,20 +24,20 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 @Controller("/pygal") // <1>
 class PygalController {
 
-    private final PygalModule pygal; // <2>
+    private final PygalModule pygal;
 
-    PygalController(PygalModule pygal) {
+    PygalController(PygalModule pygal) {  // <2>
         this.pygal = pygal;
     }
 
     @ExecuteOn(TaskExecutors.BLOCKING)
-    @Get // <4>
-    @Produces("image/svg+xml") // <5>
+    @Get // <3>
+    @Produces("image/svg+xml") // <4>
     public String index() {
-        PygalModule.StackedBar stackedBar = pygal.StackedBar(); // <6>
-        stackedBar.add("Fibonacci", new int[] {0, 1, 1, 2, 3, 5, 8}); // <7>
-        PygalModule.Svg svg = stackedBar.render(); // <8>
-        return svg.decode(); // <9>
+        PygalModule.StackedBar stackedBar = pygal.StackedBar(); // <5>
+        stackedBar.add("Fibonacci", new int[] {0, 1, 1, 2, 3, 5, 8}); // <6>
+        PygalModule.Svg svg = stackedBar.render(); // <7>
+        return svg.decode(); // <8>
     }
 
 }
