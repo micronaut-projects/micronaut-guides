@@ -110,7 +110,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 buildTools: config.buildTools ?: ['gradle', 'maven'],
                 testFramework: config.testFramework,
                 skipGradleTests: config.skipGradleTests ?: false,
-                skipMavenTests: true,//TODO config.skipMavenTests ?: false,
+                skipMavenTests: config.skipMavenTests ?: false,
                 minimumJavaVersion: config.minimumJavaVersion,
                 maximumJavaVersion: config.maximumJavaVersion,
                 skips: (config.skips.collect { new GuideMetadata.Skip(it[0], it[1]) } ?: []).toSet(),
