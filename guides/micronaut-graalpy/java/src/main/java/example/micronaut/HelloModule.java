@@ -1,8 +1,8 @@
 package example.micronaut;
 
-import io.micronaut.graal.graalpy.annotations.GraalPyModuleBean;
+import io.micronaut.graal.graalpy.annotations.GraalPyModule;
 
-@GraalPyModuleBean("hello") // <1>
+@GraalPyModule("hello") // <1>
 public interface HelloModule {
     String hello(String txt); // <2>
 }

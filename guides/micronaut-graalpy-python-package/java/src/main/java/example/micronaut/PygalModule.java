@@ -1,8 +1,8 @@
 package example.micronaut;
 
-import io.micronaut.graal.graalpy.annotations.GraalPyModuleBean;
+import io.micronaut.graal.graalpy.annotations.GraalPyModule;
 
-@GraalPyModuleBean("pygal") // <1>
+@GraalPyModule("pygal") // <1>
 interface PygalModule {
     StackedBar StackedBar(); // <2>
 
