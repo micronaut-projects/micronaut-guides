@@ -15,8 +15,10 @@
  */
 package example.micronaut;
 
+import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
@@ -27,6 +29,7 @@ import java.util.Map;
 @Controller // <1>
 public class HomeController {
 
+    @Produces(MediaType.TEXT_HTML)
     @Secured(SecurityRule.IS_ANONYMOUS) // <2>
     @View("home") // <3>
     @Get // <4>
