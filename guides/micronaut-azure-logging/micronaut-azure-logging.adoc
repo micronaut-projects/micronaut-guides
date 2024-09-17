@@ -1,0 +1,344 @@
+common:header.adoc[]
+
+This guide describes how to create a Micronaut application that publishes logs to https://learn.microsoft.com/en-us/azure/azure-monitor/logs/data-platform-logs[Azure Monitor Logs]. Typically, application logs are written to `stdout` and to files, but the Micronaut^&reg;^ Logging module supports multiple logging frameworks such as https://logback.qos.ch/[Logback], and logging to various other appenders, to email, a database, or other destinations.
+
+common:requirements.adoc[]
+common:azure-cli.adoc[]
+common:azure-account-paid.adoc[]
+common:azure-paid.adoc[]
+
+common:completesolution.adoc[]
+common:cli-or-launch.adoc[]
+common:build-lang-arguments.adoc[]
+common:default-package.adoc[]
+common:create-app.adoc[]
+
+=== Micronaut Azure Logging Dependency
+
+Add this dependency to your build to add Azure logging support:
+
+dependency:micronaut-azure-logging[groupId=io.micronaut.azure]
+
+== LogController
+
+Create a controller which enables you to send POST requests to log messages:
+
+source:LogController[]
+
+== Create Azure Cloud Resources
+
+You will create a resource group, a Log Analytics Workspace and a table in the workspace to hold log event data, a Data Collection Endpoint, and a Data Collection Rule.
+
+=== Create a Resource Group
+
+We recommend that you create a new https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/overview#resource-groups[resource group] for this guide, but you can use an existing resource group instead.
+
+Run the https://learn.microsoft.com/en-us/cli/azure/group?view=azure-cli-latest#az-group-create[az group create] command to create a resource group named _micronautguides_ in the _eastus_ region:
+
+[source,bash]
+----
+az group create --location eastus --name micronautguides
+----
+
+If you prefer using a region geographically closer to you, run `az account list-locations` to list all available regions.
+
+=== Add the monitor-control-service CLI Extension
+
+Run the https://learn.microsoft.com/en-us/cli/azure/extension?view=azure-cli-latest#az-extension-add[az extension add] command to add the monitor-control-service CLI Extension:
+
+[source,bash]
+----
+az extension add -n monitor-control-service
+----
+
+=== Add the log-analytics CLI Extension
+
+Run the https://learn.microsoft.com/en-us/cli/azure/extension?view=azure-cli-latest#az-extension-add[az extension add] command to add the log-analytics CLI Extension:
+
+[source,bash]
+----
+az extension add -n log-analytics
+----
+
+=== Create a Log Analytics Workspace
+
+Run the https://learn.microsoft.com/en-us/cli/azure/monitor/log-analytics/workspace?view=azure-cli-latest#az-monitor-log-analytics-workspace-create[az monitor log-analytics workspace create] command to create a Log Analytics Workspace:
+
+[source,bash]
+----
+az monitor log-analytics workspace create \
+   --name micronautworkspace \
+   --resource-group micronautguides
+----
+
+The response should look like this:
+
+[source,json]
+----
+{
+   "createdDate": "2024-08-19T20:11:18.4002398Z",
+   "customerId": "c222d080-5b14-43e7-b648-71c2b358dc74",
+   ...
+   "name": "micronautworkspace",
+   "provisioningState": "Creating",
+   ...
+}
+----
+
+Save the value of the _customerId_ attribute. This is your workspace GUID, and it will be needed later.
+
+=== Create a Data Collection Endpoint
+
+Run the https://learn.microsoft.com/en-us/cli/azure/monitor/data-collection/endpoint?view=azure-cli-latest#az-monitor-data-collection-endpoint-create[az monitor data-collection endpoint create] command to create a Data Collection Endpoint:
+
+[source,bash]
+----
+az monitor data-collection endpoint create \
+   --data-collection-endpoint-name micronautCollectionEndpoint \
+   --public-network-access Enabled \
+   --resource-group micronautguides
+----
+
+The response should look like this:
+
+[source,json]
+----
+{
+  ...
+  "logsIngestion": {
+    "endpoint": "https://micronautcollectionendpoint-xxxx.eastus-1.ingest.monitor.azure.com"
+  },
+  ...
+  "name": "micronautCollectionEndpoint",
+  ...
+  "type": "Microsoft.Insights/dataCollectionEndpoints"
+}
+----
+
+Save the value of the _logsIngestion.endpoint_ attribute. This is the logs ingestion endpoint URL, and it will be needed later.
+
+=== Create a table in your Log Analytics workspace
+
+Run the https://learn.microsoft.com/en-us/cli/azure/monitor/log-analytics/workspace/table?view=azure-cli-latest#az-monitor-log-analytics-workspace-table-create[az monitor log-analytics workspace table create] command to create a table in your Log Analytics workspace to hold the log records:
+
+[source,bash]
+----
+az monitor log-analytics workspace table create \
+   --name MicronautTable_CL \
+   --workspace-name micronautworkspace \
+   --columns EventTimestamp=long Source=string Subject=string Data=string TimeGenerated=datetime \
+   --resource-group micronautguides
+----
+
+=== Create a Data Collection Rule
+
+Create a file named "dcr.json" with this content:
+
+[source,json]
+----
+{
+  "location": "<region>",
+  "properties": {
+    "streamDeclarations": {
+      "Custom-MicronautTable": {
+        "columns": [
+          {
+            "name": "TimeGenerated",
+            "type": "datetime"
+          },
+          {
+            "name": "EventTimestamp",
+            "type": "long"
+          },
+          {
+            "name": "Source",
+            "type": "string"
+          },
+          {
+            "name": "Subject",
+            "type": "string"
+          },
+          {
+            "name": "Data",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "destinations": {
+      "logAnalytics": [
+        {
+          "workspaceResourceId": "/subscriptions/<subscription-id>/resourceGroups/micronautguides/providers/microsoft.operationalinsights/workspaces/micronautworkspace",
+          "name": "micronautLogDestination"
+        }
+      ]
+    },
+    "dataFlows": [
+      {
+        "streams": [
+          "Custom-MicronautTable"
+        ],
+        "destinations": [
+          "micronautLogDestination"
+        ],
+        "transformKql": "source | extend TimeGenerated = now()",
+        "outputStream": "Custom-MicronautTable_CL"
+      }
+    ]
+  }
+}
+----
+
+Replace <region> with the name of the region you’re using, e.g. "_eastus_", and replace <subscription-id> with your Azure Subscription ID.
+
+Run the https://learn.microsoft.com/en-us/cli/azure/monitor/data-collection/rule?view=azure-cli-latest#az-monitor-data-collection-rule-create[az monitor data-collection rule create] command to create a data collection rule:
+
+[source,bash]
+----
+az monitor data-collection rule create \
+   --name micronautCollectionRule \
+   --location <region> \
+   --endpoint-id /subscriptions/<subscription-id>/resourceGroups/micronautguides/providers/Microsoft.Insights/dataCollectionEndpoints/micronautCollectionEndpoint \
+   --rule-file "path/to/dcr.json" \
+   --resource-group micronautguides
+----
+
+Replace <region> with the name of the region you’re using, e.g. "_eastus_", replace <subscription-id> with your Azure Subscription ID, and replace "path/to/dcr.json" with the file location of the file you created.
+
+The response should look like this:
+
+[source,json]
+----
+{
+  "dataCollectionEndpointId": "/subscriptions/fe053...",
+  "dataFlows": [
+    {
+      "destinations": [
+        "micronautLogDestination"
+      ],
+      "outputStream": "Custom-MicronautTable_CL",
+      "streams": [
+        "Custom-MicronautTable"
+      ],
+      "transformKql": "source | extend TimeGenerated = now()"
+    }
+  ],
+  ...
+  "immutableId": "dcr-e7ebfceb7df24631b64d7ae880eb8ada",
+  "location": "eastus",
+  "name": "micronautCollectionRule",
+  ...
+  "type": "Microsoft.Insights/dataCollectionRules"
+}
+----
+
+Save the value of the _immutableId_ attribute. This is the rule ID, and it will be needed later.
+
+=== Authorize Sending Logs
+
+Authorize sending logs by assigning the _Monitoring Metrics Publisher_ role to yourself:
+
+[source,bash]
+----
+az role assignment create \
+   --role "Monitoring Metrics Publisher" \
+   --assignee <email> \
+   --scope "/subscriptions/<subscription-id>/resourceGroups/micronautguides/providers/Microsoft.Insights/dataCollectionRules/micronautCollectionRule"
+----
+
+replacing <email> with the email address associated with your account, and <subscription-id> with your Azure Subscription ID.
+
+Note that it can take a few minutes for the role grant to propagate.
+
+== Configure Appender and Application Configuration
+
+=== Logback Appender
+
+Edit `logback.xml` to look like the following:
+
+resource:logback.xml[]
+
+==== Azure Appender
+
+The appender named "_AZURE_" will publish application log events to the Azure Monitor Logs table you configured earlier.
+
+==== Emergency Appender
+
+Since the Azure appender queues log messages and then writes them remotely, there are situations which might result in log events not getting remoted correctly.
+To address such scenarios you can configure the emergency appender to preserve those messages.
+To do this, uncomment the "_STDOUT_" appender element, and the _appender-ref_ element in the "_AZURE_" appender element.
+
+In the example the emergency appender writes to the console, but any valid Logback appender can be used.
+
+==== Blacklisting Loggers
+
+The AzureAppender supports blacklisting loggers by specifying the logger name(s) to exclude in _blackListLoggerName_ elements.
+
+==== Additional configuration options
+
+You can customize your _JsonLayout_ with additional parameters that are described in the Logback https://javadoc.io/static/ch.qos.logback.contrib/logback-json-classic/0.1.5/ch/qos/logback/contrib/json/classic/JsonLayout.html[JsonLayout] documentation.
+
+=== Set Application Configuration Properties
+
+Update _application.properties_ as follows:
+
+resource:application.properties[]
+
+<1> Replace <endpoint> with the logs ingestion endpoint URL that you saved earlier
+<2> Replace <ruleid> with the rule ID that you saved earlier
+<3> Set the value of the _azure.logging.stream-name_ property with the name of the workspace table you created, "Custom-MicronautTable"
+<4> Change to `false` to disable the appender, e.g., per-environment
+
+Having configured the appender and the application configuration, you can proceed to run the application, publishing the logs.
+
+== Running the application
+
+common:runapp-instructions.adoc[]
+
+Send some `cURL` requests to test logging:
+
+```bash
+curl -id '{"message":"your message here"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/log
+```
+
+Run the https://learn.microsoft.com/en-us/cli/azure/monitor/log-analytics?view=azure-cli-latest#az-monitor-log-analytics-query[az monitor log-analytics query] command to retrieve log events that were pushed while running your application:
+
+```bash
+az monitor log-analytics query \
+   --workspace <workspace-guid> \
+   --analytics-query "MicronautTable_CL | where TimeGenerated > ago(1h)"
+```
+
+Replace <workspace-guid> with the workspace GUID that you saved earlier.
+
+Note that it can take a few minutes for log entries be available.
+
+== Cleaning Up
+
+After you've finished this guide, you can clean up the resources you created on Azure so you won't take the risk of being billed because of them in the future.
+
+Delete the resource group and all of its resources with:
+[source,bash]
+----
+az group delete --name micronautguides
+----
+
+or run these commands to delete resources individually:
+[source,bash]
+----
+az monitor data-collection rule delete --name micronautCollectionRule --resource-group micronautguides
+
+az monitor log-analytics workspace table delete --name MicronautTable_CL --workspace-name micronautworkspace --resource-group micronautguides
+
+az monitor data-collection endpoint delete --name micronautCollectionEndpoint --resource-group micronautguides
+
+az monitor log-analytics workspace delete --workspace-name micronautworkspace --resource-group micronautguides --force
+
+az group delete --name micronautguides
+----
+
+common:next.adoc[]
+
+Read more about the https://micronaut-projects.github.io/micronaut-azure/latest/guide/#azureLogging[Micronaut Azure Logging] integration.

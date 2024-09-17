@@ -148,7 +148,9 @@ kill_kotlin_daemon () {
                     def defaultApp = metadata.apps.find { it.name == DEFAULT_APP_NAME }
                     if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
                         def features = defaultApp.getFeatures(guidesOption.language)
-                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense)
+                        if (!folder.contains("-maven-groovy")) {
+                            bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense)
+                        }
                     }
                 } else {
                     bashScript << """\
@@ -160,7 +162,9 @@ cd $folder
                         }
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
                             def features = app.getFeatures(guidesOption.language)
-                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense)
+                            if (!folder.contains("-maven-groovy")) {
+                                bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense)
+                            }
                         }
                     }
                     bashScript << """\
