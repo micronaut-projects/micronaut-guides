@@ -1,11 +1,8 @@
 package io.micronaut.guides.feature;
 
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.guides.feature.template.graalpyMavenPluginPackage;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.BuildProperties;
-import io.micronaut.starter.build.Repository;
-import io.micronaut.starter.build.RequiresRepository;
 import io.micronaut.starter.build.dependencies.CoordinateResolver;
 import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.options.BuildTool;
@@ -16,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Singleton
-class MicronautGraalpy extends AbstractFeature implements RequiresRepository {
+class MicronautGraalpy extends AbstractFeature  {
 
     private static final String GROUP_ID_GRAALVM_PYTHON = "org.graalvm.python";
     private static final String ARTIFACT_ID_GRAALPY_MAVEN_PLUGIN = "graalpy-maven-plugin";
@@ -49,10 +46,5 @@ class MicronautGraalpy extends AbstractFeature implements RequiresRepository {
 
     protected List<String> pythonPackages() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public @NonNull List<Repository> getRepositories() {
-        return List.of(new GraalVMStagingRepository());
     }
 }
