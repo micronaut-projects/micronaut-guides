@@ -108,16 +108,9 @@
 </li>
 <li><a href="#testing-the-application">5. Testing the Application</a></li>
 <li><a href="#running-the-application">6. Running the Application</a></li>
-<li><a href="#graalvm-native-executable">7. GraalVM Native Executable</a>
-<ul class="sectlevel3">
-<li><a href="#native-executable-metadata">7.1. Native Executable metadata</a></li>
-<li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">7.2. Generate a Micronaut Application Native Executable with GraalVM</a></li>
-<li><a href="#native-tests">7.3. Native Tests</a></li>
-</ul>
-</li>
-<li><a href="#next-steps">8. Next steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">9. Help with the Micronaut Framework</a></li>
-<li><a href="#license">10. License</a></li>
+<li><a href="#next-steps">7. Next steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">8. Help with the Micronaut Framework</a></li>
+<li><a href="#license">9. License</a></li>
 </ul>
 
                     </div>
@@ -430,171 +423,7 @@ the <a href="https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Value.
 </div>
 </div>
 <div class="sect1">
-<h2 id="graalvm-native-executable">7. GraalVM Native Executable</h2>
-<div class="sectionbody">
-<div class="sect3">
-<h4 id="native-executable-metadata">7.1. Native Executable metadata</h4>
-<div class="paragraph">
-<p>The <a href="https://www.graalvm.org/">GraalVM</a> Native Image compilation requires metadata to properly run code that uses <a href="https://www.graalvm.org/latest/reference-manual/native-image/metadata/#dynamic-proxy">dynamic proxies</a>.</p>
-</div>
-<div class="paragraph">
-<p>For the case that also a native executable has to be generated, create a proxy configuration file:</p>
-</div>
-<div class="listingblock">
-<div class="title">src/main/resources/META-INF/native-image/proxy-config.json</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">[
-  [<span class="string"><span class="delimiter">&quot;</span><span class="content">example.micronaut.HelloModule</span><span class="delimiter">&quot;</span></span>]
-]</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="generate-a-micronaut-application-native-executable-with-graalvm">7.2. Generate a Micronaut Application Native Executable with GraalVM</h3>
-<div class="paragraph">
-<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native executable of our Micronaut application.</p>
-</div>
-<div class="paragraph">
-<p>Compiling native executables ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
-</td>
-</tr>
-</table>
-</div>
-<div class="sect3">
-<h4 id="graalvm-installation">7.2.1. GraalVM installation</h4>
-<div class="paragraph">
-<p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
-</div>
-<div class="listingblock">
-<div class="title">Java 17</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 17.0.12-graal</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Java 17</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk use java 17.0.12-graal</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>For installation on Windows, or for manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
-</div>
-<div class="paragraph">
-<p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
-</div>
-<div class="paragraph">
-<p>Alternatively, you can use the <a href="https://github.com/graalvm/graalvm-ce-builds/releases/">GraalVM Community Edition</a>:</p>
-</div>
-<div class="listingblock">
-<div class="title">Java 17</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 17.0.9-graalce</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Java 17</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk use java 17.0.9-graalce</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="native-executable-generation">7.2.2. Native executable generation</h4>
-<div class="paragraph">
-<p>To generate a native executable using Maven, run:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw package -Dpackaging=native-image</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The native executable is created in the <code>target</code> directory and can be run with <code>target/micronautguide</code>.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="invoke-the-native-executable">7.2.3. Invoke the Native Executable</h4>
-<div class="paragraph">
-<p>You can execute the endpoint exposed by the native executable:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl localhost:8080/hello</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code>Hello World</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="native-tests">7.3. Native Tests</h3>
-<div class="paragraph">
-<p>The <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html">Maven plugin for GraalVM Native Image building</a> allows you to <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html#testing-support">run native tests</a>.</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>This plugin supports running tests on the JUnit Platform as native images. This means that tests will be compiled and executed as native code.</p>
-</div>
-</blockquote>
-</div>
-<div class="paragraph">
-<p>First, add the following profile to <code>pom.xml</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"> <span class="tag">&lt;profile&gt;</span>
-      <span class="tag">&lt;id&gt;</span>native<span class="tag">&lt;/id&gt;</span>
-      <span class="tag">&lt;build&gt;</span>
-        <span class="tag">&lt;plugins&gt;</span>
-          <span class="tag">&lt;plugin&gt;</span>
-            <span class="tag">&lt;groupId&gt;</span>org.graalvm.buildtools<span class="tag">&lt;/groupId&gt;</span>
-            <span class="tag">&lt;artifactId&gt;</span>native-maven-plugin<span class="tag">&lt;/artifactId&gt;</span>
-            <span class="tag">&lt;extensions&gt;</span>true<span class="tag">&lt;/extensions&gt;</span>
-            <span class="tag">&lt;executions&gt;</span>
-              <span class="tag">&lt;execution&gt;</span>
-                <span class="tag">&lt;id&gt;</span>test-native<span class="tag">&lt;/id&gt;</span>
-                <span class="tag">&lt;goals&gt;</span>
-                  <span class="tag">&lt;goal&gt;</span>test<span class="tag">&lt;/goal&gt;</span>
-                <span class="tag">&lt;/goals&gt;</span>
-                <span class="tag">&lt;phase&gt;</span>test<span class="tag">&lt;/phase&gt;</span>
-              <span class="tag">&lt;/execution&gt;</span>
-            <span class="tag">&lt;/executions&gt;</span>
-          <span class="tag">&lt;/plugin&gt;</span>
-        <span class="tag">&lt;/plugins&gt;</span>
-      <span class="tag">&lt;/build&gt;</span>
-    <span class="tag">&lt;/profile&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then, to execute the native tests, execute:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw -Pnative test</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>INFO: A test may be disabled within a GraalVM native image via the <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-conditional-execution-native@DisabledInNativeImage">@DisabledInNativeImage</a> annotation.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="next-steps">8. Next steps</h2>
+<h2 id="next-steps">7. Next steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Read more about <a href="https://micronaut-projects.github.io/micronaut-graal-languages/latest/guide/">Micronaut Graalpy</a> integration.</p>
@@ -602,7 +431,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">9. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">8. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
@@ -610,7 +439,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 </div>
 <div class="sect1">
-<h2 id="license">10. License</h2>
+<h2 id="license">9. License</h2>
 <div class="sectionbody">
 <div class="admonitionblock note">
 <table>
