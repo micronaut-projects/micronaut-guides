@@ -1,7 +1,6 @@
 plugins {
     id "java-gradle-plugin"
     id 'groovy'
-    id 'nu.studer.rocker' version '3.0.4'
 }
 
 ext {
@@ -18,9 +17,14 @@ repositories {
 dependencies {
     annotationProcessor(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
     annotationProcessor("io.micronaut:micronaut-inject-java")
+    annotationProcessor("io.micronaut.jsonschema:micronaut-json-schema-processor")
 
-    implementation subprojects
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    implementation("org.mockito:mockito-core:5.13.0")
+
+    implementation("io.micronaut.jsonschema:micronaut-json-schema-annotations")
     implementation(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
     implementation("io.micronaut.starter:micronaut-starter-api:$micronautVersion")
     implementation("io.micronaut:micronaut-inject-java")
@@ -30,20 +34,13 @@ dependencies {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src/generated/rocker'
-        }
-    }
+// For Groovy
+tasks.withType(GroovyCompile).configureEach {
+    options.compilerArgs.add("-Amicronaut.jsonschema.baseUri=http://json-schema.org/draft-04/schema#") // (1)
 }
 
-rocker {
-    configurations {
-        main {
-            templateDir = file('src/main/java')
-            outputDir = file('src/generated/rocker')
-            optimize = true
-        }
-    }
+tasks.named('test', Test) {
+    useJUnitPlatform()
+
+    debug true
 }

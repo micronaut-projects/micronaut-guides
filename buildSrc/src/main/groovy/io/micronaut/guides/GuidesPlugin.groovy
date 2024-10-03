@@ -2,7 +2,11 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import io.micronaut.core.util.CollectionUtils
-import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.core.GuideMetadata
+import io.micronaut.guides.core.GuideMetadata.App
+import io.micronaut.guides.core.GuideProjectGenerator
+import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.Utils
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
 import io.micronaut.guides.tasks.SampleProjectGenerationTask
@@ -27,7 +31,7 @@ import java.nio.file.Paths
 import java.util.function.Predicate
 import java.util.stream.Collectors
 
-import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
+import static io.micronaut.guides.core.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.MAVEN
 
 @CompileStatic
@@ -49,7 +53,7 @@ class GuidesPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        GuideProjectGenerator projectGenerator = new GuideProjectGenerator()
+        GuideProjectGenerator projectGenerator = new GuideProjectGenerator('micronautguide','example.micronaut', new MicronautCategory.MicronautCategoryProvider())
         Directory guidesDir = project.layout.projectDirectory.dir("guides")
         Provider<Directory> codeDir = project.layout.buildDirectory.dir("code")
         Properties testProps = guidesDir.file("tests.properties").asFile.withInputStream { inputStream ->

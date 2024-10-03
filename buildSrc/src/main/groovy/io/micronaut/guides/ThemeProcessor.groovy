@@ -1,5 +1,10 @@
 package io.micronaut.guides
 
+import io.micronaut.guides.core.GuideMetadata
+import io.micronaut.guides.core.GuideProjectGenerator
+import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.Utils
+
 import java.util.regex.Pattern
 
 class ThemeProcessor {

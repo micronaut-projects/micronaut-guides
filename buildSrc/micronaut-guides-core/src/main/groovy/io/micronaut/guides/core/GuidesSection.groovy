@@ -1,4 +1,4 @@
-package io.micronaut.guides
+package io.micronaut.guides.core
 
 import groovy.transform.CompileStatic
 

@@ -1,8 +1,14 @@
 package io.micronaut.guides
 
 import groovy.transform.CompileStatic
+import io.micronaut.guides.core.GuideMetadata
+import io.micronaut.guides.core.GuideMetadata.App
+import io.micronaut.guides.core.GuideProjectGenerator
+import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.Utils
+
 import java.util.stream.Collectors
-import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
+import static io.micronaut.guides.core.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.GRADLE
 import static io.micronaut.starter.options.BuildTool.MAVEN
 import io.micronaut.starter.api.TestFramework
@@ -98,7 +104,7 @@ exit 0
         testScript.executable = true
     }
 
-    static boolean supportsNativeTest(GuideMetadata.App app, GuidesOption guidesOption) {
+    static boolean supportsNativeTest(App app, GuidesOption guidesOption) {
         isMicronautFramework(app) &&
         guidesOption.buildTool.isGradle() && // right now we don't support Maven native tests without adding a profile
         supportsNativeTest(guidesOption.language) &&
@@ -106,7 +112,7 @@ exit 0
 
     }
 
-    static boolean isMicronautFramework(GuideMetadata.App app) {
+    static boolean isMicronautFramework(App app) {
         !app.framework || app.framework == "Micronaut"
     }
 
@@ -156,7 +162,7 @@ kill_kotlin_daemon () {
                     bashScript << """\
 cd $folder
 """
-                    for (GuideMetadata.App app : metadata.apps) {
+                    for (App app : metadata.apps) {
                         if (metadata.shouldSkip(buildTool)) {
                             continue
                         }

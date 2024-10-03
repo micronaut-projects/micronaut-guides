@@ -1,4 +1,4 @@
-package io.micronaut.guides;
+package io.micronaut.guides.core;
 
 import org.apache.commons.compress.archivers.zip.UnixStat;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;

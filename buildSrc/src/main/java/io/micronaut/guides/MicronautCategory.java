@@ -1,8 +1,12 @@
 package io.micronaut.guides;
 
-import io.micronaut.core.order.Ordered;
+import groovy.lang.Singleton;
+import io.micronaut.guides.core.Category;
+import io.micronaut.guides.core.CategoryProvider;
 
-public enum Category implements Ordered {
+import java.util.Arrays;
+
+public enum MicronautCategory implements Category {
     GETTING_STARTED("Getting Started", 1),
     BEYOND_THE_BASICS("Beyond the Basics", 2),
     DISTRIBUTION("Distribution", 3),
@@ -44,21 +48,37 @@ public enum Category implements Ordered {
     SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 38),
     BUILDING_A_REST_API("Building a REST API - Spring Boot to Micronaut Framework", 39);
 
-    private final String val;
+    private final String name;
     private final int order;
 
-    Category(String val, int order) {
-        this.val = val;
+    MicronautCategory(String name, int order) {
+        this.name = name;
         this.order = order;
     }
 
     @Override
-    public String toString() {
-        return val;
+    public String getName() {
+        return name;
     }
 
     @Override
     public int getOrder() {
         return order;
+    }
+
+    @Singleton
+    public static class MicronautCategoryProvider implements CategoryProvider {
+        @Override
+        public Category[] getAllCategories() {
+            return MicronautCategory.values();
+        }
+
+        @Override
+        public Category findByName(String name) {
+            return Arrays.stream(MicronautCategory.values())
+                    .filter(c -> c.getName().equals(name))
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 }

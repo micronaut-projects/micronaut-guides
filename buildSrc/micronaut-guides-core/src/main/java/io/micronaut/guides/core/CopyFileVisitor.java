@@ -1,4 +1,4 @@
-package io.micronaut.guides;
+package io.micronaut.guides.core;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
