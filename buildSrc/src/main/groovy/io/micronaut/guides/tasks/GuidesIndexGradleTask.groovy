@@ -31,6 +31,9 @@ abstract class GuidesIndexGradleTask extends DefaultTask {
 
     @TaskAction
     def perform() {
-        IndexGenerator.generateGuidesIndex(template.get().asFile, outputDir.get().asFile, Collections.singletonList(metadata))
+        try(InputStream stream = this.getClass().getClassLoader().getResourceAsStream("indexgrid.html")) {
+            String indexgrid = new String(stream.readAllBytes());
+            IndexGenerator.generateGuidesIndex(template.get().asFile, outputDir.get().asFile, Collections.singletonList(metadata), indexgrid)
+        }
     }
 }

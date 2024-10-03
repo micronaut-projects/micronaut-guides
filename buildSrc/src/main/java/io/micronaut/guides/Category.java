@@ -3,46 +3,76 @@ package io.micronaut.guides;
 import io.micronaut.core.order.Ordered;
 
 public enum Category implements Ordered {
-    GETTING_STARTED("Getting Started", 1),
-    BEYOND_THE_BASICS("Beyond the Basics", 2),
-    DISTRIBUTION("Distribution", 3),
-    GRAALVM("GraalVM", 4),
-    CRAC("CRaC", 5),
-    SCHEMA_MIGRATION("Schema Migration", 6),
-    MICRONAUT_DATA("Micronaut Data", 7),
-    DATA_ACCESS("Data Access", 8),
-    CACHE("Cache", 9),
-    TEST("Testing", 10),
 
-    VIEWS("Views", 11),
-    SECURITY("Micronaut Security",12),
-    AUTHORIZATION_CODE("Authorization Code",13),
-    CLIENT_CREDENTIALS("Client Credentials",14),
-    SECRETS_MANAGER("Secrets Manager", 15),
-    PATTERNS("Patterns", 16),
-    EMAIL("Email", 17),
-    KOTLIN("Kotlin", 18),
-    MESSAGING("Messaging", 19),
-    API("API", 20),
-    OPEN_API("OpenAPI", 21),
-    TURBO("Turbo", 22),
-    GRAPHQL("GraphQL", 23),
-    METRICS("Metrics", 24),
-    DISTRIBUTED_TRACING("Distributed Tracing", 25),
-    SERVICE_DISCOVERY("Service Discovery", 26),
-    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 27),
-    COMMON_TASKS("Common Tasks", 28),
-    OBJECT_STORAGE("Object Storage", 29),
-    AWS("AWS", 30),
-    AWS_LAMBDA("AWS Lambda", 31),
-    AZURE("Microsoft Azure", 32),
-    GCP("Google Cloud", 33),
-    GOOGLE_CLOUD_RUN("Google Cloud Run", 34),
-    ORACLE_CLOUD("Oracle Cloud", 35),
-    GRAALPY("GraalPy", 36),
+    // GETTING STARTED
+    GETTING_STARTED("Getting Started", 1),
+    CORE_BASICS("Core Basics", 2),
+    VALIDATION("Validation", 3),
+    DEVELOPMENT("Development", 4),
+    TEST("Testing", 5),
+
+    // BEYOND THE BASICS
+    OBJECT_STORAGE("Object Storage", 6),
+    EMAIL("Email", 7),
+    MESSAGING("Messaging", 8),
+    LOGGING("Logging", 9),
+    SCHEDULING("Scheduling", 9),
+    CACHE("Cache", 10),
+    PATTERNS("Patterns", 11),
+    INTERNATIONALIZATION("i18n", 12),
+
+    // DATA ACCESS
+    DATA_JDBC("Data JDBC", 13),
+    DATA_JPA("Data JPA", 14),
+    SCHEMA_MIGRATION("Schema Migration", 15),
+    DATA_RDBC("Data R2DBC", 16),
+    DATA_MONGO("MongoDB", 17),
+    DATA_ACCESS("Data Access", 18),
+
+    // SECURITY
+    SECURITY("Micronaut Security",19),
+    AUTHORIZATION_CODE("Authorization Code",20),
+    CLIENT_CREDENTIALS("Client Credentials",21),
+    SECRETS_MANAGER("Secrets Manager", 22),
+
+    // HTTP & API
+    HTTP("HTTP Server", 23),
+    HTTP_CLIENT("HTTP Client", 24),
+    BEYOND_JSON("Beyond JSON", 25),
+    JAX_RS("JAX-RS", 26),
+    WEBSOCKETS("WebSockets", 27),
+    GRAPHQL("GraphQL", 28),
+    OPEN_API("OpenAPI", 29),
+
+    // DISTRIBUTED SYSTEMS
+    DISTRIBUTED_TRACING("Distributed Tracing", 30),
+    SERVICE_DISCOVERY("Service Discovery", 31),
+    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 32),
+    METRICS("Metrics", 33),
+
+    // DISTRIBUTION
+    DISTRIBUTION("Distribution", 34),
+    GRAALVM("GraalVM", 35),
+    CRAC("Coordinated Restore at Checkpoint", 36),
     KUBERNETES( "Kubernetes", 37),
-    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 38),
-    BUILDING_A_REST_API("Building a REST API - Spring Boot to Micronaut Framework", 39);
+
+    // CLOUD
+    SERVERLESS("Serverless", 38),
+    AWS_LAMBDA("AWS Lambda", 39),
+    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 40),
+
+    // SERVER-SIDE HTML
+    VIEWS("Views", 41),
+    TURBO("Turbo", 42),
+    STATIC_RESOURCES("Static Resources", 43),
+
+    // LANGUAGES
+    KOTLIN("Kotlin", 44),
+    GRAALPY("GraalPy", 45),
+
+    // FRAMEWORKS
+    SPRING("Spring Boot", 46),
+    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 47);
 
     private final String val;
     private final int order;

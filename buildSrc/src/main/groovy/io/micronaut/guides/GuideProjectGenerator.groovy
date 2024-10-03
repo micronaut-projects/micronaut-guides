@@ -102,6 +102,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 intro: config.intro,
                 authors: config.authors,
                 tags: config.tags,
+                cloud: config.cloud != null ? Cloud.valueOf(config.cloud.toUpperCase()) : null,
                 categories: categories,
                 publicationDate: publish ? LocalDate.parse(config.publicationDate) : null,
                 publish: publish,
@@ -401,6 +402,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.authors = mergeLists(metadata.authors, base.authors) as Set<String>
         merged.tags = mergeLists(base.tags, metadata.tags)
         merged.categories = metadata.categories ?: base.categories
+        merged.cloud = metadata.cloud ?: base.cloud
         merged.publicationDate = metadata.publicationDate
         merged.publish = metadata.publish
         merged.buildTools = metadata.buildTools ?: base.buildTools

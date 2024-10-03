@@ -1,0 +1,131 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+common:micronaut-views-thymeleaf.adoc[]
+
+=== OAuth 2.0
+
+Visit https://console.developers.google.com[https://console.developers.google.com] and create a new project:
+
+image::google-1.png[]
+
+You will also need to create OAuth 2.0 credentials for the project since Google does not do that automatically. From the sidebar, click the `Credentials` tab, the click `Create credentials` and choose `OAuth client ID` from the dropdown.
+
+image::google-2.png[]
+
+The Google Console will prompt for some information about your application such as the product name, a home page, and a logo. On the next page, select *Web Application* type, and enter the redirect URL where the Micronaut application we will build next will wait for the callback.
+
+image::google-4.png[]
+
+You will then receive a client ID and secret.
+
+image::google-3.png[]
+
+To use OAuth 2.0 integration in your Micronaut application, add the following dependency:
+
+dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
+
+Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support] dependencies:
+
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+Add the following OAuth2 Configuration:
+
+common:yaml-dependency.adoc[]
+
+resource:application.yml[tag=oauth2]
+
+callout:authentication-idtoken[number=1,arg0=Google]
+<2> You can choose any name. The name you select, will be used in your routes. E.g. If you set `google` the login route for this OAuth 2.0 client is `/oauth/login/google`
+<3> Client Secret. See previous screenshot.
+<4> Client ID. See previous screenshot.
+<5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
+<6> Accept GET request to the `/logout` endpoint.
+
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
+
+[soruce, bash]
+----
+export OAUTH_CLIENT_ID=XXXXXXXXXX
+export OAUTH_CLIENT_SECRET=YYYYYYYYYY
+----
+
+Check Google https://accounts.google.com/.well-known/openid-configuration[.well-known/openid-configuration documentation].
+
+We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
+
+image::diagramm.png[]
+
+=== Home
+
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+
+source:HomeController[]
+
+callout:controller[number=1,arg0=/]
+callout:secured-anonymous[number=2]
+<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
+
+Create a thymeleaf template:
+
+resource:views/home.html[]
+
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
+
+- The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor^] injects into the model a `security` map with the authenticated user. See https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
+
+common:runapp.adoc[]
+
+image::googlevideo.gif[]
+
+=== Custom ID token claims validation
+
+Imagine you want to allow sign-in with Google but only to users' in your organization.
+
+Google OAuth consent screen settings allows you to do that:
+
+image::google-5.png[]
+
+However, we could also achieve this programmatically. Google id token contains a claim named `hd` which stands for `hosted domain`.
+
+We can create a configuration object:
+
+source:ApplicationConfiguration[]
+
+Backed by a `@ConfigurationProperties` annotated class:
+
+source:ApplicationConfigurationProperties[]
+
+and then implement a `OpenIdClaimsValidator` bean. The Micronaut framework validates the id token against every bean of type `OpenIdClaimsValidator`. If the id token `hd` claim does not match the value configured, it is considered invalid.
+
+source:HostedDomainClaimValidator[]
+
+Add to `src/main/resources/application.yaml`
+
+[source, yaml]
+----
+app:
+  hosted-domain: 'objectcomputing.com'
+----
+
+if you start the application, you will only be able to sign in with a Google Account within the OCI organization.
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+After you execute the native executable, navigate to localhost:8080 and authenticate with Google.
+
+:exclude-for-languages:
+
+== Next steps
+
+Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
+
+common:helpWithMicronaut.adoc[]

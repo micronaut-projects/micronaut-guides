@@ -4,6 +4,7 @@ import groovy.transform.Canonical
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import io.micronaut.core.annotation.Nullable
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
@@ -21,6 +22,9 @@ class GuideMetadata {
     String intro
     Set<String> authors
     List<String> tags
+
+    @Nullable
+    Cloud cloud
     List<Category> categories
     LocalDate publicationDate
 
@@ -44,6 +48,10 @@ class GuideMetadata {
     Map<String, String> env
 
     List<App> apps
+
+    Set<String> getFrameworks() {
+        apps.collect { it.framework }.unique() as Set<String>
+    }
 
     List<String> getTags() {
 
