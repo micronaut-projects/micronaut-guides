@@ -1,4 +1,4 @@
-package io.micronaut.guides;
+package io.micronaut.guides.core;
 
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.core.annotation.NonNull;

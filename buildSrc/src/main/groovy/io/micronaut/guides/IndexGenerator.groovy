@@ -5,6 +5,12 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.core.order.OrderUtil
 import io.micronaut.core.order.Ordered
+import io.micronaut.guides.core.Category
+import io.micronaut.guides.core.GuideMetadata
+import io.micronaut.guides.core.GuideProjectGenerator
+import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.GuidesSection
+import io.micronaut.guides.core.Utils
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
@@ -47,7 +53,8 @@ class IndexGenerator {
                     [new GuidesSection(category: tag.title, metadatas: tagMetadatas)],
                     tag.title)
         }
-        Ordered[] categories = Category.values()
+        MicronautCategory.MicronautCategoryProvider categoryProvider = new MicronautCategory.MicronautCategoryProvider();
+        Ordered[] categories = categoryProvider.getAllCategories();
         OrderUtil.sort(categories)
         List<GuidesSection> sections = []
         for (Ordered obj : categories) {
@@ -329,52 +336,52 @@ class IndexGenerator {
         if (obj instanceof Category) {
             Category cat = (Category)  obj
             switch (cat) {
-                case Category.GCP:
+                case MicronautCategory.GCP:
                     return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
 
-                case Category.AWS:
+                case MicronautCategory.AWS:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/aws.svg'
 
-                case Category.AZURE:
+                case MicronautCategory.AZURE:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/Azure.svg'
 
-                case Category.CACHE:
+                case MicronautCategory.CACHE:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/cache.svg'
 
-                case Category.DATA_ACCESS:
+                case MicronautCategory.DATA_ACCESS:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/dataaccess.svg'
 
-                case Category.SERVICE_DISCOVERY:
+                case MicronautCategory.SERVICE_DISCOVERY:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/Service_Discovery.svg'
 
-                case Category.SECURITY:
-                case Category.AUTHORIZATION_CODE:
-                case Category.CLIENT_CREDENTIALS:
-                case Category.SECRETS_MANAGER:
+                case MicronautCategory.SECURITY:
+                case MicronautCategory.AUTHORIZATION_CODE:
+                case MicronautCategory.CLIENT_CREDENTIALS:
+                case MicronautCategory.SECRETS_MANAGER:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/Security.svg'
 
-                case Category.MESSAGING:
+                case MicronautCategory.MESSAGING:
                     return  'https://micronaut.io/wp-content/uploads/2020/11/Messaging.svg'
 
-                case Category.DISTRIBUTED_TRACING:
+                case MicronautCategory.DISTRIBUTED_TRACING:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
 
-                case Category.GETTING_STARTED:
+                case MicronautCategory.GETTING_STARTED:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
-                case Category.ORACLE_CLOUD:
+                case MicronautCategory.ORACLE_CLOUD:
                     return 'https://micronaut.io/wp-content/uploads/2021/05/Oracle-1.svg'
 
-                case Category.API:
+                case MicronautCategory.API:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/API.svg'
 
-                case Category.EMAIL:
+                case MicronautCategory.EMAIL:
                     return 'https://micronaut.io/wp-content/uploads/2022/02/email.svg'
 
-                case Category.TEST:
+                case MicronautCategory.TEST:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/Build.svg'
 
-                case Category.KOTLIN:
+                case MicronautCategory.KOTLIN:
                     return 'https://micronaut.io/wp-content/uploads/2021/05/Kotlin.svg'
 
                 default:
@@ -386,7 +393,7 @@ class IndexGenerator {
 
     private static String category(Object cat) {
         String h1 = cat instanceof Category ?
-                '<a href="./tag-' + cat.name().toLowerCase() + '.html\">' + cat.toString() + '</a>' :
+                '<a href="./tag-' + cat.getName().toLowerCase() + '.html\">' + cat.toString() + '</a>' :
                 cat.toString().replace("_", " ")
         '<div class="category">' +
         '<div class="inner">' +

@@ -1,13 +1,14 @@
-package io.micronaut.guides
+package io.micronaut.guides.core
 
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
+import io.micronaut.context.env.MapPropertySource
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
-import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.core.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
@@ -42,17 +43,26 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private static final Pattern GROOVY_JAVA_OR_KOTLIN = ~/.*\.java|.*\.groovy|.*\.kt/
     private static final Logger LOG = LoggerFactory.getLogger(this)
-    private static final String APP_NAME = 'micronautguide'
-    private static final String BASE_PACKAGE = 'example.micronaut'
+    private static String APP_NAME
+    private static String BASE_PACKAGE
     private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_17, JDK_21]
     public static final String LICENSEHEADER = "LICENSEHEADER"
 
     private final ApplicationContext applicationContext
-    private final GuidesGenerator guidesGenerator
+    private final GuideGenerator guidesGenerator
+    private static CategoryProvider categoryProvider
 
-    GuideProjectGenerator() {
-        applicationContext = ApplicationContext.run()
-        guidesGenerator = applicationContext.getBean(GuidesGenerator)
+    GuideProjectGenerator(String appName, String basePackage, CategoryProvider categoryProvider) {
+        APP_NAME = appName
+        BASE_PACKAGE = basePackage
+        this.categoryProvider = categoryProvider
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("micronaut.io.watch.paths", "classpath:*");
+
+        applicationContext = ApplicationContext.run(MapPropertySource.of("guide-generator", properties))
+        guidesGenerator = applicationContext.findBean(GuideGenerator.class)
+                .orElseThrow(() -> new RuntimeException("No GuideGenerator implementation found"));
     }
 
     @Override
@@ -87,7 +97,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
         List<Category> categories = []
         for (String c : config.categories) {
-            Category cat = Category.values().find { it.toString() == c }
+            Category cat = categoryProvider.findByName(c);
             if (cat) {
                 categories << cat
             } else if (publish && !cat) {
@@ -104,6 +114,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 tags: config.tags,
                 categories: categories,
                 publicationDate: publish ? LocalDate.parse(config.publicationDate) : null,
+                clouds: config.clouds,
                 publish: publish,
                 base: config.base,
                 languages: config.languages ?: ['java', 'groovy', 'kotlin'],

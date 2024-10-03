@@ -2,6 +2,7 @@ package io.micronaut.guides;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.guides.core.GuideGenerator;
 import io.micronaut.http.exceptions.HttpStatusException;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.application.ApplicationType;
@@ -30,16 +31,42 @@ import static io.micronaut.http.HttpStatus.BAD_REQUEST;
 import static io.micronaut.starter.options.BuildTool.GRADLE;
 import static io.micronaut.starter.options.JdkVersion.JDK_8;
 
+/**
+ * The GuidesGenerator class generates Micronaut applications based on provided parameters and saves them to a specified directory.
+ */
 @Singleton
-public class GuidesGenerator {
-    private static final Logger LOG = LoggerFactory.getLogger(GuidesGenerator.class);
+public class MicronautGuideGenerator implements GuideGenerator {
+    private static final Logger LOG = LoggerFactory.getLogger(MicronautGuideGenerator.class);
 
+    /**
+     * An instance of the ProjectGenerator interface responsible for creating projects.
+     */
     private final ProjectGenerator projectGenerator;
 
-    public GuidesGenerator(ProjectGenerator projectGenerator) {
+    /**
+     * Constructor for GuidesGenerator.
+     *
+     * @param projectGenerator An instance of the ProjectGenerator interface.
+     */
+    public MicronautGuideGenerator(ProjectGenerator projectGenerator) {
         this.projectGenerator = projectGenerator;
     }
 
+    /**
+     * Generates an application into a given directory.
+     *
+     * @param directory        The directory where the generated application will be saved.
+     * @param type             The type of application to generate.
+     * @param packageAndName   The full name of the package and the main class of the application.
+     * @param framework        Optional parameter specifying the testing framework to use.
+     * @param features         Optional list of additional features to include in the application.
+     * @param buildTool        Optional parameter specifying the build tool to use.
+     * @param testFramework    Optional parameter specifying the testing framework to use.
+     * @param lang             Optional parameter specifying the programming language to use.
+     * @param javaVersion      Optional parameter specifying the version of Java to use.
+     * @throws IOException If there is an error while generating the application or saving it to the directory.
+     */
+    @Override
     public void generateAppIntoDirectory(
             @NonNull File directory,
             @NotNull ApplicationType type,
@@ -62,6 +89,20 @@ public class GuidesGenerator {
         }
     }
 
+    /**
+     * Creates a GeneratorContext object containing all necessary information about the application being generated.
+     *
+     * @param type             The type of application to generate.
+     * @param packageAndName   The full name of the package and the main class of the application.
+     * @param framework        Optional parameter specifying the testing framework to use.
+     * @param features         Optional list of additional features to include in the application.
+     * @param buildTool        Optional parameter specifying the build tool to use.
+     * @param testFramework    Optional parameter specifying the testing framework to use.
+     * @param lang             Optional parameter specifying the programming language to use.
+     * @param javaVersion      Optional parameter specifying the version of Java to use.
+     * @return A GeneratorContext object populated with the provided parameters.
+     * @throws IllegalArgumentException If the provided packageAndName does not conform to the expected format.
+     */
     GeneratorContext createProjectGeneratorContext(
             ApplicationType type,
             @Pattern(regexp = "[\\w\\d-_\\.]+") String packageAndName,

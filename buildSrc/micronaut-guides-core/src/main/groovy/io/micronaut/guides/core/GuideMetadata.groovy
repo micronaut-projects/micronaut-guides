@@ -1,16 +1,18 @@
-package io.micronaut.guides
+package io.micronaut.guides.core
 
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
-import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import io.micronaut.jsonschema.JsonSchema
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
+
 import java.time.LocalDate
 
+@JsonSchema
 @ToString(includeNames = true)
 @CompileStatic
 class GuideMetadata {
@@ -23,6 +25,7 @@ class GuideMetadata {
     List<String> tags
     List<Category> categories
     LocalDate publicationDate
+    List<String> clouds
 
     boolean publish
     String base
@@ -60,7 +63,7 @@ class GuideMetadata {
                 }
             }
         }
-        Set<String> categoriesAsTags = this.categories.collect { cat -> cat.name().toLowerCase() } as Set
+        Set<String> categoriesAsTags = this.categories.collect { cat -> cat.getName().toLowerCase().replace(" ","-") } as Set
         tagsList.addAll(categoriesAsTags)
         tagsList as List<String>
     }

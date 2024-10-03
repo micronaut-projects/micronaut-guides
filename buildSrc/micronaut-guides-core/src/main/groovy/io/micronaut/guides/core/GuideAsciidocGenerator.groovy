@@ -1,4 +1,4 @@
-package io.micronaut.guides
+package io.micronaut.guides.core
 
 import com.fizzed.rocker.Rocker
 import groovy.transform.CompileStatic
@@ -6,7 +6,7 @@ import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.util.StringUtils
-import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.core.GuideMetadata.App
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
