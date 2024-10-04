@@ -67,7 +67,7 @@ class IndexGenerator {
                     .sorted(GUIDE_METADATA_COMPARATOR)
                     .collect(Collectors.toList())
 
-            Optional<Category> categoryOptional = Stream.of(Category.values()).filter(c -> tag.title == c.toString()).findFirst()
+            Optional<Category> categoryOptional = Stream.of(Category.values()).filter(c -> tag.title ==  c.name().toLowerCase()).findFirst()
 
             Object cat =  categoryOptional.isPresent() ? categoryOptional.get() : tag.title
 
