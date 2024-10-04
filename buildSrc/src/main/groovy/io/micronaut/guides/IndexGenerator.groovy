@@ -11,6 +11,7 @@ import io.micronaut.starter.options.Language
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import java.util.stream.Collectors
+import java.util.stream.Stream
 
 @CompileStatic
 class IndexGenerator {
@@ -23,16 +24,39 @@ class IndexGenerator {
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
     private static final Pattern CONTENT_REGEX = ~/(?s)(<main id="main">)(.*)(<\/main>)/
-    public static final int NUMBER_OF_LATEST_GUIDES = 4
+    public static final int NUMBER_OF_LATEST_GUIDES = 2
 
-    static void generateGuidesIndex(File template, File guidesFolder, File distDir, String metadataConfigName) {
+    private final static Comparator<GuideMetadata> GUIDE_METADATA_COMPARATOR = new Comparator<GuideMetadata>() {
+        @Override
+        int compare(GuideMetadata o1, GuideMetadata o2) {
+            int compareByFramework = o2.getFrameworks().size() <=> o1.getFrameworks().size()
+            if (compareByFramework != 0) {
+                return compareByFramework
+            }
+            if (o1.cloud == null && o2.cloud != null) {
+                return -1
+            }
+            if (o1.cloud != null && o2.cloud == null) {
+                return 1
+            }
+            if (o1.cloud != null && o2.cloud != null) {
+                int compare = OrderUtil.COMPARATOR.compare(o1.cloud, o2.cloud)
+                if (compare != 0) {
+                    return compare
+                }
+            }
+            return o1.publicationDate <=> o2.publicationDate
+        }
+    }
+
+    static void generateGuidesIndex(File template, File guidesFolder, File distDir, String metadataConfigName, String indexgrid) {
 
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
                 .findAll { it.publish }
-        generateGuidesIndex(template, distDir, metadatas)
+        generateGuidesIndex(template, distDir, metadatas, indexgrid)
     }
 
-    static void generateGuidesIndex(File template, File distDir, List<GuideMetadata> metadatas) {
+    static void generateGuidesIndex(File template, File distDir, List<GuideMetadata> metadatas, String indexgrid) {
         String templateText = template.text.replaceFirst(CONTENT_REGEX) { List<String> it ->
             "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
         }
@@ -40,25 +64,38 @@ class IndexGenerator {
         for (Tag tag :  tags) {
             List<GuideMetadata> tagMetadatas = metadatas.stream()
                     .filter(m -> (m.tags ?: []).contains(tag.slug) )
+                    .sorted(GUIDE_METADATA_COMPARATOR)
                     .collect(Collectors.toList())
+
+            Optional<Category> categoryOptional = Stream.of(Category.values()).filter(c -> tag.title ==  c.name().toLowerCase()).findFirst()
+
+            Object cat =  categoryOptional.isPresent() ? categoryOptional.get() : tag.title
+
             save(templateText,
                     "tag-" + tag.slug.toLowerCase() + '.html',
                     distDir,
-                    [new GuidesSection(category: tag.title, metadatas: tagMetadatas)],
-                    tag.title)
+                    [new GuidesSection(category: cat, metadatas: tagMetadatas)],
+                    tag.title,
+                    null)
         }
         Ordered[] categories = Category.values()
         OrderUtil.sort(categories)
         List<GuidesSection> sections = []
         for (Ordered obj : categories) {
             Category cat = (Category) obj
-            sections << new GuidesSection(category: cat,
-                    metadatas: metadatas.stream().filter(m -> m.getCategories().stream().anyMatch(c -> c == cat)).collect(Collectors.toList()))
+
+            List<GuideMetadata> guideMetadataList = metadatas.stream()
+                    .filter(m -> m.getCategories().stream().anyMatch(c -> c == cat))
+                    .sorted(GUIDE_METADATA_COMPARATOR)
+                    .collect(Collectors.toList())
+
+
+            sections << new GuidesSection(category: cat, metadatas: guideMetadataList)
         }
-        save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', tags)
+        save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', indexgrid, tags)
 
         for (GuideMetadata metadata :  metadatas) {
-            save(templateText, metadata.slug + '.html', distDir, [new GuidesSection(category: metadata.categories ? metadata.categories.first() : null, metadatas: [metadata])],  metadata.title)
+            save(templateText, metadata.slug + '.html', distDir, [new GuidesSection(category: metadata.categories ? metadata.categories.first() : null, metadatas: [metadata])],  metadata.title, null)
         }
     }
 
@@ -67,8 +104,9 @@ class IndexGenerator {
                              File distDir,
                              List<GuidesSection> sections,
                              String title,
+                             String indexGrid,
                              Collection<Tag> tags = []) {
-        String text = indexText(distDir, templateText, sections, tags, title)
+        String text = indexText(distDir, templateText, sections, tags, title, indexGrid)
         File output = new File(distDir, filename)
         output.createNewFile()
         output.setText(text, 'UTF-8')
@@ -78,7 +116,8 @@ class IndexGenerator {
                                     String templateText,
                                     List<GuidesSection> sections,
                                     Collection<Tag> tags,
-                                    String title) {
+                                    String title,
+                                    String indexGrid) {
         boolean singleGuide = sections && sections.size() == 1 && sections.get(0).metadatas.size() == 1
         List<GuideMetadata> metadatas = []
         for (GuidesSection section : sections) {
@@ -88,6 +127,7 @@ class IndexGenerator {
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
         String index = ''
         if (!singleGuide && tags) {
+
             index += '<div class="categorygrid">'
             index += '<div class="grid">'
             index += '  <div class="grid-item grid-item_primary grid-item_one-third">'
@@ -102,6 +142,10 @@ class IndexGenerator {
             index += '  </div>'
             index += '</div>'
             index += '</div>'
+        }
+
+        if (indexGrid) {
+            index += indexGrid
         }
 
         for (GuidesSection section : sections) {
@@ -180,10 +224,12 @@ class IndexGenerator {
         if (!filteredMetadatas) {
             return index
         }
-        index += '<div class="categorygrid">'
+        String category = category(cat)
+        String categoryId = cat instanceof Category ? ((Category) cat).name().toLowerCase() : ""
+        index += '<div class="categorygrid" id="' + categoryId+ '">'
         index += "<div class='row'>"
         index += "<div class='col-sm-4'>"
-        index += category(cat)
+        index += category
         index += "</div>"
         count++
 
@@ -225,7 +271,14 @@ class IndexGenerator {
         if (header) {
             index += "<h3 class='guide-list-header'>${header}</h3>"
         }
+        Set<Cloud> clouds = []
         for (GuideMetadata metadata : metadatas) {
+            if (!header) {
+                if (metadata.cloud != null && !clouds.contains(metadata.cloud)) {
+                    index += "<h3 class=\"guide-list-cloud-header\"><img height=\"20\" src=\"./images/" + metadata.cloud.accronym.toLowerCase() + ".svg\" alt=\"" + metadata.cloud.name + "\"/>&nbsp;" + metadata.cloud.name + "</h3>"
+                    clouds << metadata.cloud
+                }
+            }
             index += '<div class="guide">'
             index += "<div class='guide-title'><a href='${metadata.slug}.html'>${metadata.title}</a></div>"
             if (displayPublicationDate) {
@@ -329,24 +382,63 @@ class IndexGenerator {
         if (obj instanceof Category) {
             Category cat = (Category)  obj
             switch (cat) {
-                case Category.GCP:
-                    return 'https://micronaut.io/wp-content/uploads/2021/02/Googlecloud.svg'
-
-                case Category.AWS:
-                    return 'https://micronaut.io/wp-content/uploads/2020/12/aws.svg'
-
-                case Category.AZURE:
-                    return 'https://micronaut.io/wp-content/uploads/2020/12/Azure.svg'
-
+                case Category.VALIDATION:
+                    return './images/validation.svg'
+                case Category.CORE_BASICS:
+                    return './images/core.svg'
                 case Category.CACHE:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/cache.svg'
-
+                case Category.HTTP:
+                    return './images/http.svg'
+                case Category.GRAPHQL:
+                    return './images/graphql.svg'
+                case Category.OPEN_API:
+                    return './images/openapi.svg'
+                case Category.GRAALVM:
+                    return './images/graalvm-mascot.svg'
+                case Category.DISTRIBUTED_CONFIGURATION:
+                    return './images/configuration.svg'
+                case Category.METRICS:
+                    return './images/metrics.svg'
+                case Category.STATIC_RESOURCES:
+                    return './images/static-resources.svg'
+                case Category.WEBSOCKETS:
+                    return './images/websockets.svg'
+                case Category.SERVERLESS:
+                    return './images/serverless.svg'
+                case Category.DATA_MONGO:
+                    return './images/mongo.svg'
+                case Category.SCHEDULING:
+                    return './images/scheduling.svg'
+                case Category.PATTERNS:
+                    return './images/patterns.svg'
+                case Category.LOGGING:
+                    return './images/logging.svg'
+                case Category.TURBO:
+                    return './images/turbo.svg'
+                case Category.JAX_RS:
+                    return './images/jaxrs.svg'
+                case Category.DATA_JDBC:
+                case Category.DATA_JPA:
+                case Category.DATA_RDBC:
                 case Category.DATA_ACCESS:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/dataaccess.svg'
-
+                case Category.DEVELOPMENT:
+                    return "./images/programming.svg"
+                case Category.AWS_LAMBDA:
+                    return "./images/lambda.svg"
+                case Category.SCALE_TO_ZERO_CONTAINERS:
+                    return "./images/container.svg"
                 case Category.SERVICE_DISCOVERY:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/Service_Discovery.svg'
-
+                case Category.KUBERNETES:
+                    return "./images/k8s.svg"
+                case Category.VIEWS:
+                    return "./images/html.svg"
+                case Category.GRAALPY:
+                    return "./images/python.svg"
+                case Category.SCHEMA_MIGRATION:
+                    return "https://micronaut.io/wp-content/uploads/2020/11/database-migration.svg"
                 case Category.SECURITY:
                 case Category.AUTHORIZATION_CODE:
                 case Category.CLIENT_CREDENTIALS:
@@ -359,23 +451,37 @@ class IndexGenerator {
                 case Category.DISTRIBUTED_TRACING:
                     return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
 
+                case Category.OBJECT_STORAGE:
+                    return './images/objectstorage.svg'
+
                 case Category.GETTING_STARTED:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
-
-                case Category.ORACLE_CLOUD:
-                    return 'https://micronaut.io/wp-content/uploads/2021/05/Oracle-1.svg'
-
-                case Category.API:
-                    return 'https://micronaut.io/wp-content/uploads/2020/11/API.svg'
 
                 case Category.EMAIL:
                     return 'https://micronaut.io/wp-content/uploads/2022/02/email.svg'
 
                 case Category.TEST:
-                    return 'https://micronaut.io/wp-content/uploads/2020/11/Build.svg'
+                    return './images/test.svg'
+                case Category.BEYOND_JSON:
+                    return './images/beyond-json.svg'
+
+                case Category.CRAC:
+                    return './images/crac.svg'
+                case Category.INTERNATIONALIZATION:
+                    return './images/i18n.svg'
+
+                case Category.DISTRIBUTION:
+                    return './images/distribution.svg'
+
+                case Category.HTTP_CLIENT:
+                    return './images/http-client.svg'
 
                 case Category.KOTLIN:
                     return 'https://micronaut.io/wp-content/uploads/2021/05/Kotlin.svg'
+
+                case Category.SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API:
+                case Category.SPRING:
+                    return './images/spring.svg'
 
                 default:
                     return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
