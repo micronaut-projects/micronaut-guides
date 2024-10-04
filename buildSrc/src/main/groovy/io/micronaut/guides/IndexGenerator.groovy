@@ -40,7 +40,7 @@ class IndexGenerator {
                 return 1
             }
             if (o1.cloud != null && o2.cloud != null) {
-                int compare = OrderUtil.COMPARATOR.compare(o2.cloud, o1.cloud)
+                int compare = OrderUtil.COMPARATOR.compare(o1.cloud, o2.cloud)
                 if (compare != 0) {
                     return compare
                 }
