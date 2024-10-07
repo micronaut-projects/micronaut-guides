@@ -43,36 +43,37 @@ public enum Category implements Ordered {
     WEBSOCKETS("WebSockets", 27),
     GRAPHQL("GraphQL", 28),
     OPEN_API("OpenAPI", 29),
+    JSON_SCHEMA("JSON Schema", 30),
 
     // DISTRIBUTED SYSTEMS
-    DISTRIBUTED_TRACING("Distributed Tracing", 30),
-    SERVICE_DISCOVERY("Service Discovery", 31),
-    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 32),
+    DISTRIBUTED_TRACING("Distributed Tracing", 31),
+    SERVICE_DISCOVERY("Service Discovery", 32),
+    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 33),
     METRICS("Metrics", 33),
 
     // DISTRIBUTION
     DISTRIBUTION("Distribution", 34),
     GRAALVM("GraalVM", 35),
-    CRAC("Coordinated Restore at Checkpoint", 36),
-    KUBERNETES( "Kubernetes", 37),
+    CRAC("Coordinated Restore at Checkpoint", 37),
+    KUBERNETES( "Kubernetes", 38),
 
     // CLOUD
-    SERVERLESS("Serverless", 38),
-    AWS_LAMBDA("AWS Lambda", 39),
-    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 40),
+    SERVERLESS("Serverless", 39),
+    AWS_LAMBDA("AWS Lambda", 40),
+    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 41),
 
     // SERVER-SIDE HTML
-    VIEWS("Views", 41),
-    TURBO("Turbo", 42),
-    STATIC_RESOURCES("Static Resources", 43),
+    VIEWS("Views", 42),
+    TURBO("Turbo", 43),
+    STATIC_RESOURCES("Static Resources", 44),
 
     // LANGUAGES
-    KOTLIN("Kotlin", 44),
-    GRAALPY("GraalPy", 45),
+    KOTLIN("Kotlin", 45),
+    GRAALPY("GraalPy", 46),
 
     // FRAMEWORKS
-    SPRING("Spring Boot", 46),
-    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 47);
+    SPRING("Spring Boot", 47),
+    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 48);
 
     private final String val;
     private final int order;
