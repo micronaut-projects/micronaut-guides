@@ -137,7 +137,10 @@ function findById(id) {
     return null;
 }
 function guideSearchResult(item) {
-    var html = '<div class="guide"><div class="guide-title"><a href="' + item.id + '.html">' + item.title + '</a></div><div class="guide-date">Jul 01, 2024</div><div class="guide-intro">' + item.content_text + '</div><div class="guide-tag-list"><span class="guide-tag-title">Tags: </span><span class="guide-tag">';
+    const dateStr = item.date_published;
+    const date = new Date(dateStr);
+    const formattedDate = date.toISOString().split('T')[0];
+    var html = '<div class="guide"><div class="guide-title"><a href="' + item.id + '.html">' + item.title + '</a></div><div class="guide-date">' + formattedDate+ ' </div><div class="guide-intro">' + item.content_text + '</div><div class="guide-tag-list"><span class="guide-tag-title">Tags: </span><span class="guide-tag">';
     for (var i = 0; i < item.tags.length; i++) {
         var tag = item.tags[i];
         html += '<a href="./' + tag + '-.html">' + tag + '</a>'
