@@ -5,9 +5,17 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.core.order.OrderUtil
 import io.micronaut.core.order.Ordered
+import io.micronaut.json.JsonMapper
+import io.micronaut.rss.jsonfeed.JsonFeed
+import io.micronaut.rss.jsonfeed.JsonFeedAuthor
+import io.micronaut.rss.jsonfeed.JsonFeedItem
+import io.micronaut.rss.language.RssLanguage
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
+import java.time.LocalTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import java.util.stream.Collectors
@@ -20,6 +28,7 @@ class IndexGenerator {
     private static final String DEFAULT_INTRO = "Step-by-step tutorials to learn the Micronaut framework"
     private static final String DEFAULT_TITLE = "Micronaut Guides"
     private static final String GUIDES_URL = "https://guides.micronaut.io"
+    private static final String JSON_FEED_FILENAME = "feed.json"
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
@@ -54,11 +63,43 @@ class IndexGenerator {
         List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
                 .findAll { it.publish }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
+        save(distDir, jsonFeed(metadatas), JSON_FEED_FILENAME)
+    }
+
+    static String jsonFeed(List<GuideMetadata> metadatas) {
+        JsonFeed.Builder jsonFeedBuilder = JsonFeed.builder()
+                .version("https://jsonfeed.org/version/1.1")
+                .title("Micronaut Guides")
+                .homePageUrl(GUIDES_URL + "/latest/")
+                .feedUrl(GUIDES_URL + "/latest/" + JSON_FEED_FILENAME)
+        for (GuideMetadata metadata : metadatas ) {
+            jsonFeedBuilder.item(jsonFeedItem(metadata))
+        }
+        JsonFeed jsonFeed = jsonFeedBuilder.build()
+        JsonMapper jsonMapper = JsonMapper.createDefault()
+        jsonMapper.writeValueAsString(jsonFeed)
+    }
+
+    static JsonFeedItem jsonFeedItem(GuideMetadata metadata) {
+        JsonFeedItem.Builder jsonFeedItemBuilder = JsonFeedItem.builder()
+                .id(metadata.slug)
+                .title(metadata.title)
+                .contentText(metadata.intro)
+                .language(RssLanguage.LANG_ENGLISH)
+                .datePublished(ZonedDateTime.of(metadata.publicationDate, LocalTime.of(0, 0), ZoneOffset.UTC))
+                .url("https://guides.micronaut.io/latest/${metadata.slug}")
+        for (String author: metadata.authors) {
+            jsonFeedItemBuilder.author(JsonFeedAuthor.builder().name(author).build())
+        }
+        for (String t : metadata.tags) {
+            jsonFeedItemBuilder.tag(t)
+        }
+        jsonFeedItemBuilder.build()
     }
 
     static void generateGuidesIndex(File template, File distDir, List<GuideMetadata> metadatas, String indexgrid) {
         String templateText = template.text.replaceFirst(CONTENT_REGEX) { List<String> it ->
-            "${it[1]}\n    <div class=\"container\">@content@</div>\n${it[3]}"
+            "${it[1]}\n    <div style=\"clear: both;\"></div><div class=\"container\">@content@</div>\n${it[3]}"
         }
         Collection<Tag> tags = collectTags(metadatas)
         for (Tag tag :  tags) {
@@ -107,6 +148,10 @@ class IndexGenerator {
                              String indexGrid,
                              Collection<Tag> tags = []) {
         String text = indexText(distDir, templateText, sections, tags, title, indexGrid)
+        save(distDir, text, filename)
+    }
+
+    private static void save(File distDir, String text, String filename) {
         File output = new File(distDir, filename)
         output.createNewFile()
         output.setText(text, 'UTF-8')

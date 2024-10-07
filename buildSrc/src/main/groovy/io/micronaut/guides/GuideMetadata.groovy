@@ -2,7 +2,6 @@ package io.micronaut.guides
 
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
-import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.starter.api.TestFramework
@@ -16,6 +15,8 @@ import java.time.LocalDate
 @CompileStatic
 class GuideMetadata {
     private static final String MICRONAUT_PREFIX = "micronaut-"
+    private static final String VIEWS_PREFIX = "views-"
+    private static final List<String> FEATURES_PREFIXES = List.of(MICRONAUT_PREFIX, VIEWS_PREFIX)
     String asciidoctor
     String slug
     String title
@@ -61,11 +62,13 @@ class GuideMetadata {
         }
         for (App app : this.apps) {
             for (String featureName : app.javaFeatures + app.kotlinFeatures + app.groovyFeatures + app.visibleFeatures) {
-                if (featureName.startsWith(MICRONAUT_PREFIX)) {
-                    tagsList.add(featureName.substring(MICRONAUT_PREFIX.length()))
-                } else {
-                    tagsList.add(featureName)
+                String tagToAdd = featureName
+                for (String prefix : FEATURES_PREFIXES) {
+                    if (tagToAdd.startsWith(prefix)) {
+                        tagToAdd = tagToAdd.substring(prefix.length())
+                    }
                 }
+                tagsList.add(tagToAdd)
             }
         }
         Set<String> categoriesAsTags = this.categories.collect { cat -> cat.name().toLowerCase() } as Set
