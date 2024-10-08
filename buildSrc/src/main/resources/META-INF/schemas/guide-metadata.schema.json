@@ -4,119 +4,182 @@
   "type": "object",
   "required": ["title","intro","authors","categories","publicationDate"],
   "properties": {
-    "minimumJavaVersion": {
-      "type": "integer"
+    "title": {
+      "description": "The guide's title",
+      "type": "string"
     },
-    "prerequesites": {
+    "authors": {
+      "description": "The guide's authors",
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "cloud": {
-      "type": "string"
-    },
-    "skipGradleTests": {
-      "type": "boolean"
-    },
     "intro": {
+      "description": "The guide introduction",
       "type": "string"
-    },
-    "skipMavenTests": {
-      "type": "boolean"
     },
     "features": {
+      "description": "The features that the guide requires",
       "type": "array",
       "items": {
         "type": "string"
       }
     },
     "publicationDate": {
-      "type": "string"
+      "description": "The guide publication date. It should follow the format YYYY-MM-DD",
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}\\-(0?[1-9]|1[012])\\-(0?[1-9]|[12][0-9]|3[01])$"
     },
-    "asciidoctor": {
-      "type": "string"
+    "minimumJavaVersion": {
+      "description": "If the guide needs a minimum Java version, define it here.",
+      "type": "integer"
     },
-    "languages": {
+    "maximumJavaVersion": {
+      "description": "If the guide needs a maximum Java version, define it here.",
+      "type": "integer"
+    },
+    "prerequisites": {
+      "description": "The prerequisites of the guide",
       "type": "array",
       "items": {
         "type": "string"
       }
     },
+    "cloud": {
+      "description": "The cloud service provider of the guide",
+      "type": "string"
+    },
+    "skipGradleTests": {
+      "description": "Set it to true to skip running the tests for the Gradle applications for the guide",
+      "type": "boolean"
+    },
+    "skipMavenTests": {
+      "description": "Set it to true to skip running the tests for the Maven applications for the guide",
+      "type": "boolean"
+    },
+    "asciidoctor": {
+      "description": "The guide asciidoctor file",
+      "type": "string"
+    },
+    "languages": {
+      "description": "The guide supported languages",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["java","groovy","kotlin"]
+      }
+    },
     "tags": {
+      "description": "List of tags added to the guide",
       "type": "array",
       "items": {
         "type": "string"
       }
     },
     "buildTools": {
+      "description": "By default the code in the guide is generated for Gradle and Maven. If a guide is specific only for a build tool, define it here",
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": ["maven","gradle"]
       }
     },
     "testFramework": {
-      "type": "string"
+      "description": "The guide's test framework. By default Java and Kotlin applications are tested with JUnit5 and Groovy applications with Spock",
+      "type": "string",
+      "enum": ["spock","junit"]
     },
     "zipIncludes": {
+      "description": "List of additional files to include in the generated zip file for the guide",
       "type": "array",
       "items": {
         "type": "string"
       }
     },
     "categories": {
+      "description": "The guide's categories",
       "type": "array",
       "items": {
         "type": "string"
       }
     },
     "slug": {
+      "description": "The guide's slug",
       "type": "string"
     },
     "publish": {
+      "description": "Defaults to true for regular guides; set to false for partial/base guides",
       "type": "boolean"
     },
-    "title": {
-      "type": "string"
-    },
-    "authors": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "maximumJavaVersion": {
-      "type": "integer"
-    },
     "base": {
+      "description": "Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one",
       "type": "string"
     },
     "env": {
+      "description": "The guide's environment variables",
       "type": "object",
       "properties": {
         "AWS_SECRET_ACCESS_KEY": {
+          "description": "Amazon Web Services Access Key",
           "type": "string"
         },
         "AWS_REGION": {
+          "description": "Amazon Web Services region",
           "type": "string"
         },
         "AWS_ACCESS_KEY_ID": {
+          "description": "Amazon Web Services Key Id",
           "type": "string"
         }
       }
     },
     "apps": {
+      "description": "The Micronaut apps that need to be created for the guide. Most of the guides only generate one application (single-app). In this case the name of the applications needs to be default",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
+          "name": {
+            "description": "The app's name",
+            "type": "string"
+          },
+          "packageName": {
+            "description": "The app's package name",
+            "type": "string"
+          },
+          "applicationType": {
+            "description": "The app type",
+            "type": "string"
+          },
+          "framework": {
+            "description": "The app's framework. Default is Micronaut",
+            "type": "string"
+          },
+          "features": {
+            "description": "The app's features",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "invisibleFeatures": {
+            "description": "The app's invisible features",
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "kotlinFeatures": {
+            "description": "The app's Kotlin features",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "javaFeatures": {
+            "description": "The app's Java features",
             "type": "array",
             "items": {
               "type": "string"
@@ -126,37 +189,15 @@
             "type": "boolean"
           },
           "testFramework": {
-            "type": "string"
-          },
-          "javaFeatures": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "framework": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "features": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "packageName": {
+            "description": "The app's test framework",
             "type": "string"
           },
           "excludeTest": {
+            "description": "The tests that should not be run",
             "type": "array",
             "items": {
               "type": "string"
             }
-          },
-          "applicationType": {
-            "type": "string"
           }
         }
       }

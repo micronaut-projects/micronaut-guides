@@ -92,7 +92,7 @@ class GuideProjectGenerator implements AutoCloseable {
         Map config = new JsonSlurper().parse(configFile) as Map
         boolean publish = config.publish == null ? true : config.publish
 
-        if(publish){
+        if (publish) {
             JsonSchemaFactory jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012, builder ->
                     // This creates a mapping from $id which starts with https://www.example.org/ to the retrieval URI classpath:schema/
                     builder.schemaMappers(schemaMappers -> schemaMappers.mapPrefix("https://www.guides.micronaut.io/schemas", "classpath:META-INF/schemas"))
@@ -105,7 +105,7 @@ class GuideProjectGenerator implements AutoCloseable {
             String content = Files.readString(Paths.get(configFile.toString()))
             Set<ValidationMessage> assertions = schema.validate(content, InputFormat.JSON);
 
-            if(assertions.size()>0){
+            if (!assertions.isEmpty()) {
                 throw new Exception("Error while parsing metadata for guide " + configFile + '\n' + assertions)
             }
         }
