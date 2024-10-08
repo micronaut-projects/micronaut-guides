@@ -19,15 +19,11 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
-import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-
-import java.net.URI;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -37,8 +33,7 @@ class ProductSchemaTest {
     @Test
     void testProductSchema(@Client("/")HttpClient httpClient) throws JSONException {
         BlockingHttpClient client = httpClient.toBlocking();
-        URI uri = UriBuilder.of("/schemas").path("product.schema.json").build();
-        HttpRequest<?> request = HttpRequest.GET(uri);
+        HttpRequest<?> request = HttpRequest.GET("/schemas/product.schema.json");
         String json = assertDoesNotThrow(() -> client.retrieve(request));
         assertNotNull(json);
         String expected = """
