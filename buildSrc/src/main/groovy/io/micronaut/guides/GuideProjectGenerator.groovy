@@ -106,7 +106,7 @@ class GuideProjectGenerator implements AutoCloseable {
             Set<ValidationMessage> assertions = schema.validate(content, InputFormat.JSON);
 
             if (!assertions.isEmpty()) {
-                throw new Exception("Error while parsing metadata for guide " + configFile + '\n' + assertions)
+                throw new Exception("Guide metadata " + configFile + 'does not validate the JSON Schema\n' + assertions)
             }
         }
 
