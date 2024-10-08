@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 class JsonSchemaExposedTest {
 
     @Test
-    void openApi(@Client("/") HttpClient httpClient) { // <2>
+    void productJsonSchemaExposed(@Client("/") HttpClient httpClient) { // <2>
         BlockingHttpClient client = httpClient.toBlocking();
         assertDoesNotThrow(() -> client.exchange("/schemas/product.schema.json"));
     }

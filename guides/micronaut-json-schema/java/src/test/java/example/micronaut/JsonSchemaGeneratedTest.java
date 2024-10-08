@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JsonSchemaGeneratedTest {
 
     @Test
-    void buildGeneratesOpenApi(ResourceLoader resourceLoader) {
+    void buildGeneratesJsonSchema(ResourceLoader resourceLoader) {
         assertTrue(resourceLoader.getResource("META-INF/schemas/product.schema.json").isPresent());
     }
 }
