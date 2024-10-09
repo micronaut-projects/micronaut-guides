@@ -1,5 +1,12 @@
 package io.micronaut.guides
 
+import com.networknt.schema.InputFormat
+import com.networknt.schema.JsonSchema
+import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.SchemaLocation
+import com.networknt.schema.SchemaValidatorsConfig
+import com.networknt.schema.SpecVersion
+import com.networknt.schema.ValidationMessage
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -84,6 +91,27 @@ class GuideProjectGenerator implements AutoCloseable {
 
         Map config = new JsonSlurper().parse(configFile) as Map
         boolean publish = config.publish == null ? true : config.publish
+
+        if (publish) {
+            JsonSchemaFactory jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012, builder ->
+                    // This creates a mapping from $id which starts with https://www.example.org/ to the retrieval URI classpath:schema/
+                    builder.schemaMappers(schemaMappers -> schemaMappers.mapPrefix("https://www.guides.micronaut.io/schemas", "classpath:META-INF/schemas"))
+            );
+
+            SchemaValidatorsConfig.Builder builder = SchemaValidatorsConfig.builder();
+            SchemaValidatorsConfig validatorsConfig = builder.build();
+            JsonSchema schema = jsonSchemaFactory.getSchema(SchemaLocation.of("https://www.guides.micronaut.io/schemas/guide-metadata.schema.json"), validatorsConfig);
+
+            String content = Files.readString(Paths.get(configFile.toString()))
+            Set<ValidationMessage> assertions = schema.validate(content, InputFormat.JSON);
+
+            if (!assertions.isEmpty()) {
+                throw new Exception("Guide metadata " + configFile + 'does not validate the JSON Schema\n' + assertions)
+            }
+        }
+
+
+
 
         List<Category> categories = []
         for (String c : config.categories) {
