@@ -18,6 +18,8 @@ repositories {
 dependencies {
     annotationProcessor(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
     annotationProcessor("io.micronaut:micronaut-inject-java")
+    annotationProcessor("io.micronaut.jsonschema:micronaut-json-schema-processor")
+    implementation("io.micronaut.jsonschema:micronaut-json-schema-annotations")
     implementation(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
     implementation("io.micronaut.rss:micronaut-jsonfeed-core")
     annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
@@ -58,4 +60,8 @@ rocker {
 
 tasks.named('test', Test) {
     useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add("-Amicronaut.jsonschema.baseUri=https://guides.micronaut.io/schemas") // (1)
 }

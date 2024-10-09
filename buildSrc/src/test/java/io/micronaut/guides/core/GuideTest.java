@@ -11,14 +11,12 @@ import io.micronaut.core.beans.BeanIntrospection;
 import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest(startApplication = false)
-class AppTest {
+class GuideTest {
 
     @Inject
     Validator validator;
@@ -27,35 +25,27 @@ class AppTest {
     BeanContext beanContext;
 
     @Test
-    void typeAppPackageNameCanBeNull() {
-        String name = "name";
-        String packageName = null;
-        ApplicationType applicationType = ApplicationType.DEFAULT;
-        String framework = "Micronaut";
-        List<String> emptyList = new ArrayList<>();
-        String testFramework = "testFramework";
-        boolean validateLicense = true;
-
-        Set<ConstraintViolation<App>> violations = validator.validate(
-                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,testFramework,emptyList, validateLicense));
+    void typeCloudCanBeNull() {
+        Set<ConstraintViolation<Guide>> violations = validator.validate(
+                new Guide(null,null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null,null,null,null));
         assertTrue(violations.isEmpty());
     }
 
     @Test
     void typeAppIsAnnotatedWithIntrospected() {
-        assertDoesNotThrow(() -> BeanIntrospection.getIntrospection(App.class));
+        assertDoesNotThrow(() -> BeanIntrospection.getIntrospection(Guide.class));
     }
 
     @Test
-    void typeAppIsDeserializable() {
+    void typeGuideIsDeserializable() {
         SerdeIntrospections serdeIntrospections = beanContext.getBean(SerdeIntrospections.class);
-        assertDoesNotThrow(() -> serdeIntrospections.getDeserializableIntrospection(Argument.of(App.class)));
+        assertDoesNotThrow(() -> serdeIntrospections.getDeserializableIntrospection(Argument.of(Guide.class)));
     }
 
     @Test
-    void typeAppIsNotSerializable() {
+    void typeGuideIsNotSerializable() {
         SerdeIntrospections serdeIntrospections = beanContext.getBean(SerdeIntrospections.class);
-        assertDoesNotThrow(() -> serdeIntrospections.getSerializableIntrospection(Argument.of(App.class)));
+        assertDoesNotThrow(() -> serdeIntrospections.getSerializableIntrospection(Argument.of(Guide.class)));
     }
 
 }
