@@ -23,19 +23,23 @@ import jakarta.validation.constraints.*;
 
 import java.util.Set;
 
-@JsonSchema(description = "A product from Acme's catalog") // <1>
+/**
+ *
+ * @param productId  The unique identifier for a product // <1>
+ * @param productName Name of the product
+ * @param price The price of the product
+ * @param tags Product tags
+ */
+@JsonSchema(description = "A product from Acme's catalog") // <2>
 public record Product(
-        @NotNull // <2>
-        @JsonPropertyDescription("The unique identifier for a product") // <3>
+        @NotNull // <3>
         Long productId,
 
         @NonNull
         @NotBlank
-        @JsonPropertyDescription("Name of the product") // <3>
         String productName,
 
-        @NotNull // <1>
-        @JsonPropertyDescription("The price of the product") // <3>
+        @NotNull // <3>
         @Positive // <4>
         Double price,
 
