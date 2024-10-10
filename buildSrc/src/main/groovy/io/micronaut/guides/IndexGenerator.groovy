@@ -438,6 +438,8 @@ class IndexGenerator {
                     return './images/http.svg'
                 case Category.GRAPHQL:
                     return './images/graphql.svg'
+                case Category.JSON_SCHEMA:
+                    return './images/json-schema.svg'
                 case Category.OPEN_API:
                     return './images/openapi.svg'
                 case Category.GRAALVM:
