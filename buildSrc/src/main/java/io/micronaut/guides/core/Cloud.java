@@ -1,4 +1,4 @@
-package io.micronaut.guides;
+package io.micronaut.guides.core;
 
 import io.micronaut.core.order.Ordered;
 
