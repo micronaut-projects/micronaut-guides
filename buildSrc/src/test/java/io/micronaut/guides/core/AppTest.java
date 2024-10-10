@@ -27,8 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest(startApplication = false)
 class AppTest {
@@ -52,6 +51,16 @@ class AppTest {
         Set<ConstraintViolation<App>> violations = validator.validate(
                 new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,testFramework,emptyList, validateLicense));
         assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    void defaultValuesAreSetCorrectly() {
+        String name = "name";
+        List<String> emptyList = new ArrayList<>();
+        App app = new App(name,null,null,null,emptyList,emptyList,emptyList,emptyList,null,emptyList,false);
+        assertEquals(app.packageName(),"example.micronaut");
+        assertEquals(app.applicationType(),ApplicationType.DEFAULT);
+        assertEquals(app.framework(),"Micronaut");
     }
 
     @Test
@@ -94,7 +103,7 @@ class AppTest {
               ],
               "properties": {
                 "applicationType": {
-                  "description": "The app type.  It you don't specify, default is used.",
+                  "description": "The app type.  If you don't specify, default is used",
                   "type": [
                     "string"
                   ],
@@ -129,7 +138,7 @@ class AppTest {
                   }
                 },
                 "framework": {
-                  "description": "The app's framework. Default is Micronaut but Spring Boot is also supported.",
+                  "description": "The app's framework. Default is Micronaut but Spring Boot is also supported",
                   "type": [
                     "string"
                   ]
@@ -168,13 +177,13 @@ class AppTest {
                   }
                 },
                 "name": {
-                  "description": "The app's name. For single application guides, the application needs to be named default.",
+                  "description": "The app's name. For single application guides, the application needs to be named default",
                   "type": [
                     "string"
                   ]
                 },
                 "packageName": {
-                  "description": "The app's package name. It you don't specify, the package name example.micronaut is used.",
+                  "description": "The app's package name. If you don't specify, the package name example.micronaut is used",
                   "type": [
                     "string"
                   ]
@@ -186,6 +195,7 @@ class AppTest {
                   ]
                 },
                 "validateLicense": {
+                  "description": "To enable Spotless code check",
                   "type": [
                     "boolean"
                   ]
