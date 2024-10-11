@@ -53,6 +53,43 @@ class GuideTest {
     ResourceLoader resourceLoader;
 
     @Test
+    void testGuideWithBase() {
+        assertDoesNotThrow(() -> BeanIntrospection.getIntrospection(Guide.class));
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:base.json");
+        assertTrue(inputStreamOptional.isPresent());
+        final InputStream inputStreamBase = inputStreamOptional.get();
+        Guide base = assertDoesNotThrow(() -> jsonMapper.readValue(inputStreamBase, Guide.class));
+
+        inputStreamOptional = resourceLoader.getResourceAsStream("classpath:child.json");
+        assertTrue(inputStreamOptional.isPresent());
+        final InputStream inputStreamChild = inputStreamOptional.get();
+        Guide child = assertDoesNotThrow(() -> jsonMapper.readValue(inputStreamChild, Guide.class));
+        Guide guide = GuideUtils.merge(base, child);
+        assertEquals(List.of("Graeme Rocher"), guide.authors());
+        assertEquals("Connect a Micronaut Data JDBC Application to Azure Database for MySQL", guide.title());
+        assertEquals("Learn how to connect a Micronaut Data JDBC application to a Microsoft Azure Database for MySQL", guide.intro());
+        assertEquals(List.of("Data JDBC"), guide.categories());
+        assertEquals(LocalDate.of(2022,2, 17), guide.publicationDate());
+        assertEquals(List.of("Azure","cloud", "database", "micronaut-data", "jdbc", "flyway", "mysql"), guide.tags());
+        List<App> apps = guide.apps();
+        assertNotNull(apps);
+        assertEquals(1, apps.size());
+        assertTrue(apps.stream().anyMatch(app -> {
+            return app.name().equals("default") &&
+                    app.applicationType() == ApplicationType.DEFAULT &&
+                    app.packageName().equals("example.micronaut") &&
+                    app.framework().equals("Micronaut") &&
+                    app.features() == null &&
+                    app.invisibleFeatures() ==  null &&
+                    app.kotlinFeatures() ==  null &&
+                    app.javaFeatures() ==  null &&
+                    app.testFramework() ==  null &&
+                    app.excludeTest() ==  null &&
+                    app.validateLicense();
+        }));
+    }
+
+    @Test
     void typeCloudCanBeNull() {
         String title = "1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API";
         String intro = "This guide compares how to test serialization and deserialization with Micronaut Framework and Spring Boot.";
