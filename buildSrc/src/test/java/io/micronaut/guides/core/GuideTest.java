@@ -83,6 +83,7 @@ class GuideTest {
                     app.invisibleFeatures() ==  null &&
                     app.kotlinFeatures() ==  null &&
                     app.javaFeatures() ==  null &&
+                    app.groovyFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
                     app.validateLicense();
@@ -97,7 +98,7 @@ class GuideTest {
         List<String> authors = List.of("Sergio del Amo");
         LocalDate publicationDate = LocalDate.of(2024, 4, 24);
         List<App> apps = new ArrayList<>();
-        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, false));
+        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, false));
         Set<ConstraintViolation<Guide>> violations = validator.validate(
                 new Guide(title,intro, authors, categories, publicationDate, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,apps));
         assertTrue(violations.isEmpty());
@@ -129,6 +130,7 @@ class GuideTest {
                             app.invisibleFeatures() ==  null &&
                             app.kotlinFeatures() ==  null &&
                             app.javaFeatures() ==  null &&
+                            app.groovyFeatures() ==  null &&
                             app.testFramework() ==  null &&
                             app.excludeTest() ==  null &&
                             app.validateLicense();
@@ -142,6 +144,7 @@ class GuideTest {
                     app.invisibleFeatures() ==  null &&
                     app.kotlinFeatures() ==  null &&
                     app.javaFeatures() ==  null &&
+                    app.groovyFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
                     app.validateLicense();
@@ -154,6 +157,7 @@ class GuideTest {
                     app.features().equals(List.of("json-path", "assertj")) &&
                     app.invisibleFeatures() ==  null &&
                     app.kotlinFeatures() ==  null &&
+                    app.groovyFeatures() ==  null &&
                     app.javaFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
