@@ -1,15 +1,13 @@
 package io.micronaut.guides.core;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.starter.application.ApplicationType;
-import io.micronaut.starter.options.BuildTool;
-
-import java.util.ArrayList;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -30,46 +28,42 @@ import java.util.List;
 @Serdeable
 public record App (
         @NonNull
+        @NotBlank
         String name,
 
+        @JsonProperty(defaultValue = "example.micronaut")
         @Nullable
         String packageName,
 
+        @JsonProperty(defaultValue = "DEFAULT")
         @Nullable
         ApplicationType applicationType,
 
+        @JsonProperty(defaultValue = "Micronaut")
         @Nullable
         String framework,
 
-        @NonNull
+        @Nullable
         List<String> features,
 
+        @Nullable
         List<String> invisibleFeatures,
 
+        @Nullable
         List<String> kotlinFeatures,
 
+        @Nullable
         List<String> javaFeatures,
 
+        @Nullable
         String testFramework,
 
+        @Nullable
         List<String> excludeTest,
 
+        @JsonProperty(defaultValue = StringUtils.TRUE)
         @Nullable
-        boolean validateLicense
+        Boolean validateLicense
 ) {
-        @JsonCreator
-        public App(String name,String packageName,ApplicationType applicationType,String framework,List<String> features, List<String> invisibleFeatures, List<String> kotlinFeatures, List<String> javaFeatures, String testFramework, List<String> excludeTest, boolean validateLicense){
-                this.name=name;
-                this.packageName=packageName == null ? "example.micronaut" : packageName;
-                this.applicationType=applicationType == null ? ApplicationType.DEFAULT : applicationType;
-                this.framework=framework == null ? "Micronaut" : framework;
-                this.features=features == null ? new ArrayList<>() : features;
-                this.invisibleFeatures=invisibleFeatures == null ? new ArrayList<>() : invisibleFeatures;
-                this.kotlinFeatures=kotlinFeatures == null ? new ArrayList<>() : kotlinFeatures;
-                this.javaFeatures=javaFeatures == null ? new ArrayList<>() : javaFeatures;
-                this.testFramework=testFramework;
-                this.excludeTest=excludeTest;
-                this.validateLicense=validateLicense;
-        }
 }
 

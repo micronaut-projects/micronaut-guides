@@ -4,23 +4,30 @@ import io.micronaut.context.BeanContext;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.type.Argument;
+import io.micronaut.guides.GuideMetadata;
+import io.micronaut.json.JsonMapper;
 import io.micronaut.serde.SerdeIntrospections;
 import io.micronaut.starter.application.ApplicationType;
+import io.micronaut.starter.options.BuildTool;
+import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.validation.validator.Validator;
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
+import org.gradle.api.tasks.Input;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import javax.swing.text.html.Option;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,16 +58,6 @@ class AppTest {
         Set<ConstraintViolation<App>> violations = validator.validate(
                 new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,testFramework,emptyList, validateLicense));
         assertTrue(violations.isEmpty());
-    }
-
-    @Test
-    void defaultValuesAreSetCorrectly() {
-        String name = "name";
-        List<String> emptyList = new ArrayList<>();
-        App app = new App(name,null,null,null,emptyList,emptyList,emptyList,emptyList,null,emptyList,false);
-        assertEquals(app.packageName(),"example.micronaut");
-        assertEquals(app.applicationType(),ApplicationType.DEFAULT);
-        assertEquals(app.framework(),"Micronaut");
     }
 
     @Test
@@ -202,9 +199,7 @@ class AppTest {
                 }
               },
               "required": [
-                "name",
-                "features",
-                "validateLicense"
+                "name"
               ]
             }
         """;

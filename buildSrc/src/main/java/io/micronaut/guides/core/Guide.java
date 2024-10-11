@@ -1,19 +1,19 @@
 package io.micronaut.guides.core;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.starter.options.TestFramework;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,74 +45,75 @@ import java.util.Map;
 @Serdeable
 public record Guide(
         @NonNull
+        @NotBlank
         String title,
 
         @NonNull
+        @NotBlank
         String intro,
 
+        @NotEmpty
         @NonNull
         List<String> authors,
 
+        @NotEmpty
         @NonNull
         List<String> categories,
 
         @NonNull
+        @NotNull
         LocalDate publicationDate,
 
+        @Nullable
         Integer minimumJavaVersion,
 
+        @Nullable
         Integer maximumJavaVersion,
 
+        @Nullable
         Cloud cloud,
 
-        boolean skipGradleTests,
+        @JsonProperty(defaultValue = StringUtils.FALSE)
+        @Nullable
+        Boolean skipGradleTests,
 
-        boolean skipMavenTests,
+        @JsonProperty(defaultValue = StringUtils.FALSE)
+        @Nullable
+        Boolean skipMavenTests,
 
+        @Nullable
         String asciidoctor,
 
+        @Nullable
         List<Language> languages,
 
+        @Nullable
         List<String> tags,
 
+        @Nullable
         List<BuildTool> buildTools,
 
+        @Nullable
         TestFramework testFramework,
 
+        @Nullable
         List<String> zipIncludes,
 
+        @Nullable
         String slug,
 
+        @Nullable
+        @JsonProperty(defaultValue = StringUtils.TRUE)
         Boolean publish,
 
+        @Nullable
         String base,
 
+        @Nullable
         Map<String, String> env,
 
+        @NotEmpty
+        @NonNull
         List<App> apps
 ) {
-        @JsonCreator
-        public Guide(String title,String intro,List<String> authors,List<String> categories,LocalDate publicationDate,Integer minimumJavaVersion,Integer maximumJavaVersion, Cloud cloud, boolean skipGradleTests, boolean skipMavenTests, String asciidoctor, List<Language> languages, List<String> tags, List<BuildTool> buildTools, TestFramework testFramework, List<String> zipIncludes, String slug, Boolean publish, String base, Map<String, String> env, List<App> apps){
-                this.publish = publish == null ? true : publish;
-                this.slug = slug;
-                this.title = title;
-                this.intro = intro;
-                this.authors = authors;
-                this.categories = categories;
-                this.publicationDate = publicationDate;
-                this.minimumJavaVersion = minimumJavaVersion;
-                this.maximumJavaVersion = maximumJavaVersion;
-                this.cloud = cloud;
-                this.skipGradleTests = skipGradleTests;
-                this.skipMavenTests = skipMavenTests;
-                this.asciidoctor = asciidoctor == null ? this.slug+".adoc" : asciidoctor;
-                this.languages = languages == null ? List.of(Language.JAVA, Language.KOTLIN) : languages;
-                this.tags = tags;
-                this.buildTools = buildTools == null ? List.of(BuildTool.GRADLE, BuildTool.MAVEN) : buildTools;
-                this.testFramework = testFramework;
-                this.zipIncludes = zipIncludes;
-                this.base = base;
-                this.env = env;
-                this.apps = apps;
-        }
 }

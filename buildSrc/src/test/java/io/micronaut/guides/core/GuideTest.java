@@ -1,14 +1,22 @@
 package io.micronaut.guides.core;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.context.BeanContext;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.type.Argument;
+import io.micronaut.json.JsonMapper;
 import io.micronaut.serde.SerdeIntrospections;
+import io.micronaut.starter.application.ApplicationType;
+import io.micronaut.starter.options.BuildTool;
+import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.validation.validator.Validator;
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.constraints.NotBlank;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -20,6 +28,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,11 +46,94 @@ class GuideTest {
     @Inject
     BeanContext beanContext;
 
+    @Inject
+    JsonMapper jsonMapper;
+
+    @Inject
+    ResourceLoader resourceLoader;
+
     @Test
     void typeCloudCanBeNull() {
+        String title = "1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API";
+        String intro = "This guide compares how to test serialization and deserialization with Micronaut Framework and Spring Boot.";
+        List<String> categories = List.of("Boot to Micronaut Building a REST API");
+        List<String> authors = List.of("Sergio del Amo");
+        LocalDate publicationDate = LocalDate.of(2024, 4, 24);
+        List<App> apps = new ArrayList<>();
+        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, false));
         Set<ConstraintViolation<Guide>> violations = validator.validate(
-                new Guide(null,null, null, null, null, null, null, null,false,false,null,null,null,null,null,null,null,null,null,null,null));
+                new Guide(title,intro, authors, categories, publicationDate, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,apps));
         assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    void testDeserialization() throws IOException {
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        assertEquals(List.of("Sergio del Amo"), guide.authors());
+        assertEquals("1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API", guide.title());
+        assertEquals("This guide compares how to test serialization and deserialization with Micronaut Framework and Spring Boot.", guide.intro());
+        assertEquals(List.of("spring-boot"), guide.tags());
+        assertEquals(List.of("Boot to Micronaut Building a REST API"), guide.categories());
+        assertEquals(LocalDate.of(2024, 4, 24), guide.publicationDate());
+        assertEquals(List.of(Language.JAVA), guide.languages());
+        assertEquals(List.of(BuildTool.GRADLE), guide.buildTools());
+        List<App> apps = guide.apps();
+        assertNotNull(apps);
+        assertEquals(3, apps.size());
+        assertTrue(apps.stream().anyMatch(app -> {
+                    return app.name().equals("springboot") &&
+                            app.applicationType() == ApplicationType.DEFAULT &&
+                            app.packageName().equals("example.micronaut") &&
+                            app.framework().equals("Spring Boot") &&
+                            app.features().equals(List.of("spring-boot-starter-web")) &&
+                            app.invisibleFeatures() ==  null &&
+                            app.kotlinFeatures() ==  null &&
+                            app.javaFeatures() ==  null &&
+                            app.testFramework() ==  null &&
+                            app.excludeTest() ==  null &&
+                            app.validateLicense();
+        }));
+        assertTrue(apps.stream().anyMatch(app -> {
+            return app.name().equals("micronautframeworkjacksondatabind") &&
+                    app.applicationType() == ApplicationType.DEFAULT &&
+                    app.packageName().equals("example.micronaut") &&
+                    app.framework().equals("Micronaut") &&
+                    app.features().equals(List.of("json-path", "assertj", "jackson-databind")) &&
+                    app.invisibleFeatures() ==  null &&
+                    app.kotlinFeatures() ==  null &&
+                    app.javaFeatures() ==  null &&
+                    app.testFramework() ==  null &&
+                    app.excludeTest() ==  null &&
+                    app.validateLicense();
+        }));
+        assertTrue(apps.stream().anyMatch(app -> {
+            return app.name().equals("micronautframeworkserde") &&
+                    app.applicationType() == ApplicationType.DEFAULT &&
+                    app.packageName().equals("example.micronaut") &&
+                    app.framework().equals("Micronaut") &&
+                    app.features().equals(List.of("json-path", "assertj")) &&
+                    app.invisibleFeatures() ==  null &&
+                    app.kotlinFeatures() ==  null &&
+                    app.javaFeatures() ==  null &&
+                    app.testFramework() ==  null &&
+                    app.excludeTest() ==  null &&
+                    app.validateLicense();
+        }));
+        assertFalse(guide.skipGradleTests());
+        assertFalse(guide.skipMavenTests());
+        assertNull(guide.minimumJavaVersion());
+        assertNull(guide.maximumJavaVersion());
+        assertNull(guide.cloud());
+        assertNull(guide.asciidoctor());
+        assertTrue(guide.publish());
+        assertNull(guide.asciidoctor());
+        assertNull(guide.slug());
+        assertNull(guide.zipIncludes());
+        assertNull(guide.base());
+        assertNull(guide.env());
     }
 
     @Test
@@ -67,7 +160,7 @@ class GuideTest {
 
     @Test
     void defaultValuesAreSetCorrectly() {
-        Guide guide = new Guide(null,null, null, null, null, null, null, null,false,false,null,null,null,null,null,null,null,null,null,null,null);
+        Guide guide = new Guide(null,null, null, null, null, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,null);
 
         assertEquals(guide.publish(),true);
     }
@@ -282,11 +375,11 @@ class GuideTest {
                 "authors",
                 "categories",
                 "publicationDate",
-                "skipGradleTests",
-                "skipMavenTests"
+                "apps"
               ]
             }
                 """;
+        System.out.println(schema);
         JSONAssert.assertEquals(expected, schema, JSONCompareMode.LENIENT);
     }
 
