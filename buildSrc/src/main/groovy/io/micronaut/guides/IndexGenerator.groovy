@@ -5,6 +5,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.core.order.OrderUtil
 import io.micronaut.core.order.Ordered
+import io.micronaut.guides.core.Cloud
 import io.micronaut.json.JsonMapper
 import io.micronaut.rss.jsonfeed.JsonFeed
 import io.micronaut.rss.jsonfeed.JsonFeedAuthor
