@@ -69,9 +69,8 @@ class GuideTest {
         assertEquals("Connect a Micronaut Data JDBC Application to Azure Database for MySQL", guide.title());
         assertEquals("Learn how to connect a Micronaut Data JDBC application to a Microsoft Azure Database for MySQL", guide.intro());
         assertEquals(List.of("Data JDBC"), guide.categories());
-        assertEquals(List.of("Azure"), guide.tags());
         assertEquals(LocalDate.of(2022,2, 17), guide.publicationDate());
-        assertEquals(List.of("cloud", "database", "micronaut-data", "jdbc", "flyway", "mysql"), guide.tags());
+        assertEquals(List.of("Azure","cloud", "database", "micronaut-data", "jdbc", "flyway", "mysql"), guide.tags());
         List<App> apps = guide.apps();
         assertNotNull(apps);
         assertEquals(1, apps.size());
