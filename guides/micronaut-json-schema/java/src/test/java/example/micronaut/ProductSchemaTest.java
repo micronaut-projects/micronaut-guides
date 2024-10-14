@@ -27,11 +27,12 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@MicronautTest
+@MicronautTest // <1>
 class ProductSchemaTest {
 
     @Test
-    void testProductSchema(@Client("/")HttpClient httpClient) throws JSONException {
+    void testProductSchema(@Client("/")HttpClient httpClient) // <2>
+            throws JSONException {
         BlockingHttpClient client = httpClient.toBlocking();
         HttpRequest<?> request = HttpRequest.GET("/schemas/product.schema.json");
         String json = assertDoesNotThrow(() -> client.retrieve(request));
@@ -45,7 +46,7 @@ class ProductSchemaTest {
   "type": ["object"],
   "properties": {
     "productId": {
-      "description": "The unique identifier for a product",
+      "description": "The unique identifier for a product // <1>",
       "type": ["integer"]
     },
     "productName": {
