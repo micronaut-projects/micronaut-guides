@@ -189,6 +189,18 @@ class GuideTest {
     }
 
     @Test
+    void testGetAppFeatures(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app = guide.apps().stream().filter(el -> el.name().equals("micronautframeworkjacksondatabind")).findFirst().get();
+        List appFeatures = GuideUtils.getAppFeatures(app,Language.JAVA);
+        Collections.sort(appFeatures);
+        assertEquals(appFeatures,List.of("assertj", "jackson-databind", "json-path", "spotless"));
+    }
+
+    @Test
     void typeAppIsAnnotatedWithIntrospected() {
         assertDoesNotThrow(() -> BeanIntrospection.getIntrospection(Guide.class));
     }
