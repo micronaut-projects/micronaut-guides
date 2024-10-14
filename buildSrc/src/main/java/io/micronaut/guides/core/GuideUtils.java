@@ -150,6 +150,12 @@ public final class GuideUtils {
         return merged;
     }
 
+    /**
+     * Merges multiple collections into one list.
+     *
+     * @param lists An array of Collection objects to be merged.
+     * @return A single List containing all elements from the provided Collections, excluding any null values.
+     */
     private static List mergeLists(Collection... lists) {
         List merged = new ArrayList<>();
         for (Collection list : lists) {
@@ -160,6 +166,13 @@ public final class GuideUtils {
         return merged;
     }
 
+    /**
+     * Adds all elements from the source collection to the target collection safely.
+     *
+     * @param target The collection where elements will be added.
+     * @param src The collection whose elements are to be added to the target.
+     * @throws NullPointerException If the target collection is null.
+     */
     private static void addAllSafe(Collection target, Collection src) {
         if(target == null) {
             throw new NullPointerException("Target list cannot be null");
