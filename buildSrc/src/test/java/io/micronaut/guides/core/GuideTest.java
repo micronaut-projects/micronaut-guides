@@ -29,10 +29,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,7 +67,9 @@ class GuideTest {
         assertEquals("Learn how to connect a Micronaut Data JDBC application to a Microsoft Azure Database for MySQL", guide.intro());
         assertEquals(List.of("Data JDBC"), guide.categories());
         assertEquals(LocalDate.of(2022,2, 17), guide.publicationDate());
-        assertEquals(List.of("Azure","cloud", "database", "micronaut-data", "jdbc", "flyway", "mysql"), guide.tags());
+        List<String> tags = guide.tags();
+        Collections.sort(tags);
+        assertEquals(List.of("Azure","cloud", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
         List<App> apps = guide.apps();
         assertNotNull(apps);
         assertEquals(1, apps.size());
@@ -175,6 +174,18 @@ class GuideTest {
         assertNull(guide.zipIncludes());
         assertNull(guide.base());
         assertNull(guide.env());
+    }
+
+    @Test
+    void testGetTags(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        List<String> expectedList = List.of("assertj", "boot-to-micronaut-building-a-rest-api", "jackson-databind", "json-path", "spring-boot", "spring-boot-starter-web");
+        List<String> actualList = GuideUtils.getTags(guide);
+        Collections.sort(actualList);
+        assertEquals(expectedList, actualList);
     }
 
     @Test
