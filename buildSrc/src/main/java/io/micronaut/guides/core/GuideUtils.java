@@ -1,5 +1,8 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.starter.options.BuildTool;
+import io.micronaut.starter.options.Language;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,5 +88,15 @@ public final class GuideUtils {
 
         return merged;
 
+    }
+
+    static boolean shouldSkip(Guide guide, BuildTool buildTool) {
+        if (buildTool == BuildTool.GRADLE) {
+            return guide.skipGradleTests();
+        }
+        if (buildTool == BuildTool.MAVEN) {
+            return guide.skipMavenTests();
+        }
+        return false;
     }
 }
