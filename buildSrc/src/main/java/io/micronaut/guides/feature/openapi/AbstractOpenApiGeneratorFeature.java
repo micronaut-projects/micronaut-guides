@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2021 the original author or authors.
+ * Copyright 2003-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,6 @@ public abstract class AbstractOpenApiGeneratorFeature implements Feature {
                     .extension(new RockerWritable(provideGradleModel()))
                     .build());
         } else {
-            // temporary fix, guides currently depend on M4
-            generatorContext.getBuildProperties().put("micronaut-maven-plugin.version", "4.0.0-M6");
             generatorContext.getBuildProperties().putAll(provideMavenProperties());
         }
     }

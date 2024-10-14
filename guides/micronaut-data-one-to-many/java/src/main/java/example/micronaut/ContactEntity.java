@@ -9,10 +9,10 @@ import io.micronaut.data.annotation.Relation;
 
 import java.util.List;
 
-@MappedEntity("contact")
+@MappedEntity("contact") // <1>
 public record ContactEntity(
-        @Id
-        @GeneratedValue
+        @Id // <2>
+        @GeneratedValue // <2>
         @Nullable
         Long id,
 

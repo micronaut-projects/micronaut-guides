@@ -18,14 +18,26 @@ repositories {
 dependencies {
     annotationProcessor(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
     annotationProcessor("io.micronaut:micronaut-inject-java")
-
+    annotationProcessor("io.micronaut.jsonschema:micronaut-json-schema-processor")
+    implementation("io.micronaut.jsonschema:micronaut-json-schema-annotations")
     implementation(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
+    implementation("io.micronaut.rss:micronaut-jsonfeed-core")
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+    implementation("io.micronaut.validation:micronaut-validation")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
     implementation("io.micronaut.starter:micronaut-starter-api:$micronautVersion")
-    implementation("io.micronaut:micronaut-inject-java")
-    implementation('org.apache.commons:commons-compress:1.21')
+    testImplementation(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
+    testImplementation("io.micronaut.test:micronaut-test-junit5")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testAnnotationProcessor(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
+    testAnnotationProcessor("io.micronaut:micronaut-inject-java")
+    implementation('org.apache.commons:commons-compress:1.26.0')
     implementation "io.micronaut.docs:micronaut-docs-asciidoc-extensions:$micronautDocsVersion", {
         exclude group: "org.codehaus.groovy"
     }
+    implementation("com.networknt:json-schema-validator")
+    testImplementation("org.skyscreamer:jsonassert:1.5.3")
 }
 
 sourceSets {
@@ -44,4 +56,13 @@ rocker {
             optimize = true
         }
     }
+}
+
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add("-Amicronaut.jsonschema.baseUri=https://guides.micronaut.io/schemas") // (1)
 }

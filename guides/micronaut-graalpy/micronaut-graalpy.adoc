@@ -1,0 +1,63 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Python code
+Part of the "Hello World" functionality will be provided by Python.
+
+Create a Python file with the following code:
+resource:org.graalvm.python.vfs/src/hello.py[]
+
+<1> The Python function we are going to call from Java
+
+All files in the `src/main/resources/org.graalvm.python.vfs/` directory will be accessible to the GraalPy runtime environment.
+The `src` subdirectory is automatically added to the Python search path, making it the ideal location for custom Python files in your application.
+
+=== Java binding
+Python code can be accessed programmatically using the https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/package-summary.html[GraalVM SDK Polyglot API],
+which enables you to embed Python into your applications.
+
+In order to make it work, we first need a Java interface providing the intended binding to Python.
+
+Create a Java interface with the following code:
+source:HelloModule[]
+<1> The @api@/io/micronaut/graal/graalpy/annotations/GraalPyModule.html[@GraalPyModule] annotation indicates that the bean created from the interface
+is intended to import the `hello.py` Python module into GraalPy and and expose it to the Java code using
+the https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Value.html#target-type-mapping-heading[Target type mapping].
+<2> Java method matching the Python function `hello(txt)` in `hello.py`.
+
+=== Controller
+To create a microservice that responds with "Hello World" you also need a controller.
+
+Create a controller with the following code:
+
+source:HelloController[]
+
+callout:controller[number=1,arg0=/hello]
+callout:constructor-di[number=2,arg0=HelloModule]
+callout:get[number=3,arg0=index,arg1=/hello]
+callout:text-plain[4]
+<5> Use the `HelloModule` bean to call the Python function `hello(txt)` in `hello.py`.
+
+=== Test
+
+Create a test to verify that when you make a GET request to `/hello` you get `Hello World` as a response:
+
+test:HelloControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-request[3]
+
+common:testApp.adoc[]
+common:runapp.adoc[]
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-graal-languages/latest/guide/[Micronaut Graalpy] integration.
+
+common:helpWithMicronaut.adoc[]

@@ -6,7 +6,7 @@ import io.micronaut.core.annotation.Nullable;
 
 import java.util.Set;
 
-@Introspected
+@Introspected // <1>
 public record ContactComplete(
         @NonNull Long id,
         @Nullable String firstName,

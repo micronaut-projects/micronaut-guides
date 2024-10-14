@@ -1,0 +1,62 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+This tutorial shows how to generate a JSON Schema of a Java class at compile-time using Micronaut JSON Schema.
+The example shows a JSON Schema, such as the one found in the https://json-schema.org/learn/getting-started-step-by-step[Getting Started Tutorial on the Json Schema Website].
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== JSON Schema dependencies
+
+The `jsonschema` feature adds the following dependencies:
+
+dependency:micronaut-json-schema-processor[groupId=io.micronaut.jsonschema,scope=annotationProcessor]
+dependency:micronaut-json-schema-annotations[groupId=io.micronaut.jsonschema]
+
+=== JSON Schema annotation
+
+First create a class:
+
+source:Product[]
+<1> You can use javadoc description or Jackson's `@JsonPropertyDescription` to influence the JSON Schema property description.
+<2> Annotate with `@JsonSchema` to trigger the creation of a schema for it during build time:
+<3> You can use https://docs.micronaut.io/latest/guide/#nullabilityAnnotations[Nullability annotations] or validation annotations to influence whether a property is required in the JSON Schema specification.
+<4> Validation annotations influence the generated JSON Schema.
+
+At compilation-time a JSON Schema is generated at compile-time. You can test it as follows:
+
+test:JsonSchemaGeneratedTest[]
+callout:micronaut-test-start-application-false[1]
+
+=== Expose JSON Schema
+
+We can expose the Json Schema generated at compile-time as a static resource with the following configuration:
+
+resource:application.properties[tag=static-resources]
+
+You can test the JSON Schema specification is exposed:
+
+test:JsonSchemaExposedTest[]
+callout:micronaut-test[1]
+callout:http-client[2]
+
+=== Test
+
+Last, let's write a test that verifies the generated JSON Schema matches our expectations:
+
+test:ProductSchemaTest[]
+callout:micronaut-test[1]
+callout:http-client[2]
+
+common:json-assert.adoc[]
+
+common:testApp.adoc[]
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-json-schema/latest/guide/[Micronaut JSON Schema] and https://json-schema.org[JSON Schema].

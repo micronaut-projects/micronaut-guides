@@ -32,7 +32,6 @@ class ContactRepositoryTest {
         assertTrue(complete.isPresent());
         assertEquals(new ContactComplete(e.id(), "Sergio", "del Amo", null), complete.get());
 
-        // Add a phone
         String americanPhone = "+14155552671";
         String ukPhone = "+442071838750";
         long phoneCount = phoneRepository.count();

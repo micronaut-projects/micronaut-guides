@@ -1,0 +1,1 @@
+Some SVG images used to illustrate guide categories are derivation works from https://www.svgrepo.com/svg/ icons licensed under CC BY 4.0 or MIT license. 

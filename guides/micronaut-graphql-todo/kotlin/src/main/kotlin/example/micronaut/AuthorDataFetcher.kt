@@ -24,8 +24,8 @@ import java.util.concurrent.CompletionStage
 class AuthorDataFetcher : DataFetcher<CompletionStage<Author>> {
 
     override fun get(environment: DataFetchingEnvironment): CompletionStage<Author> {
-        val toDo: ToDo = environment.getSource()
-        val authorDataLoader = environment.getDataLoader<Long, Author>("author") // <2>
+        val toDo: ToDo = environment.getSource()!!
+        val authorDataLoader = environment.getDataLoader<Long, Author>("author")!! // <2>
         return authorDataLoader.load(toDo.authorId)
     }
 }

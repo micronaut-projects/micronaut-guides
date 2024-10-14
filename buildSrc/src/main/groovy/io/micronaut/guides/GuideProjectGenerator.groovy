@@ -1,5 +1,12 @@
 package io.micronaut.guides
 
+import com.networknt.schema.InputFormat
+import com.networknt.schema.JsonSchema
+import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.SchemaLocation
+import com.networknt.schema.SchemaValidatorsConfig
+import com.networknt.schema.SpecVersion
+import com.networknt.schema.ValidationMessage
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -8,6 +15,7 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.core.Cloud
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
@@ -85,6 +93,27 @@ class GuideProjectGenerator implements AutoCloseable {
         Map config = new JsonSlurper().parse(configFile) as Map
         boolean publish = config.publish == null ? true : config.publish
 
+        if (publish) {
+            JsonSchemaFactory jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012, builder ->
+                    // This creates a mapping from $id which starts with https://www.example.org/ to the retrieval URI classpath:schema/
+                    builder.schemaMappers(schemaMappers -> schemaMappers.mapPrefix("https://www.guides.micronaut.io/schemas", "classpath:META-INF/schemas"))
+            );
+
+            SchemaValidatorsConfig.Builder builder = SchemaValidatorsConfig.builder();
+            SchemaValidatorsConfig validatorsConfig = builder.build();
+            JsonSchema schema = jsonSchemaFactory.getSchema(SchemaLocation.of("https://www.guides.micronaut.io/schemas/guide-metadata.schema.json"), validatorsConfig);
+
+            String content = Files.readString(Paths.get(configFile.toString()))
+            Set<ValidationMessage> assertions = schema.validate(content, InputFormat.JSON);
+
+            if (!assertions.isEmpty()) {
+                throw new Exception("Guide metadata " + configFile + 'does not validate the JSON Schema\n' + assertions)
+            }
+        }
+
+
+
+
         List<Category> categories = []
         for (String c : config.categories) {
             Category cat = Category.values().find { it.toString() == c }
@@ -102,6 +131,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 intro: config.intro,
                 authors: config.authors,
                 tags: config.tags,
+                cloud: config.cloud != null ? Cloud.valueOf(config.cloud.toUpperCase()) : null,
                 categories: categories,
                 publicationDate: publish ? LocalDate.parse(config.publicationDate) : null,
                 publish: publish,
@@ -113,6 +143,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 skipMavenTests: config.skipMavenTests ?: false,
                 minimumJavaVersion: config.minimumJavaVersion,
                 maximumJavaVersion: config.maximumJavaVersion,
+                skips: (config.skips.collect { new GuideMetadata.Skip(it[0], it[1]) } ?: []).toSet(),
                 zipIncludes: config.zipIncludes ?: [],
                 env: config.env ?: [:],
                 apps: config.apps.collect { it ->
@@ -336,6 +367,10 @@ class GuideProjectGenerator implements AutoCloseable {
         for (BuildTool buildTool : BuildTool.values()) {
             if (buildTools.contains(buildTool.toString())) {
                 for (Language language : Language.values()) {
+                    if (guideMetadata.shouldSkip(buildTool, language)) {
+                        LOG.info("Skipping index guide for $buildTool and $language")
+                        continue
+                    }
                     if (languages.contains(language.toString())) {
                         guidesOptionList << createGuidesOption(buildTool, language, testFramework)
                     }
@@ -396,6 +431,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.authors = mergeLists(metadata.authors, base.authors) as Set<String>
         merged.tags = mergeLists(base.tags, metadata.tags)
         merged.categories = metadata.categories ?: base.categories
+        merged.cloud = metadata.cloud ?: base.cloud
         merged.publicationDate = metadata.publicationDate
         merged.publish = metadata.publish
         merged.buildTools = metadata.buildTools ?: base.buildTools
@@ -405,6 +441,7 @@ class GuideProjectGenerator implements AutoCloseable {
         merged.skipMavenTests = base.skipMavenTests || metadata.skipMavenTests
         merged.minimumJavaVersion = metadata.minimumJavaVersion ?: base.minimumJavaVersion
         merged.maximumJavaVersion = metadata.maximumJavaVersion ?: base.maximumJavaVersion
+        merged.skips = metadata.skips + base.skips
         merged.zipIncludes = metadata.zipIncludes // TODO support merging from base
         merged.env = metadata.env ?: base.env
         merged.apps = mergeApps(base, metadata)

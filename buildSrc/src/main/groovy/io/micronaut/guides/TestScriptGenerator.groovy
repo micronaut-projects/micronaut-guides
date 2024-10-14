@@ -1,7 +1,6 @@
 package io.micronaut.guides
 
 import groovy.transform.CompileStatic
-import io.micronaut.starter.options.BuildTool
 import java.util.stream.Collectors
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.GRADLE
@@ -141,27 +140,31 @@ kill_kotlin_daemon () {
 """
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE
-                if (buildTool == MAVEN && metadata.skipMavenTests) {
-                    continue
-                }
-                if (buildTool == GRADLE && metadata.skipGradleTests) {
-                    continue
-                }
+                BuildTool buildTool = folder.containsIgnoreCase(MAVEN.toString()) ? MAVEN : GRADLE
                 if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
+                    if (metadata.shouldSkip(buildTool)) {
+                        continue
+                    }
                     def defaultApp = metadata.apps.find { it.name == DEFAULT_APP_NAME }
                     if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
                         def features = defaultApp.getFeatures(guidesOption.language)
-                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense)
+                        if (!folder.contains("-maven-groovy")) {
+                            bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense)
+                        }
                     }
                 } else {
                     bashScript << """\
 cd $folder
 """
                     for (GuideMetadata.App app : metadata.apps) {
+                        if (metadata.shouldSkip(buildTool)) {
+                            continue
+                        }
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
                             def features = app.getFeatures(guidesOption.language)
-                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense)
+                            if (!folder.contains("-maven-groovy")) {
+                                bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense)
+                            }
                         }
                     }
                     bashScript << """\

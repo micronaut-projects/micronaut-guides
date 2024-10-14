@@ -1,13 +1,6 @@
 common:header.adoc[]
 
-== What you will need
-
-To complete this guide, you will need the following:
-
-* Some time on your hands
-* A decent text editor or IDE
-* JDK 1.8 or greater installed with `JAVA_HOME` configured appropriately
-* https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run MySQL and to run tests using https://www.testcontainers.org[Testcontainers].
+common:requirements.adoc[]
 
 common:completesolution.adoc[]
 
@@ -15,3 +8,73 @@ common:create-app-features.adoc[]
 
 common:datasource.adoc[]
 
+== One-To-Many Relationship
+
+In this tutorial, you develop a one-to-many relationship, as illustrated in the following tables.
+
+.Table: Contact
+[cols="1,1,1", options="header"]
+|===
+| id | first_name | last_name
+| 1  | Sergio       | del Amo
+|===
+
+.Table: Phone
+[cols="1,1,1", options="header"]
+|===
+| id | phone       | contact_id
+| 1  | +14155552671 | 1
+| 2  | +442071838750 | 1
+|===
+
+common:liquibase.adoc[]
+
+resource:db/changelog/01-schema.xml[]
+
+== Entities
+
+Create an entity mapping the table `contact`:
+
+source:ContactEntity[]
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:relation[4]
+
+Create an entity mapping the table `phone`:
+
+source:PhoneEntity[]
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+callout:generated-value[3]
+callout:relation[4]
+
+== Projections
+
+Create one Java record to project a complete view, phones included, of the contact:
+
+source:ContactComplete[]
+callout:introspected[1]
+
+Create one Java record to preview a contact, no phones:
+
+source:ContactPreview[]
+callout:introspected[1]
+
+== Repositories
+
+source:PhoneRepository[]
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+source:ContactRepository[]
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+callout:at-query[3]
+
+== Tests
+
+The following tests illustrates the association queries:
+
+test:ContactRepositoryTest[]
+callout:micronaut-test-transactional-false[1]

@@ -6,10 +6,10 @@ import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.Relation;
 
-@MappedEntity("phone")
+@MappedEntity("phone") // <1>
 public record PhoneEntity(
-        @Id
-        @GeneratedValue
+        @Id // <2>
+        @GeneratedValue  // <3>
         @Nullable
         Long id,
 

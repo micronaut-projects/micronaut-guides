@@ -1,0 +1,77 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+video::N6FoR-b5QCI[youtube]
+
+common:create-app-features.adoc[]
+
+=== GraalPy Maven Plugin
+Insert a `<packages>` element into the GraalPy Maven Plugin `<configuration>` element, specifying the Python packages to download and install as shown below:
+
+
+resource:../../../pom.xml[tag=graalpy-maven-plugin]
+
+Adding `<package>pygal==3.0.4</package>` instructs the plugin to download and install the Python https://www.pygal.org/en/stable/[Pygal] package at build time.
+The package is included in the Java resources and becomes available to GraalPy.
+
+=== Python code
+We are going to use the https://www.pygal.org/en/stable/documentation/types/bar.html#stacked[StackedBar] class from https://www.pygal.org/en/stable/[Pygal] package to render a graph
+in https://www.pygal.org/en/3.0.0/documentation/output.html#svg[Svg] format.
+
+=== Java binding
+Python code can be accessed programmatically using the https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/package-summary.html[GraalVM SDK Polyglot API],
+which enables you to embed Python into your applications.
+
+In order to make it work, we first need a Java interface providing the intended binding to Python.
+
+Create a Java interface with the following code:
+source:PygalModule[]
+<1> The @api@/io/micronaut/graal/graalpy/annotations/GraalPyModule.html[@GraalPyModule] annotation indicates that the bean created from the interface
+is intended to import the `pygal` Python package and expose it to the Java code using the https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Value.html#target-type-mapping-heading[Target type mapping].
+<2> Java method matching the `StackedBar` Python class constructor.
+<3> Java interface with methods matching functions from the `StackedBar` Python class we want to use.
+<4> Java method matching the `StackedBar.add(title, values)` Python function.
+<5> Java method matching the `StackedBar.render()` Python function.
+<6> Java interface with methods matching functions from the `Svg` Python class we want to use.
+<7> Java method matching the `Svg.decode()` Python function.
+
+=== Controller
+To create a microservice that provides the graph rendered by `Pygal` you also need a controller.
+
+Create a controller:
+source:PygalController[]
+
+callout:controller[number=1,arg0=/pygal]
+callout:constructor-di[number=2,arg0=PygalModule]
+callout:get[number=3,arg0=index,arg1=/pygal]
+<5> By default, a Micronaut response uses `application/json` as Content-Type. We are returning `svg/xml`, so we have to set it.
+<6> Use the `PygalModule` bean to create a `PygalModule.StackedBar` instance.
+<7> Add graph title and data.
+<8> Render the graph.
+<9> Return the graphs `svg/xml` representation decoded as a string.
+
+=== Test
+
+Create a test to verify that when you make a GET request to `/pygal` you get the `svg/xml` response:
+
+test:PygalControllerTest[]
+
+callout:micronaut-test[1]
+callout:http-client[2]
+callout:http-request[3]
+
+common:testApp.adoc[]
+common:runapp.adoc[]
+
+Open `http://localhost:8080/pygal` in a web browser of your choice execute the endpoint. You should see a stacked bar chart.
+
+image::graalpy-pygal.png[]
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-test/latest/guide/[Micronaut testing].
+
+common:helpWithMicronaut.adoc[]

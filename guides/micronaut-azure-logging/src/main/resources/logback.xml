@@ -1,0 +1,30 @@
+<configuration debug='false'>
+
+    <!--
+    You can un-comment the STDOUT appender and <appender-ref ref='STDOUT'/> in
+    the cloud appender to log to STDOUT as the 'emergency' appender.
+    -->
+
+    <!--
+    <appender name='STDOUT' class='ch.qos.logback.core.ConsoleAppender'>
+        <encoder>
+            <pattern>%cyan(%d{HH:mm:ss.SSS}) %gray([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+    -->
+
+    <appender name='AZURE' class='io.micronaut.azure.logging.AzureAppender'>
+        <!-- <appender-ref ref='STDOUT'/> -->
+        <!-- <blackListLoggerName>com.foo.Bar</blackListLoggerName> -->
+        <encoder class='ch.qos.logback.core.encoder.LayoutWrappingEncoder'>
+            <layout class='ch.qos.logback.contrib.json.classic.JsonLayout'>
+                <jsonFormatter class='io.micronaut.azure.logging.AzureJsonFormatter'/>
+            </layout>
+        </encoder>
+    </appender>
+
+    <root level='INFO'>
+        <appender-ref ref='AZURE'/>
+    </root>
+
+</configuration>
