@@ -1,5 +1,6 @@
 package example.micronaut;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
@@ -13,9 +14,11 @@ public record PhoneEntity(
         @Nullable
         Long id,
 
+        @NonNull
         String phone,
 
-        @Relation(value = Relation.Kind.MANY_TO_ONE)
+        @Nullable
+        @Relation(value = Relation.Kind.MANY_TO_ONE) // <4>
         ContactEntity contact
 ) {
 }
