@@ -56,7 +56,7 @@ class AppTest {
         boolean validateLicense = true;
 
         Set<ConstraintViolation<App>> violations = validator.validate(
-                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,testFramework,emptyList, validateLicense));
+                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList,testFramework,emptyList, validateLicense));
         assertTrue(violations.isEmpty());
     }
 
@@ -140,6 +140,17 @@ class AppTest {
                     "string"
                   ]
                 },
+                "groovyFeatures": {
+                  "description": "The app's Groovy features",
+                  "type": [
+                    "array"
+                  ],
+                  "items": {
+                    "type": [
+                      "string"
+                    ]
+                  }
+                },
                 "invisibleFeatures": {
                   "description": "The app's invisible features",
                   "type": [
@@ -177,7 +188,8 @@ class AppTest {
                   "description": "The app's name. For single application guides, the application needs to be named default",
                   "type": [
                     "string"
-                  ]
+                  ],
+                  "minLength": 1
                 },
                 "packageName": {
                   "description": "The app's package name. If you don't specify, the package name example.micronaut is used",
