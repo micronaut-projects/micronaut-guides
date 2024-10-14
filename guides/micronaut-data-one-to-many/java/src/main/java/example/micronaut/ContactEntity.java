@@ -13,7 +13,7 @@ import java.util.List;
 public record ContactEntity(
         @Id // <2>
         @GeneratedValue // <3>
-        @Nullable
+        @Nullable // <4>
         Long id,
 
         @Nullable
@@ -23,7 +23,7 @@ public record ContactEntity(
         String lastName,
 
         @Nullable
-        @Relation(value = Relation.Kind.ONE_TO_MANY, mappedBy = "contact") // <4>
+        @Relation(value = Relation.Kind.ONE_TO_MANY, mappedBy = "contact") // <5>
         List<PhoneEntity>phones
 ) {
 }
