@@ -149,9 +149,9 @@ class GuideAsciidocGenerator {
                     lines.addAll(includeRocker(line))
                 } else if (shouldProcessLine(line, 'diffLink:')) {
                     lines << buildDiffLink(line, guidesOption, metadata)
-                } else if(shouldProcessLine(line, '@envs'))
+                } else if(shouldProcessLine(line, '@envs')) {
                     lines.addAll(includeEnvironmentVariables(line))
-                else {
+                } else {
                     lines << line
                 }
             }
