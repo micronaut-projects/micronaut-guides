@@ -1,5 +1,7 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.starter.options.Language;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,6 +10,7 @@ public final class GuideUtils {
     private static final String MICRONAUT_PREFIX = "micronaut-";
     private static final String VIEWS_PREFIX = "views-";
     private static final List<String> FEATURES_PREFIXES = List.of(MICRONAUT_PREFIX, VIEWS_PREFIX);
+    private static final String FEATURE_SPOTLESS = "spotless";
 
     private GuideUtils() {}
 
@@ -35,6 +38,42 @@ public final class GuideUtils {
         Set<String> categoriesAsTags = guide.categories().stream().map(String::toLowerCase).map(s -> s.replace(" ","-")).collect(Collectors.toSet());
         tagsList.addAll(categoriesAsTags);
         return tagsList.stream().collect(Collectors.toList());
+    }
+
+    public static List<String> getAppFeatures(App app, Language language) {
+        if (language == Language.JAVA) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.javaFeatures());
+        }
+        if (language == Language.KOTLIN) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.kotlinFeatures());
+        }
+        if (language == Language.GROOVY) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.groovyFeatures());
+        }
+        return mergeLists(app.features(), getAppInvisibleFeatures(app));
+    }
+
+    public static List<String> getAppInvisibleFeatures(App app) {
+        if (app.validateLicense()) {
+            List<String> result = new ArrayList<>();
+            addAllSafe(result,app.invisibleFeatures());
+            result.add(FEATURE_SPOTLESS);
+            return result;
+        }
+        return app.invisibleFeatures();
+    }
+
+    public static List<String> getAppVisibleFeatures(App app, Language language) {
+        if (language == Language.JAVA) {
+            return mergeLists(app.features(),app.javaFeatures());
+        }
+        if (language == Language.KOTLIN) {
+            return mergeLists(app.features(),app.kotlinFeatures());
+        }
+        if (language == Language.GROOVY) {
+            return mergeLists(app.features(),app.groovyFeatures());
+        }
+        return app.features();
     }
 
     public static Guide merge(Guide base, Guide guide) {
@@ -111,17 +150,29 @@ public final class GuideUtils {
         return merged;
     }
 
-    private static List mergeLists(Collection base, Collection others) {
+    /**
+     * Merges multiple collections into one list.
+     *
+     * @param lists An array of Collection objects to be merged.
+     * @return A single List containing all elements from the provided Collections, excluding any null values.
+     */
+    private static List mergeLists(Collection... lists) {
         List merged = new ArrayList<>();
-        if (base != null) {
-            merged.addAll(base);
-        }
-        if (others != null) {
-            merged.addAll(others);
+        for (Collection list : lists) {
+            if (list != null) {
+                merged.addAll(list);
+            }
         }
         return merged;
     }
 
+    /**
+     * Adds all elements from the source collection to the target collection safely.
+     *
+     * @param target The collection where elements will be added.
+     * @param src The collection whose elements are to be added to the target.
+     * @throws NullPointerException If the target collection is null.
+     */
     private static void addAllSafe(Collection target, Collection src) {
         if(target == null) {
             throw new NullPointerException("Target list cannot be null");
