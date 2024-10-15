@@ -189,6 +189,99 @@ class GuideTest {
     }
 
     @Test
+    void testGetAppFeaturesWithoutValidateLicense(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-features.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app =  assertDoesNotThrow(() -> guide.apps().stream().filter(el -> el.name().equals("secondApp")).findFirst().get());
+
+        assertEquals(List.of("invisible"),GuideUtils.getAppInvisibleFeatures(app));
+
+        List javaAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.JAVA);
+        List kotlinAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.KOTLIN);
+        List groovyAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppVisibleFeatures);
+        Collections.sort(kotlinAppVisibleFeatures);
+        Collections.sort(groovyAppVisibleFeatures);
+        assertEquals(List.of("awaitility", "graalvm", "mqtt", "yaml"),javaAppVisibleFeatures);
+        assertEquals(List.of("graalvm", "kapt", "mqtt", "yaml"),kotlinAppVisibleFeatures);
+        assertEquals(List.of("graalvm", "groovy-toml", "mqtt", "yaml"),groovyAppVisibleFeatures);
+
+        List javaAppFeatures = GuideUtils.getAppFeatures(app,Language.JAVA);
+        List kotlinAppFeatures = GuideUtils.getAppFeatures(app,Language.KOTLIN);
+        List groovyAppFeatures = GuideUtils.getAppFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppFeatures);
+        Collections.sort(kotlinAppFeatures);
+        Collections.sort(groovyAppFeatures);
+        assertEquals(List.of("awaitility", "graalvm", "invisible", "mqtt", "yaml"),javaAppFeatures);
+        assertEquals(List.of("graalvm", "invisible", "kapt", "mqtt", "yaml"),kotlinAppFeatures);
+        assertEquals(List.of("graalvm", "groovy-toml", "invisible", "mqtt", "yaml"),groovyAppFeatures);
+    }
+
+    @Test
+    void testGetAppFeatures(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-features.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app =  assertDoesNotThrow(() -> guide.apps().stream().filter(el -> el.name().equals("app")).findFirst().get());
+
+        assertEquals(List.of("invisible", "spotless"),GuideUtils.getAppInvisibleFeatures(app));
+
+        List javaAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.JAVA);
+        List kotlinAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.KOTLIN);
+        List groovyAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppVisibleFeatures);
+        Collections.sort(kotlinAppVisibleFeatures);
+        Collections.sort(groovyAppVisibleFeatures);
+        assertEquals(List.of("awaitility", "graalvm", "mqtt", "yaml"),javaAppVisibleFeatures);
+        assertEquals(List.of("graalvm", "kapt", "mqtt", "yaml"),kotlinAppVisibleFeatures);
+        assertEquals(List.of("graalvm", "groovy-toml", "mqtt", "yaml"),groovyAppVisibleFeatures);
+
+        List javaAppFeatures = GuideUtils.getAppFeatures(app,Language.JAVA);
+        List kotlinAppFeatures = GuideUtils.getAppFeatures(app,Language.KOTLIN);
+        List groovyAppFeatures = GuideUtils.getAppFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppFeatures);
+        Collections.sort(kotlinAppFeatures);
+        Collections.sort(groovyAppFeatures);
+        assertEquals(List.of("awaitility", "graalvm", "invisible", "mqtt", "spotless", "yaml"),javaAppFeatures);
+        assertEquals(List.of("graalvm", "invisible", "kapt", "mqtt", "spotless", "yaml"),kotlinAppFeatures);
+        assertEquals(List.of("graalvm", "groovy-toml", "invisible", "mqtt", "spotless", "yaml"),groovyAppFeatures);
+    }
+
+    @Test
+    void testGetAppFeaturesEmpty(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-features.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app =  assertDoesNotThrow(() -> guide.apps().stream().filter(el -> el.name().equals("thirdApp")).findFirst().get());
+
+        assertEquals(List.of("spotless"),GuideUtils.getAppInvisibleFeatures(app));
+
+        List javaAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.JAVA);
+        List kotlinAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.KOTLIN);
+        List groovyAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppVisibleFeatures);
+        Collections.sort(kotlinAppVisibleFeatures);
+        Collections.sort(groovyAppVisibleFeatures);
+        assertEquals(List.of(),javaAppVisibleFeatures);
+        assertEquals(List.of(),kotlinAppVisibleFeatures);
+        assertEquals(List.of(),groovyAppVisibleFeatures);
+
+        List javaAppFeatures = GuideUtils.getAppFeatures(app,Language.JAVA);
+        List kotlinAppFeatures = GuideUtils.getAppFeatures(app,Language.KOTLIN);
+        List groovyAppFeatures = GuideUtils.getAppFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppFeatures);
+        Collections.sort(kotlinAppFeatures);
+        Collections.sort(groovyAppFeatures);
+        assertEquals(List.of("spotless"),javaAppFeatures);
+        assertEquals(List.of("spotless"),kotlinAppFeatures);
+        assertEquals(List.of("spotless"),groovyAppFeatures);
+    }
+
+    @Test
     void testShouldSkip() throws IOException {
         Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
         assertTrue(inputStreamOptional.isPresent());
