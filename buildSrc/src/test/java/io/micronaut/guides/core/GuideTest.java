@@ -292,6 +292,16 @@ class GuideTest {
     }
 
     @Test
+    void testShouldSkipTrueKotlin() throws IOException {
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-skip.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        assertEquals(GuideUtils.shouldSkip(guide,BuildTool.GRADLE_KOTLIN), true);
+        assertEquals(GuideUtils.shouldSkip(guide,BuildTool.MAVEN), false);
+    }
+
+    @Test
     void typeAppIsAnnotatedWithIntrospected() {
         assertDoesNotThrow(() -> BeanIntrospection.getIntrospection(Guide.class));
     }
