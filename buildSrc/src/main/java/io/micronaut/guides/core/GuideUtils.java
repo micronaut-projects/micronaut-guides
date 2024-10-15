@@ -136,7 +136,7 @@ public final class GuideUtils {
     }
 
     static boolean shouldSkip(Guide guide, BuildTool buildTool) {
-        if (buildTool == BuildTool.GRADLE) {
+        if (BuildTool.valuesGradle().contains(buildTool)) {
             return guide.skipGradleTests();
         }
         if (buildTool == BuildTool.MAVEN) {
