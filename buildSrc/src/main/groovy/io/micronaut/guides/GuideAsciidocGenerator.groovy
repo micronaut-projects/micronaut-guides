@@ -7,6 +7,8 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.core.DefaultEnvironmentVariablesMacroRenderer
+import io.micronaut.guides.core.EnvironmentVariablesMacroRenderer
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
@@ -147,7 +149,9 @@ class GuideAsciidocGenerator {
                     lines.addAll(includeRocker(line))
                 } else if (shouldProcessLine(line, 'diffLink:')) {
                     lines << buildDiffLink(line, guidesOption, metadata)
-                } else {
+                } else if(shouldProcessLine(line, '@envs'))
+                    lines.addAll(includeEnvironmentVariables(line))
+                else {
                     lines << line
                 }
             }
@@ -577,6 +581,30 @@ class GuideAsciidocGenerator {
         String name = extractName(line, 'rocker:')
         String rendered = Rocker.template("io/micronaut/guides/feature/template/${name}.rocker.raw").render()
         return rendered.split("\\r?\\n|\\r") as List
+    }
+
+    private static List<String> includeEnvironmentVariables(String line) {
+        def matcher = line =~ /@envs\[(.*?)\]/
+        if (!matcher.find()) return []
+
+        String content = matcher.group(1)
+
+        // Split the content into triplets
+        List<String[]> triplets = []
+        def parts = content.split(',')
+
+        for (int i = 0; i < parts.length; i += 3) {
+            String[] triplet = [parts[i], parts[i+1], parts[i+2]]
+            triplets.add(triplet)
+        }
+
+        EnvironmentVariablesMacroRenderer renderer = new DefaultEnvironmentVariablesMacroRenderer();
+        List<String> res = renderer.render(triplets);
+        res.add(0,"")
+        res.add(1,"++++")
+        res.add("++++")
+        res.add("")
+        return res
     }
 
     @NonNull
