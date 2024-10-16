@@ -6,7 +6,9 @@ import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.util.StringUtils
-import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.core.App
+import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideUtils
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
@@ -18,6 +20,7 @@ import java.nio.file.Paths
 import java.util.Map.Entry
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.stream.Collectors
 
 import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.application.ApplicationType.CLI
@@ -49,16 +52,16 @@ class GuideAsciidocGenerator {
     public static final String DEFAULT_APP_NAME = "default"
     private static final String COMMON_LICENSE = "common:license.adoc[]"
 
-    static void generate(GuideMetadata metadata, File inputDir,
+    static void generate(Guide metadata, File inputDir,
                          File asciidocDir, File projectDir) {
 
         JdkVersion javaVersion = Utils.parseJdkVersion()
-        if (metadata.maximumJavaVersion != null && javaVersion.majorVersion() > metadata.maximumJavaVersion) {
-            println "not generating asciidoc for $metadata.slug, JDK ${javaVersion.majorVersion()} > $metadata.maximumJavaVersion"
+        if (metadata.maximumJavaVersion( ) != null && javaVersion.majorVersion() > metadata.maximumJavaVersion( )) {
+            println "not generating asciidoc for ${metadata.slug()}, JDK ${javaVersion.majorVersion()} > ${metadata.maximumJavaVersion()} "
             return
         }
 
-        File asciidocFile = new File(inputDir, metadata.asciidoctor)
+        File asciidocFile = new File(inputDir, metadata.asciidoctor())
         assert asciidocFile.exists()
         List<String> allLines = asciidocFile.readLines()
         allLines.add("")
@@ -68,7 +71,7 @@ class GuideAsciidocGenerator {
 
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         for (GuidesOption guidesOption : guidesOptionList) {
-            String projectName = "${metadata.slug}-${guidesOption.buildTool}-${guidesOption.language}"
+            String projectName = "${metadata.slug()}-${guidesOption.buildTool}-${guidesOption.language}"
 
             List<String> lines = []
             boolean excludeLineForLanguage = false
@@ -90,22 +93,22 @@ class GuideAsciidocGenerator {
                 }
 
                 if (shouldProcessLine(line, 'source:')) {
-                    lines.addAll(sourceIncludeLines(metadata.slug, line))
+                    lines.addAll(sourceIncludeLines(metadata.slug(), line))
 
                 } else if (shouldProcessLine(line, 'test:')) {
-                    lines.addAll(testIncludeLines(metadata.slug, line, guidesOption.testFramework))
+                    lines.addAll(testIncludeLines(metadata.slug(), line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'rawTest:')) {
-                    lines.addAll(rawTestIncludeLines(metadata.slug, line, guidesOption.testFramework))
+                    lines.addAll(rawTestIncludeLines(metadata.slug(), line, guidesOption.testFramework))
 
                 } else if (shouldProcessLine(line, 'resource:')) {
-                    lines.addAll(resourceIncludeLines(metadata.slug, line))
+                    lines.addAll(resourceIncludeLines(metadata.slug(), line))
 
                 } else if (shouldProcessLine(line, 'testResource:')) {
-                    lines.addAll(testResourceIncludeLines(metadata.slug, line))
+                    lines.addAll(testResourceIncludeLines(metadata.slug(), line))
 
                 } else if (shouldProcessLine(line, 'zipInclude:')) {
-                    lines.addAll(zipIncludeLines(metadata.slug, line))
+                    lines.addAll(zipIncludeLines(metadata.slug(), line))
 
                 } else if (line == ':dependencies:') {
                     groupDependencies = !groupDependencies
@@ -137,7 +140,7 @@ class GuideAsciidocGenerator {
                         String str = line.substring(EXCLUDE_FOR_JDK_LOWER_THAN.length())
                         if (StringUtils.isNotEmpty(str)) {
                             Integer minJdk = Integer.valueOf(str)
-                            if ((metadata.minimumJavaVersion ?: DEFAULT_MIN_JDK) >= minJdk) {
+                            if ((metadata.minimumJavaVersion() ?: DEFAULT_MIN_JDK) >= minJdk) {
                                 excludeLineForMinJdk = true
                             }
                         }
@@ -155,26 +158,26 @@ class GuideAsciidocGenerator {
             String version = new File(projectDir, 'version.txt').text.trim()
 
             String text = lines.join('\n')
-            text = text.replace("{githubSlug}", metadata.slug)
+            text = text.replace("{githubSlug}", metadata.slug())
             text = text.replace("@language@", StringUtils.capitalize(guidesOption.language.toString()))
-            text = text.replace("@guideTitle@", metadata.title)
-            text = text.replace("@guideIntro@", metadata.intro)
+            text = text.replace("@guideTitle@", metadata.title())
+            text = text.replace("@guideIntro@", metadata.intro())
             text = text.replace("@micronaut@", version)
             text = text.replace("@lang@", guidesOption.language.toString())
             text = text.replace("@build@", guidesOption.buildTool.toString())
             text = text.replace("@testFramework@", guidesOption.testFramework.toString())
-            text = text.replace("@authors@", metadata.authors.join(', '))
+            text = text.replace("@authors@", metadata.authors().join(', '))
             text = text.replace("@languageextension@", guidesOption.language.extension)
             text = text.replace("@testsuffix@", guidesOption.testFramework == SPOCK ? 'Spec' : 'Test')
             text = text.replace("@sourceDir@", projectName)
-            text = text.replace("@minJdk@", metadata.minimumJavaVersion?.toString() ?: "17")
+            text = text.replace("@minJdk@", metadata.minimumJavaVersion()?.toString() ?: "17")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
             text = text.replaceAll(~/@([\w-]*):?cli-command@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
                 cliCommandForApp(metadata, app)
                         .orElseThrow {
-                            new GradleException("No CLI command found for app: $app -- should be one of ${metadata.apps.name.collect { "@$it:cli-command@" }.join(", ")}")
+                            new GradleException("No CLI command found for app: $app -- should be one of ${metadata.apps().stream().flatMap {"@$it:cli-command@"}.collect(Collectors.joining(", "))}")
                         }
             }
 
@@ -201,9 +204,9 @@ class GuideAsciidocGenerator {
         }
     }
 
-    private static Optional<String> cliCommandForApp(GuideMetadata metadata,
+    private static Optional<String> cliCommandForApp(Guide metadata,
                                                      String appName) {
-        App app = metadata.apps.find { it.name == appName }
+        App app = metadata.apps().find { it.name() == appName }
         if (app) {
             return Optional.of(cliCommandForApp(app))
         }
@@ -211,7 +214,7 @@ class GuideAsciidocGenerator {
     }
 
     private static String cliCommandForApp(App app) {
-        switch (app.getApplicationType()) {
+        switch (app.applicationType()) {
             case CLI:
                 return CLI_CLI
             case FUNCTION:
@@ -225,7 +228,7 @@ class GuideAsciidocGenerator {
         }
     }
 
-    private static String featuresWordsForApp(GuideMetadata metadata,
+    private static String featuresWordsForApp(Guide metadata,
                                               GuidesOption guidesOption,
                                               String app) {
         List<String> features = featuresForApp(metadata, guidesOption, app)
@@ -236,10 +239,11 @@ class GuideAsciidocGenerator {
         features[0]
     }
 
-    private static List<String> featuresForApp(GuideMetadata metadata,
+    private static List<String> featuresForApp(Guide metadata,
                                                GuidesOption guidesOption,
                                                String app) {
-        List<String> features = metadata.apps.find { it.name == app }?.getVisibleFeatures(guidesOption.language) ?: []
+        App appEl = metadata.apps().find { it.name() == app }
+        List<String> features = appEl?GuideUtils.getAppVisibleFeatures(appEl,guidesOption.language):[]
         if (guidesOption.language == GROOVY) {
             features.remove 'graalvm'
         }
@@ -588,7 +592,7 @@ class GuideAsciidocGenerator {
         if (features) {
             featureNames = features.tokenize('|')
         } else {
-            featureNames = ([] as List<String>) + app.getFeatures(guidesOption.language)
+            featureNames = ([] as List<String>) + GuideUtils.getAppFeatures(app,guidesOption.language)
         }
 
         String featureExcludes = extractFromParametersLine(line, 'featureExcludes')
@@ -606,17 +610,17 @@ class GuideAsciidocGenerator {
         featureNames
     }
 
-    private static String buildDiffLink(String line, GuidesOption guidesOption, GuideMetadata metadata) {
+    private static String buildDiffLink(String line, GuidesOption guidesOption, Guide metadata) {
 
         String appName = extractAppName(line) ?: DEFAULT_APP_NAME
-        App app = metadata.apps.find { it.name == appName }
+        App app = metadata.apps().find { it.name() == appName }
         String link = 'https://micronaut.io/launch?' +
                 featureNames(line, app, guidesOption).collect { 'features=' + it }.join('&') +
                 '&lang=' + guidesOption.language.name() +
                 '&build=' + guidesOption.buildTool.name() +
                 '&test=' + guidesOption.testFramework.name() +
                 '&name=' + (appName == DEFAULT_APP_NAME ? 'micronautguide' : appName) +
-                '&type=' + app.applicationType.name() +
+                '&type=' + app.applicationType().name() +
                 '&package=example.micronaut' +
                 '&activity=diff' +
                 '[view the dependency and configuration changes from the specified features, window="_blank"]'

@@ -6,6 +6,8 @@ import groovy.transform.CompileStatic
 import io.micronaut.core.order.OrderUtil
 import io.micronaut.core.order.Ordered
 import io.micronaut.guides.core.Cloud
+import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideUtils
 import io.micronaut.json.JsonMapper
 import io.micronaut.rss.jsonfeed.JsonFeed
 import io.micronaut.rss.jsonfeed.JsonFeedAuthor
@@ -36,44 +38,45 @@ class IndexGenerator {
     private static final Pattern CONTENT_REGEX = ~/(?s)(<main id="main">)(.*)(<\/main>)/
     public static final int NUMBER_OF_LATEST_GUIDES = 2
 
-    private final static Comparator<GuideMetadata> GUIDE_METADATA_COMPARATOR = new Comparator<GuideMetadata>() {
+    private final static Comparator<Guide> GUIDE_METADATA_COMPARATOR = new Comparator<Guide>() {
         @Override
-        int compare(GuideMetadata o1, GuideMetadata o2) {
-            int compareByFramework = o2.getFrameworks().size() <=> o1.getFrameworks().size()
+        int compare(Guide o1, Guide o2) {
+            GuideUtils.getFrameworks(o1)
+            int compareByFramework = GuideUtils.getFrameworks(o2).size() <=> GuideUtils.getFrameworks(o1).size()
             if (compareByFramework != 0) {
                 return compareByFramework
             }
-            if (o1.cloud == null && o2.cloud != null) {
+            if (o1.cloud() == null && o2.cloud() != null) {
                 return -1
             }
-            if (o1.cloud != null && o2.cloud == null) {
+            if (o1.cloud() != null && o2.cloud() == null) {
                 return 1
             }
-            if (o1.cloud != null && o2.cloud != null) {
-                int compare = OrderUtil.COMPARATOR.compare(o1.cloud, o2.cloud)
+            if (o1.cloud() != null && o2.cloud() != null) {
+                int compare = OrderUtil.COMPARATOR.compare(o1.cloud(), o2.cloud())
                 if (compare != 0) {
                     return compare
                 }
             }
-            return o1.publicationDate <=> o2.publicationDate
+            return o1.publicationDate() <=> o2.publicationDate()
         }
     }
 
     static void generateGuidesIndex(File template, File guidesFolder, File distDir, String metadataConfigName, String indexgrid) {
 
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
-                .findAll { it.publish }
+        List<Guide> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+                .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
         save(distDir, jsonFeed(metadatas), JSON_FEED_FILENAME)
     }
 
-    static String jsonFeed(List<GuideMetadata> metadatas) {
+    static String jsonFeed(List<Guide> metadatas) {
         JsonFeed.Builder jsonFeedBuilder = JsonFeed.builder()
                 .version("https://jsonfeed.org/version/1.1")
                 .title("Micronaut Guides")
                 .homePageUrl(GUIDES_URL + "/latest/")
                 .feedUrl(GUIDES_URL + "/latest/" + JSON_FEED_FILENAME)
-        for (GuideMetadata metadata : metadatas ) {
+        for (Guide metadata : metadatas ) {
             jsonFeedBuilder.item(jsonFeedItem(metadata))
         }
         JsonFeed jsonFeed = jsonFeedBuilder.build()
@@ -81,31 +84,31 @@ class IndexGenerator {
         jsonMapper.writeValueAsString(jsonFeed)
     }
 
-    static JsonFeedItem jsonFeedItem(GuideMetadata metadata) {
+    static JsonFeedItem jsonFeedItem(Guide metadata) {
         JsonFeedItem.Builder jsonFeedItemBuilder = JsonFeedItem.builder()
-                .id(metadata.slug)
-                .title(metadata.title)
-                .contentText(metadata.intro)
+                .id(metadata.slug())
+                .title(metadata.title())
+                .contentText(metadata.intro())
                 .language(RssLanguage.LANG_ENGLISH)
-                .datePublished(ZonedDateTime.of(metadata.publicationDate, LocalTime.of(0, 0), ZoneOffset.UTC))
-                .url("https://guides.micronaut.io/latest/${metadata.slug}")
-        for (String author: metadata.authors) {
+                .datePublished(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
+                .url("https://guides.micronaut.io/latest/${metadata.slug()}")
+        for (String author: metadata.authors()) {
             jsonFeedItemBuilder.author(JsonFeedAuthor.builder().name(author).build())
         }
-        for (String t : metadata.tags) {
+        for (String t : metadata.tags()) {
             jsonFeedItemBuilder.tag(t)
         }
         jsonFeedItemBuilder.build()
     }
 
-    static void generateGuidesIndex(File template, File distDir, List<GuideMetadata> metadatas, String indexgrid) {
+    static void generateGuidesIndex(File template, File distDir, List<Guide> metadatas, String indexgrid) {
         String templateText = template.text.replaceFirst(CONTENT_REGEX) { List<String> it ->
             "${it[1]}\n    <div style=\"clear: both;\"></div><div class=\"container\">@content@</div>\n${it[3]}"
         }
         Collection<Tag> tags = collectTags(metadatas)
         for (Tag tag :  tags) {
-            List<GuideMetadata> tagMetadatas = metadatas.stream()
-                    .filter(m -> (m.tags ?: []).contains(tag.slug) )
+            List<Guide> tagMetadatas = metadatas.stream()
+                    .filter(m -> (m.tags() ?: []).contains(tag.slug) )
                     .sorted(GUIDE_METADATA_COMPARATOR)
                     .collect(Collectors.toList())
 
@@ -126,18 +129,18 @@ class IndexGenerator {
         for (Ordered obj : categories) {
             Category cat = (Category) obj
 
-            List<GuideMetadata> guideMetadataList = metadatas.stream()
-                    .filter(m -> m.getCategories().stream().anyMatch(c -> c == cat))
+            List<Guide> GuideList = metadatas.stream()
+                    .filter(m -> m.categories().stream().anyMatch(c -> c == cat))
                     .sorted(GUIDE_METADATA_COMPARATOR)
                     .collect(Collectors.toList())
 
 
-            sections << new GuidesSection(category: cat, metadatas: guideMetadataList)
+            sections << new GuidesSection(category: cat, metadatas: GuideList)
         }
         save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', indexgrid, tags)
 
-        for (GuideMetadata metadata :  metadatas) {
-            save(templateText, metadata.slug + '.html', distDir, [new GuidesSection(category: metadata.categories ? metadata.categories.first() : null, metadatas: [metadata])],  metadata.title, null)
+        for (Guide metadata :  metadatas) {
+            save(templateText, metadata.slug() + '.html', distDir, [new GuidesSection(category: metadata.categories() ? metadata.categories().first() : null, metadatas: [metadata])],  metadata.title(), null)
         }
     }
 
@@ -165,7 +168,7 @@ class IndexGenerator {
                                     String title,
                                     String indexGrid) {
         boolean singleGuide = sections && sections.size() == 1 && sections.get(0).metadatas.size() == 1
-        List<GuideMetadata> metadatas = []
+        List<Guide> metadatas = []
         for (GuidesSection section : sections) {
             metadatas.addAll(section.metadatas)
         }
@@ -203,7 +206,7 @@ class IndexGenerator {
             text = text.substring(0, text.indexOf('<div id="breadcrumbs">')) +
                     text.substring(text.indexOf('<main id="main">'))
         } else if (singleGuide) {
-            String breadcrumb = '<span class="breadcrumb_last" aria-current="page">' + sections.get(0).metadatas.get(0).title + '</span>'
+            String breadcrumb = '<span class="breadcrumb_last" aria-current="page">' + sections.get(0).metadatas.get(0).title() + '</span>'
             text = text.replace("@breadcrumb@", breadcrumb)
         } else if (!singleGuide && !tags) {
             String breadcrumb = '<span class="breadcrumb_last" aria-current="page">' + sections.get(0).category.toString() + '</span>'
@@ -221,10 +224,10 @@ class IndexGenerator {
         text
     }
 
-    private static Collection<Tag> collectTags(List<GuideMetadata> metadatas) {
+    private static Collection<Tag> collectTags(List<Guide> metadatas) {
         Map<String, Tag> tagMap = new HashMap<>()
-        for (GuideMetadata metadata : metadatas) {
-            for (String slug : metadata.getTags() ?: []) {
+        for (Guide metadata : metadatas) {
+            for (String slug : GuideUtils.getTags(metadata) ?: []) {
                 if (tagMap.containsKey(slug)) {
                     tagMap[slug].ocurrence++
                 } else {
@@ -235,11 +238,11 @@ class IndexGenerator {
         tagMap.values()
     }
 
-    private static List<GuideMetadata> latestGuides(List<GuideMetadata> metadatas) {
+    private static List<Guide> latestGuides(List<Guide> metadatas) {
         metadatas.stream()
                 .distinct()
                 .sorted((o1, o2) -> {
-                    o2.publicationDate <=> o1.publicationDate
+                    o2.publicationDate() <=> o1.publicationDate()
                 })
                 .limit(NUMBER_OF_LATEST_GUIDES)
                 .collect(Collectors.toList())
@@ -249,23 +252,23 @@ class IndexGenerator {
         System.getenv("CI") ? GUIDES_URL : ''
     }
 
-    static String twitterCardHtml(File distDir, GuideMetadata guideMetadata) {
-        String filename = new File(distDir.absolutePath, "/images/cards/" + guideMetadata.slug + ".png").exists() ?
-                guideMetadata.slug + ".png" : DEFAULT_CARD
+    static String twitterCardHtml(File distDir, Guide Guide) {
+        String filename = new File(distDir.absolutePath, "/images/cards/" + Guide.slug() + ".png").exists() ?
+                Guide.slug() + ".png" : DEFAULT_CARD
 """\
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:image" content="${rootUrl()}/latest/images/cards/${filename}"/>
     <meta name="twitter:creator" content="${TWITTER_MICRONAUT}"/>
     <meta name="twitter:site" content="${TWITTER_MICRONAUT}"/>
-    <meta name="twitter:title" content="${guideMetadata.title?.replaceAll('"', "&quot;") ?: DEFAULT_TITLE}"/>
-    <meta name="twitter:description" content="${guideMetadata.intro?.replaceAll('"', "&quot;") ?: DEFAULT_INTRO}"/>"""
+    <meta name="twitter:title" content="${Guide.title()?.replaceAll('"', "&quot;") ?: DEFAULT_TITLE}"/>
+    <meta name="twitter:description" content="${Guide.intro()?.replaceAll('"', "&quot;") ?: DEFAULT_INTRO}"/>"""
     }
 
-    private static String renderMetadatas(String baseURL, Object cat, List<GuideMetadata> metadatas, boolean singleGuide) {
+    private static String renderMetadatas(String baseURL, Object cat, List<Guide> metadatas, boolean singleGuide) {
         String index = ''
         int count = 0
-        List<GuideMetadata> filteredMetadatas = Utils.singleGuide() ?
-                metadatas.findAll { it.slug == Utils.singleGuide() } :
+        List<Guide> filteredMetadatas = Utils.singleGuide() ?
+                metadatas.findAll { it.slug() == Utils.singleGuide() } :
                 metadatas
         if (!filteredMetadatas) {
             return index
@@ -280,7 +283,7 @@ class IndexGenerator {
         count++
 
         if (singleGuide) {
-            for (GuideMetadata metadata : filteredMetadatas) {
+            for (Guide metadata : filteredMetadatas) {
                 if ((count % 3) == 0) {
                     index += "</div>"
                     index += "<div class='row'>"
@@ -289,11 +292,11 @@ class IndexGenerator {
 
                 index += "<div class='inner'>"
                 if (singleGuide) {
-                    index += "<h2>${metadata.title}</h2>"
+                    index += "<h2>${metadata.title()}</h2>"
                 } else {
-                    index += "<h2><a href=\"${metadata.slug}.html\">${metadata.title}</a></h2>"
+                    index += "<h2><a href=\"${metadata.slug()}.html\">${metadata.title()}</a></h2>"
                 }
-                index += "<p>${metadata.intro}</p>"
+                index += "<p>${metadata.intro()}</p>"
                 index += table(baseURL, metadata)
                 index += "</div>"
                 count++
@@ -309,7 +312,7 @@ class IndexGenerator {
         index
     }
 
-    private static String guidesTable(List<GuideMetadata> metadatas,
+    private static String guidesTable(List<Guide> metadatas,
                                       String header = null,
                                       boolean displayPublicationDate = false) {
         String index = '<div class="guide-list">'
@@ -318,24 +321,24 @@ class IndexGenerator {
             index += "<h3 class='guide-list-header'>${header}</h3>"
         }
         Set<Cloud> clouds = []
-        for (GuideMetadata metadata : metadatas) {
+        for (Guide metadata : metadatas) {
             if (!header) {
-                if (metadata.cloud != null && !clouds.contains(metadata.cloud)) {
-                    index += "<h3 class=\"guide-list-cloud-header\"><img height=\"20\" src=\"./images/" + metadata.cloud.accronym.toLowerCase() + ".svg\" alt=\"" + metadata.cloud.name + "\"/>&nbsp;" + metadata.cloud.name + "</h3>"
-                    clouds << metadata.cloud
+                if (metadata.cloud() != null && !clouds.contains(metadata.cloud())) {
+                    index += "<h3 class=\"guide-list-cloud-header\"><img height=\"20\" src=\"./images/" + metadata.cloud().accronym.toLowerCase() + ".svg\" alt=\"" + metadata.cloud().name + "\"/>&nbsp;" + metadata.cloud().name + "</h3>"
+                    clouds << metadata.cloud()
                 }
             }
             index += '<div class="guide">'
-            index += "<div class='guide-title'><a href='${metadata.slug}.html'>${metadata.title}</a></div>"
+            index += "<div class='guide-title'><a href='${metadata.slug()}.html'>${metadata.title()}</a></div>"
             if (displayPublicationDate) {
-                index += "<div class='guide-date'>${metadata.publicationDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}</div>"
+                index += "<div class='guide-date'>${metadata.publicationDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}</div>"
             }
-            index += "<div class='guide-intro'>${metadata.intro}</div>"
-            if (metadata.tags?.size() > 0) {
+            index += "<div class='guide-intro'>${metadata.intro()}</div>"
+            if (metadata.tags()?.size() > 0) {
                 index += "<div class='guide-tag-list'>"
                 index += "<span class='guide-tag-title'>Tags: </span>"
-                metadata.tags.collect { new Tag(title: it) }.eachWithIndex { tag, i ->
-                    boolean isNotLast = i != metadata.tags.size() - 1
+                metadata.tags().collect { new Tag(title: it) }.eachWithIndex { tag, i ->
+                    boolean isNotLast = i != metadata.tags().size() - 1
                     index += "<span class='guide-tag'><a href='./tag-${tag.slug.toLowerCase()}.html'>${tag.title}</a></span>"
                     if (isNotLast) {
                         index += "<span class='guide-split'>, </span>"
@@ -349,13 +352,13 @@ class IndexGenerator {
         index
     }
 
-    private static String guideLink(String baseURL, GuideMetadata metadata,
+    private static String guideLink(String baseURL, Guide metadata,
                                     GuidesOption guidesOption, String title = null) {
-        String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
+        String folder = GuideProjectGenerator.folderName(metadata.slug(), guidesOption)
         "<a href='${baseURL}${folder}.html'>${title ? title : (guidesOption.buildTool.toString() + ' - ' + guidesOption.language)}</a>"
     }
 
-    private static String table(String baseURL, GuideMetadata metadata) {
+    private static String table(String baseURL, Guide metadata) {
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
         String kotlinImg = '<img src="./images/kotlin.svg" width="60" alt="Kotlin"/>'
         String groovyImg = '<img src="./images/groovy.svg" width="60" alt="Groovy"/>'
@@ -411,7 +414,7 @@ class IndexGenerator {
         tableHtml
     }
 
-    private static String cell(String baseURL, GuideMetadata metadata, BuildTool buildTool,
+    private static String cell(String baseURL, Guide metadata, BuildTool buildTool,
                                Language language, List<GuidesOption> guidesOptionList) {
         String tableHtml = "<td>"
         GuidesOption guidesOption = guidesOptionList.find {GuidesOption option -> option.buildTool == buildTool&& option.language == language }
@@ -554,24 +557,24 @@ class IndexGenerator {
     static String generateGuidesJsonIndex(File guidesFolder, String metadataConfigName) {
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
-                .findAll { it.publish }
+        List<Guide> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+                .findAll { it.publish() }
 
         List<Map> result = metadatas
             .collect {guide -> [
-                title: guide.title,
-                intro: guide.intro,
-                authors: guide.authors,
+                title: guide.title(),
+                intro: guide.intro(),
+                authors: guide.authors(),
                 tags: generateTags(guide),
-                category: guide.categories ? guide.categories.first().toString() : null, // Deprecated
-                categories: guide.categories.collect { it.toString() },
-                publicationDate: guide.publicationDate.toString(),
-                slug: guide.slug,
-                url: "${baseURL}${guide.slug}.html",
+                category: guide.categories() ? guide.categories().first().toString() : null, // Deprecated
+                categories: guide.categories().collect { it.toString() },
+                publicationDate: guide.publicationDate().toString(),
+                slug: guide.slug(),
+                url: "${baseURL}${guide.slug()}.html",
                 options: GuideProjectGenerator.guidesOptions(guide).collect {option -> [
                     buildTool: option.buildTool,
                     language: option.language,
-                    url: "${baseURL}${guide.slug}-${option.buildTool.toString().toLowerCase()}-${option.language.toString().toLowerCase()}.html"
+                    url: "${baseURL}${guide.slug()}-${option.buildTool.toString().toLowerCase()}-${option.language.toString().toLowerCase()}.html"
                 ]}
             ]} as List<Map>
 
@@ -579,12 +582,12 @@ class IndexGenerator {
     }
 
     @CompileDynamic
-    private static List<String> generateTags(GuideMetadata guide) {
+    private static List<String> generateTags(Guide guide) {
         [
             guide.tags ?: [] +
             guide.languages*.toString() +
             guide.buildTools*.toString() +
-            guide.apps.collect { it.getFeatures(Language.DEFAULT_OPTION) }.flatten().unique()
+            guide.apps.collect { GuideUtils.getAppFeatures(it,Language.DEFAULT_OPTION) }.flatten().unique()
         ]
             .flatten()
             .unique()
