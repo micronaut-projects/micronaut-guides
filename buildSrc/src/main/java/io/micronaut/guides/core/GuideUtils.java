@@ -89,6 +89,10 @@ public final class GuideUtils {
         return false;
     }
 
+    public static Set<String> getFrameworks(Guide guide){
+        return guide.apps().stream().map(it -> it.framework()).collect(Collectors.toSet());
+    }
+
     public static Guide merge(Guide base, Guide guide) {
         Guide merged = new Guide(
                 guide.title() == null ? base.title() : guide.title(),

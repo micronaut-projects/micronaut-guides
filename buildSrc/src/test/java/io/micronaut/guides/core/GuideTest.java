@@ -105,7 +105,7 @@ class GuideTest {
     }
 
     @Test
-    void testDeserialization() throws IOException {
+    void testDeserialization() {
         Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
         assertTrue(inputStreamOptional.isPresent());
         InputStream inputStream = inputStreamOptional.get();
@@ -286,7 +286,7 @@ class GuideTest {
     }
 
     @Test
-    void testShouldSkip() throws IOException {
+    void testShouldSkip() {
         Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
         assertTrue(inputStreamOptional.isPresent());
         InputStream inputStream = inputStreamOptional.get();
@@ -296,13 +296,24 @@ class GuideTest {
     }
 
     @Test
-    void testShouldSkipTrueKotlin() throws IOException {
+    void testShouldSkipTrueKotlin() {
         Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-skip.json");
         assertTrue(inputStreamOptional.isPresent());
         InputStream inputStream = inputStreamOptional.get();
         Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
         assertEquals(GuideUtils.shouldSkip(guide,BuildTool.GRADLE_KOTLIN), true);
         assertEquals(GuideUtils.shouldSkip(guide,BuildTool.MAVEN), false);
+    }
+
+    @Test
+    void testGetFrameworks() {
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        Set<String> frameworks = GuideUtils.getFrameworks(guide);
+        Set<String> expected = Set.of("Spring Boot","micronautframeworkjacksondatabind","micronautframeworkserde");
+        assertEquals(frameworks,expected);
     }
 
     @Test
@@ -358,7 +369,8 @@ class GuideTest {
                   ],
                   "items": {
                     "$ref": "https://guides.micronaut.io/schemas/app.schema.json"
-                  }
+                  },
+                  "minItems": 1
                 },
                 "asciidoctor": {
                   "description": "The guide asciidoc file. If not specified, the guide slug followed by the .adoc suffix is used",
@@ -375,7 +387,8 @@ class GuideTest {
                     "type": [
                       "string"
                     ]
-                  }
+                  },
+                  "minItems": 1
                 },
                 "base": {
                   "description": "Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one",
@@ -408,7 +421,8 @@ class GuideTest {
                     "type": [
                       "string"
                     ]
-                  }
+                  },
+                  "minItems": 1
                 },
                 "cloud": {
                   "description": "The acronym for the cloud service provider of the guide. For example, OCI for Oracle Cloud Infrastructure",
@@ -437,7 +451,8 @@ class GuideTest {
                   "description": "The guide introduction",
                   "type": [
                     "string"
-                  ]
+                  ],
+                  "minLength": 1
                 },
                 "languages": {
                   "description": "The guide supported languages",
@@ -517,6 +532,7 @@ class GuideTest {
                   "enum": [
                     "JUNIT",
                     "SPOCK",
+                    "KOTLINTEST",
                     "KOTEST"
                   ]
                 },
@@ -524,7 +540,8 @@ class GuideTest {
                   "description": "The guide's title",
                   "type": [
                     "string"
-                  ]
+                  ],
+                  "minLength": 1
                 },
                 "zipIncludes": {
                   "description": "List of additional files with a relative path to include in the generated zip file for the guide",
@@ -547,7 +564,7 @@ class GuideTest {
                 "apps"
               ]
             }
-                """;
+        """;
         System.out.println(schema);
         JSONAssert.assertEquals(expected, schema, JSONCompareMode.LENIENT);
     }
