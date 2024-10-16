@@ -247,7 +247,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 String packageAndName = BASE_PACKAGE + '.' + app.name()
 
-                guidesGenerator.generateAppIntoDirectory(destination, ApplicationType.DEFAULT, packageAndName, app.framework(),
+                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType(), packageAndName, app.framework(),
                         appFeatures, buildTool, app.testFramework() ?: testFramework, lang, javaVersion)
 
                 if (metadata.base()) {
