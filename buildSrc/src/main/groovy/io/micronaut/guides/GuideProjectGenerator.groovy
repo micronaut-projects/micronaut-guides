@@ -129,12 +129,32 @@ class GuideProjectGenerator implements AutoCloseable {
 
         Guide raw = jsonMapper.readValue(content, Guide.class)
 
+        List<App> apps = new LinkedList<>()
+
+        for(App app: raw.apps()){
+            apps.add(new App(
+                    app.name(),
+                    app.packageName(),
+                    app.applicationType(),
+                    app.framework(),
+                    app.features() ?: [],
+                    app.invisibleFeatures() ?: [],
+                    app.kotlinFeatures() ?: [],
+                    app.javaFeatures() ?: [],
+                    app.groovyFeatures() ?: [],
+                    app.testFramework(),
+                    app.excludeTest(),
+                    app.excludeSource(),
+                    app.validateLicense()
+            ))
+        }
+
         return Optional.ofNullable(new Guide(
                 raw.title(),
                 raw.intro(),
                 raw.authors(),
                 raw.categories(),
-                raw.publicationDate(),
+                publish ? raw.publicationDate() : null,
                 raw.minimumJavaVersion(),
                 raw.maximumJavaVersion(),
                 raw.cloud(),
@@ -145,12 +165,12 @@ class GuideProjectGenerator implements AutoCloseable {
                 raw.tags(),
                 raw.buildTools() ?: ['gradle', 'maven'],
                 raw.testFramework(),
-                raw.zipIncludes(),
+                raw.zipIncludes() ?: [],
                 dir.name,
                 publish,
                 raw.base(),
                 raw.env() ?: [:],
-                raw.apps()
+                apps
         ))
     }
 
