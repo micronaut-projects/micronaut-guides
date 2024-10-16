@@ -63,15 +63,6 @@ class GuideProjectGenerator implements AutoCloseable {
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
 
-    private static JsonMapper jsonMapper;
-    private static ResourceLoader resourceLoader;
-
-    static {
-        ApplicationContext context = ApplicationContext.run();
-        jsonMapper = context.getBean(JsonMapper.class);
-        resourceLoader = context.getBean(ResourceLoader.class);
-    }
-
     GuideProjectGenerator() {
         applicationContext = ApplicationContext.run()
         guidesGenerator = applicationContext.getBean(GuidesGenerator)
@@ -127,6 +118,7 @@ class GuideProjectGenerator implements AutoCloseable {
             }
         }
 
+        JsonMapper jsonMapper = JsonMapper.createDefault()
         Guide raw = jsonMapper.readValue(content, Guide.class)
 
         List<App> apps = new LinkedList<>()
