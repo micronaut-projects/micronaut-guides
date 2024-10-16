@@ -56,7 +56,7 @@ class GuideAsciidocGenerator {
                          File asciidocDir, File projectDir) {
 
         JdkVersion javaVersion = Utils.parseJdkVersion()
-        if (metadata.maximumJavaVersion( ) != null && javaVersion.majorVersion() > metadata.maximumJavaVersion( )) {
+        if (metadata.maximumJavaVersion() != null && javaVersion.majorVersion() > metadata.maximumJavaVersion()) {
             println "not generating asciidoc for ${metadata.slug()}, JDK ${javaVersion.majorVersion()} > ${metadata.maximumJavaVersion()} "
             return
         }
@@ -243,7 +243,7 @@ class GuideAsciidocGenerator {
                                                GuidesOption guidesOption,
                                                String app) {
         App appEl = metadata.apps().find { it.name() == app }
-        List<String> features = appEl?GuideUtils.getAppVisibleFeatures(appEl,guidesOption.language):[]
+        List<String> features = appEl ? GuideUtils.getAppVisibleFeatures(appEl, guidesOption.language) : []
         if (guidesOption.language == GROOVY) {
             features.remove 'graalvm'
         }
