@@ -4,7 +4,6 @@ import io.micronaut.context.BeanContext;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.type.Argument;
-import io.micronaut.guides.GuideMetadata;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.serde.SerdeIntrospections;
 import io.micronaut.starter.application.ApplicationType;
@@ -56,7 +55,7 @@ class AppTest {
         boolean validateLicense = true;
 
         Set<ConstraintViolation<App>> violations = validator.validate(
-                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList,testFramework,emptyList, validateLicense));
+                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList,testFramework,emptyList,emptyList,validateLicense));
         assertTrue(violations.isEmpty());
     }
 
@@ -114,6 +113,17 @@ class AppTest {
                 },
                 "excludeTest": {
                   "description": "The tests that should not be run",
+                  "type": [
+                    "array"
+                  ],
+                  "items": {
+                    "type": [
+                      "string"
+                    ]
+                  }
+                },
+                "excludeSource": {
+                  "description": "The source files that should not be included",
                   "type": [
                     "array"
                   ],

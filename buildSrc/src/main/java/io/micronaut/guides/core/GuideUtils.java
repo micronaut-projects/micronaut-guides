@@ -79,6 +79,16 @@ public final class GuideUtils {
         return app.features();
     }
 
+    public static boolean shouldSkip(Guide guide, BuildTool buildTool) {
+        if (BuildTool.valuesGradle().contains(buildTool)) {
+            return guide.skipGradleTests();
+        }
+        if (buildTool == BuildTool.MAVEN) {
+            return guide.skipMavenTests();
+        }
+        return false;
+    }
+
     public static Guide merge(Guide base, Guide guide) {
         Guide merged = new Guide(
                 guide.title() == null ? base.title() : guide.title(),
@@ -145,6 +155,7 @@ public final class GuideUtils {
                     mergeLists(guideApp.groovyFeatures(), baseApp.groovyFeatures()),
                     guideApp.testFramework(),
                     guideApp.excludeTest(),
+                    guideApp.excludeSource(),
                     baseApp.validateLicense()
             );
             merged.add(mergedApp);
@@ -184,15 +195,5 @@ public final class GuideUtils {
         if(src != null) {
             target.addAll(src);
         }
-    }
-
-    static boolean shouldSkip(Guide guide, BuildTool buildTool) {
-        if (BuildTool.valuesGradle().contains(buildTool)) {
-            return guide.skipGradleTests();
-        }
-        if (buildTool == BuildTool.MAVEN) {
-            return guide.skipMavenTests();
-        }
-        return false;
     }
 }

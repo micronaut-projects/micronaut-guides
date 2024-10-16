@@ -23,6 +23,7 @@ import java.util.List;
  * @param groovyFeatures The app's Groovy features
  * @param testFramework The app's test framework
  * @param excludeTest The tests that should not be run
+ * @param excludeSource The source files that should not be included
  * @param validateLicense To enable Spotless code check
  */
 @JsonSchema
@@ -64,6 +65,9 @@ public record App (
 
         @Nullable
         List<String> excludeTest,
+
+        @Nullable
+        List<String> excludeSource,
 
         @JsonProperty(defaultValue = StringUtils.TRUE)
         @Nullable

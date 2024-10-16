@@ -85,6 +85,7 @@ class GuideTest {
                     app.groovyFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
+                    app.excludeSource() ==  null &&
                     app.validateLicense();
         }));
     }
@@ -97,7 +98,7 @@ class GuideTest {
         List<String> authors = List.of("Sergio del Amo");
         LocalDate publicationDate = LocalDate.of(2024, 4, 24);
         List<App> apps = new ArrayList<>();
-        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, false));
+        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, null,false));
         Set<ConstraintViolation<Guide>> violations = validator.validate(
                 new Guide(title,intro, authors, categories, publicationDate, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,apps));
         assertTrue(violations.isEmpty());
@@ -132,6 +133,7 @@ class GuideTest {
                             app.groovyFeatures() ==  null &&
                             app.testFramework() ==  null &&
                             app.excludeTest() ==  null &&
+                            app.excludeSource() ==  null &&
                             app.validateLicense();
         }));
         assertTrue(apps.stream().anyMatch(app -> {
@@ -146,6 +148,7 @@ class GuideTest {
                     app.groovyFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
+                    app.excludeSource() ==  null &&
                     app.validateLicense();
         }));
         assertTrue(apps.stream().anyMatch(app -> {
@@ -160,6 +163,7 @@ class GuideTest {
                     app.javaFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
+                    app.excludeSource() ==  null &&
                     app.validateLicense();
         }));
         assertFalse(guide.skipGradleTests());
