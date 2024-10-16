@@ -149,7 +149,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 dir.name,
                 publish,
                 raw.base(),
-                raw.env(),
+                raw.env() ?: [:],
                 raw.apps()
         ))
     }
