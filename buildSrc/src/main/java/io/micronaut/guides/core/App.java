@@ -7,6 +7,7 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.starter.application.ApplicationType;
+import io.micronaut.starter.api.TestFramework;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -61,7 +62,7 @@ public record App (
         List<String> groovyFeatures,
 
         @Nullable
-        String testFramework,
+        TestFramework testFramework,
 
         @Nullable
         List<String> excludeTest,

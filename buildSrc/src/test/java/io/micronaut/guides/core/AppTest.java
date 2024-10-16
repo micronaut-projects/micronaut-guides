@@ -111,8 +111,8 @@ class AppTest {
                     "MESSAGING"
                   ]
                 },
-                "excludeTest": {
-                  "description": "The tests that should not be run",
+                "excludeSource": {
+                  "description": "The source files that should not be included",
                   "type": [
                     "array"
                   ],
@@ -122,8 +122,8 @@ class AppTest {
                     ]
                   }
                 },
-                "excludeSource": {
-                  "description": "The source files that should not be included",
+                "excludeTest": {
+                  "description": "The tests that should not be run",
                   "type": [
                     "array"
                   ],
@@ -211,6 +211,12 @@ class AppTest {
                   "description": "The app's test framework",
                   "type": [
                     "string"
+                  ],
+                  "enum": [
+                    "JUNIT",
+                    "SPOCK",
+                    "KOTLINTEST",
+                    "KOTEST"
                   ]
                 },
                 "validateLicense": {
