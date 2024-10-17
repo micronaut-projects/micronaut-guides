@@ -64,7 +64,8 @@ class IndexGenerator {
 
     static void generateGuidesIndex(File template, File guidesFolder, File distDir, String metadataConfigName, String indexgrid) {
 
-        List<Guide> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        GuideUtils guideUtils = new GuideUtils();
+        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName)
                 .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
         save(distDir, jsonFeed(metadatas), JSON_FEED_FILENAME)
@@ -558,7 +559,8 @@ class IndexGenerator {
     static String generateGuidesJsonIndex(File guidesFolder, String metadataConfigName) {
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
-        List<Guide> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        GuideUtils guideUtils = new GuideUtils();
+        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName)
                 .findAll { it.publish() }
 
         List<Map> result = metadatas

@@ -74,7 +74,8 @@ exit 0
                 (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
                 (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
 
-        List<Guide> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        GuideUtils guideUtils = new GuideUtils();
+        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName)
         metadatas = metadatas.stream()
                 .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
                 .collect(Collectors.toList())

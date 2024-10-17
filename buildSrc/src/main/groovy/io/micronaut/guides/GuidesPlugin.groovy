@@ -3,6 +3,7 @@ package io.micronaut.guides
 import groovy.transform.CompileStatic
 import io.micronaut.core.util.CollectionUtils
 import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideUtils
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
 import io.micronaut.guides.tasks.SampleProjectGenerationTask
@@ -57,7 +58,8 @@ class GuidesPlugin implements Plugin<Project> {
                 load(inputStream)
             }
         } as Properties
-        List<Guide> metadatas = GuideProjectGenerator.parseGuidesMetadata(
+        GuideUtils guideUtils = new GuideUtils();
+        List<Guide> metadatas = guideUtils.parseGuidesMetadata(
                 guidesDir.asFile,
                 project.extensions.extraProperties.get("metadataConfigName").toString())
         List<Map<String, TaskProvider<Task>>> sampleTasks = metadatas

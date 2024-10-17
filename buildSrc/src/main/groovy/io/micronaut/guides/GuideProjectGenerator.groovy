@@ -74,99 +74,6 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     @CompileDynamic
-    static List<Guide> parseGuidesMetadata(File guidesDir,
-                                           String metadataConfigName) {
-        List<Guide> metadatas = []
-
-        guidesDir.eachDir { dir ->
-            parseGuideMetadata(dir, metadataConfigName).ifPresent(metadatas::add)
-        }
-
-        mergeMetadataList(metadatas)
-
-        metadatas
-    }
-
-    @CompileDynamic
-    static Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName) {
-        File configFile = new File(dir, metadataConfigName)
-        if (!configFile.exists()) {
-            LOG.warn('metadata file not found for {}', dir.name)
-            return Optional.empty()
-        }
-
-
-        String content = Files.readString(Paths.get(configFile.toString()))
-        Map config = new JsonSlurper().parse(configFile) as Map
-        boolean publish = config.publish == null ? true : config.publish
-
-        if (publish) {
-            JsonSchemaFactory jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012, builder ->
-                    // This creates a mapping from $id which starts with https://www.example.org/ to the retrieval URI classpath:schema/
-                    builder.schemaMappers(schemaMappers -> schemaMappers.mapPrefix("https://www.guides.micronaut.io/schemas", "classpath:META-INF/schemas"))
-            );
-
-            SchemaValidatorsConfig.Builder builder = SchemaValidatorsConfig.builder();
-            SchemaValidatorsConfig validatorsConfig = builder.build();
-            JsonSchema schema = jsonSchemaFactory.getSchema(SchemaLocation.of("https://www.guides.micronaut.io/schemas/guide-metadata.schema.json"), validatorsConfig);
-
-
-            Set<ValidationMessage> assertions = schema.validate(content, InputFormat.JSON);
-
-            if (!assertions.isEmpty()) {
-                throw new Exception("Guide metadata " + configFile + 'does not validate the JSON Schema\n' + assertions)
-            }
-        }
-
-        JsonMapper jsonMapper = JsonMapper.createDefault()
-        Guide raw = jsonMapper.readValue(content, Guide.class)
-
-        List<App> apps = new LinkedList<>()
-
-        for(App app: raw.apps()){
-            apps.add(new App(
-                    app.name(),
-                    app.packageName(),
-                    app.applicationType(),
-                    app.framework(),
-                    app.features() ?: [],
-                    app.invisibleFeatures() ?: [],
-                    app.kotlinFeatures() ?: [],
-                    app.javaFeatures() ?: [],
-                    app.groovyFeatures() ?: [],
-                    app.testFramework(),
-                    app.excludeTest(),
-                    app.excludeSource(),
-                    app.validateLicense()
-            ))
-        }
-
-        return Optional.ofNullable(new Guide(
-                raw.title(),
-                raw.intro(),
-                raw.authors(),
-                raw.categories(),
-                publish ? raw.publicationDate() : null,
-                raw.minimumJavaVersion(),
-                raw.maximumJavaVersion(),
-                raw.cloud(),
-                raw.skipGradleTests(),
-                raw.skipMavenTests(),
-                publish ? dir.name + '.adoc' : null,
-                raw.languages() ?: List.of(Language.JAVA,Language.GROOVY,Language.KOTLIN),
-                raw.tags(),
-                raw.buildTools() ?: List.of(BuildTool.GRADLE,BuildTool.MAVEN),
-                raw.testFramework(),
-                raw.zipIncludes() ?: [],
-                dir.name,
-                publish,
-                raw.base(),
-                raw.env() ?: [:],
-                apps
-        ))
-    }
-
-    @CompileDynamic
     void generate(File guidesDir,
                   File output,
                   String metadataConfigName,
@@ -181,7 +88,9 @@ class GuideProjectGenerator implements AutoCloseable {
             asciidocDir.mkdir()
         }
 
-        List<Guide> metadatas = parseGuidesMetadata(guidesDir, metadataConfigName)
+        GuideUtils guideUtils = new GuideUtils();
+
+        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesDir, metadataConfigName)
         for (Guide metadata : metadatas) {
             File dir = new File(guidesDir, metadata.slug)
             try {
@@ -395,29 +304,6 @@ class GuideProjectGenerator implements AutoCloseable {
             return SPOCK
         }
         JUNIT
-    }
-
-    static void mergeMetadataList(List<Guide> metadatas) {
-        Map<String, Guide> metadatasByDirectory = new TreeMap<>()
-        for (Guide metadata : metadatas) {
-            metadatasByDirectory[metadata.slug()] = metadata
-        }
-
-        mergeMetadataMap(metadatasByDirectory)
-
-        metadatas.clear()
-        metadatas.addAll metadatasByDirectory.values()
-    }
-
-    private static void mergeMetadataMap(Map<String, Guide> metadatasByDirectory) {
-        for (String dir : [] + metadatasByDirectory.keySet()) {
-            Guide metadata = metadatasByDirectory[dir]
-            if (metadata.base()) {
-                Guide base = metadatasByDirectory[metadata.base()]
-                Guide merged = GuideUtils.merge(base, metadata)
-                metadatasByDirectory[dir] = merged
-            }
-        }
     }
 
     static void deleteEveryFileButSources(File dir) {
