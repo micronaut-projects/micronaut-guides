@@ -1,19 +1,13 @@
 package io.micronaut.guides.core;
 
 import com.networknt.schema.*;
-import groovy.json.DefaultJsonGenerator;
 import groovy.json.JsonSlurper;
 import io.micronaut.json.JsonMapper;
-import io.micronaut.serde.ObjectMapper;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
-
-import io.micronaut.starter.options.Language;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

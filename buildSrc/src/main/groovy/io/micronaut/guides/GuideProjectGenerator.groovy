@@ -62,10 +62,12 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
+    private final GuideUtils guideUtils
 
     GuideProjectGenerator() {
         applicationContext = ApplicationContext.run()
         guidesGenerator = applicationContext.getBean(GuidesGenerator)
+        guideUtils = applicationContext.getBean(GuideUtils)
     }
 
     @Override
@@ -87,8 +89,6 @@ class GuideProjectGenerator implements AutoCloseable {
         if (!asciidocDir.exists()) {
             asciidocDir.mkdir()
         }
-
-        GuideUtils guideUtils = new GuideUtils();
 
         List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesDir, metadataConfigName)
         for (Guide metadata : metadatas) {

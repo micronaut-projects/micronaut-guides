@@ -5,6 +5,7 @@ import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.gradle.api.file.Directory;
 import org.junit.jupiter.api.Test;
@@ -19,12 +20,16 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@MicronautTest(startApplication = false)
 public class GuideUtilsTest {
     @Inject
     JsonMapper jsonMapper;
 
     @Inject
     ResourceLoader resourceLoader;
+
+    @Inject
+    GuideUtils guideUtils;
 
     @Test
     void testGetTags(){
@@ -158,13 +163,12 @@ public class GuideUtilsTest {
         InputStream inputStream = inputStreamOptional.get();
         Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
         Set<String> frameworks = GuideUtils.getFrameworks(guide);
-        Set<String> expected = Set.of("Spring Boot","micronautframeworkjacksondatabind","micronautframeworkserde");
-        assertEquals(frameworks,expected);
+        Set<String> expected = Set.of("Spring Boot","Micronaut");
+        assertEquals(expected,frameworks);
     }
 
     @Test
     void testParseGuidesMetadata() throws Exception {
-        GuideUtils guideUtils = new GuideUtils();
         String path = "src/test/resources/guides";
         File file = new File(path);
 
