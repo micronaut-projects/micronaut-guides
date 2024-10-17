@@ -4,9 +4,9 @@ import io.micronaut.context.BeanContext;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.type.Argument;
-import io.micronaut.guides.GuideMetadata;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.serde.SerdeIntrospections;
+import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
@@ -52,11 +52,10 @@ class AppTest {
         ApplicationType applicationType = ApplicationType.DEFAULT;
         String framework = "Micronaut";
         List<String> emptyList = new ArrayList<>();
-        String testFramework = "testFramework";
         boolean validateLicense = true;
 
         Set<ConstraintViolation<App>> violations = validator.validate(
-                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList,testFramework,emptyList, validateLicense));
+                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList, TestFramework.JUNIT,emptyList,emptyList,validateLicense));
         assertTrue(violations.isEmpty());
     }
 
@@ -111,6 +110,17 @@ class AppTest {
                     "GRPC",
                     "MESSAGING"
                   ]
+                },
+                "excludeSource": {
+                  "description": "The source files that should not be included",
+                  "type": [
+                    "array"
+                  ],
+                  "items": {
+                    "type": [
+                      "string"
+                    ]
+                  }
                 },
                 "excludeTest": {
                   "description": "The tests that should not be run",
@@ -201,6 +211,12 @@ class AppTest {
                   "description": "The app's test framework",
                   "type": [
                     "string"
+                  ],
+                  "enum": [
+                    "JUNIT",
+                    "SPOCK",
+                    "KOTLINTEST",
+                    "KOTEST"
                   ]
                 },
                 "validateLicense": {

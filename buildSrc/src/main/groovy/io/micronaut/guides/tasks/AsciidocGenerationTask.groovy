@@ -2,7 +2,7 @@ package io.micronaut.guides.tasks
 
 import groovy.transform.CompileStatic
 import io.micronaut.guides.GuideAsciidocGenerator
-import io.micronaut.guides.GuideMetadata
+import io.micronaut.guides.core.Guide
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -21,7 +21,7 @@ import static org.gradle.api.tasks.PathSensitivity.RELATIVE
 abstract class AsciidocGenerationTask extends DefaultTask {
 
     @Internal
-    GuideMetadata metadata
+    Guide metadata
 
     @Input
     abstract Property<String> getSlug()

@@ -1,5 +1,8 @@
 package io.micronaut.guides
 
+import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideUtils
+
 import java.util.regex.Pattern
 
 class ThemeProcessor {
@@ -14,8 +17,9 @@ class ThemeProcessor {
 
         String templateText = template.text
 
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
-        for (GuideMetadata metadata : metadatas) {
+        GuideUtils guideUtils = new GuideUtils();
+        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        for (Guide metadata : metadatas) {
             if (!Utils.process(metadata, false)) {
                 continue
             }
