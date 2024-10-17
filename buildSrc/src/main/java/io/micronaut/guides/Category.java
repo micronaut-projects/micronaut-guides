@@ -16,64 +16,65 @@ public enum Category implements Ordered {
     EMAIL("Email", 7),
     MESSAGING("Messaging", 8),
     LOGGING("Logging", 9),
-    SCHEDULING("Scheduling", 9),
-    CACHE("Cache", 10),
-    PATTERNS("Patterns", 11),
-    INTERNATIONALIZATION("i18n", 12),
+    SCHEDULING("Scheduling", 10),
+    CACHE("Cache", 11),
+    PATTERNS("Patterns", 12),
+    INTERNATIONALIZATION("i18n", 13),
 
     // DATA ACCESS
-    DATA_JDBC("Data JDBC", 13),
-    DATA_JPA("Data JPA", 14),
-    SCHEMA_MIGRATION("Schema Migration", 15),
-    DATA_RDBC("Data R2DBC", 16),
-    DATA_MONGO("MongoDB", 17),
-    DATA_ACCESS("Data Access", 18),
+    DATABASE_MODELING("Database Modeling", 14),
+    DATA_JDBC("Data JDBC", 15),
+    DATA_JPA("Data JPA", 16),
+    SCHEMA_MIGRATION("Schema Migration", 17),
+    DATA_RDBC("Data R2DBC", 18),
+    DATA_MONGO("MongoDB", 19),
+    DATA_ACCESS("Data Access", 20),
 
     // SECURITY
-    SECURITY("Micronaut Security",19),
-    AUTHORIZATION_CODE("Authorization Code",20),
-    CLIENT_CREDENTIALS("Client Credentials",21),
-    SECRETS_MANAGER("Secrets Manager", 22),
+    SECURITY("Micronaut Security", 21),
+    AUTHORIZATION_CODE("Authorization Code", 22),
+    CLIENT_CREDENTIALS("Client Credentials", 23),
+    SECRETS_MANAGER("Secrets Manager", 24),
 
     // HTTP & API
-    HTTP("HTTP Server", 23),
-    HTTP_CLIENT("HTTP Client", 24),
-    BEYOND_JSON("Beyond JSON", 25),
-    JAX_RS("JAX-RS", 26),
-    WEBSOCKETS("WebSockets", 27),
-    GRAPHQL("GraphQL", 28),
-    OPEN_API("OpenAPI", 29),
-    JSON_SCHEMA("JSON Schema", 30),
+    HTTP("HTTP Server", 25),
+    HTTP_CLIENT("HTTP Client", 26),
+    BEYOND_JSON("Beyond JSON", 27),
+    JAX_RS("JAX-RS", 28),
+    WEBSOCKETS("WebSockets", 29),
+    GRAPHQL("GraphQL", 30),
+    OPEN_API("OpenAPI", 31),
+    JSON_SCHEMA("JSON Schema", 32),
 
     // DISTRIBUTED SYSTEMS
-    DISTRIBUTED_TRACING("Distributed Tracing", 31),
-    SERVICE_DISCOVERY("Service Discovery", 32),
-    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 33),
-    METRICS("Metrics", 33),
+    DISTRIBUTED_TRACING("Distributed Tracing", 33),
+    SERVICE_DISCOVERY("Service Discovery", 34),
+    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 35),
+    METRICS("Metrics", 36),
 
     // DISTRIBUTION
-    DISTRIBUTION("Distribution", 34),
-    GRAALVM("GraalVM", 35),
-    CRAC("Coordinated Restore at Checkpoint", 37),
-    KUBERNETES( "Kubernetes", 38),
+    DISTRIBUTION("Distribution", 37),
+    GRAALVM("GraalVM", 38),
+    CRAC("Coordinated Restore at Checkpoint", 39),
+    KUBERNETES("Kubernetes", 40),
 
     // CLOUD
-    SERVERLESS("Serverless", 39),
-    AWS_LAMBDA("AWS Lambda", 40),
-    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 41),
+    SERVERLESS("Serverless", 41),
+    AWS_LAMBDA("AWS Lambda", 42),
+    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 43),
 
     // SERVER-SIDE HTML
-    VIEWS("Views", 42),
-    TURBO("Turbo", 43),
-    STATIC_RESOURCES("Static Resources", 44),
+    VIEWS("Views", 44),
+    TURBO("Turbo", 45),
+    STATIC_RESOURCES("Static Resources", 46),
 
     // LANGUAGES
-    KOTLIN("Kotlin", 45),
-    GRAALPY("GraalPy", 46),
+    KOTLIN("Kotlin", 47),
+    GRAALPY("GraalPy", 48),
 
     // FRAMEWORKS
-    SPRING("Spring Boot", 47),
-    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 48);
+    SPRING("Spring Boot", 49),
+    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 50);
 
     private final String val;
     private final int order;

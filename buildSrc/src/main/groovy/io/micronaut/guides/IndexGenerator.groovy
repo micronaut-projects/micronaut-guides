@@ -469,6 +469,7 @@ class IndexGenerator {
                     return './images/turbo.svg'
                 case Category.JAX_RS:
                     return './images/jaxrs.svg'
+                case Category.DATABASE_MODELING:
                 case Category.DATA_JDBC:
                 case Category.DATA_JPA:
                 case Category.DATA_RDBC:
