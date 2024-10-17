@@ -153,9 +153,9 @@ class GuideProjectGenerator implements AutoCloseable {
                 raw.skipGradleTests(),
                 raw.skipMavenTests(),
                 publish ? dir.name + '.adoc' : null,
-                raw.languages() ?: ['java', 'groovy', 'kotlin'],
+                raw.languages() ?: List.of(Language.JAVA,Language.GROOVY,Language.KOTLIN),
                 raw.tags(),
-                raw.buildTools() ?: ['gradle', 'maven'],
+                raw.buildTools() ?: List.of(BuildTool.GRADLE,BuildTool.MAVEN),
                 raw.testFramework(),
                 raw.zipIncludes() ?: [],
                 dir.name,
@@ -365,7 +365,7 @@ class GuideProjectGenerator implements AutoCloseable {
         TestFramework testFramework = guideMetadata.testFramework()
         List<GuidesOption> guidesOptionList = []
 
-        for (BuildTool buildTool : BuildTool.values()) {
+        for (BuildTool buildTool : buildTools) {
             for (Language language : Language.values()) {
                 if (GuideUtils.shouldSkip(guideMetadata,buildTool)) {
                     LOG.info("Skipping index guide for $buildTool and $language")
@@ -375,7 +375,6 @@ class GuideProjectGenerator implements AutoCloseable {
                     guidesOptionList << createGuidesOption(buildTool, language, testFramework)
                 }
             }
-
         }
 
         guidesOptionList
