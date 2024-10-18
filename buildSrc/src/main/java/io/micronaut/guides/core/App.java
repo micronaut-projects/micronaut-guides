@@ -7,7 +7,6 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.starter.application.ApplicationType;
-import io.micronaut.starter.api.TestFramework;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import java.util.List;
  * @param groovyFeatures The app's Groovy features
  * @param testFramework The app's test framework
  * @param excludeTest The tests that should not be run
- * @param excludeSource The source files that should not be included
  * @param validateLicense To enable Spotless code check
  */
 @JsonSchema
@@ -62,13 +60,10 @@ public record App (
         List<String> groovyFeatures,
 
         @Nullable
-        TestFramework testFramework,
+        String testFramework,
 
         @Nullable
         List<String> excludeTest,
-
-        @Nullable
-        List<String> excludeSource,
 
         @JsonProperty(defaultValue = StringUtils.TRUE)
         @Nullable
