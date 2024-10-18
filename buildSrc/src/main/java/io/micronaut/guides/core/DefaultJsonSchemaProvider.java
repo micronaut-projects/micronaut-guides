@@ -7,7 +7,7 @@ import jakarta.inject.Singleton;
 @Singleton
 public class DefaultJsonSchemaProvider implements JsonSchemaProvider {
     JsonSchemaFactory jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012, builder ->
-            builder.schemaMappers(schemaMappers -> schemaMappers.mapPrefix("https://guides.micronaut.io/schemas", "classpath:META-INF/schemas"))
+            builder.schemaMappers(schemaMappers -> schemaMappers.mapPrefix("https://guides.micronaut.io/schemas", "classpath:"))
     );
 
     @Override
