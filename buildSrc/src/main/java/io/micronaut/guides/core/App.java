@@ -20,6 +20,7 @@ import java.util.List;
  * @param invisibleFeatures The app's invisible features
  * @param kotlinFeatures The app's Kotlin features
  * @param javaFeatures The app's Java features
+ * @param groovyFeatures The app's Groovy features
  * @param testFramework The app's test framework
  * @param excludeTest The tests that should not be run
  * @param validateLicense To enable Spotless code check
@@ -54,6 +55,9 @@ public record App (
 
         @Nullable
         List<String> javaFeatures,
+
+        @Nullable
+        List<String> groovyFeatures,
 
         @Nullable
         String testFramework,

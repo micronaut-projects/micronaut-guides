@@ -29,10 +29,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,7 +67,9 @@ class GuideTest {
         assertEquals("Learn how to connect a Micronaut Data JDBC application to a Microsoft Azure Database for MySQL", guide.intro());
         assertEquals(List.of("Data JDBC"), guide.categories());
         assertEquals(LocalDate.of(2022,2, 17), guide.publicationDate());
-        assertEquals(List.of("Azure","cloud", "database", "micronaut-data", "jdbc", "flyway", "mysql"), guide.tags());
+        List<String> tags = guide.tags();
+        Collections.sort(tags);
+        assertEquals(List.of("Azure","cloud", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
         List<App> apps = guide.apps();
         assertNotNull(apps);
         assertEquals(1, apps.size());
@@ -83,6 +82,7 @@ class GuideTest {
                     app.invisibleFeatures() ==  null &&
                     app.kotlinFeatures() ==  null &&
                     app.javaFeatures() ==  null &&
+                    app.groovyFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
                     app.validateLicense();
@@ -97,7 +97,7 @@ class GuideTest {
         List<String> authors = List.of("Sergio del Amo");
         LocalDate publicationDate = LocalDate.of(2024, 4, 24);
         List<App> apps = new ArrayList<>();
-        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, false));
+        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, false));
         Set<ConstraintViolation<Guide>> violations = validator.validate(
                 new Guide(title,intro, authors, categories, publicationDate, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,apps));
         assertTrue(violations.isEmpty());
@@ -129,6 +129,7 @@ class GuideTest {
                             app.invisibleFeatures() ==  null &&
                             app.kotlinFeatures() ==  null &&
                             app.javaFeatures() ==  null &&
+                            app.groovyFeatures() ==  null &&
                             app.testFramework() ==  null &&
                             app.excludeTest() ==  null &&
                             app.validateLicense();
@@ -142,6 +143,7 @@ class GuideTest {
                     app.invisibleFeatures() ==  null &&
                     app.kotlinFeatures() ==  null &&
                     app.javaFeatures() ==  null &&
+                    app.groovyFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
                     app.validateLicense();
@@ -154,6 +156,7 @@ class GuideTest {
                     app.features().equals(List.of("json-path", "assertj")) &&
                     app.invisibleFeatures() ==  null &&
                     app.kotlinFeatures() ==  null &&
+                    app.groovyFeatures() ==  null &&
                     app.javaFeatures() ==  null &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
@@ -171,6 +174,131 @@ class GuideTest {
         assertNull(guide.zipIncludes());
         assertNull(guide.base());
         assertNull(guide.env());
+    }
+
+    @Test
+    void testGetTags(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        List<String> expectedList = List.of("assertj", "boot-to-micronaut-building-a-rest-api", "jackson-databind", "json-path", "spring-boot", "spring-boot-starter-web");
+        List<String> actualList = GuideUtils.getTags(guide);
+        Collections.sort(actualList);
+        assertEquals(expectedList, actualList);
+    }
+
+    @Test
+    void testGetAppFeaturesWithoutValidateLicense(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-features.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app =  assertDoesNotThrow(() -> guide.apps().stream().filter(el -> el.name().equals("secondApp")).findFirst().get());
+
+        assertEquals(List.of("invisible"),GuideUtils.getAppInvisibleFeatures(app));
+
+        List javaAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.JAVA);
+        List kotlinAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.KOTLIN);
+        List groovyAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppVisibleFeatures);
+        Collections.sort(kotlinAppVisibleFeatures);
+        Collections.sort(groovyAppVisibleFeatures);
+        assertEquals(List.of("awaitility", "graalvm", "mqtt", "yaml"),javaAppVisibleFeatures);
+        assertEquals(List.of("graalvm", "kapt", "mqtt", "yaml"),kotlinAppVisibleFeatures);
+        assertEquals(List.of("graalvm", "groovy-toml", "mqtt", "yaml"),groovyAppVisibleFeatures);
+
+        List javaAppFeatures = GuideUtils.getAppFeatures(app,Language.JAVA);
+        List kotlinAppFeatures = GuideUtils.getAppFeatures(app,Language.KOTLIN);
+        List groovyAppFeatures = GuideUtils.getAppFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppFeatures);
+        Collections.sort(kotlinAppFeatures);
+        Collections.sort(groovyAppFeatures);
+        assertEquals(List.of("awaitility", "graalvm", "invisible", "mqtt", "yaml"),javaAppFeatures);
+        assertEquals(List.of("graalvm", "invisible", "kapt", "mqtt", "yaml"),kotlinAppFeatures);
+        assertEquals(List.of("graalvm", "groovy-toml", "invisible", "mqtt", "yaml"),groovyAppFeatures);
+    }
+
+    @Test
+    void testGetAppFeatures(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-features.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app =  assertDoesNotThrow(() -> guide.apps().stream().filter(el -> el.name().equals("app")).findFirst().get());
+
+        assertEquals(List.of("invisible", "spotless"),GuideUtils.getAppInvisibleFeatures(app));
+
+        List javaAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.JAVA);
+        List kotlinAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.KOTLIN);
+        List groovyAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppVisibleFeatures);
+        Collections.sort(kotlinAppVisibleFeatures);
+        Collections.sort(groovyAppVisibleFeatures);
+        assertEquals(List.of("awaitility", "graalvm", "mqtt", "yaml"),javaAppVisibleFeatures);
+        assertEquals(List.of("graalvm", "kapt", "mqtt", "yaml"),kotlinAppVisibleFeatures);
+        assertEquals(List.of("graalvm", "groovy-toml", "mqtt", "yaml"),groovyAppVisibleFeatures);
+
+        List javaAppFeatures = GuideUtils.getAppFeatures(app,Language.JAVA);
+        List kotlinAppFeatures = GuideUtils.getAppFeatures(app,Language.KOTLIN);
+        List groovyAppFeatures = GuideUtils.getAppFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppFeatures);
+        Collections.sort(kotlinAppFeatures);
+        Collections.sort(groovyAppFeatures);
+        assertEquals(List.of("awaitility", "graalvm", "invisible", "mqtt", "spotless", "yaml"),javaAppFeatures);
+        assertEquals(List.of("graalvm", "invisible", "kapt", "mqtt", "spotless", "yaml"),kotlinAppFeatures);
+        assertEquals(List.of("graalvm", "groovy-toml", "invisible", "mqtt", "spotless", "yaml"),groovyAppFeatures);
+    }
+
+    @Test
+    void testGetAppFeaturesEmpty(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-features.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app =  assertDoesNotThrow(() -> guide.apps().stream().filter(el -> el.name().equals("thirdApp")).findFirst().get());
+
+        assertEquals(List.of("spotless"),GuideUtils.getAppInvisibleFeatures(app));
+
+        List javaAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.JAVA);
+        List kotlinAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.KOTLIN);
+        List groovyAppVisibleFeatures = GuideUtils.getAppVisibleFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppVisibleFeatures);
+        Collections.sort(kotlinAppVisibleFeatures);
+        Collections.sort(groovyAppVisibleFeatures);
+        assertEquals(List.of(),javaAppVisibleFeatures);
+        assertEquals(List.of(),kotlinAppVisibleFeatures);
+        assertEquals(List.of(),groovyAppVisibleFeatures);
+
+        List javaAppFeatures = GuideUtils.getAppFeatures(app,Language.JAVA);
+        List kotlinAppFeatures = GuideUtils.getAppFeatures(app,Language.KOTLIN);
+        List groovyAppFeatures = GuideUtils.getAppFeatures(app,Language.GROOVY);
+        Collections.sort(javaAppFeatures);
+        Collections.sort(kotlinAppFeatures);
+        Collections.sort(groovyAppFeatures);
+        assertEquals(List.of("spotless"),javaAppFeatures);
+        assertEquals(List.of("spotless"),kotlinAppFeatures);
+        assertEquals(List.of("spotless"),groovyAppFeatures);
+    }
+
+    @Test
+    void testShouldSkip() throws IOException {
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        assertEquals(GuideUtils.shouldSkip(guide,BuildTool.GRADLE), false);
+        assertEquals(GuideUtils.shouldSkip(guide,BuildTool.MAVEN), false);
+    }
+
+    @Test
+    void testShouldSkipTrueKotlin() throws IOException {
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-skip.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        assertEquals(GuideUtils.shouldSkip(guide,BuildTool.GRADLE_KOTLIN), true);
+        assertEquals(GuideUtils.shouldSkip(guide,BuildTool.MAVEN), false);
     }
 
     @Test
