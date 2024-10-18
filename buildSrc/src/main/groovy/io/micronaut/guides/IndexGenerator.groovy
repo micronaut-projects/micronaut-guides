@@ -6,8 +6,10 @@ import groovy.transform.CompileStatic
 import io.micronaut.core.order.OrderUtil
 import io.micronaut.core.order.Ordered
 import io.micronaut.guides.core.Cloud
+import io.micronaut.guides.core.DefaultJsonSchemaProvider
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.json.JsonMapper
 import io.micronaut.rss.jsonfeed.JsonFeed
 import io.micronaut.rss.jsonfeed.JsonFeedAuthor
@@ -64,8 +66,10 @@ class IndexGenerator {
 
     static void generateGuidesIndex(File template, File guidesFolder, File distDir, String metadataConfigName, String indexgrid) {
 
-        GuideUtils guideUtils = new GuideUtils();
-        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        //TODO. We should have an application context and get it from it.
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
                 .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
         save(distDir, jsonFeed(metadatas), JSON_FEED_FILENAME)
@@ -559,8 +563,10 @@ class IndexGenerator {
     static String generateGuidesJsonIndex(File guidesFolder, String metadataConfigName) {
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
-        GuideUtils guideUtils = new GuideUtils();
-        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        //TOO get both from an application context
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
                 .findAll { it.publish() }
 
         List<Map> result = metadatas

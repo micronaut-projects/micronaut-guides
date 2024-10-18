@@ -2,8 +2,11 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import io.micronaut.guides.core.App
+import io.micronaut.guides.core.DefaultJsonSchemaProvider
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.JsonSchemaProvider
+import io.micronaut.json.JsonMapper
 
 import java.util.stream.Collectors
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
@@ -74,8 +77,10 @@ exit 0
                 (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
                 (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
 
-        GuideUtils guideUtils = new GuideUtils();
-        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        //TODO. We should have an application context and get it from it.
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper);
         metadatas = metadatas.stream()
                 .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
                 .collect(Collectors.toList())

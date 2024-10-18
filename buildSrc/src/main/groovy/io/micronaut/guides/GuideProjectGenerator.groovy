@@ -1,30 +1,21 @@
 package io.micronaut.guides
 
-import com.networknt.schema.InputFormat
 import com.networknt.schema.JsonSchema
-import com.networknt.schema.JsonSchemaFactory
-import com.networknt.schema.SchemaLocation
-import com.networknt.schema.SchemaValidatorsConfig
-import com.networknt.schema.SpecVersion
-import com.networknt.schema.ValidationMessage
-import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
-import io.micronaut.core.io.IOUtils
-import io.micronaut.core.io.ResourceLoader
 import io.micronaut.guides.core.App
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.json.JsonMapper
-import io.micronaut.starter.application.ApplicationType
+import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.options.Language
-import io.micronaut.starter.api.TestFramework
 import org.gradle.api.GradleException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -34,7 +25,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 import java.util.regex.Pattern
-import java.util.stream.Collectors
 
 import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
@@ -62,12 +52,13 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
-    private final GuideUtils guideUtils
-
+    private final JsonSchema jsonSchema;
+    private final JsonMapper jsonMapper;
     GuideProjectGenerator() {
         applicationContext = ApplicationContext.run()
         guidesGenerator = applicationContext.getBean(GuidesGenerator)
-        guideUtils = applicationContext.getBean(GuideUtils)
+        this.jsonSchema = applicationContext.getBean(JsonSchemaProvider.class).getSchema();
+        this.jsonMapper = applicationContext.getBean(JsonMapper.class)
     }
 
     @Override
@@ -90,7 +81,7 @@ class GuideProjectGenerator implements AutoCloseable {
             asciidocDir.mkdir()
         }
 
-        List<Guide> metadatas = guideUtils.parseGuidesMetadata(guidesDir, metadataConfigName)
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesDir, metadataConfigName,  jsonSchema, jsonMapper)
         for (Guide metadata : metadatas) {
             File dir = new File(guidesDir, metadata.slug)
             try {

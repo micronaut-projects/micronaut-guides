@@ -21,7 +21,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest(startApplication = false)
-public class GuideUtilsTest {
+class GuideUtilsTest {
     @Inject
     JsonMapper jsonMapper;
 
@@ -29,7 +29,7 @@ public class GuideUtilsTest {
     ResourceLoader resourceLoader;
 
     @Inject
-    GuideUtils guideUtils;
+    JsonSchemaProvider jsonSchemaProvider;
 
     @Test
     void testGetTags(){
@@ -172,7 +172,7 @@ public class GuideUtilsTest {
         String path = "src/test/resources/guides";
         File file = new File(path);
 
-        List<Guide> metadatas = guideUtils.parseGuidesMetadata(file,"metadata.json");
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(file,"metadata.json", jsonSchemaProvider.getSchema(), jsonMapper);
 
         assertEquals(3,metadatas.size());
 

@@ -2,8 +2,10 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import io.micronaut.core.util.CollectionUtils
+import io.micronaut.guides.core.DefaultJsonSchemaProvider
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
 import io.micronaut.guides.tasks.SampleProjectGenerationTask
@@ -11,6 +13,7 @@ import io.micronaut.guides.tasks.TestScriptRunnerTask
 import io.micronaut.guides.tasks.TestScriptTask
 import io.micronaut.guides.tasks.NativeTestScriptRunnerTask
 import io.micronaut.guides.tasks.NativeTestScriptTask
+import io.micronaut.json.JsonMapper
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -58,10 +61,13 @@ class GuidesPlugin implements Plugin<Project> {
                 load(inputStream)
             }
         } as Properties
-        GuideUtils guideUtils = new GuideUtils();
-        List<Guide> metadatas = guideUtils.parseGuidesMetadata(
+
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(
                 guidesDir.asFile,
-                project.extensions.extraProperties.get("metadataConfigName").toString())
+                project.extensions.extraProperties.get("metadataConfigName").toString(),
+        jsonSchemaProvider.getSchema(), jsonMapper)
         List<Map<String, TaskProvider<Task>>> sampleTasks = metadatas
                 .stream()
                 .filter(guideMetadata -> Utils.process(guideMetadata, false))

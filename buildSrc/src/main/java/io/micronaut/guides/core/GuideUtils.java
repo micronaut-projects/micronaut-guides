@@ -5,7 +5,6 @@ import groovy.json.JsonSlurper;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
-import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
@@ -15,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Singleton
 public final class GuideUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GuideUtils.class);
@@ -25,26 +23,17 @@ public final class GuideUtils {
     private static final List<String> FEATURES_PREFIXES = List.of(MICRONAUT_PREFIX, VIEWS_PREFIX);
     private static final String FEATURE_SPOTLESS = "spotless";
 
-    private JsonSchema schema;
-
-    JsonMapper jsonMapper;
-
-    public GuideUtils() {
-        JsonSchemaFactory jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012, builder ->
-                builder.schemaMappers(schemaMappers -> schemaMappers.mapPrefix("https://www.guides.micronaut.io/schemas", "classpath:META-INF/schemas"))
-        );
-
-        SchemaValidatorsConfig.Builder builder = SchemaValidatorsConfig.builder();
-        SchemaValidatorsConfig validatorsConfig = builder.build();
-        schema = jsonSchemaFactory.getSchema(SchemaLocation.of("https://www.guides.micronaut.io/schemas/guide-metadata.schema.json"), validatorsConfig);
-        jsonMapper = JsonMapper.createDefault();
+    private GuideUtils() {
     }
 
-    public List<Guide> parseGuidesMetadata(File guidesDir, String metadataConfigName) throws Exception {
+    public static List<Guide> parseGuidesMetadata(File guidesDir,
+                                           String metadataConfigName,
+                                           JsonSchema schema,
+                                           JsonMapper jsonMapper) throws Exception {
         List<Guide> metadatas = new ArrayList<>();
 
         for (File dir : guidesDir.listFiles(File::isDirectory)) {
-            parseGuideMetadata(dir, metadataConfigName).ifPresent(metadatas::add);
+            parseGuideMetadata(dir, metadataConfigName, schema, jsonMapper).ifPresent(metadatas::add);
         }
 
         mergeMetadataList(metadatas);
@@ -52,7 +41,9 @@ public final class GuideUtils {
         return metadatas;
     }
 
-    Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName) throws Exception {
+    private static Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName,
+                                       JsonSchema schema,
+                                       JsonMapper jsonMapper) throws Exception {
         File configFile = new File(dir, metadataConfigName);
         if (!configFile.exists()) {
             LOG.warn("metadata file not found for {}", dir.getName());
