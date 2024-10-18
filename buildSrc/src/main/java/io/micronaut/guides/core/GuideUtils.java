@@ -104,7 +104,7 @@ public final class GuideUtils {
                 raw.skipMavenTests(),
                 publish ? dir.getName() + ".adoc" : null,
                 raw.languages() != null ? raw.languages() : List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN),
-                raw.tags(),
+                raw.tags() != null ? raw.tags() : List.of(),
                 raw.buildTools() != null ? raw.buildTools() : List.of(BuildTool.GRADLE, BuildTool.MAVEN),
                 raw.testFramework(),
                 raw.zipIncludes() != null ? raw.zipIncludes() : new ArrayList<>(),

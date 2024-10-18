@@ -9,6 +9,7 @@ import io.micronaut.guides.core.Cloud
 import io.micronaut.guides.core.DefaultJsonSchemaProvider
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.GuidesFeed
 import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.json.JsonMapper
 import io.micronaut.rss.jsonfeed.JsonFeed
@@ -72,38 +73,7 @@ class IndexGenerator {
         List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
                 .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
-        save(distDir, jsonFeed(metadatas), JSON_FEED_FILENAME)
-    }
-
-    static String jsonFeed(List<Guide> metadatas) {
-        JsonFeed.Builder jsonFeedBuilder = JsonFeed.builder()
-                .version("https://jsonfeed.org/version/1.1")
-                .title("Micronaut Guides")
-                .homePageUrl(GUIDES_URL + "/latest/")
-                .feedUrl(GUIDES_URL + "/latest/" + JSON_FEED_FILENAME)
-        for (Guide metadata : metadatas ) {
-            jsonFeedBuilder.item(jsonFeedItem(metadata))
-        }
-        JsonFeed jsonFeed = jsonFeedBuilder.build()
-        JsonMapper jsonMapper = JsonMapper.createDefault()
-        jsonMapper.writeValueAsString(jsonFeed)
-    }
-
-    static JsonFeedItem jsonFeedItem(Guide metadata) {
-        JsonFeedItem.Builder jsonFeedItemBuilder = JsonFeedItem.builder()
-                .id(metadata.slug())
-                .title(metadata.title())
-                .contentText(metadata.intro())
-                .language(RssLanguage.LANG_ENGLISH)
-                .datePublished(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
-                .url("https://guides.micronaut.io/latest/${metadata.slug()}")
-        for (String author: metadata.authors()) {
-            jsonFeedItemBuilder.author(JsonFeedAuthor.builder().name(author).build())
-        }
-        for (String t : metadata.tags()) {
-            jsonFeedItemBuilder.tag(t)
-        }
-        jsonFeedItemBuilder.build()
+        save(distDir, GuidesFeed.jsonFeed(metadatas), JSON_FEED_FILENAME)
     }
 
     static void generateGuidesIndex(File template, File distDir, List<Guide> metadatas, String indexgrid) {
