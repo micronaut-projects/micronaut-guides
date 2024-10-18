@@ -1,7 +1,6 @@
 package io.micronaut.guides
 
 import groovy.transform.CompileStatic
-import io.micronaut.guides.core.Guide
 import io.micronaut.starter.options.JdkVersion
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
@@ -19,29 +18,29 @@ class Utils {
         System.getProperty(SYS_PROP_MICRONAUT_GUIDE)
     }
 
-    static boolean process(Guide metadata, boolean checkJdk = true) {
+    static boolean process(GuideMetadata metadata, boolean checkJdk = true) {
 
-        if (!metadata.publish()) {
+        if (!metadata.publish) {
             return false
         }
 
-        boolean processGuide = singleGuide() == null || singleGuide() == metadata.slug()
+        boolean processGuide = singleGuide() == null || singleGuide() == metadata.slug
         if (!processGuide) {
             return false
         }
 
         if (checkJdk && skipBecauseOfJavaVersion(metadata)) {
-            println "not processing ${metadata.slug()}, JDK not between ${metadata.minimumJavaVersion()} and ${metadata.maximumJavaVersion()}"
+            println "not processing $metadata.slug, JDK not between $metadata.minimumJavaVersion and $metadata.maximumJavaVersion"
             return false
         }
 
         return true
     }
 
-    static boolean skipBecauseOfJavaVersion(Guide metadata) {
+    static boolean skipBecauseOfJavaVersion(GuideMetadata metadata) {
         int jdkVersion = parseJdkVersion().majorVersion()
-        return (metadata.minimumJavaVersion() != null && jdkVersion < metadata.minimumJavaVersion()) ||
-                (metadata.maximumJavaVersion() != null && jdkVersion > metadata.maximumJavaVersion())
+        return (metadata.minimumJavaVersion != null && jdkVersion < metadata.minimumJavaVersion) ||
+                (metadata.maximumJavaVersion != null && jdkVersion > metadata.maximumJavaVersion)
     }
 
     static JdkVersion parseJdkVersion() {

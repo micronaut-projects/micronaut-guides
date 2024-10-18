@@ -1,12 +1,5 @@
 package io.micronaut.guides
 
-import io.micronaut.guides.core.DefaultJsonSchemaProvider
-import io.micronaut.guides.core.Guide
-import io.micronaut.guides.core.GuideUtils
-import io.micronaut.guides.core.JsonSchemaProvider
-import io.micronaut.json.JsonMapper
-import org.gradle.internal.impldep.com.google.api.client.json.Json
-
 import java.util.regex.Pattern
 
 class ThemeProcessor {
@@ -21,11 +14,8 @@ class ThemeProcessor {
 
         String templateText = template.text
 
-        //TODO. We should have an application context and get it from it.
-        JsonMapper jsonMapper = JsonMapper.createDefault();
-        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
-        for (Guide metadata : metadatas) {
+        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        for (GuideMetadata metadata : metadatas) {
             if (!Utils.process(metadata, false)) {
                 continue
             }
