@@ -7,7 +7,6 @@ import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.gradle.api.file.Directory;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
