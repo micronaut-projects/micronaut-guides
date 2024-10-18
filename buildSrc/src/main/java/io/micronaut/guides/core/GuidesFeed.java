@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.json.JsonMapper;
+import io.micronaut.rss.RssChannel;
 import io.micronaut.rss.jsonfeed.JsonFeed;
 import io.micronaut.rss.jsonfeed.JsonFeedAuthor;
 import io.micronaut.rss.jsonfeed.JsonFeedItem;
@@ -46,4 +47,14 @@ public class GuidesFeed {
         }
         return jsonFeedItemBuilder.build();
     }
+//
+//    public static String rssFeed(List<Guide> metadatas){
+//        RssChannel rssChannel = RssChannel.builder(
+//                "Micronaut Guides",
+//                "",
+//                ""
+//        ).build();
+//
+//        return rssChannel.
+//    }
 }
