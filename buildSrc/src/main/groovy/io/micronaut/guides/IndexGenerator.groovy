@@ -83,7 +83,7 @@ class IndexGenerator {
         Collection<Tag> tags = collectTags(metadatas)
         for (Tag tag :  tags) {
             List<Guide> tagMetadatas = metadatas.stream()
-                    .filter(m -> (m.tags() ?: []).contains(tag.slug) )
+                    .filter(m -> (GuideUtils.getTags(m) ?: []).contains(tag.slug) )
                     .sorted(GUIDE_METADATA_COMPARATOR)
                     .collect(Collectors.toList())
 
@@ -105,7 +105,7 @@ class IndexGenerator {
             Category cat = (Category) obj
 
             List<Guide> GuideList = metadatas.stream()
-                    .filter(m -> m.categories().stream().anyMatch(c -> c == cat))
+                    .filter(m -> m.categories().stream().anyMatch(c -> c == cat.toString()))
                     .sorted(GUIDE_METADATA_COMPARATOR)
                     .collect(Collectors.toList())
 
@@ -309,11 +309,11 @@ class IndexGenerator {
                 index += "<div class='guide-date'>${metadata.publicationDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}</div>"
             }
             index += "<div class='guide-intro'>${metadata.intro()}</div>"
-            if (metadata.tags()?.size() > 0) {
+            if (GuideUtils.getTags(metadata)?.size() > 0) {
                 index += "<div class='guide-tag-list'>"
                 index += "<span class='guide-tag-title'>Tags: </span>"
-                metadata.tags().collect { new Tag(title: it) }.eachWithIndex { tag, i ->
-                    boolean isNotLast = i != metadata.tags().size() - 1
+                GuideUtils.getTags(metadata).collect { new Tag(title: it) }.eachWithIndex { tag, i ->
+                    boolean isNotLast = i != GuideUtils.getTags(metadata).size() - 1
                     index += "<span class='guide-tag'><a href='./tag-${tag.slug.toLowerCase()}.html'>${tag.title}</a></span>"
                     if (isNotLast) {
                         index += "<span class='guide-split'>, </span>"
@@ -563,7 +563,7 @@ class IndexGenerator {
     @CompileDynamic
     private static List<String> generateTags(Guide guide) {
         [
-            guide.tags ?: [] +
+            GuideUtils.getTags(guide) ?: [] +
             guide.languages*.toString() +
             guide.buildTools*.toString() +
             guide.apps.collect { GuideUtils.getAppFeatures(it,Language.DEFAULT_OPTION) }.flatten().unique()
