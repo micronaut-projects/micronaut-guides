@@ -135,7 +135,7 @@ class IndexGenerator {
             Category cat = (Category) obj
 
             List<Guide> GuideList = metadatas.stream()
-                    .filter(m -> m.categories().stream().anyMatch(c -> c == cat))
+                    .filter(m -> m.categories().stream().anyMatch(c -> c == cat.toString()))
                     .sorted(GUIDE_METADATA_COMPARATOR)
                     .collect(Collectors.toList())
 
