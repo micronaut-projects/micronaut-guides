@@ -1,14 +1,19 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.json.JsonMapper;
+import io.micronaut.rss.DefaultRssFeedRenderer;
 import io.micronaut.rss.RssChannel;
+import io.micronaut.rss.RssItem;
 import io.micronaut.rss.jsonfeed.JsonFeed;
 import io.micronaut.rss.jsonfeed.JsonFeedAuthor;
 import io.micronaut.rss.jsonfeed.JsonFeedItem;
 import io.micronaut.rss.language.RssLanguage;
+import org.reactivestreams.Publisher;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -38,7 +43,7 @@ public class GuidesFeed {
                 .contentText(metadata.intro())
                 .language(RssLanguage.LANG_ENGLISH)
                 .datePublished(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
-                .url("https://guides.micronaut.io/latest/"+metadata.slug());
+                .url(GUIDES_URL + "/latest/" + metadata.slug());
         for (String author: metadata.authors()) {
             jsonFeedItemBuilder.author(JsonFeedAuthor.builder().name(author).build());
         }
@@ -47,14 +52,31 @@ public class GuidesFeed {
         }
         return jsonFeedItemBuilder.build();
     }
-//
-//    public static String rssFeed(List<Guide> metadatas){
-//        RssChannel rssChannel = RssChannel.builder(
-//                "Micronaut Guides",
-//                "",
-//                ""
-//        ).build();
-//
-//        return rssChannel.
-//    }
+
+    public static String rssFeed(List<Guide> metadatas){
+         RssChannel.Builder rssBuilder = RssChannel.builder(
+                "Micronaut Guides", GUIDES_URL + "/latest/", "RSS feed for Micronaut Guides")
+                 .language(RssLanguage.LANG_ENGLISH);
+        for (Guide metadata : metadatas) {
+            rssBuilder.item(rssFeedElement(metadata));
+        }
+        DefaultRssFeedRenderer rssFeedRenderer = new DefaultRssFeedRenderer();
+        StringWriter writer = new StringWriter();
+        rssFeedRenderer.render(writer, rssBuilder.build());
+        return writer.toString();
+    }
+
+    static RssItem rssFeedElement(Guide metadata){
+        RssItem.Builder rssItemBuilder = RssItem.builder()
+                        .guid(metadata.slug())
+                        .title(metadata.title())
+                        .description(metadata.intro())
+                        .pubDate(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
+                        .link(GUIDES_URL + "/latest/" + metadata.slug());
+        for (String author: metadata.authors()) {
+            rssItemBuilder.author(author);
+        }
+        rssItemBuilder.category(GuideUtils.getTags(metadata));
+        return rssItemBuilder.build();
+    }
 }
