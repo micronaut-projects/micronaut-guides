@@ -51,7 +51,7 @@ public class GuidesFeedTest {
                       "name" : "Graeme Rocher",
                       "empty" : false
                     } ],
-                    "tags" : [ "cloud", "database", "micronaut-data", "jdbc", "flyway", "mysql", "Azure" ],
+                    "tags" : [ "cloud", "database", "Azure", "flyway", "jdbc", "mysql", "micronaut-data", "data-jdbc" ],
                     "language" : "LANG_ENGLISH"
                   }, {
                     "id" : "test",
@@ -63,7 +63,7 @@ public class GuidesFeedTest {
                       "name" : "Sergio del Amo",
                       "empty" : false
                     } ],
-                    "tags" : [ "spring-boot" ],
+                    "tags" : [ "spring-boot-starter-web", "jackson-databind", "spring-boot", "assertj", "boot-to-micronaut-building-a-rest-api", "json-path" ],
                     "language" : "LANG_ENGLISH"
                   } ]
                 }

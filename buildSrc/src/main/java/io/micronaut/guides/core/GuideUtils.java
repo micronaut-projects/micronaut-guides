@@ -206,7 +206,7 @@ public final class GuideUtils {
                 base.skipMavenTests() || guide.skipMavenTests(),
                 guide.asciidoctor(),
                 guide.languages() == null ? base.languages() : guide.languages(),
-                mergeLists(base.tags(), guide.tags()),
+                mergeLists(GuideUtils.getTags(base), GuideUtils.getTags(guide)),
                 guide.buildTools() == null ? base.buildTools() : guide.buildTools(),
                 guide.testFramework() == null ? base.testFramework() : guide.testFramework(),
                 guide.zipIncludes(),

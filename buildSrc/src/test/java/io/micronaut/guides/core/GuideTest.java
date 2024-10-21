@@ -69,7 +69,7 @@ class GuideTest {
         assertEquals(LocalDate.of(2022,2, 17), guide.publicationDate());
         List<String> tags = guide.tags();
         Collections.sort(tags);
-        assertEquals(List.of("Azure","cloud", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
+        assertEquals(List.of("Azure", "cloud", "data-jdbc", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
         List<App> apps = guide.apps();
         assertNotNull(apps);
         assertEquals(1, apps.size());

@@ -41,7 +41,7 @@ public class GuidesFeed {
         for (String author: metadata.authors()) {
             jsonFeedItemBuilder.author(JsonFeedAuthor.builder().name(author).build());
         }
-        for (String t : metadata.tags()) {
+        for (String t : GuideUtils.getTags(metadata)) {
             jsonFeedItemBuilder.tag(t);
         }
         return jsonFeedItemBuilder.build();
