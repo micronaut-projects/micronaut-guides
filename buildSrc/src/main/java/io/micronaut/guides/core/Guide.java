@@ -8,7 +8,7 @@ import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
-import io.micronaut.starter.options.TestFramework;
+import io.micronaut.starter.api.TestFramework;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

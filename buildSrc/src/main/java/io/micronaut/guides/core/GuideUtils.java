@@ -1,21 +1,120 @@
 package io.micronaut.guides.core;
 
+import com.networknt.schema.*;
+import groovy.json.JsonSlurper;
+import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
-
-import io.micronaut.starter.options.Language;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public final class GuideUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GuideUtils.class);
 
     private static final String MICRONAUT_PREFIX = "micronaut-";
     private static final String VIEWS_PREFIX = "views-";
     private static final List<String> FEATURES_PREFIXES = List.of(MICRONAUT_PREFIX, VIEWS_PREFIX);
     private static final String FEATURE_SPOTLESS = "spotless";
 
-    private GuideUtils() {}
+    private GuideUtils() {
+    }
+
+    public static List<Guide> parseGuidesMetadata(File guidesDir,
+                                           String metadataConfigName,
+                                           JsonSchema schema,
+                                           JsonMapper jsonMapper) throws Exception {
+        List<Guide> metadatas = new ArrayList<>();
+
+        for (File dir : guidesDir.listFiles(File::isDirectory)) {
+            parseGuideMetadata(dir, metadataConfigName, schema, jsonMapper).ifPresent(metadatas::add);
+        }
+
+        mergeMetadataList(metadatas);
+
+        return metadatas;
+    }
+
+    private static Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName,
+                                       JsonSchema schema,
+                                       JsonMapper jsonMapper) throws Exception {
+        File configFile = new File(dir, metadataConfigName);
+        if (!configFile.exists()) {
+            LOG.warn("metadata file not found for {}", dir.getName());
+            return Optional.empty();
+        }
+
+        String content;
+        try {
+            content = Files.readString(Paths.get(configFile.toString()));
+        } catch (IOException e) {
+            LOG.warn("metadata file not found for {}", dir.getName());
+            return Optional.empty();
+        }
+
+        Map<String, Object> config = (Map<String,Object>) new JsonSlurper().parse(configFile);
+        boolean publish = config.get("publish") == null ? true : (Boolean) config.get("publish");
+
+        if(publish){
+            Set<ValidationMessage> assertions = schema.validate(content, InputFormat.JSON);
+
+            if (!assertions.isEmpty()) {
+                throw new Exception("Guide metadata " + configFile + " does not validate the JSON Schema" + assertions);
+            }
+        }
+
+        Guide raw = jsonMapper.readValue(content, Guide.class);
+
+        List<App> apps = new LinkedList<>();
+
+        for (App app : raw.apps()) {
+            apps.add(new App(
+                    app.name(),
+                    app.packageName(),
+                    app.applicationType(),
+                    app.framework(),
+                    app.features() != null ? app.features() : new ArrayList<>(),
+                    app.invisibleFeatures() != null ? app.invisibleFeatures() : new ArrayList<>(),
+                    app.kotlinFeatures() != null ? app.kotlinFeatures() : new ArrayList<>(),
+                    app.javaFeatures() != null ? app.javaFeatures() : new ArrayList<>(),
+                    app.groovyFeatures() != null ? app.groovyFeatures() : new ArrayList<>(),
+                    app.testFramework(),
+                    app.excludeTest(),
+                    app.excludeSource(),
+                    app.validateLicense()
+            ));
+        }
+
+        return Optional.ofNullable(new Guide(
+                raw.title(),
+                raw.intro(),
+                raw.authors(),
+                raw.categories(),
+                publish ? raw.publicationDate() : null,
+                raw.minimumJavaVersion(),
+                raw.maximumJavaVersion(),
+                raw.cloud(),
+                raw.skipGradleTests(),
+                raw.skipMavenTests(),
+                publish ? dir.getName() + ".adoc" : null,
+                raw.languages() != null ? raw.languages() : List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN),
+                raw.tags(),
+                raw.buildTools() != null ? raw.buildTools() : List.of(BuildTool.GRADLE, BuildTool.MAVEN),
+                raw.testFramework(),
+                raw.zipIncludes() != null ? raw.zipIncludes() : new ArrayList<>(),
+                dir.getName(),
+                publish,
+                raw.base(),
+                raw.env() != null ? raw.env() : new HashMap<>(),
+                apps
+        ));
+    }
 
     public static List<String> getTags(Guide guide) {
         Set<String> tagsList = new HashSet<>();
@@ -77,6 +176,20 @@ public final class GuideUtils {
             return mergeLists(app.features(),app.groovyFeatures());
         }
         return app.features();
+    }
+
+    public static boolean shouldSkip(Guide guide, BuildTool buildTool) {
+        if (BuildTool.valuesGradle().contains(buildTool)) {
+            return guide.skipGradleTests();
+        }
+        if (buildTool == BuildTool.MAVEN) {
+            return guide.skipMavenTests();
+        }
+        return false;
+    }
+
+    public static Set<String> getFrameworks(Guide guide){
+        return guide.apps().stream().map(it -> it.framework()).collect(Collectors.toSet());
     }
 
     public static Guide merge(Guide base, Guide guide) {
@@ -145,6 +258,7 @@ public final class GuideUtils {
                     mergeLists(guideApp.groovyFeatures(), baseApp.groovyFeatures()),
                     guideApp.testFramework(),
                     guideApp.excludeTest(),
+                    guideApp.excludeSource(),
                     baseApp.validateLicense()
             );
             merged.add(mergedApp);
@@ -186,13 +300,28 @@ public final class GuideUtils {
         }
     }
 
-    static boolean shouldSkip(Guide guide, BuildTool buildTool) {
-        if (BuildTool.valuesGradle().contains(buildTool)) {
-            return guide.skipGradleTests();
+    static void mergeMetadataList(List<Guide> metadatas) {
+        Map<String, Guide> metadatasByDirectory = new TreeMap<>();
+        for (Guide metadata : metadatas) {
+            metadatasByDirectory.put(metadata.slug(), metadata);
         }
-        if (buildTool == BuildTool.MAVEN) {
-            return guide.skipMavenTests();
+
+        mergeMetadataMap(metadatasByDirectory);
+
+        metadatas.clear();
+        metadatas.addAll(metadatasByDirectory.values());
+    }
+
+    private static void mergeMetadataMap(Map<String, Guide> metadatasByDirectory) {
+        List<String> dirs = new ArrayList<>(metadatasByDirectory.keySet());
+
+        for (String dir : dirs) {
+            Guide metadata = metadatasByDirectory.get(dir);
+            if (metadata.base() != null) {
+                Guide base = metadatasByDirectory.get(metadata.base());
+                Guide merged = GuideUtils.merge(base, metadata);
+                metadatasByDirectory.put(dir, merged);
+            }
         }
-        return false;
     }
 }
