@@ -22,7 +22,7 @@ public class GuidesFeed {
                 .title("Micronaut Guides")
                 .homePageUrl(GUIDES_URL + "/latest/")
                 .feedUrl(GUIDES_URL + "/latest/" + JSON_FEED_FILENAME);
-        for (Guide metadata : metadatas ) {
+        for (Guide metadata : metadatas) {
             jsonFeedBuilder.item(jsonFeedItem(metadata));
         }
         JsonFeed jsonFeed = jsonFeedBuilder.build();
