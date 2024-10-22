@@ -5,26 +5,11 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.core.order.OrderUtil
 import io.micronaut.core.order.Ordered
-import io.micronaut.guides.core.Cloud
-import io.micronaut.guides.core.DefaultJsonFeedGenerator
-import io.micronaut.guides.core.DefaultJsonSchemaProvider
-import io.micronaut.guides.core.Guide
-import io.micronaut.guides.core.GuideUtils
-import io.micronaut.guides.core.JsonFeedConfiguration
-import io.micronaut.guides.core.JsonFeedConfigurationProperties
-import io.micronaut.guides.core.JsonFeedGenerator
-import io.micronaut.guides.core.JsonSchemaProvider
+import io.micronaut.guides.core.*
 import io.micronaut.json.JsonMapper
-import io.micronaut.rss.jsonfeed.JsonFeed
-import io.micronaut.rss.jsonfeed.JsonFeedAuthor
-import io.micronaut.rss.jsonfeed.JsonFeedItem
-import io.micronaut.rss.language.RssLanguage
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
-import java.time.LocalTime
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import java.util.stream.Collectors
@@ -37,7 +22,6 @@ class IndexGenerator {
     private static final String DEFAULT_INTRO = "Step-by-step tutorials to learn the Micronaut framework"
     private static final String DEFAULT_TITLE = "Micronaut Guides"
     private static final String GUIDES_URL = "https://guides.micronaut.io"
-    private static final String JSON_FEED_FILENAME = "feed.json"
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
@@ -72,13 +56,17 @@ class IndexGenerator {
 
         //TODO. We should have an application context and get it from it.
         JsonMapper jsonMapper = JsonMapper.createDefault();
-        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
-        JsonFeedConfiguration jsonFeedConfiguration = new JsonFeedConfigurationProperties();
-        JsonFeedGenerator jsonFeedGenerator = new DefaultJsonFeedGenerator(jsonFeedConfiguration, jsonMapper);
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider()
         List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
                 .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
-        save(distDir, jsonFeedGenerator.jsonFeedString(metadatas), JSON_FEED_FILENAME)
+        GuidesConfiguration guidesConfiguration = new GuidesConfigurationProperties()
+        JsonFeedConfiguration jsonFeedConfiguration = new JsonFeedConfigurationProperties()
+        JsonFeedGenerator jsonFeedGenerator = new DefaultJsonFeedGenerator(guidesConfiguration, jsonFeedConfiguration, jsonMapper)
+        save(distDir, jsonFeedGenerator.jsonFeedString(metadatas), jsonFeedConfiguration.getFilename())
+        RssFeedGenerator rssFeedGenerator = new DefaultRssFeedGenerator(guidesConfiguration)
+        RssFeedConfiguration rssFeedConfiguration = new RssFeedConfigurationProperties()
+        save(distDir, rssFeedGenerator.rssFeed(metadatas), rssFeedConfiguration.getFilename())
     }
 
     static void generateGuidesIndex(File template, File distDir, List<Guide> metadatas, String indexgrid) {

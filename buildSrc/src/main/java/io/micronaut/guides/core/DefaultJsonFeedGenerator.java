@@ -16,10 +16,13 @@ import java.util.List;
 
 @Singleton
 public class DefaultJsonFeedGenerator implements JsonFeedGenerator {
+    private final GuidesConfiguration guidesConfiguration;
     private final JsonFeedConfiguration jsonFeedConfiguration;
     private final JsonMapper jsonMapper;
-    public DefaultJsonFeedGenerator(JsonFeedConfiguration jsonFeedConfiguration,
+    public DefaultJsonFeedGenerator(GuidesConfiguration guidesConfiguration,
+                                    JsonFeedConfiguration jsonFeedConfiguration,
                                     JsonMapper jsonMapper) {
+        this.guidesConfiguration = guidesConfiguration;
         this.jsonFeedConfiguration = jsonFeedConfiguration;
         this.jsonMapper = jsonMapper;
     }
@@ -42,8 +45,8 @@ public class DefaultJsonFeedGenerator implements JsonFeedGenerator {
     private JsonFeed.Builder jsonFeedBuilder() {
         return JsonFeed.builder()
                 .version(JsonFeed.VERSION_JSON_FEED_1_1)
-                .title(jsonFeedConfiguration.getTitle())
-                .homePageUrl(jsonFeedConfiguration.getHomePageUrl())
+                .title(guidesConfiguration.getTitle())
+                .homePageUrl(guidesConfiguration.getHomePageUrl())
                 .feedUrl(jsonFeedConfiguration.getFeedUrl());
     }
 
@@ -54,7 +57,7 @@ public class DefaultJsonFeedGenerator implements JsonFeedGenerator {
                 .contentText(metadata.intro())
                 .language(RssLanguage.LANG_ENGLISH)
                 .datePublished(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
-                .url(jsonFeedConfiguration.getHomePageUrl() +metadata.slug());
+                .url(guidesConfiguration.getHomePageUrl() +metadata.slug());
         for (String author: metadata.authors()) {
             jsonFeedItemBuilder.author(JsonFeedAuthor.builder().name(author).build());
         }
