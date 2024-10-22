@@ -5,23 +5,11 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import io.micronaut.core.order.OrderUtil
 import io.micronaut.core.order.Ordered
-import io.micronaut.guides.core.Cloud
-import io.micronaut.guides.core.DefaultJsonSchemaProvider
-import io.micronaut.guides.core.Guide
-import io.micronaut.guides.core.GuideUtils
-import io.micronaut.guides.core.GuidesFeed
-import io.micronaut.guides.core.JsonSchemaProvider
+import io.micronaut.guides.core.*
 import io.micronaut.json.JsonMapper
-import io.micronaut.rss.jsonfeed.JsonFeed
-import io.micronaut.rss.jsonfeed.JsonFeedAuthor
-import io.micronaut.rss.jsonfeed.JsonFeedItem
-import io.micronaut.rss.language.RssLanguage
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
-import java.time.LocalTime
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import java.util.stream.Collectors
@@ -70,10 +58,12 @@ class IndexGenerator {
         //TODO. We should have an application context and get it from it.
         JsonMapper jsonMapper = JsonMapper.createDefault();
         JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        JsonFeedConfiguration jsonFeedConfiguration = new JsonFeedConfigurationProperties();
+        JsonFeedGenerator jsonFeedGenerator = new DefaultJsonFeedGenerator(jsonFeedConfiguration, jsonMapper);
         List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
                 .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
-        save(distDir, GuidesFeed.jsonFeed(metadatas), JSON_FEED_FILENAME)
+        save(distDir, jsonFeedGenerator.jsonFeedString(metadatas), JSON_FEED_FILENAME)
     }
 
     static void generateGuidesIndex(File template, File distDir, List<Guide> metadatas, String indexgrid) {
