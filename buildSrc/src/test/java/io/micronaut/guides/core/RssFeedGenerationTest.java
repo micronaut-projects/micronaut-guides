@@ -16,12 +16,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest(startApplication = false)
-public class GuidesFeedTest {
+class RssFeedGenerationTest {
     @Inject
     JsonMapper jsonMapper;
 
     @Inject
     JsonSchemaProvider jsonSchemaProvider;
+
+    @Inject
+    RssFeedGenerator rssFeedGenerator;
 
     private List<Guide> guides;
 
@@ -29,51 +32,12 @@ public class GuidesFeedTest {
     public void setup() throws Exception {
         File file = new File("src/test/resources/guides");
         this.guides = GuideUtils.parseGuidesMetadata(file,"metadata.json", jsonSchemaProvider.getSchema(), jsonMapper)
-                .stream().filter( it -> it.publish()).toList();
+                .stream().filter(Guide::publish).toList();
     }
 
     @Test
-    public void testJsonFeed() throws IOException, JSONException {
-        String feed = GuidesFeed.jsonFeed(guides);
-        String expected = """
-                {
-                  "version" : "https://jsonfeed.org/version/1.1",
-                  "title" : "Micronaut Guides",
-                  "home_page_url" : "https://guides.micronaut.io/latest/",
-                  "feed_url" : "https://guides.micronaut.io/latest/feed.json",
-                  "items" : [ {
-                    "id" : "child",
-                    "url" : "https://guides.micronaut.io/latest/child",
-                    "title" : "Connect a Micronaut Data JDBC Application to Azure Database for MySQL",
-                    "content_text" : "Learn how to connect a Micronaut Data JDBC application to a Microsoft Azure Database for MySQL",
-                    "date_published" : "2022-02-17T00:00:00Z",
-                    "authors" : [ {
-                      "name" : "Graeme Rocher",
-                      "empty" : false
-                    } ],
-                    "tags" : [ "cloud", "database", "Azure", "flyway", "jdbc", "mysql", "micronaut-data", "data-jdbc" ],
-                    "language" : "LANG_ENGLISH"
-                  }, {
-                    "id" : "test",
-                    "url" : "https://guides.micronaut.io/latest/test",
-                    "title" : "1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API",
-                    "content_text" : "This guide compares how to test serialization and deserialization with Micronaut Framework and Spring Boot.",
-                    "date_published" : "2024-04-24T00:00:00Z",
-                    "authors" : [ {
-                      "name" : "Sergio del Amo",
-                      "empty" : false
-                    } ],
-                    "tags" : [ "spring-boot-starter-web", "jackson-databind", "spring-boot", "assertj", "boot-to-micronaut-building-a-rest-api", "json-path" ],
-                    "language" : "LANG_ENGLISH"
-                  } ]
-                }
-                """;
-        JSONAssert.assertEquals(expected, feed, JSONCompareMode.LENIENT);
-    }
-
-    @Test
-    public void testRssFeed() throws IOException {
-        String feed = GuidesFeed.rssFeed(guides);
+    void testRssFeed() {
+        String feed = rssFeedGenerator.rssFeed(guides);
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" version=\"2.0\"><channel><title>Micronaut Guides</title><link>https://guides.micronaut.io/latest/</link><description>RSS feed for Micronaut Guides</description><language>en</language><item><title>Connect a Micronaut Data JDBC Application to Azure Database for MySQL</title><link>https://guides.micronaut.io/latest/child</link><description>Learn how to connect a Micronaut Data JDBC application to a Microsoft Azure Database for MySQL</description><author>Graeme Rocher</author><category>cloud</category><category>database</category><category>Azure</category><category>flyway</category><category>jdbc</category><category>mysql</category><category>micronaut-data</category><category>data-jdbc</category><guid>child</guid><pubDate>Thu, 17 Feb 2022 00:00:00 Z</pubDate></item><item><title>1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API</title><link>https://guides.micronaut.io/latest/test</link><description>This guide compares how to test serialization and deserialization with Micronaut Framework and Spring Boot.</description><author>Sergio del Amo</author><category>spring-boot-starter-web</category><category>jackson-databind</category><category>spring-boot</category><category>assertj</category><category>boot-to-micronaut-building-a-rest-api</category><category>json-path</category><guid>test</guid><pubDate>Wed, 24 Apr 2024 00:00:00 Z</pubDate></item></channel></rss>";
         assertEquals(expected, feed);
     }

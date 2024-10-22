@@ -22,7 +22,6 @@ class IndexGenerator {
     private static final String DEFAULT_INTRO = "Step-by-step tutorials to learn the Micronaut framework"
     private static final String DEFAULT_TITLE = "Micronaut Guides"
     private static final String GUIDES_URL = "https://guides.micronaut.io"
-    private static final String JSON_FEED_FILENAME = "feed.json"
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
@@ -57,13 +56,17 @@ class IndexGenerator {
 
         //TODO. We should have an application context and get it from it.
         JsonMapper jsonMapper = JsonMapper.createDefault();
-        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
-        JsonFeedConfiguration jsonFeedConfiguration = new JsonFeedConfigurationProperties();
-        JsonFeedGenerator jsonFeedGenerator = new DefaultJsonFeedGenerator(jsonFeedConfiguration, jsonMapper);
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider()
         List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
                 .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
-        save(distDir, jsonFeedGenerator.jsonFeedString(metadatas), JSON_FEED_FILENAME)
+        GuidesConfiguration guidesConfiguration = new GuidesConfigurationProperties()
+        JsonFeedConfiguration jsonFeedConfiguration = new JsonFeedConfigurationProperties()
+        JsonFeedGenerator jsonFeedGenerator = new DefaultJsonFeedGenerator(guidesConfiguration, jsonFeedConfiguration, jsonMapper)
+        save(distDir, jsonFeedGenerator.jsonFeedString(metadatas), jsonFeedConfiguration.getFilename())
+        RssFeedGenerator rssFeedGenerator = new DefaultRssFeedGenerator(guidesConfiguration)
+        RssFeedConfiguration rssFeedConfiguration = new RssFeedConfigurationProperties()
+        save(distDir, rssFeedGenerator.rssFeed(metadatas), rssFeedConfiguration.getFilename())
     }
 
     static void generateGuidesIndex(File template, File distDir, List<Guide> metadatas, String indexgrid) {
