@@ -10,6 +10,7 @@ import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.core.App
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.GuidesOption
 import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.json.JsonMapper
 import io.micronaut.starter.api.TestFramework

@@ -8,6 +8,28 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     public static final String GUIDES_URL = "https://guides.micronaut.io/latest/";
     private String title = "Micronaut Guides";
     private String homePageUrl = GUIDES_URL;
+    private static final String DEFAULT_LICENSEHEADER = "classpath:LICENSEHEADER";
+    private static final String DEFAULT_PACKAGE_NAME = "example.micronaut";
+    private String licensePath = DEFAULT_LICENSEHEADER;
+    private String packageName = DEFAULT_PACKAGE_NAME;
+
+    @Override
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
+
+    @Override
+    public String getLicensePath() {
+        return licensePath;
+    }
+
+    public void setLicensePath(String licensePath) {
+        this.licensePath = licensePath;
+    }
 
     @Override
     public String getHomePageUrl() {

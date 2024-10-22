@@ -5,6 +5,7 @@ import io.micronaut.core.util.CollectionUtils
 import io.micronaut.guides.core.DefaultJsonSchemaProvider
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.GuidesOption
 import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
