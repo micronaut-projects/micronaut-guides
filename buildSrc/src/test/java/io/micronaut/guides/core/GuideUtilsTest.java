@@ -7,7 +7,6 @@ import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.gradle.api.file.Directory;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -190,7 +189,7 @@ class GuideUtilsTest {
         assertTrue(guide.env().isEmpty());
         List<String> tags = guide.tags();
         Collections.sort(tags);
-        assertEquals(List.of("Azure","cloud", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
+        assertEquals(List.of("Azure", "cloud", "data-jdbc", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
         List<App> apps = guide.apps();
         assertNotNull(apps);
         assertEquals(1, apps.size());

@@ -91,7 +91,7 @@ public final class GuideUtils {
             ));
         }
 
-        return Optional.ofNullable(new Guide(
+        return Optional.of(new Guide(
                 raw.title(),
                 raw.intro(),
                 raw.authors(),
@@ -104,7 +104,7 @@ public final class GuideUtils {
                 raw.skipMavenTests(),
                 publish ? dir.getName() + ".adoc" : null,
                 raw.languages() != null ? raw.languages() : List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN),
-                raw.tags(),
+                raw.tags() != null ? raw.tags() : Collections.emptyList(),
                 raw.buildTools() != null ? raw.buildTools() : List.of(BuildTool.GRADLE, BuildTool.MAVEN),
                 raw.testFramework(),
                 raw.zipIncludes() != null ? raw.zipIncludes() : new ArrayList<>(),
@@ -206,7 +206,7 @@ public final class GuideUtils {
                 base.skipMavenTests() || guide.skipMavenTests(),
                 guide.asciidoctor(),
                 guide.languages() == null ? base.languages() : guide.languages(),
-                mergeLists(base.tags(), guide.tags()),
+                mergeLists(GuideUtils.getTags(base), GuideUtils.getTags(guide)),
                 guide.buildTools() == null ? base.buildTools() : guide.buildTools(),
                 guide.testFramework() == null ? base.testFramework() : guide.testFramework(),
                 guide.zipIncludes(),

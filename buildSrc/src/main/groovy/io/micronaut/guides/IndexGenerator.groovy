@@ -6,9 +6,13 @@ import groovy.transform.CompileStatic
 import io.micronaut.core.order.OrderUtil
 import io.micronaut.core.order.Ordered
 import io.micronaut.guides.core.Cloud
+import io.micronaut.guides.core.DefaultJsonFeedGenerator
 import io.micronaut.guides.core.DefaultJsonSchemaProvider
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.JsonFeedConfiguration
+import io.micronaut.guides.core.JsonFeedConfigurationProperties
+import io.micronaut.guides.core.JsonFeedGenerator
 import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.json.JsonMapper
 import io.micronaut.rss.jsonfeed.JsonFeed
@@ -69,41 +73,12 @@ class IndexGenerator {
         //TODO. We should have an application context and get it from it.
         JsonMapper jsonMapper = JsonMapper.createDefault();
         JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        JsonFeedConfiguration jsonFeedConfiguration = new JsonFeedConfigurationProperties();
+        JsonFeedGenerator jsonFeedGenerator = new DefaultJsonFeedGenerator(jsonFeedConfiguration, jsonMapper);
         List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
                 .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
-        save(distDir, jsonFeed(metadatas), JSON_FEED_FILENAME)
-    }
-
-    static String jsonFeed(List<Guide> metadatas) {
-        JsonFeed.Builder jsonFeedBuilder = JsonFeed.builder()
-                .version("https://jsonfeed.org/version/1.1")
-                .title("Micronaut Guides")
-                .homePageUrl(GUIDES_URL + "/latest/")
-                .feedUrl(GUIDES_URL + "/latest/" + JSON_FEED_FILENAME)
-        for (Guide metadata : metadatas ) {
-            jsonFeedBuilder.item(jsonFeedItem(metadata))
-        }
-        JsonFeed jsonFeed = jsonFeedBuilder.build()
-        JsonMapper jsonMapper = JsonMapper.createDefault()
-        jsonMapper.writeValueAsString(jsonFeed)
-    }
-
-    static JsonFeedItem jsonFeedItem(Guide metadata) {
-        JsonFeedItem.Builder jsonFeedItemBuilder = JsonFeedItem.builder()
-                .id(metadata.slug())
-                .title(metadata.title())
-                .contentText(metadata.intro())
-                .language(RssLanguage.LANG_ENGLISH)
-                .datePublished(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
-                .url("https://guides.micronaut.io/latest/${metadata.slug()}")
-        for (String author: metadata.authors()) {
-            jsonFeedItemBuilder.author(JsonFeedAuthor.builder().name(author).build())
-        }
-        for (String t : metadata.tags()) {
-            jsonFeedItemBuilder.tag(t)
-        }
-        jsonFeedItemBuilder.build()
+        save(distDir, jsonFeedGenerator.jsonFeedString(metadatas), JSON_FEED_FILENAME)
     }
 
     static void generateGuidesIndex(File template, File distDir, List<Guide> metadatas, String indexgrid) {
@@ -113,7 +88,7 @@ class IndexGenerator {
         Collection<Tag> tags = collectTags(metadatas)
         for (Tag tag :  tags) {
             List<Guide> tagMetadatas = metadatas.stream()
-                    .filter(m -> (m.tags() ?: []).contains(tag.slug) )
+                    .filter(m -> (GuideUtils.getTags(m) ?: []).contains(tag.slug) )
                     .sorted(GUIDE_METADATA_COMPARATOR)
                     .collect(Collectors.toList())
 
@@ -339,11 +314,11 @@ class IndexGenerator {
                 index += "<div class='guide-date'>${metadata.publicationDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}</div>"
             }
             index += "<div class='guide-intro'>${metadata.intro()}</div>"
-            if (metadata.tags()?.size() > 0) {
+            if (GuideUtils.getTags(metadata)?.size() > 0) {
                 index += "<div class='guide-tag-list'>"
                 index += "<span class='guide-tag-title'>Tags: </span>"
-                metadata.tags().collect { new Tag(title: it) }.eachWithIndex { tag, i ->
-                    boolean isNotLast = i != metadata.tags().size() - 1
+                GuideUtils.getTags(metadata).collect { new Tag(title: it) }.eachWithIndex { tag, i ->
+                    boolean isNotLast = i != GuideUtils.getTags(metadata).size() - 1
                     index += "<span class='guide-tag'><a href='./tag-${tag.slug.toLowerCase()}.html'>${tag.title}</a></span>"
                     if (isNotLast) {
                         index += "<span class='guide-split'>, </span>"
@@ -593,7 +568,7 @@ class IndexGenerator {
     @CompileDynamic
     private static List<String> generateTags(Guide guide) {
         [
-            guide.tags ?: [] +
+            GuideUtils.getTags(guide) ?: [] +
             guide.languages*.toString() +
             guide.buildTools*.toString() +
             guide.apps.collect { GuideUtils.getAppFeatures(it,Language.DEFAULT_OPTION) }.flatten().unique()
