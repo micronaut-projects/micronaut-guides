@@ -35,7 +35,7 @@ public class SourceMacroSubstitution implements MacroSubstitution {
         lines.add("." + normalizedSourcePath);
         lines.add("----");
 
-        if (tags != null && !tags.isEmpty()) {
+        if (!tags.isEmpty()) {
             for (String tag : tags) {
                 String attrs = tag;
                 if (StringUtils.isNotEmpty(indent)) {
