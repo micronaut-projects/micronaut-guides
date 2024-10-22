@@ -13,7 +13,7 @@ public final class MacroUtils {
 
     @NonNull
     public static String extractName(@NonNull String line, @NonNull String macro) {
-        return line.substring(macro.length()+1, line.indexOf('['));
+        return line.substring(macro.length() + 1, line.indexOf('['));
     }
 
     @NonNull
