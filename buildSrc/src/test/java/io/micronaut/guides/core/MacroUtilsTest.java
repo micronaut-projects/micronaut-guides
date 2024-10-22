@@ -1,15 +1,32 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
+@MicronautTest(startApplication = false)
 class MacroUtilsTest {
 
-    GuidesConfiguration guidesConfiguration = new GuidesConfigurationProperties();
+    @Inject
+    ResourceLoader resourceLoader;
+
+    GuidesConfiguration guidesConfiguration;
+    LicenseLoader licenseLoader;
+
+    @BeforeEach
+    void setUp(){
+        guidesConfiguration = new GuidesConfigurationProperties();
+        licenseLoader = new DefaultLicenseLoader(guidesConfiguration,resourceLoader);
+    }
 
     @Test
     void testExtractName() {
@@ -59,5 +76,45 @@ class MacroUtilsTest {
         String line = "source:Application[attribute=value]";
         String result = MacroUtils.extractFromParametersLine(line, "attribute");
         assertEquals("value", result);
+    }
+
+    @Test
+    void testGetSourceDir(){
+        GuidesOption option = new GuidesOption(BuildTool.GRADLE,Language.JAVA, TestFramework.JUNIT);
+        String result = MacroUtils.getSourceDir("slug", option);
+        assertEquals("slug-gradle-java", result);
+    }
+
+    @Test
+    void testAddIncludesWithTags() {
+        List<String> lines = new ArrayList<>();
+        String slug = "exampleSlug";
+        String sourceDir = "exampleSourceDir";
+        String sourcePath = "exampleSourcePath";
+        String indent = "indent=4";
+        List<String> tags = List.of("tag=tag1", "tag=tag2");
+
+        MacroUtils.addIncludes(lines, slug, sourceDir, sourcePath, licenseLoader, indent, tags);
+
+        assertEquals(3, lines.size());
+        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[tag=tag1,indent=4]\n", lines.get(0));
+        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[tag=tag2,indent=4]\n", lines.get(1));
+        assertEquals("----\n", lines.get(2));
+    }
+
+    @Test
+    void testAddIncludesWithoutTags() {
+        List<String> lines = new ArrayList<>();
+        String slug = "exampleSlug";
+        String sourceDir = "exampleSourceDir";
+        String sourcePath = "exampleSourcePath";
+        String indent = "indent=4";
+        List<String> tags = List.of();
+
+        MacroUtils.addIncludes(lines, slug, sourceDir, sourcePath, licenseLoader, indent, tags);
+
+        assertEquals(2, lines.size());
+        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[lines=16..-1;indent=4]", lines.get(0));
+        assertEquals("----\n", lines.get(1));
     }
 }

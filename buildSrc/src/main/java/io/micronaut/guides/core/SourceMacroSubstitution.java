@@ -1,13 +1,11 @@
 package io.micronaut.guides.core;
 
-import io.micronaut.core.util.StringUtils;
 import jakarta.inject.Singleton;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.micronaut.guides.core.MacroUtils.*;
 
@@ -24,7 +22,7 @@ public class SourceMacroSubstitution implements MacroSubstitution {
 
     @Override
     public String substitute(String str, String slug, GuidesOption option) {
-        String sourceDir = slug + "-" + option.getBuildTool() + "-" + option.getLanguage();;
+        String sourceDir = getSourceDir(slug, option);
         String name = extractName(str, "source");
         String appName = extractAppName(str);
 
@@ -43,24 +41,8 @@ public class SourceMacroSubstitution implements MacroSubstitution {
         lines.add("." + normalizedSourcePath);
         lines.add("----");
 
-        if (!tags.isEmpty()) {
-            for (String tag : tags) {
-                String attrs = tag;
-                if (StringUtils.isNotEmpty(indent)) {
-                    attrs += "," + indent;
-                }
-                lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + attrs + "]\n");
-            }
-        } else {
-            List<String> attributes = new ArrayList<>();
-            attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
-            if (StringUtils.isNotEmpty(indent)) {
+        addIncludes(lines, slug, sourceDir, normalizedSourcePath, licenseLoader, indent, tags);
 
-                attributes.add(indent);
-            }
-            lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + String.join(";", attributes) + "]");
-        }
-        lines.add("----\n");
         return String.join("\n", lines);
     }
 }

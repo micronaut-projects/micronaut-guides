@@ -3,12 +3,39 @@ package io.micronaut.guides.core;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public final class MacroUtils {
     private MacroUtils() {
+    }
+
+    @NonNull
+    public static String getSourceDir(@NonNull String slug, GuidesOption option) {
+        return slug + "-" + option.getBuildTool() + "-" + option.getLanguage();
+    }
+
+    @NonNull
+    public static void addIncludes(List<String> lines, String slug, String sourceDir, String sourcePath, LicenseLoader licenseLoader, String indent, List<String> tags) {
+        if (!tags.isEmpty()) {
+            for (String tag : tags) {
+                String attrs = tag;
+                if (StringUtils.isNotEmpty(indent)) {
+                    attrs += "," + indent;
+                }
+                lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + attrs + "]\n");
+            }
+        } else {
+            List<String> attributes = new ArrayList<>();
+            attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
+            if (StringUtils.isNotEmpty(indent)) {
+                attributes.add(indent);
+            }
+            lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + String.join(";", attributes) + "]");
+        }
+        lines.add("----\n");
     }
 
     @NonNull
