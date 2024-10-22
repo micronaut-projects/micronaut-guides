@@ -9,6 +9,8 @@ import java.util.List;
 
 class MacroUtilsTest {
 
+    GuidesConfiguration guidesConfiguration = new GuidesConfigurationProperties();
+
     @Test
     void testExtractName() {
         String line = "source:Application[app=example]";
@@ -34,7 +36,7 @@ class MacroUtilsTest {
     @Test
     void testMainPath() {
         GuidesOption option = new GuidesOption(BuildTool.GRADLE,Language.JAVA, TestFramework.JUNIT);
-        String result = MacroUtils.mainPath("appName", "fileName", option);
+        String result = MacroUtils.mainPath(guidesConfiguration, "appName", "fileName", option);
         assertEquals("appName/src/main/java/example/micronaut/fileName.java", result);
     }
 

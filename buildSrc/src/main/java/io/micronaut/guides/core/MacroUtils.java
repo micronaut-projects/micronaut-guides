@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+public final class MacroUtils {
+    private MacroUtils() {
+    }
 
-public class MacroUtils {
     public static String extractName(String line, String macro) {
         return line.substring(macro.length()+1, line.indexOf('['));
     }
@@ -25,17 +27,19 @@ public class MacroUtils {
     }
 
     @NonNull
-    public static String mainPath(@NonNull String appName,
+    public static String mainPath(@NonNull GuidesConfiguration guidesConfiguration,
+                                  @NonNull String appName,
                            @NonNull String fileName, GuidesOption option) {
-        return pathByFolder(appName, fileName, "main", option);
+        return pathByFolder(guidesConfiguration, appName, fileName, "main", option);
     }
 
     @NonNull
-    private static String pathByFolder(@NonNull String appName,
+    private static String pathByFolder(@NonNull GuidesConfiguration guidesConfiguration,
+                                       @NonNull String appName,
                                        @NonNull String fileName,
                                        String folder, GuidesOption option) {
         String module = appName != "" ? appName + "/" : "";
-        return module+"src/"+folder+"/"+option.getLanguage().toString()+"/example/micronaut/"+fileName+"."+option.getLanguage().getExtension();
+        return module+"src/"+folder+"/"+option.getLanguage().toString()+"/" + guidesConfiguration.getPackageName().replaceAll("\\.", "/") + "/"+fileName+"."+option.getLanguage().getExtension();
     }
 
     public static String extractIndent(String line) {

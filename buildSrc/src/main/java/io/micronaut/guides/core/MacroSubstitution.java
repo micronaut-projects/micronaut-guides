@@ -1,5 +1,8 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.core.annotation.NonNull;
+
 public interface MacroSubstitution {
-    String substitute(String str, String slug, GuidesOption option);
+    @NonNull
+    String substitute(@NonNull String str, @NonNull String slug, @NonNull GuidesOption option);
 }
