@@ -51,9 +51,7 @@ public class SourceMacroSubstitution implements MacroSubstitution {
             }
             lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + String.join(";", attributes) + "]");
         }
-
         lines.add("----\n");
-
-        return lines.stream().collect(Collectors.joining("\n"));
+        return String.join("\n", lines);
     }
 }
