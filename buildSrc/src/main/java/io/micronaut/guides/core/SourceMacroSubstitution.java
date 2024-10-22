@@ -14,6 +14,12 @@ import static io.micronaut.guides.core.MacroUtils.*;
 @Singleton
 public class SourceMacroSubstitution implements MacroSubstitution {
 
+    private final LicenseLoader licenseLoader;
+
+    public SourceMacroSubstitution(LicenseLoader licenseLoader) {
+        this.licenseLoader = licenseLoader;
+    }
+
     @Override
     public String substitute(String str, String slug, GuidesOption option) {
         String sourceDir = slug + "-" + option.getBuildTool() + "-" + option.getLanguage();;
@@ -45,8 +51,9 @@ public class SourceMacroSubstitution implements MacroSubstitution {
             }
         } else {
             List<String> attributes = new ArrayList<>();
-            attributes.add("lines=" + MacroUtils.numberOfLinesInLicenseHeader() + "..-1");
+            attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
             if (StringUtils.isNotEmpty(indent)) {
+
                 attributes.add(indent);
             }
             lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + String.join(";", attributes) + "]");

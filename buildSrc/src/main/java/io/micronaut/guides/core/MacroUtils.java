@@ -1,17 +1,10 @@
 package io.micronaut.guides.core;
 
-import groovy.transform.Memoized;
 import io.micronaut.core.annotation.NonNull;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static io.micronaut.guides.core.GuidesConfigurationProperties.LICENSEHEADER;
 
 public class MacroUtils {
     public static String extractName(String line, String macro) {
@@ -48,19 +41,6 @@ public class MacroUtils {
     public static String extractIndent(String line) {
         String indentValue = extractFromParametersLine(line, "indent");
         return indentValue != "" ? "indent="+indentValue : "";
-    }
-
-    @Memoized
-    public static int numberOfLinesInLicenseHeader() {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        URL resource = classLoader.getResource(LICENSEHEADER);
-        int numberOfLines = 0;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.openStream()))) {
-            numberOfLines = (int) reader.lines().count() + 1;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return numberOfLines;
     }
 
     static String extractTagName(String line) {
