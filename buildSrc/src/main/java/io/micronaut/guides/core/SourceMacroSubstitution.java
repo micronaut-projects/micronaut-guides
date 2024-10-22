@@ -22,7 +22,7 @@ public class SourceMacroSubstitution implements MacroSubstitution {
 
         List<String> tagNames = extractTags(str);
         List<String> tags = (tagNames != null && !tagNames.isEmpty())
-                ? tagNames.stream().map(it -> "tag=" + it).collect(Collectors.toList())
+                ? tagNames.stream().map(it -> "tag=" + it).toList()
                 : Collections.emptyList();
 
         String indent = extractIndent(str);
