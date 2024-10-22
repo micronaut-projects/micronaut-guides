@@ -2,7 +2,6 @@ package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.starter.api.TestFramework;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -22,7 +21,13 @@ public final class MacroUtils {
     }
 
     @NonNull
-    public static List<String> addIncludes(GuidesOption option, String slug, String sourceDir, String sourcePath, LicenseLoader licenseLoader, String indent, List<String> tags) {
+    public static List<String> addIncludes(GuidesOption option,
+                                           @NonNull String slug,
+                                           @NonNull String sourcePath,
+                                           LicenseLoader licenseLoader,
+                                           String indent,
+                                           @NonNull List<String> tags) {
+        String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
         lines.add("[source,"+option.getLanguage().toString()+"]");
         String normalizedSourcePath = Paths.get(sourcePath).normalize().toString();

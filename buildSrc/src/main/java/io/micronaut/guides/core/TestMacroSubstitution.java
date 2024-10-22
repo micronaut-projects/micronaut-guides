@@ -20,7 +20,6 @@ public class TestMacroSubstitution implements MacroSubstitution{
 
     @Override
     public String substitute(String str, String slug, GuidesOption option) {
-        String sourceDir = getSourceDir(slug, option);
         String name = extractName(str, "test");
         String appName = extractAppName(str);
 
@@ -33,7 +32,7 @@ public class TestMacroSubstitution implements MacroSubstitution{
 
         String sourcePath = testPath(guidesConfiguration, appName, name, option);
 
-        List<String> lines = addIncludes(option, slug, sourceDir, sourcePath, licenseLoader, indent, tags);
+        List<String> lines = addIncludes(option, slug, sourcePath, licenseLoader, indent, tags);
 
         return String.join("\n", lines);
     }

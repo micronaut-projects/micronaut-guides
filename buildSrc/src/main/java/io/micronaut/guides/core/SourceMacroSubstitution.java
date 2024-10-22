@@ -2,8 +2,6 @@ package io.micronaut.guides.core;
 
 import jakarta.inject.Singleton;
 
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +20,6 @@ public class SourceMacroSubstitution implements MacroSubstitution {
 
     @Override
     public String substitute(String str, String slug, GuidesOption option) {
-        String sourceDir = getSourceDir(slug, option);
         String name = extractName(str, "source");
         String appName = extractAppName(str);
 
@@ -35,7 +32,7 @@ public class SourceMacroSubstitution implements MacroSubstitution {
 
         String sourcePath = mainPath(guidesConfiguration, appName, name, option);
 
-        List<String> lines = addIncludes(option, slug, sourceDir, sourcePath, licenseLoader, indent, tags);
+        List<String> lines = addIncludes(option, slug, sourcePath, licenseLoader, indent, tags);
 
         return String.join("\n", lines);
     }
