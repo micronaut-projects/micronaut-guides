@@ -9,6 +9,7 @@ import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.core.App
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.GuidesOption
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver

@@ -8,6 +8,7 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     public static final String GUIDES_URL = "https://guides.micronaut.io/latest/";
     private String title = "Micronaut Guides";
     private String homePageUrl = GUIDES_URL;
+    public static final String LICENSEHEADER = "LICENSEHEADER";
 
     @Override
     public String getHomePageUrl() {

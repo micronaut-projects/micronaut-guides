@@ -3,9 +3,9 @@ package io.micronaut.guides
 import io.micronaut.guides.core.DefaultJsonSchemaProvider
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.GuidesOption
 import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.json.JsonMapper
-import org.gradle.internal.impldep.com.google.api.client.json.Json
 
 import java.util.regex.Pattern
 
