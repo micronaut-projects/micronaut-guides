@@ -88,33 +88,41 @@ class MacroUtilsTest {
     @Test
     void testAddIncludesWithTags() {
         List<String> lines = new ArrayList<>();
+        GuidesOption option = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT);
         String slug = "exampleSlug";
         String sourceDir = "exampleSourceDir";
         String sourcePath = "exampleSourcePath";
         String indent = "indent=4";
         List<String> tags = List.of("tag=tag1", "tag=tag2");
 
-        MacroUtils.addIncludes(lines, slug, sourceDir, sourcePath, licenseLoader, indent, tags);
+        lines = MacroUtils.addIncludes(option, slug, sourceDir, sourcePath, licenseLoader, indent, tags);
 
-        assertEquals(3, lines.size());
-        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[tag=tag1,indent=4]\n", lines.get(0));
-        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[tag=tag2,indent=4]\n", lines.get(1));
-        assertEquals("----\n", lines.get(2));
+        assertEquals(6, lines.size());
+        assertEquals("[source,java]", lines.get(0));
+        assertEquals("." + sourcePath, lines.get(1));
+        assertEquals("----", lines.get(2));
+        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[tag=tag1,indent=4]\n", lines.get(3));
+        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[tag=tag2,indent=4]\n", lines.get(4));
+        assertEquals("----\n", lines.get(5));
     }
 
     @Test
     void testAddIncludesWithoutTags() {
         List<String> lines = new ArrayList<>();
+        GuidesOption option = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT);
         String slug = "exampleSlug";
         String sourceDir = "exampleSourceDir";
         String sourcePath = "exampleSourcePath";
         String indent = "indent=4";
         List<String> tags = List.of();
 
-        MacroUtils.addIncludes(lines, slug, sourceDir, sourcePath, licenseLoader, indent, tags);
+        lines = MacroUtils.addIncludes(option, slug, sourceDir, sourcePath, licenseLoader, indent, tags);
 
-        assertEquals(2, lines.size());
-        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[lines=16..-1;indent=4]", lines.get(0));
-        assertEquals("----\n", lines.get(1));
+        assertEquals(5, lines.size());
+        assertEquals("[source,java]", lines.get(0));
+        assertEquals("." + sourcePath, lines.get(1));
+        assertEquals("----", lines.get(2));
+        assertEquals("include::{sourceDir}/exampleSlug/exampleSourceDir/exampleSourcePath[lines=16..-1;indent=4]", lines.get(3));
+        assertEquals("----\n", lines.get(4));
     }
 }

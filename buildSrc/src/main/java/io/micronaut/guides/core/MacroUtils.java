@@ -2,11 +2,15 @@ package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.starter.api.TestFramework;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static io.micronaut.starter.api.TestFramework.SPOCK;
 
 public final class MacroUtils {
     private MacroUtils() {
@@ -18,7 +22,13 @@ public final class MacroUtils {
     }
 
     @NonNull
-    public static void addIncludes(List<String> lines, String slug, String sourceDir, String sourcePath, LicenseLoader licenseLoader, String indent, List<String> tags) {
+    public static List<String> addIncludes(GuidesOption option, String slug, String sourceDir, String sourcePath, LicenseLoader licenseLoader, String indent, List<String> tags) {
+        List<String> lines = new ArrayList<>();
+        lines.add("[source,"+option.getLanguage().toString()+"]");
+        String normalizedSourcePath = Paths.get(sourcePath).normalize().toString();
+        lines.add("." + normalizedSourcePath);
+        lines.add("----");
+
         if (!tags.isEmpty()) {
             for (String tag : tags) {
                 String attrs = tag;
@@ -36,6 +46,7 @@ public final class MacroUtils {
             lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + String.join(";", attributes) + "]");
         }
         lines.add("----\n");
+        return lines;
     }
 
     @NonNull
@@ -61,8 +72,24 @@ public final class MacroUtils {
     @NonNull
     public static String mainPath(@NonNull GuidesConfiguration guidesConfiguration,
                                   @NonNull String appName,
-                           @NonNull String fileName, GuidesOption option) {
+                                  @NonNull String fileName,
+                                  GuidesOption option) {
         return pathByFolder(guidesConfiguration, appName, fileName, "main", option);
+    }
+
+    @NonNull
+    static String testPath(@NonNull GuidesConfiguration guidesConfiguration,
+                           @NonNull String appName,
+                           @NonNull String name,
+                           GuidesOption option) {
+        String fileName = name;
+
+        if (name.endsWith("Test")) {
+            fileName = name.substring(0, name.indexOf("Test"));
+            fileName += option.getTestFramework() == SPOCK ? "Spec" : "Test";
+        }
+
+        return pathByFolder(guidesConfiguration, appName, fileName, "test", option);
     }
 
     @NonNull
