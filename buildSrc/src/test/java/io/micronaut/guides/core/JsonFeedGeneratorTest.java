@@ -13,10 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @MicronautTest(startApplication = false)
-public class GuidesFeedTest {
+public class JsonFeedGeneratorTest {
     @Inject
     JsonMapper jsonMapper;
 
@@ -24,6 +22,9 @@ public class GuidesFeedTest {
     JsonSchemaProvider jsonSchemaProvider;
 
     private List<Guide> guides;
+
+    @Inject
+    JsonFeedGenerator jsonFeedGenerator;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -34,7 +35,7 @@ public class GuidesFeedTest {
 
     @Test
     public void testJsonFeed() throws IOException, JSONException {
-        String feed = GuidesFeed.jsonFeed(guides);
+        String feed = jsonFeedGenerator.jsonFeedString(guides);
         String expected = """
                 {
                   "version" : "https://jsonfeed.org/version/1.1",
