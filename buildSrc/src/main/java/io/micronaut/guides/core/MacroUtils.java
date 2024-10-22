@@ -1,6 +1,8 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.StringUtils;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -9,17 +11,20 @@ public final class MacroUtils {
     private MacroUtils() {
     }
 
-    public static String extractName(String line, String macro) {
+    @NonNull
+    public static String extractName(@NonNull String line, @NonNull String macro) {
         return line.substring(macro.length()+1, line.indexOf('['));
     }
 
-    public static String extractAppName(String line) {
+    @NonNull
+    public static String extractAppName(@NonNull  String line) {
         return extractFromParametersLine(line, "app");
     }
 
-    public static List<String> extractTags(String line) {
+    @NonNull
+    public static List<String> extractTags(@NonNull  String line) {
         String attributeValue = extractFromParametersLine(line, "tags");
-        if (attributeValue != null && !attributeValue.isEmpty()) {
+        if (StringUtils.isNotEmpty(attributeValue)) {
             return Arrays.asList(attributeValue.split("\\|"));
         }
 
@@ -37,21 +42,25 @@ public final class MacroUtils {
     private static String pathByFolder(@NonNull GuidesConfiguration guidesConfiguration,
                                        @NonNull String appName,
                                        @NonNull String fileName,
-                                       String folder, GuidesOption option) {
-        String module = appName != "" ? appName + "/" : "";
-        return module+"src/"+folder+"/"+option.getLanguage().toString()+"/" + guidesConfiguration.getPackageName().replaceAll("\\.", "/") + "/"+fileName+"."+option.getLanguage().getExtension();
+                                       String folder,
+                                       GuidesOption option) {
+        String module = !appName.isEmpty() ? appName + "/" : "";
+        return module+"src/"+folder+"/"+option.getLanguage().toString()+"/" + guidesConfiguration.getPackageName().replace(".", "/") + "/"+fileName+"."+option.getLanguage().getExtension();
     }
 
-    public static String extractIndent(String line) {
+    @NonNull
+    public static String extractIndent(@NonNull String line) {
         String indentValue = extractFromParametersLine(line, "indent");
-        return indentValue != "" ? "indent="+indentValue : "";
+        return  !indentValue.isEmpty()  ? "indent="+indentValue : "";
     }
 
-    static String extractTagName(String line) {
+    @NonNull
+    static String extractTagName(@NonNull String line) {
         return extractFromParametersLine(line, "tag");
     }
 
-    static String extractFromParametersLine(String line, String attributeName) {
+    @NonNull
+    static String extractFromParametersLine(@NonNull String line, @NonNull String attributeName) {
         String[] attrs = line.substring(line.indexOf("[") + 1, line.indexOf("]")).split(",");
 
         return Arrays.stream(attrs)
