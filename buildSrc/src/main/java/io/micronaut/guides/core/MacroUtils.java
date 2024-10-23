@@ -39,7 +39,7 @@ public final class MacroUtils {
                                            LicenseLoader licenseLoader,
                                            @NonNull String extension,
                                            String indent,
-                                           @NonNull List<String> tags){
+                                           @NonNull List<String> tags) {
         String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
         lines.add("[source," + extension + "]");

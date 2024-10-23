@@ -16,7 +16,7 @@ class TestMacroSubstitutionTest {
     TestMacroSubstitution testMacroSubstitution;
 
     @Test
-    void testSubstitute(){
+    void testSubstitute() {
         String str = "test:HelloControllerTest[]";
         String resJava = testMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
@@ -48,7 +48,7 @@ class TestMacroSubstitutionTest {
     }
 
     @Test
-    void TestSubstituteWithApp(){
+    void TestSubstituteWithApp() {
         String str = "test:ApplicationTest[app=springboot]";
         String resJava = testMacroSubstitution.substitute(str, "spring-boot-to-micronaut-application-class", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
