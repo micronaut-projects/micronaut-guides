@@ -36,10 +36,11 @@ public final class MacroUtils {
     public static List<String> addIncludes(@NonNull GuidesOption option,
                                            @NonNull String slug,
                                            @NonNull String sourcePath,
-                                           LicenseLoader licenseLoader,
+                                           @NonNull LicenseLoader licenseLoader,
                                            @NonNull String extension,
                                            String indent,
-                                           @NonNull List<String> tags) {
+                                           @NonNull List<String> tags,
+                                           boolean includeLicenseOffset) {
         String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
         lines.add("[source," + extension + "]");
@@ -57,7 +58,7 @@ public final class MacroUtils {
             }
         } else {
             List<String> attributes = new ArrayList<>();
-            if (licenseLoader != null) {
+            if(includeLicenseOffset) {
                 attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
             }
             if (StringUtils.isNotEmpty(indent)) {
@@ -87,7 +88,7 @@ public final class MacroUtils {
                                            @NonNull LicenseLoader licenseLoader,
                                            String indent,
                                            @NonNull List<String> tags) {
-        return addIncludes(option, slug, sourcePath, licenseLoader, option.getLanguage().toString(), indent, tags);
+        return addIncludes(option, slug, sourcePath, licenseLoader, option.getLanguage().toString(), indent, tags, true);
     }
 
     @NonNull
