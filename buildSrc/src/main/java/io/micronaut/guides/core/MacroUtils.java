@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 
 import java.nio.file.Paths;
@@ -60,7 +61,7 @@ public final class MacroUtils {
         String appName = extractAppName(str);
 
         List<String> tagNames = extractTags(str);
-        List<String> tags = tagNames.isEmpty()
+        List<String> tags = CollectionUtils.isEmpty(tagNames)
                 ? Collections.emptyList()
                 : tagNames.stream().map(it -> "tag=" + it).toList();
 
