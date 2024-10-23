@@ -60,13 +60,13 @@ public final class MacroUtils {
         String appName = extractAppName(str);
 
         List<String> tagNames = extractTags(str);
-        List<String> tags = (!tagNames.isEmpty())
-                ? tagNames.stream().map(it -> "tag=" + it).toList()
-                : Collections.emptyList();
+        List<String> tags = tagNames.isEmpty()
+                ? Collections.emptyList()
+                : tagNames.stream().map(it -> "tag=" + it).toList();
 
         String sourceDir = getSourceDir(slug, option);
         String asciidoctorLang = resolveAsciidoctorLanguage(name);
-        String module = !appName.isEmpty() ? appName + "/" : "";
+        String module = appName.isEmpty() ? "" : appName + "/";
 
         List<String> lines = new ArrayList<>();
         String pathcallout = name.startsWith("../") ?
