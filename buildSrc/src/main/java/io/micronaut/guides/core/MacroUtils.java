@@ -29,7 +29,7 @@ public final class MacroUtils {
                                            @NonNull List<String> tags) {
         String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
-        lines.add("[source,"+option.getLanguage().toString()+"]");
+        lines.add("[source," + option.getLanguage().toString() + "]");
         String normalizedSourcePath = Paths.get(sourcePath).normalize().toString();
         lines.add("." + normalizedSourcePath);
         lines.add("----");
