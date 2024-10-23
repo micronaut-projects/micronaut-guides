@@ -15,7 +15,7 @@ public class RawTestMacroSubstitutionTest {
     private RawTestMacroSubstitution rawTestMacroSubstitution;
 
     @Test
-    void testSubstitute(){
+    void testSubstitute() {
         String str = "rawTest:HomePage[]";
         String resJava = rawTestMacroSubstitution.substitute(str, "micronaut-security-jwt-cookie", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
