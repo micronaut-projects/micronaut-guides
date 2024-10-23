@@ -8,19 +8,19 @@ import java.util.List;
 import static io.micronaut.guides.core.MacroUtils.*;
 
 @Singleton
-public class SourceMacroSubstitution implements MacroSubstitution {
+public class TestMacroSubstitution implements MacroSubstitution{
 
     private final GuidesConfiguration guidesConfiguration;
     private final LicenseLoader licenseLoader;
 
-    public SourceMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
+    public TestMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
         this.guidesConfiguration = guidesConfiguration;
         this.licenseLoader = licenseLoader;
     }
 
     @Override
     public String substitute(String str, String slug, GuidesOption option) {
-        String name = extractName(str, "source");
+        String name = extractName(str, "test");
         String appName = extractAppName(str);
 
         List<String> tagNames = extractTags(str);
@@ -30,7 +30,7 @@ public class SourceMacroSubstitution implements MacroSubstitution {
 
         String indent = extractIndent(str);
 
-        String sourcePath = mainPath(guidesConfiguration, appName, name, option);
+        String sourcePath = testPath(guidesConfiguration, appName, name, option);
 
         List<String> lines = addIncludes(option, slug, sourcePath, licenseLoader, indent, tags);
 
