@@ -20,16 +20,29 @@ public final class MacroUtils {
         return slug + "-" + option.getBuildTool() + "-" + option.getLanguage();
     }
 
+    /**
+     * Adds include directives to the list of lines for the given source path and tags.
+     *
+     * @param option        The {@link GuidesOption} containing the build tool and language.
+     * @param slug          The slug representing the guide, which will be used as root folder.
+     * @param sourcePath    The path to the source file from the guide's project root.
+     * @param licenseLoader The {@link LicenseLoader} to calculate the line offset. If null no line offset is added.
+     * @param extension     The file extension of the source file.
+     * @param indent        The indent value for the include directive. If empty no indent is added.
+     * @param tags          The list of tags for the include directive.
+     * @return A list of lines with include directives.
+     */
     @NonNull
     public static List<String> addIncludes(@NonNull GuidesOption option,
                                            @NonNull String slug,
                                            @NonNull String sourcePath,
-                                           @NonNull LicenseLoader licenseLoader,
+                                           LicenseLoader licenseLoader,
+                                           @NonNull String extension,
                                            String indent,
-                                           @NonNull List<String> tags) {
+                                           @NonNull List<String> tags){
         String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
-        lines.add("[source," + option.getLanguage().toString() + "]");
+        lines.add("[source," + extension + "]");
         String normalizedSourcePath = Paths.get(sourcePath).normalize().toString();
         lines.add("." + normalizedSourcePath);
         lines.add("----");
@@ -44,7 +57,9 @@ public final class MacroUtils {
             }
         } else {
             List<String> attributes = new ArrayList<>();
-            attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
+            if (licenseLoader != null) {
+                attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
+            }
             if (StringUtils.isNotEmpty(indent)) {
                 attributes.add(indent);
             }
@@ -52,6 +67,27 @@ public final class MacroUtils {
         }
         lines.add("----\n");
         return lines;
+    }
+
+    /**
+     * Adds include directives to the list of lines for the given source path and tags.
+     *
+     * @param option        The {@link GuidesOption} containing the build tool and language.
+     * @param slug          The slug representing the guide, which will be used as root folder.
+     * @param sourcePath    The path to the source file from the guide's project root.
+     * @param licenseLoader The {@link LicenseLoader} to calculate the line offset.
+     * @param indent        The indent value for the include directive. If empty no indent is added.
+     * @param tags          The list of tags for the include directive.
+     * @return A list of lines with include directives.
+     */
+    @NonNull
+    public static List<String> addIncludes(@NonNull GuidesOption option,
+                                           @NonNull String slug,
+                                           @NonNull String sourcePath,
+                                           @NonNull LicenseLoader licenseLoader,
+                                           String indent,
+                                           @NonNull List<String> tags) {
+        return addIncludes(option, slug, sourcePath, licenseLoader, option.getLanguage().toString(), indent, tags);
     }
 
     @NonNull
@@ -95,6 +131,17 @@ public final class MacroUtils {
         }
 
         return pathByFolder(guidesConfiguration, appName, fileName, "test", option);
+    }
+
+    @NonNull
+    static String rawTestPath(@NonNull GuidesConfiguration guidesConfiguration,
+                           @NonNull String appName,
+                           @NonNull String name,
+                           GuidesOption option) {
+        String module = !appName.isEmpty() ? appName + "/" : "";
+        String fileExtension = option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension();
+        String langTestFolder = option.getTestFramework().toTestFramework().getDefaultLanguage().getTestSrcDir();
+        return module+langTestFolder+"/"+guidesConfiguration.getPackageName().replace(".", "/")+"/"+name+"."+fileExtension;
     }
 
     @NonNull
