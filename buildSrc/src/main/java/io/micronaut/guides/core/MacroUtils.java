@@ -24,7 +24,7 @@ public final class MacroUtils {
     public static List<String> addIncludes(GuidesOption option,
                                            @NonNull String slug,
                                            @NonNull String sourcePath,
-                                           LicenseLoader licenseLoader,
+                                           @NonNull LicenseLoader licenseLoader,
                                            String indent,
                                            @NonNull List<String> tags) {
         String sourceDir = getSourceDir(slug, option);
