@@ -55,6 +55,40 @@ public final class MacroUtils {
     }
 
     @NonNull
+    public static List<String> addIncludesResources(@NonNull String str, @NonNull String slug, @NonNull GuidesOption option, @NonNull String resourceDir, @NonNull String macro) {
+        String name = extractName(str, macro);
+        String appName = extractAppName(str);
+
+        List<String> tagNames = extractTags(str);
+        List<String> tags = (!tagNames.isEmpty())
+                ? tagNames.stream().map(it -> "tag=" + it).toList()
+                : Collections.emptyList();
+
+        String sourceDir = getSourceDir(slug, option);
+        String asciidoctorLang = resolveAsciidoctorLanguage(name);
+        String module = !appName.isEmpty() ? appName + "/" : "";
+
+        List<String> lines = new ArrayList<>();
+        String pathcallout = name.startsWith("../") ?
+                "." + module + "src/" + resourceDir + "/" + name.substring("../".length()) :
+                "." + module + "src/" + resourceDir + "/resources/" + name;
+
+        lines.add("[source," + asciidoctorLang + "]");
+        lines.add(pathcallout);
+        lines.add("----");
+
+        if (!tags.isEmpty()) {
+            for (String tag : tags) {
+                lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + module + "src/" + resourceDir + "/resources/" + name + "[" + tag + "]\n");
+            }
+        } else {
+            lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + module + "src/" + resourceDir + "/resources/" + name + "[]");
+        }
+        lines.add("----\n");
+        return lines;
+    }
+
+    @NonNull
     public static String extractName(@NonNull String line, @NonNull String macro) {
         return line.substring(macro.length() + 1, line.indexOf('['));
     }
@@ -128,5 +162,18 @@ public final class MacroUtils {
                 .map(parts -> parts[1])
                 .findFirst()
                 .orElse("");
+    }
+
+    @NonNull
+    static String resolveAsciidoctorLanguage(@NonNull String fileName) {
+        String extension = fileName.indexOf(".") > 0 ?
+                fileName.substring(fileName.lastIndexOf(".") + 1) : "";
+
+        return switch (extension.toLowerCase()) {
+            case "yml", "yaml" -> "yaml";
+            case "html", "vm", "hbs" -> "html";
+            case "xml" -> "xml";
+            default -> extension.toLowerCase();
+        };
     }
 }
