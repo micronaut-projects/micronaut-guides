@@ -1,5 +1,6 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.core.util.CollectionUtils;
 import jakarta.inject.Singleton;
 
 import java.util.Collections;
@@ -24,9 +25,9 @@ public class SourceMacroSubstitution implements MacroSubstitution {
         String appName = extractAppName(str);
 
         List<String> tagNames = extractTags(str);
-        List<String> tags = (tagNames != null && !tagNames.isEmpty())
-                ? tagNames.stream().map(it -> "tag=" + it).toList()
-                : Collections.emptyList();
+        List<String> tags = CollectionUtils.isEmpty(tagNames)
+                ? Collections.emptyList()
+                : tagNames.stream().map(it -> "tag=" + it).toList();
 
         String indent = extractIndent(str);
 

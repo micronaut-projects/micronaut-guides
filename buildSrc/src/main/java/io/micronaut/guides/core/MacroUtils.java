@@ -139,10 +139,10 @@ public final class MacroUtils {
                            @NonNull String appName,
                            @NonNull String name,
                            GuidesOption option) {
-        String module = !appName.isEmpty() ? appName + "/" : "";
+        String module = appName.isEmpty() ? "" : appName + "/";
         String fileExtension = option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension();
         String langTestFolder = option.getTestFramework().toTestFramework().getDefaultLanguage().getTestSrcDir();
-        return module+langTestFolder+"/"+guidesConfiguration.getPackageName().replace(".", "/")+"/"+name+"."+fileExtension;
+        return module+langTestFolder + "/" + guidesConfiguration.getPackageName().replace(".", "/") + "/" + name + "." + fileExtension;
     }
 
     @NonNull
@@ -151,14 +151,14 @@ public final class MacroUtils {
                                        @NonNull String fileName,
                                        String folder,
                                        GuidesOption option) {
-        String module = !appName.isEmpty() ? appName + "/" : "";
-        return module+"src/"+folder+"/"+option.getLanguage().toString()+"/" + guidesConfiguration.getPackageName().replace(".", "/") + "/"+fileName+"."+option.getLanguage().getExtension();
+        String module = appName.isEmpty() ? "" : appName + "/";
+        return module + "src/" + folder + "/" + option.getLanguage().toString() + "/" + guidesConfiguration.getPackageName().replace(".", "/") + "/" +fileName + "." + option.getLanguage().getExtension();
     }
 
     @NonNull
     public static String extractIndent(@NonNull String line) {
         String indentValue = extractFromParametersLine(line, "indent");
-        return  !indentValue.isEmpty()  ? "indent="+indentValue : "";
+        return  !indentValue.isEmpty()  ? "indent=" + indentValue : "";
     }
 
     @NonNull
