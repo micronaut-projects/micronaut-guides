@@ -16,7 +16,7 @@ public final class MacroUtils {
     }
 
     @NonNull
-    public static String getSourceDir(@NonNull String slug, GuidesOption option) {
+    public static String getSourceDir(@NonNull String slug, @NonNull GuidesOption option) {
         return slug + "-" + option.getBuildTool() + "-" + option.getLanguage();
     }
 
