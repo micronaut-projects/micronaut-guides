@@ -39,8 +39,7 @@ public final class MacroUtils {
                                            @NonNull LicenseLoader licenseLoader,
                                            @NonNull String extension,
                                            String indent,
-                                           @NonNull List<String> tags,
-                                           boolean includeLicenseOffset) {
+                                           @NonNull List<String> tags) {
         String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
         lines.add("[source," + extension + "]");
@@ -58,9 +57,9 @@ public final class MacroUtils {
             }
         } else {
             List<String> attributes = new ArrayList<>();
-            if(includeLicenseOffset) {
-                attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
-            }
+
+            attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
+
             if (StringUtils.isNotEmpty(indent)) {
                 attributes.add(indent);
             }
@@ -88,7 +87,7 @@ public final class MacroUtils {
                                            @NonNull LicenseLoader licenseLoader,
                                            String indent,
                                            @NonNull List<String> tags) {
-        return addIncludes(option, slug, sourcePath, licenseLoader, option.getLanguage().toString(), indent, tags, true);
+        return addIncludes(option, slug, sourcePath, licenseLoader, option.getLanguage().toString(), indent, tags);
     }
 
     @NonNull

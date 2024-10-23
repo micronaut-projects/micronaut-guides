@@ -34,7 +34,7 @@ public class RawTestMacroSubstitution implements MacroSubstitution{
 
         String sourcePath = rawTestPath(guidesConfiguration, appName, name, option);
 
-        List<String> lines = addIncludes(option, slug, sourcePath, licenseLoader, option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension(),indent, tags, false);
+        List<String> lines = addIncludes(option, slug, sourcePath, licenseLoader, option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension(),indent, tags);
 
         return String.join("\n", lines);
     }
