@@ -21,7 +21,7 @@ public final class MacroUtils {
     }
 
     @NonNull
-    public static List<String> addIncludes(GuidesOption option,
+    public static List<String> addIncludes(@NonNull GuidesOption option,
                                            @NonNull String slug,
                                            @NonNull String sourcePath,
                                            @NonNull LicenseLoader licenseLoader,
