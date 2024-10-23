@@ -12,9 +12,11 @@ import static io.micronaut.guides.core.MacroUtils.addIncludes;
 public class RawTestMacroSubstitution implements MacroSubstitution{
 
     private final GuidesConfiguration guidesConfiguration;
+    private final LicenseLoader licenseLoader;
 
-    public RawTestMacroSubstitution(GuidesConfiguration guidesConfiguration) {
+    public RawTestMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
         this.guidesConfiguration = guidesConfiguration;
+        this.licenseLoader = licenseLoader;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class RawTestMacroSubstitution implements MacroSubstitution{
 
         String sourcePath = rawTestPath(guidesConfiguration, appName, name, option);
 
-        List<String> lines = addIncludes(option, slug, sourcePath, null, option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension(),indent, tags);
+        List<String> lines = addIncludes(option, slug, sourcePath, licenseLoader, option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension(),indent, tags, false);
 
         return String.join("\n", lines);
     }
