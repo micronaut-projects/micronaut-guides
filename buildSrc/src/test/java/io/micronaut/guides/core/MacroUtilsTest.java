@@ -18,14 +18,11 @@ class MacroUtilsTest {
     @Inject
     ResourceLoader resourceLoader;
 
+    @Inject
     GuidesConfiguration guidesConfiguration;
+    
+    @Inject
     LicenseLoader licenseLoader;
-
-    @BeforeEach
-    void setUp(){
-        guidesConfiguration = new GuidesConfigurationProperties();
-        licenseLoader = new DefaultLicenseLoader(guidesConfiguration,resourceLoader);
-    }
 
     @Test
     void testExtractName() {
