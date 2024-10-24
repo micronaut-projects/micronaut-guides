@@ -7,6 +7,7 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.core.App
+import io.micronaut.guides.core.DependencyLines
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
 import io.micronaut.guides.core.GuidesOption
