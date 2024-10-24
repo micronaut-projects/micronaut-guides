@@ -155,4 +155,17 @@ public final class MacroUtils {
                 .filter(line -> line.startsWith(macro+":"))
                 .toList();
     }
+
+    @NonNull
+    static String resolveAsciidoctorLanguage(@NonNull String fileName) {
+        String extension = fileName.indexOf(".") > 0 ?
+                fileName.substring(fileName.lastIndexOf(".") + 1) : "";
+
+        return switch (extension.toLowerCase()) {
+            case "yml", "yaml" -> "yaml";
+            case "html", "vm", "hbs" -> "html";
+            case "xml" -> "xml";
+            default -> extension.toLowerCase();
+        };
+    }
 }
