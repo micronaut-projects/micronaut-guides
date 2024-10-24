@@ -22,7 +22,7 @@ public class RawTestMacroSubstitutionTest {
                 [source,groovy]
                 .src/test/groovy/example/micronaut/HomePage.groovy
                 ----
-                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-java/src/test/groovy/example/micronaut/HomePage.groovy[]
+                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-java/src/test/groovy/example/micronaut/HomePage.groovy[lines=16..-1]
                 ----
                 """;
         assertEquals(expectedJava, resJava);
@@ -31,7 +31,7 @@ public class RawTestMacroSubstitutionTest {
                 [source,groovy]
                 .src/test/groovy/example/micronaut/HomePage.groovy
                 ----
-                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-kotlin/src/test/groovy/example/micronaut/HomePage.groovy[]
+                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-kotlin/src/test/groovy/example/micronaut/HomePage.groovy[lines=16..-1]
                 ----
                 """;
         assertEquals(expectedKotlin, resKotlin);
@@ -40,7 +40,7 @@ public class RawTestMacroSubstitutionTest {
                 [source,groovy]
                 .src/test/groovy/example/micronaut/HomePage.groovy
                 ----
-                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-groovy/src/test/groovy/example/micronaut/HomePage.groovy[]
+                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-groovy/src/test/groovy/example/micronaut/HomePage.groovy[lines=16..-1]
                 ----
                 """;
         assertEquals(expectedGroovy, resGroovy);
