@@ -58,9 +58,9 @@ public final class MacroUtils {
             }
         } else {
             List<String> attributes = new ArrayList<>();
-
-            attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
-
+            if (licenseLoader.getNumberOfLines() > 0) {
+                attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
+            }
             if (StringUtils.isNotEmpty(indent)) {
                 attributes.add(indent);
             }
