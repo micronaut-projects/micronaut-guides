@@ -2,6 +2,8 @@ package io.micronaut.guides.core;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 
+import java.util.List;
+
 @ConfigurationProperties(GuidesConfigurationProperties.PREFIX)
 public class GuidesConfigurationProperties implements GuidesConfiguration {
     public static final String PREFIX = "guides";
@@ -12,6 +14,7 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private static final String DEFAULT_PACKAGE_NAME = "example.micronaut";
     private String licensePath = DEFAULT_LICENSEHEADER;
     private String packageName = DEFAULT_PACKAGE_NAME;
+    private List<String> sourceFilesExtensions = List.of("java", "kotlin", "groovy");
 
     @Override
     public String getPackageName() {
@@ -47,5 +50,14 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public List<String> getFilesWithHeader() {
+        return sourceFilesExtensions;
+    }
+
+    public void setFilesWithHeader(List<String> sourceFilesExtensions) {
+        this.sourceFilesExtensions = sourceFilesExtensions;
     }
 }
