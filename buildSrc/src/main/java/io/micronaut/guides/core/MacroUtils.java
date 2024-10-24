@@ -3,6 +3,8 @@ package io.micronaut.guides.core;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.StringUtils;
+
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,7 +38,8 @@ public final class MacroUtils {
         String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
         lines.add("[source," + extension + "]");
-        lines.add("." + sourcePath);
+        Path path = Path.of(slug, sourceDir, sourcePath);
+        lines.add("." + path.normalize().toString().replace(slug+"/"+sourceDir+"/", ""));
         lines.add("----");
 
         if (!tags.isEmpty()) {
@@ -45,7 +48,7 @@ public final class MacroUtils {
                 if (StringUtils.isNotEmpty(indent)) {
                     attrs += "," + indent;
                 }
-                lines.add("include::{sourceDir}/" + slug + "/" + sourceDir + "/" + sourcePath + "[" + attrs + "]\n");
+                lines.add("include::{sourceDir}/" + path + "[" + attrs + "]\n");
             }
         } else {
             List<String> attributes = new ArrayList<>();
@@ -55,7 +58,7 @@ public final class MacroUtils {
             if (StringUtils.isNotEmpty(indent)) {
                 attributes.add(indent);
             }
-            lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + String.join(";", attributes) + "]");
+            lines.add("include::{sourceDir}/" + path + "[" + String.join(";", attributes) + "]");
         }
         lines.add("----");
         return lines;
