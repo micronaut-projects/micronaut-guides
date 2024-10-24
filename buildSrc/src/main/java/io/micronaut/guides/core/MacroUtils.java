@@ -117,8 +117,8 @@ public final class MacroUtils {
     static String pathByFolder(@NonNull GuidesConfiguration guidesConfiguration,
                                @NonNull String appName,
                                @NonNull String fileName,
-                               String folder,
-                               GuidesOption option) {
+                               @NonNull String folder,
+                               @NonNull GuidesOption option) {
         String module = appName.isEmpty() ? "" : appName + "/";
         return module + "src/" + folder + "/" + option.getLanguage().toString() + "/" + guidesConfiguration.getPackageName().replace(".", "/") + "/" +fileName + "." + option.getLanguage().getExtension();
     }
