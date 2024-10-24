@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.StringUtils;
 
 import java.nio.file.Paths;
@@ -38,7 +39,7 @@ public final class MacroUtils {
                                            @NonNull String sourcePath,
                                            @NonNull LicenseLoader licenseLoader,
                                            @NonNull String extension,
-                                           String indent,
+                                           @Nullable String indent,
                                            @NonNull List<String> tags) {
         String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
