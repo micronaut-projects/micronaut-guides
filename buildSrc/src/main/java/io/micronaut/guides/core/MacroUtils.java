@@ -3,14 +3,10 @@ package io.micronaut.guides.core;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.StringUtils;
-
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static io.micronaut.starter.api.TestFramework.SPOCK;
 
 public final class MacroUtils {
     private MacroUtils() {
@@ -106,7 +102,7 @@ public final class MacroUtils {
     public static List<String> extractTags(@NonNull  String line) {
         String attributeValue = extractFromParametersLine(line, "tags");
         if (StringUtils.isNotEmpty(attributeValue)) {
-            return Arrays.asList(attributeValue.split("\\|")).stream().map(it -> "tag=" + it).toList();
+            return Arrays.stream(attributeValue.split("\\|")).map(it -> "tag=" + it).toList();
         }
 
         attributeValue = extractTagName(line);

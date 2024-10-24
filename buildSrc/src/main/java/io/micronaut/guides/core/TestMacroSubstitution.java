@@ -1,10 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.util.CollectionUtils;
 import jakarta.inject.Singleton;
-
-import java.util.Collections;
 import java.util.List;
 
 import static io.micronaut.guides.core.MacroUtils.*;

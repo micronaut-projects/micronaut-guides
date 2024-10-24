@@ -6,7 +6,6 @@ import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,13 +13,6 @@ import java.util.List;
 
 @MicronautTest(startApplication = false)
 class MacroUtilsTest {
-
-    @Inject
-    ResourceLoader resourceLoader;
-
-    @Inject
-    GuidesConfiguration guidesConfiguration;
-    
     @Inject
     LicenseLoader licenseLoader;
 
