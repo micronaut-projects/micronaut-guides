@@ -1,4 +1,4 @@
-package io.micronaut.guides;
+package io.micronaut.guides.core;
 
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.starter.options.BuildTool;
@@ -28,22 +28,13 @@ public class DependencyLines {
         if (s == null) {
             return null;
         }
-        switch (s) {
-            case "api":
-            case "implementation":
-            case "annotationProcessor":
-                return "compile";
-            case "testCompile":
-            case "testRuntimeOnly":
-            case "testImplementation":
-                return "test";
-            case "compileOnly":
-                return "provided";
-            case "runtimeOnly":
-                return "runtime";
-            default:
-                return s;
-        }
+        return switch (s) {
+            case "api", "implementation", "annotationProcessor" -> "compile";
+            case "testCompile", "testRuntimeOnly", "testImplementation" -> "test";
+            case "compileOnly" -> "provided";
+            case "runtimeOnly" -> "runtime";
+            default -> s;
+        };
     }
 
     private static String toGradleScope(Map<String, String> attributes, Language language) {
@@ -170,10 +161,10 @@ public class DependencyLines {
     }
 
     private static String getMavenAnnotationScopeXMLPath(Language language) {
-        switch (language) {
-            case JAVA: return "path";
-            case KOTLIN: return "annotationProcessorPath";
-            default: return ""; // not used for Groovy
-        }
+        return switch (language) {
+            case JAVA -> "path";
+            case KOTLIN -> "annotationProcessorPath";
+            default -> ""; // not used for Groovy
+        };
     }
 }

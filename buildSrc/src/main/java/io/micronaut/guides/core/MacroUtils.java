@@ -155,4 +155,25 @@ public final class MacroUtils {
                 .filter(line -> line.startsWith(macro+":"))
                 .toList();
     }
+
+    static List<String> findMacroGroups(@NonNull String str, @NonNull String macro) {
+        List<String> matches = new ArrayList<>();
+        String pattern = ":"+macro+":";
+        int startIndex = 0;
+
+        while (true) {
+            startIndex = str.indexOf(pattern, startIndex);
+            if (startIndex == -1) break;
+
+            int endIndex = str.indexOf(pattern, startIndex + pattern.length());
+            if (endIndex == -1) break;
+
+            String match = str.substring(startIndex, endIndex + pattern.length());
+            matches.add(match);
+
+            startIndex = endIndex + pattern.length();
+        }
+
+        return matches;
+    }
 }
