@@ -39,7 +39,7 @@ public class TestMacroSubstitution implements MacroSubstitution{
     private static String testPath(@NonNull GuidesConfiguration guidesConfiguration,
                            @NonNull String appName,
                            @NonNull String name,
-                           GuidesOption option) {
+                           @NonNull GuidesOption option) {
         String fileName = name;
 
         if (name.endsWith("Test")) {

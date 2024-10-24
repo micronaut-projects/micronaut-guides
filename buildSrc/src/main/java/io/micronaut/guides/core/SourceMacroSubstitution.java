@@ -38,7 +38,7 @@ public class SourceMacroSubstitution implements MacroSubstitution {
     private static String mainPath(@NonNull GuidesConfiguration guidesConfiguration,
                                   @NonNull String appName,
                                   @NonNull String fileName,
-                                  GuidesOption option) {
+                                  @NonNull GuidesOption option) {
         return pathByFolder(guidesConfiguration, appName, fileName, "main", option);
     }
 }

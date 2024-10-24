@@ -39,7 +39,7 @@ public class RawTestMacroSubstitution implements MacroSubstitution{
     private static String rawTestPath(@NonNull GuidesConfiguration guidesConfiguration,
                               @NonNull String appName,
                               @NonNull String name,
-                              GuidesOption option) {
+                              @NonNull GuidesOption option) {
         String module = appName.isEmpty() ? "" : appName + "/";
         String fileExtension = option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension();
         String langTestFolder = option.getTestFramework().toTestFramework().getDefaultLanguage().getTestSrcDir();
