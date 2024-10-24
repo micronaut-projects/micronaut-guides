@@ -1,8 +1,7 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
-
-import java.util.Collections;
 import java.util.List;
 
 import static io.micronaut.guides.core.MacroUtils.*;
@@ -20,20 +19,26 @@ public class SourceMacroSubstitution implements MacroSubstitution {
 
     @Override
     public String substitute(String str, String slug, GuidesOption option) {
-        String name = extractName(str, "source");
-        String appName = extractAppName(str);
+        for(String line : findMacroLines(str, "source")){
 
-        List<String> tagNames = extractTags(str);
-        List<String> tags = (tagNames != null && !tagNames.isEmpty())
-                ? tagNames.stream().map(it -> "tag=" + it).toList()
-                : Collections.emptyList();
+            String name = extractName(line, "source");
+            String appName = extractAppName(line);
+            List<String> tags = extractTags(line);
+            String indent = extractIndent(line);
+            String sourcePath = mainPath(guidesConfiguration, appName, name, option);
 
-        String indent = extractIndent(str);
+            List<String> lines = addIncludes(option, licenseLoader, guidesConfiguration, slug, sourcePath, indent, tags);
 
-        String sourcePath = mainPath(guidesConfiguration, appName, name, option);
+            str = str.replace(line,String.join("\n", lines));
+        }
+        return str;
+    }
 
-        List<String> lines = addIncludes(option, slug, sourcePath, licenseLoader, indent, tags);
-
-        return String.join("\n", lines);
+    @NonNull
+    private static String mainPath(@NonNull GuidesConfiguration guidesConfiguration,
+                                  @NonNull String appName,
+                                  @NonNull String fileName,
+                                  @NonNull GuidesOption option) {
+        return pathByFolder(guidesConfiguration, appName, fileName, "main", option);
     }
 }
