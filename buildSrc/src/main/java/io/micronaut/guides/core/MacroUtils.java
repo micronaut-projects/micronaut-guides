@@ -16,11 +16,6 @@ public final class MacroUtils {
     private MacroUtils() {
     }
 
-    @NonNull
-    public static String getSourceDir(@NonNull String slug, @NonNull GuidesOption option) {
-        return slug + "-" + option.getBuildTool() + "-" + option.getLanguage();
-    }
-
     /**
      * Adds include directives to the list of lines for the given source path and tags.
      *
@@ -35,17 +30,17 @@ public final class MacroUtils {
      */
     @NonNull
     public static List<String> addIncludes(@NonNull GuidesOption option,
+                                           @NonNull LicenseLoader licenseLoader,
+                                           @NonNull GuidesConfiguration configuration,
                                            @NonNull String slug,
                                            @NonNull String sourcePath,
-                                           @NonNull LicenseLoader licenseLoader,
                                            @NonNull String extension,
                                            @Nullable String indent,
                                            @NonNull List<String> tags) {
         String sourceDir = getSourceDir(slug, option);
         List<String> lines = new ArrayList<>();
         lines.add("[source," + extension + "]");
-        String normalizedSourcePath = Paths.get(sourcePath).normalize().toString();
-        lines.add("." + normalizedSourcePath);
+        lines.add("." + sourcePath);
         lines.add("----");
 
         if (!tags.isEmpty()) {
@@ -58,7 +53,7 @@ public final class MacroUtils {
             }
         } else {
             List<String> attributes = new ArrayList<>();
-            if (licenseLoader.getNumberOfLines() > 0) {
+            if (fileContainsHeader(extension, configuration) && licenseLoader.getNumberOfLines() > 0) {
                 attributes.add("lines=" + licenseLoader.getNumberOfLines() + "..-1");
             }
             if (StringUtils.isNotEmpty(indent)) {
@@ -66,7 +61,7 @@ public final class MacroUtils {
             }
             lines.add("include::{sourceDir}/" + slug + "/"+sourceDir+"/" + sourcePath + "[" + String.join(";", attributes) + "]");
         }
-        lines.add("----\n");
+        lines.add("----");
         return lines;
     }
 
@@ -83,12 +78,18 @@ public final class MacroUtils {
      */
     @NonNull
     public static List<String> addIncludes(@NonNull GuidesOption option,
+                                           @NonNull LicenseLoader licenseLoader,
+                                           @NonNull GuidesConfiguration configuration,
                                            @NonNull String slug,
                                            @NonNull String sourcePath,
-                                           @NonNull LicenseLoader licenseLoader,
-                                           String indent,
+                                           @NonNull String indent,
                                            @NonNull List<String> tags) {
-        return addIncludes(option, slug, sourcePath, licenseLoader, option.getLanguage().toString(), indent, tags);
+        return addIncludes(option, licenseLoader, configuration, slug, sourcePath, option.getLanguage().toString(), indent, tags);
+    }
+
+    @NonNull
+    static String getSourceDir(@NonNull String slug, @NonNull GuidesOption option) {
+        return slug + "-" + option.getBuildTool() + "-" + option.getLanguage();
     }
 
     @NonNull
@@ -105,52 +106,20 @@ public final class MacroUtils {
     public static List<String> extractTags(@NonNull  String line) {
         String attributeValue = extractFromParametersLine(line, "tags");
         if (StringUtils.isNotEmpty(attributeValue)) {
-            return Arrays.asList(attributeValue.split("\\|"));
+            return Arrays.asList(attributeValue.split("\\|")).stream().map(it -> "tag=" + it).toList();
         }
 
-        return extractTagName(line).isEmpty() ? Collections.emptyList() : Collections.singletonList(extractTagName(line));
+        attributeValue = extractTagName(line);
+        return attributeValue.isEmpty() ? Collections.emptyList() : Collections.singletonList("tag="+attributeValue);
     }
 
-    @NonNull
-    public static String mainPath(@NonNull GuidesConfiguration guidesConfiguration,
-                                  @NonNull String appName,
-                                  @NonNull String fileName,
-                                  GuidesOption option) {
-        return pathByFolder(guidesConfiguration, appName, fileName, "main", option);
-    }
 
     @NonNull
-    static String testPath(@NonNull GuidesConfiguration guidesConfiguration,
-                           @NonNull String appName,
-                           @NonNull String name,
-                           GuidesOption option) {
-        String fileName = name;
-
-        if (name.endsWith("Test")) {
-            fileName = name.substring(0, name.indexOf("Test"));
-            fileName += option.getTestFramework() == SPOCK ? "Spec" : "Test";
-        }
-
-        return pathByFolder(guidesConfiguration, appName, fileName, "test", option);
-    }
-
-    @NonNull
-    static String rawTestPath(@NonNull GuidesConfiguration guidesConfiguration,
-                           @NonNull String appName,
-                           @NonNull String name,
-                           GuidesOption option) {
-        String module = appName.isEmpty() ? "" : appName + "/";
-        String fileExtension = option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension();
-        String langTestFolder = option.getTestFramework().toTestFramework().getDefaultLanguage().getTestSrcDir();
-        return module+langTestFolder + "/" + guidesConfiguration.getPackageName().replace(".", "/") + "/" + name + "." + fileExtension;
-    }
-
-    @NonNull
-    private static String pathByFolder(@NonNull GuidesConfiguration guidesConfiguration,
-                                       @NonNull String appName,
-                                       @NonNull String fileName,
-                                       String folder,
-                                       GuidesOption option) {
+    static String pathByFolder(@NonNull GuidesConfiguration guidesConfiguration,
+                               @NonNull String appName,
+                               @NonNull String fileName,
+                               String folder,
+                               GuidesOption option) {
         String module = appName.isEmpty() ? "" : appName + "/";
         return module + "src/" + folder + "/" + option.getLanguage().toString() + "/" + guidesConfiguration.getPackageName().replace(".", "/") + "/" +fileName + "." + option.getLanguage().getExtension();
     }
@@ -176,5 +145,15 @@ public final class MacroUtils {
                 .map(parts -> parts[1])
                 .findFirst()
                 .orElse("");
+    }
+
+    static boolean fileContainsHeader(@NonNull String extension, @NonNull GuidesConfiguration configuration) {
+        return configuration.getFilesWithHeader().contains(extension);
+    }
+
+    static List<String> findMacroLines(@NonNull String str, @NonNull String macro) {
+        return str.lines()
+                .filter(line -> line.startsWith(macro+":"))
+                .toList();
     }
 }

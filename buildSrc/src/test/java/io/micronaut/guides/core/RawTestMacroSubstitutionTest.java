@@ -16,9 +16,15 @@ public class RawTestMacroSubstitutionTest {
 
     @Test
     void testSubstitute() {
-        String str = "rawTest:HomePage[]";
+        String str = """
+                Create three pages:
+                
+                rawTest:HomePage[]
+                """;
         String resJava = rawTestMacroSubstitution.substitute(str, "micronaut-security-jwt-cookie", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
+                Create three pages:
+                
                 [source,groovy]
                 .src/test/groovy/example/micronaut/HomePage.groovy
                 ----
@@ -28,6 +34,8 @@ public class RawTestMacroSubstitutionTest {
         assertEquals(expectedJava, resJava);
         String resKotlin = rawTestMacroSubstitution.substitute(str, "micronaut-security-jwt-cookie", new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.SPOCK));
         String expectedKotlin = """
+                Create three pages:
+                
                 [source,groovy]
                 .src/test/groovy/example/micronaut/HomePage.groovy
                 ----
@@ -37,6 +45,8 @@ public class RawTestMacroSubstitutionTest {
         assertEquals(expectedKotlin, resKotlin);
         String resGroovy = rawTestMacroSubstitution.substitute(str, "micronaut-security-jwt-cookie", new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK));
         String expectedGroovy = """
+                Create three pages:
+                
                 [source,groovy]
                 .src/test/groovy/example/micronaut/HomePage.groovy
                 ----

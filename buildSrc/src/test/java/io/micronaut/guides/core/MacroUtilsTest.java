@@ -43,15 +43,9 @@ class MacroUtilsTest {
     void testExtractTags() {
         String line = "source:Application[tags=tag1|tag2]";
         List<String> result = MacroUtils.extractTags(line);
-        assertEquals(List.of("tag1", "tag2"), result);
+        assertEquals(List.of("tag=tag1", "tag=tag2"), result);
     }
 
-    @Test
-    void testMainPath() {
-        GuidesOption option = new GuidesOption(BuildTool.GRADLE,Language.JAVA, TestFramework.JUNIT);
-        String result = MacroUtils.mainPath(guidesConfiguration, "appName", "fileName", option);
-        assertEquals("appName/src/main/java/example/micronaut/fileName.java", result);
-    }
 
     @Test
     void testExtractIndent() {
@@ -85,12 +79,13 @@ class MacroUtilsTest {
     void testAddIncludesWithTags() {
         List<String> lines;
         GuidesOption option = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT);
+        GuidesConfiguration configuration = new GuidesConfigurationProperties();
         String slug = "exampleSlug";
         String sourcePath = "exampleSourcePath";
         String indent = "indent=4";
         List<String> tags = List.of("tag=tag1", "tag=tag2");
 
-        lines = MacroUtils.addIncludes(option, slug, sourcePath, licenseLoader, indent, tags);
+        lines = MacroUtils.addIncludes(option, licenseLoader, configuration, slug, sourcePath, indent, tags);
 
         assertEquals(6, lines.size());
         assertEquals("[source,java]", lines.get(0));
@@ -98,25 +93,26 @@ class MacroUtilsTest {
         assertEquals("----", lines.get(2));
         assertEquals("include::{sourceDir}/exampleSlug/exampleSlug-gradle-java/exampleSourcePath[tag=tag1,indent=4]\n", lines.get(3));
         assertEquals("include::{sourceDir}/exampleSlug/exampleSlug-gradle-java/exampleSourcePath[tag=tag2,indent=4]\n", lines.get(4));
-        assertEquals("----\n", lines.get(5));
+        assertEquals("----", lines.get(5));
     }
 
     @Test
     void testAddIncludesWithoutTags() {
         List<String> lines;
         GuidesOption option = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT);
+        GuidesConfiguration configuration = new GuidesConfigurationProperties();
         String slug = "exampleSlug";
         String sourcePath = "exampleSourcePath";
         String indent = "indent=4";
         List<String> tags = List.of();
 
-        lines = MacroUtils.addIncludes(option, slug, sourcePath, licenseLoader, indent, tags);
+        lines = MacroUtils.addIncludes(option, licenseLoader, configuration, slug, sourcePath, indent, tags);
 
         assertEquals(5, lines.size());
         assertEquals("[source,java]", lines.get(0));
         assertEquals(".exampleSourcePath", lines.get(1));
         assertEquals("----", lines.get(2));
         assertEquals("include::{sourceDir}/exampleSlug/exampleSlug-gradle-java/exampleSourcePath[lines=16..-1;indent=4]", lines.get(3));
-        assertEquals("----\n", lines.get(4));
+        assertEquals("----", lines.get(4));
     }
 }

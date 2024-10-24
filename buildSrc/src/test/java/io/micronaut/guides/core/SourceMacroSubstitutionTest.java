@@ -18,7 +18,7 @@ class SourceMacroSubstitutionTest {
 
     @Test
     void testSubstitute(){
-        String str = "source:GithubConfiguration[]";
+        String str = "source:GithubConfiguration[]\n";
         String resJava = sourceMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
@@ -50,7 +50,7 @@ class SourceMacroSubstitutionTest {
 
     @Test
     void TestSubstituteWithApp(){
-        String str = "source:Application[app=springboot]";
+        String str = "source:Application[app=springboot]\n";
         String resJava = sourceMacroSubstitution.substitute(str, "spring-boot-to-micronaut-application-class", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
@@ -64,7 +64,7 @@ class SourceMacroSubstitutionTest {
 
     @Test
     void TestSubstituteWithTags(){
-        String str = "source:TeamConfiguration[tags=teamConfigClassNoBuilder|gettersandsetters]";
+        String str = "source:TeamConfiguration[tags=teamConfigClassNoBuilder|gettersandsetters]\n";
         String resJava = sourceMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
@@ -81,7 +81,7 @@ class SourceMacroSubstitutionTest {
 
     @Test
     void TestSubstituteWithMultiple(){
-        String str = "source:TeamConfiguration[app=springboot,tags=teamConfigClassNoBuilder|gettersandsetters,indent=0]";
+        String str = "source:TeamConfiguration[app=springboot,tags=teamConfigClassNoBuilder|gettersandsetters,indent=0]\n";
         String resJava = sourceMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]

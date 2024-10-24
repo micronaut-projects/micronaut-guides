@@ -1,5 +1,6 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import jakarta.inject.Singleton;
 
@@ -7,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static io.micronaut.guides.core.MacroUtils.*;
+import static io.micronaut.starter.api.TestFramework.SPOCK;
 
 @Singleton
 public class TestMacroSubstitution implements MacroSubstitution{
@@ -21,20 +23,33 @@ public class TestMacroSubstitution implements MacroSubstitution{
 
     @Override
     public String substitute(String str, String slug, GuidesOption option) {
-        String name = extractName(str, "test");
-        String appName = extractAppName(str);
+        for(String line : findMacroLines(str, "test")){
 
-        List<String> tagNames = extractTags(str);
-        List<String> tags = CollectionUtils.isEmpty(tagNames)
-                ? Collections.emptyList()
-                : tagNames.stream().map(it -> "tag=" + it).toList();
+            String name = extractName(line, "test");
+            String appName = extractAppName(line);
+            List<String> tags = extractTags(line);
+            String indent = extractIndent(line);
+            String sourcePath = testPath(guidesConfiguration, appName, name, option);
 
-        String indent = extractIndent(str);
+            List<String> lines = addIncludes(option, licenseLoader, guidesConfiguration, slug, sourcePath, indent, tags);
 
-        String sourcePath = testPath(guidesConfiguration, appName, name, option);
+            str = str.replace(line,String.join("\n", lines));
+        }
+        return str;
+    }
 
-        List<String> lines = addIncludes(option, slug, sourcePath, licenseLoader, indent, tags);
+    @NonNull
+    private static String testPath(@NonNull GuidesConfiguration guidesConfiguration,
+                           @NonNull String appName,
+                           @NonNull String name,
+                           GuidesOption option) {
+        String fileName = name;
 
-        return String.join("\n", lines);
+        if (name.endsWith("Test")) {
+            fileName = name.substring(0, name.indexOf("Test"));
+            fileName += option.getTestFramework() == SPOCK ? "Spec" : "Test";
+        }
+
+        return pathByFolder(guidesConfiguration, appName, fileName, "test", option);
     }
 }
