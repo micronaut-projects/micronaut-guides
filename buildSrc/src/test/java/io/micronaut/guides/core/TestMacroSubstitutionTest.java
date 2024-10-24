@@ -16,7 +16,7 @@ class TestMacroSubstitutionTest {
     TestMacroSubstitution testMacroSubstitution;
 
     @Test
-    void testSubstitute(){
+    void testSubstitute() {
         String str = "test:HelloControllerTest[]";
         String resJava = testMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
@@ -24,8 +24,7 @@ class TestMacroSubstitutionTest {
                 .src/test/java/example/micronaut/HelloControllerTest.java
                 ----
                 include::{sourceDir}/micronaut-http-client/micronaut-http-client-gradle-java/src/test/java/example/micronaut/HelloControllerTest.java[lines=16..-1]
-                ----
-                """;
+                ----""";
         assertEquals(expectedJava, resJava);
         String resKotlin = testMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.KOTEST));
         String expectedKotlin = """
@@ -33,8 +32,7 @@ class TestMacroSubstitutionTest {
                 .src/test/kotlin/example/micronaut/HelloControllerTest.kt
                 ----
                 include::{sourceDir}/micronaut-http-client/micronaut-http-client-gradle-kotlin/src/test/kotlin/example/micronaut/HelloControllerTest.kt[lines=16..-1]
-                ----
-                """;
+                ----""";
         assertEquals(expectedKotlin, resKotlin);
         String resGroovy = testMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK));
         String expectedGroovy = """
@@ -42,13 +40,12 @@ class TestMacroSubstitutionTest {
                 .src/test/groovy/example/micronaut/HelloControllerSpec.groovy
                 ----
                 include::{sourceDir}/micronaut-http-client/micronaut-http-client-gradle-groovy/src/test/groovy/example/micronaut/HelloControllerSpec.groovy[lines=16..-1]
-                ----
-                """;
+                ----""";
         assertEquals(expectedGroovy, resGroovy);
     }
 
     @Test
-    void TestSubstituteWithApp(){
+    void TestSubstituteWithApp() {
         String str = "test:ApplicationTest[app=springboot]";
         String resJava = testMacroSubstitution.substitute(str, "spring-boot-to-micronaut-application-class", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
@@ -56,8 +53,7 @@ class TestMacroSubstitutionTest {
                 .springboot/src/test/java/example/micronaut/ApplicationTest.java
                 ----
                 include::{sourceDir}/spring-boot-to-micronaut-application-class/spring-boot-to-micronaut-application-class-gradle-java/springboot/src/test/java/example/micronaut/ApplicationTest.java[lines=16..-1]
-                ----
-                """;
+                ----""";
         assertEquals(expectedJava, resJava);
     }
 
@@ -73,8 +69,7 @@ class TestMacroSubstitutionTest {
 
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=gettersandsetters]
 
-                ----
-                """;
+                ----""";
         assertEquals(expectedJava, resJava);
     }
 
@@ -83,6 +78,28 @@ class TestMacroSubstitutionTest {
         String str = "test:TeamConfigurationTest[app=springboot,tags=teamConfigClassNoBuilder|gettersandsetters,indent=0]";
         String resJava = testMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
+                [source,java]
+                .springboot/src/test/java/example/micronaut/TeamConfigurationTest.java
+                ----
+                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=teamConfigClassNoBuilder,indent=0]
+
+                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=gettersandsetters,indent=0]
+
+                ----""";
+        assertEquals(expectedJava, resJava);
+    }
+
+    @Test
+    void TestSubstituteMultipleLines(){
+        String str = """
+                Test
+                
+                test:TeamConfigurationTest[app=springboot,tags=teamConfigClassNoBuilder|gettersandsetters,indent=0]
+                """;
+        String resJava = testMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String expectedJava = """
+                Test
+            
                 [source,java]
                 .springboot/src/test/java/example/micronaut/TeamConfigurationTest.java
                 ----
