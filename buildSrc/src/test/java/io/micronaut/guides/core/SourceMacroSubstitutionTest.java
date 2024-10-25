@@ -70,9 +70,7 @@ class SourceMacroSubstitutionTest {
                 .src/main/java/example/micronaut/TeamConfiguration.java
                 ----
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/main/java/example/micronaut/TeamConfiguration.java[tag=teamConfigClassNoBuilder]
-                
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/main/java/example/micronaut/TeamConfiguration.java[tag=gettersandsetters]
-                
                 ----
                 """;
         assertEquals(expectedJava, resJava);
@@ -87,9 +85,7 @@ class SourceMacroSubstitutionTest {
                 .springboot/src/main/java/example/micronaut/TeamConfiguration.java
                 ----
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/main/java/example/micronaut/TeamConfiguration.java[tag=teamConfigClassNoBuilder,indent=0]
-                
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/main/java/example/micronaut/TeamConfiguration.java[tag=gettersandsetters,indent=0]
-                
                 ----
                 """;
         assertEquals(expectedJava, resJava);
