@@ -82,8 +82,8 @@ class MacroUtilsTest {
         assertEquals("[source,java]", lines.get(0));
         assertEquals(".exampleSourcePath", lines.get(1));
         assertEquals("----", lines.get(2));
-        assertEquals("include::{sourceDir}/exampleSlug/exampleSlug-gradle-java/exampleSourcePath[tag=tag1,indent=4]\n", lines.get(3));
-        assertEquals("include::{sourceDir}/exampleSlug/exampleSlug-gradle-java/exampleSourcePath[tag=tag2,indent=4]\n", lines.get(4));
+        assertEquals("include::{sourceDir}/exampleSlug/exampleSlug-gradle-java/exampleSourcePath[tag=tag1,indent=4]", lines.get(3));
+        assertEquals("include::{sourceDir}/exampleSlug/exampleSlug-gradle-java/exampleSourcePath[tag=tag2,indent=4]", lines.get(4));
         assertEquals("----", lines.get(5));
     }
 

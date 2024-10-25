@@ -48,7 +48,7 @@ public final class MacroUtils {
                 if (StringUtils.isNotEmpty(indent)) {
                     attrs += "," + indent;
                 }
-                lines.add("include::{sourceDir}/" + path + "[" + attrs + "]\n");
+                lines.add("include::{sourceDir}/" + path + "[" + attrs + "]");
             }
         } else {
             List<String> attributes = new ArrayList<>();
@@ -112,7 +112,6 @@ public final class MacroUtils {
         return attributeValue.isEmpty() ? Collections.emptyList() : Collections.singletonList("tag="+attributeValue);
     }
 
-
     @NonNull
     static String pathByFolder(@NonNull GuidesConfiguration guidesConfiguration,
                                @NonNull String appName,
@@ -175,5 +174,18 @@ public final class MacroUtils {
         }
 
         return matches;
+    }
+
+    @NonNull
+    static String resolveAsciidoctorLanguage(@NonNull String fileName) {
+        String extension = fileName.indexOf(".") > 0 ?
+                fileName.substring(fileName.lastIndexOf(".") + 1) : "";
+
+        return switch (extension.toLowerCase()) {
+            case "yml", "yaml" -> "yaml";
+            case "html", "vm", "hbs" -> "html";
+            case "xml" -> "xml";
+            default -> extension.toLowerCase();
+        };
     }
 }

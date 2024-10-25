@@ -66,9 +66,7 @@ class TestMacroSubstitutionTest {
                 .src/test/java/example/micronaut/TeamConfigurationTest.java
                 ----
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=teamConfigClassNoBuilder]
-
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=gettersandsetters]
-
                 ----""";
         assertEquals(expectedJava, resJava);
     }
@@ -82,9 +80,7 @@ class TestMacroSubstitutionTest {
                 .springboot/src/test/java/example/micronaut/TeamConfigurationTest.java
                 ----
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=teamConfigClassNoBuilder,indent=0]
-
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=gettersandsetters,indent=0]
-
                 ----""";
         assertEquals(expectedJava, resJava);
     }
@@ -104,9 +100,7 @@ class TestMacroSubstitutionTest {
                 .springboot/src/test/java/example/micronaut/TeamConfigurationTest.java
                 ----
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=teamConfigClassNoBuilder,indent=0]
-
                 include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=gettersandsetters,indent=0]
-
                 ----
                 """;
         assertEquals(expectedJava, resJava);
