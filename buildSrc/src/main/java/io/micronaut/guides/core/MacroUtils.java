@@ -112,7 +112,6 @@ public final class MacroUtils {
         return attributeValue.isEmpty() ? Collections.emptyList() : Collections.singletonList("tag="+attributeValue);
     }
 
-
     @NonNull
     static String pathByFolder(@NonNull GuidesConfiguration guidesConfiguration,
                                @NonNull String appName,

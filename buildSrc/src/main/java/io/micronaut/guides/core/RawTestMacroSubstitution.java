@@ -43,6 +43,6 @@ public class RawTestMacroSubstitution implements MacroSubstitution{
         String module = appName.isEmpty() ? "" : appName + "/";
         String fileExtension = option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension();
         String langTestFolder = option.getTestFramework().toTestFramework().getDefaultLanguage().getTestSrcDir();
-        return module+langTestFolder + "/" + guidesConfiguration.getPackageName().replace(".", "/") + "/" + name + "." + fileExtension;
+        return module + langTestFolder + "/" + guidesConfiguration.getPackageName().replace(".", "/") + "/" + name + "." + fileExtension;
     }
 }
