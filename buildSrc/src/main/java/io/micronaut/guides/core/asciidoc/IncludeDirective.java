@@ -156,7 +156,7 @@ public class IncludeDirective {
             if (getTags().size() > 1) {
                 attributes.add("tags=" + String.join(";",  getTags()));
             } else if (getTags().size() == 1) {
-                attributes.add("tag=" + getTags().getFirst());
+                attributes.add("tag=" + getTags().get(0));
             }
         }
         if (getIndent() != null) {
