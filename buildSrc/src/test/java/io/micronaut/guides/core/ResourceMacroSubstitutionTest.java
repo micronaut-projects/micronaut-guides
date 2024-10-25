@@ -37,7 +37,6 @@ public class ResourceMacroSubstitutionTest {
                 .src/main/resources/application.yml
                 ----
                 include::{sourceDir}/adding-commit-info/adding-commit-info-gradle-java/src/main/resources/application.yml[tag=endpoints]
-                
                 ----""";
         assertEquals(expectedJava, resJava);
     }
@@ -63,14 +62,12 @@ public class ResourceMacroSubstitutionTest {
                 .src/main/resources/application.yml
                 ----
                 include::{sourceDir}/adding-commit-info/adding-commit-info-gradle-java/src/main/resources/application.yml[tag=endpoints]
-                                
                 ----
                 
                 [source,yaml]
                 .testApp/src/main/resources/test.yml
                 ----
                 include::{sourceDir}/adding-commit-info/adding-commit-info-gradle-java/testApp/src/main/resources/test.yml[tag=security]
-                                
                 ----
                 """;
         assertEquals(expectedJava, resJava);
