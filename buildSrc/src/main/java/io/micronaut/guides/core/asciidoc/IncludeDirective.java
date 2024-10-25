@@ -146,7 +146,7 @@ public class IncludeDirective {
         if (getLevelOffset() != null) {
             attributes.add("leveloffset=" + getLevelOffset());
         }
-        if (getLines() != null) {
+        if (getLines() != null && getLines().isValid()) {
             attributes.add("lines=" + getLines().from() + ".." + getLines().to());
         }
         if (getEncoding() != null) {
