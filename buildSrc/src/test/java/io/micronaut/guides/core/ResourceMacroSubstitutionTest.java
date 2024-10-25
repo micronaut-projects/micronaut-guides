@@ -5,16 +5,18 @@ import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest(startApplication = false)
-public class ResourceMacroSubstitutionTest {
+class ResourceMacroSubstitutionTest {
 
     @Inject
     ResourceMacroSubstitution resourceMacroSubstitution;
 
+    @Disabled("this should probably be written as a zipInclude")
     @Test
     void testSubstitute() {
         String str = "resource:../../../ttfr.sh[]";

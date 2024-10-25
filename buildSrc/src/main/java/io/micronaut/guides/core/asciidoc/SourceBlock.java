@@ -43,10 +43,10 @@ public class SourceBlock {
     @Override
     public String toString() {
         List<String> lines = new ArrayList<>();
+        lines.add("[source," + getLanguage() + "]");
         if (getTitle() != null) {
             lines.add("." + getTitle());
         }
-        lines.add("[source," + getLanguage() + "]");
         lines.add(SEPARATOR);
         getIncludeDirectives().stream()
                 .map(IncludeDirective::toString)

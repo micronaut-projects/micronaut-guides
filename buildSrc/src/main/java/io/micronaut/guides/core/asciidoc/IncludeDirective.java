@@ -29,6 +29,13 @@ import java.util.Objects;
  */
 public class IncludeDirective {
 
+    public static final String ATTRIBUTE_LEVELOFFSET = "leveloffset";
+    public static final String ATTRIBUTE_LINES = "lines";
+    public static final String ATTRIBUTE_ENCODING = "encoding";
+    public static final String ATTRIBUTE_TAG = "tag";
+    public static final String ATTRIBUTE_TAGS = ATTRIBUTE_TAG + "s";
+    public static final String ATTRIBUTE_INDENT = "indent";
+    public static final String ATTRIBUTE_OPTS = "opts";
     /**
      * Target may be an absolute path, a path relative to the current document, or a URL.
      */
@@ -144,26 +151,26 @@ public class IncludeDirective {
     private List<String> attributes() {
         List<String> attributes = new ArrayList<>();
         if (getLevelOffset() != null) {
-            attributes.add("leveloffset=" + getLevelOffset());
+            attributes.add(ATTRIBUTE_LEVELOFFSET + "=" + getLevelOffset());
         }
         if (getLines() != null && getLines().isValid()) {
-            attributes.add("lines=" + getLines().from() + ".." + getLines().to());
+            attributes.add(ATTRIBUTE_LINES + "=" + getLines().from() + ".." + getLines().to());
         }
         if (getEncoding() != null) {
-            attributes.add("encoding=" + getEncoding());
+            attributes.add(ATTRIBUTE_ENCODING + "=" + getEncoding());
         }
         if (CollectionUtils.isNotEmpty(getTags())) {
             if (getTags().size() > 1) {
-                attributes.add("tags=" + String.join(";",  getTags()));
+                attributes.add(ATTRIBUTE_TAGS + "=" + String.join(";",  getTags()));
             } else if (getTags().size() == 1) {
-                attributes.add("tag=" + getTags().get(0));
+                attributes.add(ATTRIBUTE_TAG + "=" + getTags().get(0));
             }
         }
         if (getIndent() != null) {
-            attributes.add("indent=" + getIndent());
+            attributes.add(ATTRIBUTE_INDENT + "=" + getIndent());
         }
         if (getOpts() != null) {
-            attributes.add("opts=" + getOpts());
+            attributes.add(ATTRIBUTE_OPTS + "=" + getOpts());
         }
         return attributes;
     }
@@ -243,6 +250,48 @@ public class IncludeDirective {
 
         public IncludeDirective build() {
             return new IncludeDirective(Objects.requireNonNull(target), levelOffset, lines, encoding, tags, indent, opts);
+        }
+
+        public Builder attributes(List<Attribute> attributes) {
+            for (Attribute attribute : attributes) {
+                switch (attribute.key()) {
+                    case ATTRIBUTE_LEVELOFFSET:
+                        for (String value : attribute.values()) {
+                            levelOffset(value);
+                        }
+                        break;
+                    case ATTRIBUTE_LINES:
+                        for (String value : attribute.values()) {
+                            String[] arr = value.split("\\.\\.");
+                            if (arr.length == 2) {
+                                lines(new Range(Integer.valueOf(arr[0]), Integer.valueOf(arr[1])));
+                            }
+                        }
+                        break;
+                    case ATTRIBUTE_ENCODING:
+                        for (String value : attribute.values()) {
+                            encoding(value);
+                        }
+                        break;
+                    case ATTRIBUTE_TAGS, ATTRIBUTE_TAG:
+                        for (String value : attribute.values()) {
+                            tag(value);
+                        }
+                        break;
+                    case ATTRIBUTE_INDENT:
+                        for (String value : attribute.values()) {
+                            indent(Integer.valueOf(value));
+                        }
+                        break;
+                    case ATTRIBUTE_OPTS:
+                        for (String value : attribute.values()) {
+                            opts(value);
+                        }
+                        break;
+                }
+            }
+
+            return this;
         }
     }
 }

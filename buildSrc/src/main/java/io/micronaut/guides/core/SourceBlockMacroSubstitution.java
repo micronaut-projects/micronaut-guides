@@ -1,0 +1,124 @@
+package io.micronaut.guides.core;
+
+import io.micronaut.guides.core.asciidoc.*;
+import io.micronaut.starter.options.BuildTool;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Optional;
+
+import static io.micronaut.guides.core.MacroUtils.findMacroLines;
+import static io.micronaut.guides.core.asciidoc.IncludeDirective.ATTRIBUTE_LINES;
+
+abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
+
+    private final LicenseLoader licenseLoader;
+    private final GuidesConfiguration guidesConfiguration;
+    SourceBlockMacroSubstitution(LicenseLoader licenseLoader,
+                                 GuidesConfiguration guidesConfiguration) {
+        this.licenseLoader = licenseLoader;
+        this.guidesConfiguration = guidesConfiguration;
+    }
+
+    protected abstract String getMacroName();
+
+    protected abstract Classpath getClasspath();
+
+    protected abstract FileType getFileType();
+
+    public LicenseLoader getLicenseLoader() {
+        return licenseLoader;
+    }
+
+    public GuidesConfiguration getGuidesConfiguration() {
+        return guidesConfiguration;
+    }
+
+    @Override
+    public String substitute(String str, String slug, GuidesOption option) {
+        for (String line : findMacroLines(str, getMacroName())) {
+            Optional<AsciidocMacro> asciidocMacroOptional = AsciidocMacro.of(getMacroName(), line);
+            if (asciidocMacroOptional.isPresent()) {
+                AsciidocMacro asciidocMacro = asciidocMacroOptional.get();
+                String appName = asciidocMacro.attributes().stream()
+                        .filter(attribute -> attribute.key().equals(APP))
+                        .map(Attribute::values)
+                        .filter(l -> !l.isEmpty())
+                        .map(List::getFirst)
+                        .findFirst()
+                        .orElse(APP);
+
+                String condensedTarget = condensedTarget(asciidocMacro, option);
+                String language = option.getLanguage().toString();
+                String extension = option.getLanguage().getExtension();
+                String[] arr = condensedTarget.split("\\.");
+                String sourceLanguage = option.getLanguage().toString();
+                if (arr.length == 2) {
+                    sourceLanguage = arr[1];
+                    sourceLanguage = switch (sourceLanguage.toLowerCase()) {
+                        case "yml", "yaml" -> "yaml";
+                        case "html", "vm", "hbs" -> "html";
+                        case "xml" -> "xml";
+                        default -> sourceLanguage;
+                    };
+                } else {
+                    condensedTarget = condensedTarget + "." + extension;
+                }
+                String title = sourceTitle(appName, condensedTarget, getClasspath(), language, getGuidesConfiguration().getPackageName());
+                String target = sourceInclude(slug, appName, condensedTarget, getClasspath(), option.getBuildTool(), language, getGuidesConfiguration().getPackageName());
+                IncludeDirective.Builder includeDirectiveBuilder = IncludeDirective.builder().attributes(asciidocMacro.attributes())
+                        .target(target);
+                if (getFileType() == FileType.CODE) {
+                    Range range = new Range(getLicenseLoader().getNumberOfLines(), -1);
+                    if (range.isValid() && asciidocMacro.attributes().stream().noneMatch(attribute -> attribute.key().equals(ATTRIBUTE_LINES))) {
+                        includeDirectiveBuilder.lines(range);
+                    }
+                }
+                String replacement = SourceBlock.builder()
+                        .title(title)
+                        .language(sourceLanguage)
+                        .includeDirective(includeDirectiveBuilder.build())
+                        .build()
+                        .toString();
+                str = str.replace(line, replacement);
+            }
+        }
+        return str;
+    }
+
+    protected String sourceTitle(
+            String appName,
+            String condensedTarget,
+            Classpath classpath,
+            String language,
+            String packageName) {
+        return (appName.equals(MacroSubstitution.APP) ? "" : (appName + "/")) +sourceConventionFolder(classpath, language) + "/"
+                + (getFileType() == FileType.CODE ? (packageName.replace(".", "/") + "/") : "")
+                + condensedTarget;
+    }
+
+    protected String sourceInclude(
+            String slug,
+            String appName,
+            String condensedTarget,
+            Classpath classpath,
+            BuildTool buildTool,
+            String language,
+            String packageName) {
+        return "{sourceDir}/" + slug + "/" + slug + "-" + buildTool.toString() + "-" + language + "/" +
+                sourceTitle(appName, condensedTarget, classpath, language, packageName);
+    }
+
+    private String sourceConventionFolder(Classpath classpath, String language) {
+        if (getFileType() == FileType.CODE) {
+            return "src/" + classpath + "/" + language;
+        } else if (getFileType() == FileType.RESOURCE) {
+            return "src/" + classpath + "/resources";
+        }
+        throw new UnsupportedOperationException("Unimplemented sourceConventionFolder for " + getFileType());
+    }
+
+    protected String condensedTarget(@NotNull AsciidocMacro asciidocMacro, GuidesOption option) {
+        return asciidocMacro.target();
+    }
+}

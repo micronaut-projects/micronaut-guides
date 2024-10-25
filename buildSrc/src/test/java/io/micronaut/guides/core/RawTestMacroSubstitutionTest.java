@@ -25,32 +25,32 @@ public class RawTestMacroSubstitutionTest {
         String expectedJava = """
                 Create three pages:
                 
-                [source,groovy]
-                .src/test/groovy/example/micronaut/HomePage.groovy
+                [source,java]
+                .src/test/java/example/micronaut/HomePage.java
                 ----
-                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-java/src/test/groovy/example/micronaut/HomePage.groovy[lines=16..-1]
+                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-java/src/test/java/example/micronaut/HomePage.java[lines=16..-1]
                 ----
                 """;
         assertEquals(expectedJava, resJava);
-        String resKotlin = rawTestMacroSubstitution.substitute(str, "micronaut-security-jwt-cookie", new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.SPOCK));
+        String resKotlin = rawTestMacroSubstitution.substitute(str, "micronaut-security-jwt-cookie", new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK));
         String expectedKotlin = """
                 Create three pages:
                 
                 [source,groovy]
                 .src/test/groovy/example/micronaut/HomePage.groovy
                 ----
-                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-kotlin/src/test/groovy/example/micronaut/HomePage.groovy[lines=16..-1]
+                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-groovy/src/test/groovy/example/micronaut/HomePage.groovy[lines=16..-1]
                 ----
                 """;
         assertEquals(expectedKotlin, resKotlin);
-        String resGroovy = rawTestMacroSubstitution.substitute(str, "micronaut-security-jwt-cookie", new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK));
+        String resGroovy = rawTestMacroSubstitution.substitute(str, "micronaut-security-jwt-cookie", new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.SPOCK));
         String expectedGroovy = """
                 Create three pages:
                 
-                [source,groovy]
-                .src/test/groovy/example/micronaut/HomePage.groovy
+                [source,kotlin]
+                .src/test/kotlin/example/micronaut/HomePage.kt
                 ----
-                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-groovy/src/test/groovy/example/micronaut/HomePage.groovy[lines=16..-1]
+                include::{sourceDir}/micronaut-security-jwt-cookie/micronaut-security-jwt-cookie-gradle-kotlin/src/test/kotlin/example/micronaut/HomePage.kt[lines=16..-1]
                 ----
                 """;
         assertEquals(expectedGroovy, resGroovy);
