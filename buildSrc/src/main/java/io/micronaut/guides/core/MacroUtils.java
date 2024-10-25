@@ -48,7 +48,7 @@ public final class MacroUtils {
                 if (StringUtils.isNotEmpty(indent)) {
                     attrs += "," + indent;
                 }
-                lines.add("include::{sourceDir}/" + path + "[" + attrs + "]\n");
+                lines.add("include::{sourceDir}/" + path + "[" + attrs + "]");
             }
         } else {
             List<String> attributes = new ArrayList<>();
