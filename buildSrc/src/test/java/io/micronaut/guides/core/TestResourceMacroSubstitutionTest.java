@@ -24,7 +24,6 @@ public class TestResourceMacroSubstitutionTest {
                 .src/test/resources/application-test.yml
                 ----
                 include::{sourceDir}/micronaut-metrics-oci/micronaut-metrics-oci-gradle-java/src/test/resources/application-test.yml[tag=testcontainers]
-                
                 ----""";
         assertEquals(expectedJava, resJava);
     }
