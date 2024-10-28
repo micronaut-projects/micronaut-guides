@@ -44,28 +44,28 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
                         .filter(attribute -> attribute.key().equals(APP))
                         .map(Attribute::values)
                         .filter(l -> !l.isEmpty())
-                        .map(List::getFirst)
+                        .map(l -> l.get(0))
                         .findFirst()
                         .orElse(APP);
 
                 String condensedTarget = condensedTarget(asciidocMacro, option);
-                String language = option.getLanguage().toString();
-                String extension = option.getLanguage().getExtension();
+                String language = getLanguage(option);
+                String extension = getExtension(option);
                 String[] arr = condensedTarget.split("\\.");
-                String sourceLanguage = option.getLanguage().toString();
+
                 if (arr.length == 2) {
-                    sourceLanguage = arr[1];
-                    sourceLanguage = switch (sourceLanguage.toLowerCase()) {
+                    language = arr[1];
+                    language = switch (language.toLowerCase()) {
                         case "yml", "yaml" -> "yaml";
                         case "html", "vm", "hbs" -> "html";
                         case "xml" -> "xml";
-                        default -> sourceLanguage;
+                        default -> language;
                     };
                 } else {
                     condensedTarget = condensedTarget + "." + extension;
                 }
                 String title = sourceTitle(appName, condensedTarget, getClasspath(), language, getGuidesConfiguration().getPackageName());
-                String target = sourceInclude(slug, appName, condensedTarget, getClasspath(), option.getBuildTool(), language, getGuidesConfiguration().getPackageName());
+                String target = sourceInclude(slug, appName, condensedTarget, getClasspath(), option, language, getGuidesConfiguration().getPackageName());
                 IncludeDirective.Builder includeDirectiveBuilder = IncludeDirective.builder().attributes(asciidocMacro.attributes())
                         .target(target);
                 if (getFileType() == FileType.CODE) {
@@ -76,7 +76,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
                 }
                 String replacement = SourceBlock.builder()
                         .title(title)
-                        .language(sourceLanguage)
+                        .language(language)
                         .includeDirective(includeDirectiveBuilder.build())
                         .build()
                         .toString();
@@ -84,6 +84,14 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             }
         }
         return str;
+    }
+
+    protected String getLanguage(GuidesOption option){
+        return option.getLanguage().toString();
+    }
+
+    protected String getExtension(GuidesOption option){
+        return option.getLanguage().getExtension();
     }
 
     protected String sourceTitle(
@@ -102,10 +110,10 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             String appName,
             String condensedTarget,
             Classpath classpath,
-            BuildTool buildTool,
+            GuidesOption option,
             String language,
             String packageName) {
-        return "{sourceDir}/" + slug + "/" + slug + "-" + buildTool.toString() + "-" + language + "/" +
+        return "{sourceDir}/" + slug + "/" + slug + "-" + option.getBuildTool() + "-" + option.getLanguage() + "/" +
                 sourceTitle(appName, condensedTarget, classpath, language, packageName);
     }
 

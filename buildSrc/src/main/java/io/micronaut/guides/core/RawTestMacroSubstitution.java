@@ -1,5 +1,7 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.guides.core.asciidoc.Classpath;
+import io.micronaut.starter.options.BuildTool;
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -14,4 +16,15 @@ public class RawTestMacroSubstitution extends TestMacroSubstitution {
     public String getMacroName() {
         return MACRO_RAW_TEST;
     }
+
+    @Override
+    protected String getLanguage(GuidesOption option){
+        return option.getTestFramework().toTestFramework().getDefaultLanguage().toString();
+    }
+
+    @Override
+    protected String getExtension(GuidesOption option){
+        return option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension();
+    }
+
 }
