@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest(startApplication = false)
-public class ResourceMacroSubstitutionTest {
+class ResourceMacroSubstitutionTest {
 
     @Inject
     ResourceMacroSubstitution resourceMacroSubstitution;
@@ -20,7 +20,7 @@ public class ResourceMacroSubstitutionTest {
         String str = "resource:../../../ttfr.sh[]";
         String resJava = resourceMacroSubstitution.substitute(str, "executable-jar", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
-                [source,]
+                [source,sh]
                 .ttfr.sh
                 ----
                 include::{sourceDir}/executable-jar/executable-jar-gradle-java/src/main/resources/../../../ttfr.sh[]

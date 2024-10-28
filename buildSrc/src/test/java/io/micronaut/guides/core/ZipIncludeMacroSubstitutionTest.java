@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest(startApplication = false)
-public class ZipIncludeSubstitutionTest {
+public class ZipIncludeMacroSubstitutionTest {
 
     @Inject
     ZipIncludeMacroSubstitution zipIncludeMacroSubstitution;
@@ -30,6 +30,19 @@ public class ZipIncludeSubstitutionTest {
                     ----
                     include::{sourceDir}/micronaut-kafka/micronaut-kafka-gradle-java/docker/docker-compose.yml[]
                     ----""";
+        assertEquals(expectedJava, resJava);
+    }
+
+    @Test
+    void testSubstituteWithPath() {
+        String str = "zipInclude:../ttfr.sh[]";
+        String resJava = zipIncludeMacroSubstitution.substitute(str, "executable-jar", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String expectedJava = """
+                [source,sh]
+                .ttfr.sh
+                ----
+                include::{sourceDir}/executable-jar/executable-jar-gradle-java/../ttfr.sh[]
+                ----""";
         assertEquals(expectedJava, resJava);
     }
 }

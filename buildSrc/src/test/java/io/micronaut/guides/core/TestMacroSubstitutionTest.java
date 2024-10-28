@@ -59,28 +59,26 @@ class TestMacroSubstitutionTest {
 
     @Test
     void TestSubstituteWithTags(){
-        String str = "test:TeamConfigurationTest[tags=teamConfigClassNoBuilder|gettersandsetters]";
+        String str = "test:TeamConfigurationTest[tags=teamConfigClassNoBuilder;gettersandsetters]";
         String resJava = testMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 [source,java]
                 .src/test/java/example/micronaut/TeamConfigurationTest.java
                 ----
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=teamConfigClassNoBuilder]
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=gettersandsetters]
+                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/test/java/example/micronaut/TeamConfigurationTest.java[lines=16..-1,tags=teamConfigClassNoBuilder;gettersandsetters]
                 ----""";
         assertEquals(expectedJava, resJava);
     }
 
     @Test
     void TestSubstituteWithMultiple(){
-        String str = "test:TeamConfigurationTest[app=springboot,tags=teamConfigClassNoBuilder|gettersandsetters,indent=0]";
+        String str = "test:TeamConfigurationTest[app=springboot,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]";
         String resJava = testMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 [source,java]
                 .springboot/src/test/java/example/micronaut/TeamConfigurationTest.java
                 ----
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=teamConfigClassNoBuilder,indent=0]
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=gettersandsetters,indent=0]
+                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[lines=16..-1,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]
                 ----""";
         assertEquals(expectedJava, resJava);
     }
@@ -90,7 +88,7 @@ class TestMacroSubstitutionTest {
         String str = """
                 Test
                 
-                test:TeamConfigurationTest[app=springboot,tags=teamConfigClassNoBuilder|gettersandsetters,indent=0]
+                test:TeamConfigurationTest[app=springboot,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]
                 """;
         String resJava = testMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
@@ -99,8 +97,7 @@ class TestMacroSubstitutionTest {
                 [source,java]
                 .springboot/src/test/java/example/micronaut/TeamConfigurationTest.java
                 ----
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=teamConfigClassNoBuilder,indent=0]
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[tag=gettersandsetters,indent=0]
+                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/test/java/example/micronaut/TeamConfigurationTest.java[lines=16..-1,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]
                 ----
                 """;
         assertEquals(expectedJava, resJava);

@@ -1,37 +1,31 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.guides.core.asciidoc.Classpath;
 import jakarta.inject.Singleton;
 
-import java.util.List;
-
-import static io.micronaut.guides.core.MacroUtils.*;
-import static io.micronaut.guides.core.MacroUtils.addIncludes;
-
 @Singleton
-public class ZipIncludeMacroSubstitution implements MacroSubstitution {
-    private final GuidesConfiguration guidesConfiguration;
-    private final LicenseLoader licenseLoader;
-
+public class ZipIncludeMacroSubstitution extends SourceBlockMacroSubstitution {
+    private static final String MACRO_ZIPINCLUDE = "zipInclude";
     public ZipIncludeMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
-        this.guidesConfiguration = guidesConfiguration;
-        this.licenseLoader = licenseLoader;
+        super(licenseLoader, guidesConfiguration);
     }
 
     @Override
-    public String substitute(String str, String slug, GuidesOption option) {
-        for(String line : findMacroLines(str, "zipInclude")) {
+    public String getMacroName() { return MACRO_ZIPINCLUDE; }
 
-            String name = extractName(line, "zipInclude");
-            List<String> tags = extractTags(line);
-            String indent = extractIndent(line);
-            String sourcePath = name;
-            String extension = resolveAsciidoctorLanguage(name);
+    @Override
+    protected Classpath getClasspath() { return Classpath.MAIN; }
 
-            List<String> lines = addIncludes(option, licenseLoader, guidesConfiguration, slug, sourcePath, extension, indent, tags);
+    @Override
+    protected FileType getFileType() { return FileType.RESOURCE; }
 
-            str = str.replace(line,String.join("\n", lines));
-        }
-        return str;
+    @Override
+    protected String sourceTitle(
+            String appName,
+            String condensedTarget,
+            Classpath classpath,
+            String language,
+            String packageName) {
+        return condensedTarget;
     }
-
 }

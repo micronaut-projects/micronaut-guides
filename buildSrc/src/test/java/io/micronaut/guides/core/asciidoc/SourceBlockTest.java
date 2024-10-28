@@ -18,8 +18,8 @@ class SourceBlockTest {
                         .build().toString());
 
         assertEquals("""
-                .Gemfile.lock
                 [source,ruby]
+                .Gemfile.lock               
                 ----
                 include::app.rb[]
                 ----""", SourceBlock.builder()

@@ -8,7 +8,6 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @MicronautTest(startApplication = false)
 class SourceMacroSubstitutionTest {
 
@@ -63,14 +62,13 @@ class SourceMacroSubstitutionTest {
 
     @Test
     void TestSubstituteWithTags(){
-        String str = "source:TeamConfiguration[tags=teamConfigClassNoBuilder|gettersandsetters]\n";
+        String str = "source:TeamConfiguration[tags=teamConfigClassNoBuilder;gettersandsetters]\n";
         String resJava = sourceMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
                 .src/main/java/example/micronaut/TeamConfiguration.java
                 ----
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/main/java/example/micronaut/TeamConfiguration.java[tag=teamConfigClassNoBuilder]
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/main/java/example/micronaut/TeamConfiguration.java[tag=gettersandsetters]
+                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/src/main/java/example/micronaut/TeamConfiguration.java[lines=16..-1,tags=teamConfigClassNoBuilder;gettersandsetters]
                 ----
                 """;
         assertEquals(expectedJava, resJava);
@@ -78,14 +76,13 @@ class SourceMacroSubstitutionTest {
 
     @Test
     void TestSubstituteWithMultiple(){
-        String str = "source:TeamConfiguration[app=springboot,tags=teamConfigClassNoBuilder|gettersandsetters,indent=0]\n";
+        String str = "source:TeamConfiguration[app=springboot,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]\n";
         String resJava = sourceMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
                 .springboot/src/main/java/example/micronaut/TeamConfiguration.java
                 ----
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/main/java/example/micronaut/TeamConfiguration.java[tag=teamConfigClassNoBuilder,indent=0]
-                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/main/java/example/micronaut/TeamConfiguration.java[tag=gettersandsetters,indent=0]
+                include::{sourceDir}/micronaut-configuration/micronaut-configuration-gradle-java/springboot/src/main/java/example/micronaut/TeamConfiguration.java[lines=16..-1,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]
                 ----
                 """;
         assertEquals(expectedJava, resJava);

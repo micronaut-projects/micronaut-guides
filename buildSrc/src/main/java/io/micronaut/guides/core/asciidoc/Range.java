@@ -17,8 +17,11 @@ package io.micronaut.guides.core.asciidoc;
 
 public record Range(int from, int to) {
 
-    boolean isValid() {
+    public boolean isValid() {
         if (from == to) {
+            return false;
+        }
+        if (to == -1 && from == 0) {
             return false;
         }
         if (to != -1 && from > to) {

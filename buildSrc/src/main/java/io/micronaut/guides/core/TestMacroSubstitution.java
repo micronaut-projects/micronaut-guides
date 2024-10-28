@@ -1,52 +1,43 @@
 package io.micronaut.guides.core;
 
-import io.micronaut.core.annotation.NonNull;
+import io.micronaut.guides.core.asciidoc.AsciidocMacro;
+import io.micronaut.guides.core.asciidoc.Classpath;
 import jakarta.inject.Singleton;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-import static io.micronaut.guides.core.MacroUtils.*;
 import static io.micronaut.starter.api.TestFramework.SPOCK;
 
 @Singleton
-public class TestMacroSubstitution implements MacroSubstitution{
-
-    private final GuidesConfiguration guidesConfiguration;
-    private final LicenseLoader licenseLoader;
-
+public class TestMacroSubstitution  extends SourceBlockMacroSubstitution {
+    private static final String MACRO_TEST = "test";
+    private static final String SUFFIX_TEST = "Test";
+    public static final String SUFFIX_SPEC = "Spec";
     public TestMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
-        this.guidesConfiguration = guidesConfiguration;
-        this.licenseLoader = licenseLoader;
+        super(licenseLoader, guidesConfiguration);
     }
 
     @Override
-    public String substitute(String str, String slug, GuidesOption option) {
-        for(String line : findMacroLines(str, "test")){
-
-            String name = extractName(line, "test");
-            String appName = extractAppName(line);
-            List<String> tags = extractTags(line);
-            String indent = extractIndent(line);
-            String sourcePath = testPath(guidesConfiguration, appName, name, option);
-
-            List<String> lines = addIncludes(option, licenseLoader, guidesConfiguration, slug, sourcePath, indent, tags);
-
-            str = str.replace(line,String.join("\n", lines));
-        }
-        return str;
+    public String getMacroName() {
+        return MACRO_TEST;
     }
 
-    @NonNull
-    private static String testPath(@NonNull GuidesConfiguration guidesConfiguration,
-                           @NonNull String appName,
-                           @NonNull String name,
-                           @NonNull GuidesOption option) {
-        String fileName = name;
+    @Override
+    public Classpath getClasspath() {
+        return Classpath.TEST;
+    }
 
-        if (name.endsWith("Test")) {
-            fileName = name.substring(0, name.indexOf("Test"));
-            fileName += option.getTestFramework() == SPOCK ? "Spec" : "Test";
+    @Override
+    public FileType getFileType() {
+        return FileType.CODE;
+    }
+
+    @Override
+    public String condensedTarget(@NotNull AsciidocMacro asciidocMacro, GuidesOption option) {
+        String target = asciidocMacro.target();
+        if (target.endsWith(SUFFIX_TEST)) {
+            target = target.substring(0, target.indexOf(SUFFIX_TEST));
+            target += option.getTestFramework() == SPOCK ? SUFFIX_SPEC : SUFFIX_TEST;
         }
-
-        return pathByFolder(guidesConfiguration, appName, fileName, "test", option);
+        return target;
     }
 }
