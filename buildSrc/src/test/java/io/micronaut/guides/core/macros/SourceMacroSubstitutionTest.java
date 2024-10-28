@@ -1,14 +1,11 @@
-package io.micronaut.guides.core;
+package io.micronaut.guides.core.macros;
 
-import io.micronaut.context.annotation.Property;
-import io.micronaut.context.annotation.Replaces;
-import io.micronaut.context.annotation.Requires;
+import io.micronaut.guides.core.GuidesOption;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

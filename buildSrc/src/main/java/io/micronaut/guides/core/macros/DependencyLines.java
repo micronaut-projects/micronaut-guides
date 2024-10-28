@@ -1,4 +1,4 @@
-package io.micronaut.guides.core;
+package io.micronaut.guides.core.macros;
 
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.starter.options.BuildTool;

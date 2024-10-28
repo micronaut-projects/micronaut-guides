@@ -1,5 +1,8 @@
-package io.micronaut.guides.core;
+package io.micronaut.guides.core.macros;
 
+import io.micronaut.guides.core.GuidesConfiguration;
+import io.micronaut.guides.core.GuidesOption;
+import io.micronaut.guides.core.LicenseLoader;
 import jakarta.inject.Singleton;
 
 @Singleton

@@ -1,5 +1,6 @@
-package io.micronaut.guides.core;
+package io.micronaut.guides.core.macros;
 
+import io.micronaut.guides.core.GuidesOption;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;

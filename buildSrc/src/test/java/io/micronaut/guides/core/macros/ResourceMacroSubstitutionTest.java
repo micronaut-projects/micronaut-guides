@@ -1,11 +1,11 @@
-package io.micronaut.guides.core;
+package io.micronaut.guides.core.macros;
 
+import io.micronaut.guides.core.GuidesOption;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,13 +16,12 @@ class ResourceMacroSubstitutionTest {
     @Inject
     ResourceMacroSubstitution resourceMacroSubstitution;
 
-    @Disabled("this should probably be written as a zipInclude")
     @Test
     void testSubstitute() {
         String str = "resource:../../../ttfr.sh[]";
         String resJava = resourceMacroSubstitution.substitute(str, "executable-jar", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
-                [source,]
+                [source,sh]
                 .ttfr.sh
                 ----
                 include::{sourceDir}/executable-jar/executable-jar-gradle-java/src/main/resources/../../../ttfr.sh[]

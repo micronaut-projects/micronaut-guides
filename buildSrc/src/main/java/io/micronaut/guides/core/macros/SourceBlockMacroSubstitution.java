@@ -1,11 +1,16 @@
-package io.micronaut.guides.core;
+package io.micronaut.guides.core.macros;
 
+import io.micronaut.guides.core.FileType;
+import io.micronaut.guides.core.GuidesConfiguration;
+import io.micronaut.guides.core.GuidesOption;
+import io.micronaut.guides.core.LicenseLoader;
 import io.micronaut.guides.core.asciidoc.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
-import static io.micronaut.guides.core.MacroUtils.findMacroLines;
+import static io.micronaut.guides.core.macros.MacroUtils.*;
 import static io.micronaut.guides.core.asciidoc.IncludeDirective.ATTRIBUTE_LINES;
 
 abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
@@ -48,23 +53,28 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
                         .orElse(APP);
 
                 String condensedTarget = condensedTarget(asciidocMacro, option);
+                String[] arr;
+                int lastIndex = condensedTarget.lastIndexOf('.');
+                if (lastIndex != -1 && lastIndex != condensedTarget.length() - 1) {
+                    String prefix = condensedTarget.substring(0, lastIndex);
+                    String extension = condensedTarget.substring(lastIndex + 1);
+                    arr = new String[]{prefix, extension};
+                } else {
+                    arr = new String[]{condensedTarget};
+                }
                 String language = getLanguage(option);
                 String extension = getExtension(option);
-                String[] arr = condensedTarget.split("\\.");
 
                 if (arr.length == 2) {
-                    language = arr[1];
-                    language = switch (language.toLowerCase()) {
-                        case "yml", "yaml" -> "yaml";
-                        case "html", "vm", "hbs" -> "html";
-                        case "xml" -> "xml";
-                        default -> language;
-                    };
+                    language = arr[arr.length-1];
+                    language = resolveAsciidoctorLanguage(language);
                 } else {
                     condensedTarget = condensedTarget + "." + extension;
                 }
-                String title = sourceTitle(appName, condensedTarget, getClasspath(), language, getGuidesConfiguration().getPackageName());
+
                 String target = sourceInclude(slug, appName, condensedTarget, getClasspath(), option, language, getGuidesConfiguration().getPackageName());
+                String title = Path.of(target).normalize().toString().replace("{sourceDir}/"+slug+"/", "").replace(getSourceDir(slug, option)+"/", "");
+
                 IncludeDirective.Builder includeDirectiveBuilder = IncludeDirective.builder().attributes(asciidocMacro.attributes())
                         .target(target);
                 if (getFileType() == FileType.CODE) {
@@ -112,7 +122,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             GuidesOption option,
             String language,
             String packageName) {
-        return "{sourceDir}/" + slug + "/" + slug + "-" + option.getBuildTool() + "-" + option.getLanguage() + "/" +
+        return "{sourceDir}/" + slug + "/" + getSourceDir(slug,option) + "/" +
                 sourceTitle(appName, condensedTarget, classpath, language, packageName);
     }
 
