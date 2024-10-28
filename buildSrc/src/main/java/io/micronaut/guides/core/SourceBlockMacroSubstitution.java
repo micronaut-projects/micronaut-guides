@@ -14,6 +14,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
 
     private final LicenseLoader licenseLoader;
     private final GuidesConfiguration guidesConfiguration;
+    
     SourceBlockMacroSubstitution(LicenseLoader licenseLoader,
                                  GuidesConfiguration guidesConfiguration) {
         this.licenseLoader = licenseLoader;
