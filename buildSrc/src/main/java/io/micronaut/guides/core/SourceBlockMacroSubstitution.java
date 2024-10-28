@@ -1,16 +1,12 @@
-package io.micronaut.guides.core.macros;
+package io.micronaut.guides.core;
 
-import io.micronaut.guides.core.FileType;
-import io.micronaut.guides.core.GuidesConfiguration;
-import io.micronaut.guides.core.GuidesOption;
-import io.micronaut.guides.core.LicenseLoader;
 import io.micronaut.guides.core.asciidoc.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static io.micronaut.guides.core.macros.MacroUtils.*;
+import static io.micronaut.guides.core.MacroUtils.*;
 import static io.micronaut.guides.core.asciidoc.IncludeDirective.ATTRIBUTE_LINES;
 
 abstract class SourceBlockMacroSubstitution implements MacroSubstitution {

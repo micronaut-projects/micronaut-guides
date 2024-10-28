@@ -1,7 +1,6 @@
-package io.micronaut.guides.core.macros;
+package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.guides.core.GuidesOption;
 
 import java.util.ArrayList;
 import java.util.List;

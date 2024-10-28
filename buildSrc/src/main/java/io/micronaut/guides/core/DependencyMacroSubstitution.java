@@ -1,10 +1,9 @@
-package io.micronaut.guides.core.macros;
+package io.micronaut.guides.core;
 
-import io.micronaut.guides.core.GuidesOption;
 import jakarta.inject.Singleton;
 import java.util.List;
 
-import static io.micronaut.guides.core.macros.MacroUtils.*;
+import static io.micronaut.guides.core.MacroUtils.*;
 
 @Singleton
 public class DependencyMacroSubstitution implements MacroSubstitution{
