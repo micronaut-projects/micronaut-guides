@@ -92,7 +92,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             Classpath classpath,
             String language,
             String packageName) {
-        return (appName.equals(MacroSubstitution.APP) ? "" : (appName + "/")) +sourceConventionFolder(classpath, language) + "/"
+        return (appName.equals(MacroSubstitution.APP) ? "" : (appName + "/")) + sourceConventionFolder(classpath, language) + "/"
                 + (getFileType() == FileType.CODE ? (packageName.replace(".", "/") + "/") : "")
                 + condensedTarget;
     }
