@@ -12,6 +12,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
 
     private final LicenseLoader licenseLoader;
     private final GuidesConfiguration guidesConfiguration;
+    
     SourceBlockMacroSubstitution(LicenseLoader licenseLoader,
                                  GuidesConfiguration guidesConfiguration) {
         this.licenseLoader = licenseLoader;
@@ -98,7 +99,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             Classpath classpath,
             String language,
             String packageName) {
-        return (appName.equals(MacroSubstitution.APP) ? "" : (appName + "/")) +sourceConventionFolder(classpath, language) + "/"
+        return (appName.equals(MacroSubstitution.APP) ? "" : (appName + "/")) + sourceConventionFolder(classpath, language) + "/"
                 + (getFileType() == FileType.CODE ? (packageName.replace(".", "/") + "/") : "")
                 + condensedTarget;
     }
