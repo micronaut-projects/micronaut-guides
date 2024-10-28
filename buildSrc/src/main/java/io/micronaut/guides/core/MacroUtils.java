@@ -1,13 +1,60 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.starter.options.Language;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class MacroUtils {
     private MacroUtils() {
     }
+
+    @NonNull
+    public static String extractAppName(@NonNull  String line) {
+        return extractFromParametersLine(line, "app");
+    }
+
+    @NonNull
+    static String extractFromParametersLine(@NonNull String line, @NonNull String attributeName) {
+        String[] attrs = line.substring(line.indexOf("[") + 1, line.indexOf("]")).split(",");
+        return Arrays.stream(attrs)
+                .filter(attr -> attr.startsWith(attributeName))
+                .map(attr -> attr.split("="))
+                .map(parts -> parts[1])
+                .findFirst()
+                .orElse("");
+    }
+
+    @NonNull
+    static List<String> featureNames(@NonNull String line,
+                                     @NonNull App app,
+                                     @NonNull GuidesOption guidesOption) {
+        String features = extractFromParametersLine(line, "features");
+        List<String> featureNames;
+        if (StringUtils.isNotEmpty(features)) {
+            featureNames = Arrays.asList(features.split("\\|"));
+        } else {
+            featureNames = new ArrayList<>(GuideUtils.getAppVisibleFeatures(app, guidesOption.getLanguage()));
+        }
+
+        String featureExcludes = extractFromParametersLine(line, "featureExcludes");
+        List<String> excludedFeatureNames;
+        if (featureExcludes != null && !featureExcludes.isEmpty()) {
+            excludedFeatureNames = Arrays.asList(featureExcludes.split("\\|"));
+        } else {
+            excludedFeatureNames = new ArrayList<>();
+        }
+        featureNames.removeAll(excludedFeatureNames);
+
+        if (guidesOption.getLanguage() == Language.GROOVY) {
+            featureNames.remove("graalvm");
+        }
+        return featureNames;
+    }
+
 
     @NonNull
     static String getSourceDir(@NonNull String slug, @NonNull GuidesOption option) {
