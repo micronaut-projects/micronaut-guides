@@ -1,10 +1,8 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.guides.core.asciidoc.*;
-import io.micronaut.starter.options.BuildTool;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Optional;
 
 import static io.micronaut.guides.core.MacroUtils.findMacroLines;

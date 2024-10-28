@@ -1,7 +1,5 @@
 package io.micronaut.guides.core;
 
-import io.micronaut.guides.core.asciidoc.Classpath;
-import io.micronaut.starter.options.BuildTool;
 import jakarta.inject.Singleton;
 
 @Singleton
