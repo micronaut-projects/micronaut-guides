@@ -87,4 +87,90 @@ class MacroUtilsTest {
                 :dependencies:""");
         assertEquals(expected, result);
     }
+
+    @Test
+    void findMacroGroupsNested(){
+        String str = """
+                :exclude-for-build:gradle
+                
+                [source, bash]
+                .users
+                ----
+                ./mvnw test
+                ----
+                
+                :exclude-for-build:
+                
+                {empty} +
+                
+                ==== Running the application
+                
+                Run the `users` microservice:
+                
+                :exclude-for-build:gradle
+                
+                [source, bash]
+                .users
+                ----
+                 MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
+                ----
+                
+                Test
+                
+                :exclude-for-build:maven
+                
+                [source, bash]
+                .users
+                ----
+                 MICRONAUT_ENVIRONMENTS=dev ./gradlew run
+                ----
+                
+                :exclude-for-build:
+                TestTest
+                
+                :exclude-for-build:""";
+        List<String> result = MacroUtils.findMacroGroupsNested(str,"exclude-for-build");
+        List<String> expected = List.of("""
+                :exclude-for-build:gradle
+                
+                [source, bash]
+                .users
+                ----
+                ./mvnw test
+                ----
+                
+                :exclude-for-build:""","""
+                :exclude-for-build:maven
+                
+                [source, bash]
+                .users
+                ----
+                 MICRONAUT_ENVIRONMENTS=dev ./gradlew run
+                ----
+                
+                :exclude-for-build:""", """
+               :exclude-for-build:gradle
+                
+               [source, bash]
+               .users
+               ----
+                MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
+               ----
+
+               Test
+
+               :exclude-for-build:maven
+
+               [source, bash]
+               .users
+               ----
+                MICRONAUT_ENVIRONMENTS=dev ./gradlew run
+               ----
+
+               :exclude-for-build:
+               TestTest
+
+               :exclude-for-build:""");
+        assertEquals(expected, result);
+    }
 }

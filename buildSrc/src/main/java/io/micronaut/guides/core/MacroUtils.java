@@ -7,6 +7,7 @@ import io.micronaut.starter.options.Language;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 public final class MacroUtils {
     private MacroUtils() {
@@ -86,6 +87,38 @@ public final class MacroUtils {
         }
 
         return matches;
+    }
+
+    static List<String> findMacroGroupsNested(@NonNull String str, @NonNull String macro) {
+        List<String> matches = new ArrayList<>();
+        String pattern = ":"+macro+":";
+
+        List<String> lines = str.lines().toList();
+        Stack<Integer> stack = new Stack<>();
+
+        for (int i=0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (isGroupStart(line, pattern)) {
+                stack.push(i);
+            } else if (isGroupEnd(line, pattern)) {
+                if (!stack.isEmpty()) {
+                    int start = stack.pop();
+                    matches.add(String.join("\n", lines.subList(start, i+1)));
+                } else{
+                    throw new UnsupportedOperationException("Unbalanced macro group");
+                }
+            }
+        }
+
+        return matches;
+    }
+
+    private static boolean isGroupStart(String line, String macro) {
+        return line.matches(macro+"[a-zA-Z,]+");
+    }
+
+    private static boolean isGroupEnd(String line, String macro) {
+        return line.matches(macro+"(?![a-zA-Z,]+$)");
     }
 
     @NonNull
