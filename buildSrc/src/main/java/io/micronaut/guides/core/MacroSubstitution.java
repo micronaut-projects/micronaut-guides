@@ -4,8 +4,6 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.guides.core.asciidoc.AsciidocMacro;
 import io.micronaut.guides.core.asciidoc.Attribute;
 
-import java.util.List;
-
 public interface MacroSubstitution {
     String APP = "app";
     String APP_NAME_DEFAULT = "default";
@@ -26,7 +24,7 @@ public interface MacroSubstitution {
                 .filter(attribute -> attribute.key().equals(APP))
                 .map(Attribute::values)
                 .filter(l -> !l.isEmpty())
-                .map(List::getFirst)
+                .map(l -> l.get(0))
                 .findFirst()
                 .orElse(APP_NAME_DEFAULT);
     }
