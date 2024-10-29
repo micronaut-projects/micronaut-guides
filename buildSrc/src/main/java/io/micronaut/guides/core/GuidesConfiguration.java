@@ -8,6 +8,6 @@ public interface GuidesConfiguration {
     String getLicensePath();
     String getPackageName();
     String getDefaultAppName();
-    String getLauncherUrl();
+    String getProjectGeneratorUrl();
     List<String> getFilesWithHeader();
 }

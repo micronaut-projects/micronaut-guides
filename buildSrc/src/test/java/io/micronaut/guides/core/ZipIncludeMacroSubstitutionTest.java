@@ -21,7 +21,7 @@ public class ZipIncludeMacroSubstitutionTest {
                 A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker]. Create this `docker-compose.yml` file:
                 
                 zipInclude:docker/docker-compose.yml[]""";
-        String resJava = zipIncludeMacroSubstitution.substitute(str, "micronaut-kafka", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String resJava = zipIncludeMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-kafka"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                     A fast way to start using Kafka is https://hub.docker.com/r/confluentinc/cp-kafka/[via Docker]. Create this `docker-compose.yml` file:
                     
@@ -36,7 +36,7 @@ public class ZipIncludeMacroSubstitutionTest {
     @Test
     void testSubstituteWithPath() {
         String str = "zipInclude:../ttfr.sh[]";
-        String resJava = zipIncludeMacroSubstitution.substitute(str, "executable-jar", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String resJava = zipIncludeMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("executable-jar"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 [source,sh]
                 .ttfr.sh

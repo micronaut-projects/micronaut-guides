@@ -18,7 +18,7 @@ class TestMacroSubstitutionTest {
     @Test
     void testSubstitute() {
         String str = "test:HelloControllerTest[]";
-        String resJava = testMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String resJava = testMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-http-client"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 [source,java]
                 .src/test/java/example/micronaut/HelloControllerTest.java
@@ -26,7 +26,7 @@ class TestMacroSubstitutionTest {
                 include::{sourceDir}/micronaut-http-client/micronaut-http-client-gradle-java/src/test/java/example/micronaut/HelloControllerTest.java[lines=16..-1]
                 ----""";
         assertEquals(expectedJava, resJava);
-        String resKotlin = testMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.KOTEST));
+        String resKotlin = testMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-http-client"), new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.KOTEST));
         String expectedKotlin = """
                 [source,kotlin]
                 .src/test/kotlin/example/micronaut/HelloControllerTest.kt
@@ -34,7 +34,7 @@ class TestMacroSubstitutionTest {
                 include::{sourceDir}/micronaut-http-client/micronaut-http-client-gradle-kotlin/src/test/kotlin/example/micronaut/HelloControllerTest.kt[lines=16..-1]
                 ----""";
         assertEquals(expectedKotlin, resKotlin);
-        String resGroovy = testMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK));
+        String resGroovy = testMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-http-client"), new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.SPOCK));
         String expectedGroovy = """
                 [source,groovy]
                 .src/test/groovy/example/micronaut/HelloControllerSpec.groovy
@@ -47,7 +47,7 @@ class TestMacroSubstitutionTest {
     @Test
     void TestSubstituteWithApp() {
         String str = "test:ApplicationTest[app=springboot]";
-        String resJava = testMacroSubstitution.substitute(str, "spring-boot-to-micronaut-application-class", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String resJava = testMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("spring-boot-to-micronaut-application-class"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 [source,java]
                 .springboot/src/test/java/example/micronaut/ApplicationTest.java
@@ -60,7 +60,7 @@ class TestMacroSubstitutionTest {
     @Test
     void TestSubstituteWithTags(){
         String str = "test:TeamConfigurationTest[tags=teamConfigClassNoBuilder;gettersandsetters]";
-        String resJava = testMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String resJava = testMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-configuration"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 [source,java]
                 .src/test/java/example/micronaut/TeamConfigurationTest.java
@@ -73,7 +73,7 @@ class TestMacroSubstitutionTest {
     @Test
     void TestSubstituteWithMultiple(){
         String str = "test:TeamConfigurationTest[app=springboot,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]";
-        String resJava = testMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String resJava = testMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-configuration"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 [source,java]
                 .springboot/src/test/java/example/micronaut/TeamConfigurationTest.java
@@ -90,7 +90,7 @@ class TestMacroSubstitutionTest {
                 
                 test:TeamConfigurationTest[app=springboot,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]
                 """;
-        String resJava = testMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String resJava = testMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-configuration"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 Test
             

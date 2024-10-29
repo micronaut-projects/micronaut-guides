@@ -18,7 +18,7 @@ public class TestResourceMacroSubstitutionTest {
     @Test
     void testSubstitute() {
         String str = "testResource:application-test.yml[tag=testcontainers]";
-        String resJava = testResourceMacroSubstitution.substitute(str, "micronaut-metrics-oci", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
+        String resJava = testResourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-metrics-oci"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT));
         String expectedJava = """
                 [source,yaml]
                 .src/test/resources/application-test.yml
