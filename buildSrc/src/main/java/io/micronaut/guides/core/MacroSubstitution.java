@@ -9,7 +9,7 @@ public interface MacroSubstitution {
     String APP_NAME_DEFAULT = "default";
 
     @NonNull
-    String substitute(@NonNull String str, @NonNull Guide slug, @NonNull GuidesOption option);
+    String substitute(@NonNull String str, @NonNull Guide guide, @NonNull GuidesOption option);
 
     default App app(Guide guide, AsciidocMacro asciidocMacro) {
         final String appName = appName(asciidocMacro);
