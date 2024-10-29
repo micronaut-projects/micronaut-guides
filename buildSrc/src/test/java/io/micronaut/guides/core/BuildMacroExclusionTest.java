@@ -88,7 +88,7 @@ public class BuildMacroExclusionTest {
                 ----
                 
                 """;
-        String result = buildMacroExclusion.substitute(str, option, guide);
+        String result = buildMacroExclusion.substitute(str, guide, option);
         String expected = """
                 Run the unit test:
                 
@@ -187,7 +187,7 @@ public class BuildMacroExclusionTest {
                 ----
                 
                 """;
-        String result = buildMacroExclusion.substitute(str, option, guide);
+        String result = buildMacroExclusion.substitute(str, guide, option);
         String expected = """
                 Run the unit test:
                 
