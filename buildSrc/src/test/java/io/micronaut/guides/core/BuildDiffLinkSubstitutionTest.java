@@ -35,7 +35,7 @@ public class BuildDiffLinkSubstitutionTest {
         Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStreamBase, Guide.class));
         String str = "diffLink:[app=cli]";
         String resJava = buildDiffLinkSubstitution.substitute(str, new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT), guide);
-        String expectedJava = "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can https://micronaut.io/launch?features=yaml&features=graalvm&features=mqtt&features=awaitility&lang=JAVA&build=GRADLE&test=JUNIT&name=cli&type=CLI&package=example.micronaut&activity=diff[view the dependency and configuration changes from the specified features, window=\"_blank\"] and apply those changes to your application.";
+        String expectedJava = "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can https://micronaut.io/launch?lang=JAVA&build=GRADLE&test=JUNIT&name=cli&type=CLI&package=example.micronaut&activity=diff&features=yaml&features=graalvm&features=mqtt&features=awaitility[view the dependency and configuration changes from the specified features, window=\"_blank\"] and apply those changes to your application.";
         assertEquals(expectedJava, resJava);
     }
 }

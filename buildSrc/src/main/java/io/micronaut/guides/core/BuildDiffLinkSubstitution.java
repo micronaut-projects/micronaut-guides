@@ -1,9 +1,8 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.http.uri.UriBuilder;
 import jakarta.inject.Singleton;
-
-import java.util.stream.Collectors;
 
 import static io.micronaut.guides.core.MacroUtils.*;
 
@@ -29,21 +28,20 @@ public class BuildDiffLinkSubstitution implements MacroMetadataSubstitution {
                     .findFirst()
                     .orElse(null);
 
-            String link = "https://micronaut.io/launch?" +
-                    featureNames(line, app, option).stream()
-                            .map(f -> "features=" + f)
-                            .collect(Collectors.joining("&")) +
-                    "&lang=" + option.getLanguage().name() +
-                    "&build=" + option.getBuildTool().name() +
-                    "&test=" + option.getTestFramework().name() +
-                    "&name=" + (appName.equals(guidesConfiguration.getDefaultAppName()) ? "micronautguide" : appName) +
-                    "&type=" + app.applicationType().name() +
-                    "&package=example.micronaut" +
-                    "&activity=diff" +
-                    "[view the dependency and configuration changes from the specified features, window=\"_blank\"]";
+            UriBuilder uriBuilder = UriBuilder.of(guidesConfiguration.getLauncherUrl())
+                    .queryParam("lang", option.getLanguage().name())
+                    .queryParam("build", option.getBuildTool().name())
+                    .queryParam("test", option.getTestFramework().name())
+                    .queryParam("name", appName.equals(guidesConfiguration.getDefaultAppName()) ? "micronautguide" : appName)
+                    .queryParam("type", app.applicationType().name())
+                    .queryParam("package", guidesConfiguration.getPackageName())
+                    .queryParam("activity", "diff");
+            featureNames(line, app, option).forEach(f -> uriBuilder.queryParam("features", f));
 
-            String res = "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can " +
-                    link + " and apply those changes to your application.";
+            String res = "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can "
+                    + uriBuilder.build().toString()
+                    + "[view the dependency and configuration changes from the specified features, window=\"_blank\"]"
+                    + " and apply those changes to your application.";
 
             str = str.replace(line,res);
         }
