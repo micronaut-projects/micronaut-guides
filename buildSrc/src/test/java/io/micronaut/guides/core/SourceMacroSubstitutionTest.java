@@ -17,7 +17,7 @@ class SourceMacroSubstitutionTest {
     @Test
     void testSubstitute(){
         String str = "source:GithubConfiguration[]\n";
-        String resJava = sourceMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
+        String resJava = sourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-http-client"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
                 .src/main/java/example/micronaut/GithubConfiguration.java
@@ -26,7 +26,7 @@ class SourceMacroSubstitutionTest {
                 ----
                 """;
         assertEquals(expectedJava, resJava);
-        String resKotlin = sourceMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.KOTEST));
+        String resKotlin = sourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-http-client"), new GuidesOption(BuildTool.GRADLE, Language.KOTLIN, TestFramework.KOTEST));
         String expectedKotlin = """
                 [source,kotlin]
                 .src/main/kotlin/example/micronaut/GithubConfiguration.kt
@@ -35,7 +35,7 @@ class SourceMacroSubstitutionTest {
                 ----
                 """;
         assertEquals(expectedKotlin, resKotlin);
-        String resGroovy = sourceMacroSubstitution.substitute(str, "micronaut-http-client", new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.JUNIT));
+        String resGroovy = sourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-http-client"), new GuidesOption(BuildTool.GRADLE, Language.GROOVY, TestFramework.JUNIT));
         String expectedGroovy = """
                 [source,groovy]
                 .src/main/groovy/example/micronaut/GithubConfiguration.groovy
@@ -49,7 +49,7 @@ class SourceMacroSubstitutionTest {
     @Test
     void TestSubstituteWithApp(){
         String str = "source:Application[app=springboot]\n";
-        String resJava = sourceMacroSubstitution.substitute(str, "spring-boot-to-micronaut-application-class", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
+        String resJava = sourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("spring-boot-to-micronaut-application-class"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
                 .springboot/src/main/java/example/micronaut/Application.java
@@ -63,7 +63,7 @@ class SourceMacroSubstitutionTest {
     @Test
     void TestSubstituteWithTags(){
         String str = "source:TeamConfiguration[tags=teamConfigClassNoBuilder;gettersandsetters]\n";
-        String resJava = sourceMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
+        String resJava = sourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-configuration"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
                 .src/main/java/example/micronaut/TeamConfiguration.java
@@ -77,7 +77,7 @@ class SourceMacroSubstitutionTest {
     @Test
     void TestSubstituteWithMultiple(){
         String str = "source:TeamConfiguration[app=springboot,tags=teamConfigClassNoBuilder;gettersandsetters,indent=0]\n";
-        String resJava = sourceMacroSubstitution.substitute(str, "micronaut-configuration", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
+        String resJava = sourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-configuration"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 [source,java]
                 .springboot/src/main/java/example/micronaut/TeamConfiguration.java

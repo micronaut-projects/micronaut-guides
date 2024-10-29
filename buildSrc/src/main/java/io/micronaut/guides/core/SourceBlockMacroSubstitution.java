@@ -36,18 +36,13 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
     }
 
     @Override
-    public String substitute(String str, String slug, GuidesOption option) {
+    public String substitute(String str, Guide guide, GuidesOption option) {
+        String slug = guide.slug();
         for (String line : findMacroLines(str, getMacroName())) {
             Optional<AsciidocMacro> asciidocMacroOptional = AsciidocMacro.of(getMacroName(), line);
             if (asciidocMacroOptional.isPresent()) {
                 AsciidocMacro asciidocMacro = asciidocMacroOptional.get();
-                String appName = asciidocMacro.attributes().stream()
-                        .filter(attribute -> attribute.key().equals(APP))
-                        .map(Attribute::values)
-                        .filter(l -> !l.isEmpty())
-                        .map(List::getFirst)
-                        .findFirst()
-                        .orElse(APP);
+                String appName = appName(asciidocMacro);
 
                 String condensedTarget = condensedTarget(asciidocMacro, option);
                 String[] arr;
@@ -106,7 +101,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             Classpath classpath,
             String language,
             String packageName) {
-        return (appName.equals(MacroSubstitution.APP) ? "" : (appName + "/")) + sourceConventionFolder(classpath, language) + "/"
+        return (appName.equals(MacroSubstitution.APP_NAME_DEFAULT) ? "" : (appName + "/")) + sourceConventionFolder(classpath, language) + "/"
                 + (getFileType() == FileType.CODE ? (packageName.replace(".", "/") + "/") : "")
                 + condensedTarget;
     }

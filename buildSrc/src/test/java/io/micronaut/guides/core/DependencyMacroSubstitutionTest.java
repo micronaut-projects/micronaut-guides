@@ -36,7 +36,7 @@ public class DependencyMacroSubstitutionTest {
                 dependency:micronaut-security-session[groupId=io.micronaut.security]
                 """;
 
-        String resJava = dependencyMacroSubstitution.substitute(str, "micronaut-jaxrs", new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
+        String resJava = dependencyMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("micronaut-jaxrs"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
         String expectedJava = """
                 ==== Dependencies
                 

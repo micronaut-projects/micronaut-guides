@@ -12,6 +12,7 @@ public final class MacroUtils {
     private MacroUtils() {
     }
 
+    /*
     @NonNull
     public static String extractAppName(@NonNull  String line) {
         return extractFromParametersLine(line, "app");
@@ -54,7 +55,7 @@ public final class MacroUtils {
         }
         return featureNames;
     }
-
+*/
 
     @NonNull
     static String getSourceDir(@NonNull String slug, @NonNull GuidesOption option) {
