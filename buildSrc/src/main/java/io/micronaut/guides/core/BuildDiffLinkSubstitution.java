@@ -28,7 +28,7 @@ public class BuildDiffLinkSubstitution implements MacroMetadataSubstitution {
                     .findFirst()
                     .orElse(null);
 
-            UriBuilder uriBuilder = UriBuilder.of(guidesConfiguration.getLauncherUrl())
+            UriBuilder uriBuilder = UriBuilder.of(guidesConfiguration.getProjectGeneratorUrl())
                     .queryParam("lang", option.getLanguage().name())
                     .queryParam("build", option.getBuildTool().name())
                     .queryParam("test", option.getTestFramework().name())

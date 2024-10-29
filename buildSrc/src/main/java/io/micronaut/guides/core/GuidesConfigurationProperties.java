@@ -61,7 +61,7 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     }
 
     @Override
-    public String getLauncherUrl() { return LAUNCHER_URL; }
+    public String getProjectGeneratorUrl() { return LAUNCHER_URL; }
 
     @Override
     public List<String> getFilesWithHeader() {
