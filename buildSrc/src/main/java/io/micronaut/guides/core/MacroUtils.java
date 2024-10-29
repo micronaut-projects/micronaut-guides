@@ -91,7 +91,7 @@ public final class MacroUtils {
 
     @NonNull
     static List<String> extractMacroGroupParameters(@NonNull String line, @NonNull String macro) {
-        return Arrays.stream(line.substring(macro.length() + 2, line.length()).split(",")).filter(el -> el != "").toList();
+        return Arrays.stream(line.substring(macro.length() + 2, line.length()).split(",")).filter(el -> !el.equals("")).toList();
     }
 
     @NonNull
