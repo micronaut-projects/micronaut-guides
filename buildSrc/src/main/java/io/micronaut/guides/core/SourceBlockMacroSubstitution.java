@@ -4,6 +4,7 @@ import io.micronaut.guides.core.asciidoc.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import static io.micronaut.guides.core.MacroUtils.*;
@@ -44,7 +45,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
                         .filter(attribute -> attribute.key().equals(APP))
                         .map(Attribute::values)
                         .filter(l -> !l.isEmpty())
-                        .map(l -> l.get(0))
+                        .map(List::getFirst)
                         .findFirst()
                         .orElse(APP);
 
