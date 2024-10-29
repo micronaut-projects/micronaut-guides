@@ -91,7 +91,7 @@ public final class MacroUtils {
 
     @NonNull
     static List<String> extractMacroGroupParameters(@NonNull String line, @NonNull String macro) {
-        return Arrays.stream(line.substring(macro.length() + 2, line.length()).split(",")).filter(el -> !el.equals("")).toList();
+        return Arrays.stream(line.substring(macro.length() + 2, line.length()).split(",")).filter(el -> !el.isEmpty()).toList();
     }
 
     @NonNull
@@ -120,11 +120,11 @@ public final class MacroUtils {
     }
 
     private static boolean isGroupStart(@NonNull String line, @NonNull String macro) {
-        return line.matches(macro+"[a-zA-Z,]+");
+        return line.matches(macro+"[a-zA-Z0-9,]+");
     }
 
     private static boolean isGroupEnd(@NonNull String line, @NonNull String macro) {
-        return line.matches(macro+"(?![a-zA-Z,]+$)");
+        return line.matches(macro+"(?![a-zA-Z0-9,]+$)");
     }
 
     @NonNull

@@ -9,5 +9,6 @@ public interface GuidesConfiguration {
     String getPackageName();
     String getDefaultAppName();
     String getProjectGeneratorUrl();
+    int getDefaultMinJdk();
     List<String> getFilesWithHeader();
 }
