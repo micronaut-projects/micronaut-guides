@@ -8,7 +8,7 @@ import static io.micronaut.guides.core.MacroUtils.*;
 @Singleton
 public class DependencyMacroSubstitution implements MacroSubstitution{
     @Override
-    public String substitute(String str, String slug, GuidesOption option) {
+    public String substitute(String str, Guide guide, GuidesOption option) {
         for(String block : findMacroGroups(str, "dependencies")){
             List<String> lines = DependencyLines.asciidoc(block.replace(":dependencies:","").strip().lines().toList(), option.getBuildTool(), option.getLanguage());
             str = str.replace(block,String.join("\n", lines));

@@ -613,10 +613,9 @@ class GuideAsciidocGenerator {
     }
 
     private static String buildDiffLink(String line, GuidesOption guidesOption, Guide metadata) {
-
         String appName = extractAppName(line) ?: DEFAULT_APP_NAME
         App app = metadata.apps().find { it.name() == appName }
-        String link = 'https://micronaut.io/launch?' +
+        return 'https://micronaut.io/launch?' +
                 featureNames(line, app, guidesOption).collect { 'features=' + it }.join('&') +
                 '&lang=' + guidesOption.language.name() +
                 '&build=' + guidesOption.buildTool.name() +
@@ -625,10 +624,7 @@ class GuideAsciidocGenerator {
                 '&type=' + app.applicationType().name() +
                 '&package=example.micronaut' +
                 '&activity=diff' +
-                '[view the dependency and configuration changes from the specified features, window="_blank"]'
-
-        "NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can " +
-                link + " and apply those changes to your application."
+                '[Diff, window="_blank"]'
     }
 
     private static String processGuideLink(String line) {

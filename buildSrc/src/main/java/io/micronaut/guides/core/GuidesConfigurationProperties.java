@@ -15,6 +15,9 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private String licensePath = DEFAULT_LICENSEHEADER;
     private String packageName = DEFAULT_PACKAGE_NAME;
     private List<String> sourceFilesExtensions = List.of("java", "kotlin", "groovy");
+    private static final String DEFAULT_APP_NAME = "default";
+    private static final String HOMEPAGE_URL = "https://micronaut.io";
+    private static final String LAUNCHER_URL = HOMEPAGE_URL + "/launch";
 
     @Override
     public String getPackageName() {
@@ -51,6 +54,14 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    @Override
+    public String getDefaultAppName() {
+        return DEFAULT_APP_NAME;
+    }
+
+    @Override
+    public String getProjectGeneratorUrl() { return LAUNCHER_URL; }
 
     @Override
     public List<String> getFilesWithHeader() {

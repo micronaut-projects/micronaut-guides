@@ -7,5 +7,7 @@ public interface GuidesConfiguration {
     String getTitle();
     String getLicensePath();
     String getPackageName();
+    String getDefaultAppName();
+    String getProjectGeneratorUrl();
     List<String> getFilesWithHeader();
 }
