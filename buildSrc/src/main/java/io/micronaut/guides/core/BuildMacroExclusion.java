@@ -1,8 +1,18 @@
 package io.micronaut.guides.core;
 
-public class BuildMacroExclusion implements MacroMetadataSubstitution{
+import jakarta.inject.Singleton;
+
+import java.util.List;
+
+@Singleton
+public class BuildMacroExclusion extends MacroExclusion {
     @Override
-    public String substitute(String str, GuidesOption option, Guide guide) {
-        return "";
+    protected String getMacroName() {
+        return "exclude-for-build";
+    }
+
+    @Override
+    protected boolean shouldExclude(List<String> params, GuidesOption option, Guide guide) {
+        return params.contains(option.getBuildTool().toString());
     }
 }

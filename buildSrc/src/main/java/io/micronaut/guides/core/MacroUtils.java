@@ -89,8 +89,14 @@ public final class MacroUtils {
         return matches;
     }
 
-    static List<String> findMacroGroupsNested(@NonNull String str, @NonNull String macro) {
-        List<String> matches = new ArrayList<>();
+    @NonNull
+    static List<String> extractMacroGroupParameters(@NonNull String line, @NonNull String macro) {
+        return Arrays.stream(line.substring(macro.length() + 2, line.length()).split(",")).filter(el -> el != "").toList();
+    }
+
+    @NonNull
+    static List<List<String>> findMacroGroupsNested(@NonNull String str, @NonNull String macro) {
+        List<List<String>> matches = new ArrayList<>();
         String pattern = ":"+macro+":";
 
         List<String> lines = str.lines().toList();
@@ -103,7 +109,7 @@ public final class MacroUtils {
             } else if (isGroupEnd(line, pattern)) {
                 if (!stack.isEmpty()) {
                     int start = stack.pop();
-                    matches.add(String.join("\n", lines.subList(start, i+1)));
+                    matches.add(lines.subList(start, i+1));
                 } else{
                     throw new UnsupportedOperationException("Unbalanced macro group");
                 }
@@ -113,11 +119,11 @@ public final class MacroUtils {
         return matches;
     }
 
-    private static boolean isGroupStart(String line, String macro) {
+    private static boolean isGroupStart(@NonNull String line, @NonNull String macro) {
         return line.matches(macro+"[a-zA-Z,]+");
     }
 
-    private static boolean isGroupEnd(String line, String macro) {
+    private static boolean isGroupEnd(@NonNull String line, @NonNull String macro) {
         return line.matches(macro+"(?![a-zA-Z,]+$)");
     }
 

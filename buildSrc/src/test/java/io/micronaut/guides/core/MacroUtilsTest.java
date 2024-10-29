@@ -129,7 +129,7 @@ class MacroUtilsTest {
                 TestTest
                 
                 :exclude-for-build:""";
-        List<String> result = MacroUtils.findMacroGroupsNested(str,"exclude-for-build");
+        List<String> result = MacroUtils.findMacroGroupsNested(str,"exclude-for-build").stream().map(el -> String.join("\n", el)).toList();
         List<String> expected = List.of("""
                 :exclude-for-build:gradle
                 
@@ -172,5 +172,24 @@ class MacroUtilsTest {
 
                :exclude-for-build:""");
         assertEquals(expected, result);
+    }
+
+    @Test
+    void extractMacroGroupParametersTest(){
+        String line = ":exclude-for-languages:groovy";
+        String macro = "exclude-for-languages";
+        List<String> result = MacroUtils.extractMacroGroupParameters(line,macro);
+        assertEquals("groovy", result.get(0));
+
+        line = ":exclude-for-languages:groovy,java";
+        macro = "exclude-for-languages";
+        result = MacroUtils.extractMacroGroupParameters(line,macro);
+        assertEquals("groovy", result.get(0));
+        assertEquals("java", result.get(1));
+
+        line = ":exclude-for-languages:";
+        macro = "exclude-for-languages";
+        result = MacroUtils.extractMacroGroupParameters(line,macro);
+        assertEquals(0, result.size());
     }
 }
