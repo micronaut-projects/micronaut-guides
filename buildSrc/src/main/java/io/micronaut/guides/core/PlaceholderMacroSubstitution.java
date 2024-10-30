@@ -25,7 +25,7 @@ public class PlaceholderMacroSubstitution implements MacroSubstitution {
         str = str.replace("@languageextension@", option.getLanguage().getExtension());
         str = str.replace("@testsuffix@", option.getTestFramework() == SPOCK ? "Spec" : "Test");
         str = str.replace("@sourceDir@", "projectName");
-        str = str.replace("@minJdk@", guide.minimumJavaVersion() != null ? guide.minimumJavaVersion() : guidesConfiguration.get);
+//        str = str.replace("@minJdk@", guide.minimumJavaVersion() != null ? guide.minimumJavaVersion() : guidesConfiguration.get);
         str = str.replace("@api@", "https://docs.micronaut.io/latest/api");
     }
 }
