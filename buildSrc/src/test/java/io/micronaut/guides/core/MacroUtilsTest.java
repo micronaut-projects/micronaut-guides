@@ -87,4 +87,109 @@ class MacroUtilsTest {
                 :dependencies:""");
         assertEquals(expected, result);
     }
+
+    @Test
+    void findMacroGroupsNested(){
+        String str = """
+                :exclude-for-build:gradle
+                
+                [source, bash]
+                .users
+                ----
+                ./mvnw test
+                ----
+                
+                :exclude-for-build:
+                
+                {empty} +
+                
+                ==== Running the application
+                
+                Run the `users` microservice:
+                
+                :exclude-for-build:gradle
+                
+                [source, bash]
+                .users
+                ----
+                 MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
+                ----
+                
+                Test
+                
+                :exclude-for-build:maven
+                
+                [source, bash]
+                .users
+                ----
+                 MICRONAUT_ENVIRONMENTS=dev ./gradlew run
+                ----
+                
+                :exclude-for-build:
+                TestTest
+                
+                :exclude-for-build:""";
+        List<String> result = MacroUtils.findMacroGroupsNested(str,"exclude-for-build").stream().map(el -> String.join("\n", el)).toList();
+        List<String> expected = List.of("""
+                :exclude-for-build:gradle
+                
+                [source, bash]
+                .users
+                ----
+                ./mvnw test
+                ----
+                
+                :exclude-for-build:""","""
+                :exclude-for-build:maven
+                
+                [source, bash]
+                .users
+                ----
+                 MICRONAUT_ENVIRONMENTS=dev ./gradlew run
+                ----
+                
+                :exclude-for-build:""", """
+               :exclude-for-build:gradle
+                
+               [source, bash]
+               .users
+               ----
+                MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
+               ----
+
+               Test
+
+               :exclude-for-build:maven
+
+               [source, bash]
+               .users
+               ----
+                MICRONAUT_ENVIRONMENTS=dev ./gradlew run
+               ----
+
+               :exclude-for-build:
+               TestTest
+
+               :exclude-for-build:""");
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void extractMacroGroupParametersTest(){
+        String line = ":exclude-for-languages:groovy";
+        String macro = "exclude-for-languages";
+        List<String> result = MacroUtils.extractMacroGroupParameters(line,macro);
+        assertEquals("groovy", result.get(0));
+
+        line = ":exclude-for-languages:groovy,java";
+        macro = "exclude-for-languages";
+        result = MacroUtils.extractMacroGroupParameters(line,macro);
+        assertEquals("groovy", result.get(0));
+        assertEquals("java", result.get(1));
+
+        line = ":exclude-for-languages:";
+        macro = "exclude-for-languages";
+        result = MacroUtils.extractMacroGroupParameters(line,macro);
+        assertEquals(0, result.size());
+    }
 }
