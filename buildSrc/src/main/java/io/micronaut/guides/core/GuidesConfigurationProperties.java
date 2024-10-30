@@ -18,6 +18,7 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private static final String DEFAULT_APP_NAME = "default";
     private static final String HOMEPAGE_URL = "https://micronaut.io";
     private static final String LAUNCHER_URL = HOMEPAGE_URL + "/launch";
+    public static final int DEFAULT_MIN_JDK = 17;
 
     @Override
     public String getPackageName() {
@@ -66,6 +67,11 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     @Override
     public List<String> getFilesWithHeader() {
         return sourceFilesExtensions;
+    }
+
+    @Override
+    public int getDefaultMinJdk() {
+        return DEFAULT_MIN_JDK;
     }
 
     public void setFilesWithHeader(List<String> sourceFilesExtensions) {
