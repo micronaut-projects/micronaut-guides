@@ -1,11 +1,7 @@
 package io.micronaut.guides.core;
 
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.guides.core.asciidoc.PlacheholderMacro;
 import jakarta.inject.Singleton;
 import org.gradle.api.GradleException;
-
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -35,19 +31,13 @@ public class CliMacroSubstitution extends PlaceholderWithTargetMacroSubstitution
     }
 
     private static String cliCommandForApp(App app) {
-        switch (app.applicationType()) {
-            case CLI:
-                return CLI_CLI;
-            case FUNCTION:
-                return CLI_FUNCTION;
-            case GRPC:
-                return CLI_GRPC;
-            case MESSAGING:
-                return CLI_MESSAGING;
-            case DEFAULT:
-                return CLI_DEFAULT;
-            default:
-                throw new IllegalArgumentException("Unknown application type: " + app.applicationType());
-        }
+        return switch (app.applicationType()) {
+            case CLI -> CLI_CLI;
+            case FUNCTION -> CLI_FUNCTION;
+            case GRPC -> CLI_GRPC;
+            case MESSAGING -> CLI_MESSAGING;
+            case DEFAULT -> CLI_DEFAULT;
+            default -> throw new IllegalArgumentException("Unknown application type: " + app.applicationType());
+        };
     }
 }

@@ -2,10 +2,7 @@ package io.micronaut.guides.core;
 
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.guides.core.asciidoc.PlacheholderMacro;
-import org.gradle.api.GradleException;
-
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 abstract class PlaceholderWithTargetMacroSubstitution implements MacroSubstitution {
 

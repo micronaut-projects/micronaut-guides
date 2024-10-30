@@ -1,6 +1,5 @@
 package io.micronaut.guides.core.asciidoc;
 
-import java.util.List;
 import java.util.Optional;
 
 public record PlacheholderMacro(String name, String target) {
