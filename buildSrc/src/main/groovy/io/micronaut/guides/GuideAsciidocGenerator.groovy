@@ -5,12 +5,16 @@ import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
+import io.micronaut.core.io.ResourceLoader
+import io.micronaut.core.io.scan.DefaultClassPathResourceLoader
 import io.micronaut.core.util.StringUtils
 import io.micronaut.guides.core.App
+import io.micronaut.guides.core.DefaultVersionLoader
 import io.micronaut.guides.core.DependencyLines
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideUtils
 import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.VersionLoader
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
@@ -157,7 +161,7 @@ class GuideAsciidocGenerator {
                 }
             }
 
-            String version = new File(projectDir, 'version.txt').text.trim()
+            String version = new File(projectDir, 'buildSrc/src/main/resources/version.txt').text.trim()
 
             String text = lines.join('\n')
             text = text.replace("{githubSlug}", metadata.slug())
