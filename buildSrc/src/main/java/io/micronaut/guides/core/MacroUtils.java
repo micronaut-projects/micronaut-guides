@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class MacroUtils {
     private MacroUtils() {
@@ -31,6 +33,18 @@ public final class MacroUtils {
         return str.lines()
                 .filter(line -> line.startsWith(macro+":"))
                 .toList();
+    }
+
+    static List<String> findMacroInstances(@NonNull String str, @NonNull String macro) {
+        List<String> matches = new ArrayList<>();
+        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?"+macro+"@");
+        Matcher matcher = pattern.matcher(str);
+
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+
+        return matches;
     }
 
     static List<String> findMacroGroups(@NonNull String str, @NonNull String macro) {

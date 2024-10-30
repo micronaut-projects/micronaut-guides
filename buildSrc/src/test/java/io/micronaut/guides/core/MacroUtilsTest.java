@@ -175,6 +175,31 @@ class MacroUtilsTest {
     }
 
     @Test
+    void testFindMacroInstances() {
+        String input = "Some text @cli-command@ more text @another-example:cli-command@ end @example-cli-command@.";
+        String macro = "cli-command";
+        List<String> result = MacroUtils.findMacroInstances(input, macro);
+        List<String> expected = List.of("@cli-command@", "@another-example:cli-command@");
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testFindMacroInstancesNoMatch() {
+        String input = "Some text without the pattern.";
+        String macro = "cli-command";
+        List<String> result = MacroUtils.findMacroInstances(input, macro);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testFindMacroInstancesDifferentMacro() {
+        String input = "Some text @example-cli-command@ more text @another-example:cli-command@ end.";
+        String macro = "different-command";
+        List<String> result = MacroUtils.findMacroInstances(input, macro);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void extractMacroGroupParametersTest(){
         String line = ":exclude-for-languages:groovy";
         String macro = "exclude-for-languages";
