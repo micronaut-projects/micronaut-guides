@@ -8,7 +8,7 @@ abstract class PlaceholderWithTargetMacroSubstitution implements MacroSubstituti
 
     protected abstract String getMacroName();
 
-    protected abstract String getSostitution(Guide guide, GuidesOption option, String app);
+    protected abstract String getSubstitution(Guide guide, GuidesOption option, String app);
 
     public String substitute(String str, Guide guide, GuidesOption option) {
         for (String instance : MacroUtils.findMacroInstances(str, getMacroName())) {
@@ -18,7 +18,7 @@ abstract class PlaceholderWithTargetMacroSubstitution implements MacroSubstituti
             }
             PlacheholderMacro macro = macroOptional.get();
             String app = StringUtils.isNotEmpty(macro.target()) ? macro.target() : "default";
-            String res = getSostitution(guide, option, app);
+            String res = getSubstitution(guide, option, app);
             str = str.replace(instance, res);
         }
         return str;

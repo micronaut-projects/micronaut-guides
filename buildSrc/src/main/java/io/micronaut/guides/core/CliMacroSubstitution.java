@@ -18,7 +18,7 @@ public class CliMacroSubstitution extends PlaceholderWithTargetMacroSubstitution
     }
 
     @Override
-    protected String getSostitution(Guide guide, GuidesOption option, String appName) {
+    protected String getSubstitution(Guide guide, GuidesOption option, String appName) {
         App app = guide.apps().stream()
                 .filter(a -> a.name().equals(appName))
                 .findFirst()
