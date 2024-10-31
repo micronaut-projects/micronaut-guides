@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.options.Language;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static io.micronaut.starter.options.Language.GROOVY;
 
 public final class MacroUtils {
     private MacroUtils() {
@@ -22,6 +25,21 @@ public final class MacroUtils {
                 .map(parts -> parts[1])
                 .findFirst()
                 .orElse("");
+    }
+
+    @NonNull
+    static List<String> featuresForApp(Guide metadata,
+                                       GuidesOption guidesOption,
+                                       String appName) {
+        App app = metadata.apps().stream()
+                .filter(a -> a.name().equals(appName))
+                .findFirst()
+                .orElse(null);
+        List<String> features = app != null ? GuideUtils.getAppVisibleFeatures(app, guidesOption.getLanguage()) : new ArrayList<>();
+        if (guidesOption.getLanguage() == Language.GROOVY) {
+            features.remove("graalvm");
+        }
+        return features;
     }
 
     @NonNull
