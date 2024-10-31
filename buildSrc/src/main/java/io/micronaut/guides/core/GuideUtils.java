@@ -2,6 +2,7 @@ package io.micronaut.guides.core;
 
 import com.networknt.schema.*;
 import groovy.json.JsonSlurper;
+import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
@@ -22,14 +23,21 @@ public final class GuideUtils {
     private static final String VIEWS_PREFIX = "views-";
     private static final List<String> FEATURES_PREFIXES = List.of(MICRONAUT_PREFIX, VIEWS_PREFIX);
     private static final String FEATURE_SPOTLESS = "spotless";
+    private static final String DEFAULT_METADATA_JSON = "metadata.json";
 
     private GuideUtils() {
     }
 
     public static List<Guide> parseGuidesMetadata(File guidesDir,
+                                                  JsonSchema schema,
+                                                  JsonMapper jsonMapper) throws IOException {
+        return parseGuidesMetadata(guidesDir, DEFAULT_METADATA_JSON, schema, jsonMapper);
+    }
+
+    public static List<Guide> parseGuidesMetadata(File guidesDir,
                                            String metadataConfigName,
                                            JsonSchema schema,
-                                           JsonMapper jsonMapper) throws Exception {
+                                           JsonMapper jsonMapper) throws IOException {
         List<Guide> metadatas = new ArrayList<>();
 
         for (File dir : guidesDir.listFiles(File::isDirectory)) {
@@ -43,7 +51,7 @@ public final class GuideUtils {
 
     private static Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName,
                                        JsonSchema schema,
-                                       JsonMapper jsonMapper) throws Exception {
+                                       JsonMapper jsonMapper) throws IOException {
         File configFile = new File(dir, metadataConfigName);
         if (!configFile.exists()) {
             LOG.warn("metadata file not found for {}", dir.getName());
@@ -65,7 +73,7 @@ public final class GuideUtils {
             Set<ValidationMessage> assertions = schema.validate(content, InputFormat.JSON);
 
             if (!assertions.isEmpty()) {
-                throw new Exception("Guide metadata " + configFile + " does not validate the JSON Schema" + assertions);
+                throw new ConfigurationException("Guide metadata " + configFile + " does not validate the JSON Schema" + assertions);
             }
         }
 
