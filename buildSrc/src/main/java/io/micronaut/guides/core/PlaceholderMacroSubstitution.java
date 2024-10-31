@@ -12,9 +12,9 @@ import static io.micronaut.starter.api.TestFramework.SPOCK;
 @Singleton
 public class PlaceholderMacroSubstitution implements MacroSubstitution {
 
-    private GuidesConfiguration guidesConfiguration;
-    private VersionLoader versionLoader;
-    private CoordinatesProvider coordinatesProvider;
+    private final GuidesConfiguration guidesConfiguration;
+    private final VersionLoader versionLoader;
+    private final CoordinatesProvider coordinatesProvider;
 
     public PlaceholderMacroSubstitution(GuidesConfiguration guidesConfiguration, VersionLoader versionLoader, CoordinatesProvider coordinatesProvider) {
         this.guidesConfiguration = guidesConfiguration;
