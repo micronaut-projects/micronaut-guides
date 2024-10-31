@@ -246,9 +246,6 @@ class GuideAsciidocGenerator {
                                                String app) {
         App appEl = metadata.apps().find { it.name() == app }
         List<String> features = appEl ? GuideUtils.getAppVisibleFeatures(appEl, guidesOption.language) : []
-        if (guidesOption.language == GROOVY) {
-            features.remove 'graalvm'
-        }
         features
     }
 
@@ -605,10 +602,6 @@ class GuideAsciidocGenerator {
             excludedFeatureNames = []
         }
         featureNames.removeAll excludedFeatureNames
-
-        if (guidesOption.language == GROOVY) {
-            featureNames.remove 'graalvm'
-        }
         featureNames
     }
 
