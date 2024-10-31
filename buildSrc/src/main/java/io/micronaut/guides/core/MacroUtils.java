@@ -10,8 +10,6 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.micronaut.starter.options.Language.GROOVY;
-
 public final class MacroUtils {
     private MacroUtils() {
     }

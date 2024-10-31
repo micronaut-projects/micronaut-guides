@@ -116,4 +116,13 @@ public class PlaceholderMacroSubstitutionTest {
         String result = placeholderMacroSubstitution.substitute(str, guide, option);
         assertEquals(VersionInfo.getMicronautVersion(),result);
     }
+
+    @Test
+    void testSubstitutionCoordinates(){
+        String str = """
+                dependency:geb-spock[groupId=org.gebish,scope=testImplementation,version=@geb-spockVersion@]
+                """;
+        String result = placeholderMacroSubstitution.substitute(str, guide, option);
+        assertNotEquals(str, result);
+    }
 }

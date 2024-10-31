@@ -1,8 +1,11 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.starter.build.dependencies.Coordinate;
 import io.micronaut.starter.util.VersionInfo;
 import jakarta.inject.Singleton;
+
+import java.util.Map;
 
 import static io.micronaut.starter.api.TestFramework.SPOCK;
 
@@ -11,10 +14,12 @@ public class PlaceholderMacroSubstitution implements MacroSubstitution {
 
     private GuidesConfiguration guidesConfiguration;
     private VersionLoader versionLoader;
+    private CoordinatesProvider coordinatesProvider;
 
-    public PlaceholderMacroSubstitution(GuidesConfiguration guidesConfiguration, VersionLoader versionLoader) {
+    public PlaceholderMacroSubstitution(GuidesConfiguration guidesConfiguration, VersionLoader versionLoader, CoordinatesProvider coordinatesProvider) {
         this.guidesConfiguration = guidesConfiguration;
         this.versionLoader = versionLoader;
+        this.coordinatesProvider = coordinatesProvider;
     }
     @Override
     public String substitute(String str, Guide guide, GuidesOption option) {
@@ -33,6 +38,13 @@ public class PlaceholderMacroSubstitution implements MacroSubstitution {
         str = str.replace("@sourceDir@", MacroUtils.getSourceDir(guide.slug(), option));
         str = str.replace("@minJdk@", String.valueOf( guide.minimumJavaVersion() != null ? guide.minimumJavaVersion() : guidesConfiguration.getDefaultMinJdk()) );
         str = str.replace("@api@", guidesConfiguration.getApiUrl());
+
+        for (Map.Entry<String, Coordinate> entry : coordinatesProvider.getCoordinates().entrySet()) {
+            if (StringUtils.isNotEmpty(entry.getValue().getVersion())) {
+                str = str.replace("@"+entry.getKey()+"Version@", entry.getValue().getVersion());
+            }
+        }
+
         str = str.replace("@micronautVersion@", VersionInfo.getMicronautVersion());
 
         return str;
