@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 public record AsciidocMacro(String name, String target, List<Attribute> attributes) {
-    private static final String MACRO_NAME_SEPARATOR = ":";
+    public static final String MACRO_NAME_SEPARATOR = ":";
+    public static final String ATTRIBUTE_SEPARATOR = ",";
     private static final String MACRO_OPEN_BRACKET = "[";
     private static final String MACRO_CLOSE_BRACKET = "]";
 

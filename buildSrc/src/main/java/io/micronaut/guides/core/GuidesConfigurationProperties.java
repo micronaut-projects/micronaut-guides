@@ -3,6 +3,7 @@ package io.micronaut.guides.core;
 import io.micronaut.context.annotation.ConfigurationProperties;
 
 import java.util.List;
+import java.util.Set;
 
 @ConfigurationProperties(GuidesConfigurationProperties.PREFIX)
 public class GuidesConfigurationProperties implements GuidesConfiguration {
@@ -18,7 +19,9 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private static final String DEFAULT_APP_NAME = "default";
     private static final String HOMEPAGE_URL = "https://micronaut.io";
     private static final String LAUNCHER_URL = HOMEPAGE_URL + "/launch";
-    public static final int DEFAULT_MIN_JDK = 17;
+    private static final int DEFAULT_MIN_JDK = 17;
+    private static final String API_URL = "https://docs.micronaut.io/latest/api";
+    private static final String DEFAULT_VERSION = "classpath:version.txt";
 
     @Override
     public String getPackageName() {
@@ -72,6 +75,16 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     @Override
     public int getDefaultMinJdk() {
         return DEFAULT_MIN_JDK;
+    }
+
+    @Override
+    public String getApiUrl() {
+        return API_URL;
+    }
+
+    @Override
+    public String getVersionPath() {
+        return DEFAULT_VERSION;
     }
 
     public void setFilesWithHeader(List<String> sourceFilesExtensions) {

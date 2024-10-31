@@ -1,25 +1,17 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.options.Language;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class MacroUtils {
     private MacroUtils() {
-    }
-
-    @NonNull
-    static String extractFromParametersLine(@NonNull String line, @NonNull String attributeName) {
-        String[] attrs = line.substring(line.indexOf("[") + 1, line.indexOf("]")).split(",");
-        return Arrays.stream(attrs)
-                .filter(attr -> attr.startsWith(attributeName))
-                .map(attr -> attr.split("="))
-                .map(parts -> parts[1])
-                .findFirst()
-                .orElse("");
     }
 
     @NonNull
@@ -31,6 +23,18 @@ public final class MacroUtils {
         return str.lines()
                 .filter(line -> line.startsWith(macro+":"))
                 .toList();
+    }
+
+    static List<String> findMacroInstances(@NonNull String str, @NonNull String macro) {
+        List<String> matches = new ArrayList<>();
+        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?"+macro+"@");
+        Matcher matcher = pattern.matcher(str);
+
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+
+        return matches;
     }
 
     static List<String> findMacroGroups(@NonNull String str, @NonNull String macro) {
