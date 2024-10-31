@@ -5,14 +5,17 @@ import io.micronaut.guides.core.asciidoc.AsciidocMacro;
 import io.micronaut.guides.core.asciidoc.Attribute;
 
 public interface MacroSubstitution {
-    String APP = "app";
+    String ATTRIBUTE_APP = "app";
     String APP_NAME_DEFAULT = "default";
 
     @NonNull
     String substitute(@NonNull String str, @NonNull Guide guide, @NonNull GuidesOption option);
 
     default App app(Guide guide, AsciidocMacro asciidocMacro) {
-        final String appName = appName(asciidocMacro);
+        return app(guide, appName(asciidocMacro));
+    }
+
+    default App app(Guide guide, String appName) {
         return  guide.apps().stream()
                 .filter(a -> a.name().equals(appName))
                 .findFirst()
@@ -21,7 +24,7 @@ public interface MacroSubstitution {
 
     default String appName(AsciidocMacro asciidocMacro) {
         return asciidocMacro.attributes().stream()
-                .filter(attribute -> attribute.key().equals(APP))
+                .filter(attribute -> attribute.key().equals(ATTRIBUTE_APP))
                 .map(Attribute::values)
                 .filter(l -> !l.isEmpty())
                 .map(l -> l.get(0))

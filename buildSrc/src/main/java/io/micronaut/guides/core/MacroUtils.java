@@ -15,32 +15,6 @@ public final class MacroUtils {
     }
 
     @NonNull
-    static String extractFromParametersLine(@NonNull String line, @NonNull String attributeName) {
-        String[] attrs = line.substring(line.indexOf("[") + 1, line.indexOf("]")).split(",");
-        return Arrays.stream(attrs)
-                .filter(attr -> attr.startsWith(attributeName))
-                .map(attr -> attr.split("="))
-                .map(parts -> parts[1])
-                .findFirst()
-                .orElse("");
-    }
-
-    @NonNull
-    static List<String> featuresForApp(Guide metadata,
-                                       GuidesOption guidesOption,
-                                       String appName) {
-        App app = metadata.apps().stream()
-                .filter(a -> a.name().equals(appName))
-                .findFirst()
-                .orElse(null);
-        List<String> features = app != null ? GuideUtils.getAppVisibleFeatures(app, guidesOption.getLanguage()) : new ArrayList<>();
-        if (guidesOption.getLanguage() == Language.GROOVY) {
-            features.remove("graalvm");
-        }
-        return features;
-    }
-
-    @NonNull
     static String getSourceDir(@NonNull String slug, @NonNull GuidesOption option) {
         return slug + "-" + option.getBuildTool() + "-" + option.getLanguage();
     }

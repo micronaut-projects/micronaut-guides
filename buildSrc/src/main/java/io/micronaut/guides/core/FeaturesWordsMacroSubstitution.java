@@ -14,7 +14,7 @@ public class FeaturesWordsMacroSubstitution extends PlaceholderWithTargetMacroSu
 
     @Override
     protected String getSubstitution(Guide guide, GuidesOption option, String appName) {
-        List<String> features = MacroUtils.featuresForApp(guide, option, appName)
+        List<String> features = GuideUtils.getAppVisibleFeatures(app(guide, appName), option.getLanguage())
                 .stream()
                 .map(feature -> "`" + feature + "`")
                 .collect(Collectors.toList());

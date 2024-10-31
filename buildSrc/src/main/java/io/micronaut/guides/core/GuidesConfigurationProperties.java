@@ -3,6 +3,7 @@ package io.micronaut.guides.core;
 import io.micronaut.context.annotation.ConfigurationProperties;
 
 import java.util.List;
+import java.util.Set;
 
 @ConfigurationProperties(GuidesConfigurationProperties.PREFIX)
 public class GuidesConfigurationProperties implements GuidesConfiguration {

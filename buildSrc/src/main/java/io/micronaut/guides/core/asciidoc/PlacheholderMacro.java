@@ -2,8 +2,9 @@ package io.micronaut.guides.core.asciidoc;
 
 import java.util.Optional;
 
+import static io.micronaut.guides.core.asciidoc.AsciidocMacro.MACRO_NAME_SEPARATOR;
+
 public record PlacheholderMacro(String name, String target) {
-    private static final String MACRO_NAME_SEPARATOR = ":";
     private static final String MACRO_BRACKET = "@";
 
     public static Optional<PlacheholderMacro> of(String name, String str) {
