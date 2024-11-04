@@ -132,10 +132,6 @@ class GuideProjectGenerator implements AutoCloseable {
                     appFeatures.remove('graalvm')
                 }
 
-                if (testFramework == SPOCK) {
-                    appFeatures.remove('mockito')
-                }
-
                 // typical guides use 'default' as name, multi-project guides have different modules
                 String folder = folderName(metadata.slug(), guidesOption)
 
