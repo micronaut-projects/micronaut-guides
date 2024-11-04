@@ -22,7 +22,7 @@ import static io.micronaut.starter.options.Language.GROOVY;
 
 public class GuideGenerationUtils {
 
-    private GuideGenerationUtils(){
+    private GuideGenerationUtils() {
     }
 
     @NonNull
