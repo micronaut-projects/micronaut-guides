@@ -2,9 +2,7 @@ package io.micronaut.guides.core;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.starter.options.JdkVersion;
-
 import java.util.List;
-
 import static io.micronaut.starter.options.JdkVersion.JDK_17;
 import static io.micronaut.starter.options.JdkVersion.JDK_21;
 
@@ -27,8 +25,19 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private static final String DEFAULT_VERSION = "classpath:version.txt";
     private static final String ENV_JDK_VERSION = "JDK_VERSION";
     private static final JdkVersion DEFAULT_JAVA_VERSION = JDK_17;
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = List.of(JDK_17, JDK_21);
+    private static final List<JdkVersion> DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM = List.of(JDK_17, JDK_21);
+    private List<JdkVersion> jdkVersionsSupportedByGraalvm = DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM;
 
+    @Override
+    public List<JdkVersion> getJdkVersionsSupportedByGraalvm() { return jdkVersionsSupportedByGraalvm; }
+
+    public void setJdkVersionsSupportedByGraalvm(List<JdkVersion> jdkVersionsSupportedByGraalvm) {
+        this.jdkVersionsSupportedByGraalvm = jdkVersionsSupportedByGraalvm;
+    }
+
+    public void setSourceFilesExtensions(List<String> sourceFilesExtensions) {
+        this.sourceFilesExtensions = sourceFilesExtensions;
+    }
 
     @Override
     public String getPackageName() {
@@ -99,9 +108,6 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
 
     @Override
     public JdkVersion getDefaultJdkVersion() { return DEFAULT_JAVA_VERSION; }
-
-    @Override
-    public List<JdkVersion> getJdkVersionsSupportedByGraalvm() { return JDK_VERSIONS_SUPPORTED_BY_GRAALVM; }
 
     public void setFilesWithHeader(List<String> sourceFilesExtensions) {
         this.sourceFilesExtensions = sourceFilesExtensions;
