@@ -22,7 +22,7 @@ public class DefaultLicenseLoader implements LicenseLoader {
                                 ResourceLoader resourceLoader) {
         Optional<InputStream> resourceAsStreamOptional = resourceLoader.getResourceAsStream(guidesConfiguration.getLicensePath());
         this.licenseHeaderText = resourceAsStreamOptional.map(DefaultLicenseLoader::readLicenseHeader).orElse("");
-        this.numberOfLines = (int)licenseHeaderText.lines().count()+1;
+        this.numberOfLines = (int) licenseHeaderText.lines().count() + 1;
     }
 
     private static int countLines(InputStream inputStream) {
