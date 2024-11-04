@@ -1,5 +1,6 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.exceptions.HttpStatusException;
@@ -48,16 +49,14 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
 
     @Override
     public void generate(@NotNull @NonNull File outputDirectory, @NotNull @NonNull Guide guide) throws IOException {
-        assert outputDirectory.exists() || outputDirectory.mkdir();
-
-        JdkVersion javaVersion = GuideGenerationUtils.resolveJdkVersion(guidesConfiguration);
-        if (guide.minimumJavaVersion() != null) {
-            JdkVersion minimumJavaVersion = JdkVersion.valueOf(guide.minimumJavaVersion());
-            if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
-                javaVersion = minimumJavaVersion;
-            }
+        if (!outputDirectory.exists()) {
+            throw new ConfigurationException("Output directory does not exist");
+        }
+        if (!outputDirectory.isDirectory()) {
+            throw new ConfigurationException("Output directory must be a directory");
         }
 
+        JdkVersion javaVersion = GuideGenerationUtils.resolveJdkVersion(guidesConfiguration, guide);
         if (guide.maximumJavaVersion() != null && javaVersion.majorVersion() > guide.maximumJavaVersion()) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("not generating project for {}, JDK {} > {}", guide.slug(), javaVersion.majorVersion(), guide.maximumJavaVersion());
