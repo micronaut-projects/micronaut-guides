@@ -59,7 +59,9 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
         }
 
         if (guide.maximumJavaVersion() != null && javaVersion.majorVersion() > guide.maximumJavaVersion()) {
-            System.out.println("not generating project for " + guide.slug() + ", JDK " + javaVersion.majorVersion() + " > " + guide.maximumJavaVersion());
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("not generating project for {}, JDK {} > {}", guide.slug(), javaVersion.majorVersion(), guide.maximumJavaVersion());
+            }
             return;
         }
 
