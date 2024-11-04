@@ -76,7 +76,7 @@ public class GuideProjectGeneratorTest {
 
         assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
 
-        File dest = Paths.get(outputDirectory.getAbsolutePath(),MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.GRADLE,Language.JAVA,TestFramework.JUNIT)),"cli").toFile();
+        File dest = Paths.get(outputDirectory.getAbsolutePath(), MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)), "cli").toFile();
 
         assertTrue(new File(dest, "build.gradle").exists());
         assertTrue(new File(dest, "gradlew.bat").exists());
@@ -141,7 +141,7 @@ public class GuideProjectGeneratorTest {
         assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
 
         for (App app: guide.apps()) {
-            File dest = Paths.get(outputDirectory.getAbsolutePath(),MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.GRADLE,Language.JAVA,TestFramework.JUNIT)),app.name()).toFile();
+            File dest = Paths.get(outputDirectory.getAbsolutePath(), MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)), app.name()).toFile();
             assertTrue(new File(dest, "build.gradle").exists());
             assertTrue(new File(dest, "gradlew.bat").exists());
             assertTrue(new File(dest, "gradlew").exists());
