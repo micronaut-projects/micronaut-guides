@@ -48,9 +48,7 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
 
     @Override
     public void generate(@NotNull @NonNull File outputDirectory, @NotNull @NonNull Guide guide) throws IOException {
-        if (!outputDirectory.exists()) {
-            assert outputDirectory.mkdir();
-        }
+        assert outputDirectory.exists() || outputDirectory.mkdir();
 
         JdkVersion javaVersion = GuideGenerationUtils.resolveJdkVersion(guidesConfiguration);
         if (guide.minimumJavaVersion() != null) {

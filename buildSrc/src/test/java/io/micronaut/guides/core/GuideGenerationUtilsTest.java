@@ -65,6 +65,5 @@ class GuideGenerationUtilsTest {
         JdkVersion result = GuideGenerationUtils.resolveJdkVersion(configuration);
 
         assertNotNull(result);
-        assertTrue(result.getClass()==JdkVersion.class);
     }
 }

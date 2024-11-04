@@ -104,14 +104,14 @@ public class GuideGenerationUtils {
         JdkVersion javaVersion;
         if (System.getenv(guidesConfiguration.getEnvJdkVersion()) != null) {
             try {
-                int majorVersion = Integer.valueOf(System.getenv(guidesConfiguration.getEnvJdkVersion()));
+                int majorVersion = Integer.parseInt(System.getenv(guidesConfiguration.getEnvJdkVersion()));
                 javaVersion = JdkVersion.valueOf(majorVersion);
             } catch (NumberFormatException ignored) {
                 throw new GradleException("Could not parse env " + guidesConfiguration.getEnvJdkVersion() + " to JdkVersion");
             }
         } else {
             try {
-                javaVersion = JdkVersion.valueOf(Integer.valueOf(JavaVersion.current().getMajorVersion()));
+                javaVersion = JdkVersion.valueOf(Integer.parseInt(JavaVersion.current().getMajorVersion()));
             } catch (IllegalArgumentException ex) {
                 System.out.println("WARNING: " + ex.getMessage() + ": Defaulting to " + guidesConfiguration.getDefaultJdkVersion());
                 javaVersion = guidesConfiguration.getDefaultJdkVersion();
