@@ -9,17 +9,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Singleton
 public class DefaultLicenseLoader implements LicenseLoader {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultLicenseLoader.class);
     private final int numberOfLines;
+    private final String licenseHeaderText;
 
     public DefaultLicenseLoader(GuidesConfiguration guidesConfiguration,
                                 ResourceLoader resourceLoader) {
         Optional<InputStream> resourceAsStreamOptional = resourceLoader.getResourceAsStream(guidesConfiguration.getLicensePath());
-        this.numberOfLines = resourceAsStreamOptional.map(DefaultLicenseLoader::countLines).orElse(0);
+        this.licenseHeaderText = resourceAsStreamOptional.map(DefaultLicenseLoader::readLicenseHeader).orElse("");
+        this.numberOfLines = (int)licenseHeaderText.lines().count()+1;
     }
 
     private static int countLines(InputStream inputStream) {
@@ -32,7 +35,21 @@ public class DefaultLicenseLoader implements LicenseLoader {
         return numberOfLines;
     }
 
+    private static String readLicenseHeader(InputStream inputStream) {
+        StringBuilder licenseHeaderText = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            reader.lines().forEach(line -> licenseHeaderText.append(line).append("\n"));
+        } catch (IOException e) {
+            LOG.error("", e);
+        }
+        return licenseHeaderText.toString().replace("$YEAR", String.valueOf(LocalDate.now().getYear()));
+    }
+
+    @Override
     public int getNumberOfLines() {
         return this.numberOfLines;
     }
+
+    @Override
+    public String getLicenseHeaderText() { return this.licenseHeaderText; }
 }

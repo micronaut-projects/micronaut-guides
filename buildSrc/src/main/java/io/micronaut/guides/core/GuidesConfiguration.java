@@ -1,5 +1,7 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.starter.options.JdkVersion;
+
 import java.util.List;
 
 public interface GuidesConfiguration {
@@ -12,5 +14,9 @@ public interface GuidesConfiguration {
     int getDefaultMinJdk();
     String getApiUrl();
     String getVersionPath();
+    String getEnvJdkVersion();
     List<String> getFilesWithHeader();
+    JdkVersion getDefaultJdkVersion();
+
+    List<JdkVersion> getJdkVersionsSupportedByGraalvm();
 }
