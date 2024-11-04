@@ -19,6 +19,7 @@ import io.micronaut.starter.util.NameUtils;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import org.gradle.api.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,55 +64,57 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
             }
             return;
         }
-
         List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide,LOG);
         for (GuidesOption guidesOption : guidesOptionList) {
-            BuildTool buildTool = guidesOption.getBuildTool();
-            TestFramework testFramework = guidesOption.getTestFramework();
-            Language lang = guidesOption.getLanguage();
-
-            for (App app : guide.apps()) {
-                List<String> appFeatures = new ArrayList<>(GuideUtils.getAppFeatures(app, lang));
-                if (!guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
-                    appFeatures.remove("graalvm");
-                }
-
-                if (testFramework == TestFramework.SPOCK) {
-                    appFeatures.remove("mockito");
-                }
-
-                // typical guides use 'default' as name, multi-project guides have different modules
-                String folder = MacroUtils.getSourceDir(guide.slug(), guidesOption);
-
-                String appName = app.name().equals(guidesConfiguration.getDefaultAppName()) ? EMPTY_STRING : app.name();
-
-                Path destinationPath = Paths.get(outputDirectory.getAbsolutePath(), folder, appName);
-                File destination = destinationPath.toFile();
-                destination.mkdir();
-
-                String packageAndName = guidesConfiguration.getPackageName() + '.' + app.name();
-
-                generateAppIntoDirectory(destination, app.applicationType(), packageAndName, app.framework(),
-                        appFeatures, buildTool, app.testFramework() != null ? app.testFramework() : testFramework, lang, javaVersion);
-            }
+            generate(outputDirectory, guide, guidesOption, javaVersion);
         }
     }
 
-    public void generateAppIntoDirectory(
-            @NonNull File directory,
-            @NotNull ApplicationType type,
-            @NotNull String packageAndName,
-            @Nullable String framework,
-            @Nullable List<String> features,
-            @Nullable BuildTool buildTool,
-            @Nullable TestFramework testFramework,
-            @Nullable Language lang,
-            @Nullable JdkVersion javaVersion) throws IOException {
-        GeneratorContext generatorContext = createProjectGeneratorContext(type, packageAndName, framework, features, buildTool, testFramework, lang, javaVersion);
+    public void generate(@NonNull File outputDirectory,
+                         @NonNull Guide guide,
+                         @NonNull GuidesOption guidesOption,
+                         @NonNull JdkVersion javaVersion) throws IOException {
+        for (App app : guide.apps()) {
+            generate(outputDirectory, guide, guidesOption, javaVersion, app);
+        }
+    }
+
+    public void generate(@NonNull File outputDirectory,
+                         @NonNull Guide guide,
+                         @NonNull GuidesOption guidesOption,
+                         @NonNull JdkVersion javaVersion,
+                         @NonNull App app) throws IOException {
+        List<String> appFeatures = new ArrayList<>(GuideUtils.getAppFeatures(app, guidesOption.getLanguage()));
+        if (!guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
+            appFeatures.remove("graalvm");
+        }
+
+        if (guidesOption.getTestFramework() == TestFramework.SPOCK) {
+            appFeatures.remove("mockito");
+        }
+
+        // typical guides use 'default' as name, multi-project guides have different modules
+        String folder = MacroUtils.getSourceDir(guide.slug(), guidesOption);
+
+        String appName = app.name().equals(guidesConfiguration.getDefaultAppName()) ? EMPTY_STRING : app.name();
+
+        Path destinationPath = Paths.get(outputDirectory.getAbsolutePath(), folder, appName);
+        File destination = destinationPath.toFile();
+        destination.mkdir();
+
+        String packageAndName = guidesConfiguration.getPackageName() + '.' + app.name();
+        GeneratorContext generatorContext = createProjectGeneratorContext(app.applicationType(),
+                packageAndName,
+                app.framework(),
+                appFeatures,
+                guidesOption.getBuildTool(),
+                app.testFramework() != null ? app.testFramework() : guidesOption.getTestFramework(),
+                guidesOption.getLanguage(),
+                javaVersion);
         try {
-            projectGenerator.generate(type,
+            projectGenerator.generate(app.applicationType(),
                     generatorContext.getProject(),
-                    new FileSystemOutputHandler(directory, ConsoleOutput.NOOP),
+                    new FileSystemOutputHandler(destination, ConsoleOutput.NOOP),
                     generatorContext);
         } catch (Exception e) {
             LOG.error("Error generating application: " + e.getMessage(), e);
@@ -119,7 +122,7 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
         }
     }
 
-    GeneratorContext createProjectGeneratorContext(
+    private GeneratorContext createProjectGeneratorContext(
             ApplicationType type,
             @Pattern(regexp = "[\\w\\d-_\\.]+") String packageAndName,
             @Nullable String framework,
