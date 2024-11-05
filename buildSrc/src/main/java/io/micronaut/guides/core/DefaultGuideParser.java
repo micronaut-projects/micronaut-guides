@@ -35,6 +35,7 @@ public class DefaultGuideParser implements GuideParser {
     }
 
     @Override
+    @NonNull
     public List<Guide> parseGuidesMetadata(@NonNull @NotNull File guidesDir, @NonNull @NotNull String metadataConfigName) {
         List<Guide> metadatas = new ArrayList<>();
 
@@ -52,6 +53,7 @@ public class DefaultGuideParser implements GuideParser {
     }
 
     @Override
+    @NonNull
     public Optional<Guide> parseGuideMetadata(@NonNull @NotNull File guidesDir, @NonNull @NotNull String metadataConfigName) {
         File configFile = new File(guidesDir, metadataConfigName);
         if (!configFile.exists()) {
