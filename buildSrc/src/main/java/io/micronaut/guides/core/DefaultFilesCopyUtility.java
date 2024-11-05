@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.gradle.api.GradleException;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 
+@Singleton
 public class DefaultFilesCopyUtility implements FilesCopyUtility {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFilesCopyUtility.class);
     private static final String EXTENSION_JAVA = ".java";
