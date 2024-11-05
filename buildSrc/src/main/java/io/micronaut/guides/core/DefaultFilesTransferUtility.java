@@ -19,8 +19,8 @@ import java.util.List;
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 
 @Singleton
-public class DefaultFilesCopyUtility implements FilesCopyUtility {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultFilesCopyUtility.class);
+public class DefaultFilesTransferUtility implements FilesTransferUtility {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultFilesTransferUtility.class);
     private static final String EXTENSION_JAVA = ".java";
     private static final String EXTENSION_GROOVY = ".groovy";
     private static final String EXTENSION_KT = ".kt";
@@ -28,14 +28,14 @@ public class DefaultFilesCopyUtility implements FilesCopyUtility {
     private LicenseLoader licenseLoader;
     private GuidesConfiguration guidesConfiguration;
 
-    DefaultFilesCopyUtility(LicenseLoader licenseLoader,
-                            GuidesConfiguration guidesConfiguration){
+    DefaultFilesTransferUtility(LicenseLoader licenseLoader,
+                                GuidesConfiguration guidesConfiguration){
         this.licenseLoader = licenseLoader;
         this.guidesConfiguration = guidesConfiguration;
     }
 
     @Override
-    public void copyFiles(@NotNull @NonNull File outputDirectory, @NotNull @NonNull File inputDirectory, @NotNull @NonNull Guide guide) throws IOException {
+    public void transferFiles(@NotNull @NonNull File outputDirectory, @NotNull @NonNull File inputDirectory, @NotNull @NonNull Guide guide) throws IOException {
         List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide,LOG);
         for (GuidesOption guidesOption : guidesOptionList) {
             for (App app : guide.apps()) {

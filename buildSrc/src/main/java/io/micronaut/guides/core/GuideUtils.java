@@ -41,9 +41,9 @@ public final class GuideUtils {
         return metadatas;
     }
 
-    private static Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName,
-                                       JsonSchema schema,
-                                       JsonMapper jsonMapper) throws Exception {
+    static Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName,
+                                              JsonSchema schema,
+                                              JsonMapper jsonMapper) throws Exception {
         File configFile = new File(dir, metadataConfigName);
         if (!configFile.exists()) {
             LOG.warn("metadata file not found for {}", dir.getName());
