@@ -57,7 +57,8 @@ class IndexGenerator {
         //TODO. We should have an application context and get it from it.
         JsonMapper jsonMapper = JsonMapper.createDefault();
         JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider()
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName)
                 .findAll { it.publish() }
         generateGuidesIndex(template, distDir, metadatas, indexgrid)
         GuidesConfiguration guidesConfiguration = new GuidesConfigurationProperties()
@@ -529,7 +530,8 @@ class IndexGenerator {
         //TOO get both from an application context
         JsonMapper jsonMapper = JsonMapper.createDefault();
         JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper)
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName)
                 .findAll { it.publish() }
 
         List<Map> result = metadatas

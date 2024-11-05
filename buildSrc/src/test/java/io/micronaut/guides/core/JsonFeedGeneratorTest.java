@@ -27,10 +27,11 @@ public class JsonFeedGeneratorTest {
     JsonFeedGenerator jsonFeedGenerator;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup() {
         File file = new File("src/test/resources/guides");
-        this.guides = GuideUtils.parseGuidesMetadata(file,"metadata.json", jsonSchemaProvider.getSchema(), jsonMapper)
-                .stream().filter( it -> it.publish()).toList();
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        this.guides = guideParser.parseGuidesMetadata(file,"metadata.json")
+                .stream().filter(Guide::publish).toList();
     }
 
     @Test
