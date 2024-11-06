@@ -2,6 +2,7 @@ package io.micronaut.guides.core;
 
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.guides.core.asciidoc.PlacheholderMacro;
+
 import java.util.Optional;
 
 abstract class PlaceholderWithTargetMacroSubstitution implements MacroSubstitution {

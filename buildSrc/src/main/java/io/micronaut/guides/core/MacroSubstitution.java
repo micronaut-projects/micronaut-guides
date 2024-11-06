@@ -16,7 +16,7 @@ public interface MacroSubstitution {
     }
 
     default App app(Guide guide, String appName) {
-        return  guide.apps().stream()
+        return guide.apps().stream()
                 .filter(a -> a.name().equals(appName))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("app not found for app name" + appName));

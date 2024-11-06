@@ -19,6 +19,7 @@ public class DefaultJsonFeedGenerator implements JsonFeedGenerator {
     private final GuidesConfiguration guidesConfiguration;
     private final JsonFeedConfiguration jsonFeedConfiguration;
     private final JsonMapper jsonMapper;
+
     public DefaultJsonFeedGenerator(GuidesConfiguration guidesConfiguration,
                                     JsonFeedConfiguration jsonFeedConfiguration,
                                     JsonMapper jsonMapper) {
@@ -57,8 +58,8 @@ public class DefaultJsonFeedGenerator implements JsonFeedGenerator {
                 .contentText(metadata.intro())
                 .language(RssLanguage.LANG_ENGLISH)
                 .datePublished(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
-                .url(guidesConfiguration.getHomePageUrl() +metadata.slug());
-        for (String author: metadata.authors()) {
+                .url(guidesConfiguration.getHomePageUrl() + metadata.slug());
+        for (String author : metadata.authors()) {
             jsonFeedItemBuilder.author(JsonFeedAuthor.builder().name(author).build());
         }
         for (String t : GuideUtils.getTags(metadata)) {

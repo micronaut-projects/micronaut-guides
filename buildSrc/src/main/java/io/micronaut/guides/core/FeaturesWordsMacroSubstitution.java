@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

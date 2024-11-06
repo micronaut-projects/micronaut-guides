@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,13 +20,13 @@ public final class MacroUtils {
 
     static List<String> findMacroLines(@NonNull String str, @NonNull String macro) {
         return str.lines()
-                .filter(line -> line.startsWith(macro+":"))
+                .filter(line -> line.startsWith(macro + ":"))
                 .toList();
     }
 
     static List<String> findMacroInstances(@NonNull String str, @NonNull String macro) {
         List<String> matches = new ArrayList<>();
-        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?"+macro+"@");
+        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?" + macro + "@");
         Matcher matcher = pattern.matcher(str);
 
         while (matcher.find()) {
@@ -37,7 +38,7 @@ public final class MacroUtils {
 
     static List<String> findMacroGroups(@NonNull String str, @NonNull String macro) {
         List<String> matches = new ArrayList<>();
-        String pattern = ":"+macro+":";
+        String pattern = ":" + macro + ":";
         int startIndex = 0;
 
         while (true) {
@@ -64,20 +65,20 @@ public final class MacroUtils {
     @NonNull
     static List<List<String>> findMacroGroupsNested(@NonNull String str, @NonNull String macro) {
         List<List<String>> matches = new ArrayList<>();
-        String pattern = ":"+macro+":";
+        String pattern = ":" + macro + ":";
 
         List<String> lines = str.lines().toList();
         Stack<Integer> stack = new Stack<>();
 
-        for (int i=0; i < lines.size(); i++) {
+        for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
             if (isGroupStart(line, pattern)) {
                 stack.push(i);
             } else if (isGroupEnd(line, pattern)) {
                 if (!stack.isEmpty()) {
                     int start = stack.pop();
-                    matches.add(lines.subList(start, i+1));
-                } else{
+                    matches.add(lines.subList(start, i + 1));
+                } else {
                     throw new UnsupportedOperationException("Unbalanced macro group");
                 }
             }
@@ -87,11 +88,11 @@ public final class MacroUtils {
     }
 
     private static boolean isGroupStart(@NonNull String line, @NonNull String macro) {
-        return line.matches(macro+"[a-zA-Z0-9,]+");
+        return line.matches(macro + "[a-zA-Z0-9,]+");
     }
 
     private static boolean isGroupEnd(@NonNull String line, @NonNull String macro) {
-        return line.matches(macro+"(?![a-zA-Z0-9,]+$)");
+        return line.matches(macro + "(?![a-zA-Z0-9,]+$)");
     }
 
     @NonNull

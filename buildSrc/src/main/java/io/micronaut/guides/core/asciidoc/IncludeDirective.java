@@ -74,12 +74,12 @@ public class IncludeDirective {
     private final String opts;
 
     IncludeDirective(@NonNull String target,
-                            @Nullable String levelOffset,
-                            @Nullable Range lines,
-                            @Nullable String encoding,
-                            @Nullable List<String> tags,
-                            @Nullable Integer indent,
-                            @Nullable String opts) {
+                     @Nullable String levelOffset,
+                     @Nullable Range lines,
+                     @Nullable String encoding,
+                     @Nullable List<String> tags,
+                     @Nullable Integer indent,
+                     @Nullable String opts) {
         this.target = target;
         this.levelOffset = levelOffset;
         this.lines = lines;
@@ -89,8 +89,11 @@ public class IncludeDirective {
         this.opts = opts;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /**
-     *
      * @return Target may be an absolute path, a path relative to the current document, or a URL.
      */
     @NonNull
@@ -106,7 +109,6 @@ public class IncludeDirective {
     }
 
     /**
-     *
      * @return ranges of line numbers.
      */
     @Nullable
@@ -161,7 +163,7 @@ public class IncludeDirective {
         }
         if (CollectionUtils.isNotEmpty(getTags())) {
             if (getTags().size() > 1) {
-                attributes.add(ATTRIBUTE_TAGS + "=" + String.join(";",  getTags()));
+                attributes.add(ATTRIBUTE_TAGS + "=" + String.join(";", getTags()));
             } else if (getTags().size() == 1) {
                 attributes.add(ATTRIBUTE_TAG + "=" + getTags().get(0));
             }
@@ -173,10 +175,6 @@ public class IncludeDirective {
             attributes.add(ATTRIBUTE_OPTS + "=" + getOpts());
         }
         return attributes;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {
@@ -237,7 +235,7 @@ public class IncludeDirective {
         }
 
         public Builder levelOffset(int levelOffset) {
-            return levelOffset("+"  + levelOffset);
+            return levelOffset("+" + levelOffset);
         }
 
         public Builder tag(String tag) {

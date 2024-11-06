@@ -23,7 +23,7 @@ public class DefaultRssFeedGenerator implements RssFeedGenerator {
 
     @NonNull
     public String rssFeed(@NonNull List<Guide> metadatas) {
-         RssChannel.Builder rssBuilder = rssBuilder();
+        RssChannel.Builder rssBuilder = rssBuilder();
         for (Guide metadata : metadatas) {
             rssBuilder.item(rssFeedElement(metadata));
         }
@@ -43,12 +43,12 @@ public class DefaultRssFeedGenerator implements RssFeedGenerator {
 
     private RssItem rssFeedElement(Guide metadata) {
         RssItem.Builder rssItemBuilder = RssItem.builder()
-                        .guid(metadata.slug())
-                        .title(metadata.title())
-                        .description(metadata.intro())
-                        .pubDate(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
-                        .link(guidesConfiguration.getHomePageUrl() + metadata.slug());
-        for (String author: metadata.authors()) {
+                .guid(metadata.slug())
+                .title(metadata.title())
+                .description(metadata.intro())
+                .pubDate(ZonedDateTime.of(metadata.publicationDate(), LocalTime.of(0, 0), ZoneOffset.UTC))
+                .link(guidesConfiguration.getHomePageUrl() + metadata.slug());
+        for (String author : metadata.authors()) {
             rssItemBuilder.author(author);
         }
         rssItemBuilder.category(GuideUtils.getTags(metadata));

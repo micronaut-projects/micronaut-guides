@@ -8,10 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import static io.micronaut.starter.api.TestFramework.SPOCK;
 
 @Singleton
-public class TestMacroSubstitution  extends SourceBlockMacroSubstitution {
+public class TestMacroSubstitution extends SourceBlockMacroSubstitution {
+    public static final String SUFFIX_SPEC = "Spec";
     private static final String MACRO_TEST = "test";
     private static final String SUFFIX_TEST = "Test";
-    public static final String SUFFIX_SPEC = "Spec";
+
     public TestMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
         super(licenseLoader, guidesConfiguration);
     }

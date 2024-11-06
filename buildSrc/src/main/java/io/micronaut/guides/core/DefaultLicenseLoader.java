@@ -46,5 +46,7 @@ public class DefaultLicenseLoader implements LicenseLoader {
     }
 
     @Override
-    public String getLicenseHeaderText() { return this.licenseHeaderText; }
+    public String getLicenseHeaderText() {
+        return this.licenseHeaderText;
+    }
 }

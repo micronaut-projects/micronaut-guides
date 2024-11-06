@@ -1,10 +1,10 @@
 package io.micronaut.guides.core;
 
-import io.micronaut.guides.core.asciidoc.*;
+import io.micronaut.guides.core.asciidoc.Classpath;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class SourceMacroSubstitution extends SourceBlockMacroSubstitution{
+public class SourceMacroSubstitution extends SourceBlockMacroSubstitution {
     private static final String MACRO_SOURCE = "source";
 
     public SourceMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {

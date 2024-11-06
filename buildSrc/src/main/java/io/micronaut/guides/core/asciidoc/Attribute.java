@@ -13,7 +13,7 @@ public record Attribute(String key, List<String> values) {
     @NonNull
     public static List<Attribute> of(@NonNull String str) {
         List<Attribute> result = new ArrayList<>();
-        String arr[] = str.split(ATTRIBUTE_SEPARATOR);
+        String[] arr = str.split(ATTRIBUTE_SEPARATOR);
         for (String attributeString : arr) {
             String[] attributeComponents = attributeString.split(KEY_VALUE_SEPARATOR);
             if (attributeComponents.length == 2) {

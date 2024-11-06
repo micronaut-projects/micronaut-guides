@@ -4,8 +4,9 @@ import io.micronaut.guides.core.asciidoc.Classpath;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class ResourceMacroSubstitution extends SourceBlockMacroSubstitution{
+public class ResourceMacroSubstitution extends SourceBlockMacroSubstitution {
     private static final String MACRO_RESOURCE = "resource";
+
     public ResourceMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
         super(licenseLoader, guidesConfiguration);
     }
