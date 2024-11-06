@@ -1,5 +1,6 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.exceptions.HttpStatusException;
@@ -48,69 +49,68 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
 
     @Override
     public void generate(@NotNull @NonNull File outputDirectory, @NotNull @NonNull Guide guide) throws IOException {
-        assert outputDirectory.exists() || outputDirectory.mkdir();
-
-        JdkVersion javaVersion = GuideGenerationUtils.resolveJdkVersion(guidesConfiguration);
-        if (guide.minimumJavaVersion() != null) {
-            JdkVersion minimumJavaVersion = JdkVersion.valueOf(guide.minimumJavaVersion());
-            if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
-                javaVersion = minimumJavaVersion;
-            }
+        if (!outputDirectory.exists()) {
+            throw new ConfigurationException("Output directory does not exist");
+        }
+        if (!outputDirectory.isDirectory()) {
+            throw new ConfigurationException("Output directory must be a directory");
         }
 
+        JdkVersion javaVersion = GuideGenerationUtils.resolveJdkVersion(guidesConfiguration, guide);
         if (guide.maximumJavaVersion() != null && javaVersion.majorVersion() > guide.maximumJavaVersion()) {
-            System.out.println("not generating project for " + guide.slug() + ", JDK " + javaVersion.majorVersion() + " > " + guide.maximumJavaVersion());
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("not generating project for {}, JDK {} > {}", guide.slug(), javaVersion.majorVersion(), guide.maximumJavaVersion());
+            }
             return;
         }
 
         List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide,LOG);
         for (GuidesOption guidesOption : guidesOptionList) {
-            BuildTool buildTool = guidesOption.getBuildTool();
-            TestFramework testFramework = guidesOption.getTestFramework();
-            Language lang = guidesOption.getLanguage();
-
-            for (App app : guide.apps()) {
-                List<String> appFeatures = new ArrayList<>(GuideUtils.getAppFeatures(app, lang));
-                if (!guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
-                    appFeatures.remove("graalvm");
-                }
-
-                if (testFramework == TestFramework.SPOCK) {
-                    appFeatures.remove("mockito");
-                }
-
-                // typical guides use 'default' as name, multi-project guides have different modules
-                String folder = MacroUtils.getSourceDir(guide.slug(), guidesOption);
-
-                String appName = app.name().equals(guidesConfiguration.getDefaultAppName()) ? EMPTY_STRING : app.name();
-
-                Path destinationPath = Paths.get(outputDirectory.getAbsolutePath(), folder, appName);
-                File destination = destinationPath.toFile();
-                destination.mkdir();
-
-                String packageAndName = guidesConfiguration.getPackageName() + '.' + app.name();
-
-                generateAppIntoDirectory(destination, app.applicationType(), packageAndName, app.framework(),
-                        appFeatures, buildTool, app.testFramework() != null ? app.testFramework() : testFramework, lang, javaVersion);
-            }
+            generate(outputDirectory, guide, guidesOption, javaVersion);
         }
     }
 
-    public void generateAppIntoDirectory(
-            @NonNull File directory,
-            @NotNull ApplicationType type,
-            @NotNull String packageAndName,
-            @Nullable String framework,
-            @Nullable List<String> features,
-            @Nullable BuildTool buildTool,
-            @Nullable TestFramework testFramework,
-            @Nullable Language lang,
-            @Nullable JdkVersion javaVersion) throws IOException {
-        GeneratorContext generatorContext = createProjectGeneratorContext(type, packageAndName, framework, features, buildTool, testFramework, lang, javaVersion);
+    public void generate(@NonNull File outputDirectory,
+                         @NonNull Guide guide,
+                         @NonNull GuidesOption guidesOption,
+                         @NonNull JdkVersion javaVersion) throws IOException {
+        for (App app : guide.apps()) {
+            generate(outputDirectory, guide, guidesOption, javaVersion, app);
+        }
+    }
+
+    public void generate(@NonNull File outputDirectory,
+                         @NonNull Guide guide,
+                         @NonNull GuidesOption guidesOption,
+                         @NonNull JdkVersion javaVersion,
+                         @NonNull App app) throws IOException {
+        List<String> appFeatures = new ArrayList<>(GuideUtils.getAppFeatures(app, guidesOption.getLanguage()));
+        if (!guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
+            appFeatures.remove("graalvm");
+        }
+
+        // typical guides use 'default' as name, multi-project guides have different modules
+        String folder = MacroUtils.getSourceDir(guide.slug(), guidesOption);
+
+        String appName = app.name().equals(guidesConfiguration.getDefaultAppName()) ? EMPTY_STRING : app.name();
+
+        Path destinationPath = Paths.get(outputDirectory.getAbsolutePath(), folder, appName);
+        File destination = destinationPath.toFile();
+        destination.mkdir();
+
+        String packageAndName = guidesConfiguration.getPackageName() + '.' + app.name();
+        GeneratorContext generatorContext = createProjectGeneratorContext(app.applicationType(),
+                packageAndName,
+                app.framework(),
+                appFeatures,
+                guidesOption.getBuildTool(),
+                app.testFramework() != null ? app.testFramework() : guidesOption.getTestFramework(),
+                guidesOption.getLanguage(),
+                javaVersion);
         try {
-            projectGenerator.generate(type,
+            projectGenerator.generate(app.applicationType(),
                     generatorContext.getProject(),
-                    new FileSystemOutputHandler(directory, ConsoleOutput.NOOP),
+                    new FileSystemOutputHandler(destination, ConsoleOutput.NOOP),
                     generatorContext);
         } catch (Exception e) {
             LOG.error("Error generating application: " + e.getMessage(), e);
@@ -118,7 +118,7 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
         }
     }
 
-    GeneratorContext createProjectGeneratorContext(
+    private GeneratorContext createProjectGeneratorContext(
             ApplicationType type,
             @Pattern(regexp = "[\\w\\d-_\\.]+") String packageAndName,
             @Nullable String framework,

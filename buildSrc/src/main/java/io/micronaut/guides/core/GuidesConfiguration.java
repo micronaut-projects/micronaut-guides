@@ -17,6 +17,5 @@ public interface GuidesConfiguration {
     String getEnvJdkVersion();
     List<String> getFilesWithHeader();
     JdkVersion getDefaultJdkVersion();
-
     List<JdkVersion> getJdkVersionsSupportedByGraalvm();
 }

@@ -7,6 +7,7 @@ import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.JdkVersion;
 import io.micronaut.starter.options.Language;
+import jakarta.validation.constraints.NotNull;
 import org.gradle.api.GradleException;
 import org.gradle.api.JavaVersion;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import static io.micronaut.starter.options.Language.GROOVY;
 
 public class GuideGenerationUtils {
 
-    private GuideGenerationUtils(){
+    private GuideGenerationUtils() {
     }
 
     @NonNull
@@ -115,6 +116,17 @@ public class GuideGenerationUtils {
             } catch (IllegalArgumentException ex) {
                 System.out.println("WARNING: " + ex.getMessage() + ": Defaulting to " + guidesConfiguration.getDefaultJdkVersion());
                 javaVersion = guidesConfiguration.getDefaultJdkVersion();
+            }
+        }
+        return javaVersion;
+    }
+
+    public static JdkVersion resolveJdkVersion(GuidesConfiguration guidesConfiguration, @NotNull @NonNull Guide guide) {
+        JdkVersion javaVersion = GuideGenerationUtils.resolveJdkVersion(guidesConfiguration);
+        if (guide.minimumJavaVersion() != null) {
+            JdkVersion minimumJavaVersion = JdkVersion.valueOf(guide.minimumJavaVersion());
+            if (minimumJavaVersion.majorVersion() > javaVersion.majorVersion()) {
+                return minimumJavaVersion;
             }
         }
         return javaVersion;

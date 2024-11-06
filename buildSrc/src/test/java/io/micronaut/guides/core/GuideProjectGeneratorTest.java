@@ -1,11 +1,13 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.gradle.api.JavaVersion;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -20,6 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
 public class GuideProjectGeneratorTest {
+    @Inject
+    JsonMapper jsonMapper;
+
+    @Inject
+    JsonSchemaProvider jsonSchemaProvider;
+
 
     @Inject
     GuideProjectGenerator guideProjectGenerator;
@@ -27,6 +35,7 @@ public class GuideProjectGeneratorTest {
     @Test
     void testGenerate() {
         File outputDirectory = new File("build/tmp/test");
+        outputDirectory.mkdir();
         App app = new App(
                 "cli",
                 "example.micronaut",
@@ -68,7 +77,7 @@ public class GuideProjectGeneratorTest {
 
         assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
 
-        File dest = Paths.get(outputDirectory.getAbsolutePath(),MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.GRADLE,Language.JAVA,TestFramework.JUNIT)),"cli").toFile();
+        File dest = Paths.get(outputDirectory.getAbsolutePath(), MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)), "cli").toFile();
 
         assertTrue(new File(dest, "build.gradle").exists());
         assertTrue(new File(dest, "gradlew.bat").exists());
@@ -108,6 +117,8 @@ public class GuideProjectGeneratorTest {
                         sharedServer = true
                     }
                 }"""));
+        String javaVersion = JavaVersion.current().getMajorVersion();
+
         assertTrue(result.contains("""
                 application {
                     mainClass = "example.micronaut.CliCommand"
@@ -115,8 +126,39 @@ public class GuideProjectGeneratorTest {
                 java {
                     sourceCompatibility = JavaVersion.toVersion("17")
                     targetCompatibility = JavaVersion.toVersion("17")
-                }"""));
+                }""".replace("17", javaVersion)));
 
+    }
+
+    @Test
+    void testGenerateMultipleApps() throws Exception {
+        File outputDirectory = new File("build/tmp/test");
+        outputDirectory.mkdir();
+
+        String path = "src/test/resources/guides";
+        File file = new File(path);
+
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(file,"metadata.json", jsonSchemaProvider.getSchema(), jsonMapper);
+        Guide guide = metadatas.get(2);
+
+        assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
+
+        for (App app: guide.apps()) {
+            File dest = Paths.get(outputDirectory.getAbsolutePath(), MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)), app.name()).toFile();
+            assertTrue(new File(dest, "build.gradle").exists());
+            assertTrue(new File(dest, "gradlew.bat").exists());
+            assertTrue(new File(dest, "gradlew").exists());
+            assertTrue(new File(dest, "settings.gradle").exists());
+            assertTrue(new File(dest, "LICENSEHEADER").exists());
+            assertTrue(new File(dest, "src/main/java/example/micronaut/Application.java").exists());
+
+            File buildGradleFile = new File(dest, "build.gradle");
+            String result = readFile(buildGradleFile);
+
+            for(String feature: app.features()) {
+                assertTrue(result.contains(feature));
+            }
+        }
     }
 
     private String readFile(File file){

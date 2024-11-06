@@ -3,14 +3,10 @@ package io.micronaut.guides.core;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,9 +25,10 @@ class RssFeedGenerationTest {
     private List<Guide> guides;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup() {
         File file = new File("src/test/resources/guides");
-        this.guides = GuideUtils.parseGuidesMetadata(file,"metadata.json", jsonSchemaProvider.getSchema(), jsonMapper)
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        this.guides = guideParser.parseGuidesMetadata(file,"metadata.json")
                 .stream().filter(Guide::publish).toList();
     }
 
