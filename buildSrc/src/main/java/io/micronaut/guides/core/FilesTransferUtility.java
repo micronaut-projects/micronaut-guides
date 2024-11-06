@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 public interface FilesTransferUtility {
-    void transferFiles(@NotNull @NonNull File outputDirectory,
-                       @NotNull @NonNull File inputDirectory,
-                       Guide guide) throws IOException;
+    void transferFiles(@NotNull @NonNull File inputDirectory,
+                       @NotNull @NonNull File outputDirectory,
+                       @NotNull @NonNull Guide guide) throws IOException;
 }

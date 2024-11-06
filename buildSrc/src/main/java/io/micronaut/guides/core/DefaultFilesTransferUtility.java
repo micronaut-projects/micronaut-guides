@@ -83,7 +83,7 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
     }
 
     @Override
-    public void transferFiles(@NotNull @NonNull File outputDirectory, @NotNull @NonNull File inputDirectory, @NotNull @NonNull Guide guide) throws IOException {
+    public void transferFiles(@NotNull @NonNull File inputDirectory, @NotNull @NonNull File outputDirectory, @NotNull @NonNull Guide guide) throws IOException {
         List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide, LOG);
         for (GuidesOption guidesOption : guidesOptionList) {
             for (App app : guide.apps()) {
