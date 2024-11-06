@@ -18,4 +18,8 @@ public interface GuidesConfiguration {
     List<String> getFilesWithHeader();
     JdkVersion getDefaultJdkVersion();
     List<JdkVersion> getJdkVersionsSupportedByGraalvm();
+    String getGithubWorkflowJavaCi();
+    void setGithubWorkflowJavaCi(String githubWorkflowJavaCi);
+    String getEnvGithubWorkflow();
+    void setEnvGithubWorkflow(String envGithubWorkflow);
 }

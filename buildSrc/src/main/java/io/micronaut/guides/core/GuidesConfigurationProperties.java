@@ -29,6 +29,10 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private String envJdkVersion = DEFAULT_ENV_JDK_VERSION;
     private JdkVersion defaulJdkVersion = DEFAULT_JAVA_VERSION;
     private List<JdkVersion> jdkVersionsSupportedByGraalvm = DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM;
+    private static final String GITHUB_WORKFLOW_JAVA_CI = "Java CI";
+    private static final String ENV_GITHUB_WORKFLOW = "GITHUB_WORKFLOW";
+    private String githubWorkflowJavaCi = GITHUB_WORKFLOW_JAVA_CI;
+    private String envGithubWorkflow = ENV_GITHUB_WORKFLOW;
 
     @Override
     public List<JdkVersion> getJdkVersionsSupportedByGraalvm() { return jdkVersionsSupportedByGraalvm; }
@@ -118,6 +122,18 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     public void  setDefaulJdkVersion(JdkVersion jdkVersion) {
         this.defaulJdkVersion = jdkVersion;
     }
+
+    @Override
+    public String getGithubWorkflowJavaCi() { return githubWorkflowJavaCi; }
+
+    @Override
+    public void setGithubWorkflowJavaCi(String githubWorkflowJavaCi) { this.githubWorkflowJavaCi = githubWorkflowJavaCi; }
+
+    @Override
+    public String getEnvGithubWorkflow() { return envGithubWorkflow; }
+
+    @Override
+    public void setEnvGithubWorkflow(String envGithubWorkflow) { this.envGithubWorkflow = envGithubWorkflow; }
 
     public void setFilesWithHeader(List<String> sourceFilesExtensions) {
         this.sourceFilesExtensions = sourceFilesExtensions;
