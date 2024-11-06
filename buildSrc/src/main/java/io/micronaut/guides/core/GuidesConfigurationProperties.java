@@ -1,9 +1,10 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
-
+import io.micronaut.starter.options.JdkVersion;
 import java.util.List;
-import java.util.Set;
+import static io.micronaut.starter.options.JdkVersion.JDK_17;
+import static io.micronaut.starter.options.JdkVersion.JDK_21;
 
 @ConfigurationProperties(GuidesConfigurationProperties.PREFIX)
 public class GuidesConfigurationProperties implements GuidesConfiguration {
@@ -22,6 +23,23 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private static final int DEFAULT_MIN_JDK = 17;
     private static final String API_URL = "https://docs.micronaut.io/latest/api";
     private static final String DEFAULT_VERSION = "classpath:version.txt";
+    private static final String DEFAULT_ENV_JDK_VERSION = "JDK_VERSION";
+    private static final JdkVersion DEFAULT_JAVA_VERSION = JDK_17;
+    private static final List<JdkVersion> DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM = List.of(JDK_17, JDK_21);
+    private String envJdkVersion = DEFAULT_ENV_JDK_VERSION;
+    private JdkVersion defaulJdkVersion = DEFAULT_JAVA_VERSION;
+    private List<JdkVersion> jdkVersionsSupportedByGraalvm = DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM;
+
+    @Override
+    public List<JdkVersion> getJdkVersionsSupportedByGraalvm() { return jdkVersionsSupportedByGraalvm; }
+
+    public void setJdkVersionsSupportedByGraalvm(List<JdkVersion> jdkVersionsSupportedByGraalvm) {
+        this.jdkVersionsSupportedByGraalvm = jdkVersionsSupportedByGraalvm;
+    }
+
+    public void setSourceFilesExtensions(List<String> sourceFilesExtensions) {
+        this.sourceFilesExtensions = sourceFilesExtensions;
+    }
 
     @Override
     public String getPackageName() {
@@ -85,6 +103,20 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     @Override
     public String getVersionPath() {
         return DEFAULT_VERSION;
+    }
+
+    @Override
+    public String getEnvJdkVersion() { return envJdkVersion; }
+
+    public void setEnvJdkVersion(String envJdkVersion) {
+        this.envJdkVersion = envJdkVersion;
+    }
+
+    @Override
+    public JdkVersion getDefaultJdkVersion() { return defaulJdkVersion; }
+
+    public void  setDefaulJdkVersion(JdkVersion jdkVersion) {
+        this.defaulJdkVersion = jdkVersion;
     }
 
     public void setFilesWithHeader(List<String> sourceFilesExtensions) {
