@@ -8,7 +8,7 @@ import jakarta.inject.Singleton;
 import java.util.Map;
 
 @Singleton
-public class DefaultCoordinatesProvider implements  CoordinatesProvider{
+public class DefaultCoordinatesProvider implements CoordinatesProvider {
     @Override
     public Map<String, Coordinate> getCoordinates() {
         try (ApplicationContext context = ApplicationContext.run()) {

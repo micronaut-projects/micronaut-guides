@@ -21,16 +21,16 @@ public class JsonFeedGeneratorTest {
     @Inject
     JsonSchemaProvider jsonSchemaProvider;
 
-    private List<Guide> guides;
-
     @Inject
     JsonFeedGenerator jsonFeedGenerator;
+
+    private List<Guide> guides;
 
     @BeforeEach
     public void setup() {
         File file = new File("src/test/resources/guides");
         GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
-        this.guides = guideParser.parseGuidesMetadata(file,"metadata.json")
+        this.guides = guideParser.parseGuidesMetadata(file, "metadata.json")
                 .stream().filter(Guide::publish).toList();
     }
 
@@ -54,6 +54,21 @@ public class JsonFeedGeneratorTest {
                       "empty" : false
                     } ],
                     "tags" : [ "cloud", "database", "Azure", "flyway", "jdbc", "mysql", "micronaut-data", "data-jdbc" ],
+                    "language" : "LANG_ENGLISH"
+                  }, {
+                    "id" : "creating-your-first-micronaut-app",
+                    "url" : "https://guides.micronaut.io/latest/creating-your-first-micronaut-app",
+                    "title" : "Creating your first Micronaut application",
+                    "content_text" : "Learn how to create a Hello World Micronaut application with a controller and a functional test.",
+                    "date_published" : "2018-05-23T00:00:00Z",
+                    "authors" : [ {
+                      "name" : "Iván López",
+                      "empty" : false
+                    }, {
+                      "name" : "Sergio del Amo",
+                      "empty" : false
+                    } ],
+                    "tags" : [ "junit", "getting-started", "graalvm" ],
                     "language" : "LANG_ENGLISH"
                   }, {
                     "id" : "test",

@@ -4,7 +4,6 @@ import io.micronaut.guides.core.asciidoc.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import static io.micronaut.guides.core.MacroUtils.*;
@@ -14,7 +13,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
 
     private final LicenseLoader licenseLoader;
     private final GuidesConfiguration guidesConfiguration;
-    
+
     SourceBlockMacroSubstitution(LicenseLoader licenseLoader,
                                  GuidesConfiguration guidesConfiguration) {
         this.licenseLoader = licenseLoader;
@@ -58,14 +57,14 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
                 String extension = getExtension(option);
 
                 if (arr.length == 2) {
-                    language = arr[arr.length-1];
+                    language = arr[arr.length - 1];
                     language = resolveAsciidoctorLanguage(language);
                 } else {
                     condensedTarget = condensedTarget + "." + extension;
                 }
 
                 String target = sourceInclude(slug, appName, condensedTarget, getClasspath(), option, language, getGuidesConfiguration().getPackageName());
-                String title = Path.of(target).normalize().toString().replace("{sourceDir}/"+slug+"/", "").replace(getSourceDir(slug, option)+"/", "");
+                String title = Path.of(target).normalize().toString().replace("{sourceDir}/" + slug + "/", "").replace(getSourceDir(slug, option) + "/", "");
 
                 IncludeDirective.Builder includeDirectiveBuilder = IncludeDirective.builder().attributes(asciidocMacro.attributes())
                         .target(target);
@@ -87,11 +86,11 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
         return str;
     }
 
-    protected String getLanguage(GuidesOption option){
+    protected String getLanguage(GuidesOption option) {
         return option.getLanguage().toString();
     }
 
-    protected String getExtension(GuidesOption option){
+    protected String getExtension(GuidesOption option) {
         return option.getLanguage().getExtension();
     }
 
@@ -114,7 +113,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             GuidesOption option,
             String language,
             String packageName) {
-        return "{sourceDir}/" + slug + "/" + getSourceDir(slug,option) + "/" +
+        return "{sourceDir}/" + slug + "/" + getSourceDir(slug, option) + "/" +
                 sourceTitle(appName, condensedTarget, classpath, language, packageName);
     }
 

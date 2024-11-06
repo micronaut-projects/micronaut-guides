@@ -6,18 +6,25 @@ import jakarta.inject.Singleton;
 @Singleton
 public class ZipIncludeMacroSubstitution extends SourceBlockMacroSubstitution {
     private static final String MACRO_ZIPINCLUDE = "zipInclude";
+
     public ZipIncludeMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
         super(licenseLoader, guidesConfiguration);
     }
 
     @Override
-    public String getMacroName() { return MACRO_ZIPINCLUDE; }
+    public String getMacroName() {
+        return MACRO_ZIPINCLUDE;
+    }
 
     @Override
-    protected Classpath getClasspath() { return Classpath.MAIN; }
+    protected Classpath getClasspath() {
+        return Classpath.MAIN;
+    }
 
     @Override
-    protected FileType getFileType() { return FileType.RESOURCE; }
+    protected FileType getFileType() {
+        return FileType.RESOURCE;
+    }
 
     @Override
     protected String sourceTitle(

@@ -19,7 +19,6 @@ import io.micronaut.starter.util.NameUtils;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import org.gradle.api.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +63,8 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
             }
             return;
         }
-        List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide,LOG);
+
+        List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide, LOG);
         for (GuidesOption guidesOption : guidesOptionList) {
             generate(outputDirectory, guide, guidesOption, javaVersion);
         }
@@ -87,10 +87,6 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
         List<String> appFeatures = new ArrayList<>(GuideUtils.getAppFeatures(app, guidesOption.getLanguage()));
         if (!guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
             appFeatures.remove("graalvm");
-        }
-
-        if (guidesOption.getTestFramework() == TestFramework.SPOCK) {
-            appFeatures.remove("mockito");
         }
 
         // typical guides use 'default' as name, multi-project guides have different modules

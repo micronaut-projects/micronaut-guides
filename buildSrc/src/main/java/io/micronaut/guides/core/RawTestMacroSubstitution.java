@@ -16,12 +16,12 @@ public class RawTestMacroSubstitution extends TestMacroSubstitution {
     }
 
     @Override
-    protected String getLanguage(GuidesOption option){
+    protected String getLanguage(GuidesOption option) {
         return option.getTestFramework().toTestFramework().getDefaultLanguage().toString();
     }
 
     @Override
-    protected String getExtension(GuidesOption option){
+    protected String getExtension(GuidesOption option) {
         return option.getTestFramework().toTestFramework().getDefaultLanguage().getExtension();
     }
 

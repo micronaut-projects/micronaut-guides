@@ -39,8 +39,8 @@ public class DefaultGuideParser implements GuideParser {
     public List<Guide> parseGuidesMetadata(@NonNull @NotNull File guidesDir, @NonNull @NotNull String metadataConfigName) {
         List<Guide> metadatas = new ArrayList<>();
 
-        File dirs[] = guidesDir.listFiles(File::isDirectory);
-        if(dirs == null) {
+        File[] dirs = guidesDir.listFiles(File::isDirectory);
+        if (dirs == null) {
             return metadatas;
         }
         for (File dir : dirs) {
@@ -69,10 +69,10 @@ public class DefaultGuideParser implements GuideParser {
             return Optional.empty();
         }
 
-        Map<String, Object> config = (Map<String,Object>) new JsonSlurper().parse(configFile);
+        Map<String, Object> config = (Map<String, Object>) new JsonSlurper().parse(configFile);
         boolean publish = config.get("publish") == null || (Boolean) config.get("publish");
 
-        if(publish) {
+        if (publish) {
             Set<ValidationMessage> assertions = jsonSchemaProvider.getSchema().validate(content, InputFormat.JSON);
 
             if (!assertions.isEmpty()) {

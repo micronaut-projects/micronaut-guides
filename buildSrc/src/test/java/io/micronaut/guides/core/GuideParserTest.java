@@ -27,7 +27,7 @@ public class GuideParserTest {
 
         List<Guide> metadatas = guideParser.parseGuidesMetadata(file,"metadata.json");
 
-        assertEquals(3,metadatas.size());
+        assertEquals(5,metadatas.size());
 
         Guide guide = metadatas.get(1);
         assertEquals(List.of("Graeme Rocher"), guide.authors());
@@ -61,7 +61,7 @@ public class GuideParserTest {
                 app.excludeSource() ==  null &&
                 app.validateLicense()));
 
-        guide = metadatas.get(2);
+        guide = metadatas.get(4);
         assertEquals(List.of("Sergio del Amo"), guide.authors());
         assertEquals("1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API", guide.title());
         assertEquals("This guide compares how to test serialization and deserialization with Micronaut Framework and Spring Boot.", guide.intro());

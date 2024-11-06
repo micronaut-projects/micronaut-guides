@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.util.Optional;
 
 @Singleton
-public class DefaultVersionLoader implements VersionLoader{
+public class DefaultVersionLoader implements VersionLoader {
     private final String version;
 
     public DefaultVersionLoader(GuidesConfiguration guidesConfiguration,

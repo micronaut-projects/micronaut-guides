@@ -1,12 +1,15 @@
 package io.micronaut.guides.core;
 
-import com.networknt.schema.*;
+import com.networknt.schema.InputFormat;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.ValidationMessage;
 import groovy.json.JsonSlurper;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,9 +30,9 @@ public final class GuideUtils {
     }
 
     public static List<Guide> parseGuidesMetadata(File guidesDir,
-                                           String metadataConfigName,
-                                           JsonSchema schema,
-                                           JsonMapper jsonMapper) throws Exception {
+                                                  String metadataConfigName,
+                                                  JsonSchema schema,
+                                                  JsonMapper jsonMapper) throws Exception {
         List<Guide> metadatas = new ArrayList<>();
 
         for (File dir : guidesDir.listFiles(File::isDirectory)) {
@@ -41,9 +44,9 @@ public final class GuideUtils {
         return metadatas;
     }
 
-    private static Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName,
-                                       JsonSchema schema,
-                                       JsonMapper jsonMapper) throws Exception {
+    static Optional<Guide> parseGuideMetadata(File dir, String metadataConfigName,
+                                              JsonSchema schema,
+                                              JsonMapper jsonMapper) throws Exception {
         File configFile = new File(dir, metadataConfigName);
         if (!configFile.exists()) {
             LOG.warn("metadata file not found for {}", dir.getName());
@@ -58,10 +61,10 @@ public final class GuideUtils {
             return Optional.empty();
         }
 
-        Map<String, Object> config = (Map<String,Object>) new JsonSlurper().parse(configFile);
-        boolean publish = config.get("publish") == null ? true : (Boolean) config.get("publish");
+        Map<String, Object> config = (Map<String, Object>) new JsonSlurper().parse(configFile);
+        boolean publish = config.get("publish") == null || (Boolean) config.get("publish");
 
-        if(publish){
+        if (publish) {
             Set<ValidationMessage> assertions = schema.validate(content, InputFormat.JSON);
 
             if (!assertions.isEmpty()) {
@@ -123,10 +126,10 @@ public final class GuideUtils {
         }
         for (App app : guide.apps()) {
             List<String> allFeatures = new ArrayList<>();
-            addAllSafe(allFeatures,app.features());
-            addAllSafe(allFeatures,app.javaFeatures());
-            addAllSafe(allFeatures,app.kotlinFeatures());
-            addAllSafe(allFeatures,app.groovyFeatures());
+            addAllSafe(allFeatures, app.features());
+            addAllSafe(allFeatures, app.javaFeatures());
+            addAllSafe(allFeatures, app.kotlinFeatures());
+            addAllSafe(allFeatures, app.groovyFeatures());
             for (String featureName : allFeatures) {
                 String tagToAdd = featureName;
                 for (String prefix : FEATURES_PREFIXES) {
@@ -137,7 +140,7 @@ public final class GuideUtils {
                 tagsList.add(tagToAdd);
             }
         }
-        Set<String> categoriesAsTags = guide.categories().stream().map(String::toLowerCase).map(s -> s.replace(" ","-")).collect(Collectors.toSet());
+        Set<String> categoriesAsTags = guide.categories().stream().map(String::toLowerCase).map(s -> s.replace(" ", "-")).collect(Collectors.toSet());
         tagsList.addAll(categoriesAsTags);
         return tagsList.stream().collect(Collectors.toList());
     }
@@ -158,7 +161,7 @@ public final class GuideUtils {
     public static List<String> getAppInvisibleFeatures(App app) {
         if (app.validateLicense()) {
             List<String> result = new ArrayList<>();
-            addAllSafe(result,app.invisibleFeatures());
+            addAllSafe(result, app.invisibleFeatures());
             result.add(FEATURE_SPOTLESS);
             return result;
         }
@@ -167,13 +170,13 @@ public final class GuideUtils {
 
     public static List<String> getAppVisibleFeatures(App app, Language language) {
         if (language == Language.JAVA) {
-            return mergeLists(app.features(),app.javaFeatures());
+            return mergeLists(app.features(), app.javaFeatures());
         }
         if (language == Language.KOTLIN) {
-            return mergeLists(app.features(),app.kotlinFeatures());
+            return mergeLists(app.features(), app.kotlinFeatures());
         }
         if (language == Language.GROOVY) {
-            return mergeLists(app.features(),app.groovyFeatures());
+            return mergeLists(app.features(), app.groovyFeatures());
         }
         return app.features();
     }
@@ -188,7 +191,7 @@ public final class GuideUtils {
         return false;
     }
 
-    public static Set<String> getFrameworks(Guide guide){
+    public static Set<String> getFrameworks(Guide guide) {
         return guide.apps().stream().map(it -> it.framework()).collect(Collectors.toSet());
     }
 
@@ -214,7 +217,7 @@ public final class GuideUtils {
                 guide.publish(),
                 guide.base(),
                 guide.env() == null ? base.env() : guide.env(),
-                mergeApps(base.apps(),guide.apps())
+                mergeApps(base.apps(), guide.apps())
         );
         return merged;
     }
@@ -287,15 +290,15 @@ public final class GuideUtils {
      * Adds all elements from the source collection to the target collection safely.
      *
      * @param target The collection where elements will be added.
-     * @param src The collection whose elements are to be added to the target.
+     * @param src    The collection whose elements are to be added to the target.
      * @throws NullPointerException If the target collection is null.
      */
     private static void addAllSafe(Collection target, Collection src) {
-        if(target == null) {
+        if (target == null) {
             throw new NullPointerException("Target list cannot be null");
         }
 
-        if(src != null) {
+        if (src != null) {
             target.addAll(src);
         }
     }
