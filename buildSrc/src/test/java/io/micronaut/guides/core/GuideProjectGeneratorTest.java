@@ -139,7 +139,7 @@ public class GuideProjectGeneratorTest {
         File file = new File(path);
 
         List<Guide> metadatas = GuideUtils.parseGuidesMetadata(file,"metadata.json", jsonSchemaProvider.getSchema(), jsonMapper);
-        Guide guide = metadatas.get(2);
+        Guide guide = metadatas.get(4);
 
         assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
 
