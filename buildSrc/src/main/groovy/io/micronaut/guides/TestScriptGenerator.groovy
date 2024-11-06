@@ -2,8 +2,10 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import io.micronaut.guides.core.App
+import io.micronaut.guides.core.DefaultGuideParser
 import io.micronaut.guides.core.DefaultJsonSchemaProvider
 import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideParser
 import io.micronaut.guides.core.GuideUtils
 import io.micronaut.guides.core.GuidesOption
 import io.micronaut.guides.core.JsonSchemaProvider
@@ -81,7 +83,8 @@ exit 0
         //TODO. We should have an application context and get it from it.
         JsonMapper jsonMapper = JsonMapper.createDefault();
         JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper);
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName)
         metadatas = metadatas.stream()
                 .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
                 .collect(Collectors.toList())

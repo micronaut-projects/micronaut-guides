@@ -10,10 +10,9 @@ import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.core.App
 import io.micronaut.guides.core.CopyFileVisitor
 import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideParser
 import io.micronaut.guides.core.GuideUtils
 import io.micronaut.guides.core.GuidesOption
-import io.micronaut.guides.core.JsonSchemaProvider
-import io.micronaut.json.JsonMapper
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.JdkVersion
@@ -54,13 +53,12 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
-    private final JsonSchema jsonSchema;
-    private final JsonMapper jsonMapper;
+    private final GuideParser guideParser;
+
     GuideProjectGenerator() {
         applicationContext = ApplicationContext.run()
         guidesGenerator = applicationContext.getBean(GuidesGenerator)
-        this.jsonSchema = applicationContext.getBean(JsonSchemaProvider.class).getSchema();
-        this.jsonMapper = applicationContext.getBean(JsonMapper.class)
+        guideParser = applicationContext.getBean(GuideParser)
     }
 
     @Override
@@ -83,7 +81,7 @@ class GuideProjectGenerator implements AutoCloseable {
             asciidocDir.mkdir()
         }
 
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(guidesDir, metadataConfigName,  jsonSchema, jsonMapper)
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesDir, metadataConfigName)
         for (Guide metadata : metadatas) {
             File dir = new File(guidesDir, metadata.slug)
             try {
