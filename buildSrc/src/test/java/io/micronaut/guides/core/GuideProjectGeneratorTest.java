@@ -7,6 +7,7 @@ import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.gradle.api.JavaVersion;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -116,6 +117,8 @@ public class GuideProjectGeneratorTest {
                         sharedServer = true
                     }
                 }"""));
+        String javaVersion = JavaVersion.current().getMajorVersion();
+
         assertTrue(result.contains("""
                 application {
                     mainClass = "example.micronaut.CliCommand"
@@ -123,7 +126,7 @@ public class GuideProjectGeneratorTest {
                 java {
                     sourceCompatibility = JavaVersion.toVersion("17")
                     targetCompatibility = JavaVersion.toVersion("17")
-                }"""));
+                }""".replace("17", javaVersion)));
 
     }
 
