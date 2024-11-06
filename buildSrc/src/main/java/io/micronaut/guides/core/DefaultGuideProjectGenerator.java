@@ -52,12 +52,13 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
         if (!outputDirectory.exists()) {
             throw new ConfigurationException("Output directory does not exist");
         }
+
         if (!outputDirectory.isDirectory()) {
             throw new ConfigurationException("Output directory must be a directory");
         }
 
         JdkVersion javaVersion = GuideGenerationUtils.resolveJdkVersion(guidesConfiguration, guide);
-        if (guide.maximumJavaVersion() != null && javaVersion.majorVersion() > guide.maximumJavaVersion()) {
+        if (GuideGenerationUtils.skipBecauseOfJavaVersion(guide, guidesConfiguration)) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("not generating project for {}, JDK {} > {}", guide.slug(), javaVersion.majorVersion(), guide.maximumJavaVersion());
             }

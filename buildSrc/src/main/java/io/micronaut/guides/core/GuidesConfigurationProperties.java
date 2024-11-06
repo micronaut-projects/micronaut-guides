@@ -25,6 +25,7 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private static final List<JdkVersion> DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM = List.of(JDK_17, JDK_21);
     private static final String GITHUB_WORKFLOW_JAVA_CI = "Java CI";
     private static final String ENV_GITHUB_WORKFLOW = "GITHUB_WORKFLOW";
+    private static final String SYS_PROP_MICRONAUT_GUIDE = "micronaut.guide";
     private String title = "Micronaut Guides";
     private String homePageUrl = GUIDES_URL;
     private String licensePath = DEFAULT_LICENSEHEADER;
@@ -35,6 +36,7 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private List<JdkVersion> jdkVersionsSupportedByGraalvm = DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM;
     private String githubWorkflowJavaCi = GITHUB_WORKFLOW_JAVA_CI;
     private String envGithubWorkflow = ENV_GITHUB_WORKFLOW;
+    private String sysPropMicronautGuide = SYS_PROP_MICRONAUT_GUIDE;
 
     @Override
     public List<JdkVersion> getJdkVersionsSupportedByGraalvm() {
@@ -43,10 +45,6 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
 
     public void setJdkVersionsSupportedByGraalvm(List<JdkVersion> jdkVersionsSupportedByGraalvm) {
         this.jdkVersionsSupportedByGraalvm = jdkVersionsSupportedByGraalvm;
-    }
-
-    public void setSourceFilesExtensions(List<String> sourceFilesExtensions) {
-        this.sourceFilesExtensions = sourceFilesExtensions;
     }
 
     @Override
@@ -133,20 +131,38 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
         return defaulJdkVersion;
     }
 
+    @Override
+    public String getGithubWorkflowJavaCi() {
+        return githubWorkflowJavaCi;
+    }
+
+    public void setGithubWorkflowJavaCi(String githubWorkflowJavaCi) {
+        this.githubWorkflowJavaCi = githubWorkflowJavaCi;
+    }
+
+    @Override
+    public String getEnvGithubWorkflow() {
+        return envGithubWorkflow;
+    }
+
+    public void setEnvGithubWorkflow(String envGithubWorkflow) {
+        this.envGithubWorkflow = envGithubWorkflow;
+    }
+
+    @Override
+    public String getSysPropMicronautGuide() {
+        return sysPropMicronautGuide;
+    }
+
+    public void setSysPropMicronautGuide(String sysPropMicronautGuide) {
+        this.sysPropMicronautGuide = sysPropMicronautGuide;
+    }
+
     public void setDefaulJdkVersion(JdkVersion jdkVersion) {
         this.defaulJdkVersion = jdkVersion;
     }
 
-    @Override
-    public String getGithubWorkflowJavaCi() { return githubWorkflowJavaCi; }
-
-    @Override
-    public void setGithubWorkflowJavaCi(String githubWorkflowJavaCi) { this.githubWorkflowJavaCi = githubWorkflowJavaCi; }
-
-    @Override
-    public String getEnvGithubWorkflow() { return envGithubWorkflow; }
-
-    @Override
-    public void setEnvGithubWorkflow(String envGithubWorkflow) { this.envGithubWorkflow = envGithubWorkflow; }
-
+    public void setSourceFilesExtensions(List<String> sourceFilesExtensions) {
+        this.sourceFilesExtensions = sourceFilesExtensions;
+    }
 }

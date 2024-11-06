@@ -1,12 +1,10 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.guides.Utils;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -24,17 +22,10 @@ import static io.micronaut.starter.options.BuildTool.MAVEN;
 public class DefaultTestScriptGenerator implements TestScriptGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultTestScriptGenerator.class);
 
-    @Inject
-    GuidesConfiguration guidesConfiguration;
+    private GuidesConfiguration guidesConfiguration;
 
-    @Override
-    public void generateNativeTestScript(@NonNull @NotNull File output, @NonNull @NotNull List<Guide> metadatas) {
-        generateScript(metadatas, false, true);
-    }
-
-    @Override
-    public void generateTestScript(@NonNull @NotNull File output, @NonNull @NotNull List<Guide> metadatas) {
-        generateScript(metadatas, false, false);
+    public DefaultTestScriptGenerator(GuidesConfiguration guidesConfiguration) {
+        this.guidesConfiguration = guidesConfiguration;
     }
 
     private static List<String> guidesChanged(List<String> changedFiles) {
@@ -61,106 +52,6 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
 
     private static boolean changesBuildScr(List<String> changedFiles) {
         return changedFiles.stream().anyMatch(file -> file.contains("buildSrc"));
-    }
-
-
-    String generateScript(File guidesFolder,
-                                 String metadataConfigName,
-                                 boolean stopIfFailure,
-                                 List<String> changedFiles) throws Exception {
-        List<String> slugsChanged = guidesChanged(changedFiles);
-        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
-                changesDependencies(changedFiles, slugsChanged) ||
-                changesBuildScr(changedFiles) ||
-                (System.getenv(guidesConfiguration.getEnvGithubWorkflow()) != null &&
-                        !System.getenv(guidesConfiguration.getEnvGithubWorkflow()).equals(guidesConfiguration.getGithubWorkflowJavaCi())) ||
-                (changedFiles.isEmpty() && System.getenv(guidesConfiguration.getEnvGithubWorkflow()) == null);
-
-        // TODO: We should have an application context and get it from it.
-        JsonMapper jsonMapper = JsonMapper.createDefault();
-        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(
-                guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper);
-        metadatas = metadatas.stream()
-                .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
-                .collect(Collectors.toList());
-        return generateScript(metadatas, stopIfFailure, false);
-    }
-
-
-    public String generateScript(List<Guide> metadatas,
-                                        boolean stopIfFailure,
-                                        boolean nativeTest) {
-        StringBuilder bashScript = new StringBuilder("""
-                #!/usr/bin/env bash
-                set -e
-                
-                FAILED_PROJECTS=()
-                EXIT_STATUS=0
-                
-                kill_kotlin_daemon () {
-                  echo "Killing KotlinCompile daemon to pick up fresh properties (due to kapt and java > 17)"
-                  for daemon in $(jps | grep KotlinCompile | cut -d' ' -f1); do
-                    echo "Killing $daemon"
-                    kill -9 $daemon
-                  done
-                }""");
-
-        metadatas.sort((o1, o2) -> o1.slug().compareTo(o2.slug()));
-        for (Guide metadata : metadatas) {
-            List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(metadata, LOG);
-            bashScript.append("\n");
-            for (GuidesOption guidesOption : guidesOptionList) {
-                String folder = MacroUtils.getSourceDir(metadata.slug(), guidesOption);
-                BuildTool buildTool = folder.toUpperCase().contains(MAVEN.toString()) ? MAVEN : GRADLE;
-                if (metadata.apps().stream().anyMatch(app -> app.name().equals(guidesConfiguration.getDefaultAppName()))) {
-                    if (GuideUtils.shouldSkip(metadata, buildTool)) {
-                        continue;
-                    }
-                    App defaultApp = metadata.apps().stream().filter(app -> app.name().equals(guidesConfiguration.getDefaultAppName())).findFirst().get();
-                    if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
-                        List<String> features = GuideUtils.getAppFeatures(defaultApp, guidesOption.getLanguage());
-                        if (!folder.contains("-maven-groovy")) {
-                            bashScript.append(scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.getRuntime().version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense()));
-                        }
-                    }
-                } else {
-                    bashScript.append("\ncd " + folder + "\n");
-                    for (App app : metadata.apps()) {
-                        if (GuideUtils.shouldSkip(metadata, buildTool)) {
-                            continue;
-                        }
-                        if (!nativeTest || supportsNativeTest(app, guidesOption)) {
-                            List<String> features = GuideUtils.getAppFeatures(app, guidesOption.getLanguage());
-                            if (!folder.contains("-maven-groovy")) {
-                                bashScript.append(scriptForFolder(app.name(), folder + "/" + app.name(), stopIfFailure, buildTool, features.contains("kapt") && Runtime.getRuntime().version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense()));
-                            }
-                        }
-                    }
-                    bashScript.append("\ncd ..\n");
-                }
-            }
-        }
-
-        if (!stopIfFailure) {
-            bashScript.append("""
-                            if [ ${#FAILED_PROJECTS[@]} -ne 0 ]; then
-                              echo ""
-                              echo "-------------------------------------------------"
-                              echo "Projects with errors:"
-                              for p in `echo ${FAILED_PROJECTS[@]}`; do
-                                echo "  $p"
-                              done;
-                              echo "-------------------------------------------------"
-                              exit 1
-                            else
-                              exit 0
-                            fi
-                            
-                            """);
-        }
-
-        return bashScript.toString();
     }
 
     private static String scriptForFolder(String nestedFolder,
@@ -226,7 +117,6 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
         return bashScript.toString();
     }
 
-
     public static boolean supportsNativeTest(App app, GuidesOption guidesOption) {
         return isMicronautFramework(app) &&
                 guidesOption.getBuildTool() == GRADLE &&
@@ -244,9 +134,10 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
 
     private static boolean shouldSkip(Guide metadata,
                                       List<String> guidesChanged,
-                                      boolean forceExecuteEveryTest) {
+                                      boolean forceExecuteEveryTest,
+                                      GuidesConfiguration guidesConfiguration) {
 
-        if (!Utils.process(metadata)) {
+        if (!GuideGenerationUtils.process(metadata, false, guidesConfiguration)) {
             return true;
         }
 
@@ -255,5 +146,113 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
         }
 
         return !guidesChanged.contains(metadata.slug());
+    }
+
+    @Override
+    public void generateNativeTestScript(@NonNull @NotNull File output, @NonNull @NotNull List<Guide> metadatas) {
+        generateScript(metadatas, false, true);
+    }
+
+    @Override
+    public void generateTestScript(@NonNull @NotNull File output, @NonNull @NotNull List<Guide> metadatas) {
+        generateScript(metadatas, false, false);
+    }
+
+    String generateScript(File guidesFolder,
+                          String metadataConfigName,
+                          boolean stopIfFailure,
+                          List<String> changedFiles) throws Exception {
+        List<String> slugsChanged = guidesChanged(changedFiles);
+        boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
+                changesDependencies(changedFiles, slugsChanged) ||
+                changesBuildScr(changedFiles) ||
+                (System.getenv(guidesConfiguration.getEnvGithubWorkflow()) != null &&
+                        !System.getenv(guidesConfiguration.getEnvGithubWorkflow()).equals(guidesConfiguration.getGithubWorkflowJavaCi())) ||
+                (changedFiles.isEmpty() && System.getenv(guidesConfiguration.getEnvGithubWorkflow()) == null);
+
+        // TODO: We should have an application context and get it from it.
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(
+                guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper);
+        metadatas = metadatas.stream()
+                .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
+                .collect(Collectors.toList());
+        return generateScript(metadatas, stopIfFailure, false);
+    }
+
+    public String generateScript(List<Guide> metadatas,
+                                 boolean stopIfFailure,
+                                 boolean nativeTest) {
+        StringBuilder bashScript = new StringBuilder("""
+                #!/usr/bin/env bash
+                set -e
+                
+                FAILED_PROJECTS=()
+                EXIT_STATUS=0
+                
+                kill_kotlin_daemon () {
+                  echo "Killing KotlinCompile daemon to pick up fresh properties (due to kapt and java > 17)"
+                  for daemon in $(jps | grep KotlinCompile | cut -d' ' -f1); do
+                    echo "Killing $daemon"
+                    kill -9 $daemon
+                  done
+                }""");
+
+        metadatas.sort((o1, o2) -> o1.slug().compareTo(o2.slug()));
+        for (Guide metadata : metadatas) {
+            List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(metadata, LOG);
+            bashScript.append("\n");
+            for (GuidesOption guidesOption : guidesOptionList) {
+                String folder = MacroUtils.getSourceDir(metadata.slug(), guidesOption);
+                BuildTool buildTool = folder.toUpperCase().contains(MAVEN.toString()) ? MAVEN : GRADLE;
+                if (metadata.apps().stream().anyMatch(app -> app.name().equals(guidesConfiguration.getDefaultAppName()))) {
+                    if (GuideUtils.shouldSkip(metadata, buildTool)) {
+                        continue;
+                    }
+                    App defaultApp = metadata.apps().stream().filter(app -> app.name().equals(guidesConfiguration.getDefaultAppName())).findFirst().get();
+                    if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
+                        List<String> features = GuideUtils.getAppFeatures(defaultApp, guidesOption.getLanguage());
+                        if (!folder.contains("-maven-groovy")) {
+                            bashScript.append(scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.getRuntime().version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense()));
+                        }
+                    }
+                } else {
+                    bashScript.append("\ncd " + folder + "\n");
+                    for (App app : metadata.apps()) {
+                        if (GuideUtils.shouldSkip(metadata, buildTool)) {
+                            continue;
+                        }
+                        if (!nativeTest || supportsNativeTest(app, guidesOption)) {
+                            List<String> features = GuideUtils.getAppFeatures(app, guidesOption.getLanguage());
+                            if (!folder.contains("-maven-groovy")) {
+                                bashScript.append(scriptForFolder(app.name(), folder + "/" + app.name(), stopIfFailure, buildTool, features.contains("kapt") && Runtime.getRuntime().version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense()));
+                            }
+                        }
+                    }
+                    bashScript.append("\ncd ..\n");
+                }
+            }
+        }
+
+        if (!stopIfFailure) {
+            bashScript.append("""
+                    if [ ${#FAILED_PROJECTS[@]} -ne 0 ]; then
+                      echo ""
+                      echo "-------------------------------------------------"
+                      echo "Projects with errors:"
+                      for p in `echo ${FAILED_PROJECTS[@]}`; do
+                        echo "  $p"
+                      done;
+                      echo "-------------------------------------------------"
+                      exit 1
+                    else
+                      exit 0
+                    fi
+                    
+                    """);
+        }
+
+        return bashScript.toString();
     }
 }
