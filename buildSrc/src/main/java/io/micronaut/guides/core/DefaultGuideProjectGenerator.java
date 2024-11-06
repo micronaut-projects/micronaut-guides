@@ -64,7 +64,7 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
             return;
         }
 
-        List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide,LOG);
+        List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide, LOG);
         for (GuidesOption guidesOption : guidesOptionList) {
             generate(outputDirectory, guide, guidesOption, javaVersion);
         }

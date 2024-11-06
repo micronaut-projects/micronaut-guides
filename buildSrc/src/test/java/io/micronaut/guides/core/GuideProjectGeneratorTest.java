@@ -10,7 +10,10 @@ import jakarta.inject.Inject;
 import org.gradle.api.JavaVersion;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
@@ -41,7 +44,7 @@ public class GuideProjectGeneratorTest {
                 "example.micronaut",
                 ApplicationType.CLI,
                 "Micronaut",
-                List.of("yaml","mqtt"),
+                List.of("yaml", "mqtt"),
                 List.of(),
                 List.of(),
                 List.of(),
@@ -56,7 +59,7 @@ public class GuideProjectGeneratorTest {
                 "This guide compares how to test serialization and deserialization with Micronaut Framework and Spring Boot.",
                 List.of("Sergio del Amo"),
                 List.of("Boot to Micronaut Building a REST API"),
-                LocalDate.of(2024,4,24),
+                LocalDate.of(2024, 4, 24),
                 null,
                 null,
                 null,
@@ -138,12 +141,12 @@ public class GuideProjectGeneratorTest {
         String path = "src/test/resources/guides";
         File file = new File(path);
 
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(file,"metadata.json", jsonSchemaProvider.getSchema(), jsonMapper);
+        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(file, "metadata.json", jsonSchemaProvider.getSchema(), jsonMapper);
         Guide guide = metadatas.get(4);
 
         assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
 
-        for (App app: guide.apps()) {
+        for (App app : guide.apps()) {
             File dest = Paths.get(outputDirectory.getAbsolutePath(), MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT)), app.name()).toFile();
             assertTrue(new File(dest, "build.gradle").exists());
             assertTrue(new File(dest, "gradlew.bat").exists());
@@ -155,13 +158,13 @@ public class GuideProjectGeneratorTest {
             File buildGradleFile = new File(dest, "build.gradle");
             String result = readFile(buildGradleFile);
 
-            for(String feature: app.features()) {
+            for (String feature : app.features()) {
                 assertTrue(result.contains(feature));
             }
         }
     }
 
-    private String readFile(File file){
+    private String readFile(File file) {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             return reader.lines().collect(Collectors.joining("\n"));
         } catch (IOException e) {

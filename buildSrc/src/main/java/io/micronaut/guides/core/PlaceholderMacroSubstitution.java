@@ -21,6 +21,7 @@ public class PlaceholderMacroSubstitution implements MacroSubstitution {
         this.versionLoader = versionLoader;
         this.coordinatesProvider = coordinatesProvider;
     }
+
     @Override
     public String substitute(String str, Guide guide, GuidesOption option) {
 
@@ -36,12 +37,12 @@ public class PlaceholderMacroSubstitution implements MacroSubstitution {
         str = str.replace("@languageextension@", option.getLanguage().getExtension());
         str = str.replace("@testsuffix@", option.getTestFramework() == SPOCK ? "Spec" : "Test");
         str = str.replace("@sourceDir@", MacroUtils.getSourceDir(guide.slug(), option));
-        str = str.replace("@minJdk@", String.valueOf( guide.minimumJavaVersion() != null ? guide.minimumJavaVersion() : guidesConfiguration.getDefaultMinJdk()) );
+        str = str.replace("@minJdk@", String.valueOf(guide.minimumJavaVersion() != null ? guide.minimumJavaVersion() : guidesConfiguration.getDefaultMinJdk()));
         str = str.replace("@api@", guidesConfiguration.getApiUrl());
 
         for (Map.Entry<String, Coordinate> entry : coordinatesProvider.getCoordinates().entrySet()) {
             if (StringUtils.isNotEmpty(entry.getValue().getVersion())) {
-                str = str.replace("@"+entry.getKey()+"Version@", entry.getValue().getVersion());
+                str = str.replace("@" + entry.getKey() + "Version@", entry.getValue().getVersion());
             }
         }
 

@@ -2,7 +2,9 @@ package io.micronaut.guides.core;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.starter.options.JdkVersion;
+
 import java.util.List;
+
 import static io.micronaut.starter.options.JdkVersion.JDK_17;
 import static io.micronaut.starter.options.JdkVersion.JDK_21;
 
@@ -10,13 +12,8 @@ import static io.micronaut.starter.options.JdkVersion.JDK_21;
 public class GuidesConfigurationProperties implements GuidesConfiguration {
     public static final String PREFIX = "guides";
     public static final String GUIDES_URL = "https://guides.micronaut.io/latest/";
-    private String title = "Micronaut Guides";
-    private String homePageUrl = GUIDES_URL;
     private static final String DEFAULT_LICENSEHEADER = "classpath:LICENSEHEADER";
     private static final String DEFAULT_PACKAGE_NAME = "example.micronaut";
-    private String licensePath = DEFAULT_LICENSEHEADER;
-    private String packageName = DEFAULT_PACKAGE_NAME;
-    private List<String> sourceFilesExtensions = List.of("java", "kotlin", "groovy");
     private static final String DEFAULT_APP_NAME = "default";
     private static final String HOMEPAGE_URL = "https://micronaut.io";
     private static final String LAUNCHER_URL = HOMEPAGE_URL + "/launch";
@@ -26,12 +23,19 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private static final String DEFAULT_ENV_JDK_VERSION = "JDK_VERSION";
     private static final JdkVersion DEFAULT_JAVA_VERSION = JDK_17;
     private static final List<JdkVersion> DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM = List.of(JDK_17, JDK_21);
+    private String title = "Micronaut Guides";
+    private String homePageUrl = GUIDES_URL;
+    private String licensePath = DEFAULT_LICENSEHEADER;
+    private String packageName = DEFAULT_PACKAGE_NAME;
+    private List<String> sourceFilesExtensions = List.of("java", "kotlin", "groovy");
     private String envJdkVersion = DEFAULT_ENV_JDK_VERSION;
     private JdkVersion defaulJdkVersion = DEFAULT_JAVA_VERSION;
     private List<JdkVersion> jdkVersionsSupportedByGraalvm = DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM;
 
     @Override
-    public List<JdkVersion> getJdkVersionsSupportedByGraalvm() { return jdkVersionsSupportedByGraalvm; }
+    public List<JdkVersion> getJdkVersionsSupportedByGraalvm() {
+        return jdkVersionsSupportedByGraalvm;
+    }
 
     public void setJdkVersionsSupportedByGraalvm(List<JdkVersion> jdkVersionsSupportedByGraalvm) {
         this.jdkVersionsSupportedByGraalvm = jdkVersionsSupportedByGraalvm;
@@ -83,11 +87,17 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     }
 
     @Override
-    public String getProjectGeneratorUrl() { return LAUNCHER_URL; }
+    public String getProjectGeneratorUrl() {
+        return LAUNCHER_URL;
+    }
 
     @Override
     public List<String> getFilesWithHeader() {
         return sourceFilesExtensions;
+    }
+
+    public void setFilesWithHeader(List<String> sourceFilesExtensions) {
+        this.sourceFilesExtensions = sourceFilesExtensions;
     }
 
     @Override
@@ -106,20 +116,20 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     }
 
     @Override
-    public String getEnvJdkVersion() { return envJdkVersion; }
+    public String getEnvJdkVersion() {
+        return envJdkVersion;
+    }
 
     public void setEnvJdkVersion(String envJdkVersion) {
         this.envJdkVersion = envJdkVersion;
     }
 
     @Override
-    public JdkVersion getDefaultJdkVersion() { return defaulJdkVersion; }
-
-    public void  setDefaulJdkVersion(JdkVersion jdkVersion) {
-        this.defaulJdkVersion = jdkVersion;
+    public JdkVersion getDefaultJdkVersion() {
+        return defaulJdkVersion;
     }
 
-    public void setFilesWithHeader(List<String> sourceFilesExtensions) {
-        this.sourceFilesExtensions = sourceFilesExtensions;
+    public void setDefaulJdkVersion(JdkVersion jdkVersion) {
+        this.defaulJdkVersion = jdkVersion;
     }
 }

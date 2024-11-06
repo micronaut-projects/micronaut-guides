@@ -6,6 +6,7 @@ import jakarta.inject.Singleton;
 @Singleton
 public class TestResourceMacroSubstitution extends SourceBlockMacroSubstitution {
     private static final String MACRO_TESTRESOURCE = "testResource";
+
     public TestResourceMacroSubstitution(GuidesConfiguration guidesConfiguration, LicenseLoader licenseLoader) {
         super(licenseLoader, guidesConfiguration);
     }

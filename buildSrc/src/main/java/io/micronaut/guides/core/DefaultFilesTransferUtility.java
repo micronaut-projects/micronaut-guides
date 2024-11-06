@@ -25,18 +25,66 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
     private static final String EXTENSION_GROOVY = ".groovy";
     private static final String EXTENSION_KT = ".kt";
 
-    private LicenseLoader licenseLoader;
-    private GuidesConfiguration guidesConfiguration;
+    private final LicenseLoader licenseLoader;
+    private final GuidesConfiguration guidesConfiguration;
 
     DefaultFilesTransferUtility(LicenseLoader licenseLoader,
-                                GuidesConfiguration guidesConfiguration){
+                                GuidesConfiguration guidesConfiguration) {
         this.licenseLoader = licenseLoader;
         this.guidesConfiguration = guidesConfiguration;
     }
 
+    private static boolean fileContainsText(File file, String text) {
+        try {
+            return new String(Files.readAllBytes(file.toPath())).contains(text);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
+                                             String appName, String language,
+                                             boolean ignoreMissingDirectories) throws IOException {
+
+        // look for a common 'src' directory shared by multiple languages and copy those files first
+        final String srcFolder = "src";
+        Path srcPath = Paths.get(inputDir.getAbsolutePath(), appName, srcFolder);
+        if (Files.exists(srcPath)) {
+            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
+        }
+
+        Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language);
+        if (!Files.exists(sourcePath)) {
+            sourcePath.toFile().mkdir();
+        }
+        if (Files.exists(sourcePath)) {
+            // copy source/resource files for the current language
+            Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath));
+        } else if (!ignoreMissingDirectories) {
+            throw new GradleException("source directory " + sourcePath.toFile().getAbsolutePath() + " does not exist");
+        }
+    }
+
+    private static File fileToDelete(File destination, String path) {
+        return Paths.get(destination.getAbsolutePath(), path).toFile();
+    }
+
+    private static void copyFile(File inputDir, File destinationRoot, String filePath) throws IOException {
+        File sourceFile = new File(inputDir, filePath);
+        File destinationFile = new File(destinationRoot, filePath);
+
+        File destinationFileDir = destinationFile.getParentFile();
+        if (!destinationFileDir.exists()) {
+            Files.createDirectories(destinationFileDir.toPath());
+        }
+
+        Files.copy(sourceFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
     @Override
     public void transferFiles(@NotNull @NonNull File outputDirectory, @NotNull @NonNull File inputDirectory, @NotNull @NonNull Guide guide) throws IOException {
-        List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide,LOG);
+        List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(guide, LOG);
         for (GuidesOption guidesOption : guidesOptionList) {
             for (App app : guide.apps()) {
                 String appName = app.name().equals(guidesConfiguration.getDefaultAppName()) ? EMPTY_STRING : app.name();
@@ -101,53 +149,5 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 }
             }
         });
-    }
-
-    private static boolean fileContainsText(File file, String text) {
-        try {
-            return new String(Files.readAllBytes(file.toPath())).contains(text);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
-                                             String appName, String language,
-                                             boolean ignoreMissingDirectories) throws IOException {
-
-        // look for a common 'src' directory shared by multiple languages and copy those files first
-        final String srcFolder = "src";
-        Path srcPath = Paths.get(inputDir.getAbsolutePath(), appName, srcFolder);
-        if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
-        }
-
-        Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language);
-        if (!Files.exists(sourcePath)) {
-            sourcePath.toFile().mkdir();
-        }
-        if (Files.exists(sourcePath)) {
-            // copy source/resource files for the current language
-            Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath));
-        } else if (!ignoreMissingDirectories) {
-            throw new GradleException("source directory " + sourcePath.toFile().getAbsolutePath() + " does not exist");
-        }
-    }
-
-    private static File fileToDelete(File destination, String path) {
-        return Paths.get(destination.getAbsolutePath(), path).toFile();
-    }
-
-    private static void copyFile(File inputDir, File destinationRoot, String filePath) throws IOException {
-        File sourceFile = new File(inputDir, filePath);
-        File destinationFile = new File(destinationRoot, filePath);
-
-        File destinationFileDir = destinationFile.getParentFile();
-        if (!destinationFileDir.exists()) {
-            Files.createDirectories(destinationFileDir.toPath());
-        }
-
-        Files.copy(sourceFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 }

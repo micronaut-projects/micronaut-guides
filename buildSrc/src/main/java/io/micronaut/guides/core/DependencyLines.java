@@ -4,12 +4,7 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static io.micronaut.starter.options.BuildTool.GRADLE;
 import static io.micronaut.starter.options.BuildTool.MAVEN;

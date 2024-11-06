@@ -21,16 +21,16 @@ public class JsonFeedGeneratorTest {
     @Inject
     JsonSchemaProvider jsonSchemaProvider;
 
-    private List<Guide> guides;
-
     @Inject
     JsonFeedGenerator jsonFeedGenerator;
+
+    private List<Guide> guides;
 
     @BeforeEach
     public void setup() {
         File file = new File("src/test/resources/guides");
         GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
-        this.guides = guideParser.parseGuidesMetadata(file,"metadata.json")
+        this.guides = guideParser.parseGuidesMetadata(file, "metadata.json")
                 .stream().filter(Guide::publish).toList();
     }
 

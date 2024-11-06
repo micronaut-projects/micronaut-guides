@@ -4,7 +4,7 @@ import io.micronaut.core.order.Ordered;
 
 public enum Cloud implements Ordered {
     OCI("Oracle Cloud", "OCI", 1),
-    AWS("Amazon Web Services",  "AWS", 2),
+    AWS("Amazon Web Services", "AWS", 2),
     AZURE("Microsoft Azure", "Azure", 3),
     GCP("Google Cloud Platform", "GCP", 4);
 
