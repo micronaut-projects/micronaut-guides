@@ -134,7 +134,7 @@ class GatewayControllerTest {
         val lastName = "lastName"
         val username = "username"
         val user = User(0, firstName, lastName, username)
-        `when`(usersClient!!.createUser(any())).thenReturn(user)
+        `when`(usersClient!!.createUser(user)).thenReturn(user)
         val createdUser = gatewayClient!!.createUser(user)
         assertEquals(firstName, createdUser.firstName)
         assertEquals(lastName, createdUser.lastName)
@@ -143,10 +143,10 @@ class GatewayControllerTest {
 
     @Test
     fun createOrder() {
-        val order = Order(1, 2, null, null, ArrayList(), null)
+        val order = Order(1, 2, null, null, null, null)
         val user = User(order.userId!!, "firstName", "lastName", "test")
         `when`(usersClient!!.getById(user.id)).thenReturn(user)
-        `when`(ordersClient!!.createOrder(any())).thenReturn(order)
+        `when`(ordersClient!!.createOrder(order)).thenReturn(order)
         val createdOrder = gatewayClient!!.createOrder(order)
         assertEquals(order.id, createdOrder.id)
         assertNull(createdOrder.userId)
@@ -156,8 +156,8 @@ class GatewayControllerTest {
 
     @Test
     fun createOrderUserDoesntExists() {
-        val order = Order(1, 2, null, null, ArrayList(), BigDecimal(0))
-        `when`(ordersClient!!.createOrder(any())).thenReturn(order)
+        val order = Order(1, 2, null, null, null, BigDecimal(0))
+        `when`(ordersClient!!.createOrder(order)).thenReturn(order)
         `when`(usersClient!!.getById(order.userId!!)).thenReturn(null)
         val exception = assertThrows(
             HttpClientResponseException::class.java
@@ -172,7 +172,7 @@ class GatewayControllerTest {
     fun exceptionHandler() {
         val user = User(1, "firstname", "lastname", "username")
         val message = "Test error message"
-        `when`(usersClient!!.createUser(any())).thenThrow(
+        `when`(usersClient!!.createUser(user)).thenThrow(
             HttpClientResponseException(
                 "Test",
                 HttpResponse.badRequest(message)
