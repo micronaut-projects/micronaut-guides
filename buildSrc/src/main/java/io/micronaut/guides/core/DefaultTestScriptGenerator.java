@@ -1,7 +1,6 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
@@ -23,9 +22,11 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultTestScriptGenerator.class);
 
     private GuidesConfiguration guidesConfiguration;
+    private GuideParser guideParser;
 
-    public DefaultTestScriptGenerator(GuidesConfiguration guidesConfiguration) {
+    public DefaultTestScriptGenerator(GuidesConfiguration guidesConfiguration, GuideParser guideParser) {
         this.guidesConfiguration = guidesConfiguration;
+        this.guideParser = guideParser;
     }
 
     private static List<String> guidesChanged(List<String> changedFiles) {
@@ -117,21 +118,6 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
         return bashScript.toString();
     }
 
-    public static boolean supportsNativeTest(App app, GuidesOption guidesOption) {
-        return isMicronautFramework(app) &&
-                guidesOption.getBuildTool() == GRADLE &&
-                supportsNativeTest(guidesOption.getLanguage()) &&
-                guidesOption.getTestFramework() == TestFramework.JUNIT;
-    }
-
-    public static boolean isMicronautFramework(App app) {
-        return app.framework() == null || app.framework().equals("Micronaut");
-    }
-
-    public static boolean supportsNativeTest(Language language) {
-        return language != Language.GROOVY;
-    }
-
     private static boolean shouldSkip(Guide metadata,
                                       List<String> guidesChanged,
                                       boolean forceExecuteEveryTest,
@@ -149,19 +135,37 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
     }
 
     @Override
-    public void generateNativeTestScript(@NonNull @NotNull File output, @NonNull @NotNull List<Guide> metadatas) {
-        generateScript(metadatas, false, true);
+    public boolean supportsNativeTest(App app, GuidesOption guidesOption) {
+        return isMicronautFramework(app) &&
+                guidesOption.getBuildTool() == GRADLE &&
+                supportsNativeTest(guidesOption.getLanguage()) &&
+                guidesOption.getTestFramework() == TestFramework.JUNIT;
     }
 
     @Override
-    public void generateTestScript(@NonNull @NotNull File output, @NonNull @NotNull List<Guide> metadatas) {
-        generateScript(metadatas, false, false);
+    public boolean isMicronautFramework(App app) {
+        return app.framework() == null || app.framework().equals("Micronaut");
     }
 
-    String generateScript(File guidesFolder,
-                          String metadataConfigName,
-                          boolean stopIfFailure,
-                          List<String> changedFiles) throws Exception {
+    @Override
+    public boolean supportsNativeTest(Language language) {
+        return language != Language.GROOVY;
+    }
+
+    @Override
+    public String generateNativeTestScript(@NonNull @NotNull List<Guide> metadatas) {
+        return generateScript(metadatas, false, true);
+    }
+
+    @Override
+    public String generateTestScript(@NonNull @NotNull List<Guide> metadatas) {
+        return generateScript(metadatas, false, false);
+    }
+
+    public String generateScript(File guidesFolder,
+                                 String metadataConfigName,
+                                 boolean stopIfFailure,
+                                 List<String> changedFiles) {
         List<String> slugsChanged = guidesChanged(changedFiles);
         boolean forceExecuteEveryTest = changesMicronautVersion(changedFiles) ||
                 changesDependencies(changedFiles, slugsChanged) ||
@@ -170,13 +174,9 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                         !System.getenv(guidesConfiguration.getEnvGithubWorkflow()).equals(guidesConfiguration.getGithubWorkflowJavaCi())) ||
                 (changedFiles.isEmpty() && System.getenv(guidesConfiguration.getEnvGithubWorkflow()) == null);
 
-        // TODO: We should have an application context and get it from it.
-        JsonMapper jsonMapper = JsonMapper.createDefault();
-        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(
-                guidesFolder, metadataConfigName, jsonSchemaProvider.getSchema(), jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName);
         metadatas = metadatas.stream()
-                .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
+                .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest, guidesConfiguration))
                 .collect(Collectors.toList());
         return generateScript(metadatas, stopIfFailure, false);
     }
@@ -205,7 +205,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
             bashScript.append("\n");
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = MacroUtils.getSourceDir(metadata.slug(), guidesOption);
-                BuildTool buildTool = folder.toUpperCase().contains(MAVEN.toString()) ? MAVEN : GRADLE;
+                BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE;
                 if (metadata.apps().stream().anyMatch(app -> app.name().equals(guidesConfiguration.getDefaultAppName()))) {
                     if (GuideUtils.shouldSkip(metadata, buildTool)) {
                         continue;
@@ -218,7 +218,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                         }
                     }
                 } else {
-                    bashScript.append("\ncd " + folder + "\n");
+                    bashScript.append("cd " + folder + "\n");
                     for (App app : metadata.apps()) {
                         if (GuideUtils.shouldSkip(metadata, buildTool)) {
                             continue;

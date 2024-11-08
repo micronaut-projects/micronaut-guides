@@ -1,16 +1,21 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.options.Language;
 import jakarta.validation.constraints.NotNull;
 
-import java.io.File;
 import java.util.List;
 
 public interface TestScriptGenerator {
 
-    void generateNativeTestScript(@NonNull @NotNull File output,
-                                  @NonNull @NotNull List<Guide> metadatas);
+    boolean supportsNativeTest(App app, GuidesOption guidesOption);
 
-    void generateTestScript(@NonNull @NotNull File output,
-                            @NonNull @NotNull List<Guide> metadatas);
+    boolean isMicronautFramework(App app);
+
+    boolean supportsNativeTest(Language language);
+
+    String generateNativeTestScript(@NonNull @NotNull List<Guide> metadatas);
+
+    String generateTestScript(@NonNull @NotNull List<Guide> metadatas);
+
 }
