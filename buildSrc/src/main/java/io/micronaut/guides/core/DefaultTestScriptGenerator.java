@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.micronaut.starter.options.BuildTool.GRADLE;
@@ -21,8 +23,8 @@ import static io.micronaut.starter.options.BuildTool.MAVEN;
 public class DefaultTestScriptGenerator implements TestScriptGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultTestScriptGenerator.class);
 
-    private GuidesConfiguration guidesConfiguration;
-    private GuideParser guideParser;
+    private final GuidesConfiguration guidesConfiguration;
+    private final GuideParser guideParser;
 
     public DefaultTestScriptGenerator(GuidesConfiguration guidesConfiguration, GuideParser guideParser) {
         this.guidesConfiguration = guidesConfiguration;
@@ -64,9 +66,11 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                                           boolean validateLicense) {
         String testCopy = nativeTest ? "native tests" : "tests";
         StringBuilder bashScript = new StringBuilder(String.format(
-                "cd %s\n" +
-                        "echo \"-------------------------------------------------\"\n" +
-                        "echo \"Executing '%s' %s\"\n",
+                """
+                        cd %s
+                        echo "-------------------------------------------------"
+                        echo "Executing '%s' %s"
+                        """,
                 nestedFolder, folder, testCopy
         ));
 
@@ -82,9 +86,11 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
         } else {
             String mavenCommand = validateLicense ? "./mvnw -q test spotless:check" : "./mvnw -q test";
             bashScript.append(String.format(
-                    "%s || EXIT_STATUS=$?\n" +
-                            "echo \"Stopping shared test resources service (if created)\"\n" +
-                            "%s > /dev/null 2>&1 || true\n",
+                    """
+                            %s || EXIT_STATUS=$?
+                            echo "Stopping shared test resources service (if created)"
+                            %s > /dev/null 2>&1 || true
+                            """,
                     buildTool == BuildTool.MAVEN ? mavenCommand : "./gradlew -q check",
                     buildTool == BuildTool.MAVEN ? "./mvnw -q mn:stop-testresources-service" : "./gradlew -q stopTestResourcesService"
             ));
@@ -98,19 +104,23 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
 
         if (stopIfFailure) {
             bashScript.append(String.format(
-                    "if [ $EXIT_STATUS -ne 0 ]; then\n" +
-                            "  echo \"'%s' %s failed => exit $EXIT_STATUS\"\n" +
-                            "  exit $EXIT_STATUS\n" +
-                            "fi\n",
+                    """
+                            if [ $EXIT_STATUS -ne 0 ]; then
+                              echo "'%s' %s failed => exit $EXIT_STATUS"
+                              exit $EXIT_STATUS
+                            fi
+                            """,
                     folder, testCopy
             ));
         } else {
             bashScript.append(String.format(
-                    "if [ $EXIT_STATUS -ne 0 ]; then\n" +
-                            "  FAILED_PROJECTS=(\"${FAILED_PROJECTS[@]}\" %s)\n" +
-                            "  echo \"'%s' %s failed => exit $EXIT_STATUS\"\n" +
-                            "fi\n" +
-                            "EXIT_STATUS=0\n",
+                    """
+                            if [ $EXIT_STATUS -ne 0 ]; then
+                              FAILED_PROJECTS=("${FAILED_PROJECTS[@]}" %s)
+                              echo "'%s' %s failed => exit $EXIT_STATUS"
+                            fi
+                            EXIT_STATUS=0
+                            """,
                     folder, folder, testCopy
             ));
         }
@@ -199,7 +209,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                   done
                 }""");
 
-        metadatas.sort((o1, o2) -> o1.slug().compareTo(o2.slug()));
+        metadatas.sort(Comparator.comparing(Guide::slug));
         for (Guide metadata : metadatas) {
             List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(metadata, LOG);
             bashScript.append("\n");
@@ -210,11 +220,14 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                     if (GuideUtils.shouldSkip(metadata, buildTool)) {
                         continue;
                     }
-                    App defaultApp = metadata.apps().stream().filter(app -> app.name().equals(guidesConfiguration.getDefaultAppName())).findFirst().get();
-                    if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
-                        List<String> features = GuideUtils.getAppFeatures(defaultApp, guidesOption.getLanguage());
-                        if (!folder.contains("-maven-groovy")) {
-                            bashScript.append(scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.getRuntime().version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense()));
+                    Optional<App> appOptional = metadata.apps().stream().filter(app -> app.name().equals(guidesConfiguration.getDefaultAppName())).findFirst();
+                    if (appOptional.isPresent()) {
+                        App defaultApp = appOptional.get();
+                        if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
+                            List<String> features = GuideUtils.getAppFeatures(defaultApp, guidesOption.getLanguage());
+                            if (!folder.contains("-maven-groovy")) {
+                                bashScript.append(scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.getRuntime().version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense()));
+                            }
                         }
                     }
                 } else {
