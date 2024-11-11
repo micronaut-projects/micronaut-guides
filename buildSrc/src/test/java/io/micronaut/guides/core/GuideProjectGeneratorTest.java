@@ -1,6 +1,5 @@
 package io.micronaut.guides.core;
 
-import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.options.BuildTool;
@@ -25,12 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
 public class GuideProjectGeneratorTest {
-    @Inject
-    JsonMapper jsonMapper;
 
     @Inject
-    JsonSchemaProvider jsonSchemaProvider;
-
+    GuideParser guideParser;
 
     @Inject
     GuideProjectGenerator guideProjectGenerator;
@@ -134,14 +130,14 @@ public class GuideProjectGeneratorTest {
     }
 
     @Test
-    void testGenerateMultipleApps() throws Exception {
+    void testGenerateMultipleApps() {
         File outputDirectory = new File("build/tmp/test");
         outputDirectory.mkdir();
 
         String path = "src/test/resources/guides";
         File file = new File(path);
 
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(file, "metadata.json", jsonSchemaProvider.getSchema(), jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(file, "metadata.json");
         Guide guide = metadatas.get(4);
 
         assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
