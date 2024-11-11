@@ -8,14 +8,18 @@ import java.util.List;
 
 public interface TestScriptGenerator {
 
-    boolean supportsNativeTest(App app, GuidesOption guidesOption);
+    boolean supportsNativeTest(@NonNull @NotNull App app, @NonNull @NotNull GuidesOption guidesOption);
 
-    boolean isMicronautFramework(App app);
+    boolean isMicronautFramework(@NonNull @NotNull App app);
 
-    boolean supportsNativeTest(Language language);
+    boolean supportsNativeTest(@NonNull @NotNull Language language);
 
+    @NonNull
+    @NotNull
     String generateNativeTestScript(@NonNull @NotNull List<Guide> metadatas);
 
+    @NonNull
+    @NotNull
     String generateTestScript(@NonNull @NotNull List<Guide> metadatas);
 
 }
