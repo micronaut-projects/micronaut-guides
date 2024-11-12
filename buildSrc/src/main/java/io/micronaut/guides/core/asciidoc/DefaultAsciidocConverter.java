@@ -33,6 +33,8 @@ public class DefaultAsciidocConverter implements AsciidocConverter {
                 .templateDirs(asciidocConfiguration.getTemplateDirs())
                 .attributes(attributes)
                 .safe(SafeMode.UNSAFE)
+                .baseDir(new File("."))
+                .toFile(false)
                 .build();
     }
 
