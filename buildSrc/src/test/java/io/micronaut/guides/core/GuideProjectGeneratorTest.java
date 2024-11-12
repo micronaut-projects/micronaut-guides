@@ -10,16 +10,13 @@ import jakarta.inject.Inject;
 import org.gradle.api.JavaVersion;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static io.micronaut.guides.core.TestUtils.readFile;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -164,12 +161,5 @@ public class GuideProjectGeneratorTest {
         }
     }
 
-    private String readFile(File file) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            return reader.lines().collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
+
 }
