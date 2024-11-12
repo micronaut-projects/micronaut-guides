@@ -1,15 +1,19 @@
 package io.micronaut.guides.core.asciidoc;
 
+import org.asciidoctor.Placement;
+
+import java.io.File;
+
 interface AsciidocConfiguration {
     String getSourceDir();
 
     String getSourceHighlighter();
 
-    String getToc();
+    Placement getToc();
 
     int getToclevels();
 
-    String getSectnums();
+    boolean getSectnums();
 
     String getIdprefix();
 
@@ -21,10 +25,9 @@ interface AsciidocConfiguration {
 
     boolean isNofooter();
 
-    String getProjectVersion();
-
     String getDocType();
 
     String getRuby();
 
+    File getTemplateDirs();
 }
