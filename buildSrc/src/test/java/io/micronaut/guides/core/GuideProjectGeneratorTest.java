@@ -1,6 +1,5 @@
 package io.micronaut.guides.core;
 
-import io.micronaut.json.JsonMapper;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.options.BuildTool;
@@ -10,27 +9,21 @@ import jakarta.inject.Inject;
 import org.gradle.api.JavaVersion;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static io.micronaut.guides.core.TestUtils.readFile;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
 public class GuideProjectGeneratorTest {
-    @Inject
-    JsonMapper jsonMapper;
 
     @Inject
-    JsonSchemaProvider jsonSchemaProvider;
-
+    GuideParser guideParser;
 
     @Inject
     GuideProjectGenerator guideProjectGenerator;
@@ -134,14 +127,14 @@ public class GuideProjectGeneratorTest {
     }
 
     @Test
-    void testGenerateMultipleApps() throws Exception {
+    void testGenerateMultipleApps() {
         File outputDirectory = new File("build/tmp/test");
         outputDirectory.mkdir();
 
         String path = "src/test/resources/guides";
         File file = new File(path);
 
-        List<Guide> metadatas = GuideUtils.parseGuidesMetadata(file, "metadata.json", jsonSchemaProvider.getSchema(), jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(file, "metadata.json");
         Guide guide = metadatas.get(4);
 
         assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
@@ -164,12 +157,5 @@ public class GuideProjectGeneratorTest {
         }
     }
 
-    private String readFile(File file) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            return reader.lines().collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
+
 }

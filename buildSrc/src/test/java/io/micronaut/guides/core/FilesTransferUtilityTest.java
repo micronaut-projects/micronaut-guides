@@ -1,6 +1,5 @@
 package io.micronaut.guides.core;
 
-import io.micronaut.json.JsonMapper;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
@@ -19,14 +18,10 @@ public class FilesTransferUtilityTest {
     FilesTransferUtility filesTransferUtility;
 
     @Inject
-    JsonMapper jsonMapper;
-
-    @Inject
-    JsonSchemaProvider jsonSchemaProvider;
-
-
-    @Inject
     GuideProjectGenerator guideProjectGenerator;
+
+    @Inject
+    GuideParser guideParser;
 
     @Test
     void testTransfer() throws Exception {
@@ -37,10 +32,10 @@ public class FilesTransferUtilityTest {
 
         String pathBase = "src/test/resources/guides/hello-base";
         File fileBase = new File(pathBase);
-        GuideUtils.parseGuideMetadata(fileBase, "metadata.json", jsonSchemaProvider.getSchema(), jsonMapper).ifPresent(metadatas::add);
+        guideParser.parseGuideMetadata(fileBase, "metadata.json").ifPresent(metadatas::add);
         String path = "src/test/resources/guides/creating-your-first-micronaut-app";
         File file = new File(path);
-        GuideUtils.parseGuideMetadata(file, "metadata.json", jsonSchemaProvider.getSchema(), jsonMapper).ifPresent(metadatas::add);
+        guideParser.parseGuideMetadata(file, "metadata.json").ifPresent(metadatas::add);
 
         guideProjectGenerator.generate(outputDirectory, metadatas.get(0));
         guideProjectGenerator.generate(outputDirectory, metadatas.get(1));

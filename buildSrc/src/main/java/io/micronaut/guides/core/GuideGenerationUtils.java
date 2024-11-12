@@ -22,6 +22,7 @@ import static io.micronaut.starter.options.Language.GROOVY;
 
 public class GuideGenerationUtils {
 
+
     private GuideGenerationUtils() {
     }
 
@@ -131,4 +132,35 @@ public class GuideGenerationUtils {
         }
         return javaVersion;
     }
+
+    static boolean skipBecauseOfJavaVersion(Guide metadata, GuidesConfiguration guidesConfiguration) {
+        int jdkVersion = resolveJdkVersion(guidesConfiguration).majorVersion();
+        return (metadata.minimumJavaVersion() != null && jdkVersion < metadata.minimumJavaVersion()) ||
+                (metadata.maximumJavaVersion() != null && jdkVersion > metadata.maximumJavaVersion());
+    }
+
+    public static String singleGuide(GuidesConfiguration guidesConfiguration) {
+        return System.getProperty(guidesConfiguration.getSysPropMicronautGuide());
+    }
+
+    public static boolean process(Guide metadata, boolean checkJdk, GuidesConfiguration guidesConfiguration) {
+
+        if (!metadata.publish()) {
+            return false;
+        }
+
+        boolean processGuide = singleGuide(guidesConfiguration) == null || singleGuide(guidesConfiguration).equals(metadata.slug());
+        if (!processGuide) {
+            return false;
+        }
+
+        if (checkJdk && skipBecauseOfJavaVersion(metadata, guidesConfiguration)) {
+            System.out.println("Not processing " + metadata.slug() + ", JDK not between " +
+                    metadata.minimumJavaVersion() + " and " + metadata.maximumJavaVersion());
+            return false;
+        }
+
+        return true;
+    }
+
 }

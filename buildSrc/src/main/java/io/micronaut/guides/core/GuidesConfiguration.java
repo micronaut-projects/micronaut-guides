@@ -30,4 +30,10 @@ public interface GuidesConfiguration {
     JdkVersion getDefaultJdkVersion();
 
     List<JdkVersion> getJdkVersionsSupportedByGraalvm();
+
+    String getGithubWorkflowJavaCi();
+
+    String getEnvGithubWorkflow();
+
+    String getSysPropMicronautGuide();
 }
