@@ -30,4 +30,6 @@ interface AsciidocConfiguration {
     String getRuby();
 
     File getTemplateDirs();
+
+    String getCommonsDirs();
 }

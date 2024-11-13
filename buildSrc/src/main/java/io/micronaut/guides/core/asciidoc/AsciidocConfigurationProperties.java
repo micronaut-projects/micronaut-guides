@@ -21,6 +21,7 @@ public class AsciidocConfigurationProperties implements AsciidocConfiguration {
     private static final String DEFAULT_DOCTYPE = "book";
     private static final String DEFAULT_RUBY = "erubis";
     private static final String DEFAULT_TEMPLATE_DIRS = "src/docs/asciidoc";
+    private static final String COMMONS_DIR = "src/docs/asciidoc/common";
 
     private String sourcedir = DEFAULT_SOURCEDIR;
     private String sourceHighlighter = DEFAULT_SOURCE_HIGHLIGHTER;
@@ -35,6 +36,7 @@ public class AsciidocConfigurationProperties implements AsciidocConfiguration {
     private String docType = DEFAULT_DOCTYPE;
     private String ruby = DEFAULT_RUBY;
     private File templateDirs = new File(DEFAULT_TEMPLATE_DIRS);
+    private String commonsDir = COMMONS_DIR;
 
     @Override
     public String getSourceDir() {
@@ -151,5 +153,14 @@ public class AsciidocConfigurationProperties implements AsciidocConfiguration {
 
     public void setTemplateDirs(File templateDirs) {
         this.templateDirs = templateDirs;
+    }
+
+    @Override
+    public String getCommonsDirs() {
+        return commonsDir;
+    }
+
+    public void setCommonsDirs(String commonsDir) {
+        this.commonsDir = commonsDir;
     }
 }

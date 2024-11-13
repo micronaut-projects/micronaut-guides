@@ -46,4 +46,11 @@ public class AsciidocConverterTest {
         String result = TestUtils.readFile(destinationFile);
         assertEquals(expected, result);
     }
+
+    @Test
+    void testConvertIncludeAdoc() {
+        File sourceFile = new File("src/test/resources/other-guides/adding-commit-info/adding-commit-info.adoc");
+        File destinationFile = new File("build/tmp/test/docs/adding-commit-info.html");
+        asciidocConverter.convert(sourceFile, destinationFile);
+    }
 }
