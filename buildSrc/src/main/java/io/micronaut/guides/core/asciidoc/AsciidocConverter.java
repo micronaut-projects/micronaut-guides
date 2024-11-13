@@ -7,7 +7,5 @@ import java.io.File;
 
 public interface AsciidocConverter {
 
-    @NotNull
-    @NonNull
-    String convert(@NotNull @NonNull File source);
+    void convert(@NotNull @NonNull File source, @NotNull @NonNull File destination);
 }

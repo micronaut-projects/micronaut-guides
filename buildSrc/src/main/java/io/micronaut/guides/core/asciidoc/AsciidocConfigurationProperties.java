@@ -12,7 +12,7 @@ public class AsciidocConfigurationProperties implements AsciidocConfiguration {
     private static final String DEFAULT_SOURCE_HIGHLIGHTER = "coderay";
     private static final Placement DEFAULT_TOC = Placement.LEFT;
     private static final int DEFAULT_TOCLEVELS = 2;
-    private static final boolean DEFAULT_SECTNUMS = false;
+    private static final boolean DEFAULT_SECTNUMS = true;
     private static final String DEFAULT_IDPREFIX = "";
     private static final String DEFAULT_IDSEPARATOR = "-";
     private static final String DEFAULT_ICONS = "font";

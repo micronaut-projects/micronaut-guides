@@ -1,15 +1,14 @@
 package io.micronaut.guides.core.asciidoc;
 
-import io.micronaut.guides.core.FilesTransferUtility;
-import io.micronaut.guides.core.Guide;
-import io.micronaut.guides.core.GuideParser;
-import io.micronaut.guides.core.GuideProjectGenerator;
+import io.micronaut.guides.core.*;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest(startApplication = false)
 public class AsciidocConverterTest {
@@ -32,7 +31,7 @@ public class AsciidocConverterTest {
         File outputDirectory = new File(outputPath);
         outputDirectory.mkdir();
 
-        String path = "src/test/resources/guides/adding-commit-info";
+        String path = "src/test/resources/other-guides/adding-commit-info";
         File file = new File(path);
         Guide guide = guideParser.parseGuideMetadata(file, "metadata.json").orElseThrow();
 
@@ -40,7 +39,11 @@ public class AsciidocConverterTest {
 
         filesTransferUtility.transferFiles(file, outputDirectory, guide);
 
-        File adocFile = new File("src/test/resources/adding-commit-info-gradle-java.adoc");
-        String result = asciidocConverter.convert(adocFile);
+        File sourceFile = new File("src/test/resources/adding-commit-info-gradle-java.adoc");
+        File destinationFile = new File("build/tmp/test/docs/adding-commit-info-gradle-java.html");
+        asciidocConverter.convert(sourceFile, destinationFile);
+        String expected = TestUtils.readFile(new File("src/test/resources/adding-commit-info-gradle-java-expected.html"));
+        String result = TestUtils.readFile(destinationFile);
+        assertEquals(expected, result);
     }
 }

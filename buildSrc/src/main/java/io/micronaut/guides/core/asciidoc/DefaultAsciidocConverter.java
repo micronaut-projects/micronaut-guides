@@ -1,17 +1,16 @@
 package io.micronaut.guides.core.asciidoc;
 
 import jakarta.inject.Singleton;
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Attributes;
-import org.asciidoctor.Options;
-import org.asciidoctor.SafeMode;
+import org.asciidoctor.*;
 
 import java.io.File;
 
 @Singleton
 public class DefaultAsciidocConverter implements AsciidocConverter {
 
-    Options options;
+    OptionsBuilder optionsBuilder;
+
+    Asciidoctor asciidoctor;
 
     DefaultAsciidocConverter(AsciidocConfiguration asciidocConfiguration) {
         Attributes attributes = Attributes.builder()
@@ -27,20 +26,19 @@ public class DefaultAsciidocConverter implements AsciidocConverter {
                 .noFooter(asciidocConfiguration.isNofooter())
                 .build();
 
-        options = Options.builder()
+        optionsBuilder = Options.builder()
                 .docType(asciidocConfiguration.getDocType())
                 .eruby(asciidocConfiguration.getRuby())
                 .templateDirs(asciidocConfiguration.getTemplateDirs())
                 .attributes(attributes)
                 .safe(SafeMode.UNSAFE)
-                .baseDir(new File("."))
-                .toFile(false)
-                .build();
+                .baseDir(new File("."));
+
+        asciidoctor = Asciidoctor.Factory.create();
     }
 
     @Override
-    public String convert(File source) {
-        Asciidoctor asciidoctor = Asciidoctor.Factory.create();
-        return asciidoctor.convertFile(source, options);
+    public void convert(File source, File destination) {
+        asciidoctor.convertFile(source, optionsBuilder.toFile(destination).build());
     }
 }
