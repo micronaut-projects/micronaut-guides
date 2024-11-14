@@ -40,7 +40,7 @@ import static io.micronaut.starter.options.BuildTool.MAVEN
 class GuidesPlugin implements Plugin<Project> {
 
     private static final String TASK_SUFFIX_GENERATE_PROJECTS = "GenerateProjects"
-    private static final List<Integer> JAVA_MATRIX = [8, 11, 17]
+    private static final List<Integer> JAVA_MATRIX = [21]
     private static final List<String> FINALIZED_TASKS = ['generateTestScript',
                                                          'generateGuidesIndex',
                                                          'generateGuidesJsonMetadata',

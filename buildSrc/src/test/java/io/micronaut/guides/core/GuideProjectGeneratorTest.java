@@ -115,14 +115,15 @@ public class GuideProjectGeneratorTest {
                 }"""));
         String javaVersion = JavaVersion.current().getMajorVersion();
 
+        System.out.println(result);
         assertTrue(result.contains("""
                 application {
                     mainClass = "example.micronaut.CliCommand"
                 }
                 java {
-                    sourceCompatibility = JavaVersion.toVersion("17")
-                    targetCompatibility = JavaVersion.toVersion("17")
-                }""".replace("17", javaVersion)));
+                    sourceCompatibility = JavaVersion.toVersion("21")
+                    targetCompatibility = JavaVersion.toVersion("21")
+                }""".replace("21", javaVersion)));
 
     }
 
