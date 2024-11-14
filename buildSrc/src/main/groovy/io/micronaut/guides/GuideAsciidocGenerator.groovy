@@ -5,16 +5,9 @@ import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
-import io.micronaut.core.io.ResourceLoader
-import io.micronaut.core.io.scan.DefaultClassPathResourceLoader
 import io.micronaut.core.util.StringUtils
-import io.micronaut.guides.core.App
-import io.micronaut.guides.core.DefaultVersionLoader
-import io.micronaut.guides.core.DependencyLines
-import io.micronaut.guides.core.Guide
-import io.micronaut.guides.core.GuideUtils
-import io.micronaut.guides.core.GuidesOption
-import io.micronaut.guides.core.VersionLoader
+import io.micronaut.guides.GuideProjectGenerator
+import io.micronaut.guides.core.*
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
@@ -29,12 +22,7 @@ import java.util.regex.Pattern
 import java.util.stream.Collectors
 
 import static io.micronaut.starter.api.TestFramework.SPOCK
-import static io.micronaut.starter.application.ApplicationType.CLI
-import static io.micronaut.starter.application.ApplicationType.DEFAULT
-import static io.micronaut.starter.application.ApplicationType.FUNCTION
-import static io.micronaut.starter.application.ApplicationType.GRPC
-import static io.micronaut.starter.application.ApplicationType.MESSAGING
-import static io.micronaut.starter.options.Language.GROOVY
+import static io.micronaut.starter.application.ApplicationType.*
 
 @CompileStatic
 class GuideAsciidocGenerator {
@@ -183,7 +171,7 @@ class GuideAsciidocGenerator {
                 String app = matches[1] ?: 'default'
                 cliCommandForApp(metadata, app)
                         .orElseThrow {
-                            new GradleException("No CLI command found for app: $app -- should be one of ${metadata.apps().stream().flatMap {"@$it:cli-command@"}.collect(Collectors.joining(", "))}")
+                            new GradleException("No CLI command found for app: $app -- should be one of ${metadata.apps().stream().flatMap { "@$it:cli-command@" }.collect(Collectors.joining(", "))}")
                         }
             }
 
@@ -267,12 +255,11 @@ class GuideAsciidocGenerator {
                 include rawLine, rawLines, projectDir, true
             } else if (rawLine.startsWith(EXTERNAL) && rawLine.endsWith(']')) {
                 include rawLine, rawLines, projectDir, false
-            }else if (rawLine.startsWith(COMMON_PARAMETRIZED) && rawLine.endsWith(']')){
+            } else if (rawLine.startsWith(COMMON_PARAMETRIZED) && rawLine.endsWith(']')) {
                 rawLines.addAll includeParametrized(rawLine, projectDir, true)
-            } else if (rawLine.startsWith(EXTERNAL_PARAMETRIZED) && rawLine.endsWith(']')){
+            } else if (rawLine.startsWith(EXTERNAL_PARAMETRIZED) && rawLine.endsWith(']')) {
                 rawLines.addAll includeParametrized(rawLine, projectDir, false)
-            }
-            else {
+            } else {
                 rawLines << rawLine
             }
         }
@@ -318,7 +305,7 @@ class GuideAsciidocGenerator {
 
         List<String> newLines = commonLines(file, projectDir)
 
-        String pattern = "(\\{(\\d+)(:?([UL])?)})"
+        String pattern = "(\\{(\\d+)(_?([UL])?)})"
 
         // Create a Pattern object
         Pattern r = Pattern.compile(pattern)
@@ -339,9 +326,9 @@ class GuideAsciidocGenerator {
                         case 'L':
                             line = line.replace(replaceString, value.toUpperCase())
                             break
-                       default:
+                        default:
                             line = line.replace(replaceString, value)
-                           break
+                            break
                     }
                     newLines[i] = line
                 }
@@ -595,7 +582,7 @@ class GuideAsciidocGenerator {
         if (features) {
             featureNames = features.tokenize('|')
         } else {
-            featureNames = ([] as List<String>) + GuideUtils.getAppVisibleFeatures(app,guidesOption.language)
+            featureNames = ([] as List<String>) + GuideUtils.getAppVisibleFeatures(app, guidesOption.language)
         }
 
         String featureExcludes = extractFromParametersLine(line, 'featureExcludes')
@@ -657,12 +644,12 @@ class GuideAsciidocGenerator {
         List<String> attrs = line.substring(line.indexOf("[") + 1, line.indexOf("]")).tokenize(",")
 
         return attrs
-            .stream()
-            .filter({ it.startsWith(attributeName) })
-            .map({ it.tokenize("=") })
-            .map({ it.get(1) })
-            .findFirst()
-            .orElse("")
+                .stream()
+                .filter({ it.startsWith(attributeName) })
+                .map({ it.tokenize("=") })
+                .map({ it.get(1) })
+                .findFirst()
+                .orElse("")
     }
 
     private static String resolveAsciidoctorLanguage(String fileName) {
