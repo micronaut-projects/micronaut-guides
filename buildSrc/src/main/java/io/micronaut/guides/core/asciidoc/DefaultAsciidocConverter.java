@@ -15,7 +15,8 @@ public class DefaultAsciidocConverter implements AsciidocConverter {
     DefaultAsciidocConverter(AsciidocConfiguration asciidocConfiguration) {
         Attributes attributes = Attributes.builder()
                 .attribute("sourcedir", asciidocConfiguration.getSourceDir())
-                .attribute("commonsDir", asciidocConfiguration.getCommonsDirs())
+                .attribute("commonsDir", asciidocConfiguration.getCommonsDir())
+                .attribute("guidesDir", asciidocConfiguration.getGuidesDir())
                 .sourceHighlighter(asciidocConfiguration.getSourceHighlighter())
                 .tableOfContents(asciidocConfiguration.getToc())
                 .attribute("toclevels", asciidocConfiguration.getToclevels())
@@ -33,7 +34,7 @@ public class DefaultAsciidocConverter implements AsciidocConverter {
                 .templateDirs(asciidocConfiguration.getTemplateDirs())
                 .attributes(attributes)
                 .safe(SafeMode.UNSAFE)
-                .baseDir(new File("."));
+                .baseDir(new File(asciidocConfiguration.getBaseDir()));
 
         asciidoctor = Asciidoctor.Factory.create();
     }
@@ -41,5 +42,10 @@ public class DefaultAsciidocConverter implements AsciidocConverter {
     @Override
     public void convert(File source, File destination) {
         asciidoctor.convertFile(source, optionsBuilder.toFile(destination).build());
+    }
+
+    @Override
+    public String convert(File source) {
+        return asciidoctor.convertFile(source, optionsBuilder.toFile(false).build());
     }
 }

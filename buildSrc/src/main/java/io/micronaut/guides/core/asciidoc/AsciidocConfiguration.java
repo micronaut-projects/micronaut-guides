@@ -31,5 +31,9 @@ interface AsciidocConfiguration {
 
     File getTemplateDirs();
 
-    String getCommonsDirs();
+    String getCommonsDir();
+
+    String getBaseDir();
+
+    String getGuidesDir();
 }
