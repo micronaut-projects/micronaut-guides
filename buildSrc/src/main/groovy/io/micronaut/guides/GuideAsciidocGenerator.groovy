@@ -276,7 +276,7 @@ class GuideAsciidocGenerator {
         List<String> newLines = commonLines(file, projectDir)
 
         Optional<Integer> number = parseNumber(rawLine)
-        String line = number.map(num -> '<' + num + '>').orElse('*') + ' ' + newLines.first()
+        String line = newLines.first()
 
         for (int i = 0; i < 10; i++) {
             String value = extractFromParametersLine(rawLine, "arg" + i)

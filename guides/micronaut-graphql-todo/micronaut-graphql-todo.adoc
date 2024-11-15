@@ -41,15 +41,15 @@ Create an Entity class to represent an Author:
 
 source:Author[]
 
-callout:mapped-entity[1]
-callout:mapped-entity-id[2]
+callout:mapped-entity[]
+callout:mapped-entity-id[]
 
 And another to represent a ToDo:
 
 source:ToDo[]
 
-callout:mapped-entity[1]
-callout:mapped-entity-id[2]
+callout:mapped-entity[]
+callout:mapped-entity-id[]
 
 === Repositories
 
@@ -59,15 +59,15 @@ The simplest of these is the `ToDoRepository` which just requires the default me
 
 source:ToDoRepository[]
 
-callout:jdbcrepository[1]
-callout:crudrepository[2]
+callout:jdbcrepository[]
+callout:crudrepository[]
 
 Then create a Repository for the Authors.  This requires extra finders for this to simplify the GraphQL wiring in the next step:
 
 source:AuthorRepository[]
 
-callout:jdbcrepository[1]
-callout:crudrepository[2]
+callout:jdbcrepository[]
+callout:crudrepository[]
 <3> When creating todos a method is required to search for an exisiting username.
 <4> When GraphQL loads a ToDo, it use this to fetch the authors if they are required in the response.
 <5> Find an existing author, or else create a new one when creating a ToDo.
@@ -103,8 +103,8 @@ Create class `ToDosDataFetcher` to implement the `toDos` query:
 
 source:ToDosDataFetcher[]
 
-callout:singleton[1]
-callout:constructor-di[number=2,arg0=ToDoRepository]
+callout:singleton[]
+callout:constructor-di[arg0=ToDoRepository]
 
 ==== Mutations
 
@@ -112,8 +112,8 @@ Create `CreateToDoDataFetcher` for the creation of ToDos:
 
 source:CreateToDoDataFetcher[]
 
-callout:singleton[1]
-callout:constructor-di[number=2,arg0=ToDoRepository]
+callout:singleton[]
+callout:constructor-di[arg0=ToDoRepository]
 <3> Find the existing author or create a new one.
 <4> Persist the new ToDo.
 
@@ -121,8 +121,8 @@ And `CompleteToDoDataFetcher` to mark ToDos as complete:
 
 source:CompleteToDoDataFetcher[]
 
-callout:singleton[1]
-callout:constructor-di[number=2,arg0=ToDoRepository]
+callout:singleton[]
+callout:constructor-di[arg0=ToDoRepository]
 <3> Find the existing ToDo based on its id.
 <4> If found, set completed.
 <5> And update the version in the database.
@@ -137,14 +137,14 @@ To do this, register a DataLoader that finds authors based on a collection of id
 
 source:AuthorDataLoader[]
 
-callout:singleton[1]
-callout:io-executor-service[2]
+callout:singleton[]
+callout:io-executor-service[]
 
 This is registered in the DataLoaderRegistry under the key `author`
 
 source:DataLoaderRegistryFactory[]
 
-callout:factory[1]
+callout:factory[]
 <2> This registry has request scope, so a new one will be created for every request.
 <3> Register the AuthorDataLoader whenever the loader for `"author"` is requested.
 
@@ -152,7 +152,7 @@ Add an `AuthorDataFetcher` which requests and uses this loader to populate a `To
 
 source:AuthorDataFetcher[]
 
-callout:singleton[1]
+callout:singleton[]
 <2> Uses the author data loader defined above in the Factory.
 
 === GraphQL Factory
@@ -161,8 +161,8 @@ Finally, create a factory class that will bind the GraphQL schema to the code, t
 
 source:GraphQLFactory[]
 
-callout:factory[1]
-callout:singleton[2]
+callout:factory[]
+callout:singleton[]
 <3> Wire up the query behavior.
 <4> Wire up each mutators.
 <5> Wire up how to populate a ToDo with authors if they are requested.
@@ -296,8 +296,8 @@ Create the following class:
 
 test:GraphQLControllerTest[]
 
-callout:micronaut-test[1]
-callout:http-client[2]
+callout:micronaut-test[]
+callout:http-client[]
 
 common:testApp-noheader.adoc[]
 
