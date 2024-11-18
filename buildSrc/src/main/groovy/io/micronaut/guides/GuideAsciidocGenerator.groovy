@@ -192,8 +192,6 @@ class GuideAsciidocGenerator {
             }
             text = text.replace("@micronautVersion@", VersionInfo.getMicronautVersion())
 
-            String nothing = "nothign"
-
             File renderedAsciidocFile = new File(asciidocDir, projectName + '.adoc')
             renderedAsciidocFile.createNewFile()
             renderedAsciidocFile.setText(text, 'UTF-8')
