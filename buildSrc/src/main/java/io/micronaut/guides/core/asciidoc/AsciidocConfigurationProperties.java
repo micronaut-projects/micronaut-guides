@@ -22,6 +22,7 @@ public class AsciidocConfigurationProperties implements AsciidocConfiguration {
     private static final String DEFAULT_RUBY = "erubis";
     private static final String DEFAULT_TEMPLATE_DIRS = "src/docs/asciidoc";
     private static final String DEFAULT_COMMONS_DIR = "src/docs/asciidoc/common";
+    private static final String DEFAULT_CALLOUTS_DIR = "src/docs/asciidoc/callouts";
     private static final String DEFAULT_BASE_DIR = ".";
     private static final String DEFAULT_GUIDES_DIR = "guides";
 
@@ -41,6 +42,7 @@ public class AsciidocConfigurationProperties implements AsciidocConfiguration {
     private String commonsDir = DEFAULT_COMMONS_DIR;
     private String baseDir = DEFAULT_BASE_DIR;
     private String guidesDir = DEFAULT_GUIDES_DIR;
+    private String calloutsDir = DEFAULT_CALLOUTS_DIR;
 
     @Override
     public String getSourceDir() {
@@ -184,5 +186,14 @@ public class AsciidocConfigurationProperties implements AsciidocConfiguration {
 
     public void setGuidesDir(String guidesDir) {
         this.guidesDir = guidesDir;
+    }
+
+    @Override
+    public String getCalloutsDir() {
+        return calloutsDir;
+    }
+
+    public void setCalloutsDir(String calloutsDir) {
+        this.calloutsDir = calloutsDir;
     }
 }

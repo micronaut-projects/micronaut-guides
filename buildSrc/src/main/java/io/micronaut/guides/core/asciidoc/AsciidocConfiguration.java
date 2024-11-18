@@ -4,7 +4,7 @@ import org.asciidoctor.Placement;
 
 import java.io.File;
 
-interface AsciidocConfiguration {
+public interface AsciidocConfiguration {
     String getSourceDir();
 
     String getSourceHighlighter();
@@ -36,4 +36,6 @@ interface AsciidocConfiguration {
     String getBaseDir();
 
     String getGuidesDir();
+
+    String getCalloutsDir();
 }
