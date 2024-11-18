@@ -4,7 +4,6 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.guides.core.asciidoc.PlacheholderMacro;
 
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 abstract class PlaceholderWithTargetMacroSubstitution implements MacroSubstitution {
 
@@ -13,8 +12,7 @@ abstract class PlaceholderWithTargetMacroSubstitution implements MacroSubstituti
     protected abstract String getSubstitution(Guide guide, GuidesOption option, String app);
 
     public String substitute(String str, Guide guide, GuidesOption option) {
-        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?" + getMacroName() + "@");
-        for (String instance : MacroUtils.findMacroInstances(str, pattern)) {
+        for (String instance : MacroUtils.findMacroInstances(str, getMacroName())) {
             Optional<PlacheholderMacro> macroOptional = PlacheholderMacro.of(getMacroName(), instance);
             if (macroOptional.isEmpty()) {
                 continue;
