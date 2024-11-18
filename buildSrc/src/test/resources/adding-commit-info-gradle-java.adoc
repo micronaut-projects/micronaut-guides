@@ -1,0 +1,334 @@
+// Start: src/docs/common/snippets/common-header-top.adoc
+= Adding Commit Info to your Micronaut Application
+
+Expose the exact version of code that your application is running.
+
+Authors: Sergio del Amo
+
+Micronaut Version: 4.6.3
+// End: src/docs/common/snippets/common-header-top.adoc
+
+In this guide, we will add git commit info to your Micronaut build artifacts and running application. There are many benefits of keeping your commit info handy:
+
+* Commit info is encapsulated within the built artifacts
+
+* Fast authoritative means of identifying what specific code is running in an environment
+
+* This solution doesn't rely on external tracking mechanisms
+
+* Transparency and reproducibility when investigating issues
+
+// Start: src/docs/common/snippets/common-gettingStarted.adoc
+== Getting Started
+
+In this guide, we will create a Micronaut application written in Java.
+// End: src/docs/common/snippets/common-gettingStarted.adoc
+
+// Start: src/docs/common/snippets/common-requirements.adoc
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE (e.g. https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[IntelliJ IDEA])
+* JDK 17 or greater installed with `JAVA_HOME` https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux[configured appropriately]
+// End: src/docs/common/snippets/common-requirements.adoc
+
+// Start: src/docs/common/snippets/common-completesolution.adoc
+== Solution
+
+We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the **completed example**.
+
+* link:adding-commit-info-gradle-java.zip[Download] and unzip the source
+// End: src/docs/common/snippets/common-completesolution.adoc
+
+NOTE: Before running the downloaded project, follow the steps described in the *Initialize Git Repository* section below.
+
+// Start: src/docs/common/snippets/common-create-app.adoc
+== Writing the Application
+
+// Start: src/docs/common/snippets/common-cli-or-launch.adoc
+Create an application using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
+// End: src/docs/common/snippets/common-cli-or-launch.adoc
+
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide --build=gradle --lang=java
+----
+
+// Start: src/docs/common/snippets/common-build-lang-arguments.adoc
+NOTE: If you don't specify the `--build` argument, Gradle with the https://docs.gradle.org/current/userguide/kotlin_dsl.html[Kotlin DSL] is used as the build tool. +++<br/>+++ If you don't specify the `--lang` argument, Java is used as the language.+++<br/>+++ If you don't specify the `--test` argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+// End: src/docs/common/snippets/common-build-lang-arguments.adoc
+
+// Start: src/docs/common/snippets/common-default-package.adoc
+The previous command creates a Micronaut application with the default package `example.micronaut` in a directory named `micronautguide`.
+// End: src/docs/common/snippets/common-default-package.adoc
+
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+// End: src/docs/common/snippets/common-create-app.adoc
+
+== Initialize Git Repository
+
+The project aims to demonstrate how to provide Git commit information to the
+`/info` endpoint and in order for that to work the project needs to be in a Git repository.  After creating the project, initialize a Git repository from the root of the newly created project:
+
+[source,bash]
+----
+cd micronautguide
+git init
+git add .
+git commit -am "Initial project"
+----
+
+== Management
+
+Inspired by Spring Boot and Grails, the Micronaut management dependency adds support for monitoring of your application via endpoints: special URIs that return details about the health and state of your application.
+
+To use the management features described in this section, add the dependency on your classpath.
+
+[source, groovy]
+.build.gradle
+----
+implementation("io.micronaut:micronaut-management")
+----
+
+== Info endpoint
+
+> The info endpoint returns static information from the state of the application. The info exposed can be provided by any number of "info sources".
+
+Enable the info endpoint:
+
+// Start: src/docs/common/snippets/common-yaml-dependency.adoc
+WARNING: https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/[Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency].
+// End: src/docs/common/snippets/common-yaml-dependency.adoc
+
+[source,yaml]
+.src/main/resources/application.yml
+----
+include::{sourceDir}/adding-commit-info/adding-commit-info-gradle-java/src/main/resources/application.yml[tag=endpoints]
+
+----
+
+
+== Gradle Git Properties Plugin
+
+
+If a `git.properties` file is available on the classpath, the https://docs.micronaut.io/latest/api/io/micronaut/management/endpoint/info/source/GitInfoSource.html[GitInfoSource] will expose the values in that file under the `git` key. Generation of a `git.properties` file will need to be configured as part of your build.
+
+
+For example, you may choose to use the https://plugins.gradle.org/plugin/com.gorylenko.gradle-git-properties[Gradle Git Properties] plugin. The plugin provides a task named `generateGitProperties` responsible for the `git.properties` file generation. It is automatically invoked upon the execution of the `classes` task. You can find the generated file in the directory `build/resources/main`.
+
+Modify `build.gradle` file to add the plugin:
+
+[source,groovy]
+.build.gradle
+----
+plugins {
+  id "com.gorylenko.gradle-git-properties" version "2.3.2"
+}
+----
+
+
+
+== Test
+
+Create a JUnit test to verify that when you make a GET request to `/info` you get a payload such as:
+
+[source, json]
+----
+{
+  "git": {
+    "dirty": "true",
+    "commit": {
+      "id": "7368906193527fbf2b45f1ed5b08c56631f5b155",
+      "describe": "7368906-dirty",
+      "time": "1527429126",
+      "message": {
+        "short": "Initial version",
+        "full": "Initial version"
+      },
+      "user": {
+        "name": "sdelamo",
+        "email": "sergio.delamo@softamo.com"
+      }
+    },
+    "branch": "master"
+  }
+}
+----
+
+Create a JUnit test to verify the behaviour:
+
+[source,java]
+.src/test/java/example/micronaut/InfoTest.java
+----
+include::{sourceDir}/adding-commit-info/adding-commit-info-gradle-java/src/test/java/example/micronaut/InfoTest.java[lines=16..-1]
+----
+
+<1> Annotate the class with `@MicronautTest` so the Micronaut framework will initialize the application context and the embedded server. https://micronaut-projects.github.io/micronaut-test/latest/guide/[More info].
+<2> Inject the `HttpClient` bean and point it to the embedded server.
+<3> Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.
+<4> Use `.body()` to retrieve the parsed payload.
+
+// Start: src/docs/common/snippets/common-testApp.adoc
+== Testing the Application
+
+// Start: src/docs/common/snippets/common-testApp-noheader.adoc
+To run the tests:
+
+
+[source, bash]
+----
+./gradlew test
+----
+
+Then open `build/reports/tests/test/index.html` in a browser to see the results.
+
+
+// End: src/docs/common/snippets/common-testApp-noheader.adoc
+// End: src/docs/common/snippets/common-testApp.adoc
+
+// Start: src/docs/common/snippets/common-runapp.adoc
+== Running the Application
+
+// Start: src/docs/common/snippets/common-runapp-instructions.adoc
+
+To run the application, use the `./gradlew run` command, which starts the application on port 8080.
+
+
+// End: src/docs/common/snippets/common-runapp-instructions.adoc
+// End: src/docs/common/snippets/common-runapp.adoc
+
+// Start: src/docs/common/snippets/common-graal-with-plugins.adoc
+
+== Generate a Micronaut Application Native Executable with GraalVM
+
+We will use https://www.graalvm.org/[GraalVM], the polyglot embeddable virtual machine, to generate a native executable of our Micronaut application.
+
+Compiling native executables ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.
+
+NOTE: Only Java and Kotlin projects support using GraalVM's `native-image` tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+
+=== GraalVM installation
+
+// Start: src/docs/common/snippets/common-install-graalvm-sdkman.adoc
+The easiest way to install https://www.graalvm.org[GraalVM] on Linux or Mac is to use https://sdkman.io/[SDKMan.io].
+
+[source, bash]
+.Java 17
+----
+sdk install java 17.0.12-graal
+----
+
+[source, bash]
+.Java 17
+----
+sdk use java 17.0.12-graal
+----
+
+For installation on Windows, or for manual installation on Linux or Mac, see the https://www.graalvm.org/latest/docs/getting-started/[GraalVM Getting Started] documentation.
+
+
+The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the https://www.oracle.com/downloads/licenses/graal-free-license.html[GraalVM Free Terms and Conditions].
+
+Alternatively, you can use the https://github.com/graalvm/graalvm-ce-builds/releases/[GraalVM Community Edition]:
+
+[source, bash]
+.Java 17
+----
+sdk install java 17.0.9-graalce
+----
+
+[source, bash]
+.Java 17
+----
+sdk use java 17.0.9-graalce
+----
+
+
+// End: src/docs/common/snippets/common-install-graalvm-sdkman.adoc
+
+=== Native executable generation
+
+
+To generate a native executable using Gradle, run:
+
+[source, bash]
+----
+./gradlew nativeCompile
+----
+
+The native executable is created in `build/native/nativeCompile` directory and can be run with `build/native/nativeCompile/micronautguide`.
+
+It is possible to customize the name of the native executable or pass additional parameters to GraalVM:
+
+.build.gradle
+[source,groovy]
+----
+graalvmNative {
+    binaries {
+        main {
+            imageName.set('mn-graalvm-application') // <1>
+            buildArgs.add('--verbose') // <2>
+        }
+    }
+}
+----
+<1> The native executable name will now be `mn-graalvm-application`
+<2> It is possible to pass extra arguments to build the native executable
+
+
+
+// End: src/docs/common/snippets/common-graal-with-plugins.adoc
+
+
+Annotate the `Application` class with `@Introspected`. This won't be necessary in a real world application because there
+will be Micronaut beans defined (something annotated with `@Singleton`, `@Controller`,...), but for this case we need to
+annotate a class so the visitor that generates the GraalVM `resource-config.json` file is triggered:
+
+[source,java]
+.src/main/java/example/micronaut/Application.java
+----
+include::{sourceDir}/adding-commit-info/adding-commit-info-gradle-java/src/main/java/example/micronaut/Application.java[lines=16..-1]
+----
+
+The `git.properties` file that is generated by the `gradle-git-properties` plugin
+will not be accessible from the native executable unless access to the file is
+configured in `resource-config.json`:
+
+[source,json]
+.src/main/resources/META-INF/native-image/resource-config.json
+----
+include::{sourceDir}/adding-commit-info/adding-commit-info-gradle-java/src/main/resources/META-INF/native-image/resource-config.json[]
+----
+
+You can execute the `info` endpoint exposed by the native executable:
+
+[source, bash]
+----
+curl localhost:8080/info
+----
+
+[source,json]
+----
+{"git":{"dirty":"true","total":{"commit":{"count":"45"}},"build":{"host":"Sergios-iMac-Pro.local","time":"2019-12-09T09:35:30+0100","user":{"name":"Sergio del Amo","email":"sergio.delamo@softamo.com"},"version":"0.1"},"commit":{"time":"2019-12-09T09:30:41+0100","id":"af3cff433d247fd4c2d8c54ae200108e98adfb2a","message":{"short":"add help section","full":"add help section\n"},"user":{"name":"Sergio del Amo","email":"sergio.delamo@softamo.com"}},"remote":{"origin":{"url":"git@github.com:micronaut-guides/adding-commit-info.git"}},"branch":"master"}}
+----
+
+
+// Start: src/docs/common/snippets/common-next.adoc
+== Next steps
+
+Explore more features with https://micronaut.io/guides/[Micronaut Guides].
+// End: src/docs/common/snippets/common-next.adoc
+
+// Start: src/docs/common/snippets/common-helpWithMicronaut.adoc
+== Help with the Micronaut Framework
+
+The https://micronaut.io/foundation/[Micronaut Foundation] sponsored the creation of this Guide. A variety of https://micronaut.io/commercial-support/[consulting and support services] are available.
+// End: src/docs/common/snippets/common-helpWithMicronaut.adoc
+
+// Start: src/docs/common/snippets/common-license.adoc
+== License
+
+NOTE: All guides are released with an https://www.apache.org/licenses/LICENSE-2.0[Apache license 2.0 license] for the code and a https://creativecommons.org/licenses/by/4.0/deed.en[Creative Commons Attribution 4.0] license for the writing and media (images...).
+// End: src/docs/common/snippets/common-license.adoc

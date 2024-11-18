@@ -24,9 +24,8 @@ public final class MacroUtils {
                 .toList();
     }
 
-    static List<String> findMacroInstances(@NonNull String str, @NonNull String macro) {
+    static List<String> findMacroInstances(@NonNull String str, @NonNull Pattern pattern) {
         List<String> matches = new ArrayList<>();
-        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?" + macro + "@");
         Matcher matcher = pattern.matcher(str);
 
         while (matcher.find()) {
