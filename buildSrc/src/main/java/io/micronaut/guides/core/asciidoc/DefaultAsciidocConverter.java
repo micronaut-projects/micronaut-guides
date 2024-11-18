@@ -16,6 +16,7 @@ public class DefaultAsciidocConverter implements AsciidocConverter {
         Attributes attributes = Attributes.builder()
                 .attribute("sourcedir", asciidocConfiguration.getSourceDir())
                 .attribute("commonsDir", asciidocConfiguration.getCommonsDir())
+                .attribute("calloutsDir", asciidocConfiguration.getCalloutsDir())
                 .attribute("guidesDir", asciidocConfiguration.getGuidesDir())
                 .sourceHighlighter(asciidocConfiguration.getSourceHighlighter())
                 .tableOfContents(asciidocConfiguration.getToc())
