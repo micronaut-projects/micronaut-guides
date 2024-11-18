@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,7 +42,9 @@ public class AsciidocConverterTest {
         filesTransferUtility.transferFiles(file, outputDirectory, guide);
 
         File sourceFile = new File("src/test/resources/adding-commit-info-gradle-java.adoc");
-        File destinationFile = new File("build/tmp/test/docs/adding-commit-info-gradle-java.html");
+
+        Path tempDirectory = Files.createTempDirectory("micronaut-guides");
+        File destinationFile = new File(tempDirectory.toFile(), "adding-commit-info-gradle-java.html");
         asciidocConverter.convert(sourceFile, destinationFile);
         String expected = TestUtils.readFile(new File("src/test/resources/adding-commit-info-gradle-java-expected.html"));
         String result = TestUtils.readFile(destinationFile);
@@ -48,9 +52,10 @@ public class AsciidocConverterTest {
     }
 
     @Test
-    void testConvertIncludeAdoc() {
+    void testConvertIncludeAdoc() throws IOException {
+        Path tempDirectory = Files.createTempDirectory("micronaut-guides");
+        File destinationFile = new File(tempDirectory.toFile(), "adding-commit-info.html");
         File sourceFile = new File("src/test/resources/other-guides/adding-commit-info/adding-commit-info.adoc");
-        File destinationFile = new File("build/tmp/test/docs/adding-commit-info.html");
         asciidocConverter.convert(sourceFile, destinationFile);
         File expectedFile = new File("src/test/resources/adding-commit-info-expected.html");
         String expected = TestUtils.readFile(expectedFile);
