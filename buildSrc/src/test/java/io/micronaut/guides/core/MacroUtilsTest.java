@@ -5,22 +5,25 @@ import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
+import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
 class MacroUtilsTest {
 
     @Test
-    void testGetSourceDir(){
-        GuidesOption option = new GuidesOption(BuildTool.GRADLE,Language.JAVA, TestFramework.JUNIT);
+    void testGetSourceDir() {
+        GuidesOption option = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT);
         String result = MacroUtils.getSourceDir("slug", option);
         assertEquals("slug-gradle-java", result);
     }
 
     @Test
-    void testFindMacroGroups(){
+    void testFindMacroGroups() {
         String str = """
                 https://micronaut-projects.github.io/micronaut-validation/snapshot/guide/[Micronaut validation] is built on the standard framework – https://www.jcp.org/en/jsr/detail?id=380[JSR 380], also known as Bean Validation 2.0. Micronaut Validation has built-in support for validation of beans that are annotated with `jakarta.validation` annotations.
                 
@@ -35,7 +38,7 @@ class MacroUtilsTest {
                 
                 Alternatively, you can use https://micronaut-projects.github.io/micronaut-hibernate-validator/latest/guide/[Micronaut Hibernate Validator], which uses https://hibernate.org/validator/[Hibernate Validator]; a reference implementation of the validation API.
                 """;
-        List<String> result = MacroUtils.findMacroGroups(str,"dependencies");
+        List<String> result = MacroUtils.findMacroGroups(str, "dependencies");
         List<String> expected = List.of("""
                 :dependencies:
                 
@@ -47,7 +50,7 @@ class MacroUtilsTest {
     }
 
     @Test
-    void testFindMacroGroupsMultiple(){
+    void testFindMacroGroupsMultiple() {
         String str = """
                 https://micronaut-projects.github.io/micronaut-validation/snapshot/guide/[Micronaut validation] is built on the standard framework – https://www.jcp.org/en/jsr/detail?id=380[JSR 380], also known as Bean Validation 2.0. Micronaut Validation has built-in support for validation of beans that are annotated with `jakarta.validation` annotations.
                 
@@ -71,7 +74,7 @@ class MacroUtilsTest {
                 
                 Test
                 """;
-        List<String> result = MacroUtils.findMacroGroups(str,"dependencies");
+        List<String> result = MacroUtils.findMacroGroups(str, "dependencies");
         List<String> expected = List.of("""
                 :dependencies:
                 
@@ -89,7 +92,7 @@ class MacroUtilsTest {
     }
 
     @Test
-    void findMacroGroupsNested(){
+    void findMacroGroupsNested() {
         String str = """
                 :exclude-for-build:gradle
                 
@@ -129,7 +132,7 @@ class MacroUtilsTest {
                 TestTest
                 
                 :exclude-for-build:""";
-        List<String> result = MacroUtils.findMacroGroupsNested(str,"exclude-for-build").stream().map(el -> String.join("\n", el)).toList();
+        List<String> result = MacroUtils.findMacroGroupsNested(str, "exclude-for-build").stream().map(el -> String.join("\n", el)).toList();
         List<String> expected = List.of("""
                 :exclude-for-build:gradle
                 
@@ -139,7 +142,7 @@ class MacroUtilsTest {
                 ./mvnw test
                 ----
                 
-                :exclude-for-build:""","""
+                :exclude-for-build:""", """
                 :exclude-for-build:maven
                 
                 [source, bash]
@@ -149,28 +152,28 @@ class MacroUtilsTest {
                 ----
                 
                 :exclude-for-build:""", """
-               :exclude-for-build:gradle
+                :exclude-for-build:gradle
                 
-               [source, bash]
-               .users
-               ----
-                MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
-               ----
-
-               Test
-
-               :exclude-for-build:maven
-
-               [source, bash]
-               .users
-               ----
-                MICRONAUT_ENVIRONMENTS=dev ./gradlew run
-               ----
-
-               :exclude-for-build:
-               TestTest
-
-               :exclude-for-build:""");
+                [source, bash]
+                .users
+                ----
+                 MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
+                ----
+                
+                Test
+                
+                :exclude-for-build:maven
+                
+                [source, bash]
+                .users
+                ----
+                 MICRONAUT_ENVIRONMENTS=dev ./gradlew run
+                ----
+                
+                :exclude-for-build:
+                TestTest
+                
+                :exclude-for-build:""");
         assertEquals(expected, result);
     }
 
@@ -178,7 +181,8 @@ class MacroUtilsTest {
     void testFindMacroInstances() {
         String input = "Some text @cli-command@ more text @another-example:cli-command@ end @example-cli-command@.";
         String macro = "cli-command";
-        List<String> result = MacroUtils.findMacroInstances(input, macro);
+        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?" + macro + "@");
+        List<String> result = MacroUtils.findMacroInstances(input, pattern);
         List<String> expected = List.of("@cli-command@", "@another-example:cli-command@");
         assertEquals(expected, result);
     }
@@ -187,7 +191,8 @@ class MacroUtilsTest {
     void testFindMacroInstancesNoMatch() {
         String input = "Some text without the pattern.";
         String macro = "cli-command";
-        List<String> result = MacroUtils.findMacroInstances(input, macro);
+        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?" + macro + "@");
+        List<String> result = MacroUtils.findMacroInstances(input, pattern);
         assertTrue(result.isEmpty());
     }
 
@@ -195,26 +200,27 @@ class MacroUtilsTest {
     void testFindMacroInstancesDifferentMacro() {
         String input = "Some text @example-cli-command@ more text @another-example:cli-command@ end.";
         String macro = "different-command";
-        List<String> result = MacroUtils.findMacroInstances(input, macro);
+        Pattern pattern = Pattern.compile("@(?:([\\w-]*):)?" + macro + "@");
+        List<String> result = MacroUtils.findMacroInstances(input, pattern);
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void extractMacroGroupParametersTest(){
+    void extractMacroGroupParametersTest() {
         String line = ":exclude-for-languages:groovy";
         String macro = "exclude-for-languages";
-        List<String> result = MacroUtils.extractMacroGroupParameters(line,macro);
+        List<String> result = MacroUtils.extractMacroGroupParameters(line, macro);
         assertEquals("groovy", result.get(0));
 
         line = ":exclude-for-languages:groovy,java";
         macro = "exclude-for-languages";
-        result = MacroUtils.extractMacroGroupParameters(line,macro);
+        result = MacroUtils.extractMacroGroupParameters(line, macro);
         assertEquals("groovy", result.get(0));
         assertEquals("java", result.get(1));
 
         line = ":exclude-for-languages:";
         macro = "exclude-for-languages";
-        result = MacroUtils.extractMacroGroupParameters(line,macro);
+        result = MacroUtils.extractMacroGroupParameters(line, macro);
         assertEquals(0, result.size());
     }
 }
