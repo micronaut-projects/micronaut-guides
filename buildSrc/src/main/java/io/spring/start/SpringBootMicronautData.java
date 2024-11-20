@@ -58,6 +58,16 @@ public class SpringBootMicronautData implements Feature {
                 .versionProperty(MICRONAUT_VERSION)
                 .compile()
                 .pom());
+
+        generatorContext.addDependency(MicronautDependencyUtils.platformDependency()
+                .artifactId("micronaut-platform")
+                .version(micronautVersion)
+                .versionProperty(MICRONAUT_VERSION)
+                .annotationProcessor()
+                .pom());
+
+
+
         generatorContext.addDependency(MicronautDependencyUtils.dataDependency()
                 .artifactId("micronaut-data-processor")
                 .version(VersionInfo.getBomVersion("micronaut.data"))
@@ -93,6 +103,10 @@ public class SpringBootMicronautData implements Feature {
                 .artifactId("micronaut-jdbc-hikari")
                 .compile());
 
+        generatorContext.addDependency(Dependency.builder().groupId("com.zaxxer")
+                .artifactId("HikariCP")
+                .version(VersionInfo.getDependencyVersions().get("hikari.version"))
+                .compile());
         if (generatorContext.getFeatures().isFeaturePresent(H2.class)) {
             generatorContext.getConfiguration().addNested(Map.of(
                     "datasources.default.url", "jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
