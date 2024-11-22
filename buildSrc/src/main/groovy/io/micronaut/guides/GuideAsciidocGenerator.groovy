@@ -39,7 +39,7 @@ class GuideAsciidocGenerator {
     private static final String CLI_FUNCTION = 'create-function-app'
     private static final String CLI_CLI = 'create-cli-app'
 
-    public static final int DEFAULT_MIN_JDK = 17
+    public static final int DEFAULT_MIN_JDK = 21
     public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
     public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
@@ -164,7 +164,7 @@ class GuideAsciidocGenerator {
             text = text.replace("@languageextension@", guidesOption.language.extension)
             text = text.replace("@testsuffix@", guidesOption.testFramework == SPOCK ? 'Spec' : 'Test')
             text = text.replace("@sourceDir@", projectName)
-            text = text.replace("@minJdk@", metadata.minimumJavaVersion()?.toString() ?: "17")
+            text = text.replace("@minJdk@", metadata.minimumJavaVersion()?.toString() ?: "21")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
 
             text = text.replaceAll(~/@([\w-]*):?cli-command@/) { List<String> matches ->

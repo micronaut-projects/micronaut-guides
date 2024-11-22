@@ -21,8 +21,8 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.security.authentication.UsernamePasswordCredentials
+import io.micronaut.security.token.jwt.validator.ReactiveJsonWebTokenValidator
 import io.micronaut.security.token.render.AccessRefreshToken
-import io.micronaut.security.token.jwt.validator.JwtTokenValidator
 import io.micronaut.security.token.Claims;
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import reactor.core.publisher.Flux
@@ -45,7 +45,7 @@ class LoginLdapSpec extends Specification {
 
     @Shared
     @Inject
-    JwtTokenValidator tokenValidator // <3>
+    ReactiveJsonWebTokenValidator tokenValidator // <3>
 
     void '/login with valid credentials returns 200 and access token and refresh token'() {
         when:

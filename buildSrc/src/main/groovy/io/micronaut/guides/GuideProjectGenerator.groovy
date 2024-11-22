@@ -31,7 +31,6 @@ import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.SPOCK
-import static io.micronaut.starter.options.JdkVersion.JDK_17
 import static io.micronaut.starter.options.JdkVersion.JDK_21
 import static io.micronaut.starter.options.Language.GROOVY
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
@@ -48,7 +47,7 @@ class GuideProjectGenerator implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_17, JDK_21]
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_21]
     public static final String LICENSEHEADER = "LICENSEHEADER"
 
     private final ApplicationContext applicationContext
