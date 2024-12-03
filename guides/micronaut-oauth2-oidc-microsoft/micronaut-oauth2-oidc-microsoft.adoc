@@ -23,6 +23,12 @@ image::microsoft-identity-platform/microsoft-identity-platform-1.png[]
 
 image::microsoft-identity-platform/microsoft-identity-platform-client-id.png[]
 
+=== Tenancy
+
+Click on Endpoints and annotate the Tenant - highlighted in the red in the following screenshot:
+
+image::microsoft-identity-platform/oidc-microsoft-endpoints.png[]
+
 === Client Secret
 
 Create a client secret:
@@ -33,11 +39,25 @@ image::microsoft-identity-platform/microsoft-identity-platform-2.png[]
 
 image::microsoft-identity-platform/microsoft-identity-platform-client-secret.png[]
 
+=== Token Login Hint
+
+Enable the `login_hint` token which is used for https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc#send-a-sign-out-request[sending a sign-out request].
+
+____
+Enables sign-out to occur without prompting the user to select an account. To use logout_hint, enable the login_hint optional claim in your client application and use the value of the `login_hint` optional claim as the `logout_hint` parameter.
+____
+
+image::microsoft-identity-platform/oidc_microsoft_token_login_hint.png[]
+
 common:create-app.adoc[]
 
 === Dependencies
 
+:leveloffset: +2
+
 common:micronaut-views-thymeleaf.adoc[]
+
+== Security Dependencies
 
 To use OAuth 2.0 integration in your Micronaut application, add the following dependency:
 
@@ -46,6 +66,8 @@ dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
 Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support] dependencies:
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+:leveloffset: 0
 
 === Configuration
 
@@ -61,29 +83,16 @@ callout:authentication-idtoken[number=1,arg0=Microsoft]
 <6> Accept GET request to the `/logout` endpoint.
 <7> Disable issuer claim validation
 
-The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, and `OAUTH_TENANT` environment variables.
 
 [soruce, bash]
 ----
 export OAUTH_CLIENT_ID=XXXXXXXXXX
 export OAUTH_CLIENT_SECRET=YYYYYYYYYY
+export OAUTH_TENANT=ZZZZZZZ
 ----
 
 Check Microsoft https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration[.well-known/openid-configuration documentation].
-
-
-=== Disable issuer claim validation
-
-The received ID token issuer does not match `https://login.microsoftonline.com/common/v2.0` as the issuer. You can disable the default issuer claim validation via a bean replacement:
-
-source:IdTokenClaimsValidatorReplacement[]
-
-and the following configuration setting:
-
-[source, properties]
-----
-micronaut.security.oauth2.openid.claims-validation.issuer=false
-----
 
 === Authorization Code Flow
 
