@@ -2,17 +2,17 @@
 
 == Generate a Micronaut Application Native Executable with GraalVM
 
-We will use https://www.graalvm.org/[GraalVM], the polyglot embeddable virtual machine, to generate a native executable of our Micronaut application.
+We will use https://www.graalvm.org/[GraalVM], an advanced JDK with ahead-of-time Native Image compilation, to generate a native executable of this Micronaut application.
 
-Compiling native executables ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.
+Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces the memory footprint of JVM-based applications.
 
 NOTE: Only Java and Kotlin projects support using GraalVM's `native-image` tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
 
-=== GraalVM installation
+=== GraalVM Installation
 
 common:install-graalvm-sdkman.adoc[]
 
-=== Native executable generation
+=== Native Executable Generation
 
 :exclude-for-build:maven
 
@@ -34,13 +34,13 @@ graalvmNative {
     binaries {
         main {
             imageName.set('mn-graalvm-application') // <1>
-            buildArgs.add('--verbose') // <2>
+            buildArgs.add('-Ob') // <2>
         }
     }
 }
 ----
 <1> The native executable name will now be `mn-graalvm-application`
-<2> It is possible to pass extra arguments to build the native executable
+<2> It is possible to pass extra build arguments to `native-image`. For example, `-Ob` enables the quick build mode.
 
 :exclude-for-build:
 
@@ -54,6 +54,28 @@ To generate a native executable using Maven, run:
 ----
 
 The native executable is created in the `target` directory and can be run with `target/micronautguide`.
+
+It is possible to customize the name of the native executable or pass additional build arguments using the https://graalvm.github.io/native-build-tools/latest/maven-plugin.html[Maven plugin for GraalVM Native Image building]. Declare the plugin as following:
+
+.pom.xml
+[source,xml]
+----
+<plugin>
+    <groupId>org.graalvm.buildtools</groupId>
+    <artifactId>native-maven-plugin</artifactId>
+    <version>0.10.3</version>
+    <configuration>
+        <!-- <1> -->
+        <imageName>mn-graalvm-application</imageName> <1>
+        <buildArgs>
+	      <!-- <2> -->
+          <buildArg>-Ob</buildArg>
+        </buildArgs>
+    </configuration>
+</plugin>
+----
+<1> The native executable name will now be `mn-graalvm-application`.
+<2> It is possible to pass extra build arguments to `native-image`. For example, `-Ob` enables the quick build mode.
 
 :exclude-for-build:
 

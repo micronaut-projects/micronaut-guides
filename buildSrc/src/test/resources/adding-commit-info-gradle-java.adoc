@@ -203,53 +203,50 @@ To run the application, use the `./gradlew run` command, which starts the applic
 
 == Generate a Micronaut Application Native Executable with GraalVM
 
-We will use https://www.graalvm.org/[GraalVM], the polyglot embeddable virtual machine, to generate a native executable of our Micronaut application.
+We will use https://www.graalvm.org/[GraalVM], an advanced JDK with ahead-of-time Native Image compilation, to generate a native executable of this Micronaut application.
 
-Compiling native executables ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.
+Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces the memory footprint of JVM-based applications.
 
 NOTE: Only Java and Kotlin projects support using GraalVM's `native-image` tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
 
-=== GraalVM installation
+=== GraalVM Installation
 
 // Start: src/docs/common/snippets/common-install-graalvm-sdkman.adoc
-The easiest way to install https://www.graalvm.org[GraalVM] on Linux or Mac is to use https://sdkman.io/[SDKMan.io].
+The easiest way to install https://www.graalvm.org[GraalVM] on Linux or Mac is to use https://sdkman.io/[SDKMAN!].
 
 [source, bash]
-.Java 17
+.Java 21
 ----
-sdk install java 17.0.12-graal
+sdk install java 21.0.5-graal
 ----
 
 [source, bash]
-.Java 17
+.Java 21
 ----
-sdk use java 17.0.12-graal
+sdk use java 21.0.5-graal
 ----
 
-For installation on Windows, or for manual installation on Linux or Mac, see the https://www.graalvm.org/latest/docs/getting-started/[GraalVM Getting Started] documentation.
-
+For installation on Windows, or for a manual installation on Linux or Mac, see the https://www.graalvm.org/latest/docs/getting-started/[GraalVM Getting Started] documentation.
 
 The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the https://www.oracle.com/downloads/licenses/graal-free-license.html[GraalVM Free Terms and Conditions].
 
 Alternatively, you can use the https://github.com/graalvm/graalvm-ce-builds/releases/[GraalVM Community Edition]:
 
 [source, bash]
-.Java 17
+.Java 21
 ----
-sdk install java 17.0.9-graalce
+sdk install java 21.0.5-graalce
 ----
 
 [source, bash]
-.Java 17
+.Java 21
 ----
-sdk use java 17.0.9-graalce
+sdk use java 21.0.5-graalce
 ----
-
 
 // End: src/docs/common/snippets/common-install-graalvm-sdkman.adoc
 
-=== Native executable generation
-
+=== Native Executable Generation
 
 To generate a native executable using Gradle, run:
 
@@ -269,18 +266,15 @@ graalvmNative {
     binaries {
         main {
             imageName.set('mn-graalvm-application') // <1>
-            buildArgs.add('--verbose') // <2>
+            buildArgs.add('-Ob') // <2>
         }
     }
 }
 ----
 <1> The native executable name will now be `mn-graalvm-application`
-<2> It is possible to pass extra arguments to build the native executable
-
-
+<2> It is possible to pass extra build arguments to `native-image`. For example, `-Ob` enables the quick build mode.
 
 // End: src/docs/common/snippets/common-graal-with-plugins.adoc
-
 
 Annotate the `Application` class with `@Introspected`. This won't be necessary in a real world application because there
 will be Micronaut beans defined (something annotated with `@Singleton`, `@Controller`,...), but for this case we need to
@@ -316,7 +310,7 @@ curl localhost:8080/info
 
 
 // Start: src/docs/common/snippets/common-next.adoc
-== Next steps
+== Next Steps
 
 Explore more features with https://micronaut.io/guides/[Micronaut Guides].
 // End: src/docs/common/snippets/common-next.adoc
