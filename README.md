@@ -329,7 +329,7 @@ common:next.adoc[]
 
 TODO or a personalised guide for the guide:
 
-== Next steps
+== Next Steps
 
 TODO: link to the documentation modules you used in the guide
 
