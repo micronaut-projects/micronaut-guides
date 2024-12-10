@@ -126,11 +126,11 @@
 <li><a href="#running-the-cli-app">7. Running the CLI App</a></li>
 <li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">8. Generate a Micronaut Application Native Executable with GraalVM</a>
 <ul class="sectlevel2">
-<li><a href="#graalvm-installation">8.1. GraalVM installation</a></li>
-<li><a href="#native-executable-generation">8.2. Native executable generation</a></li>
+<li><a href="#graalvm-installation">8.1. GraalVM Installation</a></li>
+<li><a href="#native-executable-generation">8.2. Native Executable Generation</a></li>
 </ul>
 </li>
-<li><a href="#next-steps">9. Next steps</a></li>
+<li><a href="#next-steps">9. Next Steps</a></li>
 <li><a href="#help-with-the-micronaut-framework">10. Help with the Micronaut Framework</a></li>
 <li><a href="#license">11. License</a></li>
 </ul>
@@ -501,10 +501,10 @@ Generates a Json Web Key (JWT) with RS256 algorithm.
 <h2 id="generate-a-micronaut-application-native-executable-with-graalvm">8. Generate a Micronaut Application Native Executable with GraalVM</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, the polyglot embeddable virtual machine, to generate a native executable of our Micronaut application.</p>
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, an advanced JDK with ahead-of-time Native Image compilation, to generate a native executable of this Micronaut application.</p>
 </div>
 <div class="paragraph">
-<p>Compiling native executables ahead of time with GraalVM improves startup time and reduces the memory footprint of JVM-based applications.</p>
+<p>Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces the memory footprint of JVM-based applications.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -519,7 +519,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </table>
 </div>
 <div class="sect2">
-<h3 id="graalvm-installation">8.1. GraalVM installation</h3>
+<h3 id="graalvm-installation">8.1. GraalVM Installation</h3>
 <div class="paragraph">
 <p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
 </div>
@@ -530,7 +530,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 </div>
 <div class="paragraph">
-<p>For installation on Windows, or for manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+<p>For installation on Windows, or for a manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
 </div>
 <div class="paragraph">
 <p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
@@ -546,7 +546,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 </div>
 <div class="sect2">
-<h3 id="native-executable-generation">8.2. Native executable generation</h3>
+<h3 id="native-executable-generation">8.2. Native Executable Generation</h3>
 <div class="paragraph">
 <p>To generate a native executable using Maven, run:</p>
 </div>
@@ -558,11 +558,44 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="paragraph">
 <p>The native executable is created in the <code>target</code> directory and can be run with <code>target/micronautguide</code>.</p>
 </div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native executable or pass additional build arguments using the <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html">Maven plugin for GraalVM Native Image building</a>. Declare the plugin as following:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;plugin&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.graalvm.buildtools<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>native-maven-plugin<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;version&gt;</span>0.10.3<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;configuration&gt;</span>
+        <span class="comment">&lt;!-- &lt;1&gt; --&gt;</span>
+        <span class="tag">&lt;imageName&gt;</span>mn-graalvm-application<span class="tag">&lt;/imageName&gt;</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="tag">&lt;buildArgs&gt;</span>
+              <span class="comment">&lt;!-- &lt;2&gt; --&gt;</span>
+          <span class="tag">&lt;buildArg&gt;</span>-Ob<span class="tag">&lt;/buildArg&gt;</span>
+        <span class="tag">&lt;/buildArgs&gt;</span>
+    <span class="tag">&lt;/configuration&gt;</span>
+<span class="tag">&lt;/plugin&gt;</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native executable name will now be <code>mn-graalvm-application</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra build arguments to <code>native-image</code>. For example, <code>-Ob</code> enables the quick build mode.</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">9. Next steps</h2>
+<h2 id="next-steps">9. Next Steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Read <a href="https://picocli.info">Picocli</a> documentation.</p>
