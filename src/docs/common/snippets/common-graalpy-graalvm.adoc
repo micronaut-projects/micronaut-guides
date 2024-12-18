@@ -1,0 +1,69 @@
+:exclude-for-languages:groovy
+
+== Python Runtime Compilation
+
+When using the GraalVM JDK, Python code executed with the GraalPy engine is just-in-time compiled.
+With other JDKs, the Python code is interpreted, resulting in reduced performance.
+
+The easiest way to install https://www.graalvm.org[GraalVM] on Linux or Mac is to use https://sdkman.io/[SDKMan.io].
+
+[source, bash]
+.Java 23
+----
+sdk install java 23-graal
+----
+
+For installation on Windows, or for a manual installation on Linux or Mac, see the https://www.graalvm.org/latest/docs/getting-started/[GraalVM Getting Started] documentation.
+
+The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the https://www.oracle.com/downloads/licenses/graal-free-license.html[GraalVM Free Terms and Conditions].
+
+Alternatively, you can use the https://github.com/graalvm/graalvm-ce-builds/releases/[GraalVM Community Edition]:
+
+[source, bash]
+.Java 23
+----
+sdk install java 23-graalce
+----
+
+=== GraalVM JDK Compatibility
+
+To enable runtime compilation, you must use versions of GraalPy and the Polyglot API dependencies that are compatible with the specified GraalVM JDK version. If you see errors like the following:
+
+[source, bash]
+----
+Your Java runtime '23.0.1+11-jvmci-b01' with compiler version '24.1.1' is incompatible with polyglot version '24.1.0'.
+----
+
+You need to override the versions of the following dependencies according to the error message:
+
+[source, text]
+----
+org.graalvm.polyglot:polyglot
+org.graalvm.python:python
+org.graalvm.python:python-embedding
+org.graalvm.python:graalpy-maven-plugin
+----
+
+== Generate a Micronaut Application Native Executable with GraalVM
+
+Starting with GraalVM for JDK 23, Micronaut applications that use GraalPy or any Truffle language can be compiled into native executables using GraalVM Native Image.
+
+Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces
+the memory footprint of JVM-based applications.
+
+=== Native Image Configuration
+GraalVM Native Image compilation requires metadata to correctly run code that uses https://www.graalvm.org/latest/reference-manual/native-image/metadata/#dynamic-proxy[dynamic proxies].
+
+Create a proxy configuration file:
+resource:META-INF/native-image/proxy-config.json[]
+
+=== Native Executable Generation
+
+To generate a native executable using Maven, run:
+
+[source, bash]
+----
+./mvnw package -Dpackaging=native-image
+----
+
+The native executable is created in the _target_ directory and can be run with `./target/micronautguide`.
