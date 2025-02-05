@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Micronaut JWT Authentication</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-security-jwt.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Micronaut JWT Authentication"/>
+    <meta name="twitter:description" content="Learn how to secure a Micronaut application using JWT (JSON Web Token) Authentication."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-security-jwt.html">Micronaut JWT Authentication</a> » <span class="breadcrumb_last" aria-current="page">gradle | kotlin</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#configuration">4.1. Configuration</a></li>
+<li><a href="#authentication-provider">4.2. Authentication Provider</a></li>
+<li><a href="#controller">4.3. Controller</a></li>
+</ul>
+</li>
+<li><a href="#tests">5. Tests</a>
+<ul class="sectlevel2">
+<li><a href="#use-the-micronaut-http-client-and-jwt">5.1. Use the Micronaut HTTP Client and JWT</a></li>
+</ul>
+</li>
+<li><a href="#issuing-a-refresh-token">6. Issuing a Refresh Token</a>
+<ul class="sectlevel2">
+<li><a href="#save-refresh-token">6.1. Save Refresh Token</a></li>
+<li><a href="#refresh-controller">6.2. Refresh Controller</a></li>
+<li><a href="#test-refresh-token">6.3. Test Refresh Token</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">7. Testing the Application</a></li>
+<li><a href="#running-the-application">8. Running the Application</a></li>
+<li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">9. Generate a Micronaut Application Native Executable with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#graalvm-installation">9.1. GraalVM Installation</a></li>
+<li><a href="#native-executable-generation">9.2. Native Executable Generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">10. Next Steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">11. Help with the Micronaut Framework</a></li>
+<li><a href="#license">12. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Micronaut JWT Authentication</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to secure a Micronaut application using JWT (JSON Web Token) Authentication.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.6.3</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Micronaut framework ships with security capabilities based on <a href="https://jwt.io/">Json Web Token (JWT)</a>. JWT is an <a href="https://tools.ietf.org/html/rfc7519">IETF standard</a> which defines a secure way to encapsulate arbitrary data that can be sent over unsecure URLs.</p>
+</div>
+<div class="paragraph">
+<p>In this guide you will create a Micronaut application written in Kotlin and secure it with JWT.</p>
+</div>
+<div class="paragraph">
+<p>The following sequence illustrates the authentication flow:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/jwt-bearer-token.svg" alt="jwt bearer token">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-security-jwt-gradle-kotlin.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
+    --features=security-jwt,data-jdbc,reactor,validation,graalvm \
+    --build=gradle \
+    --lang=kotlin \
+    --test=junit</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>security-jwt</code>, <code>data-jdbc</code>, <code>reactor</code>, <code>validation</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut.io/launch?features=security-jwt&amp;features=data-jdbc&amp;features=reactor&amp;features=validation&amp;features=graalvm&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="configuration">4.1. Configuration</h3>
+<div class="paragraph">
+<p>Note the following configuration in the generated <code>application.properties</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+micronaut.security.authentication=bearer
+<i class="conum" data-value="2"></i><b>(2)</b>
+micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;'</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set <code>authentication</code> to <code>bearer</code> to receive a JSON response from the login endpoint.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Change this to your own secret and keep it safe (do not store this in your VCS).</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="authentication-provider">4.2. Authentication Provider</h3>
+<div class="paragraph">
+<p>To keep this guide simple, create a naive <code>AuthenticationProvider</code> to simulate user&#8217;s authentication.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/AuthenticationProviderUserPassword.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.HttpRequest
+import io.micronaut.security.authentication.AuthenticationFailureReason
+import io.micronaut.security.authentication.AuthenticationRequest
+import io.micronaut.security.authentication.AuthenticationResponse
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider
+import jakarta.inject.Singleton
+
+@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
+class AuthenticationProviderUserPassword&lt;B&gt; : HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    override fun authenticate(
+        httpRequest: HttpRequest&lt;B&gt;?,
+        authenticationRequest: AuthenticationRequest&lt;String, String&gt;
+    ): AuthenticationResponse {
+        return if (authenticationRequest.identity == &quot;sherlock&quot; &amp;&amp; authenticationRequest.secret == &quot;password&quot;)
+            AuthenticationResponse.success(authenticationRequest.identity) else
+            AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A Micronaut Authentication Provider implements the interface <code>io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controller">4.3. Controller</h3>
+<div class="paragraph">
+<p>Create <code>HomeController</code> which resolves the base URL <code>/</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/HomeController.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Produces
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
+import java.security.Principal
+
+@Secured(SecurityRule.IS_AUTHENTICATED) <i class="conum" data-value="1"></i><b>(1)</b>
+@Controller <i class="conum" data-value="2"></i><b>(2)</b>
+class HomeController {
+
+    @Produces(TEXT_PLAIN)
+    @Get <i class="conum" data-value="3"></i><b>(3)</b>
+    fun index(principal: Principal): String = principal.name <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate with <code>io.micronaut.security.Secured</code> to configure secured access. The <code>isAuthenticated()</code> expression will allow access only to authenticated users.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate with <code>io.micronaut.http.annotation.Controller</code> to designate the class as a Micronaut controller.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the <code>io.micronaut.http.annotation.Get</code> annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>If a user is authenticated, the Micronaut framework will bind the user object to an argument of type <code>java.security.Principal</code> (if present).</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tests">5. Tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a test to verify a user is able to login and access a secured endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/JwtAuthenticationTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import com.nimbusds.jwt.JWTParser
+import com.nimbusds.jwt.SignedJWT
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus.OK
+import io.micronaut.http.HttpStatus.UNAUTHORIZED
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.security.authentication.UsernamePasswordCredentials
+import io.micronaut.security.token.render.BearerAccessRefreshToken
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
+@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
+class JwtAuthenticationTest(@Client(&quot;/&quot;) val client: HttpClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Test
+    fun accessingASecuredUrlWithoutAuthenticatingReturnsUnauthorized() {
+        val e = assertThrows(HttpClientResponseException::class.java) {
+            client.toBlocking().exchange&lt;Any, Any&gt;(HttpRequest.GET&lt;Any&gt;(&quot;/&quot;).accept(TEXT_PLAIN)) <i class="conum" data-value="3"></i><b>(3)</b>
+        }
+        assertEquals(UNAUTHORIZED, e.status) <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+    @Test
+    fun uponSuccessfulAuthenticationAJsonWebTokenIsIssuedToTheUser() {
+        val creds = UsernamePasswordCredentials(&quot;sherlock&quot;, &quot;password&quot;)
+        val request: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/login&quot;, creds) <i class="conum" data-value="4"></i><b>(4)</b>
+        val rsp: HttpResponse&lt;BearerAccessRefreshToken&gt; =
+            client.toBlocking().exchange(request, BearerAccessRefreshToken::class.java) <i class="conum" data-value="5"></i><b>(5)</b>
+        assertEquals(OK, rsp.status)
+
+        val bearerAccessRefreshToken: BearerAccessRefreshToken = rsp.body()
+        assertEquals(&quot;sherlock&quot;, bearerAccessRefreshToken.username)
+        assertNotNull(bearerAccessRefreshToken.accessToken)
+        assertTrue(JWTParser.parse(bearerAccessRefreshToken.accessToken) is SignedJWT)
+
+        val accessToken: String = bearerAccessRefreshToken.accessToken
+        val requestWithAuthorization = HttpRequest.GET&lt;Any&gt;(&quot;/&quot;)
+            .accept(TEXT_PLAIN)
+            .bearerAuth(accessToken) <i class="conum" data-value="6"></i><b>(6)</b>
+        val response: HttpResponse&lt;String&gt; = client.toBlocking().exchange(requestWithAuthorization, String::class.java)
+
+        assertEquals(OK, rsp.status)
+        assertEquals(&quot;sherlock&quot;, response.body()) <i class="conum" data-value="7"></i><b>(7)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>When you include the security dependencies, security is considered enabled and every endpoint is secured by default.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>To login, do a POST request to <code>/login</code> with your credentials as a JSON payload in the body of the request.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The Framework makes it easy to bind JSON responses into Java objects.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The Framework supports <a href="https://tools.ietf.org/html/rfc6750">RFC 6750 Bearer Token</a> specification out-of-the-box. We supply the JWT token in the <code>Authorization</code> HTTP Header.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Use <code>.body()</code> to retrieve the parsed payload.</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="use-the-micronaut-http-client-and-jwt">5.1. Use the Micronaut HTTP Client and JWT</h3>
+<div class="paragraph">
+<p>To access a secured endpoint, you can also use a Micronaut HTTP Client and supply the JWT token in the Authorization header.</p>
+</div>
+<div class="paragraph">
+<p>First create a <code>@Client</code> with a method <code>home</code> which accepts an <code>Authorization</code> HTTP Header.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/AppClient.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.HttpHeaders.AUTHORIZATION
+import io.micronaut.http.MediaType.TEXT_PLAIN
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Consumes
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Header
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.security.authentication.UsernamePasswordCredentials
+import io.micronaut.security.token.render.BearerAccessRefreshToken
+
+@Client(&quot;/&quot;)
+interface AppClient {
+
+    @Post(&quot;/login&quot;)
+    fun login(@Body credentials: UsernamePasswordCredentials): BearerAccessRefreshToken
+
+    @Consumes(TEXT_PLAIN)
+    @Get
+    fun home(@Header(AUTHORIZATION) authorization: String): String
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a test which uses the previous <code>@Client</code></p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/DeclarativeHttpClientWithJwtTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import com.nimbusds.jwt.JWTParser
+import com.nimbusds.jwt.SignedJWT
+import io.micronaut.security.authentication.UsernamePasswordCredentials
+import io.micronaut.security.token.render.BearerAccessRefreshToken
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
+@MicronautTest
+class DeclarativeHttpClientWithJwtTest {
+
+    @Inject
+    lateinit var appClient: AppClient <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Test
+    fun verifyJwtAuthenticationWorksWithDeclarativeClient() {
+        val creds: UsernamePasswordCredentials = UsernamePasswordCredentials(&quot;sherlock&quot;, &quot;password&quot;)
+        val loginRsp: BearerAccessRefreshToken = appClient.login(creds) <i class="conum" data-value="2"></i><b>(2)</b>
+
+        assertNotNull(loginRsp)
+        assertNotNull(loginRsp.accessToken)
+        assertTrue(JWTParser.parse(loginRsp.accessToken) is SignedJWT)
+
+        val msg = appClient.home(&quot;Bearer ${loginRsp.accessToken}&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
+        assertEquals(&quot;sherlock&quot;, msg)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Inject <code>AppClient</code> bean from the application context.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>To login, do a POST request to <code>/login</code> with your credentials as a JSON payload in the body of the request.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Supply the JWT to the HTTP <code>Authorization</code> header value to the <code>@Client</code> method.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="issuing-a-refresh-token">6. Issuing a Refresh Token</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Access tokens expire. You can control the expiration with <code>micronaut.security.token.jwt.generator.access-token.expiration</code>. In addition to the access token, you can configure your login endpoint to also return a refresh token. You can use the refresh token to obtain a new access token.</p>
+</div>
+<div class="paragraph">
+<p>First, add the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+micronaut.security.token.jwt.generator.refresh-token.secret=&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;'</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>To generate a refresh token your application must have beans of type:
+<a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/generator/RefreshTokenGenerator.html">RefreshTokenGenerator</a>,
+<a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/validator/RefreshTokenValidator.html">RefreshTokenValidator</a>, and
+<a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/refresh/RefreshTokenPersistence.html">RefreshTokenPersistence</a>.
+We will deal with the latter in the next section. For the generator and validator, Micronaut Security ships with
+<a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/jwt/generator/SignedRefreshTokenGenerator.html">SignedRefreshTokenGenerator</a>.
+It creates and verifies a JWS (JSON web signature) encoded object whose payload is a UUID with a hash-based message authentication
+code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator</code> which implements both <code>RefreshTokenGenerator</code> and <code>RefreshTokenValidator</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a test to verify the login endpoint responds both access and refresh token:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/LoginIncludesRefreshTokenTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import com.nimbusds.jwt.JWTParser
+import com.nimbusds.jwt.SignedJWT
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.security.authentication.UsernamePasswordCredentials
+import io.micronaut.security.token.render.BearerAccessRefreshToken
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
+@MicronautTest
+class LoginIncludesRefreshTokenTest(@Client(&quot;/&quot;) val client: HttpClient) {
+
+    @Test
+    fun uponSuccessfulAuthenticationUserGetsAccessTokenAndRefreshToken() {
+        val creds = UsernamePasswordCredentials(&quot;sherlock&quot;, &quot;password&quot;)
+        val request: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/login&quot;, creds)
+        val rsp: BearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
+
+        assertEquals(&quot;sherlock&quot;, rsp.username)
+        assertNotNull(rsp.accessToken)
+        assertNotNull(rsp.refreshToken) <i class="conum" data-value="1"></i><b>(1)</b>
+
+        assertTrue(JWTParser.parse(rsp.accessToken) is SignedJWT)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>A refresh token is returned.</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="save-refresh-token">6.1. Save Refresh Token</h3>
+<div class="paragraph">
+<p>We may want to save a refresh token issued by the application, for example, to revoke a user&#8217;s refresh tokens, so that a particular user cannot obtain a new access token, and thus access the application&#8217;s endpoints.</p>
+</div>
+<div class="paragraph">
+<p>Persist the refresh tokens with help of <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/">Micronaut Data</a>.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Micronaut Data is a database access toolkit that uses Ahead of Time (AoT) compilation to pre-compute queries for repository interfaces that are then executed by a thin, lightweight runtime layer.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>In particular, use Micronaut JDBC</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Micronaut Data JDBC is an implementation that pre-computes native SQL queries (given a particular database dialect) and provides a repository implementation that is a simple data mapper between a JDBC ResultSet and an object.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>The <code>data-jdbc</code> feature adds the following dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">kapt(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut:micronaut-data-processor</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.data:micronaut-data-jdbc</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.sql:micronaut-jdbc-hikari</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+runtimeOnly(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.h2database:h2</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Micronaut data is a build time tool. You need to add the build time annotation processor</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Add the Micronaut Data JDBC dependency</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Add a Hikari connection pool</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Add a JDBC driver. Add <a href="https://www.h2database.com/html/main.html">H2</a> driver</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create an entity to save the issued Refresh Tokens.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/RefreshTokenEntity.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+*/
+
+import io.micronaut.data.annotation.DateCreated
+import io.micronaut.data.annotation.GeneratedValue
+import io.micronaut.data.annotation.Id
+import io.micronaut.data.annotation.MappedEntity
+import java.time.Instant
+import jakarta.validation.constraints.NotBlank
+
+@MappedEntity <i class="conum" data-value="1"></i><b>(1)</b>
+data class RefreshTokenEntity(
+
+    @field:Id <i class="conum" data-value="2"></i><b>(2)</b>
+    @GeneratedValue <i class="conum" data-value="3"></i><b>(3)</b>
+    var id: Long? = null,
+
+    @NotBlank
+    var username: String,
+
+    @NotBlank
+    var refreshToken: String,
+
+    var revoked: Boolean,
+
+    @DateCreated <i class="conum" data-value="4"></i><b>(4)</b>
+    var dateCreated: Instant? = null
+)
+
+
+import io.micronaut.data.annotation.DateCreated
+import io.micronaut.data.annotation.GeneratedValue
+import io.micronaut.data.annotation.Id
+import io.micronaut.data.annotation.MappedEntity
+import java.time.Instant
+import jakarta.validation.constraints.NotBlank
+
+@MappedEntity <i class="conum" data-value="1"></i><b>(1)</b>
+data class RefreshTokenEntity(
+
+    @field:Id <i class="conum" data-value="2"></i><b>(2)</b>
+    @GeneratedValue <i class="conum" data-value="3"></i><b>(3)</b>
+    var id: Long? = null,
+
+    @NotBlank
+    var username: String,
+
+    @NotBlank
+    var refreshToken: String,
+
+    var revoked: Boolean,
+
+    @DateCreated <i class="conum" data-value="4"></i><b>(4)</b>
+    var dateCreated: Instant? = null
+
+)</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Specifies the entity is mapped to the database</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specifies that the property value is generated by the database and not included in inserts</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Allows assigning a data created value (such as a <code>java.time.Instant</code>) prior to an insert</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a <a href="https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/repository/CrudRepository.html">CrudRepository</a> to include methods to peform Create, Read, Updated and Delete operations with the <code>RefreshTokenEntity</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/RefreshTokenRepository.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.data.jdbc.annotation.JdbcRepository
+import io.micronaut.data.model.query.builder.sql.Dialect.H2
+import io.micronaut.data.repository.CrudRepository
+import java.util.Optional
+import jakarta.transaction.Transactional
+import jakarta.validation.constraints.NotBlank
+
+@JdbcRepository(dialect = H2) <i class="conum" data-value="1"></i><b>(1)</b>
+interface RefreshTokenRepository : CrudRepository&lt;RefreshTokenEntity, Long&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Transactional
+    fun save(@NotBlank username: String,
+             @NotBlank refreshToken: String,
+             revoked: Boolean): RefreshTokenEntity <i class="conum" data-value="3"></i><b>(3)</b>
+
+    fun findByRefreshToken(@NotBlank refreshToken: String): Optional&lt;RefreshTokenEntity&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+
+    fun updateByUsername(@NotBlank username: String,
+                         revoked: Boolean): Long <i class="conum" data-value="5"></i><b>(5)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The interface is annotated with <a href="https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/jdbc/annotation/JdbcRepository.html">@JdbcRepository</a> and specifies a dialect of H2 used to generate queries</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>CrudRepository</code> interface has two generic arguments; the entity type (in this case <code>RefreshTokenEntity</code>) and the ID type (in this case <code>Long</code>)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>When a new refresh token is issued we will use this method to persist it</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Before issuing a new access token, we will use this method to check if the supplied refresh token exists</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>We can revoke the refresh tokens of a particular user with this method</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="refresh-controller">6.2. Refresh Controller</h3>
+<div class="paragraph">
+<p>Enable the <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#refresh">Refresh Controller</a> via configuration and provide an implementation of
+<a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/refresh/RefreshTokenPersistence.html">RefreshTokenPersistence</a>.</p>
+</div>
+<div class="paragraph">
+<p>To enable the refresh controller, create a bean of type
+<a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/refresh/RefreshTokenPersistence.html">RefreshTokenPersistence</a> which leverages the Micronaut Data repository we coded in the previous section:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/CustomRefreshTokenPersistence.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.security.authentication.Authentication
+import io.micronaut.security.errors.IssuingAnAccessTokenErrorCode.INVALID_GRANT
+import io.micronaut.security.errors.OauthErrorResponseException
+import io.micronaut.security.token.event.RefreshTokenGeneratedEvent
+import io.micronaut.security.token.refresh.RefreshTokenPersistence
+import jakarta.inject.Singleton
+import org.reactivestreams.Publisher
+import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
+
+@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
+class CustomRefreshTokenPersistence(private val refreshTokenRepository: RefreshTokenRepository) <i class="conum" data-value="2"></i><b>(2)</b>
+    : RefreshTokenPersistence {
+
+    override fun persistToken(event: RefreshTokenGeneratedEvent?) { <i class="conum" data-value="3"></i><b>(3)</b>
+        if (event?.refreshToken != null &amp;&amp; event.authentication?.name != null) {
+            val payload = event.refreshToken
+            refreshTokenRepository.save(event.authentication.name, payload, false) <i class="conum" data-value="4"></i><b>(4)</b>
+        }
+    }
+
+    override fun getAuthentication(refreshToken: String): Publisher&lt;Authentication&gt; {
+        return Flux.create({ emitter: FluxSink&lt;Authentication&gt; -&gt;
+            val tokenOpt = refreshTokenRepository.findByRefreshToken(refreshToken)
+            if (tokenOpt.isPresent) {
+                val (_, username, _, revoked) = tokenOpt.get()
+                if (revoked) {
+                    emitter.error(OauthErrorResponseException(INVALID_GRANT, &quot;refresh token revoked&quot;, null)) <i class="conum" data-value="5"></i><b>(5)</b>
+                } else {
+                    emitter.next(Authentication.build(username)) <i class="conum" data-value="6"></i><b>(6)</b>
+                    emitter.complete()
+                }
+            } else {
+                emitter.error(OauthErrorResponseException(INVALID_GRANT, &quot;refresh token not found&quot;, null)) <i class="conum" data-value="7"></i><b>(7)</b>
+            }
+        }, FluxSink.OverflowStrategy.ERROR)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Constructor injection of <code>RefreshTokenRepository</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>When a new refresh token is issued, the application emits an event of type <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/event/RefreshTokenGeneratedEvent.html">RefreshTokenGeneratedEvent</a>. We listen for it and save the token in the database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The event contains both the refresh token and the user details associated to the token.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Throw an exception if the token is revoked.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Return the user details associated to the refresh token, e.g. username, roles, attributes, etc.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Throw an exception if the token is not found.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="test-refresh-token">6.3. Test Refresh Token</h3>
+<div class="sect3">
+<h4 id="test-refresh-token-validation">6.3.1. Test Refresh Token Validation</h4>
+<div class="paragraph">
+<p>Refresh tokens issued by <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/jwt/generator/SignedRefreshTokenGenerator.html">SignedRefreshTokenGenerator</a>, the default implementation of <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/generator/RefreshTokenGenerator.html">RefreshTokenGenerator</a>,
+are signed.</p>
+</div>
+<div class="paragraph">
+<p><code>SignedRefreshTokenGenerator</code> implements both <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/generator/RefreshTokenGenerator.html">RefreshTokenGenerator</a>
+and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/validator/RefreshTokenValidator.html">RefreshTokenValidator</a>.</p>
+</div>
+<div class="paragraph">
+<p>The bean of type <code>RefreshTokenValidator</code> is used by the <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#refresh">Refresh Controller</a> to ensure the refresh token supplied is valid.</p>
+</div>
+<div class="paragraph">
+<p>Create a test for this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/UnsignedRefreshTokenTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.core.type.Argument
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpStatus.BAD_REQUEST
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.security.endpoints.TokenRefreshRequest
+import io.micronaut.security.token.render.BearerAccessRefreshToken
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import java.util.Optional
+
+@MicronautTest
+internal class UnsignedRefreshTokenTest(@Client(&quot;/&quot;) val client: HttpClient) {
+
+    @Test
+    fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
+        val unsignedRefreshedToken = &quot;foo&quot; <i class="conum" data-value="1"></i><b>(1)</b>
+        val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
+        val errorArgument = Argument.of(Map::class.java)
+        val e = assertThrows(HttpClientResponseException::class.java) {
+            client.toBlocking().exchange(
+                HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, unsignedRefreshedToken)),
+                bodyArgument,
+                errorArgument)
+        }
+        assertEquals(BAD_REQUEST, e.status)
+
+        val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
+        assertTrue(mapOptional.isPresent)
+
+        val m = mapOptional.get()
+        assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
+        assertEquals(&quot;Refresh token is invalid&quot;, m[&quot;error_description&quot;])
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use an unsigned token</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="test-refresh-token-not-found">6.3.2. Test Refresh Token Not Found</h4>
+<div class="paragraph">
+<p>Create a test to verify that sending a valid refresh token that was not persisted returns HTTP Status 400.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/RefreshTokenNotFoundTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.core.type.Argument
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpStatus.BAD_REQUEST
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.security.authentication.Authentication
+import io.micronaut.security.token.generator.RefreshTokenGenerator
+import io.micronaut.security.endpoints.TokenRefreshRequest
+import io.micronaut.security.token.render.BearerAccessRefreshToken
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import java.util.Optional
+
+@MicronautTest
+class RefreshTokenNotFoundTest(@Client(&quot;/&quot;) val client: HttpClient) {
+
+    @Inject
+    lateinit var refreshTokenGenerator: RefreshTokenGenerator
+
+    @Test
+    fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
+
+        val user = Authentication.build(&quot;sherlock&quot;)
+        val refreshToken = refreshTokenGenerator.createKey(user)
+        val refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
+        assertTrue(refreshTokenOptional.isPresent)
+
+        val signedRefreshToken = refreshTokenOptional.get() <i class="conum" data-value="1"></i><b>(1)</b>
+        val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
+        val errorArgument = Argument.of(MutableMap::class.java)
+        val req: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, signedRefreshToken))
+        val e = assertThrows(HttpClientResponseException::class.java) {
+            client.toBlocking().exchange(req, bodyArgument, errorArgument)
+        }
+        assertEquals(BAD_REQUEST, e.status)
+
+        val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
+        assertTrue(mapOptional.isPresent)
+
+        val m = mapOptional.get()
+        assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
+        assertEquals(&quot;refresh token not found&quot;, m[&quot;error_description&quot;])
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Supply a signed token which was never saved.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="test-refresh-token-revocation">6.3.3. Test Refresh Token Revocation</h4>
+<div class="paragraph">
+<p>Generate a valid refresh token, save it but flag it as revoked. Expect a 400.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/RefreshTokenRevokedTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.context.ApplicationContext
+import io.micronaut.core.type.Argument
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpStatus.BAD_REQUEST
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.runtime.server.EmbeddedServer
+import io.micronaut.security.authentication.Authentication
+import io.micronaut.security.token.generator.RefreshTokenGenerator
+import io.micronaut.security.endpoints.TokenRefreshRequest
+import io.micronaut.security.token.render.BearerAccessRefreshToken
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import java.util.Optional
+
+internal class RefreshTokenRevokedTest {
+
+    val embeddedServer = ApplicationContext.run(EmbeddedServer::class.java, emptyMap())
+    val client = embeddedServer.applicationContext.createBean(HttpClient::class.java, embeddedServer.url)
+    val refreshTokenGenerator = embeddedServer.applicationContext.getBean(RefreshTokenGenerator::class.java)
+    val refreshTokenRepository = embeddedServer.applicationContext.getBean(RefreshTokenRepository::class.java)
+
+    @Test
+    fun accessingSecuredURLWithoutAuthenticatingReturnsUnauthorized() {
+        val user = Authentication.build(&quot;sherlock&quot;)
+        val refreshToken = refreshTokenGenerator.createKey(user)
+        val refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
+        assertTrue(refreshTokenOptional.isPresent)
+
+        val oldTokenCount = refreshTokenRepository.count()
+        val signedRefreshToken = refreshTokenOptional.get()
+        refreshTokenRepository.save(user.name, refreshToken, true) <i class="conum" data-value="1"></i><b>(1)</b>
+        assertEquals(oldTokenCount + 1, refreshTokenRepository.count())
+
+        val bodyArgument = Argument.of(BearerAccessRefreshToken::class.java)
+        val errorArgument = Argument.of(Map::class.java)
+        val e = assertThrows(HttpClientResponseException::class.java) {
+            client.toBlocking().exchange(
+                HttpRequest.POST(&quot;/oauth/access_token&quot;, TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, signedRefreshToken)),
+                bodyArgument,
+                errorArgument)
+        }
+        assertEquals(BAD_REQUEST, e.status)
+
+        val mapOptional: Optional&lt;Map&lt;*, *&gt;&gt; = e.response.getBody(Map::class.java)
+        assertTrue(mapOptional.isPresent)
+
+        val m = mapOptional.get()
+        assertEquals(&quot;invalid_grant&quot;, m[&quot;error&quot;])
+        assertEquals(&quot;refresh token revoked&quot;, m[&quot;error_description&quot;])
+
+        refreshTokenRepository.deleteAll()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Save the token but flag it as revoked</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="test-access-token-refresh">6.3.4. Test Access Token Refresh</h4>
+<div class="paragraph">
+<p>Login, obtain both access token and refresh token, with the refresh token obtain a different access token:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/kotlin/example/micronaut/OauthAccessTokenTest.kt</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.security.authentication.UsernamePasswordCredentials
+import io.micronaut.security.endpoints.TokenRefreshRequest
+import io.micronaut.security.token.render.AccessRefreshToken
+import io.micronaut.security.token.render.BearerAccessRefreshToken
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Test
+
+@MicronautTest(rollback = false)
+internal class OauthAccessTokenTest(@Client(&quot;/&quot;) val client: HttpClient) {
+
+    @Inject
+    lateinit var refreshTokenRepository: RefreshTokenRepository
+
+    @Test
+    fun verifyJWTAccessTokenRefreshWorks() {
+        val username = &quot;sherlock&quot;
+
+        val creds = UsernamePasswordCredentials(username, &quot;password&quot;)
+        val request: HttpRequest&lt;*&gt; = HttpRequest.POST(&quot;/login&quot;, creds)
+
+        val oldTokenCount = refreshTokenRepository.count()
+        val rsp: BearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken::class.java)
+        Thread.sleep(3000)
+        assertEquals(oldTokenCount + 1, refreshTokenRepository.count())
+
+        assertNotNull(rsp.accessToken)
+        assertNotNull(rsp.refreshToken)
+
+        Thread.sleep(1000) // sleep for one second to give time for the issued at `iat` Claim to change
+        val refreshResponse = client.toBlocking().retrieve(HttpRequest.POST(&quot;/oauth/access_token&quot;,
+                TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, rsp.refreshToken)), AccessRefreshToken::class.java) <i class="conum" data-value="1"></i><b>(1)</b>
+
+        assertNotNull(refreshResponse.accessToken)
+        assertNotEquals(rsp.accessToken, refreshResponse.accessToken) <i class="conum" data-value="2"></i><b>(2)</b>
+
+        refreshTokenRepository.deleteAll()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Make a POST request to <code>/oauth/access_token</code> with the refresh token in the JSON payload to get a new access token</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A different access token is retrieved.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">7. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">8. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command, which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>Send a request to the login endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/login&quot; -H 'Content-Type: application/json' -d $'{&quot;username&quot;: &quot;sherlock&quot;,&quot;password&quot;: &quot;password&quot;}'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">access_token</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNDc2NDEzNywicm9sZXMiOltdLCJpc3MiOiJjb21wbGV0ZSIsImV4cCI6MTYxNDc2NzczNywiaWF0IjoxNjE0NzY0MTM3fQ.cn8bOjlccFqeUQA7x7MnfacMNPjSVAtWP65z1c8eaJc</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">refresh_token</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">eyJhbGciOiJIUzI1NiJ9.NDI1ZjAxZTktYTRmYS00MmU5LTllYjctOWU2ZTNhNTI5YmQ1.RUc2iCfZdPQdwg2U0Nw_LLzZQIIDp5_Is2UWeHVZT7E</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">token_type</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Bearer</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">expires_in</span><span class="delimiter">&quot;</span></span>:<span class="integer">3600</span>}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-executable-with-graalvm">9. Generate a Micronaut Application Native Executable with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, an advanced JDK with ahead-of-time Native Image compilation, to generate a native executable of this Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="graalvm-installation">9.1. GraalVM Installation</h3>
+<div class="paragraph">
+<p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.5-graal</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for a manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the <a href="https://github.com/graalvm/graalvm-ce-builds/releases/">GraalVM Community Edition</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.2-graalce</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-executable-generation">9.2. Native Executable Generation</h3>
+<div class="paragraph">
+<p>To generate a native executable using Gradle, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native executable is created in <code>build/native/nativeCompile</code> directory and can be run with <code>build/native/nativeCompile/micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native executable or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">graalvmNative {
+    binaries {
+        main {
+            imageName.set(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">-Ob</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native executable name will now be <code>mn-graalvm-application</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra build arguments to <code>native-image</code>. For example, <code>-Ob</code> enables the quick build mode.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Send the same <code>curl</code> request as before to test that the native executable application works.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">10. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Learn more about JWT Authentication in the <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt">official documentation</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">11. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">12. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
