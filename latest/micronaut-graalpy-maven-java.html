@@ -125,9 +125,20 @@
 </li>
 <li><a href="#testing-the-application">5. Testing the Application</a></li>
 <li><a href="#running-the-application">6. Running the Application</a></li>
-<li><a href="#next-steps">7. Next Steps</a></li>
-<li><a href="#help-with-the-micronaut-framework">8. Help with the Micronaut Framework</a></li>
-<li><a href="#license">9. License</a></li>
+<li><a href="#python-runtime-compilation">7. Python Runtime Compilation</a>
+<ul class="sectlevel2">
+<li><a href="#graalvm-jdk-compatibility">7.1. GraalVM JDK Compatibility</a></li>
+</ul>
+</li>
+<li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">8. Generate a Micronaut Application Native Executable with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#native-image-configuration">8.1. Native Image Configuration</a></li>
+<li><a href="#native-executable-generation">8.2. Native Executable Generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">9. Next Steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">10. Help with the Micronaut Framework</a></li>
+<li><a href="#license">11. License</a></li>
 </ul>
 
                     </div>
@@ -443,7 +454,118 @@ the <a href="https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Value.
 </div>
 </div>
 <div class="sect1">
-<h2 id="next-steps">7. Next Steps</h2>
+<h2 id="python-runtime-compilation">7. Python Runtime Compilation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When using the GraalVM JDK, Python code executed with the GraalPy engine is just-in-time compiled.
+With other JDKs, the Python code is interpreted, resulting in reduced performance.</p>
+</div>
+<div class="paragraph">
+<p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 23</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 23-graal</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for a manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the <a href="https://github.com/graalvm/graalvm-ce-builds/releases/">GraalVM Community Edition</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 23</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 23-graalce</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="graalvm-jdk-compatibility">7.1. GraalVM JDK Compatibility</h3>
+<div class="paragraph">
+<p>To enable runtime compilation, you must use versions of GraalPy and the Polyglot API dependencies that are compatible with the specified GraalVM JDK version. If you see errors like the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">Your Java runtime '23.0.1+11-jvmci-b01' with compiler version '24.1.1' is incompatible with polyglot version '24.1.0'.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You need to override the versions of the following dependencies according to the error message:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">org.graalvm.polyglot:polyglot
+org.graalvm.python:python
+org.graalvm.python:python-embedding
+org.graalvm.python:graalpy-maven-plugin</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-executable-with-graalvm">8. Generate a Micronaut Application Native Executable with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Starting with GraalVM for JDK 23, Micronaut applications that use GraalPy or any Truffle language can be compiled into native executables using GraalVM Native Image.</p>
+</div>
+<div class="paragraph">
+<p>Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces
+the memory footprint of JVM-based applications.</p>
+</div>
+<div class="sect2">
+<h3 id="native-image-configuration">8.1. Native Image Configuration</h3>
+<div class="paragraph">
+<p>GraalVM Native Image compilation requires metadata to correctly run code that uses <a href="https://www.graalvm.org/latest/reference-manual/native-image/metadata/#dynamic-proxy">dynamic proxies</a>.</p>
+</div>
+<div class="paragraph">
+<p>Create a proxy configuration file:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/META-INF/native-image/proxy-config.json</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">[
+  [<span class="string"><span class="delimiter">&quot;</span><span class="content">example.micronaut.HelloModule</span><span class="delimiter">&quot;</span></span>]
+]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-executable-generation">8.2. Native Executable Generation</h3>
+<div class="paragraph">
+<p>To generate a native executable using Maven, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">./mvnw package -Dpackaging=native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native executable is created in the <em>target</em> directory and can be run with <code>./target/micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can execute the endpoint exposed by the native executable:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl localhost:8080/hello</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>Hello World</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">9. Next Steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Read more about <a href="https://micronaut-projects.github.io/micronaut-graal-languages/latest/guide/">Micronaut Graalpy</a> integration.</p>
@@ -451,7 +573,7 @@ the <a href="https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Value.
 </div>
 </div>
 <div class="sect1">
-<h2 id="help-with-the-micronaut-framework">8. Help with the Micronaut Framework</h2>
+<h2 id="help-with-the-micronaut-framework">10. Help with the Micronaut Framework</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
@@ -459,7 +581,7 @@ the <a href="https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Value.
 </div>
 </div>
 <div class="sect1">
-<h2 id="license">9. License</h2>
+<h2 id="license">11. License</h2>
 <div class="sectionbody">
 <div class="admonitionblock note">
 <table>
