@@ -1,0 +1,140 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+This tutorial shows how to generate Java classes from https://json-schema.org/learn/getting-started-step-by-step[JSON schema] at compile-time using Micronaut JSON Schema.
+
+This guide will generate sources from the JSON Schema used by https://openweathermap.org/current[OpenWeather]'s current weather API. The schema is available at https://json.schemastore.org/openweather.current.json[json.schemastore.org]. We will send a request to the OpenWeather API (which is free access) and validate the response against the generated Java class.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Dependencies
+
+The `jsonschema` feature adds the following dependencies:
+
+dependency:micronaut-json-schema-processor[groupId=io.micronaut.jsonschema,scope=annotationProcessor]
+dependency:micronaut-json-schema-annotations[groupId=io.micronaut.jsonschema]
+
+The `sourcegen-generator` feature is used to generate Java code and adds the following dependencies:
+
+dependency:micronaut-sourcegen-generator-java[groupId=io.micronaut.sourcegen,scope=annotationProcessor]
+dependency:micronaut-sourcegen-annotations[groupId=io.micronaut.sourcegen]
+
+The `netty-server` feature is needed for the testing environment for our example client.
+
+== Generating the Java classes from JSON Schema
+:exclude-for-build:maven
+Add the Micronaut JsonSchema plugin to your plugins section:
+
+[source, groovy]
+.build.gradle
+----
+plugins {
+  id 'io.micronaut.jsonschema' version '4.5.0-SNAPSHOT'
+  ...
+}
+----
+
+And configure your build to generate from a JSON Schema URL:
+
+[source, groovy]
+.build.gradle
+----
+micronaut {
+  ...
+  jsonschema {
+    fromUrl("https://json.schemastore.org/openweather.current.json") {
+        outputPackageName.set("com.example.openweather")
+    }
+ }
+}
+----
+
+Micronaut JsonSchema generator generates the client code in your build directory and adds it as a source set.
+Therefore, you can, for example run `./gradlew compileJava --console=verbose` and see that the sources are generated and compiled:
+
+[source]
+----
+> Task :generatingSourcesFromOpenweather
+...
+> Task :compileJava
+----
+
+TIP: The Micronaut JsonSchema generator supports a variety of parameters. Please refer to https://micronaut-projects.github.io/micronaut-gradle-plugin/snapshot/#_source_generator_from_micronaut_json_schema[Micronaut JsonSchema Gradle plugin documentation] for all possible options.
+
+After generation finishes, you should see the following directory structure under your `target/generated-sources/jsonschema` directory:
+
+[source]
+----
+target/generated-sources/jsonschema
+└── generatingSourcesFromOpenweather
+    └── src
+        ├── main
+        │   └── java
+        │       └── com.example.openweather
+        │           └── OpenweatherCurrentWeatherDataApi.java
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Enable the Micronaut JsonSchema generation in your `pom.xml` file, and configure the location to the specification file and package names:
+
+[source, xml]
+.pom.xml
+----
+<properties>
+    <micronaut.jsonschema.generator.enabled>true</micronaut.jsonschema.generator.enabled>
+   <micronaut.jsonschema.generator.input-url>https://json.schemastore.org/openweather.current.json</micronaut.jsonschema.generator.input-url>
+<micronaut.jsonschema.generator.outputPackageName>com.example.openweather</micronaut.jsonschema.generator.outputPackageName>
+</properties>
+----
+Micronaut JsonSchema generator generates the client code in your target directory and compiles it automatically alongside your regular sources.
+Therefore, you can, for example run `mvn compile` and see that the sources are generated and compiled.
+
+TIP: The Micronaut JsonSchema generator supports a variety of parameters. Please refer to https://micronaut-projects.github.io/micronaut-maven-plugin/snapshot/examples/jsonschema.html[Micronaut JsonSchema Maven plugin documentation] for all possible options.
+
+After generation finishes, you should see the following directory structure under your `target/generated-sources/jsonschema` directory:
+
+[source]
+----
+target/generated-sources/jsonschema
+└── generatingSourcesFromOpenweather
+    └── src
+        ├── main
+        │   └── java
+        │       └── com.example.openweather
+        │           └── OpenweatherCurrentWeatherDataApi.java
+----
+
+:exclude-for-build:
+
+== Configuring the OpenWeather API client
+
+We can save the API key from OpenWeather in the `application.properties` file:
+
+resource:application.properties[tag=openweatherconfig]
+
+We can create a client to interact with the OpenWeather API:
+
+
+=== Test
+
+Last, let's write a test that verifies the generated JSON Schema matches our expectations:
+
+// test:ProductSchemaTest[]
+// callout:micronaut-test[]
+// callout:http-client[]
+//
+// common:json-assert.adoc[]
+//
+// common:testApp.adoc[]
+
+== Next Steps
+
+Read more about https://micronaut-projects.github.io/micronaut-json-schema/latest/guide/[Micronaut JSON Schema] and https://json-schema.org[JSON Schema].

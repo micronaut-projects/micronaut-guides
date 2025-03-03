@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 original authors
+ * Copyright 2017-2024 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package example.micronaut;
 
-import io.micronaut.core.async.annotation.SingleResult;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Post;
+import com.example.openweather.OpenweatherCurrentWeatherDataApi;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.client.annotation.Client;
 
-@Client(value = "/test/")
-public interface VetClient {
+// tag::client[]
+@Client(value = "https://api.openweathermap.org/data/2.5")
+public interface WeatherClient {
 
-    @Post("type")
-    @SingleResult
-    AnimalTypes getAnimalType(@Body String animalJson);
+    @Get("/weather?lat={lat}&lon={lon}&appid=${micronaut.application.openweather.apikey}")
+    OpenweatherCurrentWeatherDataApi getCurrent(@PathVariable String lat, @PathVariable String lon);
 }
+// end::client[]
