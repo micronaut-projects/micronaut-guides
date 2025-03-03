@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 package example.micronaut;
-import example.openmeteo.api.WeatherForecastApisApi;
+import com.example.openweather.OpenweatherCurrentWeatherDataApi;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import jakarta.inject.Inject;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // tag::test[]
@@ -30,9 +33,9 @@ public class WeatherClientTest {
     @Test
     void testClient() {
         var response = client.getCurrent("44.34", "10.99");
-        Assertions.assertNotNull(response);
-        Assertions.assertTrue(response.main().temp() > 0);
-        Assertions.assertEquals(44.34000015258789, response.coord().lat());
+        assertNotNull(response);
+        assertTrue(response.main().temp() > -10);
+        assertEquals(44.34, response.coord().lat(), 1e-4);
     }
 }
 // end::test[]

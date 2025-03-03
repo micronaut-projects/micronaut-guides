@@ -17,6 +17,7 @@ package io.micronaut.guides.feature;
 
 import com.fizzed.rocker.RockerModel;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.guides.feature.template.snapshotGradleSettingsExtension;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver;
@@ -55,7 +56,7 @@ public class JsonSchemaGenerator implements Feature {
     }
 
     protected RockerModel provideGradleModel() {
-        return jsonSchemaGradle.template(getInputUrl() ,getOutputPackageName());
+        return jsonSchemaGradle.template(getInputUrl(), getOutputPackageName());
     }
 
     protected Map<String, String> provideMavenProperties() {
@@ -71,12 +72,15 @@ public class JsonSchemaGenerator implements Feature {
         if (generatorContext.getBuildTool().isGradle()) {
             generatorContext.addBuildPlugin(GradlePlugin.builder()
                     .id("io.micronaut.jsonschema")
-                    .lookupArtifactId("micronaut-gradle-plugin")
-                    .version(resolver.resolve("micronaut-gradle-plugin").get().getVersion())
+                    //.lookupArtifactId("micronaut-gradle-plugin")
+                    //.version(resolver.resolve("micronaut-gradle-plugin").get().getVersion())
+                    .version("4.5.0-SNAPSHOT")
                     .extension(new RockerWritable(provideGradleModel()))
+                    .settingsExtension(new RockerWritable(snapshotGradleSettingsExtension.template()))
                     .build());
         } else {
             generatorContext.getBuildProperties().putAll(provideMavenProperties());
+            generatorContext.getBuildProperties().put("micronaut-maven-plugin.version", "4.5.0-SNAPSHOT");
         }
     }
 }
