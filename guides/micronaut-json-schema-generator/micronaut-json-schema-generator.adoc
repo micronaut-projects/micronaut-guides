@@ -100,6 +100,92 @@ target/generated-sources/jsonschema
 
 :exclude-for-build:
 
+Let's take a look at the generated Java class OpenweatherCurrentWeatherDataApi:
+
+[source,java]
+----
+package com.example.openweather;
+
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import java.lang.String;
+import java.util.List;
+
+/**
+ * API responses from the OpenWeather Current Weather Data API from https://openweathermap.org/current
+ */
+@Serdeable
+public record OpenweatherCurrentWeatherDataApi(
+    @NotNull Coord coord,
+    @NotNull List<Weather> weather,
+    @NotNull String base,
+    @NotNull Main main,
+    @NotNull int visibility,
+    @NotNull Wind wind,
+    @NotNull Clouds clouds,
+    @NotNull float dt,
+    @NotNull Sys sys,
+    @NotNull int timezone,
+    @NotNull int id,
+    @NotNull String name,
+    @NotNull int cod
+) {
+  @Serdeable
+  public record Coord(
+      @NotNull float lat,
+      @NotNull float lon
+  ) {
+  }
+
+  @Serdeable
+  public record Weather(
+      @NotNull int id,
+      @NotNull String main,
+      @NotNull String description,
+      @NotNull String icon
+  ) {
+  }
+
+  @Serdeable
+  public record Main(
+      float temp,
+      float feels_like,
+      float temp_min,
+      float temp_max,
+      float pressure,
+      float humidity,
+      float sea_level,
+      float grnd_level
+  ) {
+  }
+
+  @Serdeable
+  public record Wind(
+      @NotNull float speed,
+      @NotNull float deg
+  ) {
+  }
+
+  @Serdeable
+  public record Clouds(
+      @NotNull @DecimalMin("0") float all
+  ) {
+  }
+
+  @Serdeable
+  public record Sys(
+      @NotNull int type,
+      @NotNull int id,
+      @NotNull float message,
+      @NotNull String country,
+      @NotNull int sunrise,
+      @NotNull int sunset
+  ) {
+  }
+}
+----
+
 == Configuring the OpenWeather API client
 
 In order to use the free OpenWeather API, you will need to https://openweathermap.org/price[create an account with OpenWeather and get an API key from Free Access]. Once you have your API key, expose it with an environment variable:
@@ -113,6 +199,10 @@ Feel free to discover types of free API calls available in the https://openweath
 
 == HTTP Client
 
+Configure the URL for the client id.
+
+resource:application.properties[tag=http-services]
+
 We can create a client to interact with the OpenWeather API:
 
 source:WeatherClient[]
@@ -121,9 +211,7 @@ callout:client[]
 callout:get[arg0=current,arg1=/data/2.5/weather]
 callout:pathvariable[]
 
-Configure the URL for the client id.
-
-resource:application.properties[tag=http-services]
+While using the client to access the external OpenWeather API, we would need to add "appid=${OPENWEATHER_APIKEY}" to the request address.
 
 === Test
 

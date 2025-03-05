@@ -22,7 +22,7 @@ import io.micronaut.http.client.annotation.Client;
 
 @Client(id = "openweather") // <1>
 public interface WeatherClient {
-    @Get("/data/2.5/weather?lat={lat}&lon={lon}&appid=${openweather.apikey}") // <2>
+    @Get("/data/2.5/weather?lat={lat}&lon={lon}") // <2>
     OpenweatherCurrentWeatherDataApi current(@PathVariable String lat,  // <3>
                                              @PathVariable String lon); // <3>
 }

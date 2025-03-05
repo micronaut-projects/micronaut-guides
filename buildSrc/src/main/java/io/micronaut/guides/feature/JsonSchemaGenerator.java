@@ -51,18 +51,18 @@ public class JsonSchemaGenerator implements Feature {
         return "com.example.openweather";
     }
 
-    protected String getInputUrl() {
-        return "https://json.schemastore.org/openweather.current.json";
+    protected String getInputFile() {
+        return "src/main/resources/openweather.current.json";
     }
 
     protected RockerModel provideGradleModel() {
-        return jsonSchemaGradle.template(getInputUrl(), getOutputPackageName());
+        return jsonSchemaGradle.template(getInputFile(), getOutputPackageName());
     }
 
     protected Map<String, String> provideMavenProperties() {
         return Map.of(
                 "micronaut.jsonschema.generator.enabled", "true",
-                "micronaut.jsonschema.generator.input-url", getInputUrl(),
+                "micronaut.jsonschema.generator.input-url", getInputFile(),
                 "micronaut.jsonschema.generator.outputPackageName", getOutputPackageName()
         );
     }
@@ -80,7 +80,6 @@ public class JsonSchemaGenerator implements Feature {
                     .build());
         } else {
             generatorContext.getBuildProperties().putAll(provideMavenProperties());
-            generatorContext.getBuildProperties().put("micronaut-maven-plugin.version", "4.5.0-SNAPSHOT");
         }
     }
 }
