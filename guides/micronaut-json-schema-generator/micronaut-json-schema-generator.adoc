@@ -4,7 +4,7 @@ common:header-top.adoc[]
 
 This tutorial shows how to generate Java classes from https://json-schema.org/learn/getting-started-step-by-step[JSON Schema] at compile-time using Micronaut JSON Schema.
 
-This guide will generate sources from the JSON Schema used by https://openweathermap.org/current[OpenWeather]'s current weather API. The schema is available at https://json.schemastore.org/openweather.current.json[json.schemastore.org]. We will send a request to the OpenWeather API (which is free access) and validate the response against the generated Java class.
+This guide will generate sources from the JSON Schema used by https://openweathermap.org/current[OpenWeather]'s current weather API. The schema is available at https://json.schemastore.org/openweather.current.json[json.schemastore.org]. We will send a request to the OpenWeather API (which is free to access) and validate the response against the generated Java class.
 
 common:requirements.adoc[]
 
@@ -102,27 +102,50 @@ target/generated-sources/jsonschema
 
 == Configuring the OpenWeather API client
 
-In order to use the free OpenWeather API, you will need to create an account with OpenWeather and get an API key from Free Access section in this https://openweathermap.org/price[link]. Once you have your API key, you can save the API key from OpenWeather in the `application.properties` file:
+In order to use the free OpenWeather API, you will need to https://openweathermap.org/price[create an account with OpenWeather and get an API key from Free Access]. Once you have your API key, expose it with an environment variable:
 
-resource:application.properties[tag=openweatherconfig]
+[source,bash]
+----
+export OPENWEATHER_APIKEY=xxxyyyzzz
+----
 
 Feel free to discover types of free API calls available in the https://openweathermap.org/current[OpenWeather API documentation].
 
+== HTTP Client
+
 We can create a client to interact with the OpenWeather API:
 
+source:WeatherClient[]
+
+callout:client[]
+callout:get[arg0=current,arg1=/data/2.5/weather]
+callout:pathvariable[]
+
+Configure the URL for the client id.
+
+resource:application.properties[tag=http-services]
 
 === Test
 
-Last, let's write a test that verifies the generated JSON Schema matches our expectations:
+Last, let's write a test that verifies we can fetch the weather data from the OpenWeather API using the generated Java classes:
 
-// test:ProductSchemaTest[]
-// callout:micronaut-test[]
-// callout:http-client[]
-//
-// common:json-assert.adoc[]
-//
-// common:testApp.adoc[]
+test:WeatherClientTest[]
+
+callout:micronaut-test-start-application-false[]
+
+The test mocks the OpenWeather API response.
+
+common:testApp.adoc[]
 
 == Next Steps
 
-Read more about https://micronaut-projects.github.io/micronaut-json-schema/latest/guide/[Micronaut JSON Schema] and https://json-schema.org[JSON Schema].
+Read more about:
+
+- https://json-schema.org[JSON Schema].
+- https://micronaut-projects.github.io/micronaut-json-schema/latest/guide/[Micronaut JSON Schema]
+:exclude-for-build:maven
+- https://micronaut-projects.github.io/micronaut-gradle-plugin/snapshot/#_source_generator_from_micronaut_json_schema[Micronaut JSONSchema Gradle Plugin]
+:exclude-for-build:
+:exclude-for-build:gradle
+- https://micronaut-projects.github.io/micronaut-maven-plugin/snapshot/examples/jsonschema.html[JSONSchema Generation with Micronaut Maven Plugin]
+:exclude-for-build:
