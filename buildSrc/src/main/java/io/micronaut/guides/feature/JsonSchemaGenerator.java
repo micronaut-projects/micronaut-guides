@@ -72,11 +72,9 @@ public class JsonSchemaGenerator implements Feature {
         if (generatorContext.getBuildTool().isGradle()) {
             generatorContext.addBuildPlugin(GradlePlugin.builder()
                     .id("io.micronaut.jsonschema")
-                    //.lookupArtifactId("micronaut-gradle-plugin")
-                    //.version(resolver.resolve("micronaut-gradle-plugin").get().getVersion())
-                    .version("4.5.0-SNAPSHOT")
+                    .lookupArtifactId("micronaut-gradle-plugin")
+                    .version(resolver.resolve("micronaut-gradle-plugin").get().getVersion())
                     .extension(new RockerWritable(provideGradleModel()))
-                    .settingsExtension(new RockerWritable(snapshotGradleSettingsExtension.template()))
                     .build());
         } else {
             generatorContext.getBuildProperties().putAll(provideMavenProperties());
