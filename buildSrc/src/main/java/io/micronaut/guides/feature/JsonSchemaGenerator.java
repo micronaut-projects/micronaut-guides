@@ -17,7 +17,6 @@ package io.micronaut.guides.feature;
 
 import com.fizzed.rocker.RockerModel;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.guides.feature.template.snapshotGradleSettingsExtension;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver;
