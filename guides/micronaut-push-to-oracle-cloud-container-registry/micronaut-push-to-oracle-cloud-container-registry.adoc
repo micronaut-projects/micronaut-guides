@@ -1,0 +1,91 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+# Oracle Cloud Container Registry
+
+In this guide, we push a docker image of a Micronaut Application to https://www.oracle.com/es/cloud/cloud-native/container-registry/[Oracle Cloud Container Registry]
+
+Create a repository in an OCI compartment.
+
+image::oci-container-registry-create-repository.png[]
+
+Annotate the namespace:
+
+image::oci-container-registry-repository-namespace.png[]
+
+## Auth Token
+
+https://docs.oracle.com/en-us/iaas/Content/Registry/Tasks/registrypushingimagesusingthedockercli.htm[Obtain an _Auth Token_ to push to OCI Container Registry]:
+
+____
+- In the top-right corner of the Console, open the **Profile** menu, and then select **User settings** (or **My Profile** or your account name) to view the details.
+ On the **Auth Tokens** page, select **Generate Token**.
+- Enter a friendly description for the auth token. Avoid entering confidential information.
+- Select **Generate Token**. The new auth token is displayed.
+- Copy the auth token immediately to a secure location from where you can retrieve it later, because you won't see the auth token again in the Console.
+- Close the **Generate Token** dialog.
+____
+
+
+:exclude-for-build:maven
+
+# Micronaut Gradle Plugin
+
+The https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_building_docker_images[Micronaut Gradle Plugin] applies the https://bmuschko.github.io/gradle-docker-plugin[Gradle Docker plugin].
+
+## Registry Credentials Configuration
+
+Modify the build file and configure the registry credentials using the https://bmuschko.github.io/gradle-docker-plugin/current/user-guide/#extension[Docker plugin extension].
+
+The following code samples uses the Gradle Kotlin DSL. You will need to set the environment variable `REGISTRY_TOKEN` to the auth token you created previously, set the OCI email address, the region and namespace you obtained earlier.
+
+[source, kotlin]
+----
+val ociRegion = "eu-madrid-1"
+val ociEmail = "email@example.com"
+val registryUrl = "ocir.${ociRegion}.oci.oraclecloud.com"
+val namespace = "bzcsmyxwoeez"
+val image = "${registryUrl}/${namespace}/micronaut-guides"
+docker {
+    registryCredentials {
+        url.set(registryUrl)
+        username.set("${namespace}/${ociEmail}")
+        password.set(System.getenv("REGISTRY_TOKEN"))
+    }
+}
+----
+
+## Docker Image Configuration
+
+Configure the `dockerBuild` and `dockerPush` tasks to set the `images`.
+
+**Gradle Groovy DSL**
+
+[source, groovy]
+----
+tasks.named("dockerBuild") {
+    images = [image]
+}
+----
+
+**Gradle Kotlin DSL**
+
+[source, kotlin]
+----
+tasks.named<DockerBuildImage>("dockerBuild") {
+    images.set(listOf(image))
+}
+----
+
+## Docker Push
+
+You can push to Docker Hub via the `dockerPush` Gradle Task.
+
+common:docker-push-gradle.adoc[]
+
+:exclude-for-build:
