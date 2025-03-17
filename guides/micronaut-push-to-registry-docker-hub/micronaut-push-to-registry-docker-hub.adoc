@@ -1,0 +1,53 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+# Docker Hub
+
+Create an account in https://hub.docker.com[Docker Hub], and create a new repository for the project. Note down the namespace and name:
+
+image::docker-hub-create-repository[]
+
+After creating the repository, go to _Account Settings / Personal Access Tokens_ and https://app.docker.com/settings/personal-access-tokens[Generate an access token] with scope `Read, Write, Delete`.
+
+Use the https://docs.docker.com/security/for-developers/access-tokens/#use-an-access-token[access token to sign in using the Docker CLI].
+
+:exclude-for-build:maven
+
+# Micronaut Gradle Plugin
+
+The https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_building_docker_images[Micronaut Gradle Plugin] applies the https://bmuschko.github.io/gradle-docker-plugin[Gradle Docker plugin].
+
+## Docker Image Configuration
+
+Configure the `dockerBuild` and `dockerPush` tasks to set the `images`.
+
+**Gradle Groovy DSL**
+
+[source, groovy]
+----
+tasks.named("dockerBuild") {
+    images = ["dockerHubNamespace/repositoryName"]
+}
+----
+
+**Gradle Kotlin DSL**
+
+[source, kotlin]
+----
+tasks.named<DockerBuildImage>("dockerBuild") {
+    images.set(listOf("dockerHubNamespace/repositoryName"))
+}
+----
+
+## Docker Push
+
+You can push to Docker Hub via the `dockerPush` Gradle Task.
+
+common:docker-push-gradle.adoc[]
+
+:exclude-for-build:
