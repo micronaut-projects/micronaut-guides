@@ -1,0 +1,76 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+# Github Container Registry
+
+In this guide, we push a docker image of a Micronaut Application to https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry[GitHub Container Registry]
+
+## Personal access token (classic) with Packages scopes
+
+You need an access token to push the GitHub Container Registry.
+
+Go to _Settings_ > _Developer settings_ > _Personal access tokens_ and create a personal access token with the _delete:packages_, _write:packages_
+scopes.
+
+image:personal-access-token-packages-scopes.png[]
+
+:exclude-for-build:maven
+
+# Micronaut Gradle Plugin
+
+The https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_building_docker_images[Micronaut Gradle Plugin] applies the https://bmuschko.github.io/gradle-docker-plugin[Gradle Docker plugin].
+
+## Registry Credentials Configuration
+
+Modify the build file and configure the registry credentials using the https://bmuschko.github.io/gradle-docker-plugin/current/user-guide/#extension[Docker plugin extension].
+
+The following code samples uses the Gradle Kotlin DSL.
+You will need to set the environment variable `GITHUB_PERSONAL_ACCESS_TOKEN` with the personal access token
+and replace `githubOrganizationOrUsername` with your GitHub personal username or organization name.
+
+[source, kotlin]
+----
+var githubOrg = "githubOrganizationOrUsername"
+docker {
+    registryCredentials {
+        url.set("ghcr.io")
+        username.set(githubOrg)
+        password.set(System.getenv("GITHUB_PERSONAL_ACCESS_TOKEN"))
+    }
+}
+----
+
+## Docker Image Configuration
+
+Configure the `dockerBuild` and `dockerPush` tasks to set the `images`.
+
+**Gradle Groovy DSL**
+
+[source, groovy]
+----
+tasks.named("dockerBuild") {
+    images = ["ghcr.io/${githubOrg}/${rootProject.name}"]
+}
+----
+
+**Gradle Kotlin DSL**
+
+[source, kotlin]
+----
+tasks.named<DockerBuildImage>("dockerBuild") {
+    images.set(listOf("ghcr.io/${githubOrg}/${rootProject.name}"))
+}
+----
+
+## Docker Push
+
+You can push to Docker Hub via the `dockerPush` Gradle Task.
+
+common:docker-push-gradle.adoc[]
+
+:exclude-for-build:
