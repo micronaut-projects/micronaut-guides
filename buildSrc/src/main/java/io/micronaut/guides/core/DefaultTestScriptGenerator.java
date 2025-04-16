@@ -225,7 +225,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                         App defaultApp = appOptional.get();
                         if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
                             List<String> features = GuideUtils.getAppFeatures(defaultApp, guidesOption.getLanguage());
-                            if (!folder.contains("-maven-groovy")) {
+                            if (!(folder.contains("-maven-groovy") || folder.contains("-maven-kotlin"))) {
                                 bashScript.append(scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.getRuntime().version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense()));
                             }
                         }
@@ -238,7 +238,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                         }
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
                             List<String> features = GuideUtils.getAppFeatures(app, guidesOption.getLanguage());
-                            if (!folder.contains("-maven-groovy")) {
+                            if (!(folder.contains("-maven-groovy") || folder.contains("-maven-kotlin"))) {
                                 bashScript.append(scriptForFolder(app.name(), folder + "/" + app.name(), stopIfFailure, buildTool, features.contains("kapt") && Runtime.getRuntime().version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense()));
                             }
                         }
