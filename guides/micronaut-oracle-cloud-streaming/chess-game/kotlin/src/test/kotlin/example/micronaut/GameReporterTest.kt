@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.testcontainers.containers.KafkaContainer
+import org.testcontainers.kafka.KafkaContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
@@ -55,7 +55,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
         val receivedMoves: MutableCollection<GameStateDTO> = ConcurrentLinkedDeque()
 
         @Container
-        val kafka = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest")) // <4>
+        val kafka = KafkaContainer(DockerImageName.parse("apache/kafka:latest")) // <4>
     }
 
     @Inject
