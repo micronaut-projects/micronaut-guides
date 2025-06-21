@@ -22,7 +22,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.util.Map;
 
 public class LocalStack {
-    private static final String TAG = "1.1.0";
+    private static final String TAG = "latest";
     private static final String IMAGE = "localstack/localstack";
     private static LocalStackContainer localstack;
 
