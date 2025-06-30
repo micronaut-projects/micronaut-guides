@@ -26,7 +26,7 @@ import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
-import org.testcontainers.containers.KafkaContainer
+import org.testcontainers.kafka.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
@@ -45,7 +45,7 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
     private static final PollingConditions pollingConditions = new PollingConditions(timeout: 5)
 
     static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse('confluentinc/cp-kafka:latest')) // <4>
+            DockerImageName.parse('apache/kafka:latest')) // <4>
 
     @Inject
     ChessListener chessListener // <5>
