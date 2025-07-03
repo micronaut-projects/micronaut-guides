@@ -54,27 +54,28 @@ public enum Category implements Ordered {
 
     // DISTRIBUTION
     DISTRIBUTION("Distribution", 37),
-    GRAALVM("GraalVM", 38),
-    CRAC("Coordinated Restore at Checkpoint", 39),
-    KUBERNETES("Kubernetes", 40),
+    REGISTRY("Registry", 38),
+    GRAALVM("GraalVM", 39),
+    CRAC("Coordinated Restore at Checkpoint", 40),
+    KUBERNETES("Kubernetes", 41),
 
     // CLOUD
-    SERVERLESS("Serverless", 41),
-    AWS_LAMBDA("AWS Lambda", 42),
-    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 43),
+    SERVERLESS("Serverless", 42),
+    AWS_LAMBDA("AWS Lambda", 43),
+    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 44),
 
     // SERVER-SIDE HTML
-    VIEWS("Views", 44),
-    TURBO("Turbo", 45),
-    STATIC_RESOURCES("Static Resources", 46),
+    VIEWS("Views", 45),
+    TURBO("Turbo", 46),
+    STATIC_RESOURCES("Static Resources", 47),
 
     // LANGUAGES
-    KOTLIN("Kotlin", 47),
-    GRAALPY("GraalPy", 48),
+    KOTLIN("Kotlin", 48),
+    GRAALPY("GraalPy", 49),
 
     // FRAMEWORKS
-    SPRING("Spring Boot", 49),
-    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 50);
+    SPRING("Spring Boot", 50),
+    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 51);
 
     private final String val;
     private final int order;
