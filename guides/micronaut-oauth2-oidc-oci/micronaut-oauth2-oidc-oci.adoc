@@ -1,0 +1,126 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:oracle-cloud-account.adoc[]
+
+common:completesolution.adoc[]
+
+== Oracle Cloud Identity Domain
+
+To provide authentication, sign in to you https://www.oracle.com/cloud/sign-in.html[Oracle Cloud] account and create an https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm[Identity Domains].
+
+Copy the domain URL from the Identity Domain page. Obtain the client ID and Client secret from the Integrated applications / OAuth Configuration section.
+
+Define the following environment variables:
+
+[soruce, bash]
+----
+export OAUTH_CLIENT_ID=XXXXXXXXXX
+export OAUTH_CLIENT_SECRET=YYYYYYYYYY
+export OAUTH_ISSUER=https://idcs-xxx.identity.oraclecloud.com/
+----
+
+=== OAuth 2.0 Authorization Code Flow
+
+We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
+
+image::diagramm.png[]
+
+common:create-app.adoc[]
+
+common:micronaut-views-thymeleaf.adoc[]
+
+=== OAuth 2.0
+
+To use OAuth 2.0 integration, add the following dependency:
+
+dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
+
+Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support] dependencies:
+
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+==== OAuth 2.0 Configuration
+
+Add the following OAuth2 Configuration:
+
+resource:application.properties[tag=oauth2]
+
+callout:authentication-idtoken[arg0=oci]
+callout:oauth2-client-name[arg0=oci]
+<3> Client ID. You can obtain it in the Oracle Cloud Console: `Identity Domain` / `Integrated applications` / `OAuth Configuration` section.
+<4> Client Secret. You can obtain it in the Oracle Cloud Console: `Identity Domain` / `Integrated applications` / `OAuth Configuration` section.
+<5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
+<6> Accept GET request to the `/logout` endpoint.
+
+===== OpenID Auto Configuration
+
+Upon application startup, the Micronaut application visits the https://docs.oracle.com/en/cloud/paas/iam-domains-rest-api/op-well-known-openid-configuration-get.html[OpenID discovery endpoint]
+to configure your application. if you set `micronaut.security.oauth2.clients.oci.openid.issuer` to `https://idcs-xxx.identity.oraclecloud.com/`, Micronaut visits `https://idcs-xxx.identity.oraclecloud.com/.well-known/openid-configuration` on startup.
+
+===== Scopes Configuration
+
+If you want to consider the Identity Domain User groups as your application roles, you can request the `get_groups` scope:
+
+resource:application.properties[tag=scopes]
+
+https://docs.oracle.com/en-us/iaas/Content/Resources/Assets/whitepapers/oci-iam-oauth-flows-best-practices.pdf[Oracle Cloud Infrastructure IAM
+Identity Domain OAuth and OpenID Connect Flows and Best Practices]
+
+____
+When you’re using an OpenID Connect flow, often there’s a need for the application to get user groups. In OCI IAM,
+you can request groups as part of the ID token or get an access token that’s eligible to fetch user groups. When you
+request scope=get_groups in a request to the authorization endpoint, OCI IAM returns the user groups as part of the
+ID token, which increases the size of the ID token. An alternative is to use scope=groups, which allows the returned
+access token to get user groups from the userinfo endpoints. So, scope=get_groups saves an API call but increases
+the ID token size.
+____
+
+You can create a https://docs.micronaut.io/latest/guide/#replaces[bean replacement] for a bean of type `RolesFinder`, to consider the user groups as roles:
+
+source:IdentityDomainRolesFinder[]
+
+callout:singleton[]
+
+=== Home
+
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+
+source:HomeController[]
+
+callout:controller[arg0=/]
+callout:secured-anonymous[]
+<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
+
+Create a thymeleaf template:
+
+resource:views/home.html[]
+
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
+
+- The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
+injects into the model a `security` map with the authenticated user.  See https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view^] documentation.
+
+common:runapp.adoc[]
+
+image::oraclecloudidentitydomain.gif[]
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+After you execute the native executable, navigate to localhost:8080 and authenticate with Cognito.
+
+:exclude-for-languages:
+
+=== Cleanup
+
+Once you are done with this guide, delte the Oracle Cloud resources created (Identity Domains, Users) to avoid incurring unnecessary charges.
+
+== Next steps
+
+Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
+
+common:helpWithMicronaut.adoc[]
