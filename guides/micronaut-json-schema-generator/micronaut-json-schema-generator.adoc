@@ -1,0 +1,165 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+This tutorial shows how to generate Java classes from https://json-schema.org/learn/getting-started-step-by-step[JSON Schema] at compile-time using Micronaut JSON Schema.
+
+This guide will generate sources from the JSON Schema used by https://openweathermap.org/current[OpenWeather]'s current weather API. The schema is available at https://json.schemastore.org/openweather.current.json[json.schemastore.org]. We will send a request to the OpenWeather API (which is free to access) and validate the response against the generated Java class.
+
+NOTE: This guide gives a step-by-step explanation of how to generate Java classes from JSON Schema using Micronaut's `jsonschema` plugin. However, if you would like to have the capability directly in your Micronaut application, you can add the `json-schema-generator` feature while creating your application.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+NOTE: The `validation` feature is added for the compilation and usage of generated files in this example project. It is not necessarily required for the generation of source code. However, the generated sources can include validation annotations depending on the contents of the schema file which would require the dependencies included in the `validation` feature.
+
+== Generating the Java classes from JSON Schema
+:exclude-for-build:maven
+Add the Micronaut JSON Schema plugin to your plugins section:
+
+[source, groovy]
+.build.gradle
+----
+plugins {
+  id 'io.micronaut.jsonschema' version '4.5.0'
+  ...
+}
+----
+
+And configure your build to generate from a local JSON Schema in your resources folder:
+
+[source, groovy]
+.build.gradle
+----
+micronaut {
+  ...
+  jsonschema {
+    fromFile(file("src/main/resources/openweather.current.json")) {
+        outputPackageName.set("com.example.openweather")
+    }
+ }
+}
+----
+
+Micronaut JsonSchema generator generates the client code in your build directory and adds it as a source set.
+Therefore, you can, for example run `./gradlew compileJava --console=verbose` and see that the sources are generated and compiled:
+
+[source]
+----
+> Task :generatingSourcesFromOpenweather
+...
+> Task :compileJava
+----
+
+TIP: The Micronaut JSON Schema generator supports a variety of parameters. Please refer to https://micronaut-projects.github.io/micronaut-gradle-plugin/snapshot/#_source_generator_from_micronaut_json_schema[Micronaut JsonSchema Gradle plugin documentation] for all possible options.
+
+After generation finishes, you should see the following directory structure under your `target/generated-sources/jsonschema` directory:
+
+[source]
+----
+build/generated-sources/jsonschema
+└── generatingSourcesFromOpenweather
+    └── src
+        ├── main
+        │   └── java
+        │       └── com.example.openweather
+        │           └── OpenweatherCurrentWeatherDataApi.java
+----
+
+Let's take a look at the generated Java class OpenweatherCurrentWeatherDataApi:
+
+zipInclude:build/generated-sources/jsonschema/generatingSourcesFromOpenweather/src/main/@lang@/com/example/openweather/OpenweatherCurrentWeatherDataApi.@languageextension@[]
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Enable the Micronaut JSON Schema generation in your `pom.xml` file, and configure the location to the schema file and desired output package name:
+
+[source, xml]
+.pom.xml
+----
+<properties>
+    <micronaut.jsonschema.generator.enabled>true</micronaut.jsonschema.generator.enabled>
+    <micronaut.jsonschema.generator.input-file>src/main/resources/openweather.current.json</micronaut.jsonschema.generator.input-url>
+    <micronaut.jsonschema.generator.outputPackageName>com.example.openweather</micronaut.jsonschema.generator.outputPackageName>
+</properties>
+----
+Micronaut JsonSchema generator generates the client code in your target directory and compiles it automatically alongside your regular sources.
+Therefore, you can run `mvn compile` and see that the sources are generated and compiled.
+
+TIP: The Micronaut JsonSchema generator supports a variety of parameters. Please refer to https://micronaut-projects.github.io/micronaut-maven-plugin/snapshot/examples/jsonschema.html[Micronaut JsonSchema Maven plugin documentation] for all possible options.
+
+After generation finishes, you should see the following directory structure under your `target/generated-sources/jsonschema` directory:
+
+[source]
+----
+target/generated-sources/jsonschema
+└── generatingSourcesFromOpenweather
+    └── src
+        ├── main
+        │   └── java
+        │       └── com.example.openweather
+        │           └── OpenweatherCurrentWeatherDataApi.java
+----
+
+Let's take a look at the generated Java class OpenweatherCurrentWeatherDataApi:
+
+zipInclude:target/generated-sources/jsonschema/generatingSourcesFromOpenweather/src/main/@lang@/com/example/openweather/OpenweatherCurrentWeatherDataApi.@languageextension@[]
+
+:exclude-for-build:
+
+== Configuring the OpenWeather API client
+
+In order to use the free OpenWeather API, you will need to https://openweathermap.org/price[create an account with OpenWeather and get an API key from Free Access]. Once you have your API key, expose it with an environment variable:
+
+[source,bash]
+----
+export OPENWEATHER_APIKEY=xxxyyyzzz
+----
+
+Feel free to discover types of free API calls available in the https://openweathermap.org/current[OpenWeather API documentation].
+
+== HTTP Client
+
+Configure the URL for the client id.
+
+resource:application.properties[tag=http-services]
+
+We can create a client to interact with the OpenWeather API:
+
+source:WeatherClient[]
+
+callout:client[]
+callout:get[arg0=current,arg1=/data/2.5/weather]
+callout:pathvariable[]
+
+While using the client to access the external OpenWeather API, we would need to add "appid=${OPENWEATHER_APIKEY}" to the request address.
+
+=== Test
+
+Last, let's write a test that verifies we can fetch the weather data from the OpenWeather API using the generated Java classes:
+
+test:WeatherClientTest[]
+
+callout:micronaut-test-start-application-false[]
+
+The test mocks the OpenWeather API response.
+
+common:testApp.adoc[]
+
+== Next Steps
+
+Read more about:
+
+- https://json-schema.org[JSON Schema].
+- https://micronaut-projects.github.io/micronaut-json-schema/latest/guide/[Micronaut JSON Schema]
+:exclude-for-build:maven
+- https://micronaut-projects.github.io/micronaut-gradle-plugin/snapshot/#_source_generator_from_micronaut_json_schema[Micronaut JSONSchema Gradle Plugin]
+:exclude-for-build:
+:exclude-for-build:gradle
+- https://micronaut-projects.github.io/micronaut-maven-plugin/snapshot/examples/jsonschema.html[JSONSchema Generation with Micronaut Maven Plugin]
+:exclude-for-build:
