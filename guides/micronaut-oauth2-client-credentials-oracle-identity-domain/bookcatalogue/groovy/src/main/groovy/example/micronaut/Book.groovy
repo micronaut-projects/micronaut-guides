@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2025 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import groovy.transform.EqualsAndHashCode
 import io.micronaut.core.annotation.Creator
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.serde.annotation.Serdeable
-
 import jakarta.validation.constraints.NotBlank
 
 @CompileStatic

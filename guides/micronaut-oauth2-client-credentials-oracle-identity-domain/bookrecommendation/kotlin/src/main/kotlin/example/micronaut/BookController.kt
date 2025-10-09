@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2025 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,17 @@ import io.micronaut.security.annotation.Secured
 
 @Controller("/books")
 class BookController(
-        private val bookCatalogueOperations: BookCatalogueOperations,
-        private val bookInventoryOperations: BookInventoryOperations) {
+    private val bookCatalogueOperations: BookCatalogueOperations,
+    private val bookInventoryOperations: BookInventoryOperations) {
 
     @Get
     @Secured(IS_ANONYMOUS) // <1>
     fun index(): Publisher<BookRecommendation> =
 
         Flux.from(bookCatalogueOperations.findAll())
-                .flatMap { b ->
-                    Flux.from(bookInventoryOperations.stock(b.isbn))
-                            .filter { hasStock -> hasStock }
-                            .map { b }
-                }.map { (_, name) -> BookRecommendation(name) }
+            .flatMap { b ->
+                Flux.from(bookInventoryOperations.stock(b.isbn))
+                    .filter { hasStock -> hasStock }
+                    .map { b }
+            }.map { (_, name) -> BookRecommendation(name) }
 }

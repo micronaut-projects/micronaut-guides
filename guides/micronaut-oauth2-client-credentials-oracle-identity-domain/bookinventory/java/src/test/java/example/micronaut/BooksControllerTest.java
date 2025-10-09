@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2025 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package example.micronaut;
 
+import io.micronaut.context.annotation.Property;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.client.HttpClient;
@@ -29,10 +31,8 @@ import static io.micronaut.http.HttpStatus.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.context.annotation.Property;
 
-@Property(name = "micronaut.security.enabled", value= StringUtils.FALSE)
+@Property(name = "micronaut.security.enabled", value = StringUtils.FALSE)
 @MicronautTest
 public class BooksControllerTest {
 

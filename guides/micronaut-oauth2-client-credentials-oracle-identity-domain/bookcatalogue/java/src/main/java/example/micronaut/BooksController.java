@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2025 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,18 @@ package example.micronaut;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
-import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
+
 import java.util.Arrays;
 import java.util.List;
 
+import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
+
 @Controller("/books")
-public class BooksController {
+class BooksController {
 
     @Get
     @Secured(IS_AUTHENTICATED) // <1>
-    public List<Book> index() {
+    List<Book> index() {
         return Arrays.asList(
                 new Book("1491950358", "Building Microservices"),
                 new Book("1680502395", "Release It!"),

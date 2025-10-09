@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2025 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,18 @@
  */
 package example.micronaut
 
+import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
 import io.micronaut.core.annotation.NonNull
+import io.micronaut.core.util.StringUtils
 import io.micronaut.retry.annotation.Fallback
 import jakarta.inject.Singleton
-import reactor.core.publisher.Mono
 import jakarta.validation.constraints.NotBlank
-import static io.micronaut.context.env.Environment.TEST
-import io.micronaut.core.util.StringUtils
-import io.micronaut.context.annotation.Property
+import reactor.core.publisher.Mono
 
-@Property(name = 'micronaut.security.enabled', value= StringUtils.FALSE)
+import static io.micronaut.context.env.Environment.TEST
+
+@Property(name = 'micronaut.security.enabled', value = StringUtils.FALSE)
 @Requires(env = TEST) // <1>
 @Fallback
 @Singleton

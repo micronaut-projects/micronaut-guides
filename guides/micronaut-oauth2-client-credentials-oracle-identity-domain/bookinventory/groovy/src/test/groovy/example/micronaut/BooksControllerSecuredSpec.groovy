@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2025 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
 package example.micronaut
 
 import io.micronaut.http.HttpRequest
-import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import spock.lang.Specification
-import static io.micronaut.http.HttpStatus.UNAUTHORIZED
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
+import spock.lang.Specification
+
+import static io.micronaut.http.HttpStatus.UNAUTHORIZED
 
 @MicronautTest
 class BooksControllerSecuredSpec extends Specification {
+
     @Inject
     @Client('/')
     HttpClient httpClient
@@ -33,7 +35,7 @@ class BooksControllerSecuredSpec extends Specification {
     void '/books/stock/isbn is secured'() {
         when:
         httpClient.toBlocking().exchange(HttpRequest.GET('/books/stock/1491950358'))
-        
+
         then:
         HttpClientResponseException exception = thrown()
         UNAUTHORIZED == exception.status

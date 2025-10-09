@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2025 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,21 @@ package example.micronaut;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
+import io.micronaut.security.annotation.Secured;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.Optional;
+
 import static io.micronaut.http.MediaType.TEXT_PLAIN;
 import static io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED;
-import io.micronaut.security.annotation.Secured;
 
 @Controller("/books")
-public class BooksController {
+class BooksController {
 
     @Produces(TEXT_PLAIN)
     @Get("/stock/{isbn}")
     @Secured(IS_AUTHENTICATED) // <1>
-    public Boolean stock(@NotBlank String isbn) {
+    Boolean stock(@NotBlank String isbn) {
         return bookInventoryByIsbn(isbn).map(bi -> bi.getStock() > 0).orElse(null);
     }
 
