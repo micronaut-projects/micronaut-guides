@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -206,11 +207,11 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=email-amazon-ses,aws-v2-sdk,validation,yaml,reactor,graalvm \
-    --build=gradle \
-    --lang=java \
-    --test=junit</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>email-amazon-ses,aws-v2-sdk,validation,yaml,reactor,graalvm <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -260,52 +261,52 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/MailController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncEmailSender</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.EmailException</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.exceptions.HttpStatusException</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-<span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
-<span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SendEmailResponse</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesRequest</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesResponse</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.email.AsyncEmailSender</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.Email</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.EmailException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Body</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Post</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.exceptions.HttpStatusException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.reactivestreams.Publisher</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">software.amazon.awssdk.services.ses.model.SendEmailResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">software.amazon.awssdk.services.ses.model.SesRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">software.amazon.awssdk.services.ses.model.SesResponse</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.email.BodyType.HTML</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNPROCESSABLE_ENTITY</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">email</span><span class="o">.</span><span class="na">BodyType</span><span class="o">.</span><span class="na">HTML</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">UNPROCESSABLE_ENTITY</span><span class="o">;</span>
 
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/mail</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">MailController</span> {
+<span class="nd">@Controller</span><span class="o">(</span><span class="s">"/mail"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MailController</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(MailController.class);
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="no">LOG</span> <span class="o">=</span> <span class="nc">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">MailController</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> AsyncEmailSender&lt;SesRequest, SesResponse&gt; emailSender;
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">AsyncEmailSender</span><span class="o">&lt;</span><span class="nc">SesRequest</span><span class="o">,</span> <span class="nc">SesResponse</span><span class="o">&gt;</span> <span class="n">emailSender</span><span class="o">;</span>
 
-    <span class="directive">public</span> MailController(AsyncEmailSender&lt;SesRequest, SesResponse&gt; emailSender) { <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="local-variable">this</span>.emailSender = emailSender;
-    }
+    <span class="kd">public</span> <span class="nf">MailController</span><span class="o">(</span><span class="nc">AsyncEmailSender</span><span class="o">&lt;</span><span class="nc">SesRequest</span><span class="o">,</span> <span class="nc">SesResponse</span><span class="o">&gt;</span> <span class="n">emailSender</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="k">this</span><span class="o">.</span><span class="na">emailSender</span> <span class="o">=</span> <span class="n">emailSender</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/send</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="directive">public</span> Publisher&lt;HttpResponse&lt;?&gt;&gt; send(<span class="annotation">@Body</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">to</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> to) { <i class="conum" data-value="4"></i><b>(4)</b>
-        <span class="keyword">return</span> Mono.from(emailSender.sendAsync(Email.builder()
-                        .to(to)
-                        .subject(<span class="string"><span class="delimiter">&quot;</span><span class="content">Sending email with Amazon SES is Fun</span><span class="delimiter">&quot;</span></span>)
-                        .body(<span class="string"><span class="delimiter">&quot;</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">HTML</span>)))
-                .doOnNext(rsp -&gt; {
-                    <span class="keyword">if</span> (rsp <span class="keyword">instanceof</span> SendEmailResponse) {
-                        LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">message id: {}</span><span class="delimiter">&quot;</span></span>, ((SendEmailResponse) rsp).messageId());
-                    }
-                }).onErrorMap(EmailException.class, t -&gt; <span class="keyword">new</span> HttpStatusException(UNPROCESSABLE_ENTITY, <span class="string"><span class="delimiter">&quot;</span><span class="content">Email could not be sent</span><span class="delimiter">&quot;</span></span>))
-                .map(rsp -&gt; HttpResponse.accepted()); <i class="conum" data-value="5"></i><b>(5)</b>
-    }
-}</code></pre>
+    <span class="nd">@Post</span><span class="o">(</span><span class="s">"/send"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="kd">public</span> <span class="nc">Publisher</span><span class="o">&lt;</span><span class="nc">HttpResponse</span><span class="o">&lt;?&gt;&gt;</span> <span class="n">send</span><span class="o">(</span><span class="nd">@Body</span><span class="o">(</span><span class="s">"to"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">to</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="k">return</span> <span class="nc">Mono</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">emailSender</span><span class="o">.</span><span class="na">sendAsync</span><span class="o">(</span><span class="nc">Email</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">to</span><span class="o">(</span><span class="n">to</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">subject</span><span class="o">(</span><span class="s">"Sending email with Amazon SES is Fun"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="s">"and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;"</span><span class="o">,</span> <span class="no">HTML</span><span class="o">)))</span>
+                <span class="o">.</span><span class="na">doOnNext</span><span class="o">(</span><span class="n">rsp</span> <span class="o">-&gt;</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">rsp</span> <span class="k">instanceof</span> <span class="nc">SendEmailResponse</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"message id: {}"</span><span class="o">,</span> <span class="o">((</span><span class="nc">SendEmailResponse</span><span class="o">)</span> <span class="n">rsp</span><span class="o">).</span><span class="na">messageId</span><span class="o">());</span>
+                    <span class="o">}</span>
+                <span class="o">}).</span><span class="na">onErrorMap</span><span class="o">(</span><span class="nc">EmailException</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">t</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">HttpStatusException</span><span class="o">(</span><span class="no">UNPROCESSABLE_ENTITY</span><span class="o">,</span> <span class="s">"Email could not be sent"</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">rsp</span> <span class="o">-&gt;</span> <span class="nc">HttpResponse</span><span class="o">.</span><span class="na">accepted</span><span class="o">());</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -353,11 +354,11 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="head"><span class="head">---</span></span>
-<span class="key">micronaut</span>:
-  <span class="key">email</span>:
-    <span class="key">from</span>:
-      <span class="key">email</span>: <span class="string"><span class="content">'john@micronaut.example'</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="nn">---</span>
+<span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">email</span><span class="pi">:</span>
+    <span class="na">from</span><span class="pi">:</span>
+      <span class="na">email</span><span class="pi">:</span> <span class="s1">'</span><span class="s">john@micronaut.example'</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -381,7 +382,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.micronaut.email:micronaut-email-amazon-ses</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"com.micronaut.email:micronaut-email-amazon-ses"</span><span class="o">)</span></code></pre>
 </div>
 </div>
 </div>
@@ -397,7 +398,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.aws:micronaut-aws-sdk-v2</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.aws:micronaut-aws-sdk-v2"</span><span class="o">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -425,52 +426,52 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/EmailSenderReplacement.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncTransactionalEmailSender</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.EmailException</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.ses.AsyncSesEmailSender</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Named</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>;
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SendEmailResponse</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesRequest</span>;
-<span class="keyword">import</span> <span class="include">software.amazon.awssdk.services.ses.model.SesResponse</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Replaces</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.AsyncTransactionalEmailSender</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.Email</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.EmailException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.ses.AsyncSesEmailSender</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Named</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.reactivestreams.Publisher</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">software.amazon.awssdk.services.ses.model.SendEmailResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">software.amazon.awssdk.services.ses.model.SesRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">software.amazon.awssdk.services.ses.model.SesResponse</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.validation.Valid</span>;
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
-<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
-<span class="keyword">import</span> <span class="include">java.util.function.Consumer</span>;
+<span class="kn">import</span> <span class="nn">jakarta.validation.Valid</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.function.Consumer</span><span class="o">;</span>
 
-<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">MailControllerTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Singleton</span>
-<span class="annotation">@Replaces</span>(AsyncSesEmailSender.class)
-<span class="annotation">@Named</span>(AsyncSesEmailSender.NAME)
-<span class="type">class</span> <span class="class">EmailSenderReplacement</span> <span class="directive">implements</span> AsyncTransactionalEmailSender&lt;SesRequest, SesResponse&gt; {
+<span class="nd">@Requires</span><span class="o">(</span><span class="n">property</span> <span class="o">=</span> <span class="s">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"MailControllerTest"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Singleton</span>
+<span class="nd">@Replaces</span><span class="o">(</span><span class="nc">AsyncSesEmailSender</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="nd">@Named</span><span class="o">(</span><span class="nc">AsyncSesEmailSender</span><span class="o">.</span><span class="na">NAME</span><span class="o">)</span>
+<span class="kd">class</span> <span class="nc">EmailSenderReplacement</span> <span class="kd">implements</span> <span class="nc">AsyncTransactionalEmailSender</span><span class="o">&lt;</span><span class="nc">SesRequest</span><span class="o">,</span> <span class="nc">SesResponse</span><span class="o">&gt;</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;Email&gt; emails = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Email</span><span class="o">&gt;</span> <span class="n">emails</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
 
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
-        <span class="keyword">return</span> AsyncSesEmailSender.NAME;
-    }
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">AsyncSesEmailSender</span><span class="o">.</span><span class="na">NAME</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> Publisher&lt;SesResponse&gt; sendAsync(<span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email,
-                                            <span class="annotation">@NotNull</span> Consumer&lt;SesRequest&gt; emailRequest) <span class="directive">throws</span> EmailException {
-        emails.add(email);
-        <span class="keyword">return</span> Mono.just(SendEmailResponse.builder().messageId(<span class="string"><span class="delimiter">&quot;</span><span class="content">xxx-yyy-zzz</span><span class="delimiter">&quot;</span></span>).build());
-    }
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">Publisher</span><span class="o">&lt;</span><span class="nc">SesResponse</span><span class="o">&gt;</span> <span class="nf">sendAsync</span><span class="o">(</span><span class="nd">@NotNull</span> <span class="nd">@Valid</span> <span class="nc">Email</span> <span class="n">email</span><span class="o">,</span>
+                                            <span class="nd">@NotNull</span> <span class="nc">Consumer</span><span class="o">&lt;</span><span class="nc">SesRequest</span><span class="o">&gt;</span> <span class="n">emailRequest</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">EmailException</span> <span class="o">{</span>
+        <span class="n">emails</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">email</span><span class="o">);</span>
+        <span class="k">return</span> <span class="nc">Mono</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="nc">SendEmailResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">().</span><span class="na">messageId</span><span class="o">(</span><span class="s">"xxx-yyy-zzz"</span><span class="o">).</span><span class="na">build</span><span class="o">());</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Email&gt; getEmails() {
-        <span class="keyword">return</span> emails;
-    }
-}</code></pre>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Email</span><span class="o">&gt;</span> <span class="nf">getEmails</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">emails</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -487,66 +488,66 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/MailControllerTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.BeanContext</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.util.CollectionUtils</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncTransactionalEmailSender</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.BodyType</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.context.BeanContext</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Property</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.util.CollectionUtils</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.AsyncTransactionalEmailSender</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.BodyType</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.Email</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
+<span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.ACCEPTED</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNotNull</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">ACCEPTED</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertNotNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
 
-<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">MailControllerTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">MailControllerTest</span> {
+<span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"MailControllerTest"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MailControllerTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient httpClient; <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+    <span class="nc">HttpClient</span> <span class="n">httpClient</span><span class="o">;</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-    <span class="annotation">@Inject</span>
-    <span class="predefined-type">BeanContext</span> beanContext;
+    <span class="nd">@Inject</span>
+    <span class="nc">BeanContext</span> <span class="n">beanContext</span><span class="o">;</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> getMailSendEndpointSendsAnEmail() {
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">getMailSendEndpointSendsAnEmail</span><span class="o">()</span> <span class="o">{</span>
 
-        HttpResponse&lt;?&gt; response = httpClient.toBlocking().exchange(
-                HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/mail/send</span><span class="delimiter">&quot;</span></span>,
-                <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">to</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">johnsnow@micronaut.example</span><span class="delimiter">&quot;</span></span>)));
-        assertEquals(ACCEPTED, response.status());
+        <span class="nc">HttpResponse</span><span class="o">&lt;?&gt;</span> <span class="n">response</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span>
+                <span class="nc">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s">"/mail/send"</span><span class="o">,</span>
+                <span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"to"</span><span class="o">,</span> <span class="s">"johnsnow@micronaut.example"</span><span class="o">)));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="no">ACCEPTED</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">status</span><span class="o">());</span>
 
-        AsyncTransactionalEmailSender&lt;?, ?&gt; sender = beanContext.getBean(AsyncTransactionalEmailSender.class);
-        assertTrue(sender <span class="keyword">instanceof</span> EmailSenderReplacement);
+        <span class="nc">AsyncTransactionalEmailSender</span><span class="o">&lt;?,</span> <span class="o">?&gt;</span> <span class="n">sender</span> <span class="o">=</span> <span class="n">beanContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="nc">AsyncTransactionalEmailSender</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">sender</span> <span class="k">instanceof</span> <span class="nc">EmailSenderReplacement</span><span class="o">);</span>
 
-        EmailSenderReplacement sendgridSender = (EmailSenderReplacement) sender;
-        assertTrue(CollectionUtils.isNotEmpty(sendgridSender.getEmails()));
-        assertEquals(<span class="integer">1</span>, sendgridSender.getEmails().size());
+        <span class="nc">EmailSenderReplacement</span> <span class="n">sendgridSender</span> <span class="o">=</span> <span class="o">(</span><span class="nc">EmailSenderReplacement</span><span class="o">)</span> <span class="n">sender</span><span class="o">;</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="nc">CollectionUtils</span><span class="o">.</span><span class="na">isNotEmpty</span><span class="o">(</span><span class="n">sendgridSender</span><span class="o">.</span><span class="na">getEmails</span><span class="o">()));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">sendgridSender</span><span class="o">.</span><span class="na">getEmails</span><span class="o">().</span><span class="na">size</span><span class="o">());</span>
 
-        Email email = sendgridSender.getEmails().get(<span class="integer">0</span>);
-        assertEquals(email.getFrom().getEmail(), <span class="string"><span class="delimiter">&quot;</span><span class="content">john@micronaut.example</span><span class="delimiter">&quot;</span></span>);
-        assertNotNull(email.getTo());
-        assertTrue(email.getTo().stream().findFirst().isPresent());
-        assertEquals(email.getTo().stream().findFirst().get().getEmail(), <span class="string"><span class="delimiter">&quot;</span><span class="content">johnsnow@micronaut.example</span><span class="delimiter">&quot;</span></span>);
-        assertEquals(email.getSubject(), <span class="string"><span class="delimiter">&quot;</span><span class="content">Sending email with Amazon SES is Fun</span><span class="delimiter">&quot;</span></span>);
-        assertNotNull(email.getBody());
-        assertTrue(email.getBody().get(BodyType.HTML).isPresent());
-        assertEquals(email.getBody().get(BodyType.HTML).get(), <span class="string"><span class="delimiter">&quot;</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">&quot;</span></span>);
-    }
-}</code></pre>
+        <span class="nc">Email</span> <span class="n">email</span> <span class="o">=</span> <span class="n">sendgridSender</span><span class="o">.</span><span class="na">getEmails</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">email</span><span class="o">.</span><span class="na">getFrom</span><span class="o">().</span><span class="na">getEmail</span><span class="o">(),</span> <span class="s">"john@micronaut.example"</span><span class="o">);</span>
+        <span class="n">assertNotNull</span><span class="o">(</span><span class="n">email</span><span class="o">.</span><span class="na">getTo</span><span class="o">());</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">email</span><span class="o">.</span><span class="na">getTo</span><span class="o">().</span><span class="na">stream</span><span class="o">().</span><span class="na">findFirst</span><span class="o">().</span><span class="na">isPresent</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">email</span><span class="o">.</span><span class="na">getTo</span><span class="o">().</span><span class="na">stream</span><span class="o">().</span><span class="na">findFirst</span><span class="o">().</span><span class="na">get</span><span class="o">().</span><span class="na">getEmail</span><span class="o">(),</span> <span class="s">"johnsnow@micronaut.example"</span><span class="o">);</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">email</span><span class="o">.</span><span class="na">getSubject</span><span class="o">(),</span> <span class="s">"Sending email with Amazon SES is Fun"</span><span class="o">);</span>
+        <span class="n">assertNotNull</span><span class="o">(</span><span class="n">email</span><span class="o">.</span><span class="na">getBody</span><span class="o">());</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">email</span><span class="o">.</span><span class="na">getBody</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="nc">BodyType</span><span class="o">.</span><span class="na">HTML</span><span class="o">).</span><span class="na">isPresent</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">email</span><span class="o">.</span><span class="na">getBody</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="nc">BodyType</span><span class="o">.</span><span class="na">HTML</span><span class="o">).</span><span class="na">get</span><span class="o">(),</span> <span class="s">"and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -576,7 +577,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -597,8 +598,8 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export AWS_ACCESS_KEY_ID=xxx
-export AWS_SECRET_ACCESS_KEY=xxx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>xxx
+<span class="nb">export </span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>xxx</code></pre>
 </div>
 </div>
 </div>
@@ -612,9 +613,9 @@ export AWS_SECRET_ACCESS_KEY=xxx</code></pre>
 <h4 id="invoke">5.1.4. Invoke</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -d '{&quot;to&quot;:&quot;john@micronaut.example&quot;}'
-     -H &quot;Content-Type: application/json&quot;
-     -X POST http://localhost:8080/mail/send</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-d</span> <span class="s1">'{"to":"john@micronaut.example"}'</span>
+     <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span>
+     <span class="nt">-X</span> POST http://localhost:8080/mail/send</code></pre>
 </div>
 </div>
 </div>

@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -201,7 +202,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=gradle --lang=groovy</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>groovy</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -230,7 +231,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.cache:micronaut-cache-caffeine</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.cache:micronaut-cache-caffeine"</span><span class="o">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -251,10 +252,10 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">caches</span>:
-    <span class="key">headlines</span>: <i class="conum" data-value="1"></i><b>(1)</b>
-      <span class="key">charset</span>: <span class="string"><span class="content">'UTF-8'</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">caches</span><span class="pi">:</span>
+    <span class="na">headlines</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="na">charset</span><span class="pi">:</span> <span class="s1">'</span><span class="s">UTF-8'</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -286,55 +287,55 @@ Check the <a href="https://micronaut-projects.github.io/micronaut-cache/latest/g
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/NewsService.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.cache.annotation.CacheConfig</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.cache.annotation.CacheInvalidate</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.cache.annotation.CachePut</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.cache.annotation.Cacheable</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
-<span class="keyword">import</span> <span class="include">java.time.Month</span>
-<span class="keyword">import</span> <span class="include">java.util.concurrent.TimeUnit</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.cache.annotation.CacheConfig</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.cache.annotation.CacheInvalidate</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.cache.annotation.CachePut</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.cache.annotation.Cacheable</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">java.time.Month</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.TimeUnit</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@CacheConfig</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">headlines</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">NewsService</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@CacheConfig</span><span class="o">(</span><span class="s2">"headlines"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">NewsService</span> <span class="o">{</span>
 
-    <span class="predefined-type">Map</span>&lt;Month, <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt;&gt; headlines = [
-        (Month.NOVEMBER): [<span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut Graduates to Trial Level in Thoughtworks technology radar Vol.1</span><span class="delimiter">&quot;</span></span>,
-                <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut AOP: Awesome flexibility without the complexity</span><span class="delimiter">&quot;</span></span>],
-        (Month.OCTOBER): [<span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut AOP: Awesome flexibility without the complexity</span><span class="delimiter">&quot;</span></span>]
-    ]
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">Month</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="o">[</span>
+        <span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">NOVEMBER</span><span class="o">):</span> <span class="o">[</span><span class="s2">"Micronaut Graduates to Trial Level in Thoughtworks technology radar Vol.1"</span><span class="o">,</span>
+                <span class="s2">"Micronaut AOP: Awesome flexibility without the complexity"</span><span class="o">],</span>
+        <span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">OCTOBER</span><span class="o">):</span> <span class="o">[</span><span class="s2">"Micronaut AOP: Awesome flexibility without the complexity"</span><span class="o">]</span>
+    <span class="o">]</span>
 
-    <span class="annotation">@Cacheable</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines(Month month) {
-        <span class="predefined-type">TimeUnit</span>.SECONDS.sleep(<span class="integer">3</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-        headlines[month]
-    }
+    <span class="nd">@Cacheable</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span><span class="o">(</span><span class="n">Month</span> <span class="n">month</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="n">headlines</span><span class="o">[</span><span class="n">month</span><span class="o">]</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@CachePut</span>(parameters = [<span class="string"><span class="delimiter">&quot;</span><span class="content">month</span><span class="delimiter">&quot;</span></span>]) <i class="conum" data-value="5"></i><b>(5)</b>
-    <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; addHeadline(Month month, <span class="predefined-type">String</span> headline) {
-        <span class="keyword">if</span> (headlines.containsKey(month)) {
-            <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; lines = headlines[month]
-            lines &lt;&lt; headline
-            headlines.put(month, lines)
-        } <span class="keyword">else</span> {
-            headlines[month] = [headline]
-        }
-        headlines[month]
-    }
+    <span class="nd">@CachePut</span><span class="o">(</span><span class="n">parameters</span> <span class="o">=</span> <span class="o">[</span><span class="s2">"month"</span><span class="o">])</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">addHeadline</span><span class="o">(</span><span class="n">Month</span> <span class="n">month</span><span class="o">,</span> <span class="n">String</span> <span class="n">headline</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">headlines</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">month</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">lines</span> <span class="o">=</span> <span class="n">headlines</span><span class="o">[</span><span class="n">month</span><span class="o">]</span>
+            <span class="n">lines</span> <span class="o">&lt;&lt;</span> <span class="n">headline</span>
+            <span class="n">headlines</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">month</span><span class="o">,</span> <span class="n">lines</span><span class="o">)</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">headlines</span><span class="o">[</span><span class="n">month</span><span class="o">]</span> <span class="o">=</span> <span class="o">[</span><span class="n">headline</span><span class="o">]</span>
+        <span class="o">}</span>
+        <span class="n">headlines</span><span class="o">[</span><span class="n">month</span><span class="o">]</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@CacheInvalidate</span>(parameters = [<span class="string"><span class="delimiter">&quot;</span><span class="content">month</span><span class="delimiter">&quot;</span></span>]) <i class="conum" data-value="6"></i><b>(6)</b>
-    <span class="type">void</span> removeHeadline(Month month, <span class="predefined-type">String</span> headline) {
-        <span class="keyword">if</span> (headlines.containsKey(month)) {
-            <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; lines = headlines[month]
-            lines -= headline
-            headlines.put(month, lines)
-        }
-    }
-}</code></pre>
+    <span class="nd">@CacheInvalidate</span><span class="o">(</span><span class="n">parameters</span> <span class="o">=</span> <span class="o">[</span><span class="s2">"month"</span><span class="o">])</span> <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="kt">void</span> <span class="nf">removeHeadline</span><span class="o">(</span><span class="n">Month</span> <span class="n">month</span><span class="o">,</span> <span class="n">String</span> <span class="n">headline</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">headlines</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">month</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">lines</span> <span class="o">=</span> <span class="n">headlines</span><span class="o">[</span><span class="n">month</span><span class="o">]</span>
+            <span class="n">lines</span> <span class="o">-=</span> <span class="n">headline</span>
+            <span class="n">headlines</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">month</span><span class="o">,</span> <span class="n">lines</span><span class="o">)</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -386,104 +387,104 @@ If you don&#8217;t annotate the class with <code>@CacheConfig</code>, specify th
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/NewsServiceSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Stepwise</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Timeout</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Stepwise</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Timeout</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">java.time.Month</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">java.time.Month</span>
 
-<span class="annotation">@Stepwise</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>)  <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">NewsServiceSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@Stepwise</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">startApplication</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">NewsServiceSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    NewsService newsService;
+    <span class="nd">@Inject</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="n">NewsService</span> <span class="n">newsService</span><span class="o">;</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">4</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">first invocation of November does not hit cache</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines = newsService.headlines(Month.NOVEMBER)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"first invocation of November does not hit cache"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="n">newsService</span><span class="o">.</span><span class="na">headlines</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">NOVEMBER</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="integer">2</span> == headlines.size()
-    }
+        <span class="nl">then:</span>
+        <span class="mi">2</span> <span class="o">==</span> <span class="n">headlines</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">second invocation of November hits Cache</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines = newsService.headlines(Month.NOVEMBER)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"second invocation of November hits Cache"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="n">newsService</span><span class="o">.</span><span class="na">headlines</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">NOVEMBER</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="integer">2</span> == headlines.size()
-    }
+        <span class="nl">then:</span>
+        <span class="mi">2</span> <span class="o">==</span> <span class="n">headlines</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">4</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">first invocation of October does not hit Cache</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines = newsService.headlines(Month.OCTOBER)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"first invocation of October does not hit Cache"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="n">newsService</span><span class="o">.</span><span class="na">headlines</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">OCTOBER</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="integer">1</span> == headlines.size()
-    }
+        <span class="nl">then:</span>
+        <span class="mi">1</span> <span class="o">==</span> <span class="n">headlines</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">second invocation of october hits cache</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines = newsService.headlines(Month.OCTOBER)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"second invocation of october hits cache"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="n">newsService</span><span class="o">.</span><span class="na">headlines</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">OCTOBER</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="integer">1</span> == headlines.size()
-    }
+        <span class="nl">then:</span>
+        <span class="mi">1</span> <span class="o">==</span> <span class="n">headlines</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">adding a headline to november updates cache</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines = newsService.addHeadline(Month.NOVEMBER, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut 1.3 Milestone 1 Released</span><span class="delimiter">&quot;</span></span>)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"adding a headline to november updates cache"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="n">newsService</span><span class="o">.</span><span class="na">addHeadline</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">NOVEMBER</span><span class="o">,</span> <span class="s2">"Micronaut 1.3 Milestone 1 Released"</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="integer">3</span> == headlines.size()
-    }
+        <span class="nl">then:</span>
+        <span class="mi">3</span> <span class="o">==</span> <span class="n">headlines</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">november cache was updated by cache put and thus the value is retrieved from the cache</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines = newsService.headlines(Month.NOVEMBER)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"november cache was updated by cache put and thus the value is retrieved from the cache"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="n">newsService</span><span class="o">.</span><span class="na">headlines</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">NOVEMBER</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="integer">3</span> == headlines.size()
-    }
+        <span class="nl">then:</span>
+        <span class="mi">3</span> <span class="o">==</span> <span class="n">headlines</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">invalidate november cache with cache invalidate</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        newsService.removeHeadline(Month.NOVEMBER, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut 1.3 Milestone 1 Released</span><span class="delimiter">&quot;</span></span>)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"invalidate november cache with cache invalidate"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">newsService</span><span class="o">.</span><span class="na">removeHeadline</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">NOVEMBER</span><span class="o">,</span> <span class="s2">"Micronaut 1.3 Milestone 1 Released"</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        noExceptionThrown()
-    }
+        <span class="nl">then:</span>
+        <span class="n">noExceptionThrown</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">october cache is still valid</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines = newsService.headlines(Month.OCTOBER)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"october cache is still valid"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="n">newsService</span><span class="o">.</span><span class="na">headlines</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">OCTOBER</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="integer">1</span> == headlines.size()
-    }
+        <span class="nl">then:</span>
+        <span class="mi">1</span> <span class="o">==</span> <span class="n">headlines</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">4</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">november cache was invalidated</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines = newsService.headlines(Month.NOVEMBER)
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="s2">"november cache was invalidated"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span> <span class="o">=</span> <span class="n">newsService</span><span class="o">.</span><span class="na">headlines</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">NOVEMBER</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="integer">2</span> == headlines.size()
-    }
-}</code></pre>
+        <span class="nl">then:</span>
+        <span class="mi">2</span> <span class="o">==</span> <span class="n">headlines</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -515,19 +516,19 @@ If you don&#8217;t annotate the class with <code>@CacheConfig</code>, specify th
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/News.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span>
 
-<span class="keyword">import</span> <span class="include">java.time.Month</span>
+<span class="kn">import</span> <span class="nn">java.time.Month</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">News</span> {
-    Month month
-    <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; headlines
-}</code></pre>
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">News</span> <span class="o">{</span>
+    <span class="n">Month</span> <span class="n">month</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">headlines</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -541,29 +542,29 @@ If you don&#8217;t annotate the class with <code>@CacheConfig</code>, specify th
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/NewsController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
 
-<span class="keyword">import</span> <span class="include">java.time.Month</span>
+<span class="kn">import</span> <span class="nn">java.time.Month</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">NewsController</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">NewsController</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> NewsService newsService
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">NewsService</span> <span class="n">newsService</span>
 
-    NewsController(NewsService newsService) {
-        <span class="local-variable">this</span>.newsService = newsService
-    }
+    <span class="nf">NewsController</span><span class="o">(</span><span class="n">NewsService</span> <span class="n">newsService</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">newsService</span> <span class="o">=</span> <span class="n">newsService</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/{month}</span><span class="delimiter">'</span></span>)
-    News index(Month month) {
-        <span class="keyword">new</span> News(<span class="key">month</span>: month, <span class="key">headlines</span>: newsService.headlines(month))
-    }
-}</code></pre>
+    <span class="nd">@Get</span><span class="o">(</span><span class="s1">'/{month}'</span><span class="o">)</span>
+    <span class="n">News</span> <span class="nf">index</span><span class="o">(</span><span class="n">Month</span> <span class="n">month</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">new</span> <span class="nf">News</span><span class="o">(</span><span class="nl">month:</span> <span class="n">month</span><span class="o">,</span> <span class="nl">headlines:</span> <span class="n">newsService</span><span class="o">.</span><span class="na">headlines</span><span class="o">(</span><span class="n">month</span><span class="o">))</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -580,51 +581,51 @@ If you don&#8217;t annotate the class with <code>@CacheConfig</code>, specify th
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/NewsControllerSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.uri.UriBuilder</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Timeout</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.uri.UriBuilder</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.runtime.server.EmbeddedServer</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Timeout</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">java.time.Month</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">java.time.Month</span>
 
-<span class="annotation">@MicronautTest</span>
-<span class="type">class</span> <span class="class">NewsControllerSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span>
+<span class="kd">class</span> <span class="nc">NewsControllerSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    EmbeddedServer server
+    <span class="nd">@Inject</span>
+    <span class="n">EmbeddedServer</span> <span class="n">server</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+    <span class="n">HttpClient</span> <span class="n">client</span>
 
-    <span class="annotation">@Timeout</span>(<span class="integer">5</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fetching october headlines uses cache</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">given</span>:
-        <span class="predefined-type">String</span> expected = <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronaut AOP: Awesome flexibility without the complexity</span><span class="delimiter">&quot;</span></span>
+    <span class="nd">@Timeout</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="kt">void</span> <span class="s2">"fetching october headlines uses cache"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">given:</span>
+        <span class="n">String</span> <span class="n">expected</span> <span class="o">=</span> <span class="s2">"Micronaut AOP: Awesome flexibility without the complexity"</span>
 
-        <span class="key">when</span>:
-        HttpRequest request = HttpRequest.GET(UriBuilder.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-                .path(Month.OCTOBER.name())
-                .build())
-        News news = client.toBlocking().retrieve(request, News)
+        <span class="nl">when:</span>
+        <span class="n">HttpRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="n">UriBuilder</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">path</span><span class="o">(</span><span class="n">Month</span><span class="o">.</span><span class="na">OCTOBER</span><span class="o">.</span><span class="na">name</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">())</span>
+        <span class="n">News</span> <span class="n">news</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">retrieve</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">News</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        [expected] == news.headlines
+        <span class="nl">then:</span>
+        <span class="o">[</span><span class="n">expected</span><span class="o">]</span> <span class="o">==</span> <span class="n">news</span><span class="o">.</span><span class="na">headlines</span>
 
-        <span class="key">when</span>:
-        news = client.toBlocking().retrieve(request, News)
+        <span class="nl">when:</span>
+        <span class="n">news</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">retrieve</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">News</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        [expected] == news.headlines
-    }
-}</code></pre>
+        <span class="nl">then:</span>
+        <span class="o">[</span><span class="n">expected</span><span class="o">]</span> <span class="o">==</span> <span class="n">news</span><span class="o">.</span><span class="na">headlines</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -241,7 +242,7 @@ This guide uses paid services; you may need to enable Billing in Google Cloud to
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=maven --lang=kotlin</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="nt">--build</span><span class="o">=</span>maven <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -273,20 +274,20 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/HelloController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.Produces
+<span class="k">import</span> <span class="nn">io.micronaut.http.MediaType</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Produces</span>
 
-@Controller(&quot;/hello&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-class HelloController {
+<span class="nd">@Controller</span><span class="p">(</span><span class="s">"/hello"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">HelloController</span> <span class="p">{</span>
 
-    @Get<i class="conum" data-value="2"></i><b>(2)</b>
-    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-    fun index() = &quot;Hello World&quot;
-}</code></pre>
+    <span class="nd">@Get</span><i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Produces</span><span class="p">(</span><span class="nc">MediaType</span><span class="p">.</span><span class="nc">TEXT_PLAIN</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">index</span><span class="p">()</span> <span class="p">=</span> <span class="s">"Hello World"</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -318,28 +319,28 @@ class HelloController {
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/HelloControllerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertNotNull</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
 
-@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
-class HelloControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">HelloControllerTest</span><span class="p">(</span><span class="nd">@Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> <span class="kd">val</span> <span class="py">client</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    @Test
-    fun testHello() {
-        val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(&quot;/hello&quot;)  <i class="conum" data-value="3"></i><b>(3)</b>
-        val body = client.toBlocking().retrieve(request)
-        assertNotNull(body)
-        assertEquals(&quot;Hello World&quot;, body)
-    }
-}</code></pre>
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">testHello</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">(</span><span class="s">"/hello"</span><span class="p">)</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="kd">val</span> <span class="py">body</span> <span class="p">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="nf">retrieve</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="nf">assertNotNull</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="s">"Hello World"</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -377,7 +378,7 @@ class HelloControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i cl
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud init</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud init</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -385,7 +386,7 @@ class HelloControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i cl
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud auth login</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud auth login</code></pre>
 </div>
 </div>
 </div>
@@ -396,7 +397,7 @@ class HelloControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i cl
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects create micronaut-guides-xxxxxx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects create micronaut-guides-xxxxxx</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -416,7 +417,7 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud config set project micronaut-guides-xxxxxx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud config <span class="nb">set </span>project micronaut-guides-xxxxxx</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -424,7 +425,7 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects list</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects list</code></pre>
 </div>
 </div>
 </div>
@@ -483,12 +484,12 @@ You will need to choose the region where you want your App Engine Application lo
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>com.google.cloud.tools<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>appengine-maven-plugin<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>2.4.3<span class="tag">&lt;/version&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.google.cloud.tools<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>appengine-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>2.4.3<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 </div>
@@ -515,7 +516,7 @@ You will need to choose the region where you want your App Engine Application lo
 <div class="listingblock">
 <div class="title">src/main/appengine/app.yaml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>runtime: java
+<pre class="rouge highlight"><code>runtime: java
 env: flex</code></pre>
 </div>
 </div>
@@ -530,14 +531,14 @@ env: flex</code></pre>
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml">...
+<pre class="rouge highlight"><code data-lang="xml">...
 ..
 .
-    <span class="tag">&lt;properties&gt;</span>
+    <span class="nt">&lt;properties&gt;</span>
         ...
         ..
-        <span class="tag">&lt;jdk.version&gt;</span>1.8<span class="tag">&lt;/jdk.version&gt;</span>
-        <span class="tag">&lt;release.version&gt;</span>1.8<span class="tag">&lt;/release.version&gt;</span></code></pre>
+        <span class="nt">&lt;jdk.version&gt;</span>1.8<span class="nt">&lt;/jdk.version&gt;</span>
+        <span class="nt">&lt;release.version&gt;</span>1.8<span class="nt">&lt;/release.version&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -545,7 +546,7 @@ env: flex</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw package appengine:deploy -Dapp.deploy.projectId=PROJECT_ID -Dapp.deploy.version=1</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./mvnw package appengine:deploy <span class="nt">-Dapp</span>.deploy.projectId<span class="o">=</span>PROJECT_ID <span class="nt">-Dapp</span>.deploy.version<span class="o">=</span>1</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -557,17 +558,17 @@ access your app:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">....
+<pre class="rouge highlight"><code data-lang="bash">....
 ...
 ..
-.
-Deployed service [default] to [ https://micronaut-guides.ue.r.appspot.com]
+<span class="nb">.</span>
+Deployed service <span class="o">[</span>default] to <span class="o">[</span> https://micronaut-guides.ue.r.appspot.com]
 
-You can stream logs from the command line by running:
-  $ gcloud app logs tail -s default
+You can stream logs from the <span class="nb">command </span>line by running:
+  <span class="nv">$ </span>gcloud app logs <span class="nb">tail</span> <span class="nt">-s</span> default
 
-To view your application in the web browser, run:
-  $ gcloud app browse
+To view your application <span class="k">in </span>the web browser, run:
+  <span class="nv">$ </span>gcloud app browse
 ....
 ...
 ..
@@ -585,17 +586,17 @@ in the App Engine administration panel, you will see the deployed app.</p>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -i https://micronaut-guides.ue.r.appspot.com/hello</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-i</span> https://micronaut-guides.ue.r.appspot.com/hello</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code>HTTP/2 200
+<pre class="rouge highlight"><code>HTTP/2 200
 date: Mon, 04 Oct 2021 05:29:04 GMT
 content-type: text/plain
 content-length: 11
 via: 1.1 google
-alt-svc: h3=&quot;:443&quot;; ma=2592000,h3-29=&quot;:443&quot;; ma=2592000,h3-T051=&quot;:443&quot;; ma=2592000,h3-Q050=&quot;:443&quot;; ma=2592000,h3-Q046=&quot;:443&quot;; ma=2592000,h3-Q043=&quot;:443&quot;; ma=2592000,quic=&quot;:443&quot;; ma=2592000; v=&quot;46,43&quot;
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
 
 Hello World</code></pre>
 </div>
@@ -670,7 +671,7 @@ sections describe how to delete or turn off these resources.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects delete YOUR_PROJECT_ID</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects delete YOUR_PROJECT_ID</code></pre>
 </div>
 </div>
 </div>

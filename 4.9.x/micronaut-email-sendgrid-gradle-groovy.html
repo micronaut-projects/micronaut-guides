@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -209,11 +210,11 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=email-sendgrid,validation,yaml,reactor \
-    --build=gradle \
-    --lang=groovy \
-    --test=spock</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>email-sendgrid,validation,yaml,reactor <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>groovy <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>spock</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -263,49 +264,49 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/MailController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">com.sendgrid.Request</span>
-<span class="keyword">import</span> <span class="include">com.sendgrid.Response</span>
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">groovy.util.logging.Slf4j</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncEmailSender</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">com.sendgrid.Request</span>
+<span class="kn">import</span> <span class="nn">com.sendgrid.Response</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">groovy.util.logging.Slf4j</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.AsyncEmailSender</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.Email</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Body</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Post</span>
+<span class="kn">import</span> <span class="nn">org.reactivestreams.Publisher</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.email.BodyType.HTML</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">email</span><span class="o">.</span><span class="na">BodyType</span><span class="o">.</span><span class="na">HTML</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Slf4j</span>
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/mail</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">MailController</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Slf4j</span>
+<span class="nd">@Controller</span><span class="o">(</span><span class="s1">'/mail'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">MailController</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> AsyncEmailSender&lt;Request, Response&gt; emailSender
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">AsyncEmailSender</span><span class="o">&lt;</span><span class="n">Request</span><span class="o">,</span> <span class="n">Response</span><span class="o">&gt;</span> <span class="n">emailSender</span>
 
-    MailController(AsyncEmailSender&lt;Request, Response&gt; emailSender) { <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="local-variable">this</span>.emailSender = emailSender
-    }
+    <span class="n">MailController</span><span class="o">(</span><span class="n">AsyncEmailSender</span><span class="o">&lt;</span><span class="n">Request</span><span class="o">,</span> <span class="n">Response</span><span class="o">&gt;</span> <span class="n">emailSender</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="k">this</span><span class="o">.</span><span class="na">emailSender</span> <span class="o">=</span> <span class="n">emailSender</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">'</span><span class="content">/send</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    Publisher&lt;HttpResponse&lt;?&gt;&gt; send(<span class="annotation">@Body</span>(<span class="string"><span class="delimiter">'</span><span class="content">to</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> to) { <i class="conum" data-value="4"></i><b>(4)</b>
-        Mono.from(emailSender.sendAsync(Email.builder()
-                .to(to)
-                .subject(<span class="string"><span class="delimiter">'</span><span class="content">Sending email with Twilio Sendgrid is Fun</span><span class="delimiter">'</span></span>)
-                .body(<span class="string"><span class="delimiter">'</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">'</span></span>, <span class="predefined-type">HTML</span>)))
-                .doOnNext(rsp -&gt; {
-                    log.info(<span class="string"><span class="delimiter">'</span><span class="content">response status {}\nresponse body {}\nresponse headers {}</span><span class="delimiter">'</span></span>,
-                            rsp.statusCode, rsp.body, rsp.headers)
-                }).map(rsp -&gt; rsp.statusCode &gt;= <span class="integer">400</span> ?
-                HttpResponse.unprocessableEntity() :
-                HttpResponse.accepted()) <i class="conum" data-value="5"></i><b>(5)</b>
-                <span class="keyword">as</span> Publisher
-    }
-}</code></pre>
+    <span class="nd">@Post</span><span class="o">(</span><span class="s1">'/send'</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="n">Publisher</span><span class="o">&lt;</span><span class="n">HttpResponse</span><span class="o">&lt;?&gt;&gt;</span> <span class="n">send</span><span class="o">(</span><span class="nd">@Body</span><span class="o">(</span><span class="s1">'to'</span><span class="o">)</span> <span class="n">String</span> <span class="n">to</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="n">Mono</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">emailSender</span><span class="o">.</span><span class="na">sendAsync</span><span class="o">(</span><span class="n">Email</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">to</span><span class="o">(</span><span class="n">to</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">subject</span><span class="o">(</span><span class="s1">'Sending email with Twilio Sendgrid is Fun'</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="s1">'and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;'</span><span class="o">,</span> <span class="n">HTML</span><span class="o">)))</span>
+                <span class="o">.</span><span class="na">doOnNext</span><span class="o">(</span><span class="n">rsp</span> <span class="o">-&gt;</span> <span class="o">{</span>
+                    <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s1">'response status {}\nresponse body {}\nresponse headers {}'</span><span class="o">,</span>
+                            <span class="n">rsp</span><span class="o">.</span><span class="na">statusCode</span><span class="o">,</span> <span class="n">rsp</span><span class="o">.</span><span class="na">body</span><span class="o">,</span> <span class="n">rsp</span><span class="o">.</span><span class="na">headers</span><span class="o">)</span>
+                <span class="o">}).</span><span class="na">map</span><span class="o">(</span><span class="n">rsp</span> <span class="o">-&gt;</span> <span class="n">rsp</span><span class="o">.</span><span class="na">statusCode</span> <span class="o">&gt;=</span> <span class="mi">400</span> <span class="o">?</span>
+                <span class="n">HttpResponse</span><span class="o">.</span><span class="na">unprocessableEntity</span><span class="o">()</span> <span class="o">:</span>
+                <span class="n">HttpResponse</span><span class="o">.</span><span class="na">accepted</span><span class="o">())</span> <i class="conum" data-value="5"></i><b>(5)</b>
+                <span class="k">as</span> <span class="n">Publisher</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -353,11 +354,11 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="head"><span class="head">---</span></span>
-<span class="key">micronaut</span>:
-  <span class="key">email</span>:
-    <span class="key">from</span>:
-      <span class="key">email</span>: <span class="string"><span class="content">'john@micronaut.example'</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="nn">---</span>
+<span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">email</span><span class="pi">:</span>
+    <span class="na">from</span><span class="pi">:</span>
+      <span class="na">email</span><span class="pi">:</span> <span class="s1">'</span><span class="s">john@micronaut.example'</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -393,7 +394,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.micronaut.email:micronaut-email-sendgrid</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"com.micronaut.email:micronaut-email-sendgrid"</span><span class="o">)</span></code></pre>
 </div>
 </div>
 </div>
@@ -406,49 +407,49 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/EmailSenderReplacement.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">com.sendgrid.Request</span>
-<span class="keyword">import</span> <span class="include">com.sendgrid.Response</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Replaces</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncEmailSender</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncTransactionalEmailSender</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.email.EmailException</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Named</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">com.sendgrid.Request</span>
+<span class="kn">import</span> <span class="nn">com.sendgrid.Response</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Replaces</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.AsyncEmailSender</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.AsyncTransactionalEmailSender</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.Email</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.EmailException</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Named</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">org.reactivestreams.Publisher</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.validation.Valid</span>
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>
-<span class="keyword">import</span> <span class="include">java.util.function.Consumer</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.Valid</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span>
+<span class="kn">import</span> <span class="nn">java.util.function.Consumer</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.ACCEPTED</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">ACCEPTED</span>
 
-<span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">'</span><span class="content">spec.name</span><span class="delimiter">'</span></span>, value = <span class="string"><span class="delimiter">'</span><span class="content">MailControllerSpec</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Singleton</span>
-<span class="annotation">@Replaces</span>(AsyncEmailSender)
-<span class="annotation">@Named</span>(EmailSenderReplacement.NAME)
-<span class="type">class</span> <span class="class">EmailSenderReplacement</span> <span class="directive">implements</span> AsyncTransactionalEmailSender&lt;Request, Response&gt; {
+<span class="nd">@Requires</span><span class="o">(</span><span class="n">property</span> <span class="o">=</span> <span class="s1">'spec.name'</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s1">'MailControllerSpec'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Singleton</span>
+<span class="nd">@Replaces</span><span class="o">(</span><span class="n">AsyncEmailSender</span><span class="o">)</span>
+<span class="nd">@Named</span><span class="o">(</span><span class="n">EmailSenderReplacement</span><span class="o">.</span><span class="na">NAME</span><span class="o">)</span>
+<span class="kd">class</span> <span class="nc">EmailSenderReplacement</span> <span class="kd">implements</span> <span class="n">AsyncTransactionalEmailSender</span><span class="o">&lt;</span><span class="n">Request</span><span class="o">,</span> <span class="n">Response</span><span class="o">&gt;</span> <span class="o">{</span>
 
-    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> NAME = <span class="string"><span class="delimiter">'</span><span class="content">sendgrid</span><span class="delimiter">'</span></span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">NAME</span> <span class="o">=</span> <span class="s1">'sendgrid'</span>
 
-    <span class="directive">final</span> <span class="predefined-type">List</span>&lt;Email&gt; emails = <span class="type">[]</span>
+    <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Email</span><span class="o">&gt;</span> <span class="n">emails</span> <span class="o">=</span> <span class="o">[]</span>
 
-    <span class="annotation">@Override</span>
-    <span class="predefined-type">String</span> getName() {
-        NAME
-    }
+    <span class="nd">@Override</span>
+    <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">NAME</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Override</span>
-    Publisher&lt;Response&gt; sendAsync(<span class="annotation">@NotNull</span> <span class="annotation">@Valid</span> Email email,
-                                  <span class="annotation">@NotNull</span> Consumer&lt;Request&gt; emailRequest) <span class="directive">throws</span> EmailException {
-        emails &lt;&lt; email
-        Mono.just(<span class="keyword">new</span> Response(<span class="key">statusCode</span>: ACCEPTED.code))
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="n">Publisher</span><span class="o">&lt;</span><span class="n">Response</span><span class="o">&gt;</span> <span class="n">sendAsync</span><span class="o">(</span><span class="nd">@NotNull</span> <span class="nd">@Valid</span> <span class="n">Email</span> <span class="n">email</span><span class="o">,</span>
+                                  <span class="nd">@NotNull</span> <span class="n">Consumer</span><span class="o">&lt;</span><span class="n">Request</span><span class="o">&gt;</span> <span class="n">emailRequest</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">EmailException</span> <span class="o">{</span>
+        <span class="n">emails</span> <span class="o">&lt;&lt;</span> <span class="n">email</span>
+        <span class="n">Mono</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="k">new</span> <span class="n">Response</span><span class="o">(</span><span class="nl">statusCode:</span> <span class="n">ACCEPTED</span><span class="o">.</span><span class="na">code</span><span class="o">))</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -465,69 +466,69 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/MailControllerSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.BeanContext</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.email.AsyncTransactionalEmailSender</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.email.Email</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.BeanContext</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Property</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.AsyncTransactionalEmailSender</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.email.Email</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.email.BodyType.HTML</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.ACCEPTED</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">email</span><span class="o">.</span><span class="na">BodyType</span><span class="o">.</span><span class="na">HTML</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">ACCEPTED</span>
 
-<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">spec.name</span><span class="delimiter">'</span></span>, value = <span class="string"><span class="delimiter">'</span><span class="content">MailControllerSpec</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">MailControllerSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">'spec.name'</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s1">'MailControllerSpec'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">MailControllerSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
-    HttpClient httpClient <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s1">'/'</span><span class="o">)</span>
+    <span class="n">HttpClient</span> <span class="n">httpClient</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-    <span class="annotation">@Inject</span>
-    <span class="predefined-type">BeanContext</span> beanContext
+    <span class="nd">@Inject</span>
+    <span class="n">BeanContext</span> <span class="n">beanContext</span>
 
-    <span class="type">void</span> getMailSendEndpointSendsAnEmail() {
+    <span class="kt">void</span> <span class="nf">getMailSendEndpointSendsAnEmail</span><span class="o">()</span> <span class="o">{</span>
 
-        <span class="key">when</span>:
-        HttpResponse&lt;?&gt; response = httpClient.toBlocking().exchange(
-                HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/mail/send</span><span class="delimiter">'</span></span>, [<span class="key">to</span>: <span class="string"><span class="delimiter">'</span><span class="content">johnsnow@micronaut.example</span><span class="delimiter">'</span></span>]))
+        <span class="nl">when:</span>
+        <span class="n">HttpResponse</span><span class="o">&lt;?&gt;</span> <span class="n">response</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span>
+                <span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s1">'/mail/send'</span><span class="o">,</span> <span class="o">[</span><span class="nl">to:</span> <span class="s1">'johnsnow@micronaut.example'</span><span class="o">]))</span>
 
-        <span class="key">then</span>:
-        ACCEPTED == response.status()
+        <span class="nl">then:</span>
+        <span class="n">ACCEPTED</span> <span class="o">==</span> <span class="n">response</span><span class="o">.</span><span class="na">status</span><span class="o">()</span>
 
-        <span class="key">when</span>:
-        AsyncTransactionalEmailSender&lt;?, ?&gt; sender = beanContext.getBean(AsyncTransactionalEmailSender)
+        <span class="nl">when:</span>
+        <span class="n">AsyncTransactionalEmailSender</span><span class="o">&lt;?,</span> <span class="o">?&gt;</span> <span class="n">sender</span> <span class="o">=</span> <span class="n">beanContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">AsyncTransactionalEmailSender</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        sender <span class="keyword">instanceof</span> EmailSenderReplacement
+        <span class="nl">then:</span>
+        <span class="n">sender</span> <span class="k">instanceof</span> <span class="n">EmailSenderReplacement</span>
 
-        <span class="key">when</span>:
-        EmailSenderReplacement sendgridSender = (EmailSenderReplacement) sender
+        <span class="nl">when:</span>
+        <span class="n">EmailSenderReplacement</span> <span class="n">sendgridSender</span> <span class="o">=</span> <span class="o">(</span><span class="n">EmailSenderReplacement</span><span class="o">)</span> <span class="n">sender</span>
 
-        <span class="key">then</span>:
-        <span class="integer">1</span> == sendgridSender.emails.size()
+        <span class="nl">then:</span>
+        <span class="mi">1</span> <span class="o">==</span> <span class="n">sendgridSender</span><span class="o">.</span><span class="na">emails</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
 
-        <span class="key">when</span>:
-        Email email = sendgridSender.emails[<span class="integer">0</span>]
+        <span class="nl">when:</span>
+        <span class="n">Email</span> <span class="n">email</span> <span class="o">=</span> <span class="n">sendgridSender</span><span class="o">.</span><span class="na">emails</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
 
-        <span class="key">then</span>:
-        email.from.email == <span class="string"><span class="delimiter">'</span><span class="content">john@micronaut.example</span><span class="delimiter">'</span></span>
-        email.to
-        email.to.first()
-        email.to.first().email == <span class="string"><span class="delimiter">'</span><span class="content">johnsnow@micronaut.example</span><span class="delimiter">'</span></span>
-        email.subject == <span class="string"><span class="delimiter">'</span><span class="content">Sending email with Twilio Sendgrid is Fun</span><span class="delimiter">'</span></span>
-        email.body
-        email.body.get(<span class="predefined-type">HTML</span>).present
-        email.body.get(<span class="predefined-type">HTML</span>).get() == <span class="string"><span class="delimiter">'</span><span class="content">and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;</span><span class="delimiter">'</span></span>
-    }
-}</code></pre>
+        <span class="nl">then:</span>
+        <span class="n">email</span><span class="o">.</span><span class="na">from</span><span class="o">.</span><span class="na">email</span> <span class="o">==</span> <span class="s1">'john@micronaut.example'</span>
+        <span class="n">email</span><span class="o">.</span><span class="na">to</span>
+        <span class="n">email</span><span class="o">.</span><span class="na">to</span><span class="o">.</span><span class="na">first</span><span class="o">()</span>
+        <span class="n">email</span><span class="o">.</span><span class="na">to</span><span class="o">.</span><span class="na">first</span><span class="o">().</span><span class="na">email</span> <span class="o">==</span> <span class="s1">'johnsnow@micronaut.example'</span>
+        <span class="n">email</span><span class="o">.</span><span class="na">subject</span> <span class="o">==</span> <span class="s1">'Sending email with Twilio Sendgrid is Fun'</span>
+        <span class="n">email</span><span class="o">.</span><span class="na">body</span>
+        <span class="n">email</span><span class="o">.</span><span class="na">body</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">HTML</span><span class="o">).</span><span class="na">present</span>
+        <span class="n">email</span><span class="o">.</span><span class="na">body</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">HTML</span><span class="o">).</span><span class="na">get</span><span class="o">()</span> <span class="o">==</span> <span class="s1">'and &lt;em&gt;easy&lt;/em&gt; to do anywhere with &lt;strong&gt;Micronaut Email&lt;/strong&gt;'</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -557,7 +558,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -575,7 +576,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export SENDGRID_API_KEY=xxx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">SENDGRID_API_KEY</span><span class="o">=</span>xxx</code></pre>
 </div>
 </div>
 </div>
@@ -595,9 +596,9 @@ If you have an existing Micronaut application and want to add the functionality 
 <h3 id="invoke">6.4. Invoke</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -d '{&quot;to&quot;:&quot;john@micronaut.example&quot;}' \
-     -H &quot;Content-Type: application/json&quot; \
-     -X POST http://localhost:8080/mail/send</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-d</span> <span class="s1">'{"to":"john@micronaut.example"}'</span> <span class="se">\</span>
+     <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+     <span class="nt">-X</span> POST http://localhost:8080/mail/send</code></pre>
 </div>
 </div>
 </div>

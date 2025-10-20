@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -196,17 +197,17 @@ By combining the <code>@Primary</code> annotation and the injection of a collect
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/ColorFetcher.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.core.order.Ordered
-import io.micronaut.http.HttpRequest
-import java.util.Optional
+<span class="k">import</span> <span class="nn">io.micronaut.core.order.Ordered</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">java.util.Optional</span>
 
-@FunctionalInterface <i class="conum" data-value="1"></i><b>(1)</b>
-interface ColorFetcher : Ordered { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@FunctionalInterface</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">interface</span> <span class="nc">ColorFetcher</span> <span class="p">:</span> <span class="nc">Ordered</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    fun favouriteColor(request: HttpRequest&lt;*&gt;): Optional&lt;String&gt;
-}</code></pre>
+    <span class="k">fun</span> <span class="nf">favouriteColor</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -232,20 +233,20 @@ interface ColorFetcher : Ordered { <i class="conum" data-value="2"></i><b>(2)</b
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/HttpHeaderColorFetcher.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.HttpRequest
-import jakarta.inject.Singleton
-import java.util.Optional
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="k">import</span> <span class="nn">java.util.Optional</span>
 
-@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class HttpHeaderColorFetcher : ColorFetcher {
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">HttpHeaderColorFetcher</span> <span class="p">:</span> <span class="nc">ColorFetcher</span> <span class="p">{</span>
 
-    override fun favouriteColor(request: HttpRequest&lt;*&gt;): Optional&lt;String&gt; =
-        request.headers.get(&quot;color&quot;, String::class.java)
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">favouriteColor</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">=</span>
+        <span class="n">request</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="s">"color"</span><span class="p">,</span> <span class="nc">String</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
 
-    override fun getOrder(): Int = 10 <i class="conum" data-value="2"></i><b>(2)</b>
-}</code></pre>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getOrder</span><span class="p">():</span> <span class="nc">Int</span> <span class="p">=</span> <span class="mi">10</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -271,70 +272,70 @@ class HttpHeaderColorFetcher : ColorFetcher {
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/PathColorFetcher.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.HttpRequest
-import jakarta.inject.Singleton
-import java.util.Locale
-import java.util.Optional
-import java.util.stream.Stream
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="k">import</span> <span class="nn">java.util.Locale</span>
+<span class="k">import</span> <span class="nn">java.util.Optional</span>
+<span class="k">import</span> <span class="nn">java.util.stream.Stream</span>
 
-@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class PathColorFetcher : ColorFetcher {
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">PathColorFetcher</span> <span class="p">:</span> <span class="nc">ColorFetcher</span> <span class="p">{</span>
 
-    override fun favouriteColor(request: HttpRequest&lt;*&gt;): Optional&lt;String&gt; {
-        return Stream.of(*COLORS)
-            .filter { request.path.contains(it.lowercase()) }
-            .map { it.lowercase(Locale.getDefault()) }
-            .findFirst()
-    }
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">favouriteColor</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nc">Stream</span><span class="p">.</span><span class="nf">of</span><span class="p">(*</span><span class="nc">COLORS</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">filter</span> <span class="p">{</span> <span class="n">request</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">contains</span><span class="p">(</span><span class="n">it</span><span class="p">.</span><span class="nf">lowercase</span><span class="p">())</span> <span class="p">}</span>
+            <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="nf">lowercase</span><span class="p">(</span><span class="nc">Locale</span><span class="p">.</span><span class="nf">getDefault</span><span class="p">())</span> <span class="p">}</span>
+            <span class="p">.</span><span class="nf">findFirst</span><span class="p">()</span>
+    <span class="p">}</span>
 
-    override fun getOrder(): Int = 20 <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getOrder</span><span class="p">():</span> <span class="nc">Int</span> <span class="p">=</span> <span class="mi">20</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    companion object {
-        private val COLORS = arrayOf(
-            &quot;Red&quot;,
-            &quot;Blue&quot;,
-            &quot;Green&quot;,
-            &quot;Orange&quot;,
-            &quot;White&quot;,
-            &quot;Black&quot;,
-            &quot;Yellow&quot;,
-            &quot;Purple&quot;,
-            &quot;Silver&quot;,
-            &quot;Brown&quot;,
-            &quot;Gray&quot;,
-            &quot;Pink&quot;,
-            &quot;Olive&quot;,
-            &quot;Maroon&quot;,
-            &quot;Violet&quot;,
-            &quot;Charcoal&quot;,
-            &quot;Magenta&quot;,
-            &quot;Bronze&quot;,
-            &quot;Cream&quot;,
-            &quot;Gold&quot;,
-            &quot;Tan&quot;,
-            &quot;Teal&quot;,
-            &quot;Mustard&quot;,
-            &quot;Navy Blue&quot;,
-            &quot;Coral&quot;,
-            &quot;Burgundy&quot;,
-            &quot;Lavender&quot;,
-            &quot;Mauve&quot;,
-            &quot;Peach&quot;,
-            &quot;Rust&quot;,
-            &quot;Indigo&quot;,
-            &quot;Ruby&quot;,
-            &quot;Clay&quot;,
-            &quot;Cyan&quot;,
-            &quot;Azure&quot;,
-            &quot;Beige&quot;,
-            &quot;Turquoise&quot;,
-            &quot;Amber&quot;,
-            &quot;Mint&quot;
-        )
-    }
-}</code></pre>
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">COLORS</span> <span class="p">=</span> <span class="nf">arrayOf</span><span class="p">(</span>
+            <span class="s">"Red"</span><span class="p">,</span>
+            <span class="s">"Blue"</span><span class="p">,</span>
+            <span class="s">"Green"</span><span class="p">,</span>
+            <span class="s">"Orange"</span><span class="p">,</span>
+            <span class="s">"White"</span><span class="p">,</span>
+            <span class="s">"Black"</span><span class="p">,</span>
+            <span class="s">"Yellow"</span><span class="p">,</span>
+            <span class="s">"Purple"</span><span class="p">,</span>
+            <span class="s">"Silver"</span><span class="p">,</span>
+            <span class="s">"Brown"</span><span class="p">,</span>
+            <span class="s">"Gray"</span><span class="p">,</span>
+            <span class="s">"Pink"</span><span class="p">,</span>
+            <span class="s">"Olive"</span><span class="p">,</span>
+            <span class="s">"Maroon"</span><span class="p">,</span>
+            <span class="s">"Violet"</span><span class="p">,</span>
+            <span class="s">"Charcoal"</span><span class="p">,</span>
+            <span class="s">"Magenta"</span><span class="p">,</span>
+            <span class="s">"Bronze"</span><span class="p">,</span>
+            <span class="s">"Cream"</span><span class="p">,</span>
+            <span class="s">"Gold"</span><span class="p">,</span>
+            <span class="s">"Tan"</span><span class="p">,</span>
+            <span class="s">"Teal"</span><span class="p">,</span>
+            <span class="s">"Mustard"</span><span class="p">,</span>
+            <span class="s">"Navy Blue"</span><span class="p">,</span>
+            <span class="s">"Coral"</span><span class="p">,</span>
+            <span class="s">"Burgundy"</span><span class="p">,</span>
+            <span class="s">"Lavender"</span><span class="p">,</span>
+            <span class="s">"Mauve"</span><span class="p">,</span>
+            <span class="s">"Peach"</span><span class="p">,</span>
+            <span class="s">"Rust"</span><span class="p">,</span>
+            <span class="s">"Indigo"</span><span class="p">,</span>
+            <span class="s">"Ruby"</span><span class="p">,</span>
+            <span class="s">"Clay"</span><span class="p">,</span>
+            <span class="s">"Cyan"</span><span class="p">,</span>
+            <span class="s">"Azure"</span><span class="p">,</span>
+            <span class="s">"Beige"</span><span class="p">,</span>
+            <span class="s">"Turquoise"</span><span class="p">,</span>
+            <span class="s">"Amber"</span><span class="p">,</span>
+            <span class="s">"Mint"</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -360,41 +361,41 @@ you will get the following exception:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">Message: Multiple possible bean candidates found:
-[example.micronaut.PathColorFetcher,
+<pre class="rouge highlight"><code data-lang="bash">Message: Multiple possible bean candidates found:
+<span class="o">[</span>example.micronaut.PathColorFetcher,
 example.micronaut.HttpHeaderColorFetcher]
-Path Taken: new ColorController(ColorFetcher colorFetcher)
---&gt; new ColorController([ColorFetcher colorFetcher])
+Path Taken: new ColorController<span class="o">(</span>ColorFetcher colorFetcher<span class="o">)</span>
+<span class="nt">--</span><span class="o">&gt;</span> new ColorController<span class="o">([</span>ColorFetcher colorFetcher]<span class="o">)</span>
 io.micronaut.context.exceptions.DependencyInjectionException:
-Failed to inject value for parameter [colorFetcher]
+Failed to inject value <span class="k">for </span>parameter <span class="o">[</span>colorFetcher]
 of class: example.micronaut.ColorController</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/ColorController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.Produces
-import java.util.Optional
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.MediaType</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Produces</span>
+<span class="k">import</span> <span class="nn">java.util.Optional</span>
 
-@Controller(&quot;/color&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-class ColorController(private val colorFetcher: ColorFetcher) { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Controller</span><span class="p">(</span><span class="s">"/color"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">ColorController</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">colorFetcher</span><span class="p">:</span> <span class="nc">ColorFetcher</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-    @Get(&quot;/mint&quot;) <i class="conum" data-value="4"></i><b>(4)</b>
-    fun mint(request: HttpRequest&lt;*&gt;): Optional&lt;String&gt; = <i class="conum" data-value="5"></i><b>(5)</b>
-        colorFetcher.favouriteColor(request)
+    <span class="nd">@Produces</span><span class="p">(</span><span class="nc">MediaType</span><span class="p">.</span><span class="nc">TEXT_PLAIN</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Get</span><span class="p">(</span><span class="s">"/mint"</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="k">fun</span> <span class="nf">mint</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">=</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="n">colorFetcher</span><span class="p">.</span><span class="nf">favouriteColor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 
-    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-    @Get
-    fun index(request: HttpRequest&lt;*&gt;): Optional&lt;String&gt; = <i class="conum" data-value="5"></i><b>(5)</b>
-        colorFetcher.favouriteColor(request)
-}</code></pre>
+    <span class="nd">@Produces</span><span class="p">(</span><span class="nc">MediaType</span><span class="p">.</span><span class="nc">TEXT_PLAIN</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Get</span>
+    <span class="k">fun</span> <span class="nf">index</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">=</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="n">colorFetcher</span><span class="p">.</span><span class="nf">favouriteColor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -429,24 +430,24 @@ class ColorController(private val colorFetcher: ColorFetcher) { <i class="conum"
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/CompositeColorFetcher.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.context.annotation.Primary
-import io.micronaut.http.HttpRequest
-import jakarta.inject.Singleton
-import java.util.Optional
+<span class="k">import</span> <span class="nn">io.micronaut.context.annotation.Primary</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="k">import</span> <span class="nn">java.util.Optional</span>
 
-@Primary <i class="conum" data-value="1"></i><b>(1)</b>
-@Singleton <i class="conum" data-value="2"></i><b>(2)</b>
-class CompositeColorFetcher(private val colorFetcherList: List&lt;ColorFetcher&gt;) : ColorFetcher { <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="nd">@Primary</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">CompositeColorFetcher</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">colorFetcherList</span><span class="p">:</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">ColorFetcher</span><span class="p">&gt;)</span> <span class="p">:</span> <span class="nc">ColorFetcher</span> <span class="p">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-    override fun favouriteColor(request: HttpRequest&lt;*&gt;): Optional&lt;String&gt; =
-        colorFetcherList.stream()
-            .map { it.favouriteColor(request) }
-            .filter { it.isPresent }
-            .map { it.get() }
-            .findFirst()
-}</code></pre>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">favouriteColor</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">=</span>
+        <span class="n">colorFetcherList</span><span class="p">.</span><span class="nf">stream</span><span class="p">()</span>
+            <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="nf">favouriteColor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="p">}</span>
+            <span class="p">.</span><span class="nf">filter</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">isPresent</span> <span class="p">}</span>
+            <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="k">get</span><span class="p">()</span> <span class="p">}</span>
+            <span class="p">.</span><span class="nf">findFirst</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -471,25 +472,25 @@ class CompositeColorFetcher(private val colorFetcherList: List&lt;ColorFetcher&g
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/CompositeColorFetcherTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.context.BeanContext
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
+<span class="k">import</span> <span class="nn">io.micronaut.context.BeanContext</span>
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertTrue</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
 
-@MicronautTest(startApplication = false) <i class="conum" data-value="1"></i><b>(1)</b>
-class CompositeColorFetcherTest {
+<span class="nd">@MicronautTest</span><span class="p">(</span><span class="n">startApplication</span> <span class="p">=</span> <span class="k">false</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">CompositeColorFetcherTest</span> <span class="p">{</span>
 
-    @Inject
-    lateinit var beanContext: BeanContext
+    <span class="nd">@Inject</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">beanContext</span><span class="p">:</span> <span class="nc">BeanContext</span>
 
-    @Test
-    fun compositeColorFetcherIsThePrimaryBeanOfTypeColorFetcher() {
-        assertTrue(beanContext.getBean(ColorFetcher::class.java) is CompositeColorFetcher)
-    }
-}</code></pre>
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">compositeColorFetcherIsThePrimaryBeanOfTypeColorFetcher</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nf">assertTrue</span><span class="p">(</span><span class="n">beanContext</span><span class="p">.</span><span class="nf">getBean</span><span class="p">(</span><span class="nc">ColorFetcher</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span> <span class="k">is</span> <span class="nc">CompositeColorFetcher</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -506,42 +507,42 @@ class CompositeColorFetcherTest {
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/ColorControllerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
-import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Test
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertThrows</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
 
-@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
-class ColorControllerTest {
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">ColorControllerTest</span> <span class="p">{</span>
 
-    @Inject
-    @field:Client(&quot;/&quot;)
-    lateinit var httpClient: HttpClient <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Inject</span>
+    <span class="err">@</span><span class="n">field</span><span class="p">:</span><span class="nc">Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">httpClient</span><span class="p">:</span> <span class="nc">HttpClient</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    @Test
-    fun testCompositePattern() {
-        val client = httpClient.toBlocking()
-        assertEquals(&quot;yellow&quot;,
-            client.retrieve(HttpRequest.GET&lt;Any&gt;(&quot;/color&quot;).header(&quot;color&quot;, &quot;yellow&quot;))
-        )
-        assertThrows(HttpClientResponseException::class.java) {
-            client.retrieve(HttpRequest.GET&lt;Any&gt;(&quot;/color&quot;))
-        }
-        assertEquals(&quot;yellow&quot;,
-            client.retrieve(HttpRequest.GET&lt;Any&gt;(&quot;/color/mint&quot;).header(&quot;color&quot;, &quot;yellow&quot;))
-        )
-        assertEquals(&quot;mint&quot;,
-            client.retrieve(HttpRequest.GET&lt;Any&gt;(&quot;/color/mint&quot;))
-        )
-    }
-}</code></pre>
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">testCompositePattern</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">client</span> <span class="p">=</span> <span class="n">httpClient</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">()</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="s">"yellow"</span><span class="p">,</span>
+            <span class="n">client</span><span class="p">.</span><span class="nf">retrieve</span><span class="p">(</span><span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;(</span><span class="s">"/color"</span><span class="p">).</span><span class="nf">header</span><span class="p">(</span><span class="s">"color"</span><span class="p">,</span> <span class="s">"yellow"</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="nf">assertThrows</span><span class="p">(</span><span class="nc">HttpClientResponseException</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">client</span><span class="p">.</span><span class="nf">retrieve</span><span class="p">(</span><span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;(</span><span class="s">"/color"</span><span class="p">))</span>
+        <span class="p">}</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="s">"yellow"</span><span class="p">,</span>
+            <span class="n">client</span><span class="p">.</span><span class="nf">retrieve</span><span class="p">(</span><span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;(</span><span class="s">"/color/mint"</span><span class="p">).</span><span class="nf">header</span><span class="p">(</span><span class="s">"color"</span><span class="p">,</span> <span class="s">"yellow"</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="s">"mint"</span><span class="p">,</span>
+            <span class="n">client</span><span class="p">.</span><span class="nf">retrieve</span><span class="p">(</span><span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;(</span><span class="s">"/color/mint"</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

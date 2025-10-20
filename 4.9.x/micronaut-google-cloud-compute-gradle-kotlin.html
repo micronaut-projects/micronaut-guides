@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -244,7 +245,7 @@ This guide uses paid services; you may need to enable Billing in Google Cloud to
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=gradle --lang=kotlin</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -276,20 +277,20 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/HelloController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.Produces
+<span class="k">import</span> <span class="nn">io.micronaut.http.MediaType</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Produces</span>
 
-@Controller(&quot;/hello&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-class HelloController {
+<span class="nd">@Controller</span><span class="p">(</span><span class="s">"/hello"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">HelloController</span> <span class="p">{</span>
 
-    @Get<i class="conum" data-value="2"></i><b>(2)</b>
-    @Produces(MediaType.TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-    fun index() = &quot;Hello World&quot;
-}</code></pre>
+    <span class="nd">@Get</span><i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Produces</span><span class="p">(</span><span class="nc">MediaType</span><span class="p">.</span><span class="nc">TEXT_PLAIN</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">index</span><span class="p">()</span> <span class="p">=</span> <span class="s">"Hello World"</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -321,28 +322,28 @@ class HelloController {
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/HelloControllerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertNotNull</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
 
-@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
-class HelloControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">HelloControllerTest</span><span class="p">(</span><span class="nd">@Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> <span class="kd">val</span> <span class="py">client</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    @Test
-    fun testHello() {
-        val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(&quot;/hello&quot;)  <i class="conum" data-value="3"></i><b>(3)</b>
-        val body = client.toBlocking().retrieve(request)
-        assertNotNull(body)
-        assertEquals(&quot;Hello World&quot;, body)
-    }
-}</code></pre>
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">testHello</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">(</span><span class="s">"/hello"</span><span class="p">)</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="kd">val</span> <span class="py">body</span> <span class="p">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="nf">retrieve</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="nf">assertNotNull</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="s">"Hello World"</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -380,7 +381,7 @@ class HelloControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i cl
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud init</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud init</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -388,7 +389,7 @@ class HelloControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i cl
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud auth login</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud auth login</code></pre>
 </div>
 </div>
 </div>
@@ -399,7 +400,7 @@ class HelloControllerTest(@Client(&quot;/&quot;) val client: HttpClient) { <i cl
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects create micronaut-guides-xxxxxx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects create micronaut-guides-xxxxxx</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -419,7 +420,7 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud config set project micronaut-guides-xxxxxx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud config <span class="nb">set </span>project micronaut-guides-xxxxxx</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -427,7 +428,7 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects list</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects list</code></pre>
 </div>
 </div>
 </div>
@@ -443,10 +444,10 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud compute instances create \
-  guide-micronaut-jdbc-compute \
-  --machine-type=e2-micro \
-  --zone=us-east1-b</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud compute instances create <span class="se">\</span>
+  guide-micronaut-jdbc-compute <span class="se">\</span>
+  <span class="nt">--machine-type</span><span class="o">=</span>e2-micro <span class="se">\</span>
+  <span class="nt">--zone</span><span class="o">=</span>us-east1-b</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -466,7 +467,7 @@ If you&#8217;ve omitted the default zone in the setup steps, the command will re
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="bash">Created [https://www.googleapis.com/compute/v1/projects/micronaut-guides-jdbc/zones/us-east1-b/instances/guide-micronaut-jdbc-compute].
+<pre class="rouge highlight nowrap"><code data-lang="bash">Created <span class="o">[</span>https://www.googleapis.com/compute/v1/projects/micronaut-guides-jdbc/zones/us-east1-b/instances/guide-micronaut-jdbc-compute].
 NAME                          ZONE        MACHINE_TYPE  PREEMPTIBLE  INTERNAL_IP    EXTERNAL_IP     STATUS
 guide-micronaut-jdbc-compute  us-east1-b  e2-micro                   10.xxx.xxx.4   34.xxx.xxx.200  RUNNING</code></pre>
 </div>
@@ -479,7 +480,7 @@ guide-micronaut-jdbc-compute  us-east1-b  e2-micro                   10.xxx.xxx.
 <h3 id="open-port-8080">7.2. Open Port 8080</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud compute firewall-rules create allow-8080 --allow tcp:8080</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud compute firewall-rules create allow-8080 <span class="nt">--allow</span> tcp:8080</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -487,7 +488,7 @@ guide-micronaut-jdbc-compute  us-east1-b  e2-micro                   10.xxx.xxx.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight nowrap"><code data-lang="bash">NAME        NETWORK  DIRECTION  PRIORITY  ALLOW     DENY  DISABLED
+<pre class="rouge highlight nowrap"><code data-lang="bash">NAME        NETWORK  DIRECTION  PRIORITY  ALLOW     DENY  DISABLED
 allow-8080  default  INGRESS    1000      tcp:8080        False</code></pre>
 </div>
 </div>
@@ -496,7 +497,7 @@ allow-8080  default  INGRESS    1000      tcp:8080        False</code></pre>
 <h3 id="generate-jar">7.3. Generate JAR</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew shadowJar</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew shadowJar</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -507,7 +508,7 @@ allow-8080  default  INGRESS    1000      tcp:8080        False</code></pre>
 <h3 id="copy-the-jar-to-the-instance">7.4. Copy the JAR to the Instance</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud compute scp build/libs/micronautguide-0.1-all.jar \
+<pre class="rouge highlight"><code data-lang="bash">gcloud compute scp build/libs/micronautguide-0.1-all.jar <span class="se">\</span>
     guide-micronaut-jdbc-compute:.</code></pre>
 </div>
 </div>
@@ -531,7 +532,7 @@ If you do not have an SSH key file for <code>gcloud</code>, you will be prompted
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud compute ssh guide-micronaut-jdbc-compute</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud compute ssh guide-micronaut-jdbc-compute</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -542,8 +543,8 @@ If you do not have an SSH key file for <code>gcloud</code>, you will be prompted
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sudo apt update
-apt install default-jre</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">sudo </span>apt update
+apt <span class="nb">install </span>default-jre</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -551,7 +552,7 @@ apt install default-jre</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">java -jar micronautguide-0.1-all.jar</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">java <span class="nt">-jar</span> micronautguide-0.1-all.jar</code></pre>
 </div>
 </div>
 </div>
@@ -562,13 +563,13 @@ apt install default-jre</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -i http://34.xxx.xxx.200:8080/hello</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-i</span> http://34.xxx.xxx.200:8080/hello</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">HTTP/1.1 200 OK
-date: Tue, 8 Feb 2022 23:41:33 GMT
+<pre class="rouge highlight"><code data-lang="bash">HTTP/1.1 200 OK
+<span class="nb">date</span>: Tue, 8 Feb 2022 23:41:33 GMT
 Content-Type: text/plain
 content-length: 11
 connection: keep-alive
@@ -581,7 +582,7 @@ Hello World</code></pre>
 <h3 id="stopping-the-instance">7.7. Stopping the Instance</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud compute instances stop guide-micronaut-jdbc-compute</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud compute instances stop guide-micronaut-jdbc-compute</code></pre>
 </div>
 </div>
 </div>
@@ -634,7 +635,7 @@ sections describe how to delete or turn off these resources.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects delete YOUR_PROJECT_ID</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects delete YOUR_PROJECT_ID</code></pre>
 </div>
 </div>
 </div>

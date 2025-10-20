@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -207,7 +208,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide --build=gradle --lang=kotlin</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -236,7 +237,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">io.micronaut.cache:micronaut-cache-caffeine</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.cache:micronaut-cache-caffeine"</span><span class="o">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -257,10 +258,10 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">caches</span>:
-    <span class="key">headlines</span>: <i class="conum" data-value="1"></i><b>(1)</b>
-      <span class="key">charset</span>: <span class="string"><span class="content">'UTF-8'</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">caches</span><span class="pi">:</span>
+    <span class="na">headlines</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="na">charset</span><span class="pi">:</span> <span class="s1">'</span><span class="s">UTF-8'</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -292,49 +293,49 @@ Check the <a href="https://micronaut-projects.github.io/micronaut-cache/latest/g
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/NewsService.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.cache.annotation.CacheConfig
-import io.micronaut.cache.annotation.CacheInvalidate
-import io.micronaut.cache.annotation.CachePut
-import io.micronaut.cache.annotation.Cacheable
-import java.time.Month
-import java.util.concurrent.TimeUnit
-import jakarta.inject.Singleton
+<span class="k">import</span> <span class="nn">io.micronaut.cache.annotation.CacheConfig</span>
+<span class="k">import</span> <span class="nn">io.micronaut.cache.annotation.CacheInvalidate</span>
+<span class="k">import</span> <span class="nn">io.micronaut.cache.annotation.CachePut</span>
+<span class="k">import</span> <span class="nn">io.micronaut.cache.annotation.Cacheable</span>
+<span class="k">import</span> <span class="nn">java.time.Month</span>
+<span class="k">import</span> <span class="nn">java.util.concurrent.TimeUnit</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
 
-@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-@CacheConfig(&quot;headlines&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
-open class NewsService {
-    val headlines = mutableMapOf(
-            Month.NOVEMBER to listOf(&quot;Micronaut Graduates to Trial Level in Thoughtworks technology radar Vol.1&quot;,
-            &quot;Micronaut AOP: Awesome flexibility without the complexity&quot;),
-            Month.OCTOBER to listOf(&quot;Micronaut AOP: Awesome flexibility without the complexity&quot;))
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@CacheConfig</span><span class="p">(</span><span class="s">"headlines"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="k">open</span> <span class="kd">class</span> <span class="nc">NewsService</span> <span class="p">{</span>
+    <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="nf">mutableMapOf</span><span class="p">(</span>
+            <span class="nc">Month</span><span class="p">.</span><span class="nc">NOVEMBER</span> <span class="n">to</span> <span class="nf">listOf</span><span class="p">(</span><span class="s">"Micronaut Graduates to Trial Level in Thoughtworks technology radar Vol.1"</span><span class="p">,</span>
+            <span class="s">"Micronaut AOP: Awesome flexibility without the complexity"</span><span class="p">),</span>
+            <span class="nc">Month</span><span class="p">.</span><span class="nc">OCTOBER</span> <span class="n">to</span> <span class="nf">listOf</span><span class="p">(</span><span class="s">"Micronaut AOP: Awesome flexibility without the complexity"</span><span class="p">))</span>
 
-    @Cacheable <i class="conum" data-value="3"></i><b>(3)</b>
-    open fun headlines(month: Month): List&lt;String&gt;? {
-        return try {
-            TimeUnit.SECONDS.sleep(3) <i class="conum" data-value="4"></i><b>(4)</b>
-            headlines[month]
-        } catch (e: InterruptedException) {
-            null
-        }
-    }
+    <span class="nd">@Cacheable</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">open</span> <span class="k">fun</span> <span class="nf">headlines</span><span class="p">(</span><span class="n">month</span><span class="p">:</span> <span class="nc">Month</span><span class="p">):</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;?</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">try</span> <span class="p">{</span>
+            <span class="nc">TimeUnit</span><span class="p">.</span><span class="nc">SECONDS</span><span class="p">.</span><span class="nf">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+            <span class="n">headlines</span><span class="p">[</span><span class="n">month</span><span class="p">]</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="nc">InterruptedException</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">null</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
 
-    @CachePut(parameters = [&quot;month&quot;]) <i class="conum" data-value="5"></i><b>(5)</b>
-    open fun addHeadline(month: Month, headline: String): List&lt;String&gt;? {
-        val l = headlines.getOrDefault(month, emptyList()).toMutableList()
-        l.add(headline)
-        headlines[month] = l
-        return headlines[month]
-    }
+    <span class="nd">@CachePut</span><span class="p">(</span><span class="n">parameters</span> <span class="p">=</span> <span class="p">[</span><span class="s">"month"</span><span class="p">])</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">open</span> <span class="k">fun</span> <span class="nf">addHeadline</span><span class="p">(</span><span class="n">month</span><span class="p">:</span> <span class="nc">Month</span><span class="p">,</span> <span class="n">headline</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;?</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">l</span> <span class="p">=</span> <span class="n">headlines</span><span class="p">.</span><span class="nf">getOrDefault</span><span class="p">(</span><span class="n">month</span><span class="p">,</span> <span class="nf">emptyList</span><span class="p">()).</span><span class="nf">toMutableList</span><span class="p">()</span>
+        <span class="n">l</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="n">headline</span><span class="p">)</span>
+        <span class="n">headlines</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="p">=</span> <span class="n">l</span>
+        <span class="k">return</span> <span class="n">headlines</span><span class="p">[</span><span class="n">month</span><span class="p">]</span>
+    <span class="p">}</span>
 
-    @CacheInvalidate(parameters = [&quot;month&quot;]) <i class="conum" data-value="6"></i><b>(6)</b>
-    open fun removeHeadline(month: Month, headline: String?) {
-        val l = headlines.getOrDefault(month, emptyList()).toMutableList()
-        l.remove(headline)
-        headlines[month] = l
-    }
-}</code></pre>
+    <span class="nd">@CacheInvalidate</span><span class="p">(</span><span class="n">parameters</span> <span class="p">=</span> <span class="p">[</span><span class="s">"month"</span><span class="p">])</span> <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="k">open</span> <span class="k">fun</span> <span class="nf">removeHeadline</span><span class="p">(</span><span class="n">month</span><span class="p">:</span> <span class="nc">Month</span><span class="p">,</span> <span class="n">headline</span><span class="p">:</span> <span class="nc">String</span><span class="p">?)</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">l</span> <span class="p">=</span> <span class="n">headlines</span><span class="p">.</span><span class="nf">getOrDefault</span><span class="p">(</span><span class="n">month</span><span class="p">,</span> <span class="nf">emptyList</span><span class="p">()).</span><span class="nf">toMutableList</span><span class="p">()</span>
+        <span class="n">l</span><span class="p">.</span><span class="nf">remove</span><span class="p">(</span><span class="n">headline</span><span class="p">)</span>
+        <span class="n">headlines</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="p">=</span> <span class="n">l</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -386,96 +387,96 @@ If you don&#8217;t annotate the class with <code>@CacheConfig</code>, specify th
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/NewsServiceTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions.assertDoesNotThrow
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestMethodOrder
-import org.junit.jupiter.api.Timeout
-import java.time.Month
-import jakarta.inject.Inject
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertDoesNotThrow</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.MethodOrderer.OrderAnnotation</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Order</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.TestMethodOrder</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Timeout</span>
+<span class="k">import</span> <span class="nn">java.time.Month</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
 
-@TestMethodOrder(OrderAnnotation::class) <i class="conum" data-value="1"></i><b>(1)</b>
-@MicronautTest(startApplication = false)  <i class="conum" data-value="2"></i><b>(2)</b>
-internal class NewsServiceTest {
-    @Inject
-    lateinit var newsService : NewsService <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="nd">@TestMethodOrder</span><span class="p">(</span><span class="nc">OrderAnnotation</span><span class="o">::</span><span class="k">class</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@MicronautTest</span><span class="p">(</span><span class="n">startApplication</span> <span class="p">=</span> <span class="k">false</span><span class="p">)</span>  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="k">internal</span> <span class="kd">class</span> <span class="nc">NewsServiceTest</span> <span class="p">{</span>
+    <span class="nd">@Inject</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">newsService</span> <span class="p">:</span> <span class="nc">NewsService</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-    @Timeout(4) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(1) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun firstInvocationOfNovemberDoesNotHitCache() {
-        val headlines = newsService.headlines(Month.NOVEMBER)
-        assertEquals(2, headlines!!.size)
-    }
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">firstInvocationOfNovemberDoesNotHitCache</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">headlines</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">NOVEMBER</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">headlines</span><span class="o">!!</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">}</span>
 
-    @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(2) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun secondInvocationOfNovemberHitsCache() {
-        val headlines = newsService.headlines(Month.NOVEMBER)
-        assertEquals(2, headlines!!.size)
-    }
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">secondInvocationOfNovemberHitsCache</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">headlines</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">NOVEMBER</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">headlines</span><span class="o">!!</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">}</span>
 
-    @Timeout(4) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(3) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun firstInvocationOfOctoberDoesNotHitCache() {
-        val headlines = newsService.headlines(Month.OCTOBER)
-        assertEquals(1, headlines!!.size)
-    }
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">firstInvocationOfOctoberDoesNotHitCache</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">headlines</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">OCTOBER</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">headlines</span><span class="o">!!</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">}</span>
 
-    @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(4) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun secondInvocationOfOctoberHitsCache() {
-        val headlines = newsService.headlines(Month.OCTOBER)
-        assertEquals(1, headlines!!.size)
-    }
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">secondInvocationOfOctoberHitsCache</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">headlines</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">OCTOBER</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">headlines</span><span class="o">!!</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">}</span>
 
-    @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(5) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun addingAHeadlineToNovemberUpdatesCache() {
-        val headlines = newsService.addHeadline(Month.NOVEMBER, &quot;Micronaut 1.3 Milestone 1 Released&quot;)
-        assertEquals(3, headlines!!.size)
-    }
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">addingAHeadlineToNovemberUpdatesCache</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">addHeadline</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">NOVEMBER</span><span class="p">,</span> <span class="s">"Micronaut 1.3 Milestone 1 Released"</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">headlines</span><span class="o">!!</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">}</span>
 
-    @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(6) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun novemberCacheWasUpdatedByCachePutAndThusTheValueIsRetrievedFromTheCache() {
-        val headlines = newsService.headlines(Month.NOVEMBER)
-        assertEquals(3, headlines!!.size)
-    }
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">novemberCacheWasUpdatedByCachePutAndThusTheValueIsRetrievedFromTheCache</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">headlines</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">NOVEMBER</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">headlines</span><span class="o">!!</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">}</span>
 
-    @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(7) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun invalidateNovemberCacheWithCacheInvalidate() {
-        assertDoesNotThrow { newsService.removeHeadline(Month.NOVEMBER, &quot;Micronaut 1.3 Milestone 1 Released&quot;) }
-    }
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">invalidateNovemberCacheWithCacheInvalidate</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nf">assertDoesNotThrow</span> <span class="p">{</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">removeHeadline</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">NOVEMBER</span><span class="p">,</span> <span class="s">"Micronaut 1.3 Milestone 1 Released"</span><span class="p">)</span> <span class="p">}</span>
+    <span class="p">}</span>
 
-    @Timeout(1) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(8) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun octoberCacheIsStillValid() {
-        val headlines = newsService.headlines(Month.OCTOBER)
-        assertEquals(1, headlines!!.size)
-    }
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">octoberCacheIsStillValid</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">headlines</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">OCTOBER</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">headlines</span><span class="o">!!</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">}</span>
 
-    @Timeout(4) <i class="conum" data-value="4"></i><b>(4)</b>
-    @Test
-    @Order(9) <i class="conum" data-value="5"></i><b>(5)</b>
-    fun novemberCacheWasInvalidated() {
-        val headlines = newsService.headlines(Month.NOVEMBER)
-        assertEquals(2, headlines!!.size)
-    }
-}</code></pre>
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Test</span>
+    <span class="nd">@Order</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="k">fun</span> <span class="nf">novemberCacheWasInvalidated</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">headlines</span> <span class="p">=</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">headlines</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">NOVEMBER</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">headlines</span><span class="o">!!</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -511,13 +512,13 @@ internal class NewsServiceTest {
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/News.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.serde.annotation.Serdeable
-import java.time.Month
+<span class="k">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span>
+<span class="k">import</span> <span class="nn">java.time.Month</span>
 
-@Serdeable <i class="conum" data-value="1"></i><b>(1)</b>
-data class News(val month: Month, val headlines: List&lt;String&gt;)</code></pre>
+<span class="nd">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">data class</span> <span class="nc">News</span><span class="p">(</span><span class="kd">val</span> <span class="py">month</span><span class="p">:</span> <span class="nc">Month</span><span class="p">,</span> <span class="kd">val</span> <span class="py">headlines</span><span class="p">:</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;)</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -531,19 +532,19 @@ data class News(val month: Month, val headlines: List&lt;String&gt;)</code></pre
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/NewsController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import java.time.Month
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="k">import</span> <span class="nn">java.time.Month</span>
 
-@Controller <i class="conum" data-value="1"></i><b>(1)</b>
-class NewsController(val newsService: NewsService) {
-    @Get(&quot;/{month}&quot;)
-    fun index(month: Month): News {
-        return News(month, newsService.headlines(month).orEmpty())
-    }
-}</code></pre>
+<span class="nd">@Controller</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">NewsController</span><span class="p">(</span><span class="kd">val</span> <span class="py">newsService</span><span class="p">:</span> <span class="nc">NewsService</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nd">@Get</span><span class="p">(</span><span class="s">"/{month}"</span><span class="p">)</span>
+    <span class="k">fun</span> <span class="nf">index</span><span class="p">(</span><span class="n">month</span><span class="p">:</span> <span class="nc">Month</span><span class="p">):</span> <span class="nc">News</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nc">News</span><span class="p">(</span><span class="n">month</span><span class="p">,</span> <span class="n">newsService</span><span class="p">.</span><span class="nf">headlines</span><span class="p">(</span><span class="n">month</span><span class="p">).</span><span class="nf">orEmpty</span><span class="p">())</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -560,33 +561,33 @@ class NewsController(val newsService: NewsService) {
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/NewsControllerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
-import io.micronaut.http.uri.UriBuilder
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Timeout
-import java.time.Month
-import jakarta.inject.Inject
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.uri.UriBuilder</span>
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Timeout</span>
+<span class="k">import</span> <span class="nn">java.time.Month</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
 
-@MicronautTest
-class NewsControllerTest(@Client(&quot;/&quot;) val client: HttpClient) {
+<span class="nd">@MicronautTest</span>
+<span class="kd">class</span> <span class="nc">NewsControllerTest</span><span class="p">(</span><span class="nd">@Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> <span class="kd">val</span> <span class="py">client</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">)</span> <span class="p">{</span>
 
-    @Timeout(5) <i class="conum" data-value="1"></i><b>(1)</b>
-    @Test
-    fun fetchingOctoberHeadlinesUsesCache() {
-        val request: HttpRequest&lt;Any&gt; = HttpRequest.GET(UriBuilder.of(&quot;/&quot;).path(Month.OCTOBER.name).build())
-        var news: News = client.toBlocking().retrieve(request, News::class.java)
-        val expected = &quot;Micronaut AOP: Awesome flexibility without the complexity&quot;
-        assertEquals(listOf(expected), news.headlines)
-        news = client.toBlocking().retrieve(request, News::class.java)
-        assertEquals(listOf(expected), news.headlines)
-    }
-}</code></pre>
+    <span class="nd">@Timeout</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">fetchingOctoberHeadlinesUsesCache</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">(</span><span class="nc">UriBuilder</span><span class="p">.</span><span class="nf">of</span><span class="p">(</span><span class="s">"/"</span><span class="p">).</span><span class="nf">path</span><span class="p">(</span><span class="nc">Month</span><span class="p">.</span><span class="nc">OCTOBER</span><span class="p">.</span><span class="n">name</span><span class="p">).</span><span class="nf">build</span><span class="p">())</span>
+        <span class="kd">var</span> <span class="py">news</span><span class="p">:</span> <span class="nc">News</span> <span class="p">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="nf">retrieve</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="nc">News</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
+        <span class="kd">val</span> <span class="py">expected</span> <span class="p">=</span> <span class="s">"Micronaut AOP: Awesome flexibility without the complexity"</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="nf">listOf</span><span class="p">(</span><span class="n">expected</span><span class="p">),</span> <span class="n">news</span><span class="p">.</span><span class="n">headlines</span><span class="p">)</span>
+        <span class="n">news</span> <span class="p">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="nf">retrieve</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="nc">News</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="nf">listOf</span><span class="p">(</span><span class="n">expected</span><span class="p">),</span> <span class="n">news</span><span class="p">.</span><span class="n">headlines</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -637,7 +638,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">Java 21</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.5-graal</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.5-graal</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -652,7 +653,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">Java 21</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.2-graalce</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.2-graalce</code></pre>
 </div>
 </div>
 </div>
@@ -663,7 +664,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -675,14 +676,14 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">graalvmNative {
-    binaries {
-        main {
-            imageName.set(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">-Ob</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-        }
-    }
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">graalvmNative</span> <span class="o">{</span>
+    <span class="n">binaries</span> <span class="o">{</span>
+        <span class="n">main</span> <span class="o">{</span>
+            <span class="n">imageName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s1">'mn-graalvm-application'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="n">buildArgs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s1">'-Ob'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -702,7 +703,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl localhost:8080/NOVEMBER</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl localhost:8080/NOVEMBER</code></pre>
 </div>
 </div>
 </div>

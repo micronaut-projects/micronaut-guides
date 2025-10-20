@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -217,7 +218,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app example.micronaut.micronautguide --features=graalvm,aws-lambda --build=gradle --lang=java</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-function-app example.micronaut.micronautguide <span class="nt">--features</span><span class="o">=</span>graalvm,aws-lambda <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -264,32 +265,32 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/FunctionRequestHandler.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.function.aws.MicronautRequestHandler</span>;
-<span class="keyword">import</span> <span class="include">java.io.IOException</span>;
-<span class="keyword">import</span> <span class="include">java.nio.charset.StandardCharsets</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.json.JsonMapper</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
-<span class="directive">public</span> <span class="type">class</span> <span class="class">FunctionRequestHandler</span> <span class="directive">extends</span> MicronautRequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt; {
-    <span class="annotation">@Inject</span>
-    JsonMapper objectMapper;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.function.aws.MicronautRequestHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.nio.charset.StandardCharsets</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.json.JsonMapper</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FunctionRequestHandler</span> <span class="kd">extends</span> <span class="nc">MicronautRequestHandler</span><span class="o">&lt;</span><span class="nc">APIGatewayProxyRequestEvent</span><span class="o">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nd">@Inject</span>
+    <span class="nc">JsonMapper</span> <span class="n">objectMapper</span><span class="o">;</span>
 
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> APIGatewayProxyResponseEvent execute(APIGatewayProxyRequestEvent input) {
-        APIGatewayProxyResponseEvent response = <span class="keyword">new</span> APIGatewayProxyResponseEvent();
-        <span class="keyword">try</span> {
-            <span class="predefined-type">String</span> json = <span class="keyword">new</span> <span class="predefined-type">String</span>(objectMapper.writeValueAsBytes(<span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>)));
-            response.setStatusCode(<span class="integer">200</span>);
-            response.setBody(json);
-        } <span class="keyword">catch</span> (<span class="exception">IOException</span> e) {
-            response.setStatusCode(<span class="integer">500</span>);
-        }
-        <span class="keyword">return</span> response;
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">APIGatewayProxyResponseEvent</span> <span class="nf">execute</span><span class="o">(</span><span class="nc">APIGatewayProxyRequestEvent</span> <span class="n">input</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">APIGatewayProxyResponseEvent</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">String</span> <span class="n">json</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">String</span><span class="o">(</span><span class="n">objectMapper</span><span class="o">.</span><span class="na">writeValueAsBytes</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"message"</span><span class="o">,</span> <span class="s">"Hello World"</span><span class="o">)));</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">200</span><span class="o">);</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">setBody</span><span class="o">(</span><span class="n">json</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">response</span><span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">500</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -305,41 +306,41 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/FunctionRequestHandlerTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.AfterAll</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.BeforeAll</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.AfterAll</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.BeforeAll</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
 
-<span class="directive">public</span> <span class="type">class</span> <span class="class">FunctionRequestHandlerTest</span> {
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FunctionRequestHandlerTest</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> FunctionRequestHandler handler;
+    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">FunctionRequestHandler</span> <span class="n">handler</span><span class="o">;</span>
 
-    <span class="annotation">@BeforeAll</span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> setupServer() {
-        handler = <span class="keyword">new</span> FunctionRequestHandler();
-    }
+    <span class="nd">@BeforeAll</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">setupServer</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">FunctionRequestHandler</span><span class="o">();</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@AfterAll</span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> stopServer() {
-        <span class="keyword">if</span> (handler != <span class="predefined-constant">null</span>) {
-            handler.getApplicationContext().close();
-        }
-    }
+    <span class="nd">@AfterAll</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">stopServer</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">handler</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">handler</span><span class="o">.</span><span class="na">getApplicationContext</span><span class="o">().</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="directive">public</span> <span class="type">void</span> testHandler() {
-        APIGatewayProxyRequestEvent request = <span class="keyword">new</span> APIGatewayProxyRequestEvent();
-        request.setHttpMethod(<span class="string"><span class="delimiter">&quot;</span><span class="content">GET</span><span class="delimiter">&quot;</span></span>);
-        request.setPath(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>);
-        APIGatewayProxyResponseEvent response = handler.execute(request);
-        assertEquals(<span class="integer">200</span>, response.getStatusCode().intValue());
-        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="char">\&quot;</span><span class="content">message</span><span class="char">\&quot;</span><span class="content">:</span><span class="char">\&quot;</span><span class="content">Hello World</span><span class="char">\&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span>, response.getBody());
-    }
-}</code></pre>
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testHandler</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">APIGatewayProxyRequestEvent</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">APIGatewayProxyRequestEvent</span><span class="o">();</span>
+        <span class="n">request</span><span class="o">.</span><span class="na">setHttpMethod</span><span class="o">(</span><span class="s">"GET"</span><span class="o">);</span>
+        <span class="n">request</span><span class="o">.</span><span class="na">setPath</span><span class="o">(</span><span class="s">"/"</span><span class="o">);</span>
+        <span class="nc">APIGatewayProxyResponseEvent</span> <span class="n">response</span> <span class="o">=</span> <span class="n">handler</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="mi">200</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">getStatusCode</span><span class="o">().</span><span class="na">intValue</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"{\"message\":\"Hello World\"}"</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">getBody</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -365,7 +366,7 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -399,35 +400,35 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/FunctionLambdaRuntime.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.function.aws.runtime.AbstractMicronautLambdaRuntime</span>;
-<span class="keyword">import</span> <span class="include">java.net.MalformedURLException</span>;
-<span class="keyword">import</span> <span class="include">com.amazonaws.services.lambda.runtime.RequestHandler</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
-<span class="directive">public</span> <span class="type">class</span> <span class="class">FunctionLambdaRuntime</span> <span class="directive">extends</span> AbstractMicronautLambdaRuntime&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent, APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt;
-{
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
-        <span class="keyword">try</span> {
-            <span class="keyword">new</span> FunctionLambdaRuntime().run(args);
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.function.aws.runtime.AbstractMicronautLambdaRuntime</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.net.MalformedURLException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.RequestHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FunctionLambdaRuntime</span> <span class="kd">extends</span> <span class="nc">AbstractMicronautLambdaRuntime</span><span class="o">&lt;</span><span class="nc">APIGatewayProxyRequestEvent</span><span class="o">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="o">,</span> <span class="nc">APIGatewayProxyRequestEvent</span><span class="o">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="o">&gt;</span>
+<span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">new</span> <span class="nf">FunctionLambdaRuntime</span><span class="o">().</span><span class="na">run</span><span class="o">(</span><span class="n">args</span><span class="o">);</span>
 
-        } <span class="keyword">catch</span> (<span class="exception">MalformedURLException</span> e) {
-            e.printStackTrace();
-        }
-    }
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">MalformedURLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Override</span>
-    <span class="annotation">@Nullable</span>
-    <span class="directive">protected</span> RequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt; createRequestHandler(<span class="predefined-type">String</span>... args) {
-        <span class="keyword">return</span> <span class="keyword">new</span> FunctionRequestHandler();
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="nd">@Nullable</span>
+    <span class="kd">protected</span> <span class="nc">RequestHandler</span><span class="o">&lt;</span><span class="nc">APIGatewayProxyRequestEvent</span><span class="o">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="o">&gt;</span> <span class="nf">createRequestHandler</span><span class="o">(</span><span class="nc">String</span><span class="o">...</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">FunctionRequestHandler</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew buildNativeLambda</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew buildNativeLambda</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -474,13 +475,13 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">path</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>,
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">httpMethod</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">GET</span><span class="delimiter">&quot;</span></span>,
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">headers</span><span class="delimiter">&quot;</span></span>: {
-    <span class="key"><span class="delimiter">&quot;</span><span class="content">Accept</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">application/json</span><span class="delimiter">&quot;</span></span>
-  }
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"httpMethod"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GET"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"headers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"Accept"</span><span class="p">:</span><span class="w"> </span><span class="s2">"application/json"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">

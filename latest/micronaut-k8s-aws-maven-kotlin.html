@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -226,9 +227,9 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export AWS_ACCOUNT_ID=&quot;$(aws sts get-caller-identity --query \&quot;Account\&quot; --output text)&quot;
-export AWS_REGION=&quot;$(aws configure get region)&quot;
-export EKS_CLUSTER_NAME=&quot;micronaut-k8s&quot;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">AWS_ACCOUNT_ID</span><span class="o">=</span><span class="s2">"</span><span class="si">$(</span>aws sts get-caller-identity <span class="nt">--query</span> <span class="se">\"</span>Account<span class="se">\"</span> <span class="nt">--output</span> text<span class="si">)</span><span class="s2">"</span>
+<span class="nb">export </span><span class="nv">AWS_REGION</span><span class="o">=</span><span class="s2">"</span><span class="si">$(</span>aws configure get region<span class="si">)</span><span class="s2">"</span>
+<span class="nb">export </span><span class="nv">EKS_CLUSTER_NAME</span><span class="o">=</span><span class="s2">"micronaut-k8s"</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -236,7 +237,7 @@ export EKS_CLUSTER_NAME=&quot;micronaut-k8s&quot;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws ecr get-login-password <span class="nt">--region</span> <span class="nv">$AWS_REGION</span> | docker login <span class="nt">--username</span> AWS <span class="nt">--password-stdin</span> <span class="nv">$AWS_ACCOUNT_ID</span>.dkr.ecr.<span class="nv">$AWS_REGION</span>.amazonaws.com</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -247,54 +248,54 @@ export EKS_CLUSTER_NAME=&quot;micronaut-k8s&quot;</code></pre>
 <div class="listingblock">
 <div class="title">/users/k8s.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">apiVersion</span>: <span class="string"><span class="content">apps/v1</span></span>
-<span class="key">kind</span>: <span class="string"><span class="content">Deployment</span></span>
-<span class="key">metadata</span>:
-  <span class="key">namespace</span>: <span class="string"><span class="content">micronaut-k8s</span></span>
-  <span class="key">name</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>
-<span class="key">spec</span>:
-  <span class="key">selector</span>:
-    <span class="key">matchLabels</span>:
-      <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>
-  <span class="key">template</span>:
-    <span class="key">metadata</span>:
-      <span class="key">labels</span>:
-        <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>
-    <span class="key">spec</span>:
-      <span class="key">serviceAccountName</span>: <span class="string"><span class="content">micronaut-service</span></span>
-      <span class="key">containers</span>:
-        - <span class="string"><span class="content">name: &quot;users&quot;</span></span>
-          <span class="key">image</span>: <span class="string"><span class="content">&lt;aws-account-id&gt;.dkr.ecr.&lt;aws-region&gt;.amazonaws.com/users:latest </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-          <span class="key">imagePullPolicy</span>: <span class="string"><span class="content">Always </span></span><i class="conum" data-value="2"></i><b>(2)</b>
-          <span class="key">ports</span>:
-            - <span class="string"><span class="content">name: http</span></span>
-              <span class="key">containerPort</span>: <span class="string"><span class="content">8080</span></span>
-          <span class="key">readinessProbe</span>:
-            <span class="key">httpGet</span>:
-              <span class="key">path</span>: <span class="string"><span class="content">/health/readiness</span></span>
-              <span class="key">port</span>: <span class="string"><span class="content">8080</span></span>
-            <span class="key">initialDelaySeconds</span>: <span class="string"><span class="content">5</span></span>
-            <span class="key">timeoutSeconds</span>: <span class="string"><span class="content">3</span></span>
-          <span class="key">livenessProbe</span>:
-            <span class="key">httpGet</span>:
-              <span class="key">path</span>: <span class="string"><span class="content">/health/liveness</span></span>
-              <span class="key">port</span>: <span class="string"><span class="content">8080</span></span>
-            <span class="key">initialDelaySeconds</span>: <span class="string"><span class="content">5</span></span>
-            <span class="key">timeoutSeconds</span>: <span class="string"><span class="content">3</span></span>
-            <span class="key">failureThreshold</span>: <span class="string"><span class="content">10</span></span>
-<span class="head"><span class="head">---</span></span>
-<span class="key">apiVersion</span>: <span class="string"><span class="content">v1</span></span>
-<span class="key">kind</span>: <span class="string"><span class="content">Service</span></span>
-<span class="key">metadata</span>:
-  <span class="key">namespace</span>: <span class="string"><span class="content">micronaut-k8s</span></span>
-  <span class="key">name</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>
-<span class="key">spec</span>:
-  <span class="key">selector</span>:
-    <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>
-  <span class="key">type</span>: <span class="string"><span class="content">NodePort</span></span>
-  <span class="key">ports</span>:
-    - <span class="string"><span class="content">protocol: &quot;TCP&quot;</span></span>
-      <span class="key">port</span>: <span class="string"><span class="content">8080</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">micronaut-k8s</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">users"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">users"</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">users"</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">micronaut-service</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">users"</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">&lt;aws-account-id&gt;.dkr.ecr.&lt;aws-region&gt;.amazonaws.com/users:latest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span> <i class="conum" data-value="2"></i><b>(2)</b>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+              <span class="na">containerPort</span><span class="pi">:</span> <span class="m">8080</span>
+          <span class="na">readinessProbe</span><span class="pi">:</span>
+            <span class="na">httpGet</span><span class="pi">:</span>
+              <span class="na">path</span><span class="pi">:</span> <span class="s">/health/readiness</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">3</span>
+          <span class="na">livenessProbe</span><span class="pi">:</span>
+            <span class="na">httpGet</span><span class="pi">:</span>
+              <span class="na">path</span><span class="pi">:</span> <span class="s">/health/liveness</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">3</span>
+            <span class="na">failureThreshold</span><span class="pi">:</span> <span class="m">10</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">micronaut-k8s</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">users"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">users"</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">NodePort</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">protocol</span><span class="pi">:</span> <span class="s2">"</span><span class="s">TCP"</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="s">8080</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -312,7 +313,7 @@ Create container repository in your AWS account.</td>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export USERS_REPOSITORY=$(aws ecr create-repository --repository-name users --image-scanning-configuration scanOnPush=true --region us-east-1 --output json | jq -r .repository.repositoryUri)</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">USERS_REPOSITORY</span><span class="o">=</span><span class="si">$(</span>aws ecr create-repository <span class="nt">--repository-name</span> <span class="nb">users</span> <span class="nt">--image-scanning-configuration</span> <span class="nv">scanOnPush</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--region</span> us-east-1 <span class="nt">--output</span> json | jq <span class="nt">-r</span> .repository.repositoryUri<span class="si">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -335,7 +336,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker tag users:latest ${USERS_REPOSITORY}:latest</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker tag <span class="nb">users</span>:latest <span class="k">${</span><span class="nv">USERS_REPOSITORY</span><span class="k">}</span>:latest</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -343,7 +344,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker push ${USERS_REPOSITORY}:latest</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker push <span class="k">${</span><span class="nv">USERS_REPOSITORY</span><span class="k">}</span>:latest</code></pre>
 </div>
 </div>
 </div>
@@ -355,54 +356,54 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 <div class="listingblock">
 <div class="title">/orders/k8s.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">apiVersion</span>: <span class="string"><span class="content">apps/v1</span></span>
-<span class="key">kind</span>: <span class="string"><span class="content">Deployment</span></span>
-<span class="key">metadata</span>:
-  <span class="key">namespace</span>: <span class="string"><span class="content">micronaut-k8s</span></span>
-  <span class="key">name</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">orders</span><span class="delimiter">&quot;</span></span>
-<span class="key">spec</span>:
-  <span class="key">selector</span>:
-    <span class="key">matchLabels</span>:
-      <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">orders</span><span class="delimiter">&quot;</span></span>
-  <span class="key">template</span>:
-    <span class="key">metadata</span>:
-      <span class="key">labels</span>:
-        <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">orders</span><span class="delimiter">&quot;</span></span>
-    <span class="key">spec</span>:
-      <span class="key">serviceAccountName</span>: <span class="string"><span class="content">micronaut-service</span></span>
-      <span class="key">containers</span>:
-        - <span class="string"><span class="content">name: &quot;orders&quot;</span></span>
-          <span class="key">image</span>: <span class="string"><span class="content">&lt;aws-account-id&gt;.dkr.ecr.&lt;aws-region&gt;.amazonaws.com/orders:latest </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-          <span class="key">imagePullPolicy</span>: <span class="string"><span class="content">Always </span></span><i class="conum" data-value="2"></i><b>(2)</b>
-          <span class="key">ports</span>:
-            - <span class="string"><span class="content">name: http</span></span>
-              <span class="key">containerPort</span>: <span class="string"><span class="content">8080</span></span>
-          <span class="key">readinessProbe</span>:
-            <span class="key">httpGet</span>:
-              <span class="key">path</span>: <span class="string"><span class="content">/health/readiness</span></span>
-              <span class="key">port</span>: <span class="string"><span class="content">8080</span></span>
-            <span class="key">initialDelaySeconds</span>: <span class="string"><span class="content">5</span></span>
-            <span class="key">timeoutSeconds</span>: <span class="string"><span class="content">3</span></span>
-          <span class="key">livenessProbe</span>:
-            <span class="key">httpGet</span>:
-              <span class="key">path</span>: <span class="string"><span class="content">/health/liveness</span></span>
-              <span class="key">port</span>: <span class="string"><span class="content">8080</span></span>
-            <span class="key">initialDelaySeconds</span>: <span class="string"><span class="content">5</span></span>
-            <span class="key">timeoutSeconds</span>: <span class="string"><span class="content">3</span></span>
-            <span class="key">failureThreshold</span>: <span class="string"><span class="content">10</span></span>
-<span class="head"><span class="head">---</span></span>
-<span class="key">apiVersion</span>: <span class="string"><span class="content">v1</span></span>
-<span class="key">kind</span>: <span class="string"><span class="content">Service</span></span>
-<span class="key">metadata</span>:
-  <span class="key">namespace</span>: <span class="string"><span class="content">micronaut-k8s</span></span>
-  <span class="key">name</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">orders</span><span class="delimiter">&quot;</span></span>
-<span class="key">spec</span>:
-  <span class="key">selector</span>:
-    <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">orders</span><span class="delimiter">&quot;</span></span>
-  <span class="key">type</span>: <span class="string"><span class="content">NodePort</span></span>
-  <span class="key">ports</span>:
-    - <span class="string"><span class="content">protocol: &quot;TCP&quot;</span></span>
-      <span class="key">port</span>: <span class="string"><span class="content">8080</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">micronaut-k8s</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">orders"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">orders"</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">orders"</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">micronaut-service</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">orders"</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">&lt;aws-account-id&gt;.dkr.ecr.&lt;aws-region&gt;.amazonaws.com/orders:latest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span> <i class="conum" data-value="2"></i><b>(2)</b>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+              <span class="na">containerPort</span><span class="pi">:</span> <span class="m">8080</span>
+          <span class="na">readinessProbe</span><span class="pi">:</span>
+            <span class="na">httpGet</span><span class="pi">:</span>
+              <span class="na">path</span><span class="pi">:</span> <span class="s">/health/readiness</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">3</span>
+          <span class="na">livenessProbe</span><span class="pi">:</span>
+            <span class="na">httpGet</span><span class="pi">:</span>
+              <span class="na">path</span><span class="pi">:</span> <span class="s">/health/liveness</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">3</span>
+            <span class="na">failureThreshold</span><span class="pi">:</span> <span class="m">10</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">micronaut-k8s</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">orders"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">orders"</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">NodePort</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">protocol</span><span class="pi">:</span> <span class="s2">"</span><span class="s">TCP"</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="s">8080</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -420,7 +421,7 @@ Create container repository in your AWS account.</td>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export ORDERS_REPOSITORY=$(aws ecr create-repository --repository-name orders --image-scanning-configuration scanOnPush=true --region us-east-1 --output json | jq -r .repository.repositoryUri)</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">ORDERS_REPOSITORY</span><span class="o">=</span><span class="si">$(</span>aws ecr create-repository <span class="nt">--repository-name</span> orders <span class="nt">--image-scanning-configuration</span> <span class="nv">scanOnPush</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--region</span> us-east-1 <span class="nt">--output</span> json | jq <span class="nt">-r</span> .repository.repositoryUri<span class="si">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -443,7 +444,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker tag orders:latest ${ORDERS_REPOSITORY}:latest</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker tag orders:latest <span class="k">${</span><span class="nv">ORDERS_REPOSITORY</span><span class="k">}</span>:latest</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -451,7 +452,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker push ${ORDERS_REPOSITORY}:latest</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker push <span class="k">${</span><span class="nv">ORDERS_REPOSITORY</span><span class="k">}</span>:latest</code></pre>
 </div>
 </div>
 </div>
@@ -463,54 +464,54 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 <div class="listingblock">
 <div class="title">/api/k8s.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">apiVersion</span>: <span class="string"><span class="content">apps/v1</span></span>
-<span class="key">kind</span>: <span class="string"><span class="content">Deployment</span></span>
-<span class="key">metadata</span>:
-  <span class="key">namespace</span>: <span class="string"><span class="content">micronaut-k8s</span></span>
-  <span class="key">name</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">api</span><span class="delimiter">&quot;</span></span>
-<span class="key">spec</span>:
-  <span class="key">selector</span>:
-    <span class="key">matchLabels</span>:
-      <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">api</span><span class="delimiter">&quot;</span></span>
-  <span class="key">template</span>:
-    <span class="key">metadata</span>:
-      <span class="key">labels</span>:
-        <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">api</span><span class="delimiter">&quot;</span></span>
-    <span class="key">spec</span>:
-      <span class="key">serviceAccountName</span>: <span class="string"><span class="content">micronaut-service</span></span>
-      <span class="key">containers</span>:
-        - <span class="string"><span class="content">name: &quot;api&quot;</span></span>
-          <span class="key">image</span>: <span class="string"><span class="content">&lt;aws-account-id&gt;.dkr.ecr.&lt;aws-region&gt;.amazonaws.com/api:latest </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-          <span class="key">imagePullPolicy</span>: <span class="string"><span class="content">Always </span></span><i class="conum" data-value="2"></i><b>(2)</b>
-          <span class="key">ports</span>:
-            - <span class="string"><span class="content">name: http</span></span>
-              <span class="key">containerPort</span>: <span class="string"><span class="content">8080</span></span>
-          <span class="key">readinessProbe</span>:
-            <span class="key">httpGet</span>:
-              <span class="key">path</span>: <span class="string"><span class="content">/health/readiness</span></span>
-              <span class="key">port</span>: <span class="string"><span class="content">8080</span></span>
-            <span class="key">initialDelaySeconds</span>: <span class="string"><span class="content">5</span></span>
-            <span class="key">timeoutSeconds</span>: <span class="string"><span class="content">3</span></span>
-          <span class="key">livenessProbe</span>:
-            <span class="key">httpGet</span>:
-              <span class="key">path</span>: <span class="string"><span class="content">/health/liveness</span></span>
-              <span class="key">port</span>: <span class="string"><span class="content">8080</span></span>
-            <span class="key">initialDelaySeconds</span>: <span class="string"><span class="content">5</span></span>
-            <span class="key">timeoutSeconds</span>: <span class="string"><span class="content">3</span></span>
-            <span class="key">failureThreshold</span>: <span class="string"><span class="content">10</span></span>
-<span class="head"><span class="head">---</span></span>
-<span class="key">apiVersion</span>: <span class="string"><span class="content">v1</span></span>
-<span class="key">kind</span>: <span class="string"><span class="content">Service</span></span>
-<span class="key">metadata</span>:
-  <span class="key">namespace</span>: <span class="string"><span class="content">micronaut-k8s</span></span>
-  <span class="key">name</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">api</span><span class="delimiter">&quot;</span></span>
-<span class="key">spec</span>:
-  <span class="key">selector</span>:
-    <span class="key">app</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">api</span><span class="delimiter">&quot;</span></span>
-  <span class="key">type</span>: <span class="string"><span class="content">LoadBalancer</span></span>
-  <span class="key">ports</span>:
-    - <span class="string"><span class="content">protocol: &quot;TCP&quot;</span></span>
-      <span class="key">port</span>: <span class="string"><span class="content">8080</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">micronaut-k8s</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">api"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">api"</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">api"</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">micronaut-service</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">api"</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">&lt;aws-account-id&gt;.dkr.ecr.&lt;aws-region&gt;.amazonaws.com/api:latest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span> <i class="conum" data-value="2"></i><b>(2)</b>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+              <span class="na">containerPort</span><span class="pi">:</span> <span class="m">8080</span>
+          <span class="na">readinessProbe</span><span class="pi">:</span>
+            <span class="na">httpGet</span><span class="pi">:</span>
+              <span class="na">path</span><span class="pi">:</span> <span class="s">/health/readiness</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">3</span>
+          <span class="na">livenessProbe</span><span class="pi">:</span>
+            <span class="na">httpGet</span><span class="pi">:</span>
+              <span class="na">path</span><span class="pi">:</span> <span class="s">/health/liveness</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
+            <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">3</span>
+            <span class="na">failureThreshold</span><span class="pi">:</span> <span class="m">10</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">micronaut-k8s</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">api"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">api"</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">protocol</span><span class="pi">:</span> <span class="s2">"</span><span class="s">TCP"</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="s">8080</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -528,7 +529,7 @@ Create container repository in your AWS account.</td>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export API_REPOSITORY=$(aws ecr create-repository --repository-name api --image-scanning-configuration scanOnPush=true --region us-east-1 --output json | jq -r .repository.repositoryUri)</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">API_REPOSITORY</span><span class="o">=</span><span class="si">$(</span>aws ecr create-repository <span class="nt">--repository-name</span> api <span class="nt">--image-scanning-configuration</span> <span class="nv">scanOnPush</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--region</span> us-east-1 <span class="nt">--output</span> json | jq <span class="nt">-r</span> .repository.repositoryUri<span class="si">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -551,7 +552,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker tag api:latest ${API_REPOSITORY}:latest</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker tag api:latest <span class="k">${</span><span class="nv">API_REPOSITORY</span><span class="k">}</span>:latest</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -559,7 +560,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker push ${API_REPOSITORY}:latest</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker push <span class="k">${</span><span class="nv">API_REPOSITORY</span><span class="k">}</span>:latest</code></pre>
 </div>
 </div>
 </div>
@@ -570,7 +571,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mkdir -p $HOME/.kube</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$HOME</span>/.kube</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -578,7 +579,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws eks update-kubeconfig <span class="nt">--region</span> <span class="nv">$AWS_REGION</span> <span class="nt">--name</span> <span class="nv">$EKS_CLUSTER_NAME</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -586,7 +587,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export KUBECONFIG=$HOME/.kube/config</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$HOME</span>/.kube/config</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -594,7 +595,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">kubectl apply -f auth.yml</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">kubectl apply <span class="nt">-f</span> auth.yml</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -602,7 +603,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">kubectl apply -f users/k8s.yml</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">kubectl apply <span class="nt">-f</span> <span class="nb">users</span>/k8s.yml</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -610,7 +611,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">kubectl apply -f orders/k8s.yml</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">kubectl apply <span class="nt">-f</span> orders/k8s.yml</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -618,7 +619,7 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">kubectl apply -f api/k8s.yml</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">kubectl apply <span class="nt">-f</span> api/k8s.yml</code></pre>
 </div>
 </div>
 </div>
@@ -632,12 +633,12 @@ Ensure that Docker images are constructed for the correct CPU architecture. For 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">kubectl get pods -n=micronaut-k8s</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">kubectl get pods <span class="nt">-n</span><span class="o">=</span>micronaut-k8s</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="text">NAME                      READY   STATUS    RESTARTS   AGE
+<pre class="rouge highlight"><code data-lang="text">NAME                      READY   STATUS    RESTARTS   AGE
 api-6fb4cd949f-kxxx8      1/1     Running   0          2d1h
 orders-595887ddd6-6lzp4   1/1     Running   0          2d1h
 users-df6f78cd7-lgnzx     1/1     Running   0          2d1h</code></pre>
@@ -648,12 +649,12 @@ users-df6f78cd7-lgnzx     1/1     Running   0          2d1h</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">kubectl get services -n=micronaut-k8s</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">kubectl get services <span class="nt">-n</span><span class="o">=</span>micronaut-k8s</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="text">NAME     TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)          AGE
+<pre class="rouge highlight"><code data-lang="text">NAME     TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)          AGE
 api      LoadBalancer   10.100.208.154   &lt;redacted&gt;   8080:31171/TCP   30s
 orders   NodePort       10.100.157.155   &lt;none&gt;                                                                    8080:30742/TCP   20m
 users    NodePort       10.100.126.97    &lt;none&gt;                                                                    8080:31580/TCP   20m</code></pre>
@@ -676,7 +677,7 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export API_URL=http://$(kubectl get svc api -n=micronaut-k8s -o json | jq -r '.status.loadBalancer.ingress[0].hostname'):8080</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">API_URL</span><span class="o">=</span>http://<span class="si">$(</span>kubectl get svc api <span class="nt">-n</span><span class="o">=</span>micronaut-k8s <span class="nt">-o</span> json | jq <span class="nt">-r</span> <span class="s1">'.status.loadBalancer.ingress[0].hostname'</span><span class="si">)</span>:8080</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -684,12 +685,12 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;$API_URL/api/users&quot; -H 'Content-Type: application/json; charset=utf-8' -d '{ &quot;first_name&quot;: &quot;Nemanja&quot;, &quot;last_name&quot;: &quot;Mikic&quot;, &quot;username&quot;: &quot;nmikic&quot; }'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-X</span> <span class="s2">"POST"</span> <span class="s2">"</span><span class="nv">$API_URL</span><span class="s2">/api/users"</span> <span class="nt">-H</span> <span class="s1">'Content-Type: application/json; charset=utf-8'</span> <span class="nt">-d</span> <span class="s1">'{ "first_name": "Nemanja", "last_name": "Mikic", "username": "nmikic" }'</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">nmikic</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">first_name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Nemanja</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">last_name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Mikic</span><span class="delimiter">&quot;</span></span>}</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nl">"username"</span><span class="p">:</span><span class="s2">"nmikic"</span><span class="p">,</span><span class="nl">"first_name"</span><span class="p">:</span><span class="s2">"Nemanja"</span><span class="p">,</span><span class="nl">"last_name"</span><span class="p">:</span><span class="s2">"Mikic"</span><span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -697,12 +698,12 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;$API_URL/api/orders&quot; -H 'Content-Type: application/json; charset=utf-8' -d '{ &quot;user_id&quot;: 1, &quot;item_ids&quot;: [1,2] }'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-X</span> <span class="s2">"POST"</span> <span class="s2">"</span><span class="nv">$API_URL</span><span class="s2">/api/orders"</span> <span class="nt">-H</span> <span class="s1">'Content-Type: application/json; charset=utf-8'</span> <span class="nt">-d</span> <span class="s1">'{ "user_id": 1, "item_ids": [1,2] }'</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>:{<span class="key"><span class="delimiter">&quot;</span><span class="content">first_name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Nemanja</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">last_name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Mikic</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">nmikic</span><span class="delimiter">&quot;</span></span>},<span class="key"><span class="delimiter">&quot;</span><span class="content">items</span><span class="delimiter">&quot;</span></span>:[{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Banana</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">price</span><span class="delimiter">&quot;</span></span>:<span class="float">1.5</span>},{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">2</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Kiwi</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">price</span><span class="delimiter">&quot;</span></span>:<span class="float">2.5</span>}],<span class="key"><span class="delimiter">&quot;</span><span class="content">total</span><span class="delimiter">&quot;</span></span>:<span class="float">4.0</span>}</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nl">"user"</span><span class="p">:{</span><span class="nl">"first_name"</span><span class="p">:</span><span class="s2">"Nemanja"</span><span class="p">,</span><span class="nl">"last_name"</span><span class="p">:</span><span class="s2">"Mikic"</span><span class="p">,</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nl">"username"</span><span class="p">:</span><span class="s2">"nmikic"</span><span class="p">},</span><span class="nl">"items"</span><span class="p">:[{</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Banana"</span><span class="p">,</span><span class="nl">"price"</span><span class="p">:</span><span class="mf">1.5</span><span class="p">},{</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Kiwi"</span><span class="p">,</span><span class="nl">"price"</span><span class="p">:</span><span class="mf">2.5</span><span class="p">}],</span><span class="nl">"total"</span><span class="p">:</span><span class="mf">4.0</span><span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -710,12 +711,12 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl &quot;$API_URL/api/orders&quot; -H 'Content-Type: application/json; charset=utf-8'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="s2">"</span><span class="nv">$API_URL</span><span class="s2">/api/orders"</span> <span class="nt">-H</span> <span class="s1">'Content-Type: application/json; charset=utf-8'</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">[{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>:{<span class="key"><span class="delimiter">&quot;</span><span class="content">first_name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Nemanja</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">last_name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Mikic</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">nmikic</span><span class="delimiter">&quot;</span></span>},<span class="key"><span class="delimiter">&quot;</span><span class="content">items</span><span class="delimiter">&quot;</span></span>:[{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">1</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Banana</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">price</span><span class="delimiter">&quot;</span></span>:<span class="float">1.5</span>},{<span class="key"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>:<span class="integer">2</span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Kiwi</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">price</span><span class="delimiter">&quot;</span></span>:<span class="float">2.5</span>}],<span class="key"><span class="delimiter">&quot;</span><span class="content">total</span><span class="delimiter">&quot;</span></span>:<span class="float">4.0</span>}]</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">[{</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nl">"user"</span><span class="p">:{</span><span class="nl">"first_name"</span><span class="p">:</span><span class="s2">"Nemanja"</span><span class="p">,</span><span class="nl">"last_name"</span><span class="p">:</span><span class="s2">"Mikic"</span><span class="p">,</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nl">"username"</span><span class="p">:</span><span class="s2">"nmikic"</span><span class="p">},</span><span class="nl">"items"</span><span class="p">:[{</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Banana"</span><span class="p">,</span><span class="nl">"price"</span><span class="p">:</span><span class="mf">1.5</span><span class="p">},{</span><span class="nl">"id"</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Kiwi"</span><span class="p">,</span><span class="nl">"price"</span><span class="p">:</span><span class="mf">2.5</span><span class="p">}],</span><span class="nl">"total"</span><span class="p">:</span><span class="mf">4.0</span><span class="p">}]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -723,12 +724,12 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;$API_URL/api/orders&quot; -H 'Content-Type: application/json; charset=utf-8' -d '{ &quot;user_id&quot;: 100, &quot;item_ids&quot;: [1,2] }'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-X</span> <span class="s2">"POST"</span> <span class="s2">"</span><span class="nv">$API_URL</span><span class="s2">/api/orders"</span> <span class="nt">-H</span> <span class="s1">'Content-Type: application/json; charset=utf-8'</span> <span class="nt">-d</span> <span class="s1">'{ "user_id": 100, "item_ids": [1,2] }'</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Bad Request</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">_links</span><span class="delimiter">&quot;</span></span>:{<span class="key"><span class="delimiter">&quot;</span><span class="content">self</span><span class="delimiter">&quot;</span></span>:[{<span class="key"><span class="delimiter">&quot;</span><span class="content">href</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">/api/orders</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">templated</span><span class="delimiter">&quot;</span></span>:<span class="value">false</span>}]},<span class="key"><span class="delimiter">&quot;</span><span class="content">_embedded</span><span class="delimiter">&quot;</span></span>:{<span class="key"><span class="delimiter">&quot;</span><span class="content">errors</span><span class="delimiter">&quot;</span></span>:[{<span class="key"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">User with id 100 doesn't exist</span><span class="delimiter">&quot;</span></span>}]}}</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="nl">"message"</span><span class="p">:</span><span class="s2">"Bad Request"</span><span class="p">,</span><span class="nl">"_links"</span><span class="p">:{</span><span class="nl">"self"</span><span class="p">:[{</span><span class="nl">"href"</span><span class="p">:</span><span class="s2">"/api/orders"</span><span class="p">,</span><span class="nl">"templated"</span><span class="p">:</span><span class="kc">false</span><span class="p">}]},</span><span class="nl">"_embedded"</span><span class="p">:{</span><span class="nl">"errors"</span><span class="p">:[{</span><span class="nl">"message"</span><span class="p">:</span><span class="s2">"User with id 100 doesn't exist"</span><span class="p">}]}}</span></code></pre>
 </div>
 </div>
 </div>
@@ -741,7 +742,7 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">kubectl delete namespaces micronaut-k8s</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">kubectl delete namespaces micronaut-k8s</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -749,7 +750,7 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws ecr delete-repository --repository-name users --force</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws ecr delete-repository <span class="nt">--repository-name</span> <span class="nb">users</span> <span class="nt">--force</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -757,7 +758,7 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws ecr delete-repository --repository-name orders --force</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws ecr delete-repository <span class="nt">--repository-name</span> orders <span class="nt">--force</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -765,7 +766,7 @@ users    NodePort       10.100.126.97    &lt;none&gt;                           
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws ecr delete-repository --repository-name api --force</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws ecr delete-repository <span class="nt">--repository-name</span> api <span class="nt">--force</span></code></pre>
 </div>
 </div>
 <div class="paragraph">

@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -240,7 +241,7 @@ This guide uses paid services; you may need to enable Billing in Google Cloud to
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud init</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud init</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -248,7 +249,7 @@ This guide uses paid services; you may need to enable Billing in Google Cloud to
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud auth login</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud auth login</code></pre>
 </div>
 </div>
 </div>
@@ -259,7 +260,7 @@ This guide uses paid services; you may need to enable Billing in Google Cloud to
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects create micronaut-guides-xxxxxx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects create micronaut-guides-xxxxxx</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -279,7 +280,7 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud config set project micronaut-guides-xxxxxx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud config <span class="nb">set </span>project micronaut-guides-xxxxxx</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -287,7 +288,7 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects list</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects list</code></pre>
 </div>
 </div>
 </div>
@@ -316,11 +317,11 @@ In GCP, project ids are globally unique, so the id you used above is the one you
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=yaml,tracing-opentelemetry-gcp,http-client,yaml,tracing-opentelemetry-http \
-    --build=maven \
-    --lang=java \
-    --test=junit</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>yaml,tracing-opentelemetry-gcp,http-client,yaml,tracing-opentelemetry-http <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -418,91 +419,91 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/InventoryService.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.opentelemetry.instrumentation.annotations.SpanAttribute</span>;
-<span class="keyword">import</span> <span class="include">io.opentelemetry.instrumentation.annotations.WithSpan</span>;
-<span class="keyword">import</span> <span class="include">io.opentelemetry.api.trace.Span</span>;
-<span class="keyword">import</span> <span class="include">io.opentelemetry.api.trace.Tracer</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="kn">import</span> <span class="nn">io.opentelemetry.instrumentation.annotations.SpanAttribute</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.opentelemetry.instrumentation.annotations.WithSpan</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.opentelemetry.api.trace.Span</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.opentelemetry.api.trace.Tracer</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Collection</span>;
-<span class="keyword">import</span> <span class="include">java.util.HashMap</span>;
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
-<span class="keyword">import</span> <span class="include">java.util.concurrent.ConcurrentHashMap</span>;
+<span class="kn">import</span> <span class="nn">java.util.Collection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.ConcurrentHashMap</span><span class="o">;</span>
 
-<span class="annotation">@Singleton</span>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">InventoryService</span> {
+<span class="nd">@Singleton</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">InventoryService</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> Tracer tracer;
-    <span class="directive">private</span> <span class="directive">final</span> WarehouseClient warehouse;
-    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Integer</span>&gt; inventory = <span class="keyword">new</span> <span class="predefined-type">ConcurrentHashMap</span>&lt;&gt;();
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Tracer</span> <span class="n">tracer</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">WarehouseClient</span> <span class="n">warehouse</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">inventory</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ConcurrentHashMap</span><span class="o">&lt;&gt;();</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> storeName = <span class="string"><span class="delimiter">&quot;</span><span class="content">my_store</span><span class="delimiter">&quot;</span></span>;
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">storeName</span> <span class="o">=</span> <span class="s">"my_store"</span><span class="o">;</span>
 
-    <span class="directive">public</span> InventoryService(Tracer tracer, WarehouseClient warehouse) { <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="local-variable">this</span>.tracer    = tracer;
-        <span class="local-variable">this</span>.warehouse = warehouse;
+    <span class="kd">public</span> <span class="nf">InventoryService</span><span class="o">(</span><span class="nc">Tracer</span> <span class="n">tracer</span><span class="o">,</span> <span class="nc">WarehouseClient</span> <span class="n">warehouse</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="k">this</span><span class="o">.</span><span class="na">tracer</span>    <span class="o">=</span> <span class="n">tracer</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">warehouse</span> <span class="o">=</span> <span class="n">warehouse</span><span class="o">;</span>
 
-        inventory.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">laptop</span><span class="delimiter">&quot;</span></span>,  <span class="integer">4</span>);
-        inventory.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">desktop</span><span class="delimiter">&quot;</span></span>, <span class="integer">2</span>);
-        inventory.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">monitor</span><span class="delimiter">&quot;</span></span>, <span class="integer">11</span>);
-    }
+        <span class="n">inventory</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"laptop"</span><span class="o">,</span>  <span class="mi">4</span><span class="o">);</span>
+        <span class="n">inventory</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"desktop"</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>
+        <span class="n">inventory</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"monitor"</span><span class="o">,</span> <span class="mi">11</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="predefined-type">Collection</span>&lt;<span class="predefined-type">String</span>&gt; getProductNames() {
-        <span class="keyword">return</span> inventory.keySet();
-    }
+    <span class="kd">public</span> <span class="nc">Collection</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getProductNames</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">inventory</span><span class="o">.</span><span class="na">keySet</span><span class="o">();</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@WithSpan</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">stock-counts</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Integer</span>&gt; getStockCounts(<span class="annotation">@SpanAttribute</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">inventory.item</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> item) { <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="predefined-type">HashMap</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Integer</span>&gt; counts = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;();
-        <span class="keyword">if</span>(inventory.containsKey(item)) {
-            <span class="type">int</span> count = inventory.get(item);
-            counts.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">store</span><span class="delimiter">&quot;</span></span>, count);
+    <span class="nd">@WithSpan</span><span class="o">(</span><span class="s">"stock-counts"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kd">public</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;</span> <span class="nf">getStockCounts</span><span class="o">(</span><span class="nd">@SpanAttribute</span><span class="o">(</span><span class="s">"inventory.item"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">item</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">counts</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">inventory</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">item</span><span class="o">))</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">inventory</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
+            <span class="n">counts</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"store"</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
 
-            <span class="keyword">if</span>(count &lt; <span class="integer">10</span>) {
-                counts.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">warehouse</span><span class="delimiter">&quot;</span></span>, inWarehouse(storeName, item));
-            }
-        }
+            <span class="k">if</span><span class="o">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">counts</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"warehouse"</span><span class="o">,</span> <span class="n">inWarehouse</span><span class="o">(</span><span class="n">storeName</span><span class="o">,</span> <span class="n">item</span><span class="o">));</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
 
-        <span class="keyword">return</span> counts;
-    }
+        <span class="k">return</span> <span class="n">counts</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="type">int</span> inWarehouse(<span class="predefined-type">String</span> store, <span class="predefined-type">String</span> item) {
-        Span.current().setAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">inventory.store-name</span><span class="delimiter">&quot;</span></span>, store); <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="nf">inWarehouse</span><span class="o">(</span><span class="nc">String</span> <span class="n">store</span><span class="o">,</span> <span class="nc">String</span> <span class="n">item</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Span</span><span class="o">.</span><span class="na">current</span><span class="o">().</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">"inventory.store-name"</span><span class="o">,</span> <span class="n">store</span><span class="o">);</span> <i class="conum" data-value="4"></i><b>(4)</b>
 
-        <span class="keyword">return</span> warehouse.getItemCount(store, getUPC(item));
-    }
+        <span class="k">return</span> <span class="n">warehouse</span><span class="o">.</span><span class="na">getItemCount</span><span class="o">(</span><span class="n">store</span><span class="o">,</span> <span class="n">getUPC</span><span class="o">(</span><span class="n">item</span><span class="o">));</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="type">void</span> order(<span class="predefined-type">String</span> item, <span class="type">int</span> count) {
-        orderFromWarehouse(item, count);
-        <span class="keyword">if</span>(inventory.containsKey(item)) {
-            count += inventory.get(item);
-        }
-        inventory.put(item, count);
-    }
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">order</span><span class="o">(</span><span class="nc">String</span> <span class="n">item</span><span class="o">,</span> <span class="kt">int</span> <span class="n">count</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">orderFromWarehouse</span><span class="o">(</span><span class="n">item</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">inventory</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">item</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="n">inventory</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">inventory</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">item</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="type">void</span> orderFromWarehouse(<span class="predefined-type">String</span> item, <span class="type">int</span> count) {
-        Span span = tracer.spanBuilder(<span class="string"><span class="delimiter">&quot;</span><span class="content">warehouse-order</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
-                          .setAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">item</span><span class="delimiter">&quot;</span></span>, item)
-                          .setAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">count</span><span class="delimiter">&quot;</span></span>, count)
-                          .startSpan();
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">orderFromWarehouse</span><span class="o">(</span><span class="nc">String</span> <span class="n">item</span><span class="o">,</span> <span class="kt">int</span> <span class="n">count</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Span</span> <span class="n">span</span> <span class="o">=</span> <span class="n">tracer</span><span class="o">.</span><span class="na">spanBuilder</span><span class="o">(</span><span class="s">"warehouse-order"</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+                          <span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">"item"</span><span class="o">,</span> <span class="n">item</span><span class="o">)</span>
+                          <span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">"count"</span><span class="o">,</span> <span class="n">count</span><span class="o">)</span>
+                          <span class="o">.</span><span class="na">startSpan</span><span class="o">();</span>
 
-        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; json = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;(<span class="integer">4</span>);
-        json.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">store</span><span class="delimiter">&quot;</span></span>, storeName);
-        json.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">product</span><span class="delimiter">&quot;</span></span>, item);
-        json.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">amount</span><span class="delimiter">&quot;</span></span>, count);
-        json.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">upc</span><span class="delimiter">&quot;</span></span>, getUPC(item));
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">json</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;(</span><span class="mi">4</span><span class="o">);</span>
+        <span class="n">json</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"store"</span><span class="o">,</span> <span class="n">storeName</span><span class="o">);</span>
+        <span class="n">json</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"product"</span><span class="o">,</span> <span class="n">item</span><span class="o">);</span>
+        <span class="n">json</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"amount"</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
+        <span class="n">json</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"upc"</span><span class="o">,</span> <span class="n">getUPC</span><span class="o">(</span><span class="n">item</span><span class="o">));</span>
 
-        warehouse.order(json);
+        <span class="n">warehouse</span><span class="o">.</span><span class="na">order</span><span class="o">(</span><span class="n">json</span><span class="o">);</span>
 
-        span.end();
-    }
+        <span class="n">span</span><span class="o">.</span><span class="na">end</span><span class="o">();</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="type">int</span> getUPC(<span class="predefined-type">String</span> item) {
-        <span class="keyword">return</span> <span class="predefined-type">Math</span>.abs(item.hashCode());
-    }
-}</code></pre>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="nf">getUPC</span><span class="o">(</span><span class="nc">String</span> <span class="n">item</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">item</span><span class="o">.</span><span class="na">hashCode</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -548,11 +549,11 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.tracing<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-tracing-opentelemetry-http<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.tracing<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-tracing-opentelemetry-http<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 </td>
@@ -562,62 +563,62 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/StoreController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpStatus</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Status</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.ContinueSpan</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.NewSpan</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.SpanTag</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpStatus</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Post</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Status</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.scheduling.TaskExecutors</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.scheduling.annotation.ExecuteOn</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.tracing.annotation.ContinueSpan</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.tracing.annotation.NewSpan</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.tracing.annotation.SpanTag</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
-<span class="keyword">import</span> <span class="include">java.util.HashMap</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
 
-<span class="annotation">@ExecuteOn</span>(TaskExecutors.BLOCKING)
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/store</span><span class="delimiter">&quot;</span></span>)
-<span class="directive">public</span> <span class="type">class</span> <span class="class">StoreController</span> {
-    <span class="directive">private</span> <span class="directive">final</span> InventoryService inventory;
+<span class="nd">@ExecuteOn</span><span class="o">(</span><span class="nc">TaskExecutors</span><span class="o">.</span><span class="na">BLOCKING</span><span class="o">)</span>
+<span class="nd">@Controller</span><span class="o">(</span><span class="s">"/store"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StoreController</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">InventoryService</span> <span class="n">inventory</span><span class="o">;</span>
 
-    <span class="directive">public</span> StoreController(InventoryService inventory) {
-        <span class="local-variable">this</span>.inventory = inventory;
-    }
+    <span class="kd">public</span> <span class="nf">StoreController</span><span class="o">(</span><span class="nc">InventoryService</span> <span class="n">inventory</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">inventory</span> <span class="o">=</span> <span class="n">inventory</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/order</span><span class="delimiter">&quot;</span></span>)
-    <span class="annotation">@Status</span>(HttpStatus.CREATED)
-    <span class="annotation">@NewSpan</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">store.order</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="directive">public</span> <span class="type">void</span> order(<span class="annotation">@SpanTag</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">order.item</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> item, <span class="annotation">@SpanTag</span> <span class="type">int</span> count) { <i class="conum" data-value="2"></i><b>(2)</b>
-        inventory.order(item, count);
-    }
+    <span class="nd">@Post</span><span class="o">(</span><span class="s">"/order"</span><span class="o">)</span>
+    <span class="nd">@Status</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">CREATED</span><span class="o">)</span>
+    <span class="nd">@NewSpan</span><span class="o">(</span><span class="s">"store.order"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">order</span><span class="o">(</span><span class="nd">@SpanTag</span><span class="o">(</span><span class="s">"order.item"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">item</span><span class="o">,</span> <span class="nd">@SpanTag</span> <span class="kt">int</span> <span class="n">count</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="n">inventory</span><span class="o">.</span><span class="na">order</span><span class="o">(</span><span class="n">item</span><span class="o">,</span> <span class="n">count</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/inventory</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;&gt; getInventory() {
-        <span class="predefined-type">List</span>&lt;<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt;&gt; currentInventory = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
-        <span class="keyword">for</span> (<span class="predefined-type">String</span> product: inventory.getProductNames()) {
-            currentInventory.add(getInventory(product));
-        }
-        <span class="keyword">return</span> currentInventory;
-    }
+    <span class="nd">@Get</span><span class="o">(</span><span class="s">"/inventory"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;&gt;</span> <span class="nf">getInventory</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;&gt;</span> <span class="n">currentInventory</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">String</span> <span class="nl">product:</span> <span class="n">inventory</span><span class="o">.</span><span class="na">getProductNames</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">currentInventory</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">getInventory</span><span class="o">(</span><span class="n">product</span><span class="o">));</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">currentInventory</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/inventory/{item}</span><span class="delimiter">&quot;</span></span>)
-    <span class="annotation">@ContinueSpan</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="directive">public</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; getInventory(<span class="annotation">@SpanTag</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">item</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> item) { <i class="conum" data-value="5"></i><b>(5)</b>
-        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; counts = <span class="keyword">new</span> <span class="predefined-type">HashMap</span>&lt;&gt;(inventory.getStockCounts(item));
-        <span class="keyword">if</span>(counts.isEmpty()) {
-            counts.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">note</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Not available at store</span><span class="delimiter">&quot;</span></span>);
-        }
+    <span class="nd">@Get</span><span class="o">(</span><span class="s">"/inventory/{item}"</span><span class="o">)</span>
+    <span class="nd">@ContinueSpan</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kd">public</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="nf">getInventory</span><span class="o">(</span><span class="nd">@SpanTag</span><span class="o">(</span><span class="s">"item"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">item</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">counts</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;(</span><span class="n">inventory</span><span class="o">.</span><span class="na">getStockCounts</span><span class="o">(</span><span class="n">item</span><span class="o">));</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">counts</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">counts</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"note"</span><span class="o">,</span> <span class="s">"Not available at store"</span><span class="o">);</span>
+        <span class="o">}</span>
 
-        counts.put(<span class="string"><span class="delimiter">&quot;</span><span class="content">item</span><span class="delimiter">&quot;</span></span>, item);
+        <span class="n">counts</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"item"</span><span class="o">,</span> <span class="n">item</span><span class="o">);</span>
 
-        <span class="keyword">return</span> counts;
-    }
-}</code></pre>
+        <span class="k">return</span> <span class="n">counts</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -663,11 +664,11 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.tracing<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-tracing-opentelemetry-http<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.tracing<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-tracing-opentelemetry-http<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 </td>
@@ -677,31 +678,31 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/WarehouseClient.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.QueryValue</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.ContinueSpan</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.tracing.annotation.SpanTag</span>;
-<span class="keyword">import</span> <span class="include">io.opentelemetry.instrumentation.annotations.SpanAttribute</span>;
-<span class="keyword">import</span> <span class="include">io.opentelemetry.instrumentation.annotations.WithSpan</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Post</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.QueryValue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.tracing.annotation.ContinueSpan</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.tracing.annotation.SpanTag</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.opentelemetry.instrumentation.annotations.SpanAttribute</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.opentelemetry.instrumentation.annotations.WithSpan</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
 
-<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/warehouse</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">interface</span> <span class="class">WarehouseClient</span> {
+<span class="nd">@Client</span><span class="o">(</span><span class="s">"/warehouse"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">WarehouseClient</span> <span class="o">{</span>
 
-    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/order</span><span class="delimiter">&quot;</span></span>)
-    <span class="annotation">@WithSpan</span>
-    <span class="type">void</span> order(<span class="annotation">@SpanTag</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">warehouse.order</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, ?&gt; json);
+    <span class="nd">@Post</span><span class="o">(</span><span class="s">"/order"</span><span class="o">)</span>
+    <span class="nd">@WithSpan</span>
+    <span class="kt">void</span> <span class="nf">order</span><span class="o">(</span><span class="nd">@SpanTag</span><span class="o">(</span><span class="s">"warehouse.order"</span><span class="o">)</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">json</span><span class="o">);</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/count</span><span class="delimiter">&quot;</span></span>)
-    <span class="annotation">@ContinueSpan</span>
-    <span class="type">int</span> getItemCount(<span class="annotation">@QueryValue</span> <span class="predefined-type">String</span> store, <span class="annotation">@SpanAttribute</span> <span class="annotation">@QueryValue</span> <span class="type">int</span> upc);
+    <span class="nd">@Get</span><span class="o">(</span><span class="s">"/count"</span><span class="o">)</span>
+    <span class="nd">@ContinueSpan</span>
+    <span class="kt">int</span> <span class="nf">getItemCount</span><span class="o">(</span><span class="nd">@QueryValue</span> <span class="nc">String</span> <span class="n">store</span><span class="o">,</span> <span class="nd">@SpanAttribute</span> <span class="nd">@QueryValue</span> <span class="kt">int</span> <span class="n">upc</span><span class="o">);</span>
 
-}</code></pre>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -721,37 +722,37 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/WarehouseController.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.TaskExecutors</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.scheduling.annotation.ExecuteOn</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Post</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.scheduling.TaskExecutors</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.scheduling.annotation.ExecuteOn</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Random</span>;
+<span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
 
-<span class="annotation">@ExecuteOn</span>(TaskExecutors.BLOCKING) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/warehouse</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">WarehouseController</span> {
+<span class="nd">@ExecuteOn</span><span class="o">(</span><span class="nc">TaskExecutors</span><span class="o">.</span><span class="na">BLOCKING</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Controller</span><span class="o">(</span><span class="s">"/warehouse"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WarehouseController</span> <span class="o">{</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/count</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="directive">public</span> HttpResponse getItemCount() {
-        <span class="keyword">return</span> HttpResponse.ok(<span class="keyword">new</span> <span class="predefined-type">Random</span>().nextInt(<span class="integer">11</span>));
-    }
+    <span class="nd">@Get</span><span class="o">(</span><span class="s">"/count"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="kd">public</span> <span class="nc">HttpResponse</span> <span class="nf">getItemCount</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">HttpResponse</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="k">new</span> <span class="nc">Random</span><span class="o">().</span><span class="na">nextInt</span><span class="o">(</span><span class="mi">11</span><span class="o">));</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/order</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="directive">public</span> HttpResponse order() {
-        <span class="keyword">try</span> {
-            <span class="comment">//To simulate an external process taking time</span>
-            <span class="predefined-type">Thread</span>.sleep(<span class="integer">500</span>);
-        } <span class="keyword">catch</span> (<span class="exception">InterruptedException</span> e) {
-        }
+    <span class="nd">@Post</span><span class="o">(</span><span class="s">"/order"</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kd">public</span> <span class="nc">HttpResponse</span> <span class="nf">order</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">//To simulate an external process taking time</span>
+            <span class="nc">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">500</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="o">}</span>
 
-        <span class="keyword">return</span> HttpResponse.accepted();
-    }
-}</code></pre>
+        <span class="k">return</span> <span class="nc">HttpResponse</span><span class="o">.</span><span class="na">accepted</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -795,9 +796,9 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">otel</span>:
-  <span class="key">traces</span>:
-    <span class="key">exporter</span>: <span class="string"><span class="content">google_cloud_trace</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">otel</span><span class="pi">:</span>
+  <span class="na">traces</span><span class="pi">:</span>
+    <span class="na">exporter</span><span class="pi">:</span> <span class="s">google_cloud_trace</span></code></pre>
 </div>
 </div>
 </div>
@@ -834,7 +835,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud auth application-default login</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud auth application-default login</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -868,7 +869,7 @@ Follow the instructions in the link above and <a href="https://micronaut-project
 <h3 id="get-item-counts">8.1. Get Item Counts</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/store/inventory/laptop</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/store/inventory/laptop</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -890,9 +891,9 @@ Follow the instructions in the link above and <a href="https://micronaut-project
 <h3 id="order-item">8.2. Order Item</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/store/order&quot; \
-     -H 'Content-Type: application/json; charset=utf-8' \
-     -d $'{&quot;item&quot;:&quot;laptop&quot;, &quot;count&quot;:5}'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-X</span> <span class="s2">"POST"</span> <span class="s2">"http://localhost:8080/store/order"</span> <span class="se">\</span>
+     <span class="nt">-H</span> <span class="s1">'Content-Type: application/json; charset=utf-8'</span> <span class="se">\</span>
+     <span class="nt">-d</span> <span class="s1">$'{"item":"laptop", "count":5}'</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -914,7 +915,7 @@ Follow the instructions in the link above and <a href="https://micronaut-project
 <h3 id="get-inventory">8.3. Get Inventory</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/store/inventory</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/store/inventory</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -981,7 +982,7 @@ sections describe how to delete or turn off these resources.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">gcloud projects delete YOUR_PROJECT_ID</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">gcloud projects delete YOUR_PROJECT_ID</code></pre>
 </div>
 </div>
 </div>

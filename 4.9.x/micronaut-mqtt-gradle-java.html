@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -232,16 +233,16 @@ This should be done in both apps for this guide.
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">test-resources</span>:
-  <span class="key">containers</span>:
-    <span class="key">mosquitto</span>:
-      <span class="key">image-name</span>: <span class="string"><span class="content">eclipse-mosquitto</span></span>
-      <span class="key">hostnames</span>:
-        - <span class="string"><span class="content">mqtt.host</span></span>
-      <span class="key">exposed-ports</span>:
-        - <span class="string"><span class="content">mqtt.port: 1883</span></span>
-      <span class="key">ro-fs-bind</span>:
-        - <span class="key"><span class="delimiter">&quot;</span><span class="content">src/test-resources/mosquitto.conf</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="content">/mosquitto/config/mosquitto.conf</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">test-resources</span><span class="pi">:</span>
+  <span class="na">containers</span><span class="pi">:</span>
+    <span class="na">mosquitto</span><span class="pi">:</span>
+      <span class="na">image-name</span><span class="pi">:</span> <span class="s">eclipse-mosquitto</span>
+      <span class="na">hostnames</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">mqtt.host</span>
+      <span class="na">exposed-ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">mqtt.port</span><span class="pi">:</span> <span class="m">1883</span>
+      <span class="na">ro-fs-bind</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s2">"</span><span class="s">src/test-resources/mosquitto.conf"</span><span class="err">:</span> <span class="s">/mosquitto/config/mosquitto.conf</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -250,7 +251,7 @@ This should be done in both apps for this guide.
 <div class="listingblock">
 <div class="title">src/test-resources/mosquitto.conf</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>persistence false
+<pre class="rouge highlight"><code>persistence false
 allow_anonymous true
 connection_messages true
 log_type all
@@ -265,7 +266,7 @@ listener 1883</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="shell">MQTT_CLIENT_SERVER_URI=tcp://production-server:1183</code></pre>
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">MQTT_CLIENT_SERVER_URI</span><span class="o">=</span>tcp://production-server:1183</code></pre>
 </div>
 </div>
 </div>
@@ -278,9 +279,9 @@ listener 1883</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-cli-app example.micronaut.micronautguide \
-    --features=yaml,mqtt,graalvm,awaitility \
-    --build=gradle --lang=java</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-cli-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>yaml,mqtt,graalvm,awaitility <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -330,17 +331,17 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/java/example/micronaut/TemperatureClient.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.Topic</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.v5.MqttPublisher</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.v5.MqttPublisher</span><span class="o">;</span>
 
-<span class="annotation">@MqttPublisher</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">interface</span> <span class="class">TemperatureClient</span> {
+<span class="nd">@MqttPublisher</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">TemperatureClient</span> <span class="o">{</span>
 
-    <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">house/livingroom/temperature</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="type">void</span> publishLivingroomTemperature(<span class="type">byte</span><span class="type">[]</span> data);
-}</code></pre>
+    <span class="nd">@Topic</span><span class="o">(</span><span class="s">"house/livingroom/temperature"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kt">void</span> <span class="nf">publishLivingroomTemperature</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -364,54 +365,54 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/java/example/micronaut/Scale.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
-<span class="keyword">import</span> <span class="include">java.util.Set</span>;
-<span class="keyword">import</span> <span class="include">java.util.concurrent.ConcurrentHashMap</span>;
+<span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Set</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.ConcurrentHashMap</span><span class="o">;</span>
 
-<span class="directive">public</span> <span class="type">enum</span> Scale {
-    FAHRENHEIT(<span class="string"><span class="delimiter">&quot;</span><span class="content">Fahrenheit</span><span class="delimiter">&quot;</span></span>),
-    CELSIUS(<span class="string"><span class="delimiter">&quot;</span><span class="content">Celsius</span><span class="delimiter">&quot;</span></span>);
+<span class="kd">public</span> <span class="kd">enum</span> <span class="nc">Scale</span> <span class="o">{</span>
+    <span class="no">FAHRENHEIT</span><span class="o">(</span><span class="s">"Fahrenheit"</span><span class="o">),</span>
+    <span class="no">CELSIUS</span><span class="o">(</span><span class="s">"Celsius"</span><span class="o">);</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>,Scale&gt; ENUM_MAP;
-    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> name;
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span><span class="nc">Scale</span><span class="o">&gt;</span> <span class="no">ENUM_MAP</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
 
-    Scale(<span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
-    }
+    <span class="nc">Scale</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">static</span> {
-        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>,Scale&gt; map = <span class="keyword">new</span> <span class="predefined-type">ConcurrentHashMap</span>&lt;&gt;();
-        <span class="keyword">for</span> (Scale instance : Scale.values()) {
-            map.put(instance.getName(), instance);
-        }
-        ENUM_MAP = <span class="predefined-type">Collections</span>.unmodifiableMap(map);
-    }
+    <span class="kd">static</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span><span class="nc">Scale</span><span class="o">&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ConcurrentHashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">Scale</span> <span class="n">instance</span> <span class="o">:</span> <span class="nc">Scale</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">instance</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <span class="n">instance</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="no">ENUM_MAP</span> <span class="o">=</span> <span class="nc">Collections</span><span class="o">.</span><span class="na">unmodifiableMap</span><span class="o">(</span><span class="n">map</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="directive">public</span> <span class="directive">static</span> Optional&lt;Scale&gt; of(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
-        <span class="keyword">return</span> Optional.ofNullable(ENUM_MAP.get(name));
-    }
+    <span class="nd">@NonNull</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Scale</span><span class="o">&gt;</span> <span class="nf">of</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Optional</span><span class="o">.</span><span class="na">ofNullable</span><span class="o">(</span><span class="no">ENUM_MAP</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">name</span><span class="o">));</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
-        <span class="keyword">return</span> name;
-    }
+    <span class="nd">@NonNull</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="predefined-type">String</span> toString() {
-        <span class="keyword">return</span> name;
-    }
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="directive">static</span> <span class="predefined-type">Set</span>&lt;<span class="predefined-type">String</span>&gt; candidates() {
-        <span class="keyword">return</span> ENUM_MAP.keySet();
-    }
-}</code></pre>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">candidates</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="no">ENUM_MAP</span><span class="o">.</span><span class="na">keySet</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -420,16 +421,16 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/java/example/micronaut/TemperatureScaleCandidates.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
 
-<span class="directive">public</span> <span class="type">class</span> <span class="class">TemperatureScaleCandidates</span> <span class="directive">extends</span> <span class="predefined-type">ArrayList</span>&lt;<span class="predefined-type">String</span>&gt; {
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TemperatureScaleCandidates</span> <span class="kd">extends</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="o">{</span>
 
-    <span class="directive">public</span> TemperatureScaleCandidates() {
-        <span class="local-variable">super</span>(Scale.candidates());
-    }
-}</code></pre>
+    <span class="kd">public</span> <span class="nf">TemperatureScaleCandidates</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="nc">Scale</span><span class="o">.</span><span class="na">candidates</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -438,59 +439,59 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/java/example/micronaut/MicronautguideCommand.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.picocli.PicocliRunner</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">picocli.CommandLine.Command</span>;
-<span class="keyword">import</span> <span class="include">picocli.CommandLine.Option</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.picocli.PicocliRunner</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">picocli.CommandLine.Command</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">picocli.CommandLine.Option</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
-<span class="keyword">import</span> <span class="include">java.math.RoundingMode</span>;
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.math.RoundingMode</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">example.micronaut.Scale.CELSIUS</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">example.micronaut.Scale.FAHRENHEIT</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">example</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">Scale</span><span class="o">.</span><span class="na">CELSIUS</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">example</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">Scale</span><span class="o">.</span><span class="na">FAHRENHEIT</span><span class="o">;</span>
 
-<span class="annotation">@Command</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">house-livingroom-temperature</span><span class="delimiter">&quot;</span></span>, <i class="conum" data-value="1"></i><b>(1)</b>
-         description = <span class="string"><span class="delimiter">&quot;</span><span class="content">Publish living room temperature</span><span class="delimiter">&quot;</span></span>,
-         mixinStandardHelpOptions = <span class="predefined-constant">true</span>)
-<span class="directive">public</span> <span class="type">class</span> <span class="class">MicronautguideCommand</span> <span class="directive">implements</span> <span class="predefined-type">Runnable</span> {
+<span class="nd">@Command</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"house-livingroom-temperature"</span><span class="o">,</span> <i class="conum" data-value="1"></i><b>(1)</b>
+         <span class="n">description</span> <span class="o">=</span> <span class="s">"Publish living room temperature"</span><span class="o">,</span>
+         <span class="n">mixinStandardHelpOptions</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MicronautguideCommand</span> <span class="kd">implements</span> <span class="nc">Runnable</span> <span class="o">{</span>
 
-    <span class="annotation">@Option</span>(names = {<span class="string"><span class="delimiter">&quot;</span><span class="content">-t</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">--temperature</span><span class="delimiter">&quot;</span></span>}, <i class="conum" data-value="2"></i><b>(2)</b>
-            required = <span class="predefined-constant">true</span>, <i class="conum" data-value="3"></i><b>(3)</b>
-            description = <span class="string"><span class="delimiter">&quot;</span><span class="content">Temperature value</span><span class="delimiter">&quot;</span></span>)
-    <span class="predefined-type">BigDecimal</span> temperature;
+    <span class="nd">@Option</span><span class="o">(</span><span class="n">names</span> <span class="o">=</span> <span class="o">{</span><span class="s">"-t"</span><span class="o">,</span> <span class="s">"--temperature"</span><span class="o">},</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">true</span><span class="o">,</span> <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="n">description</span> <span class="o">=</span> <span class="s">"Temperature value"</span><span class="o">)</span>
+    <span class="nc">BigDecimal</span> <span class="n">temperature</span><span class="o">;</span>
 
-    <span class="annotation">@Option</span>(names = {<span class="string"><span class="delimiter">&quot;</span><span class="content">-s</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">--scale</span><span class="delimiter">&quot;</span></span>}, <i class="conum" data-value="2"></i><b>(2)</b>
-            required = <span class="predefined-constant">false</span>, <i class="conum" data-value="3"></i><b>(3)</b>
-            description = <span class="string"><span class="delimiter">&quot;</span><span class="content">Temperate scales ${COMPLETION-CANDIDATES}</span><span class="delimiter">&quot;</span></span>, <i class="conum" data-value="4"></i><b>(4)</b>
-            completionCandidates = TemperatureScaleCandidates.class) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="predefined-type">String</span> scale;
+    <span class="nd">@Option</span><span class="o">(</span><span class="n">names</span> <span class="o">=</span> <span class="o">{</span><span class="s">"-s"</span><span class="o">,</span> <span class="s">"--scale"</span><span class="o">},</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="n">description</span> <span class="o">=</span> <span class="s">"Temperate scales ${COMPLETION-CANDIDATES}"</span><span class="o">,</span> <i class="conum" data-value="4"></i><b>(4)</b>
+            <span class="n">completionCandidates</span> <span class="o">=</span> <span class="nc">TemperatureScaleCandidates</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nc">String</span> <span class="n">scale</span><span class="o">;</span>
 
-    <span class="annotation">@Inject</span>
-    TemperatureClient temperatureClient; <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="nd">@Inject</span>
+    <span class="nc">TemperatureClient</span> <span class="n">temperatureClient</span><span class="o">;</span> <i class="conum" data-value="5"></i><b>(5)</b>
 
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
-        PicocliRunner.run(MicronautguideCommand.class, args);
-    }
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">PicocliRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="nc">MicronautguideCommand</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="type">void</span> run() {
-        Scale temperatureScale = scale != <span class="predefined-constant">null</span> ?
-                Scale.of(scale).orElse(CELSIUS) : CELSIUS;
-        <span class="predefined-type">BigDecimal</span> celsius = (temperatureScale == FAHRENHEIT)
-                ? fahrenheitToCelsius(temperature) : temperature;
-        <span class="type">byte</span><span class="type">[]</span> data = celsius.toPlainString().getBytes();
-        temperatureClient.publishLivingroomTemperature(data); <i class="conum" data-value="6"></i><b>(6)</b>
-        <span class="predefined-type">System</span>.out.println(<span class="string"><span class="delimiter">&quot;</span><span class="content">Topic published</span><span class="delimiter">&quot;</span></span>);
-    }
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">Scale</span> <span class="n">temperatureScale</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span>
+                <span class="nc">Scale</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">scale</span><span class="o">).</span><span class="na">orElse</span><span class="o">(</span><span class="no">CELSIUS</span><span class="o">)</span> <span class="o">:</span> <span class="no">CELSIUS</span><span class="o">;</span>
+        <span class="nc">BigDecimal</span> <span class="n">celsius</span> <span class="o">=</span> <span class="o">(</span><span class="n">temperatureScale</span> <span class="o">==</span> <span class="no">FAHRENHEIT</span><span class="o">)</span>
+                <span class="o">?</span> <span class="n">fahrenheitToCelsius</span><span class="o">(</span><span class="n">temperature</span><span class="o">)</span> <span class="o">:</span> <span class="n">temperature</span><span class="o">;</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span> <span class="o">=</span> <span class="n">celsius</span><span class="o">.</span><span class="na">toPlainString</span><span class="o">().</span><span class="na">getBytes</span><span class="o">();</span>
+        <span class="n">temperatureClient</span><span class="o">.</span><span class="na">publishLivingroomTemperature</span><span class="o">(</span><span class="n">data</span><span class="o">);</span> <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Topic published"</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="predefined-type">BigDecimal</span> fahrenheitToCelsius(<span class="predefined-type">BigDecimal</span> temperature) {
-        <span class="keyword">return</span> temperature
-                .subtract(<span class="predefined-type">BigDecimal</span>.valueOf(<span class="integer">32</span>))
-                .multiply(<span class="predefined-type">BigDecimal</span>.valueOf(<span class="integer">5</span>/<span class="float">9.0</span>))
-                .setScale(<span class="integer">2</span>, <span class="predefined-type">RoundingMode</span>.FLOOR);
-    }
-}</code></pre>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">BigDecimal</span> <span class="nf">fahrenheitToCelsius</span><span class="o">(</span><span class="nc">BigDecimal</span> <span class="n">temperature</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">temperature</span>
+                <span class="o">.</span><span class="na">subtract</span><span class="o">(</span><span class="nc">BigDecimal</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">32</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">multiply</span><span class="o">(</span><span class="nc">BigDecimal</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">9.0</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">setScale</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="nc">RoundingMode</span><span class="o">.</span><span class="na">FLOOR</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -527,61 +528,61 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/test/java/example/micronaut/MicronautguideCommandTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.picocli.PicocliRunner</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.util.CollectionUtils</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.MqttSubscriber</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.Topic</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.picocli.PicocliRunner</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.ApplicationContext</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.env.Environment</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.util.CollectionUtils</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.MqttSubscriber</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.io.ByteArrayOutputStream</span>;
-<span class="keyword">import</span> <span class="include">java.io.OutputStream</span>;
-<span class="keyword">import</span> <span class="include">java.io.PrintStream</span>;
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
-<span class="keyword">import</span> <span class="include">java.util.concurrent.TimeUnit</span>;
+<span class="kn">import</span> <span class="nn">java.io.ByteArrayOutputStream</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.OutputStream</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.PrintStream</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.TimeUnit</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">java.nio.charset.StandardCharsets.UTF_8</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.awaitility.Awaitility.await</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">nio</span><span class="o">.</span><span class="na">charset</span><span class="o">.</span><span class="na">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">awaitility</span><span class="o">.</span><span class="na">Awaitility</span><span class="o">.</span><span class="na">await</span><span class="o">;</span>
 
-<span class="type">class</span> <span class="class">MicronautguideCommandTest</span> {
+<span class="kd">class</span> <span class="nc">MicronautguideCommandTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> testWithCommandLineOption() {
-        <span class="predefined-type">OutputStream</span> baos = <span class="keyword">new</span> <span class="predefined-type">ByteArrayOutputStream</span>();
-        <span class="predefined-type">System</span>.setOut(<span class="keyword">new</span> <span class="predefined-type">PrintStream</span>(baos));
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">testWithCommandLineOption</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">OutputStream</span> <span class="n">baos</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ByteArrayOutputStream</span><span class="o">();</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">setOut</span><span class="o">(</span><span class="k">new</span> <span class="nc">PrintStream</span><span class="o">(</span><span class="n">baos</span><span class="o">));</span>
 
-        <span class="keyword">try</span> (ApplicationContext ctx = ApplicationContext.run(
-                CollectionUtils.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">MicronautguideCommandTest</span><span class="delimiter">&quot;</span></span>),
-                Environment.CLI, Environment.TEST)) {
+        <span class="k">try</span> <span class="o">(</span><span class="nc">ApplicationContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="nc">ApplicationContext</span><span class="o">.</span><span class="na">run</span><span class="o">(</span>
+                <span class="nc">CollectionUtils</span><span class="o">.</span><span class="na">mapOf</span><span class="o">(</span><span class="s">"spec.name"</span><span class="o">,</span> <span class="s">"MicronautguideCommandTest"</span><span class="o">),</span>
+                <span class="nc">Environment</span><span class="o">.</span><span class="na">CLI</span><span class="o">,</span> <span class="nc">Environment</span><span class="o">.</span><span class="na">TEST</span><span class="o">))</span> <span class="o">{</span>
 
-            <span class="predefined-type">String</span><span class="type">[]</span> args = <span class="keyword">new</span> <span class="predefined-type">String</span><span class="type">[]</span> { <span class="string"><span class="delimiter">&quot;</span><span class="content">-t</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">212</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">-s</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Fahrenheit</span><span class="delimiter">&quot;</span></span> };
-            PicocliRunner.run(MicronautguideCommand.class, ctx, args);
-            assertTrue(baos.toString().contains(<span class="string"><span class="delimiter">&quot;</span><span class="content">Topic published</span><span class="delimiter">&quot;</span></span>));
+            <span class="nc">String</span><span class="o">[]</span> <span class="n">args</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">String</span><span class="o">[]</span> <span class="o">{</span> <span class="s">"-t"</span><span class="o">,</span> <span class="s">"212"</span><span class="o">,</span> <span class="s">"-s"</span><span class="o">,</span> <span class="s">"Fahrenheit"</span> <span class="o">};</span>
+            <span class="nc">PicocliRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="nc">MicronautguideCommand</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">ctx</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+            <span class="n">assertTrue</span><span class="o">(</span><span class="n">baos</span><span class="o">.</span><span class="na">toString</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"Topic published"</span><span class="o">));</span>
 
-            TemperatureListener listener = ctx.getBean(TemperatureListener.class);
-            await().atMost(<span class="integer">5</span>, <span class="predefined-type">TimeUnit</span>.SECONDS)
-                    .untilAsserted(() -&gt; assertEquals(<span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">100.00</span><span class="delimiter">&quot;</span></span>), listener.temperature));
-        }
-    }
+            <span class="nc">TemperatureListener</span> <span class="n">listener</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="nc">TemperatureListener</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+            <span class="n">await</span><span class="o">().</span><span class="na">atMost</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="nc">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">untilAsserted</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">assertEquals</span><span class="o">(</span><span class="k">new</span> <span class="nc">BigDecimal</span><span class="o">(</span><span class="s">"100.00"</span><span class="o">),</span> <span class="n">listener</span><span class="o">.</span><span class="na">temperature</span><span class="o">));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">MicronautguideCommandTest</span><span class="delimiter">&quot;</span></span>)
-    <span class="annotation">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">class</span> <span class="class">TemperatureListener</span> {
+    <span class="nd">@Requires</span><span class="o">(</span><span class="n">property</span> <span class="o">=</span> <span class="s">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"MicronautguideCommandTest"</span><span class="o">)</span>
+    <span class="nd">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">TemperatureListener</span> <span class="o">{</span>
 
-        <span class="directive">private</span> <span class="predefined-type">BigDecimal</span> temperature;
+        <span class="kd">private</span> <span class="nc">BigDecimal</span> <span class="n">temperature</span><span class="o">;</span>
 
-        <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">house/livingroom/temperature</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="directive">public</span> <span class="type">void</span> receive(<span class="type">byte</span><span class="type">[]</span> data) {
-            temperature = <span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="keyword">new</span> <span class="predefined-type">String</span>(data, UTF_8));
-        }
-    }
-}</code></pre>
+        <span class="nd">@Topic</span><span class="o">(</span><span class="s">"house/livingroom/temperature"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">receive</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">temperature</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BigDecimal</span><span class="o">(</span><span class="k">new</span> <span class="nc">String</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="no">UTF_8</span><span class="o">));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -614,10 +615,10 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">mqtt</span>:
-  <span class="key">client</span>:
-    <span class="key">server-uri</span>: <span class="string"><span class="content">tcp://${mqtt.host}:${mqtt.port}</span></span>
-    <span class="key">client-id</span>: <span class="string"><span class="content">${random.uuid}</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">mqtt</span><span class="pi">:</span>
+  <span class="na">client</span><span class="pi">:</span>
+    <span class="na">server-uri</span><span class="pi">:</span> <span class="s">tcp://${mqtt.host}:${mqtt.port}</span>
+    <span class="na">client-id</span><span class="pi">:</span> <span class="s">${random.uuid}</span></code></pre>
 </div>
 </div>
 </div>
@@ -631,9 +632,9 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-messaging-app example.micronaut.micronautguide \
-    --features=yaml,mqtt,graalvm,awaitility \
-    --build=gradle --lang=java</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-messaging-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>yaml,mqtt,graalvm,awaitility <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -683,10 +684,10 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">app/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">mqtt</span>:
-  <span class="key">client</span>:
-    <span class="key">server-uri</span>: <span class="string"><span class="content">tcp://${mqtt.host}:${mqtt.port}</span></span>
-    <span class="key">client-id</span>: <span class="string"><span class="content">${random.uuid}</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">mqtt</span><span class="pi">:</span>
+  <span class="na">client</span><span class="pi">:</span>
+    <span class="na">server-uri</span><span class="pi">:</span> <span class="s">tcp://${mqtt.host}:${mqtt.port}</span>
+    <span class="na">client-id</span><span class="pi">:</span> <span class="s">${random.uuid}</span></code></pre>
 </div>
 </div>
 </div>
@@ -695,35 +696,35 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">app/src/main/java/example/micronaut/TemperatureListener.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.MqttSubscriber</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.Topic</span>;
-<span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
-<span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.MqttSubscriber</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">java.nio.charset.StandardCharsets.UTF_8</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">nio</span><span class="o">.</span><span class="na">charset</span><span class="o">.</span><span class="na">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">;</span>
 
-<span class="annotation">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">TemperatureListener</span> {
+<span class="nd">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TemperatureListener</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(TemperatureListener.class);
-    <span class="directive">private</span> <span class="predefined-type">BigDecimal</span> temperature = <span class="predefined-constant">null</span>;
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="no">LOG</span> <span class="o">=</span> <span class="nc">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">TemperatureListener</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="nc">BigDecimal</span> <span class="n">temperature</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
-    <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">house/livingroom/temperature</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="directive">public</span> <span class="type">void</span> receive(<span class="type">byte</span><span class="type">[]</span> data) {
-        temperature = <span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="keyword">new</span> <span class="predefined-type">String</span>(data, UTF_8));
-        LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">temperature: {}</span><span class="delimiter">&quot;</span></span>, temperature);
-    }
+    <span class="nd">@Topic</span><span class="o">(</span><span class="s">"house/livingroom/temperature"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">receive</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">temperature</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BigDecimal</span><span class="o">(</span><span class="k">new</span> <span class="nc">String</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="no">UTF_8</span><span class="o">));</span>
+        <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"temperature: {}"</span><span class="o">,</span> <span class="n">temperature</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Nullable</span>
-    <span class="directive">public</span> <span class="predefined-type">BigDecimal</span> getTemperature() {
-        <span class="keyword">return</span> temperature;
-    }
-}</code></pre>
+    <span class="nd">@Nullable</span>
+    <span class="kd">public</span> <span class="nc">BigDecimal</span> <span class="nf">getTemperature</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">temperature</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -744,49 +745,49 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">app/src/test/java/example/micronaut/SubscriptionTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.Topic</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.v5.MqttPublisher</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Property</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.v5.MqttPublisher</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
-<span class="keyword">import</span> <span class="include">java.nio.charset.StandardCharsets</span>;
-<span class="keyword">import</span> <span class="include">java.util.concurrent.TimeUnit</span>;
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.nio.charset.StandardCharsets</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.TimeUnit</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.awaitility.Awaitility.await</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">awaitility</span><span class="o">.</span><span class="na">Awaitility</span><span class="o">.</span><span class="na">await</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
 
-<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">SubscriptionTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">SubscriptionTest</span> {
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"SubscriptionTest"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">SubscriptionTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    TemperatureClient client;
+    <span class="nd">@Inject</span>
+    <span class="nc">TemperatureClient</span> <span class="n">client</span><span class="o">;</span>
 
-    <span class="annotation">@Inject</span>
-    TemperatureListener listener;
+    <span class="nd">@Inject</span>
+    <span class="nc">TemperatureListener</span> <span class="n">listener</span><span class="o">;</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> checkSubscriptionsAreReceived() {
-        client.publishLivingroomTemperature(<span class="string"><span class="delimiter">&quot;</span><span class="content">3.145</span><span class="delimiter">&quot;</span></span>.getBytes(StandardCharsets.UTF_8));
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">checkSubscriptionsAreReceived</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">client</span><span class="o">.</span><span class="na">publishLivingroomTemperature</span><span class="o">(</span><span class="s">"3.145"</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span><span class="nc">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">));</span>
 
-        await().atMost(<span class="integer">5</span>, <span class="predefined-type">TimeUnit</span>.SECONDS)
-                .untilAsserted(() -&gt; assertEquals(<span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">3.145</span><span class="delimiter">&quot;</span></span>), listener.getTemperature()));
-    }
+        <span class="n">await</span><span class="o">().</span><span class="na">atMost</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="nc">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">untilAsserted</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">assertEquals</span><span class="o">(</span><span class="k">new</span> <span class="nc">BigDecimal</span><span class="o">(</span><span class="s">"3.145"</span><span class="o">),</span> <span class="n">listener</span><span class="o">.</span><span class="na">getTemperature</span><span class="o">()));</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">SubscriptionTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@MqttPublisher</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="directive">static</span> <span class="type">interface</span> <span class="class">TemperatureClient</span> {
+    <span class="nd">@Requires</span><span class="o">(</span><span class="n">property</span> <span class="o">=</span> <span class="s">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"SubscriptionTest"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@MqttPublisher</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kd">static</span> <span class="kd">interface</span> <span class="nc">TemperatureClient</span> <span class="o">{</span>
 
-        <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">house/livingroom/temperature</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
-        <span class="type">void</span> publishLivingroomTemperature(<span class="type">byte</span><span class="type">[]</span> data);
-    }
-}</code></pre>
+        <span class="nd">@Topic</span><span class="o">(</span><span class="s">"house/livingroom/temperature"</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="kt">void</span> <span class="nf">publishLivingroomTemperature</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -835,7 +836,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew run --args=&quot;-t 212 -s Fahrenheit&quot;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run <span class="nt">--args</span><span class="o">=</span><span class="s2">"-t 212 -s Fahrenheit"</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -843,7 +844,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">12:09:47.280 [MQTT Call: 180d98b5-75b9-41be-a874-295289346592]
+<pre class="rouge highlight"><code data-lang="bash">12:09:47.280 <span class="o">[</span>MQTT Call: 180d98b5-75b9-41be-a874-295289346592]
     INFO  e.micronaut.TemperatureListener - temperature: 100.00</code></pre>
 </div>
 </div>
@@ -879,7 +880,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">Java 21</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.5-graal</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.5-graal</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -894,7 +895,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">Java 21</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.2-graalce</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.2-graalce</code></pre>
 </div>
 </div>
 </div>
@@ -905,7 +906,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -917,14 +918,14 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">graalvmNative {
-    binaries {
-        main {
-            imageName.set(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">-Ob</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-        }
-    }
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">graalvmNative</span> <span class="o">{</span>
+    <span class="n">binaries</span> <span class="o">{</span>
+        <span class="n">main</span> <span class="o">{</span>
+            <span class="n">imageName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s1">'mn-graalvm-application'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="n">buildArgs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s1">'-Ob'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

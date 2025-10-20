@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -269,10 +270,10 @@ Then we will test the repositories using Micronaut testing support and Testconta
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=flyway,jooq,postgres,testcontainers,assertj \
-    --build=maven \
-    --lang=java</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>flyway,jooq,postgres,testcontainers,assertj <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -389,8 +390,8 @@ So, let&#8217;s start with creating our database structure using Flyway migratio
 <div class="listingblock">
 <div class="title">testcontainers/src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">datasources.default.db-type=postgres
-datasources.default.driver-class-name=org.postgresql.Driver</code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">datasources.default.db-type</span><span class="p">=</span><span class="s">postgres</span>
+<span class="py">datasources.default.driver-class-name</span><span class="p">=</span><span class="s">org.postgresql.Driver</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -408,7 +409,7 @@ datasources.default.driver-class-name=org.postgresql.Driver</code></pre>
 <div class="listingblock">
 <div class="title">testcontainers/src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">flyway.datasources.default.enabled=true</code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">flyway.datasources.default.enabled</span><span class="p">=</span><span class="s">true</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -450,42 +451,42 @@ Let&#8217;s create our first migration script following the Flyway naming conven
 <div class="listingblock">
 <div class="title">testcontainers/src/main/resources/db/migration/V1__create_tables.sql</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">create</span> <span class="type">table</span> users
-(
-    id         bigserial <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    name       <span class="predefined-type">varchar</span>   <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    email      <span class="predefined-type">varchar</span>   <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    created_at <span class="predefined-type">timestamp</span>,
-    updated_at <span class="predefined-type">timestamp</span>,
-    <span class="directive">primary</span> <span class="type">key</span> (id),
-    <span class="type">constraint</span> user_email_unique <span class="directive">unique</span> (email)
-);
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">create</span> <span class="k">table</span> <span class="n">users</span>
+<span class="p">(</span>
+    <span class="n">id</span>         <span class="n">bigserial</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">name</span>       <span class="nb">varchar</span>   <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">email</span>      <span class="nb">varchar</span>   <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">created_at</span> <span class="nb">timestamp</span><span class="p">,</span>
+    <span class="n">updated_at</span> <span class="nb">timestamp</span><span class="p">,</span>
+    <span class="k">primary</span> <span class="k">key</span> <span class="p">(</span><span class="n">id</span><span class="p">),</span>
+    <span class="k">constraint</span> <span class="n">user_email_unique</span> <span class="k">unique</span> <span class="p">(</span><span class="n">email</span><span class="p">)</span>
+<span class="p">);</span>
 
-<span class="class">create</span> <span class="type">table</span> posts
-(
-    id         bigserial                    <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    title      <span class="predefined-type">varchar</span>                      <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    content    <span class="predefined-type">varchar</span>                      <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    created_by <span class="predefined-type">bigint</span> <span class="keyword">references</span> users (id) <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    created_at <span class="predefined-type">timestamp</span>,
-    updated_at <span class="predefined-type">timestamp</span>,
-    <span class="directive">primary</span> <span class="type">key</span> (id)
-);
+<span class="k">create</span> <span class="k">table</span> <span class="n">posts</span>
+<span class="p">(</span>
+    <span class="n">id</span>         <span class="n">bigserial</span>                    <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">title</span>      <span class="nb">varchar</span>                      <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">content</span>    <span class="nb">varchar</span>                      <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">created_by</span> <span class="nb">bigint</span> <span class="k">references</span> <span class="n">users</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">created_at</span> <span class="nb">timestamp</span><span class="p">,</span>
+    <span class="n">updated_at</span> <span class="nb">timestamp</span><span class="p">,</span>
+    <span class="k">primary</span> <span class="k">key</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="p">);</span>
 
-<span class="class">create</span> <span class="type">table</span> comments
-(
-    id         bigserial                    <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    name       <span class="predefined-type">varchar</span>                      <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    content    <span class="predefined-type">varchar</span>                      <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    post_id    <span class="predefined-type">bigint</span> <span class="keyword">references</span> posts (id) <span class="keyword">not</span> <span class="predefined-constant">null</span>,
-    created_at <span class="predefined-type">timestamp</span>,
-    updated_at <span class="predefined-type">timestamp</span>,
-    <span class="directive">primary</span> <span class="type">key</span> (id)
-);
+<span class="k">create</span> <span class="k">table</span> <span class="n">comments</span>
+<span class="p">(</span>
+    <span class="n">id</span>         <span class="n">bigserial</span>                    <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">name</span>       <span class="nb">varchar</span>                      <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">content</span>    <span class="nb">varchar</span>                      <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">post_id</span>    <span class="nb">bigint</span> <span class="k">references</span> <span class="n">posts</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">created_at</span> <span class="nb">timestamp</span><span class="p">,</span>
+    <span class="n">updated_at</span> <span class="nb">timestamp</span><span class="p">,</span>
+    <span class="k">primary</span> <span class="k">key</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="p">);</span>
 
-<span class="class">ALTER</span> SEQUENCE users_id_seq RESTART WITH <span class="integer">101</span>;
-<span class="class">ALTER</span> SEQUENCE posts_id_seq RESTART WITH <span class="integer">101</span>;
-<span class="class">ALTER</span> SEQUENCE comments_id_seq RESTART WITH <span class="integer">101</span>;</code></pre>
+<span class="k">ALTER</span> <span class="n">SEQUENCE</span> <span class="n">users_id_seq</span> <span class="k">RESTART</span> <span class="k">WITH</span> <span class="mi">101</span><span class="p">;</span>
+<span class="k">ALTER</span> <span class="n">SEQUENCE</span> <span class="n">posts_id_seq</span> <span class="k">RESTART</span> <span class="k">WITH</span> <span class="mi">101</span><span class="p">;</span>
+<span class="k">ALTER</span> <span class="n">SEQUENCE</span> <span class="n">comments_id_seq</span> <span class="k">RESTART</span> <span class="k">WITH</span> <span class="mi">101</span><span class="p">;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -502,72 +503,72 @@ so that we can insert some sample data along with primary key values for testing
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="preprocessor">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-<span class="tag">&lt;project</span> <span class="attribute-name">xmlns</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://maven.apache.org/POM/4.0.0</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">xmlns:xsi</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.w3.org/2001/XMLSchema-instance</span><span class="delimiter">&quot;</span></span>
-         <span class="attribute-name">xsi:schemaLocation</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+<pre class="rouge highlight"><code data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
  ...
-    <span class="tag">&lt;properties&gt;</span>
+    <span class="nt">&lt;properties&gt;</span>
 ...
-        <span class="tag">&lt;testcontainers-jooq-codegen-maven-plugin.version&gt;</span>0.0.2<span class="tag">&lt;/testcontainers-jooq-codegen-maven-plugin.version&gt;</span>
-    <span class="tag">&lt;/properties&gt;</span>
+        <span class="nt">&lt;testcontainers-jooq-codegen-maven-plugin.version&gt;</span>0.0.2<span class="nt">&lt;/testcontainers-jooq-codegen-maven-plugin.version&gt;</span>
+    <span class="nt">&lt;/properties&gt;</span>
 ...
-    <span class="tag">&lt;build&gt;</span>
-        <span class="tag">&lt;plugins&gt;</span>
+    <span class="nt">&lt;build&gt;</span>
+        <span class="nt">&lt;plugins&gt;</span>
 ...
-            <span class="tag">&lt;plugin&gt;</span>
-                <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-                <span class="tag">&lt;artifactId&gt;</span>testcontainers-jooq-codegen-maven-plugin<span class="tag">&lt;/artifactId&gt;</span>
-                <span class="tag">&lt;version&gt;</span>${testcontainers-jooq-codegen-maven-plugin.version}<span class="tag">&lt;/version&gt;</span>
-                <span class="tag">&lt;dependencies&gt;</span>
-                    <span class="tag">&lt;dependency&gt;</span>
-                        <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-                        <span class="tag">&lt;artifactId&gt;</span>postgresql<span class="tag">&lt;/artifactId&gt;</span>
-                        <span class="tag">&lt;version&gt;</span>${testcontainers.version}<span class="tag">&lt;/version&gt;</span>
-                    <span class="tag">&lt;/dependency&gt;</span>
-                    <span class="tag">&lt;dependency&gt;</span>
-                        <span class="tag">&lt;groupId&gt;</span>org.postgresql<span class="tag">&lt;/groupId&gt;</span>
-                        <span class="tag">&lt;artifactId&gt;</span>postgresql<span class="tag">&lt;/artifactId&gt;</span>
-                        <span class="tag">&lt;version&gt;</span>42.6.0<span class="tag">&lt;/version&gt;</span>
-                    <span class="tag">&lt;/dependency&gt;</span>
-                <span class="tag">&lt;/dependencies&gt;</span>
-                <span class="tag">&lt;executions&gt;</span>
-                    <span class="tag">&lt;execution&gt;</span>
-                        <span class="tag">&lt;id&gt;</span>generate-jooq-sources<span class="tag">&lt;/id&gt;</span>
-                        <span class="tag">&lt;goals&gt;</span>
-                            <span class="tag">&lt;goal&gt;</span>generate<span class="tag">&lt;/goal&gt;</span>
-                        <span class="tag">&lt;/goals&gt;</span>
-                        <span class="tag">&lt;phase&gt;</span>generate-sources<span class="tag">&lt;/phase&gt;</span>
-                        <span class="tag">&lt;configuration&gt;</span>
-                            <span class="tag">&lt;database&gt;</span>
-                                <span class="tag">&lt;type&gt;</span>POSTGRES<span class="tag">&lt;/type&gt;</span>
-                                <span class="tag">&lt;containerImage&gt;</span>postgres:15.3-alpine<span class="tag">&lt;/containerImage&gt;</span>
-                            <span class="tag">&lt;/database&gt;</span>
-                            <span class="tag">&lt;flyway&gt;</span>
-                                <span class="tag">&lt;locations&gt;</span>
+            <span class="nt">&lt;plugin&gt;</span>
+                <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+                <span class="nt">&lt;artifactId&gt;</span>testcontainers-jooq-codegen-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+                <span class="nt">&lt;version&gt;</span>${testcontainers-jooq-codegen-maven-plugin.version}<span class="nt">&lt;/version&gt;</span>
+                <span class="nt">&lt;dependencies&gt;</span>
+                    <span class="nt">&lt;dependency&gt;</span>
+                        <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+                        <span class="nt">&lt;artifactId&gt;</span>postgresql<span class="nt">&lt;/artifactId&gt;</span>
+                        <span class="nt">&lt;version&gt;</span>${testcontainers.version}<span class="nt">&lt;/version&gt;</span>
+                    <span class="nt">&lt;/dependency&gt;</span>
+                    <span class="nt">&lt;dependency&gt;</span>
+                        <span class="nt">&lt;groupId&gt;</span>org.postgresql<span class="nt">&lt;/groupId&gt;</span>
+                        <span class="nt">&lt;artifactId&gt;</span>postgresql<span class="nt">&lt;/artifactId&gt;</span>
+                        <span class="nt">&lt;version&gt;</span>42.6.0<span class="nt">&lt;/version&gt;</span>
+                    <span class="nt">&lt;/dependency&gt;</span>
+                <span class="nt">&lt;/dependencies&gt;</span>
+                <span class="nt">&lt;executions&gt;</span>
+                    <span class="nt">&lt;execution&gt;</span>
+                        <span class="nt">&lt;id&gt;</span>generate-jooq-sources<span class="nt">&lt;/id&gt;</span>
+                        <span class="nt">&lt;goals&gt;</span>
+                            <span class="nt">&lt;goal&gt;</span>generate<span class="nt">&lt;/goal&gt;</span>
+                        <span class="nt">&lt;/goals&gt;</span>
+                        <span class="nt">&lt;phase&gt;</span>generate-sources<span class="nt">&lt;/phase&gt;</span>
+                        <span class="nt">&lt;configuration&gt;</span>
+                            <span class="nt">&lt;database&gt;</span>
+                                <span class="nt">&lt;type&gt;</span>POSTGRES<span class="nt">&lt;/type&gt;</span>
+                                <span class="nt">&lt;containerImage&gt;</span>postgres:15.3-alpine<span class="nt">&lt;/containerImage&gt;</span>
+                            <span class="nt">&lt;/database&gt;</span>
+                            <span class="nt">&lt;flyway&gt;</span>
+                                <span class="nt">&lt;locations&gt;</span>
                                     filesystem:src/main/resources/db/migration
-                                <span class="tag">&lt;/locations&gt;</span>
-                            <span class="tag">&lt;/flyway&gt;</span>
-                            <span class="tag">&lt;jooq&gt;</span>
-                                <span class="tag">&lt;generator&gt;</span>
-                                    <span class="tag">&lt;database&gt;</span>
-                                        <span class="tag">&lt;includes&gt;</span>.*<span class="tag">&lt;/includes&gt;</span>
-                                        <span class="tag">&lt;excludes&gt;</span>flyway_schema_history<span class="tag">&lt;/excludes&gt;</span>
-                                        <span class="tag">&lt;inputSchema&gt;</span>public<span class="tag">&lt;/inputSchema&gt;</span>
-                                    <span class="tag">&lt;/database&gt;</span>
-                                    <span class="tag">&lt;target&gt;</span>
-                                        <span class="tag">&lt;packageName&gt;</span>example.micronaut.jooq<span class="tag">&lt;/packageName&gt;</span>
-                                        <span class="tag">&lt;directory&gt;</span>target/generated-sources/jooq<span class="tag">&lt;/directory&gt;</span>
-                                    <span class="tag">&lt;/target&gt;</span>
-                                <span class="tag">&lt;/generator&gt;</span>
-                            <span class="tag">&lt;/jooq&gt;</span>
-                        <span class="tag">&lt;/configuration&gt;</span>
-                    <span class="tag">&lt;/execution&gt;</span>
-                <span class="tag">&lt;/executions&gt;</span>
-            <span class="tag">&lt;/plugin&gt;</span>
+                                <span class="nt">&lt;/locations&gt;</span>
+                            <span class="nt">&lt;/flyway&gt;</span>
+                            <span class="nt">&lt;jooq&gt;</span>
+                                <span class="nt">&lt;generator&gt;</span>
+                                    <span class="nt">&lt;database&gt;</span>
+                                        <span class="nt">&lt;includes&gt;</span>.*<span class="nt">&lt;/includes&gt;</span>
+                                        <span class="nt">&lt;excludes&gt;</span>flyway_schema_history<span class="nt">&lt;/excludes&gt;</span>
+                                        <span class="nt">&lt;inputSchema&gt;</span>public<span class="nt">&lt;/inputSchema&gt;</span>
+                                    <span class="nt">&lt;/database&gt;</span>
+                                    <span class="nt">&lt;target&gt;</span>
+                                        <span class="nt">&lt;packageName&gt;</span>example.micronaut.jooq<span class="nt">&lt;/packageName&gt;</span>
+                                        <span class="nt">&lt;directory&gt;</span>target/generated-sources/jooq<span class="nt">&lt;/directory&gt;</span>
+                                    <span class="nt">&lt;/target&gt;</span>
+                                <span class="nt">&lt;/generator&gt;</span>
+                            <span class="nt">&lt;/jooq&gt;</span>
+                        <span class="nt">&lt;/configuration&gt;</span>
+                    <span class="nt">&lt;/execution&gt;</span>
+                <span class="nt">&lt;/executions&gt;</span>
+            <span class="nt">&lt;/plugin&gt;</span>
             ...
-        <span class="tag">&lt;/plugins&gt;</span>
-    <span class="tag">&lt;/build&gt;</span>
-<span class="tag">&lt;/project&gt;</span></code></pre>
+        <span class="nt">&lt;/plugins&gt;</span>
+    <span class="nt">&lt;/build&gt;</span>
+<span class="nt">&lt;/project&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -613,48 +614,48 @@ and we may want to return responses with only a subset of column values from our
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/domain/User.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="directive">public</span> record User(
-        <span class="predefined-type">Long</span> id,
-        <span class="predefined-type">String</span> name,
-        <span class="predefined-type">String</span> email
-) {}</code></pre>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">User</span><span class="o">(</span>
+        <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>
+        <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
+        <span class="nc">String</span> <span class="n">email</span>
+<span class="o">)</span> <span class="o">{}</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/domain/Post.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.time.LocalDateTime</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
+<span class="kn">import</span> <span class="nn">java.time.LocalDateTime</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
 
-<span class="directive">public</span> record Post(
-        <span class="predefined-type">Long</span> id,
-        <span class="predefined-type">String</span> title,
-        <span class="predefined-type">String</span> content,
-        User createdBy,
-        <span class="predefined-type">List</span>&lt;Comment&gt; comments,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {}</code></pre>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">Post</span><span class="o">(</span>
+        <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>
+        <span class="nc">String</span> <span class="n">title</span><span class="o">,</span>
+        <span class="nc">String</span> <span class="n">content</span><span class="o">,</span>
+        <span class="nc">User</span> <span class="n">createdBy</span><span class="o">,</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Comment</span><span class="o">&gt;</span> <span class="n">comments</span><span class="o">,</span>
+        <span class="nc">LocalDateTime</span> <span class="n">createdAt</span><span class="o">,</span>
+        <span class="nc">LocalDateTime</span> <span class="n">updatedAt</span>
+<span class="o">)</span> <span class="o">{}</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/domain/Comment.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.time.LocalDateTime</span>;
+<span class="kn">import</span> <span class="nn">java.time.LocalDateTime</span><span class="o">;</span>
 
-<span class="directive">public</span> record Comment(
-        <span class="predefined-type">Long</span> id,
-        <span class="predefined-type">String</span> name,
-        <span class="predefined-type">String</span> content,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {}</code></pre>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">Comment</span><span class="o">(</span>
+        <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>
+        <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
+        <span class="nc">String</span> <span class="n">content</span><span class="o">,</span>
+        <span class="nc">LocalDateTime</span> <span class="n">createdAt</span><span class="o">,</span>
+        <span class="nc">LocalDateTime</span> <span class="n">updatedAt</span>
+<span class="o">)</span> <span class="o">{}</span></code></pre>
 </div>
 </div>
 </div>
@@ -668,48 +669,48 @@ and we may want to return responses with only a subset of column values from our
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/domain/UserRepository.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">example.micronaut.jooq.tables.Users.USERS</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.jooq.Records.mapping</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">example</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">jooq</span><span class="o">.</span><span class="na">tables</span><span class="o">.</span><span class="na">Users</span><span class="o">.</span><span class="na">USERS</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">jooq</span><span class="o">.</span><span class="na">Records</span><span class="o">.</span><span class="na">mapping</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.time.LocalDateTime</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+<span class="kn">import</span> <span class="nn">java.time.LocalDateTime</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">org.jooq.DSLContext</span>;
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.jooq.DSLContext</span><span class="o">;</span>
 
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">UserRepository</span> {
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">UserRepository</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> DSLContext dsl;
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">DSLContext</span> <span class="n">dsl</span><span class="o">;</span>
 
-    UserRepository(DSLContext dsl) { <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="local-variable">this</span>.dsl = dsl;
-    }
+    <span class="nc">UserRepository</span><span class="o">(</span><span class="nc">DSLContext</span> <span class="n">dsl</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="k">this</span><span class="o">.</span><span class="na">dsl</span> <span class="o">=</span> <span class="n">dsl</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> User createUser(User user) {
-        <span class="keyword">return</span> <span class="local-variable">this</span>.dsl
-                .insertInto(USERS)
-                .set(USERS.NAME, user.name())
-                .set(USERS.EMAIL, user.email())
-                .set(USERS.CREATED_AT, LocalDateTime.now())
-                .returningResult(USERS.ID, USERS.NAME, USERS.EMAIL)
-                .fetchOne(mapping(User::<span class="keyword">new</span>));
-    }
+    <span class="kd">public</span> <span class="nc">User</span> <span class="nf">createUser</span><span class="o">(</span><span class="nc">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">dsl</span>
+                <span class="o">.</span><span class="na">insertInto</span><span class="o">(</span><span class="no">USERS</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="no">USERS</span><span class="o">.</span><span class="na">NAME</span><span class="o">,</span> <span class="n">user</span><span class="o">.</span><span class="na">name</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="no">USERS</span><span class="o">.</span><span class="na">EMAIL</span><span class="o">,</span> <span class="n">user</span><span class="o">.</span><span class="na">email</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="no">USERS</span><span class="o">.</span><span class="na">CREATED_AT</span><span class="o">,</span> <span class="nc">LocalDateTime</span><span class="o">.</span><span class="na">now</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">returningResult</span><span class="o">(</span><span class="no">USERS</span><span class="o">.</span><span class="na">ID</span><span class="o">,</span> <span class="no">USERS</span><span class="o">.</span><span class="na">NAME</span><span class="o">,</span> <span class="no">USERS</span><span class="o">.</span><span class="na">EMAIL</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">fetchOne</span><span class="o">(</span><span class="n">mapping</span><span class="o">(</span><span class="nl">User:</span><span class="o">:</span><span class="k">new</span><span class="o">));</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> Optional&lt;User&gt; getUserByEmail(<span class="predefined-type">String</span> email) {
-        <span class="keyword">return</span> <span class="local-variable">this</span>.dsl
-                .select(USERS.ID, USERS.NAME, USERS.EMAIL)
-                .from(USERS)
-                .where(USERS.EMAIL.equalIgnoreCase(email))
-                .fetchOptional(mapping(User::<span class="keyword">new</span>));
-    }
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">getUserByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">dsl</span>
+                <span class="o">.</span><span class="na">select</span><span class="o">(</span><span class="no">USERS</span><span class="o">.</span><span class="na">ID</span><span class="o">,</span> <span class="no">USERS</span><span class="o">.</span><span class="na">NAME</span><span class="o">,</span> <span class="no">USERS</span><span class="o">.</span><span class="na">EMAIL</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="no">USERS</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">where</span><span class="o">(</span><span class="no">USERS</span><span class="o">.</span><span class="na">EMAIL</span><span class="o">.</span><span class="na">equalIgnoreCase</span><span class="o">(</span><span class="n">email</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">fetchOptional</span><span class="o">(</span><span class="n">mapping</span><span class="o">(</span><span class="nl">User:</span><span class="o">:</span><span class="k">new</span><span class="o">));</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="type">void</span> deleteUser(<span class="predefined-type">Long</span> id) {
-        dsl.deleteFrom(USERS).where(USERS.ID.eq(id)).execute();
-    }
-}</code></pre>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">deleteUser</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">dsl</span><span class="o">.</span><span class="na">deleteFrom</span><span class="o">(</span><span class="no">USERS</span><span class="o">).</span><span class="na">where</span><span class="o">(</span><span class="no">USERS</span><span class="o">.</span><span class="na">ID</span><span class="o">.</span><span class="na">eq</span><span class="o">(</span><span class="n">id</span><span class="o">)).</span><span class="na">execute</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -750,21 +751,21 @@ then it will give you a compiler error preventing you from making mistakes at th
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>testcontainers<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>testcontainers<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>postgresql<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>postgresql<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -776,22 +777,22 @@ creating <code>src/test/resources/db/testmigration/V99__test_data.sql</code> fil
 <div class="listingblock">
 <div class="title">testcontainers/src/test/resources/db/testmigration/V99__test_data.sql</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="sql"><span class="class">DELETE</span> <span class="keyword">FROM</span> comments;
-<span class="class">DELETE</span> <span class="keyword">FROM</span> posts;
-<span class="class">DELETE</span> <span class="keyword">FROM</span> users;
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">DELETE</span> <span class="k">FROM</span> <span class="n">comments</span><span class="p">;</span>
+<span class="k">DELETE</span> <span class="k">FROM</span> <span class="n">posts</span><span class="p">;</span>
+<span class="k">DELETE</span> <span class="k">FROM</span> <span class="n">users</span><span class="p">;</span>
 
-<span class="class">INSERT</span> <span class="class">INTO</span> users(id, name, email) <span class="keyword">VALUES</span>
-(<span class="integer">1</span>, <span class="string"><span class="delimiter">'</span><span class="content">Siva</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">siva@gmail.com</span><span class="delimiter">'</span></span>),
-(<span class="integer">2</span>, <span class="string"><span class="delimiter">'</span><span class="content">Oleg</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">oleg@gmail.com</span><span class="delimiter">'</span></span>);
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span> <span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'Siva'</span><span class="p">,</span> <span class="s1">'siva@gmail.com'</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'Oleg'</span><span class="p">,</span> <span class="s1">'oleg@gmail.com'</span><span class="p">);</span>
 
-<span class="class">INSERT</span> <span class="class">INTO</span> posts(id, title, content, created_by, created_at) <span class="keyword">VALUES</span>
-(<span class="integer">1</span>, <span class="string"><span class="delimiter">'</span><span class="content">Post 1 Title</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Post 1 content</span><span class="delimiter">'</span></span>, <span class="integer">1</span>, CURRENT_TIMESTAMP),
-(<span class="integer">2</span>, <span class="string"><span class="delimiter">'</span><span class="content">Post 2 Title</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Post 2 content</span><span class="delimiter">'</span></span>, <span class="integer">2</span>, CURRENT_TIMESTAMP);
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">posts</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">created_by</span><span class="p">,</span> <span class="n">created_at</span><span class="p">)</span> <span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'Post 1 Title'</span><span class="p">,</span> <span class="s1">'Post 1 content'</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'Post 2 Title'</span><span class="p">,</span> <span class="s1">'Post 2 content'</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">);</span>
 
-<span class="class">INSERT</span> <span class="class">INTO</span> comments(id, name, content, post_id, created_at) <span class="keyword">VALUES</span>
-(<span class="integer">1</span>, <span class="string"><span class="delimiter">'</span><span class="content">Ron</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Comment 1</span><span class="delimiter">'</span></span>, <span class="integer">1</span>, CURRENT_TIMESTAMP),
-(<span class="integer">2</span>, <span class="string"><span class="delimiter">'</span><span class="content">James</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Comment 2</span><span class="delimiter">'</span></span>, <span class="integer">1</span>, CURRENT_TIMESTAMP),
-(<span class="integer">3</span>, <span class="string"><span class="delimiter">'</span><span class="content">Robert</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Comment 3</span><span class="delimiter">'</span></span>, <span class="integer">2</span>, CURRENT_TIMESTAMP);</code></pre>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">comments</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">post_id</span><span class="p">,</span> <span class="n">created_at</span><span class="p">)</span> <span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'Ron'</span><span class="p">,</span> <span class="s1">'Comment 1'</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'James'</span><span class="p">,</span> <span class="s1">'Comment 2'</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">'Robert'</span><span class="p">,</span> <span class="s1">'Comment 3'</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">);</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -800,8 +801,8 @@ creating <code>src/test/resources/db/testmigration/V99__test_data.sql</code> fil
 <div class="listingblock">
 <div class="title">testcontainers/src/test/resources/application-test.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">flyway.datasources.default.locations[0]=classpath:db/migration
-flyway.datasources.default.locations[1]=classpath:db/testmigration</code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="err">flyway.datasources.default.locations[0]=</span><span class="py">classpath</span><span class="p">:</span><span class="s">db/migration</span>
+<span class="err">flyway.datasources.default.locations[1]=</span><span class="py">classpath</span><span class="p">:</span><span class="s">db/testmigration</span></code></pre>
 </div>
 </div>
 </div>
@@ -813,30 +814,30 @@ flyway.datasources.default.locations[1]=classpath:db/testmigration</code></pre>
 <div class="listingblock">
 <div class="title">testcontainers/src/test/java/example/micronaut/domain/AbstractTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.test.support.TestPropertyProvider</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.containers.PostgreSQLContainer</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.junit.jupiter.Container</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.support.TestPropertyProvider</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.containers.PostgreSQLContainer</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.junit.jupiter.Container</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
 
-<span class="directive">public</span> <span class="directive">abstract</span> <span class="type">class</span> <span class="class">AbstractTest</span> <span class="directive">implements</span> TestPropertyProvider { <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractTest</span> <span class="kd">implements</span> <span class="nc">TestPropertyProvider</span> <span class="o">{</span> <i class="conum" data-value="1"></i><b>(1)</b>
 
-    <span class="annotation">@Container</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="directive">static</span> PostgreSQLContainer&lt;?&gt; postgres = <span class="keyword">new</span> PostgreSQLContainer&lt;&gt;(<span class="string"><span class="delimiter">&quot;</span><span class="content">postgres:15.3-alpine</span><span class="delimiter">&quot;</span></span>);
+    <span class="nd">@Container</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kd">static</span> <span class="nc">PostgreSQLContainer</span><span class="o">&lt;?&gt;</span> <span class="n">postgres</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PostgreSQLContainer</span><span class="o">&lt;&gt;(</span><span class="s">"postgres:15.3-alpine"</span><span class="o">);</span>
 
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="annotation">@NonNull</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() { <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="keyword">if</span> (!postgres.isRunning()) {
-            postgres.start();
-        }
-        <span class="keyword">return</span> <span class="predefined-type">Map</span>.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">datasources.default.url</span><span class="delimiter">&quot;</span></span>, postgres.getJdbcUrl(),
-                <span class="string"><span class="delimiter">&quot;</span><span class="content">datasources.default.username</span><span class="delimiter">&quot;</span></span>, postgres.getUsername(),
-                <span class="string"><span class="delimiter">&quot;</span><span class="content">datasources.default.password</span><span class="delimiter">&quot;</span></span>, postgres.getPassword());
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nd">@NonNull</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getProperties</span><span class="o">()</span> <span class="o">{</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">postgres</span><span class="o">.</span><span class="na">isRunning</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">postgres</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"datasources.default.url"</span><span class="o">,</span> <span class="n">postgres</span><span class="o">.</span><span class="na">getJdbcUrl</span><span class="o">(),</span>
+                <span class="s">"datasources.default.username"</span><span class="o">,</span> <span class="n">postgres</span><span class="o">.</span><span class="na">getUsername</span><span class="o">(),</span>
+                <span class="s">"datasources.default.password"</span><span class="o">,</span> <span class="n">postgres</span><span class="o">.</span><span class="na">getPassword</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -862,47 +863,47 @@ as follows:</p>
 <div class="listingblock">
 <div class="title">testcontainers/src/test/java/example/micronaut/domain/UserRepositoryTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.junit.jupiter.Testcontainers</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.assertj.core.api.Assertions.assertThat</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.TestInstance</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.junit.jupiter.Testcontainers</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">assertj</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
 
-<span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@TestInstance</span>(TestInstance.Lifecycle.PER_CLASS) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="annotation">@Testcontainers</span>(disabledWithoutDocker = <span class="predefined-constant">true</span>) <i class="conum" data-value="3"></i><b>(3)</b>
-<span class="type">class</span> <span class="class">UserRepositoryTest</span> <span class="directive">extends</span> AbstractTest {
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">startApplication</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@TestInstance</span><span class="o">(</span><span class="nc">TestInstance</span><span class="o">.</span><span class="na">Lifecycle</span><span class="o">.</span><span class="na">PER_CLASS</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Testcontainers</span><span class="o">(</span><span class="n">disabledWithoutDocker</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="kd">class</span> <span class="nc">UserRepositoryTest</span> <span class="kd">extends</span> <span class="nc">AbstractTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    UserRepository repository;
+    <span class="nd">@Inject</span>
+    <span class="nc">UserRepository</span> <span class="n">repository</span><span class="o">;</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> shouldCreateUserSuccessfully() {
-        User user = <span class="keyword">new</span> User(<span class="predefined-constant">null</span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">John</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">john@gmail.com</span><span class="delimiter">&quot;</span></span>);
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldCreateUserSuccessfully</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="s">"John"</span><span class="o">,</span> <span class="s">"john@gmail.com"</span><span class="o">);</span>
 
-        User savedUser = repository.createUser(user);
+        <span class="nc">User</span> <span class="n">savedUser</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="na">createUser</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
 
-        assertThat(savedUser.id()).isNotNull();
-        assertThat(savedUser.name()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">John</span><span class="delimiter">&quot;</span></span>);
-        assertThat(savedUser.email()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">john@gmail.com</span><span class="delimiter">&quot;</span></span>);
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"John"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"john@gmail.com"</span><span class="o">);</span>
 
-        repository.deleteUser(savedUser.id());
-    }
+        <span class="n">repository</span><span class="o">.</span><span class="na">deleteUser</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">id</span><span class="o">());</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> shouldGetUserByEmail() {
-        User user = repository.getUserByEmail(<span class="string"><span class="delimiter">&quot;</span><span class="content">siva@gmail.com</span><span class="delimiter">&quot;</span></span>).orElseThrow();
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldGetUserByEmail</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="na">getUserByEmail</span><span class="o">(</span><span class="s">"siva@gmail.com"</span><span class="o">).</span><span class="na">orElseThrow</span><span class="o">();</span>
 
-        assertThat(user.id()).isEqualTo(<span class="integer">1L</span>);
-        assertThat(user.name()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Siva</span><span class="delimiter">&quot;</span></span>);
-        assertThat(user.email()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">siva@gmail.com</span><span class="delimiter">&quot;</span></span>);
-    }
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"Siva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"siva@gmail.com"</span><span class="o">);</span>
+    <span class="o">}</span>
 
 
-}</code></pre>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -944,58 +945,58 @@ using jOOQ powerful <strong>MULTISET</strong> feature using a single query.</p>
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/domain/PostRepository.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">example.micronaut.jooq.Tables.COMMENTS</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">example.micronaut.jooq.tables.Posts.POSTS</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.jooq.Records.mapping</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.jooq.impl.DSL.multiset</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.jooq.impl.DSL.row</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.jooq.impl.DSL.select</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">example</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">jooq</span><span class="o">.</span><span class="na">Tables</span><span class="o">.</span><span class="na">COMMENTS</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">example</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">jooq</span><span class="o">.</span><span class="na">tables</span><span class="o">.</span><span class="na">Posts</span><span class="o">.</span><span class="na">POSTS</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">jooq</span><span class="o">.</span><span class="na">Records</span><span class="o">.</span><span class="na">mapping</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">jooq</span><span class="o">.</span><span class="na">impl</span><span class="o">.</span><span class="na">DSL</span><span class="o">.</span><span class="na">multiset</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">jooq</span><span class="o">.</span><span class="na">impl</span><span class="o">.</span><span class="na">DSL</span><span class="o">.</span><span class="na">row</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">jooq</span><span class="o">.</span><span class="na">impl</span><span class="o">.</span><span class="na">DSL</span><span class="o">.</span><span class="na">select</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">org.jooq.DSLContext</span>;
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.jooq.DSLContext</span><span class="o">;</span>
 
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">PostRepository</span> {
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">PostRepository</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> DSLContext dsl;
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">DSLContext</span> <span class="n">dsl</span><span class="o">;</span>
 
-    PostRepository(DSLContext dsl) {
-        <span class="local-variable">this</span>.dsl = dsl;
-    }
+    <span class="nc">PostRepository</span><span class="o">(</span><span class="nc">DSLContext</span> <span class="n">dsl</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">dsl</span> <span class="o">=</span> <span class="n">dsl</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> Optional&lt;Post&gt; getPostById(<span class="predefined-type">Long</span> id) {
-        <span class="keyword">return</span> <span class="local-variable">this</span>.dsl
-                .select(
-                        POSTS.ID,
-                        POSTS.TITLE,
-                        POSTS.CONTENT,
-                        row(POSTS.users().ID, POSTS.users().NAME, POSTS.users().EMAIL)
-                                .mapping(User::<span class="keyword">new</span>)
-                                .as(<span class="string"><span class="delimiter">&quot;</span><span class="content">createdBy</span><span class="delimiter">&quot;</span></span>),
-                        multiset(
-                                select(
-                                        COMMENTS.ID,
-                                        COMMENTS.NAME,
-                                        COMMENTS.CONTENT,
-                                        COMMENTS.CREATED_AT,
-                                        COMMENTS.UPDATED_AT
-                                )
-                                        .from(COMMENTS)
-                                        .where(POSTS.ID.eq(COMMENTS.POST_ID))
-                        )
-                                .as(<span class="string"><span class="delimiter">&quot;</span><span class="content">comments</span><span class="delimiter">&quot;</span></span>)
-                                .convertFrom(r -&gt; r.map(mapping(Comment::<span class="keyword">new</span>))),
-                        POSTS.CREATED_AT,
-                        POSTS.UPDATED_AT)
-                .from(POSTS)
-                .where(POSTS.ID.eq(id))
-                .fetchOptional(mapping(Post::<span class="keyword">new</span>));
-    }
-}</code></pre>
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Post</span><span class="o">&gt;</span> <span class="nf">getPostById</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">dsl</span>
+                <span class="o">.</span><span class="na">select</span><span class="o">(</span>
+                        <span class="no">POSTS</span><span class="o">.</span><span class="na">ID</span><span class="o">,</span>
+                        <span class="no">POSTS</span><span class="o">.</span><span class="na">TITLE</span><span class="o">,</span>
+                        <span class="no">POSTS</span><span class="o">.</span><span class="na">CONTENT</span><span class="o">,</span>
+                        <span class="n">row</span><span class="o">(</span><span class="no">POSTS</span><span class="o">.</span><span class="na">users</span><span class="o">().</span><span class="na">ID</span><span class="o">,</span> <span class="no">POSTS</span><span class="o">.</span><span class="na">users</span><span class="o">().</span><span class="na">NAME</span><span class="o">,</span> <span class="no">POSTS</span><span class="o">.</span><span class="na">users</span><span class="o">().</span><span class="na">EMAIL</span><span class="o">)</span>
+                                <span class="o">.</span><span class="na">mapping</span><span class="o">(</span><span class="nl">User:</span><span class="o">:</span><span class="k">new</span><span class="o">)</span>
+                                <span class="o">.</span><span class="na">as</span><span class="o">(</span><span class="s">"createdBy"</span><span class="o">),</span>
+                        <span class="n">multiset</span><span class="o">(</span>
+                                <span class="n">select</span><span class="o">(</span>
+                                        <span class="no">COMMENTS</span><span class="o">.</span><span class="na">ID</span><span class="o">,</span>
+                                        <span class="no">COMMENTS</span><span class="o">.</span><span class="na">NAME</span><span class="o">,</span>
+                                        <span class="no">COMMENTS</span><span class="o">.</span><span class="na">CONTENT</span><span class="o">,</span>
+                                        <span class="no">COMMENTS</span><span class="o">.</span><span class="na">CREATED_AT</span><span class="o">,</span>
+                                        <span class="no">COMMENTS</span><span class="o">.</span><span class="na">UPDATED_AT</span>
+                                <span class="o">)</span>
+                                        <span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="no">COMMENTS</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">where</span><span class="o">(</span><span class="no">POSTS</span><span class="o">.</span><span class="na">ID</span><span class="o">.</span><span class="na">eq</span><span class="o">(</span><span class="no">COMMENTS</span><span class="o">.</span><span class="na">POST_ID</span><span class="o">))</span>
+                        <span class="o">)</span>
+                                <span class="o">.</span><span class="na">as</span><span class="o">(</span><span class="s">"comments"</span><span class="o">)</span>
+                                <span class="o">.</span><span class="na">convertFrom</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">mapping</span><span class="o">(</span><span class="nl">Comment:</span><span class="o">:</span><span class="k">new</span><span class="o">))),</span>
+                        <span class="no">POSTS</span><span class="o">.</span><span class="na">CREATED_AT</span><span class="o">,</span>
+                        <span class="no">POSTS</span><span class="o">.</span><span class="na">UPDATED_AT</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="no">POSTS</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">where</span><span class="o">(</span><span class="no">POSTS</span><span class="o">.</span><span class="na">ID</span><span class="o">.</span><span class="na">eq</span><span class="o">(</span><span class="n">id</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">fetchOptional</span><span class="o">(</span><span class="n">mapping</span><span class="o">(</span><span class="nl">Post:</span><span class="o">:</span><span class="k">new</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1031,36 +1032,36 @@ From jOOQ 3.19, fetching the associations using MULTISET is further simplified u
 <div class="listingblock">
 <div class="title">testcontainers/src/test/java/example/micronaut/domain/PostRepositoryTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.junit.jupiter.Testcontainers</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.assertj.core.api.Assertions.assertThat</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.TestInstance</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.junit.jupiter.Testcontainers</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">assertj</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
 
-<span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@TestInstance</span>(TestInstance.Lifecycle.PER_CLASS) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="annotation">@Testcontainers</span>(disabledWithoutDocker = <span class="predefined-constant">true</span>) <i class="conum" data-value="3"></i><b>(3)</b>
-<span class="type">class</span> <span class="class">PostRepositoryTest</span> <span class="directive">extends</span> AbstractTest {
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">startApplication</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@TestInstance</span><span class="o">(</span><span class="nc">TestInstance</span><span class="o">.</span><span class="na">Lifecycle</span><span class="o">.</span><span class="na">PER_CLASS</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Testcontainers</span><span class="o">(</span><span class="n">disabledWithoutDocker</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="kd">class</span> <span class="nc">PostRepositoryTest</span> <span class="kd">extends</span> <span class="nc">AbstractTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> shouldGetPostById(PostRepository repository) {
-        Optional&lt;Post&gt; postOptional = repository.getPostById(<span class="integer">1L</span>);
-        assertTrue(postOptional.isPresent());
-        Post post = postOptional.get();
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldGetPostById</span><span class="o">(</span><span class="nc">PostRepository</span> <span class="n">repository</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Post</span><span class="o">&gt;</span> <span class="n">postOptional</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="na">getPostById</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">postOptional</span><span class="o">.</span><span class="na">isPresent</span><span class="o">());</span>
+        <span class="nc">Post</span> <span class="n">post</span> <span class="o">=</span> <span class="n">postOptional</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
 
-        assertThat(post.id()).isEqualTo(<span class="integer">1L</span>);
-        assertThat(post.title()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Post 1 Title</span><span class="delimiter">&quot;</span></span>);
-        assertThat(post.content()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Post 1 content</span><span class="delimiter">&quot;</span></span>);
-        assertThat(post.createdBy().id()).isEqualTo(<span class="integer">1L</span>);
-        assertThat(post.createdBy().name()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Siva</span><span class="delimiter">&quot;</span></span>);
-        assertThat(post.createdBy().email()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">siva@gmail.com</span><span class="delimiter">&quot;</span></span>);
-        assertThat(post.comments()).hasSize(<span class="integer">2</span>);
-    }
-}</code></pre>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">post</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">post</span><span class="o">.</span><span class="na">title</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"Post 1 Title"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">post</span><span class="o">.</span><span class="na">content</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"Post 1 content"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">post</span><span class="o">.</span><span class="na">createdBy</span><span class="o">().</span><span class="na">id</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">post</span><span class="o">.</span><span class="na">createdBy</span><span class="o">().</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"Siva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">post</span><span class="o">.</span><span class="na">createdBy</span><span class="o">().</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"siva@gmail.com"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">post</span><span class="o">.</span><span class="na">comments</span><span class="o">()).</span><span class="na">hasSize</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1089,7 +1090,7 @@ From jOOQ 3.19, fetching the associations using MULTISET is further simplified u
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./mvnw <span class="nb">test</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1144,41 +1145,41 @@ properties <code>datasources.default.url</code>, <code>datasources.default.usern
 <div class="listingblock">
 <div class="title">testresources/src/test/java/example/micronaut/domain/UserRepositoryTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut.domain</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.domain</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.assertj.core.api.Assertions.assertThat</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">assertj</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
 
-<span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">UserRepositoryTest</span> {
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">startApplication</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">UserRepositoryTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    UserRepository repository;
+    <span class="nd">@Inject</span>
+    <span class="nc">UserRepository</span> <span class="n">repository</span><span class="o">;</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> shouldCreateUserSuccessfully() {
-        User user = <span class="keyword">new</span> User(<span class="predefined-constant">null</span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">John</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">john@gmail.com</span><span class="delimiter">&quot;</span></span>);
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldCreateUserSuccessfully</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="s">"John"</span><span class="o">,</span> <span class="s">"john@gmail.com"</span><span class="o">);</span>
 
-        User savedUser = repository.createUser(user);
+        <span class="nc">User</span> <span class="n">savedUser</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="na">createUser</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
 
-        assertThat(savedUser.id()).isNotNull();
-        assertThat(savedUser.name()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">John</span><span class="delimiter">&quot;</span></span>);
-        assertThat(savedUser.email()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">john@gmail.com</span><span class="delimiter">&quot;</span></span>);
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"John"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"john@gmail.com"</span><span class="o">);</span>
 
-        repository.deleteUser(savedUser.id());
-    }
+        <span class="n">repository</span><span class="o">.</span><span class="na">deleteUser</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">id</span><span class="o">());</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> shouldGetUserByEmail() {
-        User user = repository.getUserByEmail(<span class="string"><span class="delimiter">&quot;</span><span class="content">siva@gmail.com</span><span class="delimiter">&quot;</span></span>).orElseThrow();
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldGetUserByEmail</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="na">getUserByEmail</span><span class="o">(</span><span class="s">"siva@gmail.com"</span><span class="o">).</span><span class="na">orElseThrow</span><span class="o">();</span>
 
-        assertThat(user.id()).isEqualTo(<span class="integer">1L</span>);
-        assertThat(user.name()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">Siva</span><span class="delimiter">&quot;</span></span>);
-        assertThat(user.email()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">siva@gmail.com</span><span class="delimiter">&quot;</span></span>);
-    }
-}</code></pre>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"Siva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"siva@gmail.com"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

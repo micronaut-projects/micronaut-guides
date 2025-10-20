@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -225,11 +226,11 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws iam create-group --group-name Administrators
-aws iam create-user --user-name Administrator
-aws iam add-user-to-group --user-name Administrator --group-name Administrators
-aws iam attach-group-policy --group-name Administrators --policy-arn $(aws iam list-policies --query 'Policies[?PolicyName==`AdministratorAccess`].{ARN:Arn}' --output text)
-aws iam create-access-key --user-name Administrator</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws iam create-group <span class="nt">--group-name</span> Administrators
+aws iam create-user <span class="nt">--user-name</span> Administrator
+aws iam add-user-to-group <span class="nt">--user-name</span> Administrator <span class="nt">--group-name</span> Administrators
+aws iam attach-group-policy <span class="nt">--group-name</span> Administrators <span class="nt">--policy-arn</span> <span class="si">$(</span>aws iam list-policies <span class="nt">--query</span> <span class="s1">'Policies[?PolicyName==`AdministratorAccess`].{ARN:Arn}'</span> <span class="nt">--output</span> text<span class="si">)</span>
+aws iam create-access-key <span class="nt">--user-name</span> Administrator</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -276,27 +277,27 @@ Exposing a database port to the internet is a security risk. This should be done
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash"># VPC, internet gateway and route table
-export VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 | jq -r '.Vpc.VpcId')
-export IG_ID=$(aws ec2 create-internet-gateway | jq -r '.InternetGateway.InternetGatewayId')
-aws ec2 attach-internet-gateway --internet-gateway-id $IG_ID --vpc-id $VPC_ID
-aws ec2 modify-vpc-attribute --enable-dns-hostnames --vpc-id $VPC_ID
-export RT_ID=$(aws ec2 describe-route-tables --filters &quot;Name=vpc-id,Values=$VPC_ID&quot; --query &quot;RouteTables[].RouteTableId&quot; --output text)
-aws ec2 create-route --route-table-id $RT_ID --destination-cidr-block 0.0.0.0/0 --gateway-id $IG_ID
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># VPC, internet gateway and route table</span>
+<span class="nb">export </span><span class="nv">VPC_ID</span><span class="o">=</span><span class="si">$(</span>aws ec2 create-vpc <span class="nt">--cidr-block</span> 10.0.0.0/16 | jq <span class="nt">-r</span> <span class="s1">'.Vpc.VpcId'</span><span class="si">)</span>
+<span class="nb">export </span><span class="nv">IG_ID</span><span class="o">=</span><span class="si">$(</span>aws ec2 create-internet-gateway | jq <span class="nt">-r</span> <span class="s1">'.InternetGateway.InternetGatewayId'</span><span class="si">)</span>
+aws ec2 attach-internet-gateway <span class="nt">--internet-gateway-id</span> <span class="nv">$IG_ID</span> <span class="nt">--vpc-id</span> <span class="nv">$VPC_ID</span>
+aws ec2 modify-vpc-attribute <span class="nt">--enable-dns-hostnames</span> <span class="nt">--vpc-id</span> <span class="nv">$VPC_ID</span>
+<span class="nb">export </span><span class="nv">RT_ID</span><span class="o">=</span><span class="si">$(</span>aws ec2 describe-route-tables <span class="nt">--filters</span> <span class="s2">"Name=vpc-id,Values=</span><span class="nv">$VPC_ID</span><span class="s2">"</span> <span class="nt">--query</span> <span class="s2">"RouteTables[].RouteTableId"</span> <span class="nt">--output</span> text<span class="si">)</span>
+aws ec2 create-route <span class="nt">--route-table-id</span> <span class="nv">$RT_ID</span> <span class="nt">--destination-cidr-block</span> 0.0.0.0/0 <span class="nt">--gateway-id</span> <span class="nv">$IG_ID</span>
 
-# Security group
-aws ec2 create-security-group --group-name micronaut-guides-mysql-sg --description &quot;Security Group for the Micronaut MySQL guide&quot; --vpc-id $VPC_ID
-export SG_ID=$(aws ec2 describe-security-groups --query 'SecurityGroups[?GroupName==`micronaut-guides-mysql-sg`].GroupId' --output text)
-aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 3306 --cidr $(curl ifconfig.me)/32
+<span class="c"># Security group</span>
+aws ec2 create-security-group <span class="nt">--group-name</span> micronaut-guides-mysql-sg <span class="nt">--description</span> <span class="s2">"Security Group for the Micronaut MySQL guide"</span> <span class="nt">--vpc-id</span> <span class="nv">$VPC_ID</span>
+<span class="nb">export </span><span class="nv">SG_ID</span><span class="o">=</span><span class="si">$(</span>aws ec2 describe-security-groups <span class="nt">--query</span> <span class="s1">'SecurityGroups[?GroupName==`micronaut-guides-mysql-sg`].GroupId'</span> <span class="nt">--output</span> text<span class="si">)</span>
+aws ec2 authorize-security-group-ingress <span class="nt">--group-id</span> <span class="nv">$SG_ID</span> <span class="nt">--protocol</span> tcp <span class="nt">--port</span> 3306 <span class="nt">--cidr</span> <span class="si">$(</span>curl ifconfig.me<span class="si">)</span>/32
 
-# Subnets and subnet group
-export AZ_0=$(aws ec2 describe-availability-zones --filters &quot;Name=state,Values=available&quot; --query &quot;AvailabilityZones[0].ZoneName&quot; --output text)
-export AZ_1=$(aws ec2 describe-availability-zones --filters &quot;Name=state,Values=available&quot; --query &quot;AvailabilityZones[1].ZoneName&quot; --output text)
-export SN0_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.0.0/20 --availability-zone $AZ_0 | jq -r '.Subnet.SubnetId')
-export SN1_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.16.0/20 --availability-zone $AZ_1 | jq -r '.Subnet.SubnetId')
-aws ec2 modify-subnet-attribute --subnet-id $SN0_ID --map-public-ip-on-launch
-aws ec2 modify-subnet-attribute --subnet-id $SN1_ID --map-public-ip-on-launch
-aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng --db-subnet-group-description &quot;DB subnet group for the Micronaut MySQL guide&quot; --subnet-ids &quot;$SN0_ID&quot; &quot;$SN1_ID&quot;</code></pre>
+<span class="c"># Subnets and subnet group</span>
+<span class="nb">export </span><span class="nv">AZ_0</span><span class="o">=</span><span class="si">$(</span>aws ec2 describe-availability-zones <span class="nt">--filters</span> <span class="s2">"Name=state,Values=available"</span> <span class="nt">--query</span> <span class="s2">"AvailabilityZones[0].ZoneName"</span> <span class="nt">--output</span> text<span class="si">)</span>
+<span class="nb">export </span><span class="nv">AZ_1</span><span class="o">=</span><span class="si">$(</span>aws ec2 describe-availability-zones <span class="nt">--filters</span> <span class="s2">"Name=state,Values=available"</span> <span class="nt">--query</span> <span class="s2">"AvailabilityZones[1].ZoneName"</span> <span class="nt">--output</span> text<span class="si">)</span>
+<span class="nb">export </span><span class="nv">SN0_ID</span><span class="o">=</span><span class="si">$(</span>aws ec2 create-subnet <span class="nt">--vpc-id</span> <span class="nv">$VPC_ID</span> <span class="nt">--cidr-block</span> 10.0.0.0/20 <span class="nt">--availability-zone</span> <span class="nv">$AZ_0</span> | jq <span class="nt">-r</span> <span class="s1">'.Subnet.SubnetId'</span><span class="si">)</span>
+<span class="nb">export </span><span class="nv">SN1_ID</span><span class="o">=</span><span class="si">$(</span>aws ec2 create-subnet <span class="nt">--vpc-id</span> <span class="nv">$VPC_ID</span> <span class="nt">--cidr-block</span> 10.0.16.0/20 <span class="nt">--availability-zone</span> <span class="nv">$AZ_1</span> | jq <span class="nt">-r</span> <span class="s1">'.Subnet.SubnetId'</span><span class="si">)</span>
+aws ec2 modify-subnet-attribute <span class="nt">--subnet-id</span> <span class="nv">$SN0_ID</span> <span class="nt">--map-public-ip-on-launch</span>
+aws ec2 modify-subnet-attribute <span class="nt">--subnet-id</span> <span class="nv">$SN1_ID</span> <span class="nt">--map-public-ip-on-launch</span>
+aws rds create-db-subnet-group <span class="nt">--db-subnet-group-name</span> micronaut-guides-mysql-sng <span class="nt">--db-subnet-group-description</span> <span class="s2">"DB subnet group for the Micronaut MySQL guide"</span> <span class="nt">--subnet-ids</span> <span class="s2">"</span><span class="nv">$SN0_ID</span><span class="s2">"</span> <span class="s2">"</span><span class="nv">$SN1_ID</span><span class="s2">"</span></code></pre>
 </div>
 </div>
 </div>
@@ -304,16 +305,16 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 <h3 id="create-the-mysql-instance">4.2. Create the MySQL instance</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws rds create-db-instance \
-    --db-instance-identifier micronaut-guides-mysql \
-    --db-instance-class db.t2.micro \
-    --engine mysql \
-    --master-username admin \
-    --master-user-password secret99 \
-    --allocated-storage 20 \
-    --db-subnet-group-name micronaut-guides-mysql-sng \
-    --vpc-security-group-ids $SG_ID \
-    --publicly-accessible</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws rds create-db-instance <span class="se">\</span>
+    <span class="nt">--db-instance-identifier</span> micronaut-guides-mysql <span class="se">\</span>
+    <span class="nt">--db-instance-class</span> db.t2.micro <span class="se">\</span>
+    <span class="nt">--engine</span> mysql <span class="se">\</span>
+    <span class="nt">--master-username</span> admin <span class="se">\</span>
+    <span class="nt">--master-user-password</span> secret99 <span class="se">\</span>
+    <span class="nt">--allocated-storage</span> 20 <span class="se">\</span>
+    <span class="nt">--db-subnet-group-name</span> micronaut-guides-mysql-sng <span class="se">\</span>
+    <span class="nt">--vpc-security-group-ids</span> <span class="nv">$SG_ID</span> <span class="se">\</span>
+    <span class="nt">--publicly-accessible</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -321,7 +322,7 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws rds wait db-instance-available --db-instance-identifier micronaut-guides-mysql</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws rds <span class="nb">wait </span>db-instance-available <span class="nt">--db-instance-identifier</span> micronaut-guides-mysql</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -329,7 +330,7 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export MYSQL_HOST=$(aws rds describe-db-instances --query 'DBInstances[?DBInstanceIdentifier==`micronaut-guides-mysql`].Endpoint.Address' --output text)</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">MYSQL_HOST</span><span class="o">=</span><span class="si">$(</span>aws rds describe-db-instances <span class="nt">--query</span> <span class="s1">'DBInstances[?DBInstanceIdentifier==`micronaut-guides-mysql`].Endpoint.Address'</span> <span class="nt">--output</span> text<span class="si">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -337,7 +338,7 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mysql -u admin -p</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mysql <span class="nt">-u</span> admin <span class="nt">-p</span></code></pre>
 </div>
 </div>
 </div>
@@ -348,7 +349,7 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="mysql">CREATE DATABASE micronaut;</code></pre>
+<pre class="rouge highlight"><code data-lang="mysql">CREATE DATABASE micronaut;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -356,7 +357,7 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="mysql">CREATE USER 'guide_user' IDENTIFIED BY 'M1cr0n4ut!';</code></pre>
+<pre class="rouge highlight"><code data-lang="mysql">CREATE USER 'guide_user' IDENTIFIED BY 'M1cr0n4ut!';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -364,7 +365,7 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="mysql">GRANT ALL ON micronaut.* TO 'guide_user';</code></pre>
+<pre class="rouge highlight"><code data-lang="mysql">GRANT ALL ON micronaut.* TO 'guide_user';</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -372,7 +373,7 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="mysql">exit</code></pre>
+<pre class="rouge highlight"><code data-lang="mysql">exit</code></pre>
 </div>
 </div>
 </div>
@@ -397,9 +398,9 @@ aws rds create-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export DATASOURCES_DEFAULT_URL=jdbc:mysql://${MYSQL_HOST}:3306/micronaut
-export DATASOURCES_DEFAULT_USERNAME=guide_user
-export DATASOURCES_DEFAULT_PASSWORD=M1cr0n4ut!</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">DATASOURCES_DEFAULT_URL</span><span class="o">=</span>jdbc:mysql://<span class="k">${</span><span class="nv">MYSQL_HOST</span><span class="k">}</span>:3306/micronaut
+<span class="nb">export </span><span class="nv">DATASOURCES_DEFAULT_USERNAME</span><span class="o">=</span>guide_user
+<span class="nb">export </span><span class="nv">DATASOURCES_DEFAULT_PASSWORD</span><span class="o">=</span>M1cr0n4ut!</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -446,9 +447,9 @@ export DATASOURCES_DEFAULT_PASSWORD=M1cr0n4ut!</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/genres&quot; \
-     -H 'Content-Type: application/json; charset=utf-8' \
-     -d $'{ &quot;name&quot;: &quot;music&quot; }'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-X</span> <span class="s2">"POST"</span> <span class="s2">"http://localhost:8080/genres"</span> <span class="se">\</span>
+     <span class="nt">-H</span> <span class="s1">'Content-Type: application/json; charset=utf-8'</span> <span class="se">\</span>
+     <span class="nt">-d</span> <span class="s1">$'{ "name": "music" }'</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -456,7 +457,7 @@ export DATASOURCES_DEFAULT_PASSWORD=M1cr0n4ut!</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/genres/list</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/genres/list</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -466,15 +467,15 @@ export DATASOURCES_DEFAULT_PASSWORD=M1cr0n4ut!</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws rds delete-db-instance --db-instance-identifier micronaut-guides-mysql --skip-final-snapshot
-aws rds wait db-instance-deleted --db-instance-identifier micronaut-guides-mysql
-aws ec2 delete-subnet --subnet-id $SN0_ID
-aws ec2 delete-subnet --subnet-id $SN1_ID
-aws rds delete-db-subnet-group --db-subnet-group-name micronaut-guides-mysql-sng
-aws ec2 delete-security-group --group-id $SG_ID
-aws ec2 detach-internet-gateway --internet-gateway-id $IG_ID --vpc-id $VPC_ID
-aws ec2 delete-internet-gateway --internet-gateway-id $IG_ID
-aws ec2 delete-vpc --vpc-id $VPC_ID</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws rds delete-db-instance <span class="nt">--db-instance-identifier</span> micronaut-guides-mysql <span class="nt">--skip-final-snapshot</span>
+aws rds <span class="nb">wait </span>db-instance-deleted <span class="nt">--db-instance-identifier</span> micronaut-guides-mysql
+aws ec2 delete-subnet <span class="nt">--subnet-id</span> <span class="nv">$SN0_ID</span>
+aws ec2 delete-subnet <span class="nt">--subnet-id</span> <span class="nv">$SN1_ID</span>
+aws rds delete-db-subnet-group <span class="nt">--db-subnet-group-name</span> micronaut-guides-mysql-sng
+aws ec2 delete-security-group <span class="nt">--group-id</span> <span class="nv">$SG_ID</span>
+aws ec2 detach-internet-gateway <span class="nt">--internet-gateway-id</span> <span class="nv">$IG_ID</span> <span class="nt">--vpc-id</span> <span class="nv">$VPC_ID</span>
+aws ec2 delete-internet-gateway <span class="nt">--internet-gateway-id</span> <span class="nv">$IG_ID</span>
+aws ec2 delete-vpc <span class="nt">--vpc-id</span> <span class="nv">$VPC_ID</span></code></pre>
 </div>
 </div>
 </div>

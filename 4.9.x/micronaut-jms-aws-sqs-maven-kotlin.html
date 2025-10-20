@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -240,11 +241,11 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=jms-sqs,localstack,awaitility \
-    --build=maven \
-    --lang=kotlin \
-    --test=junit</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>jms-sqs,localstack,awaitility <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>kotlin <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -306,7 +307,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">micronaut.jms.sqs.enabled=true</code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">micronaut.jms.sqs.enabled</span><span class="p">=</span><span class="s">true</span></code></pre>
 </div>
 </div>
 </div>
@@ -318,19 +319,19 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/DemoProducer.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.jms.annotations.JMSProducer
-import io.micronaut.jms.annotations.Queue
-import io.micronaut.jms.sqs.configuration.SqsConfiguration.CONNECTION_FACTORY_BEAN_NAME
-import io.micronaut.messaging.annotation.MessageBody
+<span class="k">import</span> <span class="nn">io.micronaut.jms.annotations.JMSProducer</span>
+<span class="k">import</span> <span class="nn">io.micronaut.jms.annotations.Queue</span>
+<span class="k">import</span> <span class="nn">io.micronaut.jms.sqs.configuration.SqsConfiguration.CONNECTION_FACTORY_BEAN_NAME</span>
+<span class="k">import</span> <span class="nn">io.micronaut.messaging.annotation.MessageBody</span>
 
-@JMSProducer(CONNECTION_FACTORY_BEAN_NAME)  <i class="conum" data-value="1"></i><b>(1)</b>
-interface DemoProducer {
+<span class="nd">@JMSProducer</span><span class="p">(</span><span class="nc">CONNECTION_FACTORY_BEAN_NAME</span><span class="p">)</span>  <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">interface</span> <span class="nc">DemoProducer</span> <span class="p">{</span>
 
-    @Queue(&quot;demo_queue&quot;)  <i class="conum" data-value="2"></i><b>(2)</b>
-    fun send(@MessageBody body: String?)  <i class="conum" data-value="3"></i><b>(3)</b>
-}</code></pre>
+    <span class="nd">@Queue</span><span class="p">(</span><span class="s">"demo_queue"</span><span class="p">)</span>  <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">fun</span> <span class="nf">send</span><span class="p">(</span><span class="nd">@MessageBody</span> <span class="n">body</span><span class="p">:</span> <span class="nc">String</span><span class="p">?)</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -358,32 +359,32 @@ interface DemoProducer {
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/DemoConsumer.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.jms.annotations.JMSListener
-import io.micronaut.jms.annotations.Queue
-import io.micronaut.jms.sqs.configuration.SqsConfiguration.CONNECTION_FACTORY_BEAN_NAME
-import io.micronaut.messaging.annotation.MessageBody
-import org.slf4j.LoggerFactory
-import java.util.concurrent.atomic.AtomicInteger
+<span class="k">import</span> <span class="nn">io.micronaut.jms.annotations.JMSListener</span>
+<span class="k">import</span> <span class="nn">io.micronaut.jms.annotations.Queue</span>
+<span class="k">import</span> <span class="nn">io.micronaut.jms.sqs.configuration.SqsConfiguration.CONNECTION_FACTORY_BEAN_NAME</span>
+<span class="k">import</span> <span class="nn">io.micronaut.messaging.annotation.MessageBody</span>
+<span class="k">import</span> <span class="nn">org.slf4j.LoggerFactory</span>
+<span class="k">import</span> <span class="nn">java.util.concurrent.atomic.AtomicInteger</span>
 
-@JMSListener(CONNECTION_FACTORY_BEAN_NAME) <i class="conum" data-value="1"></i><b>(1)</b>
-class DemoConsumer {
+<span class="nd">@JMSListener</span><span class="p">(</span><span class="nc">CONNECTION_FACTORY_BEAN_NAME</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">DemoConsumer</span> <span class="p">{</span>
 
-    private val messageCount = AtomicInteger(0)
+    <span class="k">private</span> <span class="kd">val</span> <span class="py">messageCount</span> <span class="p">=</span> <span class="nc">AtomicInteger</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    @Queue(value = &quot;demo_queue&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
-    fun receive(@MessageBody body: String?) {  <i class="conum" data-value="3"></i><b>(3)</b>
-        LOG.info(&quot;Message has been consumed. Message body: {}&quot;, body)
-        messageCount.incrementAndGet()
-    }
+    <span class="nd">@Queue</span><span class="p">(</span><span class="n">value</span> <span class="p">=</span> <span class="s">"demo_queue"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">fun</span> <span class="nf">receive</span><span class="p">(</span><span class="nd">@MessageBody</span> <span class="n">body</span><span class="p">:</span> <span class="nc">String</span><span class="p">?)</span> <span class="p">{</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="nc">LOG</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s">"Message has been consumed. Message body: {}"</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+        <span class="n">messageCount</span><span class="p">.</span><span class="nf">incrementAndGet</span><span class="p">()</span>
+    <span class="p">}</span>
 
-    fun getMessageCount() = messageCount.toInt()
+    <span class="k">fun</span> <span class="nf">getMessageCount</span><span class="p">()</span> <span class="p">=</span> <span class="n">messageCount</span><span class="p">.</span><span class="nf">toInt</span><span class="p">()</span>
 
-    companion object {
-        private val LOG = LoggerFactory.getLogger(DemoConsumer::class.java)
-    }
-}</code></pre>
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">LOG</span> <span class="p">=</span> <span class="nc">LoggerFactory</span><span class="p">.</span><span class="nf">getLogger</span><span class="p">(</span><span class="nc">DemoConsumer</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -411,22 +412,22 @@ class DemoConsumer {
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/DemoController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Post
-import io.micronaut.http.annotation.Status
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpStatus</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Post</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Status</span>
 
-@Controller  <i class="conum" data-value="1"></i><b>(1)</b>
-class DemoController(private val demoProducer: DemoProducer) {  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Controller</span>  <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">DemoController</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">demoProducer</span><span class="p">:</span> <span class="nc">DemoProducer</span><span class="p">)</span> <span class="p">{</span>  <i class="conum" data-value="2"></i><b>(2)</b>
 
-    @Post(&quot;/demo&quot;)  <i class="conum" data-value="3"></i><b>(3)</b>
-    @Status(HttpStatus.NO_CONTENT)
-    fun publishDemoMessages() {
-        demoProducer.send(&quot;Demo message body&quot;)  <i class="conum" data-value="4"></i><b>(4)</b>
-    }
-}</code></pre>
+    <span class="nd">@Post</span><span class="p">(</span><span class="s">"/demo"</span><span class="p">)</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Status</span><span class="p">(</span><span class="nc">HttpStatus</span><span class="p">.</span><span class="nc">NO_CONTENT</span><span class="p">)</span>
+    <span class="k">fun</span> <span class="nf">publishDemoMessages</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">demoProducer</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="s">"Demo message body"</span><span class="p">)</span>  <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -473,21 +474,21 @@ class DemoController(private val demoProducer: DemoProducer) {  <i class="conum"
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>junit-jupiter<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>localstack<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>testcontainers<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>junit-jupiter<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>localstack<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>testcontainers<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -496,25 +497,25 @@ class DemoController(private val demoProducer: DemoProducer) {  <i class="conum"
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/SqsConfig.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.context.annotation.ConfigurationBuilder
-import io.micronaut.context.annotation.ConfigurationProperties
+<span class="k">import</span> <span class="nn">io.micronaut.context.annotation.ConfigurationBuilder</span>
+<span class="k">import</span> <span class="nn">io.micronaut.context.annotation.ConfigurationProperties</span>
 
-@ConfigurationProperties(&quot;aws&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-class SqsConfig {
+<span class="nd">@ConfigurationProperties</span><span class="p">(</span><span class="s">"aws"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">SqsConfig</span> <span class="p">{</span>
 
-    var accessKeyId: String? = null
-    var secretKey: String? = null
-    var region: String? = null
+    <span class="kd">var</span> <span class="py">accessKeyId</span><span class="p">:</span> <span class="nc">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+    <span class="kd">var</span> <span class="py">secretKey</span><span class="p">:</span> <span class="nc">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+    <span class="kd">var</span> <span class="py">region</span><span class="p">:</span> <span class="nc">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
 
-    @ConfigurationBuilder(configurationPrefix = &quot;services.sqs&quot;)
-    val sqs: Sqs = Sqs()
+    <span class="nd">@ConfigurationBuilder</span><span class="p">(</span><span class="n">configurationPrefix</span> <span class="p">=</span> <span class="s">"services.sqs"</span><span class="p">)</span>
+    <span class="kd">val</span> <span class="py">sqs</span><span class="p">:</span> <span class="nc">Sqs</span> <span class="p">=</span> <span class="nc">Sqs</span><span class="p">()</span>
 
-    class Sqs {
-        var endpointOverride: String? = null
-    }
-}</code></pre>
+    <span class="kd">class</span> <span class="nc">Sqs</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="py">endpointOverride</span><span class="p">:</span> <span class="nc">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -531,38 +532,38 @@ class SqsConfig {
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/SqsClientBuilderListener.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.context.event.BeanCreatedEvent
-import io.micronaut.context.event.BeanCreatedEventListener
-import jakarta.inject.Singleton
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.sqs.SqsClientBuilder
-import java.net.URI
-import java.net.URISyntaxException
+<span class="k">import</span> <span class="nn">io.micronaut.context.event.BeanCreatedEvent</span>
+<span class="k">import</span> <span class="nn">io.micronaut.context.event.BeanCreatedEventListener</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="k">import</span> <span class="nn">software.amazon.awssdk.auth.credentials.AwsBasicCredentials</span>
+<span class="k">import</span> <span class="nn">software.amazon.awssdk.auth.credentials.StaticCredentialsProvider</span>
+<span class="k">import</span> <span class="nn">software.amazon.awssdk.regions.Region</span>
+<span class="k">import</span> <span class="nn">software.amazon.awssdk.services.sqs.SqsClientBuilder</span>
+<span class="k">import</span> <span class="nn">java.net.URI</span>
+<span class="k">import</span> <span class="nn">java.net.URISyntaxException</span>
 
-@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class SqsClientBuilderListener(private val sqsConfig: SqsConfig) <i class="conum" data-value="3"></i><b>(3)</b>
-    : BeanCreatedEventListener&lt;SqsClientBuilder&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">SqsClientBuilderListener</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">sqsConfig</span><span class="p">:</span> <span class="nc">SqsConfig</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="p">:</span> <span class="nc">BeanCreatedEventListener</span><span class="p">&lt;</span><span class="nc">SqsClientBuilder</span><span class="p">&gt;</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    override fun onCreated(event: BeanCreatedEvent&lt;SqsClientBuilder&gt;): SqsClientBuilder {
-        val builder = event.bean
-        try {
-            return builder
-                .endpointOverride(URI(sqsConfig.sqs.endpointOverride!!))
-                .credentialsProvider(
-                    StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(sqsConfig.accessKeyId, sqsConfig.secretKey)
-                    )
-                )
-                .region(Region.of(sqsConfig.region))
-        } catch (e: URISyntaxException) {
-            throw RuntimeException(e)
-        }
-    }
-}</code></pre>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreated</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nc">BeanCreatedEvent</span><span class="p">&lt;</span><span class="nc">SqsClientBuilder</span><span class="p">&gt;):</span> <span class="nc">SqsClientBuilder</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">builder</span> <span class="p">=</span> <span class="n">event</span><span class="p">.</span><span class="n">bean</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">builder</span>
+                <span class="p">.</span><span class="nf">endpointOverride</span><span class="p">(</span><span class="nc">URI</span><span class="p">(</span><span class="n">sqsConfig</span><span class="p">.</span><span class="n">sqs</span><span class="p">.</span><span class="n">endpointOverride</span><span class="o">!!</span><span class="p">))</span>
+                <span class="p">.</span><span class="nf">credentialsProvider</span><span class="p">(</span>
+                    <span class="nc">StaticCredentialsProvider</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+                        <span class="nc">AwsBasicCredentials</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">sqsConfig</span><span class="p">.</span><span class="n">accessKeyId</span><span class="p">,</span> <span class="n">sqsConfig</span><span class="p">.</span><span class="n">secretKey</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="p">.</span><span class="nf">region</span><span class="p">(</span><span class="nc">Region</span><span class="p">.</span><span class="nf">of</span><span class="p">(</span><span class="n">sqsConfig</span><span class="p">.</span><span class="n">region</span><span class="p">))</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="nc">URISyntaxException</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="nc">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -587,33 +588,33 @@ class SqsClientBuilderListener(private val sqsConfig: SqsConfig) <i class="conum
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/SqsClientCreatedEventListener.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.context.event.BeanCreatedEvent
-import io.micronaut.context.event.BeanCreatedEventListener
-import jakarta.inject.Singleton
-import software.amazon.awssdk.services.sqs.SqsClient
-import software.amazon.awssdk.services.sqs.model.CreateQueueRequest
+<span class="k">import</span> <span class="nn">io.micronaut.context.event.BeanCreatedEvent</span>
+<span class="k">import</span> <span class="nn">io.micronaut.context.event.BeanCreatedEventListener</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="k">import</span> <span class="nn">software.amazon.awssdk.services.sqs.SqsClient</span>
+<span class="k">import</span> <span class="nn">software.amazon.awssdk.services.sqs.model.CreateQueueRequest</span>
 
-@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
-class SqsClientCreatedEventListener : BeanCreatedEventListener&lt;SqsClient&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">SqsClientCreatedEventListener</span> <span class="p">:</span> <span class="nc">BeanCreatedEventListener</span><span class="p">&lt;</span><span class="nc">SqsClient</span><span class="p">&gt;</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    override fun onCreated(event: BeanCreatedEvent&lt;SqsClient&gt;): SqsClient {
-        val client = event.bean
-        if (client.listQueues().queueUrls().stream().noneMatch { it: String -&gt; it.contains(QUEUE_NAME) }) {
-            client.createQueue(
-                CreateQueueRequest.builder()
-                    .queueName(QUEUE_NAME)
-                    .build()
-            )
-        }
-        return client
-    }
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreated</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nc">BeanCreatedEvent</span><span class="p">&lt;</span><span class="nc">SqsClient</span><span class="p">&gt;):</span> <span class="nc">SqsClient</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">client</span> <span class="p">=</span> <span class="n">event</span><span class="p">.</span><span class="n">bean</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">client</span><span class="p">.</span><span class="nf">listQueues</span><span class="p">().</span><span class="nf">queueUrls</span><span class="p">().</span><span class="nf">stream</span><span class="p">().</span><span class="nf">noneMatch</span> <span class="p">{</span> <span class="n">it</span><span class="p">:</span> <span class="nc">String</span> <span class="p">-&gt;</span> <span class="n">it</span><span class="p">.</span><span class="nf">contains</span><span class="p">(</span><span class="nc">QUEUE_NAME</span><span class="p">)</span> <span class="p">})</span> <span class="p">{</span>
+            <span class="n">client</span><span class="p">.</span><span class="nf">createQueue</span><span class="p">(</span>
+                <span class="nc">CreateQueueRequest</span><span class="p">.</span><span class="nf">builder</span><span class="p">()</span>
+                    <span class="p">.</span><span class="nf">queueName</span><span class="p">(</span><span class="nc">QUEUE_NAME</span><span class="p">)</span>
+                    <span class="p">.</span><span class="nf">build</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">client</span>
+    <span class="p">}</span>
 
-    companion object {
-        private const val QUEUE_NAME = &quot;demo_queue&quot;
-    }
-}</code></pre>
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="k">const</span> <span class="kd">val</span> <span class="py">QUEUE_NAME</span> <span class="p">=</span> <span class="s">"demo_queue"</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -634,61 +635,61 @@ class SqsClientCreatedEventListener : BeanCreatedEventListener&lt;SqsClient&gt; 
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/MicronautguideTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.core.annotation.NonNull
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
-import jakarta.inject.Inject
-import org.awaitility.Awaitility
-import org.hamcrest.Matchers
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.testcontainers.containers.localstack.LocalStackContainer
-import org.testcontainers.utility.DockerImageName
+<span class="k">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">io.micronaut.test.support.TestPropertyProvider</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="k">import</span> <span class="nn">org.awaitility.Awaitility</span>
+<span class="k">import</span> <span class="nn">org.hamcrest.Matchers</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.TestInstance</span>
+<span class="k">import</span> <span class="nn">org.testcontainers.containers.localstack.LocalStackContainer</span>
+<span class="k">import</span> <span class="nn">org.testcontainers.utility.DockerImageName</span>
 
-@MicronautTest <i class="conum" data-value="1"></i><b>(1)</b>
-@TestInstance(TestInstance.Lifecycle.PER_CLASS) <i class="conum" data-value="2"></i><b>(2)</b>
-internal class MicronautguideTest : TestPropertyProvider { <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@TestInstance</span><span class="p">(</span><span class="nc">TestInstance</span><span class="p">.</span><span class="nc">Lifecycle</span><span class="p">.</span><span class="nc">PER_CLASS</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="k">internal</span> <span class="kd">class</span> <span class="nc">MicronautguideTest</span> <span class="p">:</span> <span class="nc">TestPropertyProvider</span> <span class="p">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-    @Inject
-    @field:Client(&quot;/&quot;)
-    lateinit var httpClient : HttpClient
+    <span class="nd">@Inject</span>
+    <span class="err">@</span><span class="n">field</span><span class="p">:</span><span class="nc">Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">httpClient</span> <span class="p">:</span> <span class="nc">HttpClient</span>
 
-    @Inject
-    lateinit var demoConsumer: DemoConsumer
+    <span class="nd">@Inject</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">demoConsumer</span><span class="p">:</span> <span class="nc">DemoConsumer</span>
 
-    override fun getProperties(): @NonNull MutableMap&lt;String, String&gt; {
-        if (!localstack.isRunning) {
-            localstack.start()
-        }
-        return mapOf(
-            &quot;aws.access-key-id&quot; to localstack.accessKey,
-            &quot;aws.secret-key&quot; to localstack.secretKey,
-            &quot;aws.region&quot; to localstack.region,
-            &quot;aws.services.sqs.endpoint-override&quot; to localstack.getEndpointOverride(LocalStackContainer.Service.SQS)
-                .toString()
-        ).toMutableMap()
-    }
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getProperties</span><span class="p">():</span> <span class="nd">@NonNull</span> <span class="nc">MutableMap</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">,</span> <span class="nc">String</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(!</span><span class="n">localstack</span><span class="p">.</span><span class="n">isRunning</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">localstack</span><span class="p">.</span><span class="nf">start</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nf">mapOf</span><span class="p">(</span>
+            <span class="s">"aws.access-key-id"</span> <span class="n">to</span> <span class="n">localstack</span><span class="p">.</span><span class="n">accessKey</span><span class="p">,</span>
+            <span class="s">"aws.secret-key"</span> <span class="n">to</span> <span class="n">localstack</span><span class="p">.</span><span class="n">secretKey</span><span class="p">,</span>
+            <span class="s">"aws.region"</span> <span class="n">to</span> <span class="n">localstack</span><span class="p">.</span><span class="n">region</span><span class="p">,</span>
+            <span class="s">"aws.services.sqs.endpoint-override"</span> <span class="n">to</span> <span class="n">localstack</span><span class="p">.</span><span class="nf">getEndpointOverride</span><span class="p">(</span><span class="nc">LocalStackContainer</span><span class="p">.</span><span class="nc">Service</span><span class="p">.</span><span class="nc">SQS</span><span class="p">)</span>
+                <span class="p">.</span><span class="nf">toString</span><span class="p">()</span>
+        <span class="p">).</span><span class="nf">toMutableMap</span><span class="p">()</span>
+    <span class="p">}</span>
 
-    @Test
-    fun testItWorks() {
-        Assertions.assertEquals(0, demoConsumer.getMessageCount())
-        httpClient.toBlocking().exchange&lt;Map&lt;Any, Any&gt;, Any&gt;(HttpRequest.POST(&quot;/demo&quot;, emptyMap()))
-        Awaitility.await().until({ demoConsumer.getMessageCount() }, Matchers.equalTo(1))
-        Assertions.assertEquals(1, demoConsumer.getMessageCount())
-    }
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">testItWorks</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nc">Assertions</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">demoConsumer</span><span class="p">.</span><span class="nf">getMessageCount</span><span class="p">())</span>
+        <span class="n">httpClient</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="n">exchange</span><span class="p">&lt;</span><span class="nc">Map</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">,</span> <span class="nc">Any</span><span class="p">&gt;,</span> <span class="nc">Any</span><span class="p">&gt;(</span><span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">POST</span><span class="p">(</span><span class="s">"/demo"</span><span class="p">,</span> <span class="nf">emptyMap</span><span class="p">()))</span>
+        <span class="nc">Awaitility</span><span class="p">.</span><span class="nf">await</span><span class="p">().</span><span class="nf">until</span><span class="p">({</span> <span class="n">demoConsumer</span><span class="p">.</span><span class="nf">getMessageCount</span><span class="p">()</span> <span class="p">},</span> <span class="nc">Matchers</span><span class="p">.</span><span class="nf">equalTo</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="nc">Assertions</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">demoConsumer</span><span class="p">.</span><span class="nf">getMessageCount</span><span class="p">())</span>
+    <span class="p">}</span>
 
-    companion object {
-        private val localstackImage: DockerImageName = DockerImageName.parse(&quot;localstack/localstack:latest&quot;)
-        private val localstack: LocalStackContainer = LocalStackContainer(localstackImage)
-            .withServices(LocalStackContainer.Service.SQS)
-    }
-}</code></pre>
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">localstackImage</span><span class="p">:</span> <span class="nc">DockerImageName</span> <span class="p">=</span> <span class="nc">DockerImageName</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="s">"localstack/localstack:latest"</span><span class="p">)</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">localstack</span><span class="p">:</span> <span class="nc">LocalStackContainer</span> <span class="p">=</span> <span class="nc">LocalStackContainer</span><span class="p">(</span><span class="n">localstackImage</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">withServices</span><span class="p">(</span><span class="nc">LocalStackContainer</span><span class="p">.</span><span class="nc">Service</span><span class="p">.</span><span class="nc">SQS</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -729,11 +730,11 @@ internal class MicronautguideTest : TestPropertyProvider { <i class="conum" data
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws iam create-group --group-name Administrators
-aws iam create-user --user-name Administrator
-aws iam add-user-to-group --user-name Administrator --group-name Administrators
-aws iam attach-group-policy --group-name Administrators --policy-arn $(aws iam list-policies --query 'Policies[?PolicyName==`AdministratorAccess`].{ARN:Arn}' --output text)
-aws iam create-access-key --user-name Administrator</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws iam create-group <span class="nt">--group-name</span> Administrators
+aws iam create-user <span class="nt">--user-name</span> Administrator
+aws iam add-user-to-group <span class="nt">--user-name</span> Administrator <span class="nt">--group-name</span> Administrators
+aws iam attach-group-policy <span class="nt">--group-name</span> Administrators <span class="nt">--policy-arn</span> <span class="si">$(</span>aws iam list-policies <span class="nt">--query</span> <span class="s1">'Policies[?PolicyName==`AdministratorAccess`].{ARN:Arn}'</span> <span class="nt">--output</span> text<span class="si">)</span>
+aws iam create-access-key <span class="nt">--user-name</span> Administrator</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -752,7 +753,7 @@ aws iam create-access-key --user-name Administrator</code></pre>
 <h3 id="create-a-queue-instance">8.1. Create a queue instance</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws sqs create-queue --queue-name demo_queue</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws sqs create-queue <span class="nt">--queue-name</span> demo_queue</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -772,8 +773,8 @@ aws iam create-access-key --user-name Administrator</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">export AWS_ACCESS_KEY_ID=&lt;the access key from the AWS configuration step&gt;
-export AWS_SECRET_ACCESS_KEY=&lt;the secret key from the AWS configuration step&gt;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>&lt;the access key from the AWS configuration step&gt;
+<span class="nb">export </span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>&lt;the secret key from the AWS configuration step&gt;</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -817,7 +818,7 @@ export AWS_SECRET_ACCESS_KEY=&lt;the secret key from the AWS configuration step&
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://localhost:8080/demo&quot;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="s2">"http://localhost:8080/demo"</span></code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -827,7 +828,7 @@ export AWS_SECRET_ACCESS_KEY=&lt;the secret key from the AWS configuration step&
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">aws sqs delete-queue --queue-url &lt;QUEUE_URL&gt;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">aws sqs delete-queue <span class="nt">--queue-url</span> &lt;QUEUE_URL&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -865,7 +866,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">Java 21</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.5-graal</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.5-graal</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -880,7 +881,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">Java 21</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.2-graalce</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.2-graalce</code></pre>
 </div>
 </div>
 </div>
@@ -891,7 +892,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw package -Dpackaging=native-image</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./mvnw package <span class="nt">-Dpackaging</span><span class="o">=</span>native-image</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -903,19 +904,19 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;plugin&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.graalvm.buildtools<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>native-maven-plugin<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>0.10.3<span class="tag">&lt;/version&gt;</span>
-    <span class="tag">&lt;configuration&gt;</span>
-        <span class="comment">&lt;!-- &lt;1&gt; --&gt;</span>
-        <span class="tag">&lt;imageName&gt;</span>mn-graalvm-application<span class="tag">&lt;/imageName&gt;</span> <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="tag">&lt;buildArgs&gt;</span>
-              <span class="comment">&lt;!-- &lt;2&gt; --&gt;</span>
-          <span class="tag">&lt;buildArg&gt;</span>-Ob<span class="tag">&lt;/buildArg&gt;</span>
-        <span class="tag">&lt;/buildArgs&gt;</span>
-    <span class="tag">&lt;/configuration&gt;</span>
-<span class="tag">&lt;/plugin&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.graalvm.buildtools<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>native-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>0.10.3<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;configuration&gt;</span>
+        <span class="c">&lt;!-- &lt;1&gt; --&gt;</span>
+        <span class="nt">&lt;imageName&gt;</span>mn-graalvm-application<span class="nt">&lt;/imageName&gt;</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="nt">&lt;buildArgs&gt;</span>
+	      <span class="c">&lt;!-- &lt;2&gt; --&gt;</span>
+          <span class="nt">&lt;buildArg&gt;</span>-Ob<span class="nt">&lt;/buildArg&gt;</span>
+        <span class="nt">&lt;/buildArgs&gt;</span>
+    <span class="nt">&lt;/configuration&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

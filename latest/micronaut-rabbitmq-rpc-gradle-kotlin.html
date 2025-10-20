@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -249,7 +250,7 @@ Message Queuing Telemetry Transport (MQTT), and other protocols.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="shell">RABBITMQ_URI=amqp://production-server:5672</code></pre>
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">RABBITMQ_URI</span><span class="o">=</span>amqp://production-server:5672</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -262,7 +263,7 @@ Message Queuing Telemetry Transport (MQTT), and other protocols.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,graalvm example.micronaut.bookcatalogue --build=gradle --lang=kotlin</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app <span class="nt">--features</span><span class="o">=</span>rabbitmq,graalvm example.micronaut.bookcatalogue <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -311,26 +312,26 @@ Use <code>guest</code> for both username and password.</p>
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/kotlin/example/micronaut/ChannelPoolListener.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import com.rabbitmq.client.BuiltinExchangeType
-import com.rabbitmq.client.Channel
-import io.micronaut.rabbitmq.connect.ChannelInitializer
-import jakarta.inject.Singleton
-import java.io.IOException
+<span class="k">import</span> <span class="nn">com.rabbitmq.client.BuiltinExchangeType</span>
+<span class="k">import</span> <span class="nn">com.rabbitmq.client.Channel</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.connect.ChannelInitializer</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="k">import</span> <span class="nn">java.io.IOException</span>
 
-@Singleton
-class ChannelPoolListener : ChannelInitializer() {
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">ChannelPoolListener</span> <span class="p">:</span> <span class="nc">ChannelInitializer</span><span class="p">()</span> <span class="p">{</span>
 
-    @Throws(IOException::class)
-    override fun initialize(channel: Channel, name: String) {
-        channel.exchangeDeclare(&quot;micronaut&quot;, BuiltinExchangeType.DIRECT, true) <i class="conum" data-value="1"></i><b>(1)</b>
-        channel.queueDeclare(&quot;inventory&quot;, true, false, false, null) <i class="conum" data-value="2"></i><b>(2)</b>
-        channel.queueBind(&quot;inventory&quot;, &quot;micronaut&quot;, &quot;books.inventory&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
-        channel.queueDeclare(&quot;catalogue&quot;, true, false, false, null) <i class="conum" data-value="4"></i><b>(4)</b>
-        channel.queueBind(&quot;catalogue&quot;, &quot;micronaut&quot;, &quot;books.catalogue&quot;) <i class="conum" data-value="5"></i><b>(5)</b>
-    }
-}</code></pre>
+    <span class="nd">@Throws</span><span class="p">(</span><span class="nc">IOException</span><span class="o">::</span><span class="k">class</span><span class="p">)</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">channel</span><span class="p">:</span> <span class="nc">Channel</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">exchangeDeclare</span><span class="p">(</span><span class="s">"micronaut"</span><span class="p">,</span> <span class="nc">BuiltinExchangeType</span><span class="p">.</span><span class="nc">DIRECT</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">queueDeclare</span><span class="p">(</span><span class="s">"inventory"</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">queueBind</span><span class="p">(</span><span class="s">"inventory"</span><span class="p">,</span> <span class="s">"micronaut"</span><span class="p">,</span> <span class="s">"books.inventory"</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">queueDeclare</span><span class="p">(</span><span class="s">"catalogue"</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">queueBind</span><span class="p">(</span><span class="s">"catalogue"</span><span class="p">,</span> <span class="s">"micronaut"</span><span class="p">,</span> <span class="s">"books.catalogue"</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -380,23 +381,23 @@ all the elements in the same file and share the file between all the projects.
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/kotlin/example/micronaut/BookCatalogueService.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.rabbitmq.annotation.Queue
-import io.micronaut.rabbitmq.annotation.RabbitListener
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.Queue</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.RabbitListener</span>
 
-@RabbitListener <i class="conum" data-value="1"></i><b>(1)</b>
-class BookCatalogueService {
+<span class="nd">@RabbitListener</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">BookCatalogueService</span> <span class="p">{</span>
 
-    @Queue(&quot;catalogue&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
-    fun listBooks(): List&lt;Book&gt; {
-        val buildingMicroservices = Book(&quot;1491950358&quot;, &quot;Building Microservices&quot;)
-        val releaseIt = Book(&quot;1680502395&quot;, &quot;Release It!&quot;)
-        val cidelivery = Book(&quot;0321601912&quot;, &quot;Continuous Delivery:&quot;)
+    <span class="nd">@Queue</span><span class="p">(</span><span class="s">"catalogue"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">fun</span> <span class="nf">listBooks</span><span class="p">():</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">Book</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">buildingMicroservices</span> <span class="p">=</span> <span class="nc">Book</span><span class="p">(</span><span class="s">"1491950358"</span><span class="p">,</span> <span class="s">"Building Microservices"</span><span class="p">)</span>
+        <span class="kd">val</span> <span class="py">releaseIt</span> <span class="p">=</span> <span class="nc">Book</span><span class="p">(</span><span class="s">"1680502395"</span><span class="p">,</span> <span class="s">"Release It!"</span><span class="p">)</span>
+        <span class="kd">val</span> <span class="py">cidelivery</span> <span class="p">=</span> <span class="nc">Book</span><span class="p">(</span><span class="s">"0321601912"</span><span class="p">,</span> <span class="s">"Continuous Delivery:"</span><span class="p">)</span>
 
-        return listOf(buildingMicroservices, releaseIt, cidelivery)
-    }
-}</code></pre>
+        <span class="k">return</span> <span class="nf">listOf</span><span class="p">(</span><span class="n">buildingMicroservices</span><span class="p">,</span> <span class="n">releaseIt</span><span class="p">,</span> <span class="n">cidelivery</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -417,12 +418,12 @@ class BookCatalogueService {
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/kotlin/example/micronaut/Book.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.serde.annotation.Serdeable
+<span class="k">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span>
 
-@Serdeable
-data class Book(val isbn: String, val name: String)</code></pre>
+<span class="nd">@Serdeable</span>
+<span class="kd">data class</span> <span class="nc">Book</span><span class="p">(</span><span class="kd">val</span> <span class="py">isbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="kd">val</span> <span class="py">name</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
 </div>
@@ -434,7 +435,7 @@ data class Book(val isbn: String, val name: String)</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,graalvm example.micronaut.bookinventory --build=gradle --lang=kotlin</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app <span class="nt">--features</span><span class="o">=</span>rabbitmq,graalvm example.micronaut.bookinventory <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -487,29 +488,29 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">bookinventory/src/main/kotlin/example/micronaut/BookInventoryService.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.rabbitmq.annotation.Queue
-import io.micronaut.rabbitmq.annotation.RabbitListener
-import java.util.Optional
-import jakarta.validation.constraints.NotBlank
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.Queue</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.RabbitListener</span>
+<span class="k">import</span> <span class="nn">java.util.Optional</span>
+<span class="k">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span>
 
-@RabbitListener <i class="conum" data-value="1"></i><b>(1)</b>
-open class BookInventoryService {
+<span class="nd">@RabbitListener</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="k">open</span> <span class="kd">class</span> <span class="nc">BookInventoryService</span> <span class="p">{</span>
 
-    @Queue(&quot;inventory&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
-    open fun stock(isbn: @NotBlank String?): Boolean? =
-        bookInventoryByIsbn(isbn).map { (_, stock): BookInventory -&gt; stock &gt; 0 }.orElse(null)
+    <span class="nd">@Queue</span><span class="p">(</span><span class="s">"inventory"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">open</span> <span class="k">fun</span> <span class="nf">stock</span><span class="p">(</span><span class="n">isbn</span><span class="p">:</span> <span class="nd">@NotBlank</span> <span class="nc">String</span><span class="p">?):</span> <span class="nc">Boolean</span><span class="p">?</span> <span class="p">=</span>
+        <span class="nf">bookInventoryByIsbn</span><span class="p">(</span><span class="n">isbn</span><span class="p">).</span><span class="nf">map</span> <span class="p">{</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">stock</span><span class="p">):</span> <span class="nc">BookInventory</span> <span class="p">-&gt;</span> <span class="n">stock</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">}.</span><span class="nf">orElse</span><span class="p">(</span><span class="k">null</span><span class="p">)</span>
 
-    private fun bookInventoryByIsbn(isbn: String?): Optional&lt;BookInventory&gt; =
-        if (isbn.equals(&quot;1491950358&quot;)) {
-            Optional.of(BookInventory(isbn!!, 4))
-        } else if (isbn.equals(&quot;1680502395&quot;)) {
-            Optional.of(BookInventory(isbn!!, 0))
-        } else {
-            Optional.empty&lt;Any&gt;() as Optional&lt;BookInventory&gt;
-        }
-}</code></pre>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">bookInventoryByIsbn</span><span class="p">(</span><span class="n">isbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">?):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">BookInventory</span><span class="p">&gt;</span> <span class="p">=</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">isbn</span><span class="p">.</span><span class="nf">equals</span><span class="p">(</span><span class="s">"1491950358"</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nc">Optional</span><span class="p">.</span><span class="nf">of</span><span class="p">(</span><span class="nc">BookInventory</span><span class="p">(</span><span class="n">isbn</span><span class="o">!!</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isbn</span><span class="p">.</span><span class="nf">equals</span><span class="p">(</span><span class="s">"1680502395"</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nc">Optional</span><span class="p">.</span><span class="nf">of</span><span class="p">(</span><span class="nc">BookInventory</span><span class="p">(</span><span class="n">isbn</span><span class="o">!!</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nc">Optional</span><span class="p">.</span><span class="n">empty</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;()</span> <span class="k">as</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">BookInventory</span><span class="p">&gt;</span>
+        <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -530,12 +531,12 @@ open class BookInventoryService {
 <div class="listingblock">
 <div class="title">bookinventory/src/main/kotlin/example/micronaut/BookInventory.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.serde.annotation.Serdeable
+<span class="k">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span>
 
-@Serdeable
-data class BookInventory(val isbn: String, val stock: Int)</code></pre>
+<span class="nd">@Serdeable</span>
+<span class="kd">data class</span> <span class="nc">BookInventory</span><span class="p">(</span><span class="kd">val</span> <span class="py">isbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="kd">val</span> <span class="py">stock</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span></code></pre>
 </div>
 </div>
 </div>
@@ -547,7 +548,7 @@ data class BookInventory(val isbn: String, val stock: Int)</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=rabbitmq,reactor,graalvm example.micronaut.bookrecommendation --build=gradle --lang=kotlin</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app <span class="nt">--features</span><span class="o">=</span>rabbitmq,reactor,graalvm example.micronaut.bookrecommendation <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -598,20 +599,20 @@ Create <code>CatalogueClient</code>:</p>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/kotlin/example/micronaut/CatalogueClient.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.rabbitmq.annotation.Binding
-import io.micronaut.rabbitmq.annotation.RabbitClient
-import io.micronaut.rabbitmq.annotation.RabbitProperty
-import org.reactivestreams.Publisher
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.Binding</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.RabbitClient</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.RabbitProperty</span>
+<span class="k">import</span> <span class="nn">org.reactivestreams.Publisher</span>
 
-@RabbitClient(&quot;micronaut&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-@RabbitProperty(name = &quot;replyTo&quot;, value = &quot;amq.rabbitmq.reply-to&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
-interface CatalogueClient {
+<span class="nd">@RabbitClient</span><span class="p">(</span><span class="s">"micronaut"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@RabbitProperty</span><span class="p">(</span><span class="n">name</span> <span class="p">=</span> <span class="s">"replyTo"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="s">"amq.rabbitmq.reply-to"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">interface</span> <span class="nc">CatalogueClient</span> <span class="p">{</span>
 
-    @Binding(&quot;books.catalogue&quot;) <i class="conum" data-value="3"></i><b>(3)</b>
-    fun findAll(data: ByteArray?): Publisher&lt;List&lt;Book&gt;&gt; <i class="conum" data-value="4"></i><b>(4)</b>
-}</code></pre>
+    <span class="nd">@Binding</span><span class="p">(</span><span class="s">"books.catalogue"</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">findAll</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nc">ByteArray</span><span class="p">?):</span> <span class="nc">Publisher</span><span class="p">&lt;</span><span class="nc">List</span><span class="p">&lt;</span><span class="nc">Book</span><span class="p">&gt;&gt;</span> <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -645,20 +646,20 @@ used in the consumer.</td>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/kotlin/example/micronaut/InventoryClient.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.rabbitmq.annotation.Binding
-import io.micronaut.rabbitmq.annotation.RabbitClient
-import io.micronaut.rabbitmq.annotation.RabbitProperty
-import reactor.core.publisher.Mono
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.Binding</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.RabbitClient</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.RabbitProperty</span>
+<span class="k">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-@RabbitClient(&quot;micronaut&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-@RabbitProperty(name = &quot;replyTo&quot;, value = &quot;amq.rabbitmq.reply-to&quot;) <i class="conum" data-value="2"></i><b>(2)</b>
-interface InventoryClient {
+<span class="nd">@RabbitClient</span><span class="p">(</span><span class="s">"micronaut"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@RabbitProperty</span><span class="p">(</span><span class="n">name</span> <span class="p">=</span> <span class="s">"replyTo"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="s">"amq.rabbitmq.reply-to"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">interface</span> <span class="nc">InventoryClient</span> <span class="p">{</span>
 
-    @Binding(&quot;books.inventory&quot;)<i class="conum" data-value="3"></i><b>(3)</b>
-    fun stock(isbn: String): Mono&lt;Boolean?&gt; <i class="conum" data-value="4"></i><b>(4)</b>
-}</code></pre>
+    <span class="nd">@Binding</span><span class="p">(</span><span class="s">"books.inventory"</span><span class="p">)</span><i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">stock</span><span class="p">(</span><span class="n">isbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">Mono</span><span class="p">&lt;</span><span class="nc">Boolean</span><span class="p">?&gt;</span> <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -691,29 +692,29 @@ type to wrap the result.</td>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/kotlin/example/micronaut/BookController.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import org.reactivestreams.Publisher
-import reactor.core.publisher.Flux
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="k">import</span> <span class="nn">org.reactivestreams.Publisher</span>
+<span class="k">import</span> <span class="nn">reactor.core.publisher.Flux</span>
 
-@Controller(&quot;/books&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
-class BookController(
-        private val catalogueClient: CatalogueClient, <i class="conum" data-value="2"></i><b>(2)</b>
-        private val inventoryClient: InventoryClient) {
+<span class="nd">@Controller</span><span class="p">(</span><span class="s">"/books"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">BookController</span><span class="p">(</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">catalogueClient</span><span class="p">:</span> <span class="nc">CatalogueClient</span><span class="p">,</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">inventoryClient</span><span class="p">:</span> <span class="nc">InventoryClient</span><span class="p">)</span> <span class="p">{</span>
 
-    @Get <i class="conum" data-value="3"></i><b>(3)</b>
-    fun index(): Publisher&lt;BookRecommendation&gt; =
-        Flux.from(catalogueClient.findAll(null))
-                .flatMap { Flux.fromIterable(it) }
-                .flatMap { book: Book -&gt;
-                    Flux.from(inventoryClient.stock(book.isbn))
-                            .filter { obj: Boolean? -&gt; obj == true }
-                            .map { book }
-                }
-                .map { (_, name): Book -&gt; BookRecommendation(name) }
-}</code></pre>
+    <span class="nd">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">index</span><span class="p">():</span> <span class="nc">Publisher</span><span class="p">&lt;</span><span class="nc">BookRecommendation</span><span class="p">&gt;</span> <span class="p">=</span>
+        <span class="nc">Flux</span><span class="p">.</span><span class="nf">from</span><span class="p">(</span><span class="n">catalogueClient</span><span class="p">.</span><span class="nf">findAll</span><span class="p">(</span><span class="k">null</span><span class="p">))</span>
+                <span class="p">.</span><span class="nf">flatMap</span> <span class="p">{</span> <span class="nc">Flux</span><span class="p">.</span><span class="nf">fromIterable</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="p">}</span>
+                <span class="p">.</span><span class="nf">flatMap</span> <span class="p">{</span> <span class="n">book</span><span class="p">:</span> <span class="nc">Book</span> <span class="p">-&gt;</span>
+                    <span class="nc">Flux</span><span class="p">.</span><span class="nf">from</span><span class="p">(</span><span class="n">inventoryClient</span><span class="p">.</span><span class="nf">stock</span><span class="p">(</span><span class="n">book</span><span class="p">.</span><span class="n">isbn</span><span class="p">))</span>
+                            <span class="p">.</span><span class="nf">filter</span> <span class="p">{</span> <span class="n">obj</span><span class="p">:</span> <span class="nc">Boolean</span><span class="p">?</span> <span class="p">-&gt;</span> <span class="n">obj</span> <span class="p">==</span> <span class="k">true</span> <span class="p">}</span>
+                            <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="n">book</span> <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span> <span class="nc">Book</span> <span class="p">-&gt;</span> <span class="nc">BookRecommendation</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -738,12 +739,12 @@ class BookController(
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/kotlin/example/micronaut/BookRecommendation.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
 
-import io.micronaut.serde.annotation.Serdeable
+<span class="k">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span>
 
-@Serdeable
-class BookRecommendation(val name: String)</code></pre>
+<span class="nd">@Serdeable</span>
+<span class="kd">class</span> <span class="nc">BookRecommendation</span><span class="p">(</span><span class="kd">val</span> <span class="py">name</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
 </div>
@@ -763,9 +764,9 @@ class BookRecommendation(val name: String)</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">docker run --rm -it \
-        -p 5672:5672 \
-        -p 15672:15672 \
+<pre class="rouge highlight"><code data-lang="bash">docker run <span class="nt">--rm</span> <span class="nt">-it</span> <span class="se">\</span>
+        <span class="nt">-p</span> 5672:5672 <span class="se">\</span>
+        <span class="nt">-p</span> 15672:15672 <span class="se">\</span>
         rabbitmq:3.8.12-management</code></pre>
 </div>
 </div>
@@ -799,9 +800,9 @@ class BookRecommendation(val name: String)</code></pre>
 <div class="listingblock">
 <div class="title">bookinventory/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">8082 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">server</span><span class="pi">:</span>
+    <span class="na">port</span><span class="pi">:</span> <span class="s">8082</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -810,12 +811,12 @@ class BookRecommendation(val name: String)</code></pre>
 <div class="listingblock">
 <div class="title">bookinventory</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew run</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code>13:30:22.426 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 742ms. Server Running: 1 active message listeners.</code></pre>
+<pre class="rouge highlight"><code>13:30:22.426 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 742ms. Server Running: 1 active message listeners.</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -824,9 +825,9 @@ class BookRecommendation(val name: String)</code></pre>
 <div class="listingblock">
 <div class="title">bookcatalogue/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">8081 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">server</span><span class="pi">:</span>
+    <span class="na">port</span><span class="pi">:</span> <span class="s">8081</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -835,12 +836,12 @@ class BookRecommendation(val name: String)</code></pre>
 <div class="listingblock">
 <div class="title">bookcatalogue</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew run</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code>13:31:19.887 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 949ms. Server Running: 1 active message listeners.</code></pre>
+<pre class="rouge highlight"><code>13:31:19.887 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 949ms. Server Running: 1 active message listeners.</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -849,9 +850,9 @@ class BookRecommendation(val name: String)</code></pre>
 <div class="listingblock">
 <div class="title">bookrecommendation/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">8080 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">server</span><span class="pi">:</span>
+    <span class="na">port</span><span class="pi">:</span> <span class="s">8080</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -872,12 +873,12 @@ class BookRecommendation(val name: String)</code></pre>
 <div class="listingblock">
 <div class="title">bookrecommendation</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew run</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code>13:32:06.045 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 959ms. Server Running: http://localhost:8080</code></pre>
+<pre class="rouge highlight"><code>13:32:06.045 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 959ms. Server Running: http://localhost:8080</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -885,12 +886,12 @@ class BookRecommendation(val name: String)</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl http://localhost:8080/books</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/books</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">[{<span class="key"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Building Microservices</span><span class="delimiter">&quot;</span></span>}]</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">[{</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Building Microservices"</span><span class="p">}]</span></code></pre>
 </div>
 </div>
 </div>
@@ -924,7 +925,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">Java 21</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.5-graal</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.5-graal</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -939,7 +940,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">Java 21</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">sdk install java 21.0.2-graalce</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.2-graalce</code></pre>
 </div>
 </div>
 </div>
@@ -950,7 +951,7 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -962,14 +963,14 @@ Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">graalvmNative {
-    binaries {
-        main {
-            imageName.set(<span class="string"><span class="delimiter">'</span><span class="content">mn-graalvm-application</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-            buildArgs.add(<span class="string"><span class="delimiter">'</span><span class="content">-Ob</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-        }
-    }
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">graalvmNative</span> <span class="o">{</span>
+    <span class="n">binaries</span> <span class="o">{</span>
+        <span class="n">main</span> <span class="o">{</span>
+            <span class="n">imageName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s1">'mn-graalvm-application'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="n">buildArgs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s1">'-Ob'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

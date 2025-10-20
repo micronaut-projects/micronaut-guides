@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -229,7 +230,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.gateway --build=maven --lang=groovy</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.gateway <span class="nt">--build</span><span class="o">=</span>maven <span class="nt">--lang</span><span class="o">=</span>groovy</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -238,16 +239,16 @@
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-annotations<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-jwt<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.security<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-security-annotations<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.security<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-security-jwt<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -256,26 +257,26 @@
 <div class="listingblock">
 <div class="title">intermediate-gateway/src/main/groovy/example/micronaut/AuthenticationProviderUserPassword.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailureReason</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationFailureReason</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationResponse</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
 
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span>&lt;B&gt; <span class="directive">implements</span> HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
-    AuthenticationResponse authenticate(<span class="annotation">@Nullable</span> HttpRequest&lt;B&gt; httpRequest,
-                                        <span class="annotation">@NonNull</span> AuthenticationRequest&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; authenticationRequest) {
-        <span class="keyword">return</span> (authenticationRequest.identity == <span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span> || authenticationRequest.identity == <span class="string"><span class="delimiter">&quot;</span><span class="content">watson</span><span class="delimiter">&quot;</span></span>)  &amp;&amp; authenticationRequest.secret == <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>
-                ? AuthenticationResponse.success(authenticationRequest.getIdentity())
-                : AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
-    }
-}</code></pre>
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">AuthenticationProviderUserPassword</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">HttpRequestAuthenticationProvider</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="n">AuthenticationResponse</span> <span class="nf">authenticate</span><span class="o">(</span><span class="nd">@Nullable</span> <span class="n">HttpRequest</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="n">httpRequest</span><span class="o">,</span>
+                                        <span class="nd">@NonNull</span> <span class="n">AuthenticationRequest</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">authenticationRequest</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">authenticationRequest</span><span class="o">.</span><span class="na">identity</span> <span class="o">==</span> <span class="s2">"sherlock"</span> <span class="o">||</span> <span class="n">authenticationRequest</span><span class="o">.</span><span class="na">identity</span> <span class="o">==</span> <span class="s2">"watson"</span><span class="o">)</span>  <span class="o">&amp;&amp;</span> <span class="n">authenticationRequest</span><span class="o">.</span><span class="na">secret</span> <span class="o">==</span> <span class="s2">"password"</span>
+                <span class="o">?</span> <span class="n">AuthenticationResponse</span><span class="o">.</span><span class="na">success</span><span class="o">(</span><span class="n">authenticationRequest</span><span class="o">.</span><span class="na">getIdentity</span><span class="o">())</span>
+                <span class="o">:</span> <span class="n">AuthenticationResponse</span><span class="o">.</span><span class="na">failure</span><span class="o">(</span><span class="n">AuthenticationFailureReason</span><span class="o">.</span><span class="na">CREDENTIALS_DO_NOT_MATCH</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -296,36 +297,36 @@
 <div class="listingblock">
 <div class="title">intermediate-gateway/src/main/groovy/example/micronaut/UserController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Header</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Produces</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.annotation.Secured</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">TEXT_PLAIN</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">rules</span><span class="o">.</span><span class="na">SecurityRule</span><span class="o">.</span><span class="na">IS_AUTHENTICATED</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/user</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">UserController</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Controller</span><span class="o">(</span><span class="s1">'/user'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">UserController</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> UsernameFetcher usernameFetcher
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">UsernameFetcher</span> <span class="n">usernameFetcher</span>
 
-    UserController(UsernameFetcher usernameFetcher) {  <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="local-variable">this</span>.usernameFetcher = usernameFetcher
-    }
+    <span class="nf">UserController</span><span class="o">(</span><span class="n">UsernameFetcher</span> <span class="n">usernameFetcher</span><span class="o">)</span> <span class="o">{</span>  <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="k">this</span><span class="o">.</span><span class="na">usernameFetcher</span> <span class="o">=</span> <span class="n">usernameFetcher</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Secured</span>(IS_AUTHENTICATED)  <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@Produces</span>(TEXT_PLAIN) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="annotation">@Get</span><i class="conum" data-value="5"></i><b>(5)</b>
-    Mono&lt;<span class="predefined-type">String</span>&gt; index(<span class="annotation">@Header</span>(<span class="string"><span class="delimiter">'</span><span class="content">Authorization</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> authorization) {  <i class="conum" data-value="6"></i><b>(6)</b>
-        <span class="keyword">return</span> usernameFetcher.findUsername(authorization)
-    }
-}</code></pre>
+    <span class="nd">@Secured</span><span class="o">(</span><span class="n">IS_AUTHENTICATED</span><span class="o">)</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="n">TEXT_PLAIN</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Get</span><i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">index</span><span class="o">(</span><span class="nd">@Header</span><span class="o">(</span><span class="s1">'Authorization'</span><span class="o">)</span> <span class="n">String</span> <span class="n">authorization</span><span class="o">)</span> <span class="o">{</span>  <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="k">return</span> <span class="n">usernameFetcher</span><span class="o">.</span><span class="na">findUsername</span><span class="o">(</span><span class="n">authorization</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -362,14 +363,14 @@
 <div class="listingblock">
 <div class="title">intermediate-gateway/src/main/groovy/example/micronaut/UsernameFetcher.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Header</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="type">interface</span> UsernameFetcher {
-    Mono&lt;<span class="predefined-type">String</span>&gt; findUsername(<span class="annotation">@Header</span>(<span class="string"><span class="delimiter">'</span><span class="content">Authorization</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> authorization)
-}</code></pre>
+<span class="kd">interface</span> <span class="nc">UsernameFetcher</span> <span class="o">{</span>
+    <span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">findUsername</span><span class="o">(</span><span class="nd">@Header</span><span class="o">(</span><span class="s1">'Authorization'</span><span class="o">)</span> <span class="n">String</span> <span class="n">authorization</span><span class="o">)</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -378,27 +379,27 @@
 <div class="listingblock">
 <div class="title">intermediate-gateway/src/main/groovy/example/micronaut/UserEchoClient.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Consumes</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Header</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">context</span><span class="o">.</span><span class="na">env</span><span class="o">.</span><span class="na">Environment</span><span class="o">.</span><span class="na">TEST</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">TEXT_PLAIN</span>
 
-<span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">'</span><span class="content">userecho</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Requires</span>(notEnv = TEST) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">interface</span> UserEchoClient <span class="directive">extends</span> UsernameFetcher {
+<span class="nd">@Client</span><span class="o">(</span><span class="n">id</span> <span class="o">=</span> <span class="s1">'userecho'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Requires</span><span class="o">(</span><span class="n">notEnv</span> <span class="o">=</span> <span class="n">TEST</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">interface</span> <span class="nc">UserEchoClient</span> <span class="kd">extends</span> <span class="n">UsernameFetcher</span> <span class="o">{</span>
 
-    <span class="annotation">@Override</span>
-    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/user</span><span class="delimiter">'</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    Mono&lt;<span class="predefined-type">String</span>&gt; findUsername(<span class="annotation">@Header</span>(<span class="string"><span class="delimiter">'</span><span class="content">Authorization</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> authorization) <i class="conum" data-value="4"></i><b>(4)</b>
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="nd">@Consumes</span><span class="o">(</span><span class="n">TEXT_PLAIN</span><span class="o">)</span>
+    <span class="nd">@Get</span><span class="o">(</span><span class="s1">'/user'</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">findUsername</span><span class="o">(</span><span class="nd">@Header</span><span class="o">(</span><span class="s1">'Authorization'</span><span class="o">)</span> <span class="n">String</span> <span class="n">authorization</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -439,12 +440,12 @@
 <div class="listingblock">
 <div class="title">intermediate-gateway/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">http</span>:
-    <span class="key">services</span>:
-      <span class="key">userecho</span>: <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="key">urls</span>:
-          - <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:8081</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">services</span><span class="pi">:</span>
+      <span class="na">userecho</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="na">urls</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s2">"</span><span class="s">http://localhost:8081"</span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -465,15 +466,15 @@
 <div class="listingblock">
 <div class="title">intermediate-gateway/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">security</span>:
-    <span class="key">authentication</span>: <span class="string"><span class="content">bearer </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="key">token</span>:
-      <span class="key">jwt</span>:
-        <span class="key">signatures</span>:
-          <span class="key">secret</span>:
-            <span class="key">generator</span>: <i class="conum" data-value="2"></i><b>(2)</b>
-              <span class="key">secret</span>: <span class="string"><span class="content">'&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;' </span></span><i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">security</span><span class="pi">:</span>
+    <span class="na">authentication</span><span class="pi">:</span> <span class="s">bearer</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="na">token</span><span class="pi">:</span>
+      <span class="na">jwt</span><span class="pi">:</span>
+        <span class="na">signatures</span><span class="pi">:</span>
+          <span class="na">secret</span><span class="pi">:</span>
+            <span class="na">generator</span><span class="pi">:</span> <i class="conum" data-value="2"></i><b>(2)</b>
+              <span class="na">secret</span><span class="pi">:</span> <span class="s1">'</span><span class="s">"${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"'</span> <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -500,26 +501,26 @@
 <div class="listingblock">
 <div class="title">intermediate-gateway/src/test/groovy/example/micronaut/UserEchoClientReplacement.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Header</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">context</span><span class="o">.</span><span class="na">env</span><span class="o">.</span><span class="na">Environment</span><span class="o">.</span><span class="na">TEST</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Requires</span>(env = TEST)
-<span class="annotation">@Singleton</span>
-<span class="type">class</span> <span class="class">UserEchoClientReplacement</span> <span class="directive">implements</span> UsernameFetcher {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Requires</span><span class="o">(</span><span class="n">env</span> <span class="o">=</span> <span class="n">TEST</span><span class="o">)</span>
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">UserEchoClientReplacement</span> <span class="kd">implements</span> <span class="n">UsernameFetcher</span> <span class="o">{</span>
 
-    <span class="annotation">@Override</span>
-    Mono&lt;<span class="predefined-type">String</span>&gt; findUsername(<span class="annotation">@Header</span>(<span class="string"><span class="delimiter">'</span><span class="content">Authorization</span><span class="delimiter">'</span></span>) <span class="predefined-type">String</span> authorization) {
-        <span class="keyword">return</span> Mono.just(<span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>)
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">findUsername</span><span class="o">(</span><span class="nd">@Header</span><span class="o">(</span><span class="s1">'Authorization'</span><span class="o">)</span> <span class="n">String</span> <span class="n">authorization</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Mono</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="s1">'sherlock'</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -528,50 +529,50 @@
 <div class="listingblock">
 <div class="title">intermediate-gateway/src/test/groovy/example/micronaut/UserControllerSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNAUTHORIZED</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">UNAUTHORIZED</span>
 
-<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">UserControllerSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">UserControllerSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
-    HttpClient client <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s1">'/'</span><span class="o">)</span>
+    <span class="n">HttpClient</span> <span class="n">client</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="type">void</span> testUserEndpointIsSecured() { <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="key">when</span>:
-        client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/user</span><span class="delimiter">'</span></span>))
+    <span class="kt">void</span> <span class="nf">testUserEndpointIsSecured</span><span class="o">()</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="nl">when:</span>
+        <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span><span class="n">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="s1">'/user'</span><span class="o">))</span>
 
-        <span class="key">then</span>:
-        HttpClientResponseException e = thrown()
-        UNAUTHORIZED == e.response.status
-    }
+        <span class="nl">then:</span>
+        <span class="n">HttpClientResponseException</span> <span class="n">e</span> <span class="o">=</span> <span class="n">thrown</span><span class="o">()</span>
+        <span class="n">UNAUTHORIZED</span> <span class="o">==</span> <span class="n">e</span><span class="o">.</span><span class="na">response</span><span class="o">.</span><span class="na">status</span>
+    <span class="o">}</span>
 
-    <span class="type">void</span> testAuthenticatedCanFetchUsername() {
-        <span class="key">when</span>:
-        UsernamePasswordCredentials credentials = <span class="keyword">new</span> UsernamePasswordCredentials(<span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">password</span><span class="delimiter">'</span></span>)
-        HttpRequest&lt;?&gt; request = HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/login</span><span class="delimiter">'</span></span>, credentials)
+    <span class="kt">void</span> <span class="nf">testAuthenticatedCanFetchUsername</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">UsernamePasswordCredentials</span> <span class="n">credentials</span> <span class="o">=</span> <span class="k">new</span> <span class="n">UsernamePasswordCredentials</span><span class="o">(</span><span class="s1">'sherlock'</span><span class="o">,</span> <span class="s1">'password'</span><span class="o">)</span>
+        <span class="n">HttpRequest</span><span class="o">&lt;?&gt;</span> <span class="n">request</span> <span class="o">=</span> <span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s1">'/login'</span><span class="o">,</span> <span class="n">credentials</span><span class="o">)</span>
 
-        BearerAccessRefreshToken bearerAccessRefreshToken = client.toBlocking().retrieve(request, BearerAccessRefreshToken)
+        <span class="n">BearerAccessRefreshToken</span> <span class="n">bearerAccessRefreshToken</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">retrieve</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">BearerAccessRefreshToken</span><span class="o">)</span>
 
-        <span class="predefined-type">String</span> username = client.toBlocking().retrieve(HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/user</span><span class="delimiter">'</span></span>)
-                .header(<span class="string"><span class="delimiter">'</span><span class="content">Authorization</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Bearer </span><span class="delimiter">'</span></span> + bearerAccessRefreshToken.getAccessToken()), <span class="predefined-type">String</span>)
+        <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">retrieve</span><span class="o">(</span><span class="n">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="s1">'/user'</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">header</span><span class="o">(</span><span class="s1">'Authorization'</span><span class="o">,</span> <span class="s1">'Bearer '</span> <span class="o">+</span> <span class="n">bearerAccessRefreshToken</span><span class="o">.</span><span class="na">getAccessToken</span><span class="o">()),</span> <span class="n">String</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span> == username
-    }
-}</code></pre>
+        <span class="nl">then:</span>
+        <span class="s1">'sherlock'</span> <span class="o">==</span> <span class="n">username</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -599,7 +600,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.userecho --build=maven --lang=groovy</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.userecho <span class="nt">--build</span><span class="o">=</span>maven <span class="nt">--lang</span><span class="o">=</span>groovy</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -608,16 +609,16 @@
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-annotations<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.security<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-security-jwt<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.security<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-security-annotations<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.security<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-security-jwt<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -626,30 +627,30 @@
 <div class="listingblock">
 <div class="title">intermediate-userecho/src/main/groovy/example/micronaut/UserController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Produces</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.annotation.Secured</span>
 
-<span class="keyword">import</span> <span class="include">java.security.Principal</span>
+<span class="kn">import</span> <span class="nn">java.security.Principal</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">TEXT_PLAIN</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">rules</span><span class="o">.</span><span class="na">SecurityRule</span><span class="o">.</span><span class="na">IS_AUTHENTICATED</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/user</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">UserController</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Controller</span><span class="o">(</span><span class="s1">'/user'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">UserController</span> <span class="o">{</span>
 
-    <span class="annotation">@Secured</span>(IS_AUTHENTICATED) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="annotation">@Produces</span>(TEXT_PLAIN) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@Get</span><i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="predefined-type">String</span> index(<span class="predefined-type">Principal</span> principal) { <i class="conum" data-value="5"></i><b>(5)</b>
-        <span class="keyword">return</span> principal.name
-    }
-}</code></pre>
+    <span class="nd">@Secured</span><span class="o">(</span><span class="n">IS_AUTHENTICATED</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="n">TEXT_PLAIN</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Get</span><i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="n">String</span> <span class="nf">index</span><span class="o">(</span><span class="n">Principal</span> <span class="n">principal</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="k">return</span> <span class="n">principal</span><span class="o">.</span><span class="na">name</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -682,9 +683,9 @@
 <div class="listingblock">
 <div class="title">intermediate-userecho/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">server</span>:
-    <span class="key">port</span>: <span class="string"><span class="content">8081 </span></span><i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">server</span><span class="pi">:</span>
+    <span class="na">port</span><span class="pi">:</span> <span class="s">8081</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -701,14 +702,14 @@
 <div class="listingblock">
 <div class="title">intermediate-userecho/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">security</span>:
-    <span class="key">token</span>:
-      <span class="key">jwt</span>:
-        <span class="key">signatures</span>:
-          <span class="key">secret</span>:
-            <span class="key">validation</span>: <i class="conum" data-value="1"></i><b>(1)</b>
-              <span class="key">secret</span>: <span class="string"><span class="content">'&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;' </span></span><i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">security</span><span class="pi">:</span>
+    <span class="na">token</span><span class="pi">:</span>
+      <span class="na">jwt</span><span class="pi">:</span>
+        <span class="na">signatures</span><span class="pi">:</span>
+          <span class="na">secret</span><span class="pi">:</span>
+            <span class="na">validation</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
+              <span class="na">secret</span><span class="pi">:</span> <span class="s1">'</span><span class="s">"${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"'</span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -737,12 +738,12 @@ In an application with several controllers and declarative clients, it can lead 
 <div class="listingblock">
 <div class="title">gateway/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">security</span>:
-    <span class="key">token</span>:
-      <span class="key">propagation</span>:
-        <span class="key">enabled</span>: <span class="string"><span class="content">true </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="key">service-id-regex</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">userecho</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">security</span><span class="pi">:</span>
+    <span class="na">token</span><span class="pi">:</span>
+      <span class="na">propagation</span><span class="pi">:</span>
+        <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="na">service-id-regex</span><span class="pi">:</span> <span class="s2">"</span><span class="s">userecho"</span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -766,35 +767,35 @@ In an application with several controllers and declarative clients, it can lead 
 <div class="listingblock">
 <div class="title">gateway/src/main/groovy/example/micronaut/UserController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Produces</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.annotation.Secured</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.rules.SecurityRule.IS_AUTHENTICATED</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">TEXT_PLAIN</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">rules</span><span class="o">.</span><span class="na">SecurityRule</span><span class="o">.</span><span class="na">IS_AUTHENTICATED</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">'</span><span class="content">/user</span><span class="delimiter">'</span></span>)
-<span class="type">class</span> <span class="class">UserController</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Controller</span><span class="o">(</span><span class="s1">'/user'</span><span class="o">)</span>
+<span class="kd">class</span> <span class="nc">UserController</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> UsernameFetcher usernameFetcher
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">UsernameFetcher</span> <span class="n">usernameFetcher</span>
 
-    UserController(UsernameFetcher usernameFetcher) {
-        <span class="local-variable">this</span>.usernameFetcher = usernameFetcher
-    }
+    <span class="nf">UserController</span><span class="o">(</span><span class="n">UsernameFetcher</span> <span class="n">usernameFetcher</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">usernameFetcher</span> <span class="o">=</span> <span class="n">usernameFetcher</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Secured</span>(IS_AUTHENTICATED)
-    <span class="annotation">@Produces</span>(TEXT_PLAIN)
-    <span class="annotation">@Get</span>
-    Mono&lt;<span class="predefined-type">String</span>&gt; index() {
-        <span class="keyword">return</span> usernameFetcher.findUsername()
-    }
-}</code></pre>
+    <span class="nd">@Secured</span><span class="o">(</span><span class="n">IS_AUTHENTICATED</span><span class="o">)</span>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="n">TEXT_PLAIN</span><span class="o">)</span>
+    <span class="nd">@Get</span>
+    <span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">index</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">usernameFetcher</span><span class="o">.</span><span class="na">findUsername</span><span class="o">()</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -803,13 +804,13 @@ In an application with several controllers and declarative clients, it can lead 
 <div class="listingblock">
 <div class="title">gateway/src/main/groovy/example/micronaut/UsernameFetcher.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="type">interface</span> UsernameFetcher {
-    Mono&lt;<span class="predefined-type">String</span>&gt; findUsername()
-}</code></pre>
+<span class="kd">interface</span> <span class="nc">UsernameFetcher</span> <span class="o">{</span>
+    <span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">findUsername</span><span class="o">()</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -818,25 +819,25 @@ In an application with several controllers and declarative clients, it can lead 
 <div class="listingblock">
 <div class="title">gateway/src/main/groovy/example/micronaut/UserEchoClient.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Consumes</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">context</span><span class="o">.</span><span class="na">env</span><span class="o">.</span><span class="na">Environment</span><span class="o">.</span><span class="na">TEST</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">TEXT_PLAIN</span>
 
-<span class="annotation">@Client</span>(id = <span class="string"><span class="delimiter">'</span><span class="content">userecho</span><span class="delimiter">'</span></span>)
-<span class="annotation">@Requires</span>(notEnv = TEST)
-<span class="type">interface</span> UserEchoClient <span class="directive">extends</span> UsernameFetcher {
+<span class="nd">@Client</span><span class="o">(</span><span class="n">id</span> <span class="o">=</span> <span class="s1">'userecho'</span><span class="o">)</span>
+<span class="nd">@Requires</span><span class="o">(</span><span class="n">notEnv</span> <span class="o">=</span> <span class="n">TEST</span><span class="o">)</span>
+<span class="kd">interface</span> <span class="nc">UserEchoClient</span> <span class="kd">extends</span> <span class="n">UsernameFetcher</span> <span class="o">{</span>
 
-    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">'</span><span class="content">/user</span><span class="delimiter">'</span></span>)
-    Mono&lt;<span class="predefined-type">String</span>&gt; findUsername()
-}</code></pre>
+    <span class="nd">@Consumes</span><span class="o">(</span><span class="n">TEXT_PLAIN</span><span class="o">)</span>
+    <span class="nd">@Get</span><span class="o">(</span><span class="s1">'/user'</span><span class="o">)</span>
+    <span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">findUsername</span><span class="o">()</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -845,25 +846,25 @@ In an application with several controllers and declarative clients, it can lead 
 <div class="listingblock">
 <div class="title">gateway/src/test/groovy/example/micronaut/UserEchoClientReplacement.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Mono</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.context.env.Environment.TEST</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">context</span><span class="o">.</span><span class="na">env</span><span class="o">.</span><span class="na">Environment</span><span class="o">.</span><span class="na">TEST</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Requires</span>(env = TEST)
-<span class="annotation">@Singleton</span>
-<span class="type">class</span> <span class="class">UserEchoClientReplacement</span> <span class="directive">implements</span> UsernameFetcher {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Requires</span><span class="o">(</span><span class="n">env</span> <span class="o">=</span> <span class="n">TEST</span><span class="o">)</span>
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">UserEchoClientReplacement</span> <span class="kd">implements</span> <span class="n">UsernameFetcher</span> <span class="o">{</span>
 
-    <span class="annotation">@Override</span>
-    Mono&lt;<span class="predefined-type">String</span>&gt; findUsername() {
-        <span class="keyword">return</span> Mono.just(<span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>)
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">findUsername</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Mono</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="s1">'sherlock'</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 </div>
@@ -878,23 +879,23 @@ In an application with several controllers and declarative clients, it can lead 
 <div class="listingblock">
 <div class="title">userecho</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw mn:run</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./mvnw mn:run</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code>18:29:26.500 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 671ms. Server Running: http://localhost:8081</code></pre>
+<pre class="rouge highlight"><code>18:29:26.500 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 671ms. Server Running: http://localhost:8081</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">gateway</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw mn:run</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./mvnw mn:run</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code>18:28:35.723 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 707ms. Server Running: http://localhost:8080</code></pre>
+<pre class="rouge highlight"><code>18:28:35.723 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 707ms. Server Running: http://localhost:8080</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -902,14 +903,14 @@ In an application with several controllers and declarative clients, it can lead 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/login&quot; \
-     -H 'Content-Type: application/json; charset=utf-8' \
-     -d $'{&quot;username&quot;: &quot;sherlock&quot;, &quot;password&quot;: &quot;password&quot;}'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-X</span> <span class="s2">"POST"</span> <span class="s2">"http://localhost:8080/login"</span> <span class="se">\</span>
+     <span class="nt">-H</span> <span class="s1">'Content-Type: application/json; charset=utf-8'</span> <span class="se">\</span>
+     <span class="nt">-d</span> <span class="s1">$'{"username": "sherlock", "password": "password"}'</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">access_token</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNTkxMDM3Nywicm9sZXMiOltdLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNjE1OTEzOTc3LCJpYXQiOjE2MTU5MTAzNzd9.nWoaNq9YzRzYKDBvDw_QaiUyVyIoc6rHCW_vLfnrtQ8</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">token_type</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Bearer</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">expires_in</span><span class="delimiter">&quot;</span></span>:<span class="integer">3600</span>}</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="nl">"username"</span><span class="p">:</span><span class="s2">"sherlock"</span><span class="p">,</span><span class="nl">"access_token"</span><span class="p">:</span><span class="s2">"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNTkxMDM3Nywicm9sZXMiOltdLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNjE1OTEzOTc3LCJpYXQiOjE2MTU5MTAzNzd9.nWoaNq9YzRzYKDBvDw_QaiUyVyIoc6rHCW_vLfnrtQ8"</span><span class="p">,</span><span class="nl">"token_type"</span><span class="p">:</span><span class="s2">"Bearer"</span><span class="p">,</span><span class="nl">"expires_in"</span><span class="p">:</span><span class="mi">3600</span><span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -917,12 +918,12 @@ In an application with several controllers and declarative clients, it can lead 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://localhost:8080/user&quot; -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNTkxMDM3Nywicm9sZXMiOltdLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNjE1OTEzOTc3LCJpYXQiOjE2MTU5MTAzNzd9.nWoaNq9YzRzYKDBvDw_QaiUyVyIoc6rHCW_vLfnrtQ8'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="s2">"http://localhost:8080/user"</span> <span class="nt">-H</span> <span class="s1">'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNTkxMDM3Nywicm9sZXMiOltdLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNjE1OTEzOTc3LCJpYXQiOjE2MTU5MTAzNzd9.nWoaNq9YzRzYKDBvDw_QaiUyVyIoc6rHCW_vLfnrtQ8'</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code>sherlock</code></pre>
+<pre class="rouge highlight"><code>sherlock</code></pre>
 </div>
 </div>
 </div>

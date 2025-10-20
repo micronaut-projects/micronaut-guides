@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -249,10 +250,10 @@ which we can use for asserting the expectations of an asynchronous process flow.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=assertj,data-jpa,kafka,testcontainers,kafka,mysql,awaitility \
-    --build=maven \
-    --lang=java</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>assertj,data-jpa,kafka,testcontainers,kafka,mysql,awaitility <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -302,21 +303,21 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>kafka<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>kafka<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>org.testcontainers<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>mysql<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>mysql<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 </div>
@@ -330,11 +331,11 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">testcontainers/src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties">datasources.default.db-type=mysql
-datasources.default.dialect=MYSQL
-jpa.default.properties.hibernate.hbm2ddl.auto=update
-jpa.default.entity-scan.packages=example.micronaut
-datasources.default.driver-class-name=com.mysql.cj.jdbc.Driver</code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">datasources.default.db-type</span><span class="p">=</span><span class="s">mysql</span>
+<span class="py">datasources.default.dialect</span><span class="p">=</span><span class="s">MYSQL</span>
+<span class="py">jpa.default.properties.hibernate.hbm2ddl.auto</span><span class="p">=</span><span class="s">update</span>
+<span class="py">jpa.default.entity-scan.packages</span><span class="p">=</span><span class="s">example.micronaut</span>
+<span class="py">datasources.default.driver-class-name</span><span class="p">=</span><span class="s">com.mysql.cj.jdbc.Driver</span></code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -370,75 +371,75 @@ and update the price of that product in the MySQL database.</p>
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/Product.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.persistence.Column</span>;
-<span class="keyword">import</span> <span class="include">jakarta.persistence.Entity</span>;
-<span class="keyword">import</span> <span class="include">jakarta.persistence.GeneratedValue</span>;
-<span class="keyword">import</span> <span class="include">jakarta.persistence.GenerationType</span>;
-<span class="keyword">import</span> <span class="include">jakarta.persistence.Id</span>;
-<span class="keyword">import</span> <span class="include">jakarta.persistence.Table</span>;
+<span class="kn">import</span> <span class="nn">jakarta.persistence.Column</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.persistence.Entity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.persistence.GeneratedValue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.persistence.GenerationType</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.persistence.Id</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.persistence.Table</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
 
-<span class="annotation">@Entity</span>
-<span class="annotation">@Table</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">products</span><span class="delimiter">&quot;</span></span>)
-<span class="directive">public</span> <span class="type">class</span> <span class="class">Product</span> {
+<span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"products"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Product</span> <span class="o">{</span>
 
-    <span class="annotation">@Id</span>
-    <span class="annotation">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
-    <span class="directive">private</span> <span class="predefined-type">Long</span> id;
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
 
-    <span class="annotation">@Column</span>(nullable = <span class="predefined-constant">false</span>, unique = <span class="predefined-constant">true</span>)
-    <span class="directive">private</span> <span class="predefined-type">String</span> code;
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">code</span><span class="o">;</span>
 
-    <span class="annotation">@Column</span>(nullable = <span class="predefined-constant">false</span>)
-    <span class="directive">private</span> <span class="predefined-type">String</span> name;
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
 
-    <span class="annotation">@Column</span>(nullable = <span class="predefined-constant">false</span>)
-    <span class="directive">private</span> <span class="predefined-type">BigDecimal</span> price;
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">BigDecimal</span> <span class="n">price</span><span class="o">;</span>
 
-    <span class="directive">public</span> Product() {}
+    <span class="kd">public</span> <span class="nf">Product</span><span class="o">()</span> <span class="o">{}</span>
 
-    <span class="directive">public</span> Product(<span class="predefined-type">Long</span> id, <span class="predefined-type">String</span> code, <span class="predefined-type">String</span> name, <span class="predefined-type">BigDecimal</span> price) {
-        <span class="local-variable">this</span>.id = id;
-        <span class="local-variable">this</span>.code = code;
-        <span class="local-variable">this</span>.name = name;
-        <span class="local-variable">this</span>.price = price;
-    }
+    <span class="kd">public</span> <span class="nf">Product</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">,</span> <span class="nc">String</span> <span class="n">code</span><span class="o">,</span> <span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="nc">BigDecimal</span> <span class="n">price</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">code</span> <span class="o">=</span> <span class="n">code</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">price</span> <span class="o">=</span> <span class="n">price</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="predefined-type">Long</span> getId() {
-        <span class="keyword">return</span> id;
-    }
+    <span class="kd">public</span> <span class="nc">Long</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="type">void</span> setId(<span class="predefined-type">Long</span> id) {
-        <span class="local-variable">this</span>.id = id;
-    }
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="predefined-type">String</span> getCode() {
-        <span class="keyword">return</span> code;
-    }
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">code</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="type">void</span> setCode(<span class="predefined-type">String</span> code) {
-        <span class="local-variable">this</span>.code = code;
-    }
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCode</span><span class="o">(</span><span class="nc">String</span> <span class="n">code</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">code</span> <span class="o">=</span> <span class="n">code</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="predefined-type">String</span> getName() {
-        <span class="keyword">return</span> name;
-    }
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="type">void</span> setName(<span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name;
-    }
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="predefined-type">BigDecimal</span> getPrice() {
-        <span class="keyword">return</span> price;
-    }
+    <span class="kd">public</span> <span class="nc">BigDecimal</span> <span class="nf">getPrice</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">price</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="type">void</span> setPrice(<span class="predefined-type">BigDecimal</span> price) {
-        <span class="local-variable">this</span>.price = price;
-    }
-}</code></pre>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPrice</span><span class="o">(</span><span class="nc">BigDecimal</span> <span class="n">price</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">price</span> <span class="o">=</span> <span class="n">price</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 </div>
@@ -453,23 +454,23 @@ add methods to find a product for a given code and update the price for the give
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/ProductRepository.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Query</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Repository</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.data.jpa.repository.JpaRepository</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Query</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Repository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jpa.repository.JpaRepository</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
 
-<span class="annotation">@Repository</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">interface</span> <span class="class">ProductRepository</span> <span class="directive">extends</span> JpaRepository&lt;Product, <span class="predefined-type">Long</span>&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Repository</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ProductRepository</span> <span class="kd">extends</span> <span class="nc">JpaRepository</span><span class="o">&lt;</span><span class="nc">Product</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    Optional&lt;Product&gt; findByCode(<span class="predefined-type">String</span> code);
+    <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Product</span><span class="o">&gt;</span> <span class="nf">findByCode</span><span class="o">(</span><span class="nc">String</span> <span class="n">code</span><span class="o">);</span>
 
-    <span class="annotation">@Query</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">update Product p set p.price = :price where p.code = :productCode</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="type">void</span> updateProductPrice(<span class="predefined-type">String</span> productCode, <span class="predefined-type">BigDecimal</span> price);
-}</code></pre>
+    <span class="nd">@Query</span><span class="o">(</span><span class="s">"update Product p set p.price = :price where p.code = :productCode"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="kt">void</span> <span class="nf">updateProductPrice</span><span class="o">(</span><span class="nc">String</span> <span class="n">productCode</span><span class="o">,</span> <span class="nc">BigDecimal</span> <span class="n">price</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -500,14 +501,14 @@ that we are going to receive from the Kafka topic.</p>
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/ProductPriceChangedEvent.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.serde.annotation.Serdeable</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
 
-<span class="annotation">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> record ProductPriceChangedEvent(<span class="predefined-type">String</span> productCode, <span class="predefined-type">BigDecimal</span> price) {}</code></pre>
+<span class="nd">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">ProductPriceChangedEvent</span><span class="o">(</span><span class="nc">String</span> <span class="n">productCode</span><span class="o">,</span> <span class="nc">BigDecimal</span> <span class="n">price</span><span class="o">)</span> <span class="o">{}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -533,36 +534,36 @@ and updates the product price in the database.</p>
 <div class="listingblock">
 <div class="title">testcontainers/src/main/java/example/micronaut/ProductPriceChangedEventHandler.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.KafkaListener</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.Topic</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
-<span class="keyword">import</span> <span class="include">jakarta.transaction.Transactional</span>;
-<span class="keyword">import</span> <span class="include">org.slf4j.Logger</span>;
-<span class="keyword">import</span> <span class="include">org.slf4j.LoggerFactory</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.kafka.annotation.KafkaListener</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.kafka.annotation.Topic</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.transaction.Transactional</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">configuration</span><span class="o">.</span><span class="na">kafka</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">OffsetReset</span><span class="o">.</span><span class="na">EARLIEST</span><span class="o">;</span>
 
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Transactional</span> <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">ProductPriceChangedEventHandler</span> {
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Transactional</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">ProductPriceChangedEventHandler</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Logger</span> LOG = LoggerFactory.getLogger(ProductPriceChangedEventHandler.class);
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="no">LOG</span> <span class="o">=</span> <span class="nc">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">ProductPriceChangedEventHandler</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> ProductRepository productRepository;
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">ProductRepository</span> <span class="n">productRepository</span><span class="o">;</span>
 
-    ProductPriceChangedEventHandler(ProductRepository productRepository) { <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="local-variable">this</span>.productRepository = productRepository;
-    }
+    <span class="nc">ProductPriceChangedEventHandler</span><span class="o">(</span><span class="nc">ProductRepository</span> <span class="n">productRepository</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="k">this</span><span class="o">.</span><span class="na">productRepository</span> <span class="o">=</span> <span class="n">productRepository</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">product-price-changes</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="annotation">@KafkaListener</span>(offsetReset = EARLIEST, groupId = <span class="string"><span class="delimiter">&quot;</span><span class="content">demo</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
-    <span class="directive">public</span> <span class="type">void</span> handle(ProductPriceChangedEvent event) {
-        LOG.info(<span class="string"><span class="delimiter">&quot;</span><span class="content">Received a ProductPriceChangedEvent with productCode:{}: </span><span class="delimiter">&quot;</span></span>, event.productCode());
-        productRepository.updateProductPrice(event.productCode(), event.price());
-    }
-}</code></pre>
+    <span class="nd">@Topic</span><span class="o">(</span><span class="s">"product-price-changes"</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@KafkaListener</span><span class="o">(</span><span class="n">offsetReset</span> <span class="o">=</span> <span class="no">EARLIEST</span><span class="o">,</span> <span class="n">groupId</span> <span class="o">=</span> <span class="s">"demo"</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handle</span><span class="o">(</span><span class="nc">ProductPriceChangedEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+        <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Received a ProductPriceChangedEvent with productCode:{}: "</span><span class="o">,</span> <span class="n">event</span><span class="o">.</span><span class="na">productCode</span><span class="o">());</span>
+        <span class="n">productRepository</span><span class="o">.</span><span class="na">updateProductPrice</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">productCode</span><span class="o">(),</span> <span class="n">event</span><span class="o">.</span><span class="na">price</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -594,10 +595,10 @@ and updates the product price in the database.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{
-    <span class="key"><span class="delimiter">&quot;</span><span class="content">productCode</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>,
-    <span class="key"><span class="delimiter">&quot;</span><span class="content">price</span><span class="delimiter">&quot;</span></span>: <span class="float">25.00</span>
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+    </span><span class="nl">"productCode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"P100"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="mf">25.00</span><span class="w">
+</span><span class="p">}</span></code></pre>
 </div>
 </div>
 </div>
@@ -621,19 +622,19 @@ and configure the Micronaut context to talk to them.</p>
 <div class="listingblock">
 <div class="title">testcontainers/src/test/java/example/micronaut/ProductPriceChangesClient.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.KafkaClient</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.KafkaKey</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.kafka.annotation.Topic</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.kafka.annotation.KafkaClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.kafka.annotation.KafkaKey</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.kafka.annotation.Topic</span><span class="o">;</span>
 
-<span class="annotation">@KafkaClient</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="directive">public</span> <span class="type">interface</span> <span class="class">ProductPriceChangesClient</span> {
+<span class="nd">@KafkaClient</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ProductPriceChangesClient</span> <span class="o">{</span>
 
-    <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">product-price-changes</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="type">void</span> send(<span class="annotation">@KafkaKey</span> <span class="predefined-type">String</span> productCode, <i class="conum" data-value="3"></i><b>(3)</b>
-              ProductPriceChangedEvent event);
-}</code></pre>
+    <span class="nd">@Topic</span><span class="o">(</span><span class="s">"product-price-changes"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kt">void</span> <span class="nf">send</span><span class="o">(</span><span class="nd">@KafkaKey</span> <span class="nc">String</span> <span class="n">productCode</span><span class="o">,</span> <i class="conum" data-value="3"></i><b>(3)</b>
+              <span class="nc">ProductPriceChangedEvent</span> <span class="n">event</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -659,77 +660,77 @@ and configure the application to talk to them as follows:</p>
 <div class="listingblock">
 <div class="title">testcontainers/src/test/java/example/micronaut/ProductPriceChangedEventHandlerTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.test.support.TestPropertyProvider</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.TestInstance</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.kafka.KafkaContainer</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.junit.jupiter.Container</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.junit.jupiter.Testcontainers</span>;
-<span class="keyword">import</span> <span class="include">org.testcontainers.utility.DockerImageName</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Property</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.support.TestPropertyProvider</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.TestInstance</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.kafka.KafkaContainer</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.junit.jupiter.Container</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.junit.jupiter.Testcontainers</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.utility.DockerImageName</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
-<span class="keyword">import</span> <span class="include">java.time.Duration</span>;
-<span class="keyword">import</span> <span class="include">java.util.Collections</span>;
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.time.Duration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">java.util.concurrent.TimeUnit.SECONDS</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.assertj.core.api.Assertions.assertThat</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.awaitility.Awaitility.await</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">concurrent</span><span class="o">.</span><span class="na">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">assertj</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">awaitility</span><span class="o">.</span><span class="na">Awaitility</span><span class="o">.</span><span class="na">await</span><span class="o">;</span>
 
-<span class="annotation">@MicronautTest</span>(transactional = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">datasources.default.driver-class-name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">org.testcontainers.jdbc.ContainerDatabaseDriver</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">datasources.default.url</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">jdbc:tc:mysql:8:///db</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-<span class="annotation">@Testcontainers</span>(disabledWithoutDocker = <span class="predefined-constant">true</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-<span class="annotation">@TestInstance</span>(TestInstance.Lifecycle.PER_CLASS) <i class="conum" data-value="5"></i><b>(5)</b>
-<span class="type">class</span> <span class="class">ProductPriceChangedEventHandlerTest</span> <span class="directive">implements</span> TestPropertyProvider {  <i class="conum" data-value="6"></i><b>(6)</b>
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">transactional</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"datasources.default.driver-class-name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"org.testcontainers.jdbc.ContainerDatabaseDriver"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"datasources.default.url"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"jdbc:tc:mysql:8:///db"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="nd">@Testcontainers</span><span class="o">(</span><span class="n">disabledWithoutDocker</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="nd">@TestInstance</span><span class="o">(</span><span class="nc">TestInstance</span><span class="o">.</span><span class="na">Lifecycle</span><span class="o">.</span><span class="na">PER_CLASS</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+<span class="kd">class</span> <span class="nc">ProductPriceChangedEventHandlerTest</span> <span class="kd">implements</span> <span class="nc">TestPropertyProvider</span> <span class="o">{</span>  <i class="conum" data-value="6"></i><b>(6)</b>
 
-    <span class="annotation">@Container</span> <i class="conum" data-value="7"></i><b>(7)</b>
-    <span class="directive">static</span> <span class="directive">final</span> KafkaContainer kafka = <span class="keyword">new</span> KafkaContainer(
-            DockerImageName.parse(<span class="string"><span class="delimiter">&quot;</span><span class="content">apache/kafka:latest</span><span class="delimiter">&quot;</span></span>)
-    );
+    <span class="nd">@Container</span> <i class="conum" data-value="7"></i><b>(7)</b>
+    <span class="kd">static</span> <span class="kd">final</span> <span class="nc">KafkaContainer</span> <span class="n">kafka</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">KafkaContainer</span><span class="o">(</span>
+            <span class="nc">DockerImageName</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"apache/kafka:latest"</span><span class="o">)</span>
+    <span class="o">);</span>
 
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="annotation">@NonNull</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; getProperties() {  <i class="conum" data-value="6"></i><b>(6)</b>
-        <span class="keyword">if</span> (!kafka.isRunning()) {
-            kafka.start();
-        }
-        <span class="keyword">return</span> <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">&quot;</span><span class="content">kafka.bootstrap.servers</span><span class="delimiter">&quot;</span></span>, kafka.getBootstrapServers());
-    }
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nd">@NonNull</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getProperties</span><span class="o">()</span> <span class="o">{</span>  <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">kafka</span><span class="o">.</span><span class="na">isRunning</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">kafka</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"kafka.bootstrap.servers"</span><span class="o">,</span> <span class="n">kafka</span><span class="o">.</span><span class="na">getBootstrapServers</span><span class="o">());</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> shouldHandleProductPriceChangedEvent(
-            ProductPriceChangesClient productPriceChangesClient,
-            ProductRepository productRepository
-    ) {
-        Product product = <span class="keyword">new</span> Product(<span class="predefined-constant">null</span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Product One</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">BigDecimal</span>.TEN);
-        <span class="predefined-type">Long</span> id = productRepository.save(product).getId(); <i class="conum" data-value="8"></i><b>(8)</b>
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldHandleProductPriceChangedEvent</span><span class="o">(</span>
+            <span class="nc">ProductPriceChangesClient</span> <span class="n">productPriceChangesClient</span><span class="o">,</span>
+            <span class="nc">ProductRepository</span> <span class="n">productRepository</span>
+    <span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Product</span> <span class="n">product</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Product</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="s">"P100"</span><span class="o">,</span> <span class="s">"Product One"</span><span class="o">,</span> <span class="nc">BigDecimal</span><span class="o">.</span><span class="na">TEN</span><span class="o">);</span>
+        <span class="nc">Long</span> <span class="n">id</span> <span class="o">=</span> <span class="n">productRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">product</span><span class="o">).</span><span class="na">getId</span><span class="o">();</span> <i class="conum" data-value="8"></i><b>(8)</b>
 
-        ProductPriceChangedEvent event = <span class="keyword">new</span> ProductPriceChangedEvent(
-                <span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>,
-                <span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">14.50</span><span class="delimiter">&quot;</span></span>)
-        );
+        <span class="nc">ProductPriceChangedEvent</span> <span class="n">event</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ProductPriceChangedEvent</span><span class="o">(</span>
+                <span class="s">"P100"</span><span class="o">,</span>
+                <span class="k">new</span> <span class="nf">BigDecimal</span><span class="o">(</span><span class="s">"14.50"</span><span class="o">)</span>
+        <span class="o">);</span>
 
-        productPriceChangesClient.send(event.productCode(), event); <i class="conum" data-value="9"></i><b>(9)</b>
+        <span class="n">productPriceChangesClient</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">productCode</span><span class="o">(),</span> <span class="n">event</span><span class="o">);</span> <i class="conum" data-value="9"></i><b>(9)</b>
 
-        await() <i class="conum" data-value="10"></i><b>(10)</b>
-                .pollInterval(<span class="predefined-type">Duration</span>.ofSeconds(<span class="integer">3</span>))
-                .atMost(<span class="integer">10</span>, SECONDS)
-                .untilAsserted(() -&gt; {
-                    Optional&lt;Product&gt; optionalProduct = productRepository.findByCode(<span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>);
-                    assertThat(optionalProduct).isPresent();
-                    assertThat(optionalProduct.get().getCode()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>);
-                    assertThat(optionalProduct.get().getPrice()).isEqualTo(<span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">14.50</span><span class="delimiter">&quot;</span></span>));
-                });
+        <span class="n">await</span><span class="o">()</span> <i class="conum" data-value="10"></i><b>(10)</b>
+                <span class="o">.</span><span class="na">pollInterval</span><span class="o">(</span><span class="nc">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="mi">3</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">atMost</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="no">SECONDS</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">untilAsserted</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+                    <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Product</span><span class="o">&gt;</span> <span class="n">optionalProduct</span> <span class="o">=</span> <span class="n">productRepository</span><span class="o">.</span><span class="na">findByCode</span><span class="o">(</span><span class="s">"P100"</span><span class="o">);</span>
+                    <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">).</span><span class="na">isPresent</span><span class="o">();</span>
+                    <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">getCode</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"P100"</span><span class="o">);</span>
+                    <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">getPrice</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="k">new</span> <span class="nc">BigDecimal</span><span class="o">(</span><span class="s">"14.50"</span><span class="o">));</span>
+                <span class="o">});</span>
 
-        productRepository.deleteById(id);
-    }
-}</code></pre>
+        <span class="n">productRepository</span><span class="o">.</span><span class="na">deleteById</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -787,7 +788,7 @@ and configure the application to talk to them as follows:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./mvnw <span class="nb">test</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -844,50 +845,50 @@ and configure the application to talk to them as follows:</p>
 <div class="listingblock">
 <div class="title">testresources/src/test/java/example/micronaut/ProductPriceChangedEventHandlerTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.math.BigDecimal</span>;
-<span class="keyword">import</span> <span class="include">java.time.Duration</span>;
-<span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+<span class="kn">import</span> <span class="nn">java.math.BigDecimal</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.time.Duration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">java.util.concurrent.TimeUnit.SECONDS</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.assertj.core.api.Assertions.assertThat</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.awaitility.Awaitility.await</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">concurrent</span><span class="o">.</span><span class="na">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">assertj</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">awaitility</span><span class="o">.</span><span class="na">Awaitility</span><span class="o">.</span><span class="na">await</span><span class="o">;</span>
 
-<span class="annotation">@MicronautTest</span>(transactional = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">ProductPriceChangedEventHandlerTest</span> {
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">transactional</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">ProductPriceChangedEventHandlerTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> shouldHandleProductPriceChangedEvent(
-            ProductPriceChangesClient productPriceChangesClient,
-            ProductRepository productRepository
-    ) {
-        Product product = <span class="keyword">new</span> Product(<span class="predefined-constant">null</span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Product One</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">BigDecimal</span>.TEN);
-        <span class="predefined-type">Long</span> id = productRepository.save(product).getId(); <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldHandleProductPriceChangedEvent</span><span class="o">(</span>
+            <span class="nc">ProductPriceChangesClient</span> <span class="n">productPriceChangesClient</span><span class="o">,</span>
+            <span class="nc">ProductRepository</span> <span class="n">productRepository</span>
+    <span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Product</span> <span class="n">product</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Product</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="s">"P100"</span><span class="o">,</span> <span class="s">"Product One"</span><span class="o">,</span> <span class="nc">BigDecimal</span><span class="o">.</span><span class="na">TEN</span><span class="o">);</span>
+        <span class="nc">Long</span> <span class="n">id</span> <span class="o">=</span> <span class="n">productRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">product</span><span class="o">).</span><span class="na">getId</span><span class="o">();</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-        ProductPriceChangedEvent event = <span class="keyword">new</span> ProductPriceChangedEvent(
-                <span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>,
-                <span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">14.50</span><span class="delimiter">&quot;</span></span>)
-        );
+        <span class="nc">ProductPriceChangedEvent</span> <span class="n">event</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ProductPriceChangedEvent</span><span class="o">(</span>
+                <span class="s">"P100"</span><span class="o">,</span>
+                <span class="k">new</span> <span class="nf">BigDecimal</span><span class="o">(</span><span class="s">"14.50"</span><span class="o">)</span>
+        <span class="o">);</span>
 
-        productPriceChangesClient.send(event.productCode(), event); <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">productPriceChangesClient</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">productCode</span><span class="o">(),</span> <span class="n">event</span><span class="o">);</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-        await() <i class="conum" data-value="4"></i><b>(4)</b>
-                .pollInterval(<span class="predefined-type">Duration</span>.ofSeconds(<span class="integer">3</span>))
-                .atMost(<span class="integer">10</span>, SECONDS)
-                .untilAsserted(() -&gt; {
-                    Optional&lt;Product&gt; optionalProduct = productRepository.findByCode(<span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>);
-                    assertThat(optionalProduct).isPresent();
-                    assertThat(optionalProduct.get().getCode()).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">P100</span><span class="delimiter">&quot;</span></span>);
-                    assertThat(optionalProduct.get().getPrice()).isEqualTo(<span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">14.50</span><span class="delimiter">&quot;</span></span>));
-                });
+        <span class="n">await</span><span class="o">()</span> <i class="conum" data-value="4"></i><b>(4)</b>
+                <span class="o">.</span><span class="na">pollInterval</span><span class="o">(</span><span class="nc">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="mi">3</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">atMost</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="no">SECONDS</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">untilAsserted</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+                    <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Product</span><span class="o">&gt;</span> <span class="n">optionalProduct</span> <span class="o">=</span> <span class="n">productRepository</span><span class="o">.</span><span class="na">findByCode</span><span class="o">(</span><span class="s">"P100"</span><span class="o">);</span>
+                    <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">).</span><span class="na">isPresent</span><span class="o">();</span>
+                    <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">getCode</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"P100"</span><span class="o">);</span>
+                    <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">getPrice</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="k">new</span> <span class="nc">BigDecimal</span><span class="o">(</span><span class="s">"14.50"</span><span class="o">));</span>
+                <span class="o">});</span>
 
-        productRepository.deleteById(id);
-    }
-}</code></pre>
+        <span class="n">productRepository</span><span class="o">.</span><span class="na">deleteById</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -212,7 +213,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app --features=security-jwt,views-velocity,reactor,graalvm example.micronaut.micronautguide --build=gradle --lang=groovy --test=spock</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app <span class="nt">--features</span><span class="o">=</span>security-jwt,views-velocity,reactor,graalvm example.micronaut.micronautguide <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>groovy <span class="nt">--test</span><span class="o">=</span>spock</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -271,17 +272,17 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">micronaut</span>:
-  <span class="key">security</span>:
-    <span class="key">authentication</span>: <span class="string"><span class="content">cookie </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="key">redirect</span>:
-      <span class="key">login-failure</span>: <span class="string"><span class="content">/login/authFailed  </span></span><i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="key">token</span>:
-      <span class="key">jwt</span>:
-        <span class="key">signatures</span>:
-          <span class="key">secret</span>:
-            <span class="key">generator</span>:  <i class="conum" data-value="3"></i><b>(3)</b>
-              <span class="key">secret</span>: <span class="string"><span class="content">'&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;' </span></span><i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">security</span><span class="pi">:</span>
+    <span class="na">authentication</span><span class="pi">:</span> <span class="s">cookie</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="na">redirect</span><span class="pi">:</span>
+      <span class="na">login-failure</span><span class="pi">:</span> <span class="s">/login/authFailed</span>  <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="na">token</span><span class="pi">:</span>
+      <span class="na">jwt</span><span class="pi">:</span>
+        <span class="na">signatures</span><span class="pi">:</span>
+          <span class="na">secret</span><span class="pi">:</span>
+            <span class="na">generator</span><span class="pi">:</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+              <span class="na">secret</span><span class="pi">:</span> <span class="s1">'</span><span class="s">"${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"'</span> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -313,30 +314,30 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/AuthenticationProviderUserPassword.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailureReason</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationFailureReason</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationResponse</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
 
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span>&lt;B&gt; <span class="directive">implements</span> HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">AuthenticationProviderUserPassword</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">HttpRequestAuthenticationProvider</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="annotation">@Override</span>
-    AuthenticationResponse authenticate(
-            <span class="annotation">@Nullable</span> HttpRequest&lt;B&gt; httpRequest,
-            <span class="annotation">@NonNull</span> AuthenticationRequest&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; authenticationRequest
-    ) {
-        <span class="keyword">return</span> authenticationRequest.identity == <span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span> &amp;&amp; authenticationRequest.secret == <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>
-                ? AuthenticationResponse.success(authenticationRequest.getIdentity())
-                : AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="n">AuthenticationResponse</span> <span class="nf">authenticate</span><span class="o">(</span>
+            <span class="nd">@Nullable</span> <span class="n">HttpRequest</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="n">httpRequest</span><span class="o">,</span>
+            <span class="nd">@NonNull</span> <span class="n">AuthenticationRequest</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">authenticationRequest</span>
+    <span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">authenticationRequest</span><span class="o">.</span><span class="na">identity</span> <span class="o">==</span> <span class="s2">"sherlock"</span> <span class="o">&amp;&amp;</span> <span class="n">authenticationRequest</span><span class="o">.</span><span class="na">secret</span> <span class="o">==</span> <span class="s2">"password"</span>
+                <span class="o">?</span> <span class="n">AuthenticationResponse</span><span class="o">.</span><span class="na">success</span><span class="o">(</span><span class="n">authenticationRequest</span><span class="o">.</span><span class="na">getIdentity</span><span class="o">())</span>
+                <span class="o">:</span> <span class="n">AuthenticationResponse</span><span class="o">.</span><span class="na">failure</span><span class="o">(</span><span class="n">AuthenticationFailureReason</span><span class="o">.</span><span class="na">CREDENTIALS_DO_NOT_MATCH</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -373,63 +374,63 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/views/home.vm</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!DOCTYPE html&gt;</span>
-<span class="tag">&lt;html&gt;</span>
-    <span class="tag">&lt;head&gt;</span>
-        <span class="tag">&lt;title&gt;</span>Home<span class="tag">&lt;/title&gt;</span>
-    <span class="tag">&lt;/head&gt;</span>
-    <span class="tag">&lt;body&gt;</span>
+<pre class="rouge highlight"><code data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+    <span class="nt">&lt;head&gt;</span>
+        <span class="nt">&lt;title&gt;</span>Home<span class="nt">&lt;/title&gt;</span>
+    <span class="nt">&lt;/head&gt;</span>
+    <span class="nt">&lt;body&gt;</span>
         #if( $loggedIn )
-            <span class="tag">&lt;h1&gt;</span>username: <span class="tag">&lt;span&gt;</span>$username<span class="tag">&lt;/span&gt;</span><span class="tag">&lt;/h1&gt;</span>
+            <span class="nt">&lt;h1&gt;</span>username: <span class="nt">&lt;span&gt;</span>$username<span class="nt">&lt;/span&gt;&lt;/h1&gt;</span>
         #else
-            <span class="tag">&lt;h1&gt;</span>You are not logged in<span class="tag">&lt;/h1&gt;</span>
+            <span class="nt">&lt;h1&gt;</span>You are not logged in<span class="nt">&lt;/h1&gt;</span>
         #end
         #if( $loggedIn )
-            <span class="tag">&lt;form</span> <span class="attribute-name">action</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">logout</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">method</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">POST</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
-                <span class="tag">&lt;input</span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">submit</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">value</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">Logout</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
-            <span class="tag">&lt;/form&gt;</span>
+            <span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"logout"</span> <span class="na">method=</span><span class="s">"POST"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Logout"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/form&gt;</span>
         #else
-            <span class="tag">&lt;p&gt;</span><span class="tag">&lt;a</span> <span class="attribute-name">href</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/login/auth</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Login<span class="tag">&lt;/a&gt;</span><span class="tag">&lt;/p&gt;</span>
+            <span class="nt">&lt;p&gt;&lt;a</span> <span class="na">href=</span><span class="s">"/login/auth"</span><span class="nt">&gt;</span>Login<span class="nt">&lt;/a&gt;&lt;/p&gt;</span>
         #end
-    <span class="tag">&lt;/body&gt;</span>
-<span class="tag">&lt;/html&gt;</span></code></pre>
+    <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">src/main/resources/views/auth.vm</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="html"><span class="doctype">&lt;!DOCTYPE html&gt;</span>
-<span class="tag">&lt;html&gt;</span>
-    <span class="tag">&lt;head&gt;</span>
+<pre class="rouge highlight"><code data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+    <span class="nt">&lt;head&gt;</span>
         #if( $errors )
-            <span class="tag">&lt;title&gt;</span>Login Failed<span class="tag">&lt;/title&gt;</span>
+            <span class="nt">&lt;title&gt;</span>Login Failed<span class="nt">&lt;/title&gt;</span>
         #else
-            <span class="tag">&lt;title&gt;</span>Login<span class="tag">&lt;/title&gt;</span>
+            <span class="nt">&lt;title&gt;</span>Login<span class="nt">&lt;/title&gt;</span>
         #end
-    <span class="tag">&lt;/head&gt;</span>
-<span class="tag">&lt;body&gt;</span>
-    <span class="tag">&lt;form</span> <span class="attribute-name">action</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">method</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">POST</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
-        <span class="tag">&lt;ol&gt;</span>
-            <span class="tag">&lt;li&gt;</span>
-                <span class="tag">&lt;label</span> <span class="attribute-name">for</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Username<span class="tag">&lt;/label&gt;</span>
-                <span class="tag">&lt;input</span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">text</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
-            <span class="tag">&lt;/li&gt;</span>
-            <span class="tag">&lt;li&gt;</span>
-                <span class="tag">&lt;label</span> <span class="attribute-name">for</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Password<span class="tag">&lt;/label&gt;</span>
-                <span class="tag">&lt;input</span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">name</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
-            <span class="tag">&lt;/li&gt;</span>
-            <span class="tag">&lt;li&gt;</span>
-                <span class="tag">&lt;input</span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">submit</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">value</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">Login</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
-            <span class="tag">&lt;/li&gt;</span>
+    <span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"/login"</span> <span class="na">method=</span><span class="s">"POST"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;ol&gt;</span>
+            <span class="nt">&lt;li&gt;</span>
+                <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"username"</span><span class="nt">&gt;</span>Username<span class="nt">&lt;/label&gt;</span>
+                <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"username"</span> <span class="na">id=</span><span class="s">"username"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/li&gt;</span>
+            <span class="nt">&lt;li&gt;</span>
+                <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"password"</span><span class="nt">&gt;</span>Password<span class="nt">&lt;/label&gt;</span>
+                <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"password"</span> <span class="na">name=</span><span class="s">"password"</span> <span class="na">id=</span><span class="s">"password"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/li&gt;</span>
+            <span class="nt">&lt;li&gt;</span>
+                <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Login"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/li&gt;</span>
             #if( $errors )
-                <span class="tag">&lt;li</span> <span class="attribute-name">id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">errors</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
-                    <span class="tag">&lt;span</span> <span class="attribute-name">style</span>=<span class="string"><span class="delimiter">&quot;</span><span class="key">color</span>: <span class="value">red</span>;<span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>Login Failed<span class="tag">&lt;/span&gt;</span>
-                <span class="tag">&lt;/li&gt;</span>
+                <span class="nt">&lt;li</span> <span class="na">id=</span><span class="s">"errors"</span><span class="nt">&gt;</span>
+                    <span class="nt">&lt;span</span> <span class="na">style=</span><span class="s">"color: red;"</span><span class="nt">&gt;</span>Login Failed<span class="nt">&lt;/span&gt;</span>
+                <span class="nt">&lt;/li&gt;</span>
             #end
-        <span class="tag">&lt;/ol&gt;</span>
-    <span class="tag">&lt;/form&gt;</span>
-<span class="tag">&lt;/body&gt;</span>
-<span class="tag">&lt;/html&gt;</span></code></pre>
+        <span class="nt">&lt;/ol&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre>
 </div>
 </div>
 </div>
@@ -441,33 +442,33 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/HomeController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.views.View</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.annotation.Secured</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.rules.SecurityRule</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.views.View</span>
 
-<span class="keyword">import</span> <span class="include">java.security.Principal</span>
+<span class="kn">import</span> <span class="nn">java.security.Principal</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Secured</span>(SecurityRule.IS_ANONYMOUS) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Controller</span> <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">HomeController</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Secured</span><span class="o">(</span><span class="n">SecurityRule</span><span class="o">.</span><span class="na">IS_ANONYMOUS</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Controller</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">HomeController</span> <span class="o">{</span>
 
-    <span class="annotation">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@View</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">home</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; index(<span class="annotation">@Nullable</span> <span class="predefined-type">Principal</span> principal) { <i class="conum" data-value="5"></i><b>(5)</b>
-        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; data = [<span class="key">loggedIn</span>: principal != <span class="predefined-constant">null</span>] <span class="keyword">as</span> <span class="predefined-type">Map</span>
-        <span class="keyword">if</span> (principal) {
-            data.username = principal.name
-        }
-        data
-    }
-}</code></pre>
+    <span class="nd">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@View</span><span class="o">(</span><span class="s2">"home"</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">index</span><span class="o">(</span><span class="nd">@Nullable</span> <span class="n">Principal</span> <span class="n">principal</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">data</span> <span class="o">=</span> <span class="o">[</span><span class="nl">loggedIn:</span> <span class="n">principal</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">]</span> <span class="k">as</span> <span class="n">Map</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">principal</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">data</span><span class="o">.</span><span class="na">username</span> <span class="o">=</span> <span class="n">principal</span><span class="o">.</span><span class="na">name</span>
+        <span class="o">}</span>
+        <span class="n">data</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -503,32 +504,32 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/LoginAuthController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.views.View</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.annotation.Secured</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.rules.SecurityRule</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.views.View</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Secured</span>(SecurityRule.IS_ANONYMOUS) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Controller</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">LoginAuthController</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Secured</span><span class="o">(</span><span class="n">SecurityRule</span><span class="o">.</span><span class="na">IS_ANONYMOUS</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Controller</span><span class="o">(</span><span class="s2">"/login"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">LoginAuthController</span> <span class="o">{</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/auth</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@View</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">auth</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; auth() {
-        [:]
-    }
+    <span class="nd">@Get</span><span class="o">(</span><span class="s2">"/auth"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@View</span><span class="o">(</span><span class="s2">"auth"</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">auth</span><span class="o">()</span> <span class="o">{</span>
+        <span class="o">[:]</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Get</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/authFailed</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
-    <span class="annotation">@View</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">auth</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; authFailed() {
-        <span class="predefined-type">Collections</span>.singletonMap(<span class="string"><span class="delimiter">'</span><span class="content">errors</span><span class="delimiter">'</span></span>, <span class="predefined-constant">true</span>) <span class="keyword">as</span> <span class="predefined-type">Map</span>
-    }
-}</code></pre>
+    <span class="nd">@Get</span><span class="o">(</span><span class="s2">"/authFailed"</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="nd">@View</span><span class="o">(</span><span class="s2">"auth"</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">authFailed</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s1">'errors'</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span> <span class="k">as</span> <span class="n">Map</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -570,8 +571,8 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.gebish:geb-spock:7.0</span><span class="delimiter">&quot;</span></span>)
-testImplementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.seleniumhq.selenium:htmlunit-driver:3.62.0</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">testImplementation</span><span class="o">(</span><span class="s2">"org.gebish:geb-spock:7.0"</span><span class="o">)</span>
+<span class="n">testImplementation</span><span class="o">(</span><span class="s2">"org.seleniumhq.selenium:htmlunit-driver:3.62.0"</span><span class="o">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -583,99 +584,99 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/HomePage.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="comment">/*
+<pre class="rouge highlight"><code data-lang="groovy"><span class="cm">/*
  * Copyright 2017-2024 original authors
  *
- * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */</span>
-<span class="keyword">package</span> example.micronaut
+<span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">geb.Page</span>
+<span class="kn">import</span> <span class="nn">geb.Page</span>
 
-<span class="type">class</span> <span class="class">HomePage</span> <span class="directive">extends</span> Page {
+<span class="kd">class</span> <span class="nc">HomePage</span> <span class="kd">extends</span> <span class="n">Page</span> <span class="o">{</span>
 
-    <span class="directive">static</span> url = <span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>
+    <span class="kd">static</span> <span class="n">url</span> <span class="o">=</span> <span class="s1">'/'</span>
 
-    <span class="directive">static</span> at = { title == <span class="string"><span class="delimiter">'</span><span class="content">Home</span><span class="delimiter">'</span></span> }
+    <span class="kd">static</span> <span class="n">at</span> <span class="o">=</span> <span class="o">{</span> <span class="n">title</span> <span class="o">==</span> <span class="s1">'Home'</span> <span class="o">}</span>
 
-    <span class="directive">static</span> content = {
-        loginLink { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">a</span><span class="delimiter">'</span></span>, <span class="key">text</span>: <span class="string"><span class="delimiter">'</span><span class="content">Login</span><span class="delimiter">'</span></span>) }
-        logoutButton { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">input</span><span class="delimiter">'</span></span>, <span class="key">type</span>: <span class="string"><span class="delimiter">'</span><span class="content">submit</span><span class="delimiter">'</span></span>, <span class="key">value</span>: <span class="string"><span class="delimiter">'</span><span class="content">Logout</span><span class="delimiter">'</span></span>) }
-        usernameElement(<span class="key">required</span>: <span class="predefined-constant">false</span>) { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">h1 span</span><span class="delimiter">'</span></span>, <span class="integer">0</span>) }
-    }
+    <span class="kd">static</span> <span class="n">content</span> <span class="o">=</span> <span class="o">{</span>
+        <span class="n">loginLink</span> <span class="o">{</span> <span class="n">$</span><span class="o">(</span><span class="s1">'a'</span><span class="o">,</span> <span class="nl">text:</span> <span class="s1">'Login'</span><span class="o">)</span> <span class="o">}</span>
+        <span class="n">logoutButton</span> <span class="o">{</span> <span class="n">$</span><span class="o">(</span><span class="s1">'input'</span><span class="o">,</span> <span class="nl">type:</span> <span class="s1">'submit'</span><span class="o">,</span> <span class="nl">value:</span> <span class="s1">'Logout'</span><span class="o">)</span> <span class="o">}</span>
+        <span class="n">usernameElement</span><span class="o">(</span><span class="nl">required:</span> <span class="kc">false</span><span class="o">)</span> <span class="o">{</span> <span class="n">$</span><span class="o">(</span><span class="s1">'h1 span'</span><span class="o">,</span> <span class="mi">0</span><span class="o">)</span> <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="predefined-type">String</span> username() {
-        <span class="keyword">if</span> (usernameElement.empty) {
-            <span class="keyword">return</span> <span class="predefined-constant">null</span>
-        }
-        usernameElement.text()
-    }
+    <span class="n">String</span> <span class="nf">username</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">usernameElement</span><span class="o">.</span><span class="na">empty</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">null</span>
+        <span class="o">}</span>
+        <span class="n">usernameElement</span><span class="o">.</span><span class="na">text</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="type">void</span> login() {
-        loginLink.click()
-    }
+    <span class="kt">void</span> <span class="nf">login</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">loginLink</span><span class="o">.</span><span class="na">click</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="type">void</span> logout() {
-        logoutButton.click()
-    }
-}</code></pre>
+    <span class="kt">void</span> <span class="nf">logout</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">logoutButton</span><span class="o">.</span><span class="na">click</span><span class="o">()</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/LoginPage.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="comment">/*
+<pre class="rouge highlight"><code data-lang="groovy"><span class="cm">/*
  * Copyright 2017-2024 original authors
  *
- * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */</span>
-<span class="keyword">package</span> example.micronaut
+<span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">geb.Page</span>
+<span class="kn">import</span> <span class="nn">geb.Page</span>
 
-<span class="type">class</span> <span class="class">LoginPage</span> <span class="directive">extends</span> Page {
+<span class="kd">class</span> <span class="nc">LoginPage</span> <span class="kd">extends</span> <span class="n">Page</span> <span class="o">{</span>
 
-    <span class="directive">static</span> url = <span class="string"><span class="delimiter">'</span><span class="content">/login/auth</span><span class="delimiter">'</span></span>
+    <span class="kd">static</span> <span class="n">url</span> <span class="o">=</span> <span class="s1">'/login/auth'</span>
 
-    <span class="directive">static</span> at = { title.contains <span class="string"><span class="delimiter">'</span><span class="content">Login</span><span class="delimiter">'</span></span> }
+    <span class="kd">static</span> <span class="n">at</span> <span class="o">=</span> <span class="o">{</span> <span class="n">title</span><span class="o">.</span><span class="na">contains</span> <span class="s1">'Login'</span> <span class="o">}</span>
 
-    <span class="directive">static</span> content = {
-        usernameInput { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">#username</span><span class="delimiter">'</span></span>) }
-        passwordInput { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">#password</span><span class="delimiter">'</span></span>) }
-        submitInput { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">input</span><span class="delimiter">'</span></span>, <span class="key">type</span>: <span class="string"><span class="delimiter">'</span><span class="content">submit</span><span class="delimiter">'</span></span>) }
-        errorsLi(<span class="key">required</span>: <span class="predefined-constant">false</span>) { <span class="error">$</span>(<span class="string"><span class="delimiter">'</span><span class="content">li#errors</span><span class="delimiter">'</span></span>) }
-    }
+    <span class="kd">static</span> <span class="n">content</span> <span class="o">=</span> <span class="o">{</span>
+        <span class="n">usernameInput</span> <span class="o">{</span> <span class="n">$</span><span class="o">(</span><span class="s1">'#username'</span><span class="o">)</span> <span class="o">}</span>
+        <span class="n">passwordInput</span> <span class="o">{</span> <span class="n">$</span><span class="o">(</span><span class="s1">'#password'</span><span class="o">)</span> <span class="o">}</span>
+        <span class="n">submitInput</span> <span class="o">{</span> <span class="n">$</span><span class="o">(</span><span class="s1">'input'</span><span class="o">,</span> <span class="nl">type:</span> <span class="s1">'submit'</span><span class="o">)</span> <span class="o">}</span>
+        <span class="n">errorsLi</span><span class="o">(</span><span class="nl">required:</span> <span class="kc">false</span><span class="o">)</span> <span class="o">{</span> <span class="n">$</span><span class="o">(</span><span class="s1">'li#errors'</span><span class="o">)</span> <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="type">boolean</span> hasErrors() {
-        !errorsLi.empty
-    }
+    <span class="kt">boolean</span> <span class="nf">hasErrors</span><span class="o">()</span> <span class="o">{</span>
+        <span class="o">!</span><span class="n">errorsLi</span><span class="o">.</span><span class="na">empty</span>
+    <span class="o">}</span>
 
-    <span class="type">void</span> login(<span class="predefined-type">String</span> username, <span class="predefined-type">String</span> password) {
-        usernameInput = username
-        passwordInput = password
-        submitInput.click()
-    }
-}</code></pre>
+    <span class="kt">void</span> <span class="nf">login</span><span class="o">(</span><span class="n">String</span> <span class="n">username</span><span class="o">,</span> <span class="n">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">usernameInput</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="n">passwordInput</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="n">submitInput</span><span class="o">.</span><span class="na">click</span><span class="o">()</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -684,91 +685,91 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/AuthenticationSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="comment">/*
+<pre class="rouge highlight"><code data-lang="groovy"><span class="cm">/*
  * Copyright 2017-2024 original authors
  *
- * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */</span>
-<span class="keyword">package</span> example.micronaut
+<span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">geb.spock.GebSpec</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">geb.spock.GebSpec</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.runtime.server.EmbeddedServer</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
 
-<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">AuthenticationSpec</span> <span class="directive">extends</span> GebSpec {
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">AuthenticationSpec</span> <span class="kd">extends</span> <span class="n">GebSpec</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    EmbeddedServer embeddedServer <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Inject</span>
+    <span class="n">EmbeddedServer</span> <span class="n">embeddedServer</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">verify session based authentication works</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">given</span>:
-        browser.baseUrl = <span class="string"><span class="delimiter">&quot;</span><span class="content">http://localhost:</span><span class="inline"><span class="inline-delimiter">$</span>embeddedServer</span><span class="content">.port</span><span class="delimiter">&quot;</span></span>
+    <span class="kt">void</span> <span class="s2">"verify session based authentication works"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">given:</span>
+        <span class="n">browser</span><span class="o">.</span><span class="na">baseUrl</span> <span class="o">=</span> <span class="s2">"http://localhost:$embeddedServer.port"</span>
 
-        <span class="key">when</span>:
-        to HomePage
+        <span class="nl">when:</span>
+        <span class="n">to</span> <span class="n">HomePage</span>
 
-        <span class="key">then</span>:
-        at HomePage
+        <span class="nl">then:</span>
+        <span class="n">at</span> <span class="n">HomePage</span>
 
-        <span class="key">when</span>:
-        HomePage homePage = browser.page HomePage
+        <span class="nl">when:</span>
+        <span class="n">HomePage</span> <span class="n">homePage</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="na">page</span> <span class="n">HomePage</span>
 
-        <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">As we are not logged in, there is no username</span><span class="delimiter">'</span></span>
-        homePage.username() == <span class="predefined-constant">null</span>
+        <span class="nl">then:</span> <span class="s1">'As we are not logged in, there is no username'</span>
+        <span class="n">homePage</span><span class="o">.</span><span class="na">username</span><span class="o">()</span> <span class="o">==</span> <span class="kc">null</span>
 
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">click the login link</span><span class="delimiter">'</span></span>
-        homePage.login()
+        <span class="nl">when:</span> <span class="s1">'click the login link'</span>
+        <span class="n">homePage</span><span class="o">.</span><span class="na">login</span><span class="o">()</span>
 
-        <span class="key">then</span>:
-        at LoginPage
+        <span class="nl">then:</span>
+        <span class="n">at</span> <span class="n">LoginPage</span>
 
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">fill the login form, with invalid credentials</span><span class="delimiter">'</span></span>
-        LoginPage loginPage = browser.page LoginPage
-        loginPage.login(<span class="string"><span class="delimiter">'</span><span class="content">foo</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">foo</span><span class="delimiter">'</span></span>)
+        <span class="nl">when:</span> <span class="s1">'fill the login form, with invalid credentials'</span>
+        <span class="n">LoginPage</span> <span class="n">loginPage</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="na">page</span> <span class="n">LoginPage</span>
+        <span class="n">loginPage</span><span class="o">.</span><span class="na">login</span><span class="o">(</span><span class="s1">'foo'</span><span class="o">,</span> <span class="s1">'foo'</span><span class="o">)</span>
 
-        <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">the user is still in the login form</span><span class="delimiter">'</span></span>
-        at LoginPage
+        <span class="nl">then:</span> <span class="s1">'the user is still in the login form'</span>
+        <span class="n">at</span> <span class="n">LoginPage</span>
 
-        <span class="key">and</span>: <span class="string"><span class="delimiter">'</span><span class="content">and error is displayed</span><span class="delimiter">'</span></span>
-        loginPage.hasErrors()
+        <span class="nl">and:</span> <span class="s1">'and error is displayed'</span>
+        <span class="n">loginPage</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span>
 
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">fill the form with valid credentials</span><span class="delimiter">'</span></span>
-        loginPage.login(<span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">password</span><span class="delimiter">'</span></span>)
+        <span class="nl">when:</span> <span class="s1">'fill the form with valid credentials'</span>
+        <span class="n">loginPage</span><span class="o">.</span><span class="na">login</span><span class="o">(</span><span class="s1">'sherlock'</span><span class="o">,</span> <span class="s1">'password'</span><span class="o">)</span>
 
-        <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">we get redirected to the home page</span><span class="delimiter">'</span></span>
-        at HomePage
+        <span class="nl">then:</span> <span class="s1">'we get redirected to the home page'</span>
+        <span class="n">at</span> <span class="n">HomePage</span>
 
-        <span class="key">when</span>:
-        homePage = browser.page HomePage
+        <span class="nl">when:</span>
+        <span class="n">homePage</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="na">page</span> <span class="n">HomePage</span>
 
-        <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">the username is populated</span><span class="delimiter">'</span></span>
-        homePage.username() == <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>
+        <span class="nl">then:</span> <span class="s1">'the username is populated'</span>
+        <span class="n">homePage</span><span class="o">.</span><span class="na">username</span><span class="o">()</span> <span class="o">==</span> <span class="s1">'sherlock'</span>
 
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">click the logout button</span><span class="delimiter">'</span></span>
-        homePage.logout()
+        <span class="nl">when:</span> <span class="s1">'click the logout button'</span>
+        <span class="n">homePage</span><span class="o">.</span><span class="na">logout</span><span class="o">()</span>
 
-        <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">we are in the home page</span><span class="delimiter">'</span></span>
-        at HomePage
+        <span class="nl">then:</span> <span class="s1">'we are in the home page'</span>
+        <span class="n">at</span> <span class="n">HomePage</span>
 
-        <span class="key">when</span>:
-        homePage = browser.page HomePage
+        <span class="nl">when:</span>
+        <span class="n">homePage</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="na">page</span> <span class="n">HomePage</span>
 
-        <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">but we are no longer logged in</span><span class="delimiter">'</span></span>
-        homePage.username() == <span class="predefined-constant">null</span>
-    }
-}</code></pre>
+        <span class="nl">then:</span> <span class="s1">'but we are no longer logged in'</span>
+        <span class="n">homePage</span><span class="o">.</span><span class="na">username</span><span class="o">()</span> <span class="o">==</span> <span class="kc">null</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -793,7 +794,7 @@ testImplementation(<span class="string"><span class="delimiter">&quot;</span><sp
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
 </div>
 </div>
 <div class="paragraph">

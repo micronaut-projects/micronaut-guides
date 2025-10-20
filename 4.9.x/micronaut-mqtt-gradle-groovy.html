@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -226,16 +227,16 @@ This should be done in both apps for this guide.
 <div class="listingblock">
 <div class="title">src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">test-resources</span>:
-  <span class="key">containers</span>:
-    <span class="key">mosquitto</span>:
-      <span class="key">image-name</span>: <span class="string"><span class="content">eclipse-mosquitto</span></span>
-      <span class="key">hostnames</span>:
-        - <span class="string"><span class="content">mqtt.host</span></span>
-      <span class="key">exposed-ports</span>:
-        - <span class="string"><span class="content">mqtt.port: 1883</span></span>
-      <span class="key">ro-fs-bind</span>:
-        - <span class="key"><span class="delimiter">&quot;</span><span class="content">src/test-resources/mosquitto.conf</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="content">/mosquitto/config/mosquitto.conf</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">test-resources</span><span class="pi">:</span>
+  <span class="na">containers</span><span class="pi">:</span>
+    <span class="na">mosquitto</span><span class="pi">:</span>
+      <span class="na">image-name</span><span class="pi">:</span> <span class="s">eclipse-mosquitto</span>
+      <span class="na">hostnames</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">mqtt.host</span>
+      <span class="na">exposed-ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">mqtt.port</span><span class="pi">:</span> <span class="m">1883</span>
+      <span class="na">ro-fs-bind</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s2">"</span><span class="s">src/test-resources/mosquitto.conf"</span><span class="err">:</span> <span class="s">/mosquitto/config/mosquitto.conf</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -244,7 +245,7 @@ This should be done in both apps for this guide.
 <div class="listingblock">
 <div class="title">src/test-resources/mosquitto.conf</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>persistence false
+<pre class="rouge highlight"><code>persistence false
 allow_anonymous true
 connection_messages true
 log_type all
@@ -259,7 +260,7 @@ listener 1883</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="shell">MQTT_CLIENT_SERVER_URI=tcp://production-server:1183</code></pre>
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">MQTT_CLIENT_SERVER_URI</span><span class="o">=</span>tcp://production-server:1183</code></pre>
 </div>
 </div>
 </div>
@@ -272,9 +273,9 @@ listener 1883</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-cli-app example.micronaut.micronautguide \
-    --features=yaml,mqtt \
-    --build=gradle --lang=groovy</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-cli-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>yaml,mqtt <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>groovy</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -324,17 +325,17 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/groovy/example/micronaut/TemperatureClient.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.Topic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.v5.MqttPublisher</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.v5.MqttPublisher</span>
 
-<span class="annotation">@MqttPublisher</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">interface</span> TemperatureClient {
+<span class="nd">@MqttPublisher</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">interface</span> <span class="nc">TemperatureClient</span> <span class="o">{</span>
 
-    <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">'</span><span class="content">house/livingroom/temperature</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="type">void</span> publishLivingroomTemperature(<span class="type">byte</span><span class="type">[]</span> data)
-}</code></pre>
+    <span class="nd">@Topic</span><span class="o">(</span><span class="s1">'house/livingroom/temperature'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kt">void</span> <span class="nf">publishLivingroomTemperature</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span><span class="o">)</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -358,48 +359,48 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/groovy/example/micronaut/Scale.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
 
-<span class="keyword">import</span> <span class="include">java.util.concurrent.ConcurrentHashMap</span>
+<span class="kn">import</span> <span class="nn">java.util.concurrent.ConcurrentHashMap</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="type">enum</span> Scale {
-    FAHRENHEIT(<span class="string"><span class="delimiter">'</span><span class="content">Fahrenheit</span><span class="delimiter">'</span></span>),
-    CELSIUS(<span class="string"><span class="delimiter">'</span><span class="content">Celsius</span><span class="delimiter">'</span></span>)
+<span class="nd">@CompileStatic</span>
+<span class="kd">enum</span> <span class="n">Scale</span> <span class="o">{</span>
+    <span class="n">FAHRENHEIT</span><span class="o">(</span><span class="s1">'Fahrenheit'</span><span class="o">),</span>
+    <span class="n">CELSIUS</span><span class="o">(</span><span class="s1">'Celsius'</span><span class="o">)</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>,Scale&gt; ENUM_MAP
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">Scale</span><span class="o">&gt;</span> <span class="n">ENUM_MAP</span>
 
-    <span class="directive">final</span> <span class="predefined-type">String</span> name
+    <span class="kd">final</span> <span class="n">String</span> <span class="n">name</span>
 
-    Scale(<span class="predefined-type">String</span> name) {
-        <span class="local-variable">this</span>.name = name
-    }
+    <span class="nf">Scale</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="o">}</span>
 
-    <span class="directive">static</span> {
-        <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>,Scale&gt; map = <span class="keyword">new</span> <span class="predefined-type">ConcurrentHashMap</span>&lt;&gt;()
-        <span class="keyword">for</span> (Scale instance : Scale.values()) {
-            map[instance.name] = instance
-        }
-        ENUM_MAP = <span class="predefined-type">Collections</span>.unmodifiableMap(map)
-    }
+    <span class="kd">static</span> <span class="o">{</span>
+        <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">Scale</span><span class="o">&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;()</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Scale</span> <span class="n">instance</span> <span class="o">:</span> <span class="n">Scale</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">map</span><span class="o">[</span><span class="n">instance</span><span class="o">.</span><span class="na">name</span><span class="o">]</span> <span class="o">=</span> <span class="n">instance</span>
+        <span class="o">}</span>
+        <span class="n">ENUM_MAP</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">unmodifiableMap</span><span class="o">(</span><span class="n">map</span><span class="o">)</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="directive">static</span> Optional&lt;Scale&gt; of(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> name) {
-        <span class="keyword">return</span> Optional.ofNullable(ENUM_MAP.get(name))
-    }
+    <span class="nd">@NonNull</span>
+    <span class="kd">static</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Scale</span><span class="o">&gt;</span> <span class="n">of</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Optional</span><span class="o">.</span><span class="na">ofNullable</span><span class="o">(</span><span class="n">ENUM_MAP</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">name</span><span class="o">))</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Override</span>
-    <span class="predefined-type">String</span> toString() {
-        name
-    }
+    <span class="nd">@Override</span>
+    <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">name</span>
+    <span class="o">}</span>
 
-    <span class="directive">static</span> <span class="predefined-type">Set</span>&lt;<span class="predefined-type">String</span>&gt; candidates() {
-        ENUM_MAP.keySet()
-    }
-}</code></pre>
+    <span class="kd">static</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">candidates</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">ENUM_MAP</span><span class="o">.</span><span class="na">keySet</span><span class="o">()</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -408,17 +409,17 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/groovy/example/micronaut/TemperatureScaleCandidates.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="type">class</span> <span class="class">TemperatureScaleCandidates</span> <span class="directive">extends</span> <span class="predefined-type">ArrayList</span>&lt;<span class="predefined-type">String</span>&gt; {
+<span class="nd">@CompileStatic</span>
+<span class="kd">class</span> <span class="nc">TemperatureScaleCandidates</span> <span class="kd">extends</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="o">{</span>
 
-    TemperatureScaleCandidates() {
-        <span class="local-variable">super</span>(Scale.candidates());
-    }
-}</code></pre>
+    <span class="n">TemperatureScaleCandidates</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">Scale</span><span class="o">.</span><span class="na">candidates</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -427,60 +428,60 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/groovy/example/micronaut/MicronautguideCommand.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.picocli.PicocliRunner</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">picocli.CommandLine.Command</span>
-<span class="keyword">import</span> <span class="include">picocli.CommandLine.Option</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.picocli.PicocliRunner</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">picocli.CommandLine.Command</span>
+<span class="kn">import</span> <span class="nn">picocli.CommandLine.Option</span>
 
-<span class="keyword">import</span> <span class="include">java.math.RoundingMode</span>
+<span class="kn">import</span> <span class="nn">java.math.RoundingMode</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">example.micronaut.Scale.CELSIUS</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">example.micronaut.Scale.FAHRENHEIT</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">example</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">Scale</span><span class="o">.</span><span class="na">CELSIUS</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">example</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">Scale</span><span class="o">.</span><span class="na">FAHRENHEIT</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Command</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">house-livingroom-temperature</span><span class="delimiter">'</span></span>, <i class="conum" data-value="1"></i><b>(1)</b>
-         description = <span class="string"><span class="delimiter">'</span><span class="content">Publish living room temperature</span><span class="delimiter">'</span></span>,
-         mixinStandardHelpOptions = <span class="predefined-constant">true</span>)
-<span class="type">class</span> <span class="class">MicronautguideCommand</span> <span class="directive">implements</span> <span class="predefined-type">Runnable</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Command</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">'house-livingroom-temperature'</span><span class="o">,</span> <i class="conum" data-value="1"></i><b>(1)</b>
+         <span class="n">description</span> <span class="o">=</span> <span class="s1">'Publish living room temperature'</span><span class="o">,</span>
+         <span class="n">mixinStandardHelpOptions</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+<span class="kd">class</span> <span class="nc">MicronautguideCommand</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
 
-    <span class="annotation">@Option</span>(names = [<span class="string"><span class="delimiter">'</span><span class="content">-t</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">--temperature</span><span class="delimiter">'</span></span>], <i class="conum" data-value="2"></i><b>(2)</b>
-            required = <span class="predefined-constant">true</span>, <i class="conum" data-value="3"></i><b>(3)</b>
-            description = <span class="string"><span class="delimiter">'</span><span class="content">Temperature value</span><span class="delimiter">'</span></span>)
-    <span class="predefined-type">BigDecimal</span> temperature
+    <span class="nd">@Option</span><span class="o">(</span><span class="n">names</span> <span class="o">=</span> <span class="o">[</span><span class="s1">'-t'</span><span class="o">,</span> <span class="s1">'--temperature'</span><span class="o">],</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">true</span><span class="o">,</span> <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="n">description</span> <span class="o">=</span> <span class="s1">'Temperature value'</span><span class="o">)</span>
+    <span class="n">BigDecimal</span> <span class="n">temperature</span>
 
-    <span class="annotation">@Option</span>(names = [<span class="string"><span class="delimiter">'</span><span class="content">-s</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">--scale</span><span class="delimiter">'</span></span>], <i class="conum" data-value="2"></i><b>(2)</b>
-            required = <span class="predefined-constant">false</span>, <i class="conum" data-value="3"></i><b>(3)</b>
-            description = <span class="string"><span class="delimiter">'</span><span class="content">Temperate scales ${COMPLETION-CANDIDATES}</span><span class="delimiter">'</span></span>, <i class="conum" data-value="4"></i><b>(4)</b>
-            completionCandidates = TemperatureScaleCandidates) <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="predefined-type">String</span> scale
+    <span class="nd">@Option</span><span class="o">(</span><span class="n">names</span> <span class="o">=</span> <span class="o">[</span><span class="s1">'-s'</span><span class="o">,</span> <span class="s1">'--scale'</span><span class="o">],</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="n">description</span> <span class="o">=</span> <span class="s1">'Temperate scales ${COMPLETION-CANDIDATES}'</span><span class="o">,</span> <i class="conum" data-value="4"></i><b>(4)</b>
+            <span class="n">completionCandidates</span> <span class="o">=</span> <span class="n">TemperatureScaleCandidates</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="n">String</span> <span class="n">scale</span>
 
-    <span class="annotation">@Inject</span>
-    TemperatureClient temperatureClient <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="nd">@Inject</span>
+    <span class="n">TemperatureClient</span> <span class="n">temperatureClient</span> <i class="conum" data-value="5"></i><b>(5)</b>
 
-    <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
-        PicocliRunner.run(MicronautguideCommand, args)
-    }
+    <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">PicocliRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">MicronautguideCommand</span><span class="o">,</span> <span class="n">args</span><span class="o">)</span>
+    <span class="o">}</span>
 
-    <span class="type">void</span> run() {
-        Scale temperatureScale = scale != <span class="predefined-constant">null</span> ?
-                Scale.of(scale).orElse(CELSIUS) : CELSIUS
-        <span class="predefined-type">BigDecimal</span> celsius = (temperatureScale == FAHRENHEIT)
-                ? fahrenheitToCelsius(temperature) : temperature
-        <span class="type">byte</span><span class="type">[]</span> data = celsius.toPlainString().bytes
-        temperatureClient.publishLivingroomTemperature(data) <i class="conum" data-value="6"></i><b>(6)</b>
-        println(<span class="string"><span class="delimiter">'</span><span class="content">Topic published</span><span class="delimiter">'</span></span>)
-    }
+    <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Scale</span> <span class="n">temperatureScale</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span>
+                <span class="n">Scale</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">scale</span><span class="o">).</span><span class="na">orElse</span><span class="o">(</span><span class="n">CELSIUS</span><span class="o">)</span> <span class="o">:</span> <span class="n">CELSIUS</span>
+        <span class="n">BigDecimal</span> <span class="n">celsius</span> <span class="o">=</span> <span class="o">(</span><span class="n">temperatureScale</span> <span class="o">==</span> <span class="n">FAHRENHEIT</span><span class="o">)</span>
+                <span class="o">?</span> <span class="n">fahrenheitToCelsius</span><span class="o">(</span><span class="n">temperature</span><span class="o">)</span> <span class="o">:</span> <span class="n">temperature</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span> <span class="o">=</span> <span class="n">celsius</span><span class="o">.</span><span class="na">toPlainString</span><span class="o">().</span><span class="na">bytes</span>
+        <span class="n">temperatureClient</span><span class="o">.</span><span class="na">publishLivingroomTemperature</span><span class="o">(</span><span class="n">data</span><span class="o">)</span> <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="n">println</span><span class="o">(</span><span class="s1">'Topic published'</span><span class="o">)</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="predefined-type">BigDecimal</span> fahrenheitToCelsius(<span class="predefined-type">BigDecimal</span> temperature) {
-        <span class="keyword">return</span> temperature
-                .subtract(<span class="predefined-type">BigDecimal</span>.valueOf(<span class="integer">32</span>))
-                .multiply(<span class="predefined-type">BigDecimal</span>.valueOf(<span class="integer">5</span>/<span class="float">9.0</span> <span class="keyword">as</span> <span class="type">double</span>))
-                .setScale(<span class="integer">2</span>, <span class="predefined-type">RoundingMode</span>.FLOOR)
-    }
-}</code></pre>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">BigDecimal</span> <span class="nf">fahrenheitToCelsius</span><span class="o">(</span><span class="n">BigDecimal</span> <span class="n">temperature</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">temperature</span>
+                <span class="o">.</span><span class="na">subtract</span><span class="o">(</span><span class="n">BigDecimal</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">32</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">multiply</span><span class="o">(</span><span class="n">BigDecimal</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">5</span><span class="o">/</span><span class="mf">9.0</span> <span class="k">as</span> <span class="kt">double</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">setScale</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="n">RoundingMode</span><span class="o">.</span><span class="na">FLOOR</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -517,61 +518,61 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/test/groovy/example/micronaut/MicronautguideCommandSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.picocli.PicocliRunner</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.MqttSubscriber</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.Topic</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-<span class="keyword">import</span> <span class="include">spock.util.concurrent.PollingConditions</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.picocli.PicocliRunner</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.ApplicationContext</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.env.Environment</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.MqttSubscriber</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">spock.util.concurrent.PollingConditions</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">java.nio.charset.StandardCharsets.UTF_8</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">nio</span><span class="o">.</span><span class="na">charset</span><span class="o">.</span><span class="na">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span>
 
-<span class="type">class</span> <span class="class">MicronautguideCommandSpec</span> <span class="directive">extends</span> Specification {
+<span class="kd">class</span> <span class="nc">MicronautguideCommandSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    PollingConditions pollingConditions = <span class="keyword">new</span> PollingConditions()
+    <span class="n">PollingConditions</span> <span class="n">pollingConditions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PollingConditions</span><span class="o">()</span>
 
-    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">test with command line option</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        <span class="predefined-type">OutputStream</span> baos = <span class="keyword">new</span> <span class="predefined-type">ByteArrayOutputStream</span>()
-        <span class="predefined-type">System</span>.setOut(<span class="keyword">new</span> <span class="predefined-type">PrintStream</span>(baos))
+    <span class="kt">def</span> <span class="s2">"test with command line option"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">OutputStream</span> <span class="n">baos</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ByteArrayOutputStream</span><span class="o">()</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">setOut</span><span class="o">(</span><span class="k">new</span> <span class="n">PrintStream</span><span class="o">(</span><span class="n">baos</span><span class="o">))</span>
 
-        ApplicationContext ctx = ApplicationContext.run(
-                [<span class="string"><span class="delimiter">'</span><span class="content">spec.name</span><span class="delimiter">'</span></span>: <span class="string"><span class="delimiter">'</span><span class="content">MicronautguideCommandSpec</span><span class="delimiter">'</span></span>],
-                Environment.CLI, Environment.TEST)
+        <span class="n">ApplicationContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">ApplicationContext</span><span class="o">.</span><span class="na">run</span><span class="o">(</span>
+                <span class="o">[</span><span class="s1">'spec.name'</span><span class="o">:</span> <span class="s1">'MicronautguideCommandSpec'</span><span class="o">],</span>
+                <span class="n">Environment</span><span class="o">.</span><span class="na">CLI</span><span class="o">,</span> <span class="n">Environment</span><span class="o">.</span><span class="na">TEST</span><span class="o">)</span>
 
-        <span class="predefined-type">String</span><span class="type">[]</span> args = [<span class="string"><span class="delimiter">'</span><span class="content">-t</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">212</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">-s</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">Fahrenheit</span><span class="delimiter">'</span></span>]
-        PicocliRunner.run(MicronautguideCommand, ctx, args)
+        <span class="n">String</span><span class="o">[]</span> <span class="n">args</span> <span class="o">=</span> <span class="o">[</span><span class="s1">'-t'</span><span class="o">,</span> <span class="s1">'212'</span><span class="o">,</span> <span class="s1">'-s'</span><span class="o">,</span> <span class="s1">'Fahrenheit'</span><span class="o">]</span>
+        <span class="n">PicocliRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">MicronautguideCommand</span><span class="o">,</span> <span class="n">ctx</span><span class="o">,</span> <span class="n">args</span><span class="o">)</span>
 
-        TemperatureListener listener = ctx.getBean(TemperatureListener.class);
+        <span class="n">TemperatureListener</span> <span class="n">listener</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">TemperatureListener</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 
-        <span class="key">then</span>:
-        baos.toString().contains(<span class="string"><span class="delimiter">'</span><span class="content">Topic published</span><span class="delimiter">'</span></span>)
+        <span class="nl">then:</span>
+        <span class="n">baos</span><span class="o">.</span><span class="na">toString</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s1">'Topic published'</span><span class="o">)</span>
 
-        <span class="key">and</span>:
-        pollingConditions.within(<span class="integer">5</span>) {
-            listener.temperature == <span class="float">100.0</span>
-        }
+        <span class="nl">and:</span>
+        <span class="n">pollingConditions</span><span class="o">.</span><span class="na">within</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">listener</span><span class="o">.</span><span class="na">temperature</span> <span class="o">==</span> <span class="mf">100.0</span>
+        <span class="o">}</span>
 
-        <span class="key">cleanup</span>:
-        ctx.close()
-    }
+        <span class="nl">cleanup:</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="na">close</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">MicronautguideCommandSpec</span><span class="delimiter">&quot;</span></span>)
-    <span class="annotation">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="directive">static</span> <span class="type">class</span> <span class="class">TemperatureListener</span> {
+    <span class="nd">@Requires</span><span class="o">(</span><span class="n">property</span> <span class="o">=</span> <span class="s2">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">"MicronautguideCommandSpec"</span><span class="o">)</span>
+    <span class="nd">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="kd">static</span> <span class="kd">class</span> <span class="nc">TemperatureListener</span> <span class="o">{</span>
 
-        <span class="directive">private</span> <span class="predefined-type">BigDecimal</span> temperature
+        <span class="kd">private</span> <span class="n">BigDecimal</span> <span class="n">temperature</span>
 
-        <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">house/livingroom/temperature</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="type">void</span> receive(<span class="type">byte</span><span class="type">[]</span> data) {
-            temperature = <span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="keyword">new</span> <span class="predefined-type">String</span>(data, UTF_8))
-        }
-    }
-}</code></pre>
+        <span class="nd">@Topic</span><span class="o">(</span><span class="s2">"house/livingroom/temperature"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="kt">void</span> <span class="nf">receive</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">temperature</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="n">UTF_8</span><span class="o">))</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -604,10 +605,10 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">cli/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">mqtt</span>:
-  <span class="key">client</span>:
-    <span class="key">server-uri</span>: <span class="string"><span class="content">tcp://${mqtt.host}:${mqtt.port}</span></span>
-    <span class="key">client-id</span>: <span class="string"><span class="content">${random.uuid}</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">mqtt</span><span class="pi">:</span>
+  <span class="na">client</span><span class="pi">:</span>
+    <span class="na">server-uri</span><span class="pi">:</span> <span class="s">tcp://${mqtt.host}:${mqtt.port}</span>
+    <span class="na">client-id</span><span class="pi">:</span> <span class="s">${random.uuid}</span></code></pre>
 </div>
 </div>
 </div>
@@ -621,9 +622,9 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-messaging-app example.micronaut.micronautguide \
-    --features=yaml,mqtt \
-    --build=gradle --lang=groovy</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-messaging-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>yaml,mqtt <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>groovy</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -673,10 +674,10 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">app/src/main/resources/application.yml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yaml"><span class="key">mqtt</span>:
-  <span class="key">client</span>:
-    <span class="key">server-uri</span>: <span class="string"><span class="content">tcp://${mqtt.host}:${mqtt.port}</span></span>
-    <span class="key">client-id</span>: <span class="string"><span class="content">${random.uuid}</span></span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">mqtt</span><span class="pi">:</span>
+  <span class="na">client</span><span class="pi">:</span>
+    <span class="na">server-uri</span><span class="pi">:</span> <span class="s">tcp://${mqtt.host}:${mqtt.port}</span>
+    <span class="na">client-id</span><span class="pi">:</span> <span class="s">${random.uuid}</span></code></pre>
 </div>
 </div>
 </div>
@@ -685,30 +686,30 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">app/src/main/groovy/example/micronaut/TemperatureListener.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">groovy.util.logging.Slf4j</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.MqttSubscriber</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.Topic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">groovy.util.logging.Slf4j</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.MqttSubscriber</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">java.nio.charset.StandardCharsets.UTF_8</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">nio</span><span class="o">.</span><span class="na">charset</span><span class="o">.</span><span class="na">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span>
 
-<span class="annotation">@Slf4j</span>
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">TemperatureListener</span> {
+<span class="nd">@Slf4j</span>
+<span class="nd">@CompileStatic</span>
+<span class="nd">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">TemperatureListener</span> <span class="o">{</span>
 
-    <span class="annotation">@Nullable</span>
-    <span class="predefined-type">BigDecimal</span> temperature = <span class="predefined-constant">null</span>;
+    <span class="nd">@Nullable</span>
+    <span class="n">BigDecimal</span> <span class="n">temperature</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
-    <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">'</span><span class="content">house/livingroom/temperature</span><span class="delimiter">'</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="type">void</span> receive(<span class="type">byte</span><span class="type">[]</span> data) {
-        temperature = <span class="keyword">new</span> <span class="predefined-type">BigDecimal</span>(<span class="keyword">new</span> <span class="predefined-type">String</span>(data, UTF_8))
-        log.info(<span class="string"><span class="delimiter">'</span><span class="content">temperature: {}</span><span class="delimiter">'</span></span>, temperature)
-    }
-}</code></pre>
+    <span class="nd">@Topic</span><span class="o">(</span><span class="s1">'house/livingroom/temperature'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kt">void</span> <span class="nf">receive</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">temperature</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="n">UTF_8</span><span class="o">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s1">'temperature: {}'</span><span class="o">,</span> <span class="n">temperature</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -729,49 +730,49 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">app/src/test/groovy/example/micronaut/SubscriptionSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Property</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Requires</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.Topic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.mqtt.annotation.v5.MqttPublisher</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.util.concurrent.PollingConditions</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Property</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.mqtt.annotation.v5.MqttPublisher</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.util.concurrent.PollingConditions</span>
 
-<span class="keyword">import</span> <span class="include">java.nio.charset.StandardCharsets</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">java.nio.charset.StandardCharsets</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Property</span>(name = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">SubscriptionTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">SubscriptionSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">"SubscriptionTest"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">SubscriptionSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    TemperatureClient client
+    <span class="nd">@Inject</span>
+    <span class="n">TemperatureClient</span> <span class="n">client</span>
 
-    <span class="annotation">@Inject</span>
-    TemperatureListener listener
+    <span class="nd">@Inject</span>
+    <span class="n">TemperatureListener</span> <span class="n">listener</span>
 
-    PollingConditions conditions = <span class="keyword">new</span> PollingConditions()
+    <span class="n">PollingConditions</span> <span class="n">conditions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PollingConditions</span><span class="o">()</span>
 
-    <span class="keyword">def</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">subscriptions are received</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>:
-        client.publishLivingroomTemperature(<span class="string"><span class="delimiter">&quot;</span><span class="content">3.145</span><span class="delimiter">&quot;</span></span>.getBytes(StandardCharsets.UTF_8))
+    <span class="kt">def</span> <span class="s2">"subscriptions are received"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">client</span><span class="o">.</span><span class="na">publishLivingroomTemperature</span><span class="o">(</span><span class="s2">"3.145"</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span><span class="n">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">))</span>
 
-        <span class="key">then</span>:
-        conditions.within(<span class="integer">5</span>) {
-            listener.temperature == <span class="float">3.145</span>
-        }
-    }
+        <span class="nl">then:</span>
+        <span class="n">conditions</span><span class="o">.</span><span class="na">within</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">listener</span><span class="o">.</span><span class="na">temperature</span> <span class="o">==</span> <span class="mf">3.145</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Requires</span>(property = <span class="string"><span class="delimiter">&quot;</span><span class="content">spec.name</span><span class="delimiter">&quot;</span></span>, value = <span class="string"><span class="delimiter">&quot;</span><span class="content">SubscriptionTest</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@MqttPublisher</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="directive">static</span> <span class="type">interface</span> TemperatureClient {
+    <span class="nd">@Requires</span><span class="o">(</span><span class="n">property</span> <span class="o">=</span> <span class="s2">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s2">"SubscriptionTest"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@MqttPublisher</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kd">static</span> <span class="kd">interface</span> <span class="nc">TemperatureClient</span> <span class="o">{</span>
 
-        <span class="annotation">@Topic</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">house/livingroom/temperature</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="5"></i><b>(5)</b>
-        <span class="type">void</span> publishLivingroomTemperature(<span class="type">byte</span><span class="type">[]</span> data)
-    }
-}</code></pre>
+        <span class="nd">@Topic</span><span class="o">(</span><span class="s2">"house/livingroom/temperature"</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="kt">void</span> <span class="nf">publishLivingroomTemperature</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -820,7 +821,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew run --args=&quot;-t 212 -s Fahrenheit&quot;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run <span class="nt">--args</span><span class="o">=</span><span class="s2">"-t 212 -s Fahrenheit"</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -828,7 +829,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">12:09:47.280 [MQTT Call: 180d98b5-75b9-41be-a874-295289346592]
+<pre class="rouge highlight"><code data-lang="bash">12:09:47.280 <span class="o">[</span>MQTT Call: 180d98b5-75b9-41be-a874-295289346592]
     INFO  e.micronaut.TemperatureListener - temperature: 100.00</code></pre>
 </div>
 </div>

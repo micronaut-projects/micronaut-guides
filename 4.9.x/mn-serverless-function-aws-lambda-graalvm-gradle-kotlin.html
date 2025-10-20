@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -217,7 +218,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-function-app example.micronaut.micronautguide --features=graalvm,aws-lambda --build=gradle --lang=kotlin</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-function-app example.micronaut.micronautguide <span class="nt">--features</span><span class="o">=</span>graalvm,aws-lambda <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -264,30 +265,30 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select <c
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/FunctionRequestHandler.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
-import io.micronaut.function.aws.MicronautRequestHandler
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import io.micronaut.json.JsonMapper;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import jakarta.inject.Inject
-class FunctionRequestHandler : MicronautRequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt;() {
-    @Inject
-    lateinit var objectMapper: JsonMapper
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+<span class="k">import</span> <span class="nn">io.micronaut.function.aws.MicronautRequestHandler</span>
+<span class="k">import</span> <span class="nn">java.io.IOException;</span>
+<span class="k">import</span> <span class="nn">java.nio.charset.StandardCharsets;</span>
+<span class="k">import</span> <span class="nn">io.micronaut.json.JsonMapper;</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kd">class</span> <span class="nc">FunctionRequestHandler</span> <span class="p">:</span> <span class="nc">MicronautRequestHandler</span><span class="p">&lt;</span><span class="nc">APIGatewayProxyRequestEvent</span><span class="p">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="p">&gt;()</span> <span class="p">{</span>
+    <span class="nd">@Inject</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">objectMapper</span><span class="p">:</span> <span class="nc">JsonMapper</span>
 
-    override fun execute(input: APIGatewayProxyRequestEvent): APIGatewayProxyResponseEvent {
-        val response = APIGatewayProxyResponseEvent()
-        try {
-            val json = String(objectMapper.writeValueAsBytes(mapOf(&quot;message&quot; to &quot;Hello World&quot;)))
-            response.statusCode = 200
-            response.body = json
-        } catch (e: IOException) {
-            response.statusCode = 500
-        }
-        return response
-    }
-}</code></pre>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">execute</span><span class="p">(</span><span class="n">input</span><span class="p">:</span> <span class="nc">APIGatewayProxyRequestEvent</span><span class="p">):</span> <span class="nc">APIGatewayProxyResponseEvent</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">response</span> <span class="p">=</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="p">()</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="kd">val</span> <span class="py">json</span> <span class="p">=</span> <span class="nc">String</span><span class="p">(</span><span class="n">objectMapper</span><span class="p">.</span><span class="nf">writeValueAsBytes</span><span class="p">(</span><span class="nf">mapOf</span><span class="p">(</span><span class="s">"message"</span> <span class="n">to</span> <span class="s">"Hello World"</span><span class="p">)))</span>
+            <span class="n">response</span><span class="p">.</span><span class="n">statusCode</span> <span class="p">=</span> <span class="mi">200</span>
+            <span class="n">response</span><span class="p">.</span><span class="n">body</span> <span class="p">=</span> <span class="n">json</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="nc">IOException</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">response</span><span class="p">.</span><span class="n">statusCode</span> <span class="p">=</span> <span class="mi">500</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">response</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -303,25 +304,25 @@ class FunctionRequestHandler : MicronautRequestHandler&lt;APIGatewayProxyRequest
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/FunctionRequestHandlerTest.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
 
-class FunctionRequestHandlerTest {
+<span class="kd">class</span> <span class="nc">FunctionRequestHandlerTest</span> <span class="p">{</span>
 
-    @Test
-    fun testHandler() {
-        val handler = FunctionRequestHandler()
-        val request = APIGatewayProxyRequestEvent()
-        request.httpMethod = &quot;GET&quot;
-        request.path = &quot;/&quot;
-        val response = handler.execute(request)
-        assertEquals(200, response.statusCode.toInt())
-        assertEquals(&quot;{\&quot;message\&quot;:\&quot;Hello World\&quot;}&quot;, response.body)
-        handler.close()
-    }
-}</code></pre>
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">testHandler</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">handler</span> <span class="p">=</span> <span class="nc">FunctionRequestHandler</span><span class="p">()</span>
+        <span class="kd">val</span> <span class="py">request</span> <span class="p">=</span> <span class="nc">APIGatewayProxyRequestEvent</span><span class="p">()</span>
+        <span class="n">request</span><span class="p">.</span><span class="n">httpMethod</span> <span class="p">=</span> <span class="s">"GET"</span>
+        <span class="n">request</span><span class="p">.</span><span class="n">path</span> <span class="p">=</span> <span class="s">"/"</span>
+        <span class="kd">val</span> <span class="py">response</span> <span class="p">=</span> <span class="n">handler</span><span class="p">.</span><span class="nf">execute</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">response</span><span class="p">.</span><span class="n">statusCode</span><span class="p">.</span><span class="nf">toInt</span><span class="p">())</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="s">"{\"message\":\"Hello World\"}"</span><span class="p">,</span> <span class="n">response</span><span class="p">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="n">handler</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -347,7 +348,7 @@ class FunctionRequestHandlerTest {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -381,35 +382,35 @@ class FunctionRequestHandlerTest {
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/FunctionLambdaRuntime.kt</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="kotlin">package example.micronaut
-import com.amazonaws.services.lambda.runtime.RequestHandler
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import io.micronaut.function.aws.runtime.AbstractMicronautLambdaRuntime
-import java.net.MalformedURLException
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.RequestHandler</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent</span>
+<span class="k">import</span> <span class="nn">io.micronaut.function.aws.runtime.AbstractMicronautLambdaRuntime</span>
+<span class="k">import</span> <span class="nn">java.net.MalformedURLException</span>
 
-class FunctionLambdaRuntime : AbstractMicronautLambdaRuntime&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent, APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt;()
-{
+<span class="kd">class</span> <span class="nc">FunctionLambdaRuntime</span> <span class="p">:</span> <span class="nc">AbstractMicronautLambdaRuntime</span><span class="p">&lt;</span><span class="nc">APIGatewayProxyRequestEvent</span><span class="p">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="p">,</span> <span class="nc">APIGatewayProxyRequestEvent</span><span class="p">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="p">&gt;()</span>
+<span class="p">{</span>
 
-    override fun createRequestHandler(vararg args: String?): RequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt; {
-        return FunctionRequestHandler()
-    }
-    companion object {
-        @JvmStatic
-        fun main(vararg args: String) {
-            try {
-                FunctionLambdaRuntime().run(*args)
-            } catch (e: MalformedURLException) {
-                e.printStackTrace()
-            }
-        }
-    }
-}</code></pre>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">createRequestHandler</span><span class="p">(</span><span class="k">vararg</span> <span class="n">args</span><span class="p">:</span> <span class="nc">String</span><span class="p">?):</span> <span class="nc">RequestHandler</span><span class="p">&lt;</span><span class="nc">APIGatewayProxyRequestEvent</span><span class="p">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nc">FunctionRequestHandler</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="nd">@JvmStatic</span>
+        <span class="k">fun</span> <span class="nf">main</span><span class="p">(</span><span class="k">vararg</span> <span class="n">args</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="nc">FunctionLambdaRuntime</span><span class="p">().</span><span class="nf">run</span><span class="p">(*</span><span class="n">args</span><span class="p">)</span>
+            <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="nc">MalformedURLException</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">e</span><span class="p">.</span><span class="nf">printStackTrace</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew buildNativeLambda</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew buildNativeLambda</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -456,13 +457,13 @@ class FunctionLambdaRuntime : AbstractMicronautLambdaRuntime&lt;APIGatewayProxyR
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">path</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>,
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">httpMethod</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">GET</span><span class="delimiter">&quot;</span></span>,
-  <span class="key"><span class="delimiter">&quot;</span><span class="content">headers</span><span class="delimiter">&quot;</span></span>: {
-    <span class="key"><span class="delimiter">&quot;</span><span class="content">Accept</span><span class="delimiter">&quot;</span></span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">application/json</span><span class="delimiter">&quot;</span></span>
-  }
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"httpMethod"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GET"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"headers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"Accept"</span><span class="p">:</span><span class="w"> </span><span class="s2">"application/json"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">

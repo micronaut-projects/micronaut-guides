@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -201,7 +202,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-cli-app  example.micronaut.micronautguide --build=gradle --lang=groovy</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-cli-app  example.micronaut.micronautguide <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>groovy</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -235,19 +236,19 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/JsonWebKeyGenerator.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
 
-<span class="comment">/**
- * &lt;a href=&quot;https://datatracker.ietf.org/doc/html/rfc7517&quot;&gt;JSON Web Key&lt;/a&gt;
+<span class="cm">/**
+ * &lt;a href="https://datatracker.ietf.org/doc/html/rfc7517"&gt;JSON Web Key&lt;/a&gt;
  */</span>
-<span class="type">interface</span> JsonWebKeyGenerator {
+<span class="kd">interface</span> <span class="nc">JsonWebKeyGenerator</span> <span class="o">{</span>
 
-    <span class="annotation">@NonNull</span>
-    Optional&lt;<span class="predefined-type">String</span>&gt; generateJsonWebKey(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> kid)
-}</code></pre>
+    <span class="nd">@NonNull</span>
+    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">generateJsonWebKey</span><span class="o">(</span><span class="nd">@Nullable</span> <span class="n">String</span> <span class="n">kid</span><span class="o">)</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -259,7 +260,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">build.gradle</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">implementation(<span class="string"><span class="delimiter">&quot;</span><span class="content">com.nimbusds:nimbus-jose-jwt:9.40</span><span class="delimiter">&quot;</span></span>)</code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"com.nimbusds:nimbus-jose-jwt:9.40"</span><span class="o">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -268,44 +269,44 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/RS256JsonWebKeyGenerator.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">com.nimbusds.jose.JOSEException</span>
-<span class="keyword">import</span> <span class="include">com.nimbusds.jose.jwk.gen.RSAKeyGenerator</span>
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">groovy.util.logging.Slf4j</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jose.JOSEException</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jose.jwk.gen.RSAKeyGenerator</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">groovy.util.logging.Slf4j</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.nimbusds.jose.JWSAlgorithm.RS256</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">com.nimbusds.jose.jwk.KeyUse.SIGNATURE</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">com</span><span class="o">.</span><span class="na">nimbusds</span><span class="o">.</span><span class="na">jose</span><span class="o">.</span><span class="na">JWSAlgorithm</span><span class="o">.</span><span class="na">RS256</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">com</span><span class="o">.</span><span class="na">nimbusds</span><span class="o">.</span><span class="na">jose</span><span class="o">.</span><span class="na">jwk</span><span class="o">.</span><span class="na">KeyUse</span><span class="o">.</span><span class="na">SIGNATURE</span>
 
-<span class="annotation">@Slf4j</span>
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">RS256JsonWebKeyGenerator</span> <span class="directive">implements</span> JsonWebKeyGenerator {
+<span class="nd">@Slf4j</span>
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">RS256JsonWebKeyGenerator</span> <span class="kd">implements</span> <span class="n">JsonWebKeyGenerator</span> <span class="o">{</span>
 
-    <span class="annotation">@Override</span>
-    <span class="annotation">@NonNull</span>
-    Optional&lt;<span class="predefined-type">String</span>&gt; generateJsonWebKey(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> kid) {
-        <span class="keyword">try</span> {
-            Optional.of(<span class="keyword">new</span> RSAKeyGenerator(<span class="integer">2048</span>)
-                    .algorithm(RS256)
-                    .keyUse(SIGNATURE) <span class="comment">// indicate the intended use of the key</span>
-                    .keyID(kid != <span class="predefined-constant">null</span> ? kid : generateKid()) <span class="comment">// give the key a unique ID</span>
-                    .generate()
-                    .toJSONString())
-        } <span class="keyword">catch</span> (JOSEException e) {
-            log.warn(<span class="string"><span class="delimiter">'</span><span class="content">unable to generate RS256 key</span><span class="delimiter">'</span></span>, e)
-            Optional.empty()
-        }
-    }
+    <span class="nd">@Override</span>
+    <span class="nd">@NonNull</span>
+    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">generateJsonWebKey</span><span class="o">(</span><span class="nd">@Nullable</span> <span class="n">String</span> <span class="n">kid</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">Optional</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="k">new</span> <span class="n">RSAKeyGenerator</span><span class="o">(</span><span class="mi">2048</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">algorithm</span><span class="o">(</span><span class="n">RS256</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">keyUse</span><span class="o">(</span><span class="n">SIGNATURE</span><span class="o">)</span> <span class="c1">// indicate the intended use of the key</span>
+                    <span class="o">.</span><span class="na">keyID</span><span class="o">(</span><span class="n">kid</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">kid</span> <span class="o">:</span> <span class="n">generateKid</span><span class="o">())</span> <span class="c1">// give the key a unique ID</span>
+                    <span class="o">.</span><span class="na">generate</span><span class="o">()</span>
+                    <span class="o">.</span><span class="na">toJSONString</span><span class="o">())</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JOSEException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">log</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s1">'unable to generate RS256 key'</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span>
+            <span class="n">Optional</span><span class="o">.</span><span class="na">empty</span><span class="o">()</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="predefined-type">String</span> generateKid() {
-        <span class="predefined-type">UUID</span>.randomUUID().toString().replaceAll(<span class="string"><span class="delimiter">'</span><span class="content">-</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="delimiter">'</span></span>)
-    }
-}</code></pre>
+    <span class="kd">private</span> <span class="n">String</span> <span class="nf">generateKid</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">().</span><span class="na">replaceAll</span><span class="o">(</span><span class="s1">'-'</span><span class="o">,</span> <span class="s1">''</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -328,40 +329,40 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/MicronautguideCommand.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.picocli.PicocliRunner</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">picocli.CommandLine.Command</span>
-<span class="keyword">import</span> <span class="include">picocli.CommandLine.Option</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.picocli.PicocliRunner</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">picocli.CommandLine.Command</span>
+<span class="kn">import</span> <span class="nn">picocli.CommandLine.Option</span>
 
-<span class="annotation">@Command</span>(name = <span class="string"><span class="delimiter">'</span><span class="content">keysgen</span><span class="delimiter">'</span></span>,
-         description = <span class="string"><span class="delimiter">'</span><span class="content">Generates a Json Web Key (JWT) with RS256 algorithm.</span><span class="delimiter">'</span></span>,
-         mixinStandardHelpOptions = <span class="predefined-constant">true</span>)  <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@CompileStatic</span>
-<span class="type">class</span> <span class="class">MicronautguideCommand</span> <span class="directive">implements</span> <span class="predefined-type">Runnable</span> {
+<span class="nd">@Command</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">'keysgen'</span><span class="o">,</span>
+         <span class="n">description</span> <span class="o">=</span> <span class="s1">'Generates a Json Web Key (JWT) with RS256 algorithm.'</span><span class="o">,</span>
+         <span class="n">mixinStandardHelpOptions</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>  <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@CompileStatic</span>
+<span class="kd">class</span> <span class="nc">MicronautguideCommand</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
 
-    <span class="annotation">@Option</span>(names = [<span class="string"><span class="delimiter">'</span><span class="content">-kid</span><span class="delimiter">'</span></span>], <i class="conum" data-value="2"></i><b>(2)</b>
-            required = <span class="predefined-constant">false</span>,
-            description = <span class="string"><span class="delimiter">'</span><span class="content">Key ID. Parameter is used to match a specific key. If not specified a random Key ID is generated.</span><span class="delimiter">'</span></span>)
-    <span class="directive">private</span> <span class="predefined-type">String</span> kid
+    <span class="nd">@Option</span><span class="o">(</span><span class="n">names</span> <span class="o">=</span> <span class="o">[</span><span class="s1">'-kid'</span><span class="o">],</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="s1">'Key ID. Parameter is used to match a specific key. If not specified a random Key ID is generated.'</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">kid</span>
 
-    <span class="annotation">@Inject</span>
-    JsonWebKeyGenerator jsonWebKeyGenerator <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Inject</span>
+    <span class="n">JsonWebKeyGenerator</span> <span class="n">jsonWebKeyGenerator</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-    <span class="directive">static</span> <span class="type">void</span> main(<span class="predefined-type">String</span><span class="type">[]</span> args) {
-        PicocliRunner.run(MicronautguideCommand, args)
-    }
+    <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">PicocliRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">MicronautguideCommand</span><span class="o">,</span> <span class="n">args</span><span class="o">)</span>
+    <span class="o">}</span>
 
-    <span class="type">void</span> run() {
-        jsonWebKeyGenerator.generateJsonWebKey(kid).ifPresent(<span class="local-variable">this</span>::printlnJsonWebKey)
-    }
+    <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">jsonWebKeyGenerator</span><span class="o">.</span><span class="na">generateJsonWebKey</span><span class="o">(</span><span class="n">kid</span><span class="o">).</span><span class="na">ifPresent</span><span class="o">(</span><span class="nl">this:</span><span class="o">:</span><span class="n">printlnJsonWebKey</span><span class="o">)</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="type">void</span> printlnJsonWebKey(<span class="predefined-type">String</span> jwk) {
-        println(<span class="string"><span class="delimiter">'</span><span class="content">JWK: </span><span class="delimiter">'</span></span> + jwk)
-    }
-}</code></pre>
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">printlnJsonWebKey</span><span class="o">(</span><span class="n">String</span> <span class="n">jwk</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">println</span><span class="o">(</span><span class="s1">'JWK: '</span> <span class="o">+</span> <span class="n">jwk</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -386,45 +387,45 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/MicronautguideCommandSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">com.nimbusds.jose.jwk.JWK</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.configuration.picocli.PicocliRunner</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.context.env.Environment</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jose.jwk.JWK</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.configuration.picocli.PicocliRunner</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.ApplicationContext</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.env.Environment</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="type">class</span> <span class="class">MicronautguideCommandSpec</span> <span class="directive">extends</span> Specification {
+<span class="kd">class</span> <span class="nc">MicronautguideCommandSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="type">void</span> testGenerateJwk() {
-        <span class="key">when</span>:
-        <span class="predefined-type">String</span> jwkJsonRepresentation = executeCommand(MicronautguideCommand, <span class="type">[]</span> <span class="keyword">as</span> <span class="predefined-type">String</span><span class="type">[]</span>)
+    <span class="kt">void</span> <span class="nf">testGenerateJwk</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">String</span> <span class="n">jwkJsonRepresentation</span> <span class="o">=</span> <span class="n">executeCommand</span><span class="o">(</span><span class="n">MicronautguideCommand</span><span class="o">,</span> <span class="o">[]</span> <span class="k">as</span> <span class="n">String</span><span class="o">[])</span>
 
-        <span class="key">then</span>:
-        jwkJsonRepresentation != <span class="predefined-constant">null</span>
+        <span class="nl">then:</span>
+        <span class="n">jwkJsonRepresentation</span> <span class="o">!=</span> <span class="kc">null</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">String</span> prefix = <span class="string"><span class="delimiter">'</span><span class="content">JWK: </span><span class="delimiter">'</span></span>
+        <span class="nl">when:</span>
+        <span class="n">String</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s1">'JWK: '</span>
 
-        <span class="key">then</span>:
-        jwkJsonRepresentation.indexOf(prefix) &gt; -<span class="integer">1</span>
+        <span class="nl">then:</span>
+        <span class="n">jwkJsonRepresentation</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">prefix</span><span class="o">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
 
-        <span class="key">when</span>:
-        JWK.parse(jwkJsonRepresentation.substring(jwkJsonRepresentation.indexOf(prefix) + prefix.length()))
+        <span class="nl">when:</span>
+        <span class="n">JWK</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">jwkJsonRepresentation</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="n">jwkJsonRepresentation</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">prefix</span><span class="o">)</span> <span class="o">+</span> <span class="n">prefix</span><span class="o">.</span><span class="na">length</span><span class="o">()))</span>
 
-        <span class="key">then</span>:
-        noExceptionThrown()
-    }
+        <span class="nl">then:</span>
+        <span class="n">noExceptionThrown</span><span class="o">()</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="predefined-type">String</span> executeCommand(<span class="predefined-type">Class</span> commandClass, <span class="predefined-type">String</span><span class="type">[]</span> args) { <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="predefined-type">OutputStream</span> baos = <span class="keyword">new</span> <span class="predefined-type">ByteArrayOutputStream</span>()
-        <span class="predefined-type">System</span>.setOut(<span class="keyword">new</span> <span class="predefined-type">PrintStream</span>(baos))
-        <span class="keyword">try</span> (ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST)) {
-            PicocliRunner.run(commandClass, ctx, args)
-        }
-        baos
-    }
-}</code></pre>
+    <span class="kd">private</span> <span class="n">String</span> <span class="nf">executeCommand</span><span class="o">(</span><span class="n">Class</span> <span class="n">commandClass</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="n">OutputStream</span> <span class="n">baos</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ByteArrayOutputStream</span><span class="o">()</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">setOut</span><span class="o">(</span><span class="k">new</span> <span class="n">PrintStream</span><span class="o">(</span><span class="n">baos</span><span class="o">))</span>
+        <span class="k">try</span> <span class="o">(</span><span class="n">ApplicationContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">ApplicationContext</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Environment</span><span class="o">.</span><span class="na">CLI</span><span class="o">,</span> <span class="n">Environment</span><span class="o">.</span><span class="na">TEST</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">PicocliRunner</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">commandClass</span><span class="o">,</span> <span class="n">ctx</span><span class="o">,</span> <span class="n">args</span><span class="o">)</span>
+        <span class="o">}</span>
+        <span class="n">baos</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -446,7 +447,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -462,7 +463,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./gradlew shadowJar</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./gradlew shadowJar</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -470,18 +471,18 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">java -jar build/libs/micronautguide-0.1-all.jar --help</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">java <span class="nt">-jar</span> build/libs/micronautguide-0.1-all.jar <span class="nt">--help</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">12:16:33.257 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [cli]
-Usage: keysgen [-hV] [-kid=&lt;kid&gt;]
-Generates a Json Web Key (JWT) with RS256 algorithm.
-  -h, --help       Show this help message and exit.
-      -kid=&lt;kid&gt;   Key ID. Parameter is used to match a specific key. If not
+<pre class="rouge highlight"><code data-lang="bash">12:16:33.257 <span class="o">[</span>main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: <span class="o">[</span>cli]
+Usage: keysgen <span class="o">[</span><span class="nt">-hV</span><span class="o">]</span> <span class="o">[</span><span class="nt">-kid</span><span class="o">=</span>&lt;kid&gt;]
+Generates a Json Web Key <span class="o">(</span>JWT<span class="o">)</span> with RS256 algorithm.
+  <span class="nt">-h</span>, <span class="nt">--help</span>       Show this <span class="nb">help </span>message and exit.
+      <span class="nt">-kid</span><span class="o">=</span>&lt;kid&gt;   Key ID. Parameter is used to match a specific key. If not
                      specified a random Key ID is generated.
-  -V, --version    Print version information and exit.</code></pre>
+  <span class="nt">-V</span>, <span class="nt">--version</span>    Print version information and exit.</code></pre>
 </div>
 </div>
 </div>

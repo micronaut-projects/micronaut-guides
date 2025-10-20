@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -224,11 +225,11 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=security-jwt,data-jdbc,reactor,validation \
-    --build=maven \
-    --lang=groovy \
-    --test=spock</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>security-jwt,data-jdbc,reactor,validation <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>groovy <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>spock</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -275,10 +276,10 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
-micronaut.security.authentication=bearer
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">micronaut.security.authentication</span><span class="p">=</span><span class="s">bearer</span>
 <i class="conum" data-value="2"></i><b>(2)</b>
-micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;'</code></pre>
+<span class="py">micronaut.security.token.jwt.signatures.secret.generator.secret</span><span class="p">=</span><span class="s">"${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"'</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -302,30 +303,30 @@ micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENE
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/AuthenticationProviderUserPassword.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationFailureReason</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.AuthenticationResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationFailureReason</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.AuthenticationResponse</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
 
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">AuthenticationProviderUserPassword</span>&lt;B&gt; <span class="directive">implements</span> HttpRequestAuthenticationProvider&lt;B&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">AuthenticationProviderUserPassword</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">HttpRequestAuthenticationProvider</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="annotation">@Override</span>
-    AuthenticationResponse authenticate(
-            <span class="annotation">@Nullable</span> HttpRequest&lt;B&gt; httpRequest,
-            <span class="annotation">@NonNull</span> AuthenticationRequest&lt;<span class="predefined-type">String</span>, <span class="predefined-type">String</span>&gt; authenticationRequest
-    ) {
-        <span class="keyword">return</span> authenticationRequest.identity == <span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span> &amp;&amp; authenticationRequest.secret == <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>
-                ? AuthenticationResponse.success(authenticationRequest.getIdentity())
-                : AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="n">AuthenticationResponse</span> <span class="nf">authenticate</span><span class="o">(</span>
+            <span class="nd">@Nullable</span> <span class="n">HttpRequest</span><span class="o">&lt;</span><span class="n">B</span><span class="o">&gt;</span> <span class="n">httpRequest</span><span class="o">,</span>
+            <span class="nd">@NonNull</span> <span class="n">AuthenticationRequest</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">authenticationRequest</span>
+    <span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">authenticationRequest</span><span class="o">.</span><span class="na">identity</span> <span class="o">==</span> <span class="s2">"sherlock"</span> <span class="o">&amp;&amp;</span> <span class="n">authenticationRequest</span><span class="o">.</span><span class="na">secret</span> <span class="o">==</span> <span class="s2">"password"</span>
+                <span class="o">?</span> <span class="n">AuthenticationResponse</span><span class="o">.</span><span class="na">success</span><span class="o">(</span><span class="n">authenticationRequest</span><span class="o">.</span><span class="na">getIdentity</span><span class="o">())</span>
+                <span class="o">:</span> <span class="n">AuthenticationResponse</span><span class="o">.</span><span class="na">failure</span><span class="o">(</span><span class="n">AuthenticationFailureReason</span><span class="o">.</span><span class="na">CREDENTIALS_DO_NOT_MATCH</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -349,29 +350,29 @@ micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENE
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/HomeController.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.MediaType</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Controller</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Produces</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.annotation.Secured</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.rules.SecurityRule</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.MediaType</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Produces</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.annotation.Secured</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.rules.SecurityRule</span>
 
-<span class="keyword">import</span> <span class="include">java.security.Principal</span>
+<span class="kn">import</span> <span class="nn">java.security.Principal</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Secured</span>(SecurityRule.IS_AUTHENTICATED) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="annotation">@Controller</span> <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="type">class</span> <span class="class">HomeController</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Secured</span><span class="o">(</span><span class="n">SecurityRule</span><span class="o">.</span><span class="na">IS_AUTHENTICATED</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Controller</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">HomeController</span> <span class="o">{</span>
 
-    <span class="annotation">@Produces</span>(MediaType.TEXT_PLAIN)
-    <span class="annotation">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="predefined-type">String</span> index(<span class="predefined-type">Principal</span> principal) { <i class="conum" data-value="4"></i><b>(4)</b>
-        principal.name
-    }
-}</code></pre>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="n">MediaType</span><span class="o">.</span><span class="na">TEXT_PLAIN</span><span class="o">)</span>
+    <span class="nd">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="n">String</span> <span class="nf">index</span><span class="o">(</span><span class="n">Principal</span> <span class="n">principal</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="n">principal</span><span class="o">.</span><span class="na">name</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -406,72 +407,72 @@ micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENE
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/JwtAuthenticationSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">com.nimbusds.jwt.JWTParser</span>
-<span class="keyword">import</span> <span class="include">com.nimbusds.jwt.SignedJWT</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpResponse</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jwt.JWTParser</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jwt.SignedJWT</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.OK</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.UNAUTHORIZED</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">OK</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">UNAUTHORIZED</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">TEXT_PLAIN</span>
 
-<span class="annotation">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">JwtAuthenticationSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">JwtAuthenticationSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+    <span class="n">HttpClient</span> <span class="n">client</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">Accessing a secured URL without authenticating returns unauthorized</span><span class="delimiter">'</span></span>() {
-        <span class="key">when</span>:
-        client.toBlocking().exchange(HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>).accept(TEXT_PLAIN))
+    <span class="kt">void</span> <span class="s1">'Accessing a secured URL without authenticating returns unauthorized'</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span>
+        <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span><span class="n">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="s1">'/'</span><span class="o">).</span><span class="na">accept</span><span class="o">(</span><span class="n">TEXT_PLAIN</span><span class="o">))</span>
 
-        <span class="key">then</span>:
-        HttpClientResponseException e = thrown()
-        e.status == UNAUTHORIZED <i class="conum" data-value="3"></i><b>(3)</b>
-    }
+        <span class="nl">then:</span>
+        <span class="n">HttpClientResponseException</span> <span class="n">e</span> <span class="o">=</span> <span class="n">thrown</span><span class="o">()</span>
+        <span class="n">e</span><span class="o">.</span><span class="na">status</span> <span class="o">==</span> <span class="n">UNAUTHORIZED</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="o">}</span>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">upon successful authentication, a JSON Web token is issued to the user</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">Login endpoint is called with valid credentials</span><span class="delimiter">'</span></span>
-        UsernamePasswordCredentials creds = <span class="keyword">new</span> UsernamePasswordCredentials(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>)
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/login</span><span class="delimiter">'</span></span>, creds) <i class="conum" data-value="4"></i><b>(4)</b>
-        HttpResponse&lt;BearerAccessRefreshToken&gt; rsp = client.toBlocking().exchange(request, BearerAccessRefreshToken) <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="kt">void</span> <span class="s2">"upon successful authentication, a JSON Web token is issued to the user"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span> <span class="s1">'Login endpoint is called with valid credentials'</span>
+        <span class="n">UsernamePasswordCredentials</span> <span class="n">creds</span> <span class="o">=</span> <span class="k">new</span> <span class="n">UsernamePasswordCredentials</span><span class="o">(</span><span class="s2">"sherlock"</span><span class="o">,</span> <span class="s2">"password"</span><span class="o">)</span>
+        <span class="n">HttpRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s1">'/login'</span><span class="o">,</span> <span class="n">creds</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="n">HttpResponse</span><span class="o">&lt;</span><span class="n">BearerAccessRefreshToken</span><span class="o">&gt;</span> <span class="n">rsp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">BearerAccessRefreshToken</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
 
-        <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">the endpoint can be accessed</span><span class="delimiter">'</span></span>
-        rsp.status == OK
+        <span class="nl">then:</span> <span class="s1">'the endpoint can be accessed'</span>
+        <span class="n">rsp</span><span class="o">.</span><span class="na">status</span> <span class="o">==</span> <span class="n">OK</span>
 
-        <span class="key">when</span>:
-        BearerAccessRefreshToken bearerAccessRefreshToken = rsp.body()
+        <span class="nl">when:</span>
+        <span class="n">BearerAccessRefreshToken</span> <span class="n">bearerAccessRefreshToken</span> <span class="o">=</span> <span class="n">rsp</span><span class="o">.</span><span class="na">body</span><span class="o">()</span>
 
-        <span class="key">then</span>:
-        bearerAccessRefreshToken.username == <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>
-        bearerAccessRefreshToken.accessToken
+        <span class="nl">then:</span>
+        <span class="n">bearerAccessRefreshToken</span><span class="o">.</span><span class="na">username</span> <span class="o">==</span> <span class="s1">'sherlock'</span>
+        <span class="n">bearerAccessRefreshToken</span><span class="o">.</span><span class="na">accessToken</span>
 
-        <span class="key">and</span>: <span class="string"><span class="delimiter">'</span><span class="content">the access token is a signed JWT</span><span class="delimiter">'</span></span>
-        JWTParser.parse(bearerAccessRefreshToken.accessToken) <span class="keyword">instanceof</span> SignedJWT
+        <span class="nl">and:</span> <span class="s1">'the access token is a signed JWT'</span>
+        <span class="n">JWTParser</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">bearerAccessRefreshToken</span><span class="o">.</span><span class="na">accessToken</span><span class="o">)</span> <span class="k">instanceof</span> <span class="n">SignedJWT</span>
 
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">passing the access token as in the Authorization HTTP Header with the prefix Bearer allows the user to access a secured endpoint</span><span class="delimiter">'</span></span>
-        <span class="predefined-type">String</span> accessToken = bearerAccessRefreshToken.accessToken
-        HttpRequest requestWithAuthorization = HttpRequest.GET(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span> )
-                .accept(TEXT_PLAIN)
-                .bearerAuth(accessToken) <i class="conum" data-value="6"></i><b>(6)</b>
-        HttpResponse&lt;<span class="predefined-type">String</span>&gt; response = client.toBlocking().exchange(requestWithAuthorization, <span class="predefined-type">String</span>)
+        <span class="nl">when:</span> <span class="s1">'passing the access token as in the Authorization HTTP Header with the prefix Bearer allows the user to access a secured endpoint'</span>
+        <span class="n">String</span> <span class="n">accessToken</span> <span class="o">=</span> <span class="n">bearerAccessRefreshToken</span><span class="o">.</span><span class="na">accessToken</span>
+        <span class="n">HttpRequest</span> <span class="n">requestWithAuthorization</span> <span class="o">=</span> <span class="n">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="s1">'/'</span> <span class="o">)</span>
+                <span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">TEXT_PLAIN</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">bearerAuth</span><span class="o">(</span><span class="n">accessToken</span><span class="o">)</span> <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="n">HttpResponse</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span><span class="n">requestWithAuthorization</span><span class="o">,</span> <span class="n">String</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        response.status == OK
-        response.body() == <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span> <i class="conum" data-value="7"></i><b>(7)</b>
-    }
-}</code></pre>
+        <span class="nl">then:</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">status</span> <span class="o">==</span> <span class="n">OK</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">body</span><span class="o">()</span> <span class="o">==</span> <span class="s1">'sherlock'</span> <i class="conum" data-value="7"></i><b>(7)</b>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -517,32 +518,32 @@ micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENE
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/AppClient.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Body</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Consumes</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Get</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Header</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.annotation.Post</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Body</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Consumes</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Header</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Post</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpHeaders.AUTHORIZATION</span>
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.MediaType.TEXT_PLAIN</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpHeaders</span><span class="o">.</span><span class="na">AUTHORIZATION</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">TEXT_PLAIN</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-<span class="type">interface</span> AppClient {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Client</span><span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+<span class="kd">interface</span> <span class="nc">AppClient</span> <span class="o">{</span>
 
-    <span class="annotation">@Post</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/login</span><span class="delimiter">&quot;</span></span>)
-    BearerAccessRefreshToken login(<span class="annotation">@Body</span> UsernamePasswordCredentials credentials)
+    <span class="nd">@Post</span><span class="o">(</span><span class="s2">"/login"</span><span class="o">)</span>
+    <span class="n">BearerAccessRefreshToken</span> <span class="nf">login</span><span class="o">(</span><span class="nd">@Body</span> <span class="n">UsernamePasswordCredentials</span> <span class="n">credentials</span><span class="o">)</span>
 
-    <span class="annotation">@Consumes</span>(TEXT_PLAIN)
-    <span class="annotation">@Get</span>
-    <span class="predefined-type">String</span> home(<span class="annotation">@Header</span>(AUTHORIZATION) <span class="predefined-type">String</span> authorization)
-}</code></pre>
+    <span class="nd">@Consumes</span><span class="o">(</span><span class="n">TEXT_PLAIN</span><span class="o">)</span>
+    <span class="nd">@Get</span>
+    <span class="n">String</span> <span class="nf">home</span><span class="o">(</span><span class="nd">@Header</span><span class="o">(</span><span class="n">AUTHORIZATION</span><span class="o">)</span> <span class="n">String</span> <span class="n">authorization</span><span class="o">)</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -551,39 +552,39 @@ micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENE
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/DeclarativeHttpClientWithJwtSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">com.nimbusds.jwt.JWTParser</span>
-<span class="keyword">import</span> <span class="include">com.nimbusds.jwt.SignedJWT</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jwt.JWTParser</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jwt.SignedJWT</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="annotation">@MicronautTest</span>
-<span class="type">class</span> <span class="class">DeclarativeHttpClientWithJwtSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span>
+<span class="kd">class</span> <span class="nc">DeclarativeHttpClientWithJwtSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    AppClient appClient <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="nd">@Inject</span>
+    <span class="n">AppClient</span> <span class="n">appClient</span> <i class="conum" data-value="1"></i><b>(1)</b>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Verify JWT authentication works with declarative @Client</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">Login endpoint is called with valid credentials</span><span class="delimiter">'</span></span>
-        UsernamePasswordCredentials creds = <span class="keyword">new</span> UsernamePasswordCredentials(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>)
-        BearerAccessRefreshToken loginRsp = appClient.login(creds) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kt">void</span> <span class="s2">"Verify JWT authentication works with declarative @Client"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span> <span class="s1">'Login endpoint is called with valid credentials'</span>
+        <span class="n">UsernamePasswordCredentials</span> <span class="n">creds</span> <span class="o">=</span> <span class="k">new</span> <span class="n">UsernamePasswordCredentials</span><span class="o">(</span><span class="s2">"sherlock"</span><span class="o">,</span> <span class="s2">"password"</span><span class="o">)</span>
+        <span class="n">BearerAccessRefreshToken</span> <span class="n">loginRsp</span> <span class="o">=</span> <span class="n">appClient</span><span class="o">.</span><span class="na">login</span><span class="o">(</span><span class="n">creds</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-        <span class="key">then</span>:
-        loginRsp
-        loginRsp.accessToken
-        JWTParser.parse(loginRsp.accessToken) <span class="keyword">instanceof</span> SignedJWT
+        <span class="nl">then:</span>
+        <span class="n">loginRsp</span>
+        <span class="n">loginRsp</span><span class="o">.</span><span class="na">accessToken</span>
+        <span class="n">JWTParser</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">loginRsp</span><span class="o">.</span><span class="na">accessToken</span><span class="o">)</span> <span class="k">instanceof</span> <span class="n">SignedJWT</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">String</span> msg = appClient.home(<span class="string"><span class="delimiter">&quot;</span><span class="content">Bearer </span><span class="inline"><span class="inline-delimiter">$</span>loginRsp</span><span class="content">.accessToken</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="nl">when:</span>
+        <span class="n">String</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">appClient</span><span class="o">.</span><span class="na">home</span><span class="o">(</span><span class="s2">"Bearer $loginRsp.accessToken"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-        <span class="key">then</span>:
-        msg == <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>
-    }
-}</code></pre>
+        <span class="nl">then:</span>
+        <span class="n">msg</span> <span class="o">==</span> <span class="s1">'sherlock'</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -617,8 +618,8 @@ micronaut.security.token.jwt.signatures.secret.generator.secret=&quot;${JWT_GENE
 <div class="listingblock">
 <div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
-micronaut.security.token.jwt.generator.refresh-token.secret=&quot;${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}&quot;'</code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">micronaut.security.token.jwt.generator.refresh-token.secret</span><span class="p">=</span><span class="s">"${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"'</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -642,41 +643,41 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/LoginIncludesRefreshTokenSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">com.nimbusds.jwt.JWTParser</span>
-<span class="keyword">import</span> <span class="include">com.nimbusds.jwt.SignedJWT</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jwt.JWTParser</span>
+<span class="kn">import</span> <span class="nn">com.nimbusds.jwt.SignedJWT</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="annotation">@MicronautTest</span>
-<span class="type">class</span> <span class="class">LoginIncludesRefreshTokenSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span>
+<span class="kd">class</span> <span class="nc">LoginIncludesRefreshTokenSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+    <span class="n">HttpClient</span> <span class="n">client</span>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">upon successful authentication, the user gets an access token and a refresh token</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">Login endpoint is called with valid credentials</span><span class="delimiter">'</span></span>
-        UsernamePasswordCredentials creds = <span class="keyword">new</span> UsernamePasswordCredentials(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>)
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/login</span><span class="delimiter">'</span></span>, creds)
-        BearerAccessRefreshToken rsp = client.toBlocking().retrieve(request, BearerAccessRefreshToken)
+    <span class="kt">void</span> <span class="s2">"upon successful authentication, the user gets an access token and a refresh token"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">when:</span> <span class="s1">'Login endpoint is called with valid credentials'</span>
+        <span class="n">UsernamePasswordCredentials</span> <span class="n">creds</span> <span class="o">=</span> <span class="k">new</span> <span class="n">UsernamePasswordCredentials</span><span class="o">(</span><span class="s2">"sherlock"</span><span class="o">,</span> <span class="s2">"password"</span><span class="o">)</span>
+        <span class="n">HttpRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s1">'/login'</span><span class="o">,</span> <span class="n">creds</span><span class="o">)</span>
+        <span class="n">BearerAccessRefreshToken</span> <span class="n">rsp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">retrieve</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">BearerAccessRefreshToken</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        rsp.username == <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>
-        rsp.accessToken
-        rsp.refreshToken <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="nl">then:</span>
+        <span class="n">rsp</span><span class="o">.</span><span class="na">username</span> <span class="o">==</span> <span class="s1">'sherlock'</span>
+        <span class="n">rsp</span><span class="o">.</span><span class="na">accessToken</span>
+        <span class="n">rsp</span><span class="o">.</span><span class="na">refreshToken</span> <i class="conum" data-value="1"></i><b>(1)</b>
 
-        <span class="key">and</span>: <span class="string"><span class="delimiter">'</span><span class="content">access token is a JWT</span><span class="delimiter">'</span></span>
-        JWTParser.parse(rsp.accessToken) <span class="keyword">instanceof</span> SignedJWT
-    }
-}</code></pre>
+        <span class="nl">and:</span> <span class="s1">'access token is a JWT'</span>
+        <span class="n">JWTParser</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">rsp</span><span class="o">.</span><span class="na">accessToken</span><span class="o">)</span> <span class="k">instanceof</span> <span class="n">SignedJWT</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -718,26 +719,26 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 <div class="listingblock">
 <div class="title">pom.xml</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-data-processor<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.data<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-data-jdbc<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="tag">&lt;groupId&gt;</span>io.micronaut.sql<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>micronaut-jdbc-hikari<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>compile<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span>
-<span class="tag">&lt;dependency&gt;</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="tag">&lt;groupId&gt;</span>com.h2database<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>h2<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;scope&gt;</span>runtime<span class="tag">&lt;/scope&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-data-processor<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.data<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-data-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.sql<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-jdbc-hikari<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nt">&lt;groupId&gt;</span>com.h2database<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>h2<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -766,86 +767,86 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/RefreshTokenEntity.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
-*<span class="regexp"><span class="delimiter">/</span></span><span class="error">
-</span>
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.DateCreated</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.GeneratedValue</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Id</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.MappedEntity</span>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
+<span class="o">*/</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>
-<span class="keyword">import</span> <span class="include">java.time.Instant</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.DateCreated</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.GeneratedValue</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Id</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">RefreshTokenEntity</span> {
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span>
+<span class="kn">import</span> <span class="nn">java.time.Instant</span>
 
-    <span class="annotation">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="annotation">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@NonNull</span>
-    <span class="predefined-type">Long</span> id
+<span class="nd">@CompileStatic</span>
+<span class="nd">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">RefreshTokenEntity</span> <span class="o">{</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotBlank</span>
-    <span class="predefined-type">String</span> username
+    <span class="nd">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@NonNull</span>
+    <span class="n">Long</span> <span class="n">id</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotBlank</span>
-    <span class="predefined-type">String</span> refreshToken
+    <span class="nd">@NonNull</span>
+    <span class="nd">@NotBlank</span>
+    <span class="n">String</span> <span class="n">username</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotNull</span>
-    <span class="predefined-type">Boolean</span> revoked
+    <span class="nd">@NonNull</span>
+    <span class="nd">@NotBlank</span>
+    <span class="n">String</span> <span class="n">refreshToken</span>
 
-    <span class="annotation">@DateCreated</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotNull</span>
-    Instant dateCreated
-}
+    <span class="nd">@NonNull</span>
+    <span class="nd">@NotNull</span>
+    <span class="n">Boolean</span> <span class="n">revoked</span>
+
+    <span class="nd">@DateCreated</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@NonNull</span>
+    <span class="nd">@NotNull</span>
+    <span class="n">Instant</span> <span class="n">dateCreated</span>
+<span class="o">}</span>
 
 
-<span class="keyword">import</span> <span class="include">groovy.transform.CompileStatic</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.DateCreated</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.GeneratedValue</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.Id</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.annotation.MappedEntity</span>
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.DateCreated</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.GeneratedValue</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Id</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>
-<span class="keyword">import</span> <span class="include">java.time.Instant</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span>
+<span class="kn">import</span> <span class="nn">java.time.Instant</span>
 
-<span class="annotation">@CompileStatic</span>
-<span class="annotation">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">RefreshTokenEntity</span> {
+<span class="nd">@CompileStatic</span>
+<span class="nd">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">RefreshTokenEntity</span> <span class="o">{</span>
 
-    <span class="annotation">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="annotation">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="annotation">@NonNull</span>
-    <span class="predefined-type">Long</span> id
+    <span class="nd">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@NonNull</span>
+    <span class="n">Long</span> <span class="n">id</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotBlank</span>
-    <span class="predefined-type">String</span> username
+    <span class="nd">@NonNull</span>
+    <span class="nd">@NotBlank</span>
+    <span class="n">String</span> <span class="n">username</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotBlank</span>
-    <span class="predefined-type">String</span> refreshToken
+    <span class="nd">@NonNull</span>
+    <span class="nd">@NotBlank</span>
+    <span class="n">String</span> <span class="n">refreshToken</span>
 
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotNull</span>
-    <span class="predefined-type">Boolean</span> revoked
+    <span class="nd">@NonNull</span>
+    <span class="nd">@NotNull</span>
+    <span class="n">Boolean</span> <span class="n">revoked</span>
 
-    <span class="annotation">@DateCreated</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="annotation">@NonNull</span>
-    <span class="annotation">@NotNull</span>
-    Instant dateCreated
+    <span class="nd">@DateCreated</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@NonNull</span>
+    <span class="nd">@NotNull</span>
+    <span class="n">Instant</span> <span class="n">dateCreated</span>
 
-}</code></pre>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -874,31 +875,31 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/RefreshTokenRepository.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.jdbc.annotation.JdbcRepository</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.data.repository.CrudRepository</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jdbc.annotation.JdbcRepository</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.repository.CrudRepository</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.transaction.Transactional</span>
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>
+<span class="kn">import</span> <span class="nn">jakarta.transaction.Transactional</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.data.model.query.builder.sql.Dialect.H2</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">data</span><span class="o">.</span><span class="na">model</span><span class="o">.</span><span class="na">query</span><span class="o">.</span><span class="na">builder</span><span class="o">.</span><span class="na">sql</span><span class="o">.</span><span class="na">Dialect</span><span class="o">.</span><span class="na">H2</span>
 
-<span class="annotation">@JdbcRepository</span>(dialect = H2) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">interface</span> RefreshTokenRepository <span class="directive">extends</span> CrudRepository&lt;RefreshTokenEntity, <span class="predefined-type">Long</span>&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@JdbcRepository</span><span class="o">(</span><span class="n">dialect</span> <span class="o">=</span> <span class="n">H2</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">interface</span> <span class="nc">RefreshTokenRepository</span> <span class="kd">extends</span> <span class="n">CrudRepository</span><span class="o">&lt;</span><span class="n">RefreshTokenEntity</span><span class="o">,</span> <span class="n">Long</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="annotation">@Transactional</span>
-    RefreshTokenEntity save(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> username,
-                            <span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> refreshToken,
-                            <span class="annotation">@NonNull</span> <span class="annotation">@NotNull</span> <span class="predefined-type">Boolean</span> revoked) <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Transactional</span>
+    <span class="n">RefreshTokenEntity</span> <span class="nf">save</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="n">String</span> <span class="n">username</span><span class="o">,</span>
+                            <span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="n">String</span> <span class="n">refreshToken</span><span class="o">,</span>
+                            <span class="nd">@NonNull</span> <span class="nd">@NotNull</span> <span class="n">Boolean</span> <span class="n">revoked</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-    Optional&lt;RefreshTokenEntity&gt; findByRefreshToken(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> refreshToken) <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">RefreshTokenEntity</span><span class="o">&gt;</span> <span class="n">findByRefreshToken</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="n">String</span> <span class="n">refreshToken</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
 
-    <span class="type">long</span> updateByUsername(<span class="annotation">@NonNull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> username,
-                          <span class="type">boolean</span> revoked) <i class="conum" data-value="5"></i><b>(5)</b>
-}</code></pre>
+    <span class="kt">long</span> <span class="nf">updateByUsername</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="n">String</span> <span class="n">username</span><span class="o">,</span>
+                          <span class="kt">boolean</span> <span class="n">revoked</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -939,54 +940,54 @@ code (HMAC). You need to provide secret to use <code>SignedRefreshTokenGenerator
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/CustomRefreshTokenPersistence.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.Authentication</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.errors.OauthErrorResponseException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.event.RefreshTokenGeneratedEvent</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.refresh.RefreshTokenPersistence</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>
-<span class="keyword">import</span> <span class="include">org.reactivestreams.Publisher</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.Flux</span>
-<span class="keyword">import</span> <span class="include">reactor.core.publisher.FluxSink</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.Authentication</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.errors.OauthErrorResponseException</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.event.RefreshTokenGeneratedEvent</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.refresh.RefreshTokenPersistence</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span>
+<span class="kn">import</span> <span class="nn">org.reactivestreams.Publisher</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.Flux</span>
+<span class="kn">import</span> <span class="nn">reactor.core.publisher.FluxSink</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.security.errors.IssuingAnAccessTokenErrorCode.INVALID_GRANT</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">errors</span><span class="o">.</span><span class="na">IssuingAnAccessTokenErrorCode</span><span class="o">.</span><span class="na">INVALID_GRANT</span>
 
-<span class="annotation">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">CustomRefreshTokenPersistence</span> <span class="directive">implements</span> RefreshTokenPersistence {
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">CustomRefreshTokenPersistence</span> <span class="kd">implements</span> <span class="n">RefreshTokenPersistence</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> RefreshTokenRepository refreshTokenRepository
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">RefreshTokenRepository</span> <span class="n">refreshTokenRepository</span>
 
-    CustomRefreshTokenPersistence(RefreshTokenRepository refreshTokenRepository) { <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="local-variable">this</span>.refreshTokenRepository = refreshTokenRepository
-    }
+    <span class="nf">CustomRefreshTokenPersistence</span><span class="o">(</span><span class="n">RefreshTokenRepository</span> <span class="n">refreshTokenRepository</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="k">this</span><span class="o">.</span><span class="na">refreshTokenRepository</span> <span class="o">=</span> <span class="n">refreshTokenRepository</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Override</span>
-    <span class="type">void</span> persistToken(RefreshTokenGeneratedEvent event) { <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="keyword">if</span> (event?.refreshToken &amp;&amp; event?.authentication?.name) {
-            <span class="predefined-type">String</span> payload = event.refreshToken
-            refreshTokenRepository.save(event.authentication.name, payload, <span class="predefined-constant">false</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-        }
-    }
+    <span class="nd">@Override</span>
+    <span class="kt">void</span> <span class="nf">persistToken</span><span class="o">(</span><span class="n">RefreshTokenGeneratedEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="k">if</span> <span class="o">(</span><span class="n">event</span><span class="o">?.</span><span class="na">refreshToken</span> <span class="o">&amp;&amp;</span> <span class="n">event</span><span class="o">?.</span><span class="na">authentication</span><span class="o">?.</span><span class="na">name</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">payload</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">refreshToken</span>
+            <span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">authentication</span><span class="o">.</span><span class="na">name</span><span class="o">,</span> <span class="n">payload</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Override</span>
-    Publisher&lt;Authentication&gt; getAuthentication(<span class="predefined-type">String</span> refreshToken) {
-        Flux.create(emitter -&gt; {
-            Optional&lt;RefreshTokenEntity&gt; tokenOpt = refreshTokenRepository.findByRefreshToken(refreshToken)
-            <span class="keyword">if</span> (tokenOpt.isPresent()) {
-                RefreshTokenEntity token = tokenOpt.get()
-                <span class="keyword">if</span> (token.getRevoked()) {
-                    emitter.error(<span class="keyword">new</span> OauthErrorResponseException(INVALID_GRANT, <span class="string"><span class="delimiter">&quot;</span><span class="content">refresh token revoked</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">null</span>)) <i class="conum" data-value="5"></i><b>(5)</b>
-                } <span class="keyword">else</span> {
-                    emitter.next(Authentication.build(token.username)) <i class="conum" data-value="6"></i><b>(6)</b>
-                    emitter.complete()
-                }
-            } <span class="keyword">else</span> {
-                emitter.error(<span class="keyword">new</span> OauthErrorResponseException(INVALID_GRANT, <span class="string"><span class="delimiter">&quot;</span><span class="content">refresh token not found</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">null</span>)) <i class="conum" data-value="7"></i><b>(7)</b>
-            }
-        }, FluxSink.OverflowStrategy.ERROR)
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="n">Publisher</span><span class="o">&lt;</span><span class="n">Authentication</span><span class="o">&gt;</span> <span class="n">getAuthentication</span><span class="o">(</span><span class="n">String</span> <span class="n">refreshToken</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Flux</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">emitter</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="n">Optional</span><span class="o">&lt;</span><span class="n">RefreshTokenEntity</span><span class="o">&gt;</span> <span class="n">tokenOpt</span> <span class="o">=</span> <span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">findByRefreshToken</span><span class="o">(</span><span class="n">refreshToken</span><span class="o">)</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">tokenOpt</span><span class="o">.</span><span class="na">isPresent</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">RefreshTokenEntity</span> <span class="n">token</span> <span class="o">=</span> <span class="n">tokenOpt</span><span class="o">.</span><span class="na">get</span><span class="o">()</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">token</span><span class="o">.</span><span class="na">getRevoked</span><span class="o">())</span> <span class="o">{</span>
+                    <span class="n">emitter</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="k">new</span> <span class="n">OauthErrorResponseException</span><span class="o">(</span><span class="n">INVALID_GRANT</span><span class="o">,</span> <span class="s2">"refresh token revoked"</span><span class="o">,</span> <span class="kc">null</span><span class="o">))</span> <i class="conum" data-value="5"></i><b>(5)</b>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="n">emitter</span><span class="o">.</span><span class="na">next</span><span class="o">(</span><span class="n">Authentication</span><span class="o">.</span><span class="na">build</span><span class="o">(</span><span class="n">token</span><span class="o">.</span><span class="na">username</span><span class="o">))</span> <i class="conum" data-value="6"></i><b>(6)</b>
+                    <span class="n">emitter</span><span class="o">.</span><span class="na">complete</span><span class="o">()</span>
+                <span class="o">}</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">emitter</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="k">new</span> <span class="n">OauthErrorResponseException</span><span class="o">(</span><span class="n">INVALID_GRANT</span><span class="o">,</span> <span class="s2">"refresh token not found"</span><span class="o">,</span> <span class="kc">null</span><span class="o">))</span> <i class="conum" data-value="7"></i><b>(7)</b>
+            <span class="o">}</span>
+        <span class="o">},</span> <span class="n">FluxSink</span><span class="o">.</span><span class="na">OverflowStrategy</span><span class="o">.</span><span class="na">ERROR</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1043,60 +1044,60 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/UnsignedRefreshTokenSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.endpoints.TokenRefreshRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.endpoints.TokenRefreshRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.BAD_REQUEST</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">BAD_REQUEST</span>
 
-<span class="annotation">@MicronautTest</span>
-<span class="type">class</span> <span class="class">UnsignedRefreshTokenSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span>
+<span class="kd">class</span> <span class="nc">UnsignedRefreshTokenSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+    <span class="n">HttpClient</span> <span class="n">client</span>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">Accessing a secured URL without authenticating returns unauthorized</span><span class="delimiter">'</span></span>() {
+    <span class="kt">void</span> <span class="s1">'Accessing a secured URL without authenticating returns unauthorized'</span><span class="o">()</span> <span class="o">{</span>
 
-        <span class="key">given</span>:
-        <span class="predefined-type">String</span> unsignedRefreshedToken = <span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="nl">given:</span>
+        <span class="n">String</span> <span class="n">unsignedRefreshedToken</span> <span class="o">=</span> <span class="s2">"foo"</span> <i class="conum" data-value="1"></i><b>(1)</b>
 
-        <span class="key">when</span>:
-        Argument&lt;BearerAccessRefreshToken&gt; bodyArgument = Argument.of(BearerAccessRefreshToken)
-        Argument&lt;<span class="predefined-type">Map</span>&gt; errorArgument = Argument.of(<span class="predefined-type">Map</span>)
+        <span class="nl">when:</span>
+        <span class="n">Argument</span><span class="o">&lt;</span><span class="n">BearerAccessRefreshToken</span><span class="o">&gt;</span> <span class="n">bodyArgument</span> <span class="o">=</span> <span class="n">Argument</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">BearerAccessRefreshToken</span><span class="o">)</span>
+        <span class="n">Argument</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&gt;</span> <span class="n">errorArgument</span> <span class="o">=</span> <span class="n">Argument</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">Map</span><span class="o">)</span>
 
-        client.toBlocking().exchange(
-                HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, unsignedRefreshedToken)),
-                bodyArgument,
-                errorArgument)
+        <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span>
+                <span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s2">"/oauth/access_token"</span><span class="o">,</span> <span class="k">new</span> <span class="n">TokenRefreshRequest</span><span class="o">(</span><span class="n">TokenRefreshRequest</span><span class="o">.</span><span class="na">GRANT_TYPE_REFRESH_TOKEN</span><span class="o">,</span> <span class="n">unsignedRefreshedToken</span><span class="o">)),</span>
+                <span class="n">bodyArgument</span><span class="o">,</span>
+                <span class="n">errorArgument</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        HttpClientResponseException e = thrown()
-        e.status == BAD_REQUEST
+        <span class="nl">then:</span>
+        <span class="n">HttpClientResponseException</span> <span class="n">e</span> <span class="o">=</span> <span class="n">thrown</span><span class="o">()</span>
+        <span class="n">e</span><span class="o">.</span><span class="na">status</span> <span class="o">==</span> <span class="n">BAD_REQUEST</span>
 
-        <span class="key">when</span>:
-        Optional&lt;<span class="predefined-type">Map</span>&gt; mapOptional = e.response.getBody(<span class="predefined-type">Map</span>)
+        <span class="nl">when:</span>
+        <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&gt;</span> <span class="n">mapOptional</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">response</span><span class="o">.</span><span class="na">getBody</span><span class="o">(</span><span class="n">Map</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        mapOptional.isPresent()
+        <span class="nl">then:</span>
+        <span class="n">mapOptional</span><span class="o">.</span><span class="na">isPresent</span><span class="o">()</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">Map</span> m = mapOptional.get()
+        <span class="nl">when:</span>
+        <span class="n">Map</span> <span class="n">m</span> <span class="o">=</span> <span class="n">mapOptional</span><span class="o">.</span><span class="na">get</span><span class="o">()</span>
 
-        <span class="key">then</span>:
-        m.error == <span class="string"><span class="delimiter">'</span><span class="content">invalid_grant</span><span class="delimiter">'</span></span>
-        m.error_description == <span class="string"><span class="delimiter">'</span><span class="content">Refresh token is invalid</span><span class="delimiter">'</span></span>
-    }
-}</code></pre>
+        <span class="nl">then:</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">error</span> <span class="o">==</span> <span class="s1">'invalid_grant'</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">error_description</span> <span class="o">==</span> <span class="s1">'Refresh token is invalid'</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1116,69 +1117,69 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/RefreshTokenNotFoundSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.Authentication</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.generator.RefreshTokenGenerator</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.endpoints.TokenRefreshRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.Authentication</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.generator.RefreshTokenGenerator</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.endpoints.TokenRefreshRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.BAD_REQUEST</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">BAD_REQUEST</span>
 
-<span class="annotation">@MicronautTest</span>
-<span class="type">class</span> <span class="class">RefreshTokenNotFoundSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span>
+<span class="kd">class</span> <span class="nc">RefreshTokenNotFoundSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+    <span class="n">HttpClient</span> <span class="n">client</span>
 
-    <span class="annotation">@Inject</span>
-    RefreshTokenGenerator refreshTokenGenerator
+    <span class="nd">@Inject</span>
+    <span class="n">RefreshTokenGenerator</span> <span class="n">refreshTokenGenerator</span>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">Accessing a secured URL without authenticating returns unauthorized</span><span class="delimiter">'</span></span>() {
-        <span class="key">given</span>:
-        Authentication user = Authentication.build(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>)
+    <span class="kt">void</span> <span class="s1">'Accessing a secured URL without authenticating returns unauthorized'</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">given:</span>
+        <span class="n">Authentication</span> <span class="n">user</span> <span class="o">=</span> <span class="n">Authentication</span><span class="o">.</span><span class="na">build</span><span class="o">(</span><span class="s2">"sherlock"</span><span class="o">)</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">String</span> refreshToken = refreshTokenGenerator.createKey(user)
-        Optional&lt;<span class="predefined-type">String</span>&gt; refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
+        <span class="nl">when:</span>
+        <span class="n">String</span> <span class="n">refreshToken</span> <span class="o">=</span> <span class="n">refreshTokenGenerator</span><span class="o">.</span><span class="na">createKey</span><span class="o">(</span><span class="n">user</span><span class="o">)</span>
+        <span class="n">Optional</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">refreshTokenOptional</span> <span class="o">=</span> <span class="n">refreshTokenGenerator</span><span class="o">.</span><span class="na">generate</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">refreshToken</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        refreshTokenOptional.isPresent()
+        <span class="nl">then:</span>
+        <span class="n">refreshTokenOptional</span><span class="o">.</span><span class="na">isPresent</span><span class="o">()</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">String</span> signedRefreshToken = refreshTokenOptional.get()  <i class="conum" data-value="1"></i><b>(1)</b>
-        Argument&lt;BearerAccessRefreshToken&gt; bodyArgument = Argument.of(BearerAccessRefreshToken)
-        Argument&lt;<span class="predefined-type">Map</span>&gt; errorArgument = Argument.of(<span class="predefined-type">Map</span>)
-        HttpRequest req = HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, signedRefreshToken))
-        client.toBlocking().exchange(req, bodyArgument, errorArgument)
+        <span class="nl">when:</span>
+        <span class="n">String</span> <span class="n">signedRefreshToken</span> <span class="o">=</span> <span class="n">refreshTokenOptional</span><span class="o">.</span><span class="na">get</span><span class="o">()</span>  <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="n">Argument</span><span class="o">&lt;</span><span class="n">BearerAccessRefreshToken</span><span class="o">&gt;</span> <span class="n">bodyArgument</span> <span class="o">=</span> <span class="n">Argument</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">BearerAccessRefreshToken</span><span class="o">)</span>
+        <span class="n">Argument</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&gt;</span> <span class="n">errorArgument</span> <span class="o">=</span> <span class="n">Argument</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">Map</span><span class="o">)</span>
+        <span class="n">HttpRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s2">"/oauth/access_token"</span><span class="o">,</span> <span class="k">new</span> <span class="n">TokenRefreshRequest</span><span class="o">(</span><span class="n">TokenRefreshRequest</span><span class="o">.</span><span class="na">GRANT_TYPE_REFRESH_TOKEN</span><span class="o">,</span> <span class="n">signedRefreshToken</span><span class="o">))</span>
+        <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">bodyArgument</span><span class="o">,</span> <span class="n">errorArgument</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        HttpClientResponseException e = thrown()
-        e.status == BAD_REQUEST
+        <span class="nl">then:</span>
+        <span class="n">HttpClientResponseException</span> <span class="n">e</span> <span class="o">=</span> <span class="n">thrown</span><span class="o">()</span>
+        <span class="n">e</span><span class="o">.</span><span class="na">status</span> <span class="o">==</span> <span class="n">BAD_REQUEST</span>
 
-        <span class="key">when</span>:
-        Optional&lt;<span class="predefined-type">Map</span>&gt; mapOptional = e.response.getBody(<span class="predefined-type">Map</span>)
+        <span class="nl">when:</span>
+        <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&gt;</span> <span class="n">mapOptional</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">response</span><span class="o">.</span><span class="na">getBody</span><span class="o">(</span><span class="n">Map</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        mapOptional.isPresent()
+        <span class="nl">then:</span>
+        <span class="n">mapOptional</span><span class="o">.</span><span class="na">isPresent</span><span class="o">()</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">Map</span> m = mapOptional.get()
+        <span class="nl">when:</span>
+        <span class="n">Map</span> <span class="n">m</span> <span class="o">=</span> <span class="n">mapOptional</span><span class="o">.</span><span class="na">get</span><span class="o">()</span>
 
-        <span class="key">then</span>:
-        m.error == <span class="string"><span class="delimiter">'</span><span class="content">invalid_grant</span><span class="delimiter">'</span></span>
-        m.error_description == <span class="string"><span class="delimiter">'</span><span class="content">refresh token not found</span><span class="delimiter">'</span></span>
-    }
-}</code></pre>
+        <span class="nl">then:</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">error</span> <span class="o">==</span> <span class="s1">'invalid_grant'</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">error_description</span> <span class="o">==</span> <span class="s1">'refresh token not found'</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1198,86 +1199,86 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/RefreshTokenRevokedSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.ApplicationContext</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.core.type.Argument</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.runtime.server.EmbeddedServer</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.Authentication</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.generator.RefreshTokenGenerator</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.endpoints.TokenRefreshRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">spock.lang.AutoCleanup</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Shared</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.ApplicationContext</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.exceptions.HttpClientResponseException</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.runtime.server.EmbeddedServer</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.Authentication</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.generator.RefreshTokenGenerator</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.endpoints.TokenRefreshRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">spock.lang.AutoCleanup</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Shared</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">io.micronaut.http.HttpStatus.BAD_REQUEST</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">io</span><span class="o">.</span><span class="na">micronaut</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">HttpStatus</span><span class="o">.</span><span class="na">BAD_REQUEST</span>
 
-<span class="type">class</span> <span class="class">RefreshTokenRevokedSpec</span> <span class="directive">extends</span> Specification {
+<span class="kd">class</span> <span class="nc">RefreshTokenRevokedSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@AutoCleanup</span>
-    <span class="annotation">@Shared</span>
-    EmbeddedServer embeddedServer = ApplicationContext.run(EmbeddedServer, [:])
+    <span class="nd">@AutoCleanup</span>
+    <span class="nd">@Shared</span>
+    <span class="n">EmbeddedServer</span> <span class="n">embeddedServer</span> <span class="o">=</span> <span class="n">ApplicationContext</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">EmbeddedServer</span><span class="o">,</span> <span class="o">[:])</span>
 
-    <span class="annotation">@Shared</span>
-    HttpClient client = embeddedServer.applicationContext.createBean(HttpClient, embeddedServer.URL)
+    <span class="nd">@Shared</span>
+    <span class="n">HttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">embeddedServer</span><span class="o">.</span><span class="na">applicationContext</span><span class="o">.</span><span class="na">createBean</span><span class="o">(</span><span class="n">HttpClient</span><span class="o">,</span> <span class="n">embeddedServer</span><span class="o">.</span><span class="na">URL</span><span class="o">)</span>
 
-    <span class="annotation">@Shared</span>
-    RefreshTokenGenerator refreshTokenGenerator = embeddedServer.applicationContext.getBean(RefreshTokenGenerator)
+    <span class="nd">@Shared</span>
+    <span class="n">RefreshTokenGenerator</span> <span class="n">refreshTokenGenerator</span> <span class="o">=</span> <span class="n">embeddedServer</span><span class="o">.</span><span class="na">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">RefreshTokenGenerator</span><span class="o">)</span>
 
-    <span class="annotation">@Shared</span>
-    RefreshTokenRepository refreshTokenRepository = embeddedServer.applicationContext.getBean(RefreshTokenRepository)
+    <span class="nd">@Shared</span>
+    <span class="n">RefreshTokenRepository</span> <span class="n">refreshTokenRepository</span> <span class="o">=</span> <span class="n">embeddedServer</span><span class="o">.</span><span class="na">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">RefreshTokenRepository</span><span class="o">)</span>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">Accessing a secured URL without authenticating returns unauthorized</span><span class="delimiter">'</span></span>() {
-        <span class="key">given</span>:
-        Authentication user = Authentication.build(<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>)
+    <span class="kt">void</span> <span class="s1">'Accessing a secured URL without authenticating returns unauthorized'</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">given:</span>
+        <span class="n">Authentication</span> <span class="n">user</span> <span class="o">=</span> <span class="n">Authentication</span><span class="o">.</span><span class="na">build</span><span class="o">(</span><span class="s2">"sherlock"</span><span class="o">)</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">String</span> refreshToken = refreshTokenGenerator.createKey(user)
-        Optional&lt;<span class="predefined-type">String</span>&gt; refreshTokenOptional = refreshTokenGenerator.generate(user, refreshToken)
+        <span class="nl">when:</span>
+        <span class="n">String</span> <span class="n">refreshToken</span> <span class="o">=</span> <span class="n">refreshTokenGenerator</span><span class="o">.</span><span class="na">createKey</span><span class="o">(</span><span class="n">user</span><span class="o">)</span>
+        <span class="n">Optional</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">refreshTokenOptional</span> <span class="o">=</span> <span class="n">refreshTokenGenerator</span><span class="o">.</span><span class="na">generate</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">refreshToken</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        refreshTokenOptional.isPresent()
+        <span class="nl">then:</span>
+        <span class="n">refreshTokenOptional</span><span class="o">.</span><span class="na">isPresent</span><span class="o">()</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">String</span> signedRefreshToken = refreshTokenOptional.get()
-        refreshTokenRepository.save(user.name, refreshToken, <span class="predefined-constant">true</span>) <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="nl">when:</span>
+        <span class="n">String</span> <span class="n">signedRefreshToken</span> <span class="o">=</span> <span class="n">refreshTokenOptional</span><span class="o">.</span><span class="na">get</span><span class="o">()</span>
+        <span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">name</span><span class="o">,</span> <span class="n">refreshToken</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
 
-        <span class="key">then</span>:
-        refreshTokenRepository.count() == old(refreshTokenRepository.count()) + <span class="integer">1</span>
+        <span class="nl">then:</span>
+        <span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">count</span><span class="o">()</span> <span class="o">==</span> <span class="n">old</span><span class="o">(</span><span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">count</span><span class="o">())</span> <span class="o">+</span> <span class="mi">1</span>
 
-        <span class="key">when</span>:
-        Argument&lt;BearerAccessRefreshToken&gt; bodyArgument = Argument.of(BearerAccessRefreshToken)
-        Argument&lt;<span class="predefined-type">Map</span>&gt; errorArgument = Argument.of(<span class="predefined-type">Map</span>)
-        client.toBlocking().exchange(
-                HttpRequest.POST(<span class="string"><span class="delimiter">&quot;</span><span class="content">/oauth/access_token</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, signedRefreshToken)),
-                bodyArgument,
-                errorArgument)
+        <span class="nl">when:</span>
+        <span class="n">Argument</span><span class="o">&lt;</span><span class="n">BearerAccessRefreshToken</span><span class="o">&gt;</span> <span class="n">bodyArgument</span> <span class="o">=</span> <span class="n">Argument</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">BearerAccessRefreshToken</span><span class="o">)</span>
+        <span class="n">Argument</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&gt;</span> <span class="n">errorArgument</span> <span class="o">=</span> <span class="n">Argument</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">Map</span><span class="o">)</span>
+        <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">exchange</span><span class="o">(</span>
+                <span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s2">"/oauth/access_token"</span><span class="o">,</span> <span class="k">new</span> <span class="n">TokenRefreshRequest</span><span class="o">(</span><span class="n">TokenRefreshRequest</span><span class="o">.</span><span class="na">GRANT_TYPE_REFRESH_TOKEN</span><span class="o">,</span> <span class="n">signedRefreshToken</span><span class="o">)),</span>
+                <span class="n">bodyArgument</span><span class="o">,</span>
+                <span class="n">errorArgument</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        HttpClientResponseException e = thrown()
-        e.status == BAD_REQUEST
+        <span class="nl">then:</span>
+        <span class="n">HttpClientResponseException</span> <span class="n">e</span> <span class="o">=</span> <span class="n">thrown</span><span class="o">()</span>
+        <span class="n">e</span><span class="o">.</span><span class="na">status</span> <span class="o">==</span> <span class="n">BAD_REQUEST</span>
 
-        <span class="key">when</span>:
-        Optional&lt;<span class="predefined-type">Map</span>&gt; mapOptional = e.response.getBody(<span class="predefined-type">Map</span>)
+        <span class="nl">when:</span>
+        <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&gt;</span> <span class="n">mapOptional</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">response</span><span class="o">.</span><span class="na">getBody</span><span class="o">(</span><span class="n">Map</span><span class="o">)</span>
 
-        <span class="key">then</span>:
-        mapOptional.isPresent()
+        <span class="nl">then:</span>
+        <span class="n">mapOptional</span><span class="o">.</span><span class="na">isPresent</span><span class="o">()</span>
 
-        <span class="key">when</span>:
-        <span class="predefined-type">Map</span> m = mapOptional.get()
+        <span class="nl">when:</span>
+        <span class="n">Map</span> <span class="n">m</span> <span class="o">=</span> <span class="n">mapOptional</span><span class="o">.</span><span class="na">get</span><span class="o">()</span>
 
-        <span class="key">then</span>:
-        m.error == <span class="string"><span class="delimiter">'</span><span class="content">invalid_grant</span><span class="delimiter">'</span></span>
-        m.error_description == <span class="string"><span class="delimiter">'</span><span class="content">refresh token revoked</span><span class="delimiter">'</span></span>
+        <span class="nl">then:</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">error</span> <span class="o">==</span> <span class="s1">'invalid_grant'</span>
+        <span class="n">m</span><span class="o">.</span><span class="na">error_description</span> <span class="o">==</span> <span class="s1">'refresh token revoked'</span>
 
-        <span class="key">cleanup</span>:
-        refreshTokenRepository.deleteAll()
-    }
-}</code></pre>
+        <span class="nl">cleanup:</span>
+        <span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">deleteAll</span><span class="o">()</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1297,65 +1298,65 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 <div class="listingblock">
 <div class="title">src/test/groovy/example/micronaut/OauthAccessTokenSpec.groovy</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> example.micronaut
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.http.HttpRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.HttpClient</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.http.client.annotation.Client</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.endpoints.TokenRefreshRequest</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.AccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Shared</span>
-<span class="keyword">import</span> <span class="include">spock.lang.Specification</span>
-<span class="keyword">import</span> <span class="include">spock.util.concurrent.PollingConditions</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.authentication.UsernamePasswordCredentials</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.endpoints.TokenRefreshRequest</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.AccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.security.token.render.BearerAccessRefreshToken</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.spock.annotation.MicronautTest</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Shared</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
+<span class="kn">import</span> <span class="nn">spock.util.concurrent.PollingConditions</span>
 
-<span class="annotation">@MicronautTest</span>(rollback = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">OauthAccessTokenSpec</span> <span class="directive">extends</span> Specification {
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">rollback</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">OauthAccessTokenSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span>
-    <span class="annotation">@Client</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)
-    HttpClient client <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s2">"/"</span><span class="o">)</span>
+    <span class="n">HttpClient</span> <span class="n">client</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="annotation">@Shared</span>
-    <span class="annotation">@Inject</span>
-    RefreshTokenRepository refreshTokenRepository
+    <span class="nd">@Shared</span>
+    <span class="nd">@Inject</span>
+    <span class="n">RefreshTokenRepository</span> <span class="n">refreshTokenRepository</span>
 
-    <span class="type">void</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Verify JWT access token refresh works</span><span class="delimiter">&quot;</span></span>() {
-        <span class="key">given</span>:
-        <span class="predefined-type">String</span> username = <span class="string"><span class="delimiter">'</span><span class="content">sherlock</span><span class="delimiter">'</span></span>
+    <span class="kt">void</span> <span class="s2">"Verify JWT access token refresh works"</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nl">given:</span>
+        <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="s1">'sherlock'</span>
 
-        <span class="key">when</span>: <span class="string"><span class="delimiter">'</span><span class="content">login endpoint is called with valid credentials</span><span class="delimiter">'</span></span>
-        <span class="keyword">def</span> creds = <span class="keyword">new</span> UsernamePasswordCredentials(username, <span class="string"><span class="delimiter">&quot;</span><span class="content">password</span><span class="delimiter">&quot;</span></span>)
-        HttpRequest request = HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/login</span><span class="delimiter">'</span></span>, creds)
-        BearerAccessRefreshToken rsp = client.toBlocking().retrieve(request, BearerAccessRefreshToken)
+        <span class="nl">when:</span> <span class="s1">'login endpoint is called with valid credentials'</span>
+        <span class="kt">def</span> <span class="n">creds</span> <span class="o">=</span> <span class="k">new</span> <span class="n">UsernamePasswordCredentials</span><span class="o">(</span><span class="n">username</span><span class="o">,</span> <span class="s2">"password"</span><span class="o">)</span>
+        <span class="n">HttpRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s1">'/login'</span><span class="o">,</span> <span class="n">creds</span><span class="o">)</span>
+        <span class="n">BearerAccessRefreshToken</span> <span class="n">rsp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">retrieve</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">BearerAccessRefreshToken</span><span class="o">)</span>
 
-        <span class="key">then</span>: <span class="string"><span class="delimiter">'</span><span class="content">the refresh token is saved to the database</span><span class="delimiter">'</span></span>
-        <span class="keyword">new</span> PollingConditions().eventually {
-            <span class="keyword">assert</span> refreshTokenRepository.count() == old(refreshTokenRepository.count()) + <span class="integer">1</span>
-        }
+        <span class="nl">then:</span> <span class="s1">'the refresh token is saved to the database'</span>
+        <span class="k">new</span> <span class="nf">PollingConditions</span><span class="o">().</span><span class="na">eventually</span> <span class="o">{</span>
+            <span class="k">assert</span> <span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">count</span><span class="o">()</span> <span class="o">==</span> <span class="n">old</span><span class="o">(</span><span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">count</span><span class="o">())</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="o">}</span>
 
-        <span class="key">and</span>: <span class="string"><span class="delimiter">'</span><span class="content">response contains an access token token</span><span class="delimiter">'</span></span>
-        rsp.accessToken
+        <span class="nl">and:</span> <span class="s1">'response contains an access token token'</span>
+        <span class="n">rsp</span><span class="o">.</span><span class="na">accessToken</span>
 
-        <span class="key">and</span>: <span class="string"><span class="delimiter">'</span><span class="content">response contains a refresh token</span><span class="delimiter">'</span></span>
-        rsp.refreshToken
+        <span class="nl">and:</span> <span class="s1">'response contains a refresh token'</span>
+        <span class="n">rsp</span><span class="o">.</span><span class="na">refreshToken</span>
 
-        <span class="key">when</span>:
-        sleep(<span class="integer">1</span>_000) <span class="comment">// sleep for one second to give time for the issued at `iat` Claim to change</span>
-        AccessRefreshToken refreshResponse = client.toBlocking().retrieve(HttpRequest.POST(<span class="string"><span class="delimiter">'</span><span class="content">/oauth/access_token</span><span class="delimiter">'</span></span>,
-                <span class="keyword">new</span> TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, rsp.refreshToken)), AccessRefreshToken) <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="nl">when:</span>
+        <span class="n">sleep</span><span class="o">(</span><span class="mi">1</span><span class="n">_000</span><span class="o">)</span> <span class="c1">// sleep for one second to give time for the issued at `iat` Claim to change</span>
+        <span class="n">AccessRefreshToken</span> <span class="n">refreshResponse</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">retrieve</span><span class="o">(</span><span class="n">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s1">'/oauth/access_token'</span><span class="o">,</span>
+                <span class="k">new</span> <span class="nf">TokenRefreshRequest</span><span class="o">(</span><span class="n">TokenRefreshRequest</span><span class="o">.</span><span class="na">GRANT_TYPE_REFRESH_TOKEN</span><span class="o">,</span> <span class="n">rsp</span><span class="o">.</span><span class="na">refreshToken</span><span class="o">)),</span> <span class="n">AccessRefreshToken</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
 
-        <span class="key">then</span>:
-        refreshResponse.accessToken
-        refreshResponse.accessToken != rsp.accessToken <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="nl">then:</span>
+        <span class="n">refreshResponse</span><span class="o">.</span><span class="na">accessToken</span>
+        <span class="n">refreshResponse</span><span class="o">.</span><span class="na">accessToken</span> <span class="o">!=</span> <span class="n">rsp</span><span class="o">.</span><span class="na">accessToken</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-        <span class="key">cleanup</span>:
-        refreshTokenRepository.deleteAll()
-    }
-}</code></pre>
+        <span class="nl">cleanup:</span>
+        <span class="n">refreshTokenRepository</span><span class="o">.</span><span class="na">deleteAll</span><span class="o">()</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1382,7 +1383,7 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw test</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">./mvnw <span class="nb">test</span></code></pre>
 </div>
 </div>
 </div>
@@ -1398,12 +1399,12 @@ and <a href="https://micronaut-projects.github.io/micronaut-security/latest/api/
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -X &quot;POST&quot; &quot;http://localhost:8080/login&quot; -H 'Content-Type: application/json' -d $'{&quot;username&quot;: &quot;sherlock&quot;,&quot;password&quot;: &quot;password&quot;}'</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-X</span> <span class="s2">"POST"</span> <span class="s2">"http://localhost:8080/login"</span> <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="nt">-d</span> <span class="s1">$'{"username": "sherlock","password": "password"}'</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{<span class="key"><span class="delimiter">&quot;</span><span class="content">username</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">sherlock</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">access_token</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNDc2NDEzNywicm9sZXMiOltdLCJpc3MiOiJjb21wbGV0ZSIsImV4cCI6MTYxNDc2NzczNywiaWF0IjoxNjE0NzY0MTM3fQ.cn8bOjlccFqeUQA7x7MnfacMNPjSVAtWP65z1c8eaJc</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">refresh_token</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">eyJhbGciOiJIUzI1NiJ9.NDI1ZjAxZTktYTRmYS00MmU5LTllYjctOWU2ZTNhNTI5YmQ1.RUc2iCfZdPQdwg2U0Nw_LLzZQIIDp5_Is2UWeHVZT7E</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">token_type</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">Bearer</span><span class="delimiter">&quot;</span></span>,<span class="key"><span class="delimiter">&quot;</span><span class="content">expires_in</span><span class="delimiter">&quot;</span></span>:<span class="integer">3600</span>}</code></pre>
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="nl">"username"</span><span class="p">:</span><span class="s2">"sherlock"</span><span class="p">,</span><span class="nl">"access_token"</span><span class="p">:</span><span class="s2">"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNDc2NDEzNywicm9sZXMiOltdLCJpc3MiOiJjb21wbGV0ZSIsImV4cCI6MTYxNDc2NzczNywiaWF0IjoxNjE0NzY0MTM3fQ.cn8bOjlccFqeUQA7x7MnfacMNPjSVAtWP65z1c8eaJc"</span><span class="p">,</span><span class="nl">"refresh_token"</span><span class="p">:</span><span class="s2">"eyJhbGciOiJIUzI1NiJ9.NDI1ZjAxZTktYTRmYS00MmU5LTllYjctOWU2ZTNhNTI5YmQ1.RUc2iCfZdPQdwg2U0Nw_LLzZQIIDp5_Is2UWeHVZT7E"</span><span class="p">,</span><span class="nl">"token_type"</span><span class="p">:</span><span class="s2">"Bearer"</span><span class="p">,</span><span class="nl">"expires_in"</span><span class="p">:</span><span class="mi">3600</span><span class="p">}</span></code></pre>
 </div>
 </div>
 </div>

@@ -14,6 +14,7 @@
     <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
     <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
     <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
     <link href="guide.css" rel="stylesheet" />
     <script src="lunr.js"></script>
     <script src="guide.js"></script>
@@ -203,11 +204,11 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide \
-    --features=junit-params,validation \
-    --build=maven \
-    --lang=java \
-    --test=junit</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>junit-params,validation <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -275,343 +276,343 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/CountryCode.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
-<span class="keyword">import</span> <span class="include">jakarta.annotation.Nonnull</span>;
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>;
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotNull</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.annotation.Nonnull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.ArrayList</span>;
-<span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
-<span class="keyword">import</span> <span class="include">java.util.Comparator</span>;
-<span class="keyword">import</span> <span class="include">java.util.List</span>;
-<span class="keyword">import</span> <span class="include">java.util.Map</span>;
-<span class="keyword">import</span> <span class="include">java.util.stream.Collectors</span>;
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Comparator</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.stream.Collectors</span><span class="o">;</span>
 
-<span class="comment">/**
+<span class="cm">/**
  * Every country code in the world.
- * @see &lt;a href=&quot;https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf&quot;&gt;LIST OF ITU-T RECOMMENDATION E.164 ASSIGNED COUNTRY CODES&lt;/a&gt;
+ * @see &lt;a href="https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf"&gt;LIST OF ITU-T RECOMMENDATION E.164 ASSIGNED COUNTRY CODES&lt;/a&gt;
  */</span>
-<span class="directive">public</span> <span class="type">enum</span> CountryCode {
+<span class="kd">public</span> <span class="kd">enum</span> <span class="nc">CountryCode</span> <span class="o">{</span>
 
-    AFGHANISTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">93</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Afghanistan</span><span class="delimiter">&quot;</span></span>),
-    ALBANIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">355</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Albania (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ALGERIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">213</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Algeria (People's Democratic Republic of)</span><span class="delimiter">&quot;</span></span>),
-    AMERICAN_SAMOA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">American Samoa</span><span class="delimiter">&quot;</span></span>),
-    ANDORRA(<span class="string"><span class="delimiter">&quot;</span><span class="content">376</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Andorra (Principality of)</span><span class="delimiter">&quot;</span></span>),
-    ANGOLA(<span class="string"><span class="delimiter">&quot;</span><span class="content">244</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Angola (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ANGUILLA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anguilla</span><span class="delimiter">&quot;</span></span>),
-    ANTIGUA_AND_BARBUDA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Antigua and Barbuda</span><span class="delimiter">&quot;</span></span>),
-    ARGENTINA(<span class="string"><span class="delimiter">&quot;</span><span class="content">54</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Argentine Republic</span><span class="delimiter">&quot;</span></span>),
-    ARMENIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">374</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Armenia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ARUBA(<span class="string"><span class="delimiter">&quot;</span><span class="content">297</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Aruba</span><span class="delimiter">&quot;</span></span>),
-    AUSTRALIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">61</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Australia</span><span class="delimiter">&quot;</span></span>),
-    AUSTRALIAN_EXTERNAL_TERRITORIES(<span class="string"><span class="delimiter">&quot;</span><span class="content">672</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Australian External Territories</span><span class="delimiter">&quot;</span></span>),
-    AUSTRIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">43</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Austria</span><span class="delimiter">&quot;</span></span>),
-    AZERBAIJAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">994</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Azerbaijan (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    BAHAMAS(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bahamas (Commonwealth of the)</span><span class="delimiter">&quot;</span></span>),
-    BAHRAIN(<span class="string"><span class="delimiter">&quot;</span><span class="content">973</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bahrain (Kingdom of)</span><span class="delimiter">&quot;</span></span>),
-    BANGLADESH(<span class="string"><span class="delimiter">&quot;</span><span class="content">880</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bangladesh (People's Republic of)</span><span class="delimiter">&quot;</span></span>),
-    BARBADOS(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Barbados</span><span class="delimiter">&quot;</span></span>),
-    BELARUS(<span class="string"><span class="delimiter">&quot;</span><span class="content">375</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Belarus (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    BELGIUM(<span class="string"><span class="delimiter">&quot;</span><span class="content">32</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Belgium</span><span class="delimiter">&quot;</span></span>),
-    BELIZE(<span class="string"><span class="delimiter">&quot;</span><span class="content">501</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Belize</span><span class="delimiter">&quot;</span></span>),
-    BENIN(<span class="string"><span class="delimiter">&quot;</span><span class="content">229</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Benin (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    BERMUDA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bermuda</span><span class="delimiter">&quot;</span></span>),
-    BHUTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">975</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bhutan (Kingdom of)</span><span class="delimiter">&quot;</span></span>),
-    BOLIVIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">591</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bolivia (Plurinational State of)</span><span class="delimiter">&quot;</span></span>),
-    BONAIRE_SINT_EUSTATIUS_AND_SABA(<span class="string"><span class="delimiter">&quot;</span><span class="content">599</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bonaire, Sint Eustatius and Saba</span><span class="delimiter">&quot;</span></span>),
-    BOSNIA_AND_HERZEGOVINA(<span class="string"><span class="delimiter">&quot;</span><span class="content">387</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bosnia and Herzegovina</span><span class="delimiter">&quot;</span></span>),
-    BOTSWANA(<span class="string"><span class="delimiter">&quot;</span><span class="content">267</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Botswana (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    BRAZIL(<span class="string"><span class="delimiter">&quot;</span><span class="content">55</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Brazil (Federative Republic of)</span><span class="delimiter">&quot;</span></span>),
-    BRITISH_VIRGIN_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">British Version Islands</span><span class="delimiter">&quot;</span></span>),
-    BRUNEI(<span class="string"><span class="delimiter">&quot;</span><span class="content">673</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Brunei Darussalam</span><span class="delimiter">&quot;</span></span>),
-    BULGARIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">359</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Bulgaria (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    BURKINA_FASO(<span class="string"><span class="delimiter">&quot;</span><span class="content">226</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Burkina Faso</span><span class="delimiter">&quot;</span></span>),
-    BURUNDI(<span class="string"><span class="delimiter">&quot;</span><span class="content">257</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Burundi (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    CABO_VERDE(<span class="string"><span class="delimiter">&quot;</span><span class="content">238</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Cabo Verde (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    CAMBODIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">855</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Cambodia (Kingdom of</span><span class="delimiter">&quot;</span></span>),
-    CAMEROON(<span class="string"><span class="delimiter">&quot;</span><span class="content">237</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Cameroon (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    CANADA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Canada</span><span class="delimiter">&quot;</span></span>),
-    CAYMAN_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Cayman Islands</span><span class="delimiter">&quot;</span></span>),
-    CENTRAL_AFRICAN_REPUBLIC(<span class="string"><span class="delimiter">&quot;</span><span class="content">236</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Central African Republic</span><span class="delimiter">&quot;</span></span>),
-    CHAD(<span class="string"><span class="delimiter">&quot;</span><span class="content">235</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Chad (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    CHILE(<span class="string"><span class="delimiter">&quot;</span><span class="content">56</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Chile</span><span class="delimiter">&quot;</span></span>),
-    CHINA(<span class="string"><span class="delimiter">&quot;</span><span class="content">86</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">China (People's Republic of)</span><span class="delimiter">&quot;</span></span>),
-    COLOMBIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">57</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Colombia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    COMOROS(<span class="string"><span class="delimiter">&quot;</span><span class="content">269</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Comoros (Union of the)</span><span class="delimiter">&quot;</span></span>),
-    CONGO(<span class="string"><span class="delimiter">&quot;</span><span class="content">242</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Congo (Republic of the)</span><span class="delimiter">&quot;</span></span>),
-    COOK_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">682</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Cook Islands</span><span class="delimiter">&quot;</span></span>),
-    COSTA_RICA(<span class="string"><span class="delimiter">&quot;</span><span class="content">506</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Costa Rica</span><span class="delimiter">&quot;</span></span>),
-    CROATIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">385</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Croatia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    CUBA(<span class="string"><span class="delimiter">&quot;</span><span class="content">53</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Cuba</span><span class="delimiter">&quot;</span></span>),
-    CURACAO(<span class="string"><span class="delimiter">&quot;</span><span class="content">599</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Curacao</span><span class="delimiter">&quot;</span></span>),
-    CYPRUS(<span class="string"><span class="delimiter">&quot;</span><span class="content">357</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Cyprus (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    CZECH_REPUBLIC(<span class="string"><span class="delimiter">&quot;</span><span class="content">420</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Czech Republic</span><span class="delimiter">&quot;</span></span>),
-    DEMOCRATIC_REPUBLIC_OF_THE_CONGO(<span class="string"><span class="delimiter">&quot;</span><span class="content">243</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Democratic Republic of the Congo</span><span class="delimiter">&quot;</span></span>),
-    DENMARK(<span class="string"><span class="delimiter">&quot;</span><span class="content">45</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Denmark</span><span class="delimiter">&quot;</span></span>),
-    DISASTER_RELIEF(<span class="string"><span class="delimiter">&quot;</span><span class="content">888</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Telecommunications for Disaster Relief (TDR)</span><span class="delimiter">&quot;</span></span>),
-    DJIBOUTI(<span class="string"><span class="delimiter">&quot;</span><span class="content">253</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Djibouti (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    DOMINICA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Dominica (Commonwealth of)</span><span class="delimiter">&quot;</span></span>),
-    DOMINICAN_REPUBLIC(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Dominican Republic</span><span class="delimiter">&quot;</span></span>),
-    EAST_TIMOR(<span class="string"><span class="delimiter">&quot;</span><span class="content">670</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Timor-Leste (Democratic Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ECUADOR(<span class="string"><span class="delimiter">&quot;</span><span class="content">593</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Ecuador</span><span class="delimiter">&quot;</span></span>),
-    EGYPT(<span class="string"><span class="delimiter">&quot;</span><span class="content">20</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Egypt (Arab Republic of)</span><span class="delimiter">&quot;</span></span>),
-    EL_SALVADOR(<span class="string"><span class="delimiter">&quot;</span><span class="content">503</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">El Salvador (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    EQUATORIAL_GUINEA(<span class="string"><span class="delimiter">&quot;</span><span class="content">240</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Equatorial Guinea (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ERITREA(<span class="string"><span class="delimiter">&quot;</span><span class="content">291</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Eritrea</span><span class="delimiter">&quot;</span></span>),
-    ESTONIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">372</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Estonia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ETHIOPIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">251</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Ethiopia (Federal Democratic Republic of)</span><span class="delimiter">&quot;</span></span>),
-    FALKLAND_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">500</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Falkland Islands (Malvinas)</span><span class="delimiter">&quot;</span></span>),
-    FAROE_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">298</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Faroe Islands</span><span class="delimiter">&quot;</span></span>),
-    FIJI(<span class="string"><span class="delimiter">&quot;</span><span class="content">679</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Fiji (Republic of</span><span class="delimiter">&quot;</span></span>),
-    FINLAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">358</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Finland</span><span class="delimiter">&quot;</span></span>),
-    FRANCE(<span class="string"><span class="delimiter">&quot;</span><span class="content">33</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">France</span><span class="delimiter">&quot;</span></span>),
-    FRENCH_GUIANA(<span class="string"><span class="delimiter">&quot;</span><span class="content">590</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">French Guiana (French Department of)</span><span class="delimiter">&quot;</span></span>),
-    FRENCH_POLYNESIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">689</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">French Polynesia</span><span class="delimiter">&quot;</span></span>),
-    GABON(<span class="string"><span class="delimiter">&quot;</span><span class="content">241</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Gabonese Republic</span><span class="delimiter">&quot;</span></span>),
-    GAMBIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">220</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Gambia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    GEORGIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">995</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Georgia</span><span class="delimiter">&quot;</span></span>),
-    GERMANY(<span class="string"><span class="delimiter">&quot;</span><span class="content">49</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Germany (Federal Republic of)</span><span class="delimiter">&quot;</span></span>),
-    GHANA(<span class="string"><span class="delimiter">&quot;</span><span class="content">233</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Ghana</span><span class="delimiter">&quot;</span></span>),
-    GIBRALTAR(<span class="string"><span class="delimiter">&quot;</span><span class="content">350</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Gibraltar</span><span class="delimiter">&quot;</span></span>),
-    GMSS(<span class="string"><span class="delimiter">&quot;</span><span class="content">881</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Global Missile Satellite System (GMSS), shared code</span><span class="delimiter">&quot;</span></span>),
-    GREECE(<span class="string"><span class="delimiter">&quot;</span><span class="content">30</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Greece</span><span class="delimiter">&quot;</span></span>),
-    GREENLAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">299</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Greenland (Denmark)</span><span class="delimiter">&quot;</span></span>),
-    GRENADA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Grenada</span><span class="delimiter">&quot;</span></span>),
-    GROUP_SHARED(<span class="string"><span class="delimiter">&quot;</span><span class="content">388</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Group of countries, shared code</span><span class="delimiter">&quot;</span></span>),
-    GUADELOUPE(<span class="string"><span class="delimiter">&quot;</span><span class="content">590</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Guadeloupe (French Department of</span><span class="delimiter">&quot;</span></span>),
-    GUAM(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Guam</span><span class="delimiter">&quot;</span></span>),
-    GUATEMALA(<span class="string"><span class="delimiter">&quot;</span><span class="content">502</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Guatemala (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    GUINEA(<span class="string"><span class="delimiter">&quot;</span><span class="content">224</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Guinea (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    GUINEA_BISSAU(<span class="string"><span class="delimiter">&quot;</span><span class="content">245</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Guinnea-Bassau (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    GUYANA(<span class="string"><span class="delimiter">&quot;</span><span class="content">592</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Guyana</span><span class="delimiter">&quot;</span></span>),
-    HAITI(<span class="string"><span class="delimiter">&quot;</span><span class="content">509</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Haiti (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    HONDURAS(<span class="string"><span class="delimiter">&quot;</span><span class="content">504</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Honduras (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    HONG_KONG(<span class="string"><span class="delimiter">&quot;</span><span class="content">852</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Hong Kong, China</span><span class="delimiter">&quot;</span></span>),
-    HUNGARY(<span class="string"><span class="delimiter">&quot;</span><span class="content">36</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Hungary (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ICELAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">354</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Iceland</span><span class="delimiter">&quot;</span></span>),
-    INDIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">91</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">India (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    INDONESIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">62</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Indonesia</span><span class="delimiter">&quot;</span></span>),
-    INMARSAT(<span class="string"><span class="delimiter">&quot;</span><span class="content">870</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Inmarsat SNAC</span><span class="delimiter">&quot;</span></span>),
-    INTERNATIONAL_FREEPHONE(<span class="string"><span class="delimiter">&quot;</span><span class="content">800</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">International Freephone Service</span><span class="delimiter">&quot;</span></span>),
-    INTERNATIONAL_NETWORKS(<span class="string"><span class="delimiter">&quot;</span><span class="content">882</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">International Networks, shared code</span><span class="delimiter">&quot;</span></span>), <span class="comment">//There is a second entry for 883 with the same name.</span>
-    INTERNATIONAL_PREMIUM(<span class="string"><span class="delimiter">&quot;</span><span class="content">979</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">International Premium Rate Service (IPRS)</span><span class="delimiter">&quot;</span></span>),
-    INTERNATIONAL_SHARED(<span class="string"><span class="delimiter">&quot;</span><span class="content">808</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">International Shared Cost Service (ISCS)</span><span class="delimiter">&quot;</span></span>),
-    INTERNATIONAL_TRIAL(<span class="string"><span class="delimiter">&quot;</span><span class="content">991</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Trial of a proposed new international telecommunication public correspondence service, shared code</span><span class="delimiter">&quot;</span></span>),
-    IRAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">98</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Iran (Islamic Republic of)</span><span class="delimiter">&quot;</span></span>),
-    IRAQ(<span class="string"><span class="delimiter">&quot;</span><span class="content">964</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Iraq (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    IRELAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">353</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Ireland</span><span class="delimiter">&quot;</span></span>),
-    ISRAEL(<span class="string"><span class="delimiter">&quot;</span><span class="content">972</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Israel (State of)</span><span class="delimiter">&quot;</span></span>),
-    ITALY(<span class="string"><span class="delimiter">&quot;</span><span class="content">39</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Italy</span><span class="delimiter">&quot;</span></span>),
-    IVORY_COAST(<span class="string"><span class="delimiter">&quot;</span><span class="content">225</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Cote d'Ivoire (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    JAMAICA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Jamaica</span><span class="delimiter">&quot;</span></span>),
-    JAPAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">81</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Japan</span><span class="delimiter">&quot;</span></span>),
-    JORDAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">962</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Jordan (Hashemite Kingdom of)</span><span class="delimiter">&quot;</span></span>),
-    KAZAKHSTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">7</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Kazakhstan (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    KENYA(<span class="string"><span class="delimiter">&quot;</span><span class="content">254</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Kenya (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    KIRIBATI(<span class="string"><span class="delimiter">&quot;</span><span class="content">686</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Kiribati (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    KOSOVO(<span class="string"><span class="delimiter">&quot;</span><span class="content">383</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Kosovo</span><span class="delimiter">&quot;</span></span>),
-    KUWAIT(<span class="string"><span class="delimiter">&quot;</span><span class="content">965</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Kuwait (State of)</span><span class="delimiter">&quot;</span></span>),
-    KYRGYZSTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">996</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Kyrgyz Republic</span><span class="delimiter">&quot;</span></span>),
-    LAOS(<span class="string"><span class="delimiter">&quot;</span><span class="content">856</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Lao People's Democratic Republic</span><span class="delimiter">&quot;</span></span>),
-    LATVIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">371</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Latvia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    LEBANON(<span class="string"><span class="delimiter">&quot;</span><span class="content">961</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Lebanon</span><span class="delimiter">&quot;</span></span>),
-    LESOTHO(<span class="string"><span class="delimiter">&quot;</span><span class="content">266</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Lesotho (Kingdom of)</span><span class="delimiter">&quot;</span></span>),
-    LIBERIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">231</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Liberia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    LIBYA(<span class="string"><span class="delimiter">&quot;</span><span class="content">218</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Libya</span><span class="delimiter">&quot;</span></span>),
-    LIECHTENSTEIN(<span class="string"><span class="delimiter">&quot;</span><span class="content">423</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Liechtenstein (Principality of)</span><span class="delimiter">&quot;</span></span>),
-    LITHUANIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">370</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Lithuania (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    LUXEMBOURG(<span class="string"><span class="delimiter">&quot;</span><span class="content">352</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Luxembourg</span><span class="delimiter">&quot;</span></span>),
-    MACAO(<span class="string"><span class="delimiter">&quot;</span><span class="content">853</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Macao, China</span><span class="delimiter">&quot;</span></span>),
-    MACEDONIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">389</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">The Former Yugoslav Republic of Macedonia</span><span class="delimiter">&quot;</span></span>),
-    MADAGASCAR(<span class="string"><span class="delimiter">&quot;</span><span class="content">261</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Madagascar (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MALAWI(<span class="string"><span class="delimiter">&quot;</span><span class="content">265</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Malawi</span><span class="delimiter">&quot;</span></span>),
-    MALAYSIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">60</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Malaysia</span><span class="delimiter">&quot;</span></span>),
-    MALDIVES(<span class="string"><span class="delimiter">&quot;</span><span class="content">960</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Maldives (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MALI(<span class="string"><span class="delimiter">&quot;</span><span class="content">223</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mali (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MALTA(<span class="string"><span class="delimiter">&quot;</span><span class="content">356</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Malta</span><span class="delimiter">&quot;</span></span>),
-    MARSHALL_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">692</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Marshall Islands (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MARTINIQUE(<span class="string"><span class="delimiter">&quot;</span><span class="content">596</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Martinique (French Department of</span><span class="delimiter">&quot;</span></span>),
-    MAURITANIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">222</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mauritania (Islamic Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MAURITIUS(<span class="string"><span class="delimiter">&quot;</span><span class="content">230</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mauritius (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MEXICO(<span class="string"><span class="delimiter">&quot;</span><span class="content">52</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mexico</span><span class="delimiter">&quot;</span></span>),
-    MICRONESIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">691</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Micronesia (Federated States of)</span><span class="delimiter">&quot;</span></span>),
-    MOLDOVA(<span class="string"><span class="delimiter">&quot;</span><span class="content">373</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Moldova (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MONACO(<span class="string"><span class="delimiter">&quot;</span><span class="content">377</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Monaco (Principality of)</span><span class="delimiter">&quot;</span></span>),
-    MONGOLIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">976</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mongolia</span><span class="delimiter">&quot;</span></span>),
-    MONTENEGRO(<span class="string"><span class="delimiter">&quot;</span><span class="content">382</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Montenegro (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MONTSERRAT(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Montserrat</span><span class="delimiter">&quot;</span></span>),
-    MOROCCO(<span class="string"><span class="delimiter">&quot;</span><span class="content">212</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Morocco (Kingdom of)</span><span class="delimiter">&quot;</span></span>),
-    MOZAMBIQUE(<span class="string"><span class="delimiter">&quot;</span><span class="content">258</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mozambique (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    MYANMAR(<span class="string"><span class="delimiter">&quot;</span><span class="content">95</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Myanmar (The Republic of the Union of)</span><span class="delimiter">&quot;</span></span>),
-    NAMIBIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">264</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Namibia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    NAURU(<span class="string"><span class="delimiter">&quot;</span><span class="content">674</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Nauru (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    NEPAL(<span class="string"><span class="delimiter">&quot;</span><span class="content">977</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Nepal (Federal Democratic Republic of)</span><span class="delimiter">&quot;</span></span>),
-    NETHERLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">31</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Netherlands (Kingdom of the)</span><span class="delimiter">&quot;</span></span>),
-    NEW_CALEDONIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">687</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">New Caledonia (Territoire francais d'outre-mer)</span><span class="delimiter">&quot;</span></span>),
-    NEW_ZEALAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">64</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">New Zealand</span><span class="delimiter">&quot;</span></span>),
-    NICARAGUA(<span class="string"><span class="delimiter">&quot;</span><span class="content">505</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Nicaragua</span><span class="delimiter">&quot;</span></span>),
-    NIGER(<span class="string"><span class="delimiter">&quot;</span><span class="content">227</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Niger (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    NIGERIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">234</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Nigeria (Federal Republic of)</span><span class="delimiter">&quot;</span></span>),
-    NIUE(<span class="string"><span class="delimiter">&quot;</span><span class="content">683</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Niue</span><span class="delimiter">&quot;</span></span>),
-    NORTH_KOREA(<span class="string"><span class="delimiter">&quot;</span><span class="content">850</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Democratic People's Republic of Korea</span><span class="char">\n</span><span class="delimiter">&quot;</span></span>),
-    NORTHERN_MARIANA_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Northern Mariana Islands (Commonwealth of the)</span><span class="delimiter">&quot;</span></span>),
-    NORWAY(<span class="string"><span class="delimiter">&quot;</span><span class="content">47</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Norway</span><span class="delimiter">&quot;</span></span>),
-    OMAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">968</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Oman (Sultanate of)</span><span class="delimiter">&quot;</span></span>),
-    PAKISTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">92</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Pakistan (Islamic Republic of)</span><span class="delimiter">&quot;</span></span>),
-    PALAU(<span class="string"><span class="delimiter">&quot;</span><span class="content">680</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Palau (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    PANAMA(<span class="string"><span class="delimiter">&quot;</span><span class="content">507</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Panama (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    PAPUA_NEW_GUINEA(<span class="string"><span class="delimiter">&quot;</span><span class="content">675</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Papua New Guinea</span><span class="delimiter">&quot;</span></span>),
-    PARAGUAY(<span class="string"><span class="delimiter">&quot;</span><span class="content">595</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">PARAGUAY (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    PERU(<span class="string"><span class="delimiter">&quot;</span><span class="content">51</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Peru</span><span class="delimiter">&quot;</span></span>),
-    PHILIPPINES(<span class="string"><span class="delimiter">&quot;</span><span class="content">63</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Philippines (Republic of the)</span><span class="delimiter">&quot;</span></span>),
-    POLAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">48</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Poland (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    PORTUGAL(<span class="string"><span class="delimiter">&quot;</span><span class="content">351</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Portugal</span><span class="delimiter">&quot;</span></span>),
-    PUERTO_RICO(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Puerto Rico</span><span class="delimiter">&quot;</span></span>),
-    QATAR(<span class="string"><span class="delimiter">&quot;</span><span class="content">974</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Qatar (State of)</span><span class="delimiter">&quot;</span></span>),
-    REUNION(<span class="string"><span class="delimiter">&quot;</span><span class="content">262</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">French Departments and Territories in the Indian Ocean</span><span class="delimiter">&quot;</span></span>),
-    ROMANIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">40</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Romania</span><span class="delimiter">&quot;</span></span>),
-    RUSSIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">7</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Russian Federation</span><span class="delimiter">&quot;</span></span>),
-    RWANDA(<span class="string"><span class="delimiter">&quot;</span><span class="content">250</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Rwanda (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SAINT_HELENA(<span class="string"><span class="delimiter">&quot;</span><span class="content">290</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Saint Helena, Ascension and the Tristan da Cunha</span><span class="delimiter">&quot;</span></span>), <span class="comment">//Also, 247 has an identical entry</span>
-    SAINT_KITTS_AND_NEVIS(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Saint Kitts and Nevis</span><span class="delimiter">&quot;</span></span>),
-    SAINT_LUCIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Saint Lucia</span><span class="delimiter">&quot;</span></span>),
-    SAINT_PIERRE_AND_MIQUELON(<span class="string"><span class="delimiter">&quot;</span><span class="content">508</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Saint Pierre and Miquelon (Collectivite territoriale de la Republique francaise)</span><span class="delimiter">&quot;</span></span>),
-    SAINT_VINCENT_AND_THE_GRENADINES(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Saint Vincent and the Grenadines</span><span class="delimiter">&quot;</span></span>),
-    SAMOA(<span class="string"><span class="delimiter">&quot;</span><span class="content">685</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Samoa (Independent State of</span><span class="delimiter">&quot;</span></span>),
-    SAN_MARINO(<span class="string"><span class="delimiter">&quot;</span><span class="content">378</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">San Marino (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SAO_TOME_AND_PRINCIPE(<span class="string"><span class="delimiter">&quot;</span><span class="content">239</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sao Tome and Principe (Democratic Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SAUDI_ARABIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">966</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Saudi Arabia (Kingdom of)</span><span class="delimiter">&quot;</span></span>),
-    SENEGAL(<span class="string"><span class="delimiter">&quot;</span><span class="content">221</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Senegal (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SERBIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">381</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Serbia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SEYCHELLES(<span class="string"><span class="delimiter">&quot;</span><span class="content">248</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Seychelles (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SIERRA_LEONE(<span class="string"><span class="delimiter">&quot;</span><span class="content">232</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sierra Leone</span><span class="delimiter">&quot;</span></span>),
-    SINGAPORE(<span class="string"><span class="delimiter">&quot;</span><span class="content">65</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Singapore (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SINT_MAARTEN(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sint Maarten (Dutch part)</span><span class="delimiter">&quot;</span></span>),
-    SLOVAKIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">421</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Slovak Republic</span><span class="delimiter">&quot;</span></span>),
-    SLOVENIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">386</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Slovenia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SOLOMON_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">677</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Solomon Islands</span><span class="delimiter">&quot;</span></span>),
-    SOMALIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">252</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Somalia (Federal Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SOUTH_AFRICA(<span class="string"><span class="delimiter">&quot;</span><span class="content">27</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">South Africa (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SOUTH_KOREA(<span class="string"><span class="delimiter">&quot;</span><span class="content">82</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Korea (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SOUTH_SUDAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">211</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">South Sudan (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SPAIN(<span class="string"><span class="delimiter">&quot;</span><span class="content">34</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Spain</span><span class="delimiter">&quot;</span></span>),
-    SRI_LANKA(<span class="string"><span class="delimiter">&quot;</span><span class="content">94</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sri Lanka (Democratic Socialist Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SUDAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">249</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sudan (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    SURINAME(<span class="string"><span class="delimiter">&quot;</span><span class="content">597</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Suriname (Republic of</span><span class="delimiter">&quot;</span></span>),
-    SWAZILAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">268</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Swaziland (Kingdom of)</span><span class="delimiter">&quot;</span></span>),
-    SWEDEN(<span class="string"><span class="delimiter">&quot;</span><span class="content">46</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sweden</span><span class="delimiter">&quot;</span></span>),
-    SWITZERLAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">41</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Switzerland (Confederation of)</span><span class="delimiter">&quot;</span></span>),
-    SYRIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">963</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Syrian Arab Republic</span><span class="delimiter">&quot;</span></span>),
-    TAIWAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">886</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Taiwan, China</span><span class="delimiter">&quot;</span></span>), <span class="comment">//Republic of China?</span>
-    TAJIKISTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">992</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Tajikstan (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    TANZANIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">255</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Tanzania (United Republic of)</span><span class="delimiter">&quot;</span></span>),
-    THAILAND(<span class="string"><span class="delimiter">&quot;</span><span class="content">66</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Thailand</span><span class="delimiter">&quot;</span></span>),
-    TOGO(<span class="string"><span class="delimiter">&quot;</span><span class="content">228</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Togolese Republic</span><span class="delimiter">&quot;</span></span>),
-    TOKELAU(<span class="string"><span class="delimiter">&quot;</span><span class="content">690</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Tokelau</span><span class="delimiter">&quot;</span></span>),
-    TONGA(<span class="string"><span class="delimiter">&quot;</span><span class="content">676</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Tonga (Kingdom of)</span><span class="delimiter">&quot;</span></span>),
-    TRINIDAD_AND_TOBAGO(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Trinidad and Tobago</span><span class="delimiter">&quot;</span></span>),
-    TUNISIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">216</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Tunisia</span><span class="delimiter">&quot;</span></span>),
-    TURKEY(<span class="string"><span class="delimiter">&quot;</span><span class="content">90</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Turkey</span><span class="delimiter">&quot;</span></span>),
-    TURKMENISTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">993</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Turkemenistan</span><span class="delimiter">&quot;</span></span>),
-    TURKS_AND_CAICOS_ISLANDS(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Turks and Caicos Islands</span><span class="delimiter">&quot;</span></span>),
-    TUVALU(<span class="string"><span class="delimiter">&quot;</span><span class="content">688</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Tuvalu</span><span class="delimiter">&quot;</span></span>),
-    UGANDA(<span class="string"><span class="delimiter">&quot;</span><span class="content">256</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Uganda (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    UKRAINE(<span class="string"><span class="delimiter">&quot;</span><span class="content">380</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Ukraine</span><span class="delimiter">&quot;</span></span>),
-    UNITED_ARAB_EMIRATES(<span class="string"><span class="delimiter">&quot;</span><span class="content">971</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">United Arab Emirates</span><span class="delimiter">&quot;</span></span>),
-    UNITED_KINGDOM(<span class="string"><span class="delimiter">&quot;</span><span class="content">44</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">United Kingdom of Great Britain and Northern Ireland</span><span class="delimiter">&quot;</span></span>),
-    UNITED_STATES(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">United States of America</span><span class="delimiter">&quot;</span></span>),
-    UPT(<span class="string"><span class="delimiter">&quot;</span><span class="content">878</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Universal Personal Telecommunication Service (UPT)</span><span class="delimiter">&quot;</span></span>),
-    URUGUAY(<span class="string"><span class="delimiter">&quot;</span><span class="content">598</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Uruguay (Eastern Republic of)</span><span class="delimiter">&quot;</span></span>),
-    UZBEKISTAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">998</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Uzbekistan (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    VANUATU(<span class="string"><span class="delimiter">&quot;</span><span class="content">678</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Vanuatu (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    VATICAN(<span class="string"><span class="delimiter">&quot;</span><span class="content">379</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Vatican City State</span><span class="delimiter">&quot;</span></span>),
-    VENEZUELA(<span class="string"><span class="delimiter">&quot;</span><span class="content">58</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Venezuala (Bolivarian Republic of)</span><span class="delimiter">&quot;</span></span>),
-    VIETNAM(<span class="string"><span class="delimiter">&quot;</span><span class="content">84</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Viet nam (Socialist Republic of)</span><span class="delimiter">&quot;</span></span>),
-    WALLIS_AND_FUTUNA(<span class="string"><span class="delimiter">&quot;</span><span class="content">681</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Wallis and Futuna (Territoire francais d'outre-mer)</span><span class="delimiter">&quot;</span></span>),
-    YEMEN(<span class="string"><span class="delimiter">&quot;</span><span class="content">967</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Yemen (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ZAMBIA(<span class="string"><span class="delimiter">&quot;</span><span class="content">260</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Zambia (Republic of)</span><span class="delimiter">&quot;</span></span>),
-    ZIMBABWE(<span class="string"><span class="delimiter">&quot;</span><span class="content">263</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Zimbabwe (Republic of)</span><span class="delimiter">&quot;</span></span>);
+    <span class="no">AFGHANISTAN</span><span class="o">(</span><span class="s">"93"</span><span class="o">,</span> <span class="s">"Afghanistan"</span><span class="o">),</span>
+    <span class="no">ALBANIA</span><span class="o">(</span><span class="s">"355"</span><span class="o">,</span> <span class="s">"Albania (Republic of)"</span><span class="o">),</span>
+    <span class="no">ALGERIA</span><span class="o">(</span><span class="s">"213"</span><span class="o">,</span> <span class="s">"Algeria (People's Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">AMERICAN_SAMOA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"American Samoa"</span><span class="o">),</span>
+    <span class="no">ANDORRA</span><span class="o">(</span><span class="s">"376"</span><span class="o">,</span> <span class="s">"Andorra (Principality of)"</span><span class="o">),</span>
+    <span class="no">ANGOLA</span><span class="o">(</span><span class="s">"244"</span><span class="o">,</span> <span class="s">"Angola (Republic of)"</span><span class="o">),</span>
+    <span class="no">ANGUILLA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Anguilla"</span><span class="o">),</span>
+    <span class="no">ANTIGUA_AND_BARBUDA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Antigua and Barbuda"</span><span class="o">),</span>
+    <span class="no">ARGENTINA</span><span class="o">(</span><span class="s">"54"</span><span class="o">,</span> <span class="s">"Argentine Republic"</span><span class="o">),</span>
+    <span class="no">ARMENIA</span><span class="o">(</span><span class="s">"374"</span><span class="o">,</span> <span class="s">"Armenia (Republic of)"</span><span class="o">),</span>
+    <span class="no">ARUBA</span><span class="o">(</span><span class="s">"297"</span><span class="o">,</span> <span class="s">"Aruba"</span><span class="o">),</span>
+    <span class="no">AUSTRALIA</span><span class="o">(</span><span class="s">"61"</span><span class="o">,</span> <span class="s">"Australia"</span><span class="o">),</span>
+    <span class="no">AUSTRALIAN_EXTERNAL_TERRITORIES</span><span class="o">(</span><span class="s">"672"</span><span class="o">,</span> <span class="s">"Australian External Territories"</span><span class="o">),</span>
+    <span class="no">AUSTRIA</span><span class="o">(</span><span class="s">"43"</span><span class="o">,</span> <span class="s">"Austria"</span><span class="o">),</span>
+    <span class="no">AZERBAIJAN</span><span class="o">(</span><span class="s">"994"</span><span class="o">,</span> <span class="s">"Azerbaijan (Republic of)"</span><span class="o">),</span>
+    <span class="no">BAHAMAS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Bahamas (Commonwealth of the)"</span><span class="o">),</span>
+    <span class="no">BAHRAIN</span><span class="o">(</span><span class="s">"973"</span><span class="o">,</span> <span class="s">"Bahrain (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">BANGLADESH</span><span class="o">(</span><span class="s">"880"</span><span class="o">,</span> <span class="s">"Bangladesh (People's Republic of)"</span><span class="o">),</span>
+    <span class="no">BARBADOS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Barbados"</span><span class="o">),</span>
+    <span class="no">BELARUS</span><span class="o">(</span><span class="s">"375"</span><span class="o">,</span> <span class="s">"Belarus (Republic of)"</span><span class="o">),</span>
+    <span class="no">BELGIUM</span><span class="o">(</span><span class="s">"32"</span><span class="o">,</span> <span class="s">"Belgium"</span><span class="o">),</span>
+    <span class="no">BELIZE</span><span class="o">(</span><span class="s">"501"</span><span class="o">,</span> <span class="s">"Belize"</span><span class="o">),</span>
+    <span class="no">BENIN</span><span class="o">(</span><span class="s">"229"</span><span class="o">,</span> <span class="s">"Benin (Republic of)"</span><span class="o">),</span>
+    <span class="no">BERMUDA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Bermuda"</span><span class="o">),</span>
+    <span class="no">BHUTAN</span><span class="o">(</span><span class="s">"975"</span><span class="o">,</span> <span class="s">"Bhutan (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">BOLIVIA</span><span class="o">(</span><span class="s">"591"</span><span class="o">,</span> <span class="s">"Bolivia (Plurinational State of)"</span><span class="o">),</span>
+    <span class="no">BONAIRE_SINT_EUSTATIUS_AND_SABA</span><span class="o">(</span><span class="s">"599"</span><span class="o">,</span> <span class="s">"Bonaire, Sint Eustatius and Saba"</span><span class="o">),</span>
+    <span class="no">BOSNIA_AND_HERZEGOVINA</span><span class="o">(</span><span class="s">"387"</span><span class="o">,</span> <span class="s">"Bosnia and Herzegovina"</span><span class="o">),</span>
+    <span class="no">BOTSWANA</span><span class="o">(</span><span class="s">"267"</span><span class="o">,</span> <span class="s">"Botswana (Republic of)"</span><span class="o">),</span>
+    <span class="no">BRAZIL</span><span class="o">(</span><span class="s">"55"</span><span class="o">,</span> <span class="s">"Brazil (Federative Republic of)"</span><span class="o">),</span>
+    <span class="no">BRITISH_VIRGIN_ISLANDS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"British Version Islands"</span><span class="o">),</span>
+    <span class="no">BRUNEI</span><span class="o">(</span><span class="s">"673"</span><span class="o">,</span> <span class="s">"Brunei Darussalam"</span><span class="o">),</span>
+    <span class="no">BULGARIA</span><span class="o">(</span><span class="s">"359"</span><span class="o">,</span> <span class="s">"Bulgaria (Republic of)"</span><span class="o">),</span>
+    <span class="no">BURKINA_FASO</span><span class="o">(</span><span class="s">"226"</span><span class="o">,</span> <span class="s">"Burkina Faso"</span><span class="o">),</span>
+    <span class="no">BURUNDI</span><span class="o">(</span><span class="s">"257"</span><span class="o">,</span> <span class="s">"Burundi (Republic of)"</span><span class="o">),</span>
+    <span class="no">CABO_VERDE</span><span class="o">(</span><span class="s">"238"</span><span class="o">,</span> <span class="s">"Cabo Verde (Republic of)"</span><span class="o">),</span>
+    <span class="no">CAMBODIA</span><span class="o">(</span><span class="s">"855"</span><span class="o">,</span> <span class="s">"Cambodia (Kingdom of"</span><span class="o">),</span>
+    <span class="no">CAMEROON</span><span class="o">(</span><span class="s">"237"</span><span class="o">,</span> <span class="s">"Cameroon (Republic of)"</span><span class="o">),</span>
+    <span class="no">CANADA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Canada"</span><span class="o">),</span>
+    <span class="no">CAYMAN_ISLANDS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Cayman Islands"</span><span class="o">),</span>
+    <span class="no">CENTRAL_AFRICAN_REPUBLIC</span><span class="o">(</span><span class="s">"236"</span><span class="o">,</span> <span class="s">"Central African Republic"</span><span class="o">),</span>
+    <span class="no">CHAD</span><span class="o">(</span><span class="s">"235"</span><span class="o">,</span> <span class="s">"Chad (Republic of)"</span><span class="o">),</span>
+    <span class="no">CHILE</span><span class="o">(</span><span class="s">"56"</span><span class="o">,</span> <span class="s">"Chile"</span><span class="o">),</span>
+    <span class="no">CHINA</span><span class="o">(</span><span class="s">"86"</span><span class="o">,</span> <span class="s">"China (People's Republic of)"</span><span class="o">),</span>
+    <span class="no">COLOMBIA</span><span class="o">(</span><span class="s">"57"</span><span class="o">,</span> <span class="s">"Colombia (Republic of)"</span><span class="o">),</span>
+    <span class="no">COMOROS</span><span class="o">(</span><span class="s">"269"</span><span class="o">,</span> <span class="s">"Comoros (Union of the)"</span><span class="o">),</span>
+    <span class="no">CONGO</span><span class="o">(</span><span class="s">"242"</span><span class="o">,</span> <span class="s">"Congo (Republic of the)"</span><span class="o">),</span>
+    <span class="no">COOK_ISLANDS</span><span class="o">(</span><span class="s">"682"</span><span class="o">,</span> <span class="s">"Cook Islands"</span><span class="o">),</span>
+    <span class="no">COSTA_RICA</span><span class="o">(</span><span class="s">"506"</span><span class="o">,</span> <span class="s">"Costa Rica"</span><span class="o">),</span>
+    <span class="no">CROATIA</span><span class="o">(</span><span class="s">"385"</span><span class="o">,</span> <span class="s">"Croatia (Republic of)"</span><span class="o">),</span>
+    <span class="no">CUBA</span><span class="o">(</span><span class="s">"53"</span><span class="o">,</span> <span class="s">"Cuba"</span><span class="o">),</span>
+    <span class="no">CURACAO</span><span class="o">(</span><span class="s">"599"</span><span class="o">,</span> <span class="s">"Curacao"</span><span class="o">),</span>
+    <span class="no">CYPRUS</span><span class="o">(</span><span class="s">"357"</span><span class="o">,</span> <span class="s">"Cyprus (Republic of)"</span><span class="o">),</span>
+    <span class="no">CZECH_REPUBLIC</span><span class="o">(</span><span class="s">"420"</span><span class="o">,</span> <span class="s">"Czech Republic"</span><span class="o">),</span>
+    <span class="no">DEMOCRATIC_REPUBLIC_OF_THE_CONGO</span><span class="o">(</span><span class="s">"243"</span><span class="o">,</span> <span class="s">"Democratic Republic of the Congo"</span><span class="o">),</span>
+    <span class="no">DENMARK</span><span class="o">(</span><span class="s">"45"</span><span class="o">,</span> <span class="s">"Denmark"</span><span class="o">),</span>
+    <span class="no">DISASTER_RELIEF</span><span class="o">(</span><span class="s">"888"</span><span class="o">,</span> <span class="s">"Telecommunications for Disaster Relief (TDR)"</span><span class="o">),</span>
+    <span class="no">DJIBOUTI</span><span class="o">(</span><span class="s">"253"</span><span class="o">,</span> <span class="s">"Djibouti (Republic of)"</span><span class="o">),</span>
+    <span class="no">DOMINICA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Dominica (Commonwealth of)"</span><span class="o">),</span>
+    <span class="no">DOMINICAN_REPUBLIC</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Dominican Republic"</span><span class="o">),</span>
+    <span class="no">EAST_TIMOR</span><span class="o">(</span><span class="s">"670"</span><span class="o">,</span> <span class="s">"Timor-Leste (Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">ECUADOR</span><span class="o">(</span><span class="s">"593"</span><span class="o">,</span> <span class="s">"Ecuador"</span><span class="o">),</span>
+    <span class="no">EGYPT</span><span class="o">(</span><span class="s">"20"</span><span class="o">,</span> <span class="s">"Egypt (Arab Republic of)"</span><span class="o">),</span>
+    <span class="no">EL_SALVADOR</span><span class="o">(</span><span class="s">"503"</span><span class="o">,</span> <span class="s">"El Salvador (Republic of)"</span><span class="o">),</span>
+    <span class="no">EQUATORIAL_GUINEA</span><span class="o">(</span><span class="s">"240"</span><span class="o">,</span> <span class="s">"Equatorial Guinea (Republic of)"</span><span class="o">),</span>
+    <span class="no">ERITREA</span><span class="o">(</span><span class="s">"291"</span><span class="o">,</span> <span class="s">"Eritrea"</span><span class="o">),</span>
+    <span class="no">ESTONIA</span><span class="o">(</span><span class="s">"372"</span><span class="o">,</span> <span class="s">"Estonia (Republic of)"</span><span class="o">),</span>
+    <span class="no">ETHIOPIA</span><span class="o">(</span><span class="s">"251"</span><span class="o">,</span> <span class="s">"Ethiopia (Federal Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">FALKLAND_ISLANDS</span><span class="o">(</span><span class="s">"500"</span><span class="o">,</span> <span class="s">"Falkland Islands (Malvinas)"</span><span class="o">),</span>
+    <span class="no">FAROE_ISLANDS</span><span class="o">(</span><span class="s">"298"</span><span class="o">,</span> <span class="s">"Faroe Islands"</span><span class="o">),</span>
+    <span class="no">FIJI</span><span class="o">(</span><span class="s">"679"</span><span class="o">,</span> <span class="s">"Fiji (Republic of"</span><span class="o">),</span>
+    <span class="no">FINLAND</span><span class="o">(</span><span class="s">"358"</span><span class="o">,</span> <span class="s">"Finland"</span><span class="o">),</span>
+    <span class="no">FRANCE</span><span class="o">(</span><span class="s">"33"</span><span class="o">,</span> <span class="s">"France"</span><span class="o">),</span>
+    <span class="no">FRENCH_GUIANA</span><span class="o">(</span><span class="s">"590"</span><span class="o">,</span> <span class="s">"French Guiana (French Department of)"</span><span class="o">),</span>
+    <span class="no">FRENCH_POLYNESIA</span><span class="o">(</span><span class="s">"689"</span><span class="o">,</span> <span class="s">"French Polynesia"</span><span class="o">),</span>
+    <span class="no">GABON</span><span class="o">(</span><span class="s">"241"</span><span class="o">,</span> <span class="s">"Gabonese Republic"</span><span class="o">),</span>
+    <span class="no">GAMBIA</span><span class="o">(</span><span class="s">"220"</span><span class="o">,</span> <span class="s">"Gambia (Republic of)"</span><span class="o">),</span>
+    <span class="no">GEORGIA</span><span class="o">(</span><span class="s">"995"</span><span class="o">,</span> <span class="s">"Georgia"</span><span class="o">),</span>
+    <span class="no">GERMANY</span><span class="o">(</span><span class="s">"49"</span><span class="o">,</span> <span class="s">"Germany (Federal Republic of)"</span><span class="o">),</span>
+    <span class="no">GHANA</span><span class="o">(</span><span class="s">"233"</span><span class="o">,</span> <span class="s">"Ghana"</span><span class="o">),</span>
+    <span class="no">GIBRALTAR</span><span class="o">(</span><span class="s">"350"</span><span class="o">,</span> <span class="s">"Gibraltar"</span><span class="o">),</span>
+    <span class="no">GMSS</span><span class="o">(</span><span class="s">"881"</span><span class="o">,</span> <span class="s">"Global Missile Satellite System (GMSS), shared code"</span><span class="o">),</span>
+    <span class="no">GREECE</span><span class="o">(</span><span class="s">"30"</span><span class="o">,</span> <span class="s">"Greece"</span><span class="o">),</span>
+    <span class="no">GREENLAND</span><span class="o">(</span><span class="s">"299"</span><span class="o">,</span> <span class="s">"Greenland (Denmark)"</span><span class="o">),</span>
+    <span class="no">GRENADA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Grenada"</span><span class="o">),</span>
+    <span class="no">GROUP_SHARED</span><span class="o">(</span><span class="s">"388"</span><span class="o">,</span> <span class="s">"Group of countries, shared code"</span><span class="o">),</span>
+    <span class="no">GUADELOUPE</span><span class="o">(</span><span class="s">"590"</span><span class="o">,</span> <span class="s">"Guadeloupe (French Department of"</span><span class="o">),</span>
+    <span class="no">GUAM</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Guam"</span><span class="o">),</span>
+    <span class="no">GUATEMALA</span><span class="o">(</span><span class="s">"502"</span><span class="o">,</span> <span class="s">"Guatemala (Republic of)"</span><span class="o">),</span>
+    <span class="no">GUINEA</span><span class="o">(</span><span class="s">"224"</span><span class="o">,</span> <span class="s">"Guinea (Republic of)"</span><span class="o">),</span>
+    <span class="no">GUINEA_BISSAU</span><span class="o">(</span><span class="s">"245"</span><span class="o">,</span> <span class="s">"Guinnea-Bassau (Republic of)"</span><span class="o">),</span>
+    <span class="no">GUYANA</span><span class="o">(</span><span class="s">"592"</span><span class="o">,</span> <span class="s">"Guyana"</span><span class="o">),</span>
+    <span class="no">HAITI</span><span class="o">(</span><span class="s">"509"</span><span class="o">,</span> <span class="s">"Haiti (Republic of)"</span><span class="o">),</span>
+    <span class="no">HONDURAS</span><span class="o">(</span><span class="s">"504"</span><span class="o">,</span> <span class="s">"Honduras (Republic of)"</span><span class="o">),</span>
+    <span class="no">HONG_KONG</span><span class="o">(</span><span class="s">"852"</span><span class="o">,</span> <span class="s">"Hong Kong, China"</span><span class="o">),</span>
+    <span class="no">HUNGARY</span><span class="o">(</span><span class="s">"36"</span><span class="o">,</span> <span class="s">"Hungary (Republic of)"</span><span class="o">),</span>
+    <span class="no">ICELAND</span><span class="o">(</span><span class="s">"354"</span><span class="o">,</span> <span class="s">"Iceland"</span><span class="o">),</span>
+    <span class="no">INDIA</span><span class="o">(</span><span class="s">"91"</span><span class="o">,</span> <span class="s">"India (Republic of)"</span><span class="o">),</span>
+    <span class="no">INDONESIA</span><span class="o">(</span><span class="s">"62"</span><span class="o">,</span> <span class="s">"Indonesia"</span><span class="o">),</span>
+    <span class="no">INMARSAT</span><span class="o">(</span><span class="s">"870"</span><span class="o">,</span> <span class="s">"Inmarsat SNAC"</span><span class="o">),</span>
+    <span class="no">INTERNATIONAL_FREEPHONE</span><span class="o">(</span><span class="s">"800"</span><span class="o">,</span> <span class="s">"International Freephone Service"</span><span class="o">),</span>
+    <span class="no">INTERNATIONAL_NETWORKS</span><span class="o">(</span><span class="s">"882"</span><span class="o">,</span> <span class="s">"International Networks, shared code"</span><span class="o">),</span> <span class="c1">//There is a second entry for 883 with the same name.</span>
+    <span class="no">INTERNATIONAL_PREMIUM</span><span class="o">(</span><span class="s">"979"</span><span class="o">,</span> <span class="s">"International Premium Rate Service (IPRS)"</span><span class="o">),</span>
+    <span class="no">INTERNATIONAL_SHARED</span><span class="o">(</span><span class="s">"808"</span><span class="o">,</span> <span class="s">"International Shared Cost Service (ISCS)"</span><span class="o">),</span>
+    <span class="no">INTERNATIONAL_TRIAL</span><span class="o">(</span><span class="s">"991"</span><span class="o">,</span> <span class="s">"Trial of a proposed new international telecommunication public correspondence service, shared code"</span><span class="o">),</span>
+    <span class="no">IRAN</span><span class="o">(</span><span class="s">"98"</span><span class="o">,</span> <span class="s">"Iran (Islamic Republic of)"</span><span class="o">),</span>
+    <span class="no">IRAQ</span><span class="o">(</span><span class="s">"964"</span><span class="o">,</span> <span class="s">"Iraq (Republic of)"</span><span class="o">),</span>
+    <span class="no">IRELAND</span><span class="o">(</span><span class="s">"353"</span><span class="o">,</span> <span class="s">"Ireland"</span><span class="o">),</span>
+    <span class="no">ISRAEL</span><span class="o">(</span><span class="s">"972"</span><span class="o">,</span> <span class="s">"Israel (State of)"</span><span class="o">),</span>
+    <span class="no">ITALY</span><span class="o">(</span><span class="s">"39"</span><span class="o">,</span> <span class="s">"Italy"</span><span class="o">),</span>
+    <span class="no">IVORY_COAST</span><span class="o">(</span><span class="s">"225"</span><span class="o">,</span> <span class="s">"Cote d'Ivoire (Republic of)"</span><span class="o">),</span>
+    <span class="no">JAMAICA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Jamaica"</span><span class="o">),</span>
+    <span class="no">JAPAN</span><span class="o">(</span><span class="s">"81"</span><span class="o">,</span> <span class="s">"Japan"</span><span class="o">),</span>
+    <span class="no">JORDAN</span><span class="o">(</span><span class="s">"962"</span><span class="o">,</span> <span class="s">"Jordan (Hashemite Kingdom of)"</span><span class="o">),</span>
+    <span class="no">KAZAKHSTAN</span><span class="o">(</span><span class="s">"7"</span><span class="o">,</span> <span class="s">"Kazakhstan (Republic of)"</span><span class="o">),</span>
+    <span class="no">KENYA</span><span class="o">(</span><span class="s">"254"</span><span class="o">,</span> <span class="s">"Kenya (Republic of)"</span><span class="o">),</span>
+    <span class="no">KIRIBATI</span><span class="o">(</span><span class="s">"686"</span><span class="o">,</span> <span class="s">"Kiribati (Republic of)"</span><span class="o">),</span>
+    <span class="no">KOSOVO</span><span class="o">(</span><span class="s">"383"</span><span class="o">,</span> <span class="s">"Kosovo"</span><span class="o">),</span>
+    <span class="no">KUWAIT</span><span class="o">(</span><span class="s">"965"</span><span class="o">,</span> <span class="s">"Kuwait (State of)"</span><span class="o">),</span>
+    <span class="no">KYRGYZSTAN</span><span class="o">(</span><span class="s">"996"</span><span class="o">,</span> <span class="s">"Kyrgyz Republic"</span><span class="o">),</span>
+    <span class="no">LAOS</span><span class="o">(</span><span class="s">"856"</span><span class="o">,</span> <span class="s">"Lao People's Democratic Republic"</span><span class="o">),</span>
+    <span class="no">LATVIA</span><span class="o">(</span><span class="s">"371"</span><span class="o">,</span> <span class="s">"Latvia (Republic of)"</span><span class="o">),</span>
+    <span class="no">LEBANON</span><span class="o">(</span><span class="s">"961"</span><span class="o">,</span> <span class="s">"Lebanon"</span><span class="o">),</span>
+    <span class="no">LESOTHO</span><span class="o">(</span><span class="s">"266"</span><span class="o">,</span> <span class="s">"Lesotho (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">LIBERIA</span><span class="o">(</span><span class="s">"231"</span><span class="o">,</span> <span class="s">"Liberia (Republic of)"</span><span class="o">),</span>
+    <span class="no">LIBYA</span><span class="o">(</span><span class="s">"218"</span><span class="o">,</span> <span class="s">"Libya"</span><span class="o">),</span>
+    <span class="no">LIECHTENSTEIN</span><span class="o">(</span><span class="s">"423"</span><span class="o">,</span> <span class="s">"Liechtenstein (Principality of)"</span><span class="o">),</span>
+    <span class="no">LITHUANIA</span><span class="o">(</span><span class="s">"370"</span><span class="o">,</span> <span class="s">"Lithuania (Republic of)"</span><span class="o">),</span>
+    <span class="no">LUXEMBOURG</span><span class="o">(</span><span class="s">"352"</span><span class="o">,</span> <span class="s">"Luxembourg"</span><span class="o">),</span>
+    <span class="no">MACAO</span><span class="o">(</span><span class="s">"853"</span><span class="o">,</span> <span class="s">"Macao, China"</span><span class="o">),</span>
+    <span class="no">MACEDONIA</span><span class="o">(</span><span class="s">"389"</span><span class="o">,</span> <span class="s">"The Former Yugoslav Republic of Macedonia"</span><span class="o">),</span>
+    <span class="no">MADAGASCAR</span><span class="o">(</span><span class="s">"261"</span><span class="o">,</span> <span class="s">"Madagascar (Republic of)"</span><span class="o">),</span>
+    <span class="no">MALAWI</span><span class="o">(</span><span class="s">"265"</span><span class="o">,</span> <span class="s">"Malawi"</span><span class="o">),</span>
+    <span class="no">MALAYSIA</span><span class="o">(</span><span class="s">"60"</span><span class="o">,</span> <span class="s">"Malaysia"</span><span class="o">),</span>
+    <span class="no">MALDIVES</span><span class="o">(</span><span class="s">"960"</span><span class="o">,</span> <span class="s">"Maldives (Republic of)"</span><span class="o">),</span>
+    <span class="no">MALI</span><span class="o">(</span><span class="s">"223"</span><span class="o">,</span> <span class="s">"Mali (Republic of)"</span><span class="o">),</span>
+    <span class="no">MALTA</span><span class="o">(</span><span class="s">"356"</span><span class="o">,</span> <span class="s">"Malta"</span><span class="o">),</span>
+    <span class="no">MARSHALL_ISLANDS</span><span class="o">(</span><span class="s">"692"</span><span class="o">,</span> <span class="s">"Marshall Islands (Republic of)"</span><span class="o">),</span>
+    <span class="no">MARTINIQUE</span><span class="o">(</span><span class="s">"596"</span><span class="o">,</span> <span class="s">"Martinique (French Department of"</span><span class="o">),</span>
+    <span class="no">MAURITANIA</span><span class="o">(</span><span class="s">"222"</span><span class="o">,</span> <span class="s">"Mauritania (Islamic Republic of)"</span><span class="o">),</span>
+    <span class="no">MAURITIUS</span><span class="o">(</span><span class="s">"230"</span><span class="o">,</span> <span class="s">"Mauritius (Republic of)"</span><span class="o">),</span>
+    <span class="no">MEXICO</span><span class="o">(</span><span class="s">"52"</span><span class="o">,</span> <span class="s">"Mexico"</span><span class="o">),</span>
+    <span class="no">MICRONESIA</span><span class="o">(</span><span class="s">"691"</span><span class="o">,</span> <span class="s">"Micronesia (Federated States of)"</span><span class="o">),</span>
+    <span class="no">MOLDOVA</span><span class="o">(</span><span class="s">"373"</span><span class="o">,</span> <span class="s">"Moldova (Republic of)"</span><span class="o">),</span>
+    <span class="no">MONACO</span><span class="o">(</span><span class="s">"377"</span><span class="o">,</span> <span class="s">"Monaco (Principality of)"</span><span class="o">),</span>
+    <span class="no">MONGOLIA</span><span class="o">(</span><span class="s">"976"</span><span class="o">,</span> <span class="s">"Mongolia"</span><span class="o">),</span>
+    <span class="no">MONTENEGRO</span><span class="o">(</span><span class="s">"382"</span><span class="o">,</span> <span class="s">"Montenegro (Republic of)"</span><span class="o">),</span>
+    <span class="no">MONTSERRAT</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Montserrat"</span><span class="o">),</span>
+    <span class="no">MOROCCO</span><span class="o">(</span><span class="s">"212"</span><span class="o">,</span> <span class="s">"Morocco (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">MOZAMBIQUE</span><span class="o">(</span><span class="s">"258"</span><span class="o">,</span> <span class="s">"Mozambique (Republic of)"</span><span class="o">),</span>
+    <span class="no">MYANMAR</span><span class="o">(</span><span class="s">"95"</span><span class="o">,</span> <span class="s">"Myanmar (The Republic of the Union of)"</span><span class="o">),</span>
+    <span class="no">NAMIBIA</span><span class="o">(</span><span class="s">"264"</span><span class="o">,</span> <span class="s">"Namibia (Republic of)"</span><span class="o">),</span>
+    <span class="no">NAURU</span><span class="o">(</span><span class="s">"674"</span><span class="o">,</span> <span class="s">"Nauru (Republic of)"</span><span class="o">),</span>
+    <span class="no">NEPAL</span><span class="o">(</span><span class="s">"977"</span><span class="o">,</span> <span class="s">"Nepal (Federal Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">NETHERLANDS</span><span class="o">(</span><span class="s">"31"</span><span class="o">,</span> <span class="s">"Netherlands (Kingdom of the)"</span><span class="o">),</span>
+    <span class="no">NEW_CALEDONIA</span><span class="o">(</span><span class="s">"687"</span><span class="o">,</span> <span class="s">"New Caledonia (Territoire francais d'outre-mer)"</span><span class="o">),</span>
+    <span class="no">NEW_ZEALAND</span><span class="o">(</span><span class="s">"64"</span><span class="o">,</span> <span class="s">"New Zealand"</span><span class="o">),</span>
+    <span class="no">NICARAGUA</span><span class="o">(</span><span class="s">"505"</span><span class="o">,</span> <span class="s">"Nicaragua"</span><span class="o">),</span>
+    <span class="no">NIGER</span><span class="o">(</span><span class="s">"227"</span><span class="o">,</span> <span class="s">"Niger (Republic of)"</span><span class="o">),</span>
+    <span class="no">NIGERIA</span><span class="o">(</span><span class="s">"234"</span><span class="o">,</span> <span class="s">"Nigeria (Federal Republic of)"</span><span class="o">),</span>
+    <span class="no">NIUE</span><span class="o">(</span><span class="s">"683"</span><span class="o">,</span> <span class="s">"Niue"</span><span class="o">),</span>
+    <span class="no">NORTH_KOREA</span><span class="o">(</span><span class="s">"850"</span><span class="o">,</span> <span class="s">"Democratic People's Republic of Korea\n"</span><span class="o">),</span>
+    <span class="no">NORTHERN_MARIANA_ISLANDS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Northern Mariana Islands (Commonwealth of the)"</span><span class="o">),</span>
+    <span class="no">NORWAY</span><span class="o">(</span><span class="s">"47"</span><span class="o">,</span> <span class="s">"Norway"</span><span class="o">),</span>
+    <span class="no">OMAN</span><span class="o">(</span><span class="s">"968"</span><span class="o">,</span> <span class="s">"Oman (Sultanate of)"</span><span class="o">),</span>
+    <span class="no">PAKISTAN</span><span class="o">(</span><span class="s">"92"</span><span class="o">,</span> <span class="s">"Pakistan (Islamic Republic of)"</span><span class="o">),</span>
+    <span class="no">PALAU</span><span class="o">(</span><span class="s">"680"</span><span class="o">,</span> <span class="s">"Palau (Republic of)"</span><span class="o">),</span>
+    <span class="no">PANAMA</span><span class="o">(</span><span class="s">"507"</span><span class="o">,</span> <span class="s">"Panama (Republic of)"</span><span class="o">),</span>
+    <span class="no">PAPUA_NEW_GUINEA</span><span class="o">(</span><span class="s">"675"</span><span class="o">,</span> <span class="s">"Papua New Guinea"</span><span class="o">),</span>
+    <span class="no">PARAGUAY</span><span class="o">(</span><span class="s">"595"</span><span class="o">,</span> <span class="s">"PARAGUAY (Republic of)"</span><span class="o">),</span>
+    <span class="no">PERU</span><span class="o">(</span><span class="s">"51"</span><span class="o">,</span> <span class="s">"Peru"</span><span class="o">),</span>
+    <span class="no">PHILIPPINES</span><span class="o">(</span><span class="s">"63"</span><span class="o">,</span> <span class="s">"Philippines (Republic of the)"</span><span class="o">),</span>
+    <span class="no">POLAND</span><span class="o">(</span><span class="s">"48"</span><span class="o">,</span> <span class="s">"Poland (Republic of)"</span><span class="o">),</span>
+    <span class="no">PORTUGAL</span><span class="o">(</span><span class="s">"351"</span><span class="o">,</span> <span class="s">"Portugal"</span><span class="o">),</span>
+    <span class="no">PUERTO_RICO</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Puerto Rico"</span><span class="o">),</span>
+    <span class="no">QATAR</span><span class="o">(</span><span class="s">"974"</span><span class="o">,</span> <span class="s">"Qatar (State of)"</span><span class="o">),</span>
+    <span class="no">REUNION</span><span class="o">(</span><span class="s">"262"</span><span class="o">,</span> <span class="s">"French Departments and Territories in the Indian Ocean"</span><span class="o">),</span>
+    <span class="no">ROMANIA</span><span class="o">(</span><span class="s">"40"</span><span class="o">,</span> <span class="s">"Romania"</span><span class="o">),</span>
+    <span class="no">RUSSIA</span><span class="o">(</span><span class="s">"7"</span><span class="o">,</span> <span class="s">"Russian Federation"</span><span class="o">),</span>
+    <span class="no">RWANDA</span><span class="o">(</span><span class="s">"250"</span><span class="o">,</span> <span class="s">"Rwanda (Republic of)"</span><span class="o">),</span>
+    <span class="no">SAINT_HELENA</span><span class="o">(</span><span class="s">"290"</span><span class="o">,</span> <span class="s">"Saint Helena, Ascension and the Tristan da Cunha"</span><span class="o">),</span> <span class="c1">//Also, 247 has an identical entry</span>
+    <span class="no">SAINT_KITTS_AND_NEVIS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Saint Kitts and Nevis"</span><span class="o">),</span>
+    <span class="no">SAINT_LUCIA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Saint Lucia"</span><span class="o">),</span>
+    <span class="no">SAINT_PIERRE_AND_MIQUELON</span><span class="o">(</span><span class="s">"508"</span><span class="o">,</span> <span class="s">"Saint Pierre and Miquelon (Collectivite territoriale de la Republique francaise)"</span><span class="o">),</span>
+    <span class="no">SAINT_VINCENT_AND_THE_GRENADINES</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Saint Vincent and the Grenadines"</span><span class="o">),</span>
+    <span class="no">SAMOA</span><span class="o">(</span><span class="s">"685"</span><span class="o">,</span> <span class="s">"Samoa (Independent State of"</span><span class="o">),</span>
+    <span class="no">SAN_MARINO</span><span class="o">(</span><span class="s">"378"</span><span class="o">,</span> <span class="s">"San Marino (Republic of)"</span><span class="o">),</span>
+    <span class="no">SAO_TOME_AND_PRINCIPE</span><span class="o">(</span><span class="s">"239"</span><span class="o">,</span> <span class="s">"Sao Tome and Principe (Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">SAUDI_ARABIA</span><span class="o">(</span><span class="s">"966"</span><span class="o">,</span> <span class="s">"Saudi Arabia (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">SENEGAL</span><span class="o">(</span><span class="s">"221"</span><span class="o">,</span> <span class="s">"Senegal (Republic of)"</span><span class="o">),</span>
+    <span class="no">SERBIA</span><span class="o">(</span><span class="s">"381"</span><span class="o">,</span> <span class="s">"Serbia (Republic of)"</span><span class="o">),</span>
+    <span class="no">SEYCHELLES</span><span class="o">(</span><span class="s">"248"</span><span class="o">,</span> <span class="s">"Seychelles (Republic of)"</span><span class="o">),</span>
+    <span class="no">SIERRA_LEONE</span><span class="o">(</span><span class="s">"232"</span><span class="o">,</span> <span class="s">"Sierra Leone"</span><span class="o">),</span>
+    <span class="no">SINGAPORE</span><span class="o">(</span><span class="s">"65"</span><span class="o">,</span> <span class="s">"Singapore (Republic of)"</span><span class="o">),</span>
+    <span class="no">SINT_MAARTEN</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Sint Maarten (Dutch part)"</span><span class="o">),</span>
+    <span class="no">SLOVAKIA</span><span class="o">(</span><span class="s">"421"</span><span class="o">,</span> <span class="s">"Slovak Republic"</span><span class="o">),</span>
+    <span class="no">SLOVENIA</span><span class="o">(</span><span class="s">"386"</span><span class="o">,</span> <span class="s">"Slovenia (Republic of)"</span><span class="o">),</span>
+    <span class="no">SOLOMON_ISLANDS</span><span class="o">(</span><span class="s">"677"</span><span class="o">,</span> <span class="s">"Solomon Islands"</span><span class="o">),</span>
+    <span class="no">SOMALIA</span><span class="o">(</span><span class="s">"252"</span><span class="o">,</span> <span class="s">"Somalia (Federal Republic of)"</span><span class="o">),</span>
+    <span class="no">SOUTH_AFRICA</span><span class="o">(</span><span class="s">"27"</span><span class="o">,</span> <span class="s">"South Africa (Republic of)"</span><span class="o">),</span>
+    <span class="no">SOUTH_KOREA</span><span class="o">(</span><span class="s">"82"</span><span class="o">,</span> <span class="s">"Korea (Republic of)"</span><span class="o">),</span>
+    <span class="no">SOUTH_SUDAN</span><span class="o">(</span><span class="s">"211"</span><span class="o">,</span> <span class="s">"South Sudan (Republic of)"</span><span class="o">),</span>
+    <span class="no">SPAIN</span><span class="o">(</span><span class="s">"34"</span><span class="o">,</span> <span class="s">"Spain"</span><span class="o">),</span>
+    <span class="no">SRI_LANKA</span><span class="o">(</span><span class="s">"94"</span><span class="o">,</span> <span class="s">"Sri Lanka (Democratic Socialist Republic of)"</span><span class="o">),</span>
+    <span class="no">SUDAN</span><span class="o">(</span><span class="s">"249"</span><span class="o">,</span> <span class="s">"Sudan (Republic of)"</span><span class="o">),</span>
+    <span class="no">SURINAME</span><span class="o">(</span><span class="s">"597"</span><span class="o">,</span> <span class="s">"Suriname (Republic of"</span><span class="o">),</span>
+    <span class="no">SWAZILAND</span><span class="o">(</span><span class="s">"268"</span><span class="o">,</span> <span class="s">"Swaziland (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">SWEDEN</span><span class="o">(</span><span class="s">"46"</span><span class="o">,</span> <span class="s">"Sweden"</span><span class="o">),</span>
+    <span class="no">SWITZERLAND</span><span class="o">(</span><span class="s">"41"</span><span class="o">,</span> <span class="s">"Switzerland (Confederation of)"</span><span class="o">),</span>
+    <span class="no">SYRIA</span><span class="o">(</span><span class="s">"963"</span><span class="o">,</span> <span class="s">"Syrian Arab Republic"</span><span class="o">),</span>
+    <span class="no">TAIWAN</span><span class="o">(</span><span class="s">"886"</span><span class="o">,</span> <span class="s">"Taiwan, China"</span><span class="o">),</span> <span class="c1">//Republic of China?</span>
+    <span class="no">TAJIKISTAN</span><span class="o">(</span><span class="s">"992"</span><span class="o">,</span> <span class="s">"Tajikstan (Republic of)"</span><span class="o">),</span>
+    <span class="no">TANZANIA</span><span class="o">(</span><span class="s">"255"</span><span class="o">,</span> <span class="s">"Tanzania (United Republic of)"</span><span class="o">),</span>
+    <span class="no">THAILAND</span><span class="o">(</span><span class="s">"66"</span><span class="o">,</span> <span class="s">"Thailand"</span><span class="o">),</span>
+    <span class="no">TOGO</span><span class="o">(</span><span class="s">"228"</span><span class="o">,</span> <span class="s">"Togolese Republic"</span><span class="o">),</span>
+    <span class="no">TOKELAU</span><span class="o">(</span><span class="s">"690"</span><span class="o">,</span> <span class="s">"Tokelau"</span><span class="o">),</span>
+    <span class="no">TONGA</span><span class="o">(</span><span class="s">"676"</span><span class="o">,</span> <span class="s">"Tonga (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">TRINIDAD_AND_TOBAGO</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Trinidad and Tobago"</span><span class="o">),</span>
+    <span class="no">TUNISIA</span><span class="o">(</span><span class="s">"216"</span><span class="o">,</span> <span class="s">"Tunisia"</span><span class="o">),</span>
+    <span class="no">TURKEY</span><span class="o">(</span><span class="s">"90"</span><span class="o">,</span> <span class="s">"Turkey"</span><span class="o">),</span>
+    <span class="no">TURKMENISTAN</span><span class="o">(</span><span class="s">"993"</span><span class="o">,</span> <span class="s">"Turkemenistan"</span><span class="o">),</span>
+    <span class="no">TURKS_AND_CAICOS_ISLANDS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Turks and Caicos Islands"</span><span class="o">),</span>
+    <span class="no">TUVALU</span><span class="o">(</span><span class="s">"688"</span><span class="o">,</span> <span class="s">"Tuvalu"</span><span class="o">),</span>
+    <span class="no">UGANDA</span><span class="o">(</span><span class="s">"256"</span><span class="o">,</span> <span class="s">"Uganda (Republic of)"</span><span class="o">),</span>
+    <span class="no">UKRAINE</span><span class="o">(</span><span class="s">"380"</span><span class="o">,</span> <span class="s">"Ukraine"</span><span class="o">),</span>
+    <span class="no">UNITED_ARAB_EMIRATES</span><span class="o">(</span><span class="s">"971"</span><span class="o">,</span> <span class="s">"United Arab Emirates"</span><span class="o">),</span>
+    <span class="no">UNITED_KINGDOM</span><span class="o">(</span><span class="s">"44"</span><span class="o">,</span> <span class="s">"United Kingdom of Great Britain and Northern Ireland"</span><span class="o">),</span>
+    <span class="no">UNITED_STATES</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"United States of America"</span><span class="o">),</span>
+    <span class="no">UPT</span><span class="o">(</span><span class="s">"878"</span><span class="o">,</span> <span class="s">"Universal Personal Telecommunication Service (UPT)"</span><span class="o">),</span>
+    <span class="no">URUGUAY</span><span class="o">(</span><span class="s">"598"</span><span class="o">,</span> <span class="s">"Uruguay (Eastern Republic of)"</span><span class="o">),</span>
+    <span class="no">UZBEKISTAN</span><span class="o">(</span><span class="s">"998"</span><span class="o">,</span> <span class="s">"Uzbekistan (Republic of)"</span><span class="o">),</span>
+    <span class="no">VANUATU</span><span class="o">(</span><span class="s">"678"</span><span class="o">,</span> <span class="s">"Vanuatu (Republic of)"</span><span class="o">),</span>
+    <span class="no">VATICAN</span><span class="o">(</span><span class="s">"379"</span><span class="o">,</span> <span class="s">"Vatican City State"</span><span class="o">),</span>
+    <span class="no">VENEZUELA</span><span class="o">(</span><span class="s">"58"</span><span class="o">,</span> <span class="s">"Venezuala (Bolivarian Republic of)"</span><span class="o">),</span>
+    <span class="no">VIETNAM</span><span class="o">(</span><span class="s">"84"</span><span class="o">,</span> <span class="s">"Viet nam (Socialist Republic of)"</span><span class="o">),</span>
+    <span class="no">WALLIS_AND_FUTUNA</span><span class="o">(</span><span class="s">"681"</span><span class="o">,</span> <span class="s">"Wallis and Futuna (Territoire francais d'outre-mer)"</span><span class="o">),</span>
+    <span class="no">YEMEN</span><span class="o">(</span><span class="s">"967"</span><span class="o">,</span> <span class="s">"Yemen (Republic of)"</span><span class="o">),</span>
+    <span class="no">ZAMBIA</span><span class="o">(</span><span class="s">"260"</span><span class="o">,</span> <span class="s">"Zambia (Republic of)"</span><span class="o">),</span>
+    <span class="no">ZIMBABWE</span><span class="o">(</span><span class="s">"263"</span><span class="o">,</span> <span class="s">"Zimbabwe (Republic of)"</span><span class="o">);</span>
 
-    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> code;
-    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> countryName;
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">code</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">countryName</span><span class="o">;</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * Constructor for countries whose name does not match the enum.
      * @param code country code
      * @param countryName full country name
      */</span>
-    CountryCode(<span class="predefined-type">String</span> code, <span class="predefined-type">String</span> countryName) {
-        <span class="local-variable">this</span>.code = code;
-        <span class="local-variable">this</span>.countryName = countryName;
-    }
+    <span class="nc">CountryCode</span><span class="o">(</span><span class="nc">String</span> <span class="n">code</span><span class="o">,</span> <span class="nc">String</span> <span class="n">countryName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">code</span> <span class="o">=</span> <span class="n">code</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">countryName</span> <span class="o">=</span> <span class="n">countryName</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">public</span> <span class="predefined-type">String</span> getCode() {
-        <span class="keyword">return</span> <span class="local-variable">this</span>.code;
-    }
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">code</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * Country name.
      * @return country name
      */</span>
-    <span class="directive">public</span> <span class="predefined-type">String</span> getCountryName() {
-        <span class="keyword">return</span> <span class="local-variable">this</span>.countryName;
-    }
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getCountryName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">countryName</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> PLUS_SIGN = <span class="string"><span class="delimiter">&quot;</span><span class="content">+</span><span class="delimiter">&quot;</span></span>;
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">PLUS_SIGN</span> <span class="o">=</span> <span class="s">"+"</span><span class="o">;</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">List</span>&lt;CountryCode&gt;&gt; COUNTRYCODESBYCODE =
-            <span class="predefined-type">Arrays</span>.stream(CountryCode.values())
-                    .collect(Collectors.groupingBy(CountryCode::getCode));
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">CountryCode</span><span class="o">&gt;&gt;</span> <span class="no">COUNTRYCODESBYCODE</span> <span class="o">=</span>
+            <span class="nc">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">values</span><span class="o">())</span>
+                    <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">groupingBy</span><span class="o">(</span><span class="nl">CountryCode:</span><span class="o">:</span><span class="n">getCode</span><span class="o">));</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; CODES = COUNTRYCODESBYCODE.keySet().stream()
-            .sorted(<span class="predefined-type">Comparator</span>.comparing(<span class="predefined-type">String</span>::length).reversed()).toList();
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="no">CODES</span> <span class="o">=</span> <span class="no">COUNTRYCODESBYCODE</span><span class="o">.</span><span class="na">keySet</span><span class="o">().</span><span class="na">stream</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">sorted</span><span class="o">(</span><span class="nc">Comparator</span><span class="o">.</span><span class="na">comparing</span><span class="o">(</span><span class="nl">String:</span><span class="o">:</span><span class="n">length</span><span class="o">).</span><span class="na">reversed</span><span class="o">()).</span><span class="na">toList</span><span class="o">();</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      *
      * @param code Country code
      * @return a List of {@link CountryCode} for a found code or an empty list
      */</span>
-    <span class="annotation">@NotNull</span>
-    <span class="annotation">@Nonnull</span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="predefined-type">List</span>&lt;CountryCode&gt; countryCodesByCode(<span class="annotation">@Nonnull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> code) {
-        <span class="keyword">if</span> (COUNTRYCODESBYCODE.containsKey(code)) {
-            <span class="keyword">return</span> COUNTRYCODESBYCODE.get(code);
-        }
-        <span class="keyword">return</span> <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
-    }
+    <span class="nd">@NotNull</span>
+    <span class="nd">@Nonnull</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">CountryCode</span><span class="o">&gt;</span> <span class="nf">countryCodesByCode</span><span class="o">(</span><span class="nd">@Nonnull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">code</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="no">COUNTRYCODESBYCODE</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">code</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="no">COUNTRYCODESBYCODE</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">code</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+    <span class="o">}</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      *
      * @return Country codes ordered from codes of longer length to less length.
      */</span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="predefined-type">List</span>&lt;<span class="predefined-type">String</span>&gt; getCodes() {
-        <span class="keyword">return</span> CODES;
-    }
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getCodes</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="no">CODES</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      *
      * @param number Phone number
      * @return the Country code found in the phone number or {@code null} if not found.
      */</span>
-    <span class="annotation">@Nullable</span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="predefined-type">String</span> parseCountryCode(<span class="annotation">@Nonnull</span> <span class="annotation">@NotBlank</span> <span class="predefined-type">String</span> number) {
-        <span class="predefined-type">String</span> phone = number.startsWith(PLUS_SIGN) ? number.substring(<span class="integer">1</span>) : number;
-        <span class="keyword">for</span> (<span class="predefined-type">String</span> code : getCodes()) {
-            <span class="keyword">if</span> (phone.startsWith(code)) {
-                <span class="keyword">return</span> code;
-            }
-        }
-        <span class="keyword">return</span> <span class="predefined-constant">null</span>;
-    }
+    <span class="nd">@Nullable</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">String</span> <span class="nf">parseCountryCode</span><span class="o">(</span><span class="nd">@Nonnull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">number</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">phone</span> <span class="o">=</span> <span class="n">number</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="no">PLUS_SIGN</span><span class="o">)</span> <span class="o">?</span> <span class="n">number</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <span class="o">:</span> <span class="n">number</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">String</span> <span class="n">code</span> <span class="o">:</span> <span class="n">getCodes</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">code</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">code</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="predefined-type">String</span> toString() {
-        <span class="keyword">return</span> <span class="local-variable">this</span>.code;
-    }
-}</code></pre>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">code</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -620,81 +621,81 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/CountryCodeTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Arrays</span>;
+<span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertEquals</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertNull</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
 
-<span class="type">class</span> <span class="class">CountryCodeTest</span> {
+<span class="kd">class</span> <span class="nc">CountryCodeTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> preferredNameGetsUsed() {
-        <span class="predefined-type">String</span> name = CountryCode.YEMEN.getCountryName();
-        assertEquals(name, <span class="string"><span class="delimiter">&quot;</span><span class="content">Yemen (Republic of)</span><span class="delimiter">&quot;</span></span>);
-    }
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">preferredNameGetsUsed</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="nc">CountryCode</span><span class="o">.</span><span class="na">YEMEN</span><span class="o">.</span><span class="na">getCountryName</span><span class="o">();</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="s">"Yemen (Republic of)"</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> defaultNameIsCapitalizedCorrectly() {
-        <span class="predefined-type">String</span> name = CountryCode.SPAIN.getCountryName();
-        assertEquals(name, <span class="string"><span class="delimiter">&quot;</span><span class="content">Spain</span><span class="delimiter">&quot;</span></span>);
-    }
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">defaultNameIsCapitalizedCorrectly</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SPAIN</span><span class="o">.</span><span class="na">getCountryName</span><span class="o">();</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="s">"Spain"</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> toStringReturnsCorrectValue() {
-        <span class="predefined-type">String</span> code = CountryCode.AMERICAN_SAMOA.toString();
-        assertEquals(code, <span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>);
-    }
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">toStringReturnsCorrectValue</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">code</span> <span class="o">=</span> <span class="nc">CountryCode</span><span class="o">.</span><span class="na">AMERICAN_SAMOA</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">code</span><span class="o">,</span> <span class="s">"1"</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> countryCodeGetCodesReturnEveryCodeWithLongestCodesFirst() {
-        assertTrue(CountryCode.getCodes().get(<span class="integer">0</span>).length() &gt; <span class="integer">1</span>);
-    }
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">countryCodeGetCodesReturnEveryCodeWithLongestCodesFirst</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">getCodes</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> countryCodeParseCountryCodeParseCodes() {
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">countryCodeParseCountryCodeParseCodes</span><span class="o">()</span> <span class="o">{</span>
 
-        assertNull(CountryCode.parseCountryCode(<span class="string"><span class="delimiter">&quot;</span><span class="content">999999</span><span class="delimiter">&quot;</span></span>));
+        <span class="n">assertNull</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="s">"999999"</span><span class="o">));</span>
 
-        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">34</span><span class="delimiter">&quot;</span></span>,CountryCode.parseCountryCode(<span class="string"><span class="delimiter">&quot;</span><span class="content">34630443322</span><span class="delimiter">&quot;</span></span>));
-        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">268</span><span class="delimiter">&quot;</span></span>,CountryCode.parseCountryCode(<span class="string"><span class="delimiter">&quot;</span><span class="content">2684046441</span><span class="delimiter">&quot;</span></span>));
-        assertEquals(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>,CountryCode.parseCountryCode(<span class="string"><span class="delimiter">&quot;</span><span class="content">+14155552671</span><span class="delimiter">&quot;</span></span>));
-    }
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"34"</span><span class="o">,</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="s">"34630443322"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"268"</span><span class="o">,</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="s">"2684046441"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="s">"+14155552671"</span><span class="o">));</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> countryCodeCountryCodesByCodeReturnAListOfCountryCodeWithTheSameCountryCode() {
-        assertTrue(CountryCode.countryCodesByCode(<span class="string"><span class="delimiter">&quot;</span><span class="content">999999</span><span class="delimiter">&quot;</span></span>).isEmpty());
-        assertEquals(CountryCode.countryCodesByCode(<span class="string"><span class="delimiter">&quot;</span><span class="content">1</span><span class="delimiter">&quot;</span></span>), <span class="predefined-type">Arrays</span>.asList(
-                CountryCode.AMERICAN_SAMOA,
-                CountryCode.ANGUILLA,
-                CountryCode.ANTIGUA_AND_BARBUDA,
-                CountryCode.BAHAMAS,
-                CountryCode.BARBADOS,
-                CountryCode.BERMUDA,
-                CountryCode.BRITISH_VIRGIN_ISLANDS,
-                CountryCode.CANADA,
-                CountryCode.CAYMAN_ISLANDS,
-                CountryCode.DOMINICA,
-                CountryCode.DOMINICAN_REPUBLIC,
-                CountryCode.GRENADA,
-                CountryCode.GUAM,
-                CountryCode.JAMAICA,
-                CountryCode.MONTSERRAT,
-                CountryCode.NORTHERN_MARIANA_ISLANDS,
-                CountryCode.PUERTO_RICO,
-                CountryCode.SAINT_KITTS_AND_NEVIS,
-                CountryCode.SAINT_LUCIA,
-                CountryCode.SAINT_VINCENT_AND_THE_GRENADINES,
-                CountryCode.SINT_MAARTEN,
-                CountryCode.TRINIDAD_AND_TOBAGO,
-                CountryCode.TURKS_AND_CAICOS_ISLANDS,
-                CountryCode.UNITED_STATES));
-    }
-}</code></pre>
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">countryCodeCountryCodesByCodeReturnAListOfCountryCodeWithTheSameCountryCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">countryCodesByCode</span><span class="o">(</span><span class="s">"999999"</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">countryCodesByCode</span><span class="o">(</span><span class="s">"1"</span><span class="o">),</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">AMERICAN_SAMOA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">ANGUILLA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">ANTIGUA_AND_BARBUDA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">BAHAMAS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">BARBADOS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">BERMUDA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">BRITISH_VIRGIN_ISLANDS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">CANADA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">CAYMAN_ISLANDS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">DOMINICA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">DOMINICAN_REPUBLIC</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">GRENADA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">GUAM</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">JAMAICA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">MONTSERRAT</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">NORTHERN_MARIANA_ISLANDS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">PUERTO_RICO</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SAINT_KITTS_AND_NEVIS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SAINT_LUCIA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SAINT_VINCENT_AND_THE_GRENADINES</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SINT_MAARTEN</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">TRINIDAD_AND_TOBAGO</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">TURKS_AND_CAICOS_ISLANDS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">UNITED_STATES</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 </div>
@@ -709,45 +710,45 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/E164Utils.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Nullable</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.util.StringUtils</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.util.StringUtils</span><span class="o">;</span>
 
-<span class="comment">/**
+<span class="cm">/**
  * Utility methods to ease {@link E164} validation.
  */</span>
-<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">E164Utils</span> {
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">E164Utils</span> <span class="o">{</span>
 
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="type">int</span> MAX_NUMBER_OF_DIGITS = <span class="integer">15</span>;
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> PLUS_SIGN = <span class="string"><span class="delimiter">&quot;</span><span class="content">+</span><span class="delimiter">&quot;</span></span>;
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">MAX_NUMBER_OF_DIGITS</span> <span class="o">=</span> <span class="mi">15</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">PLUS_SIGN</span> <span class="o">=</span> <span class="s">"+"</span><span class="o">;</span>
 
-    <span class="directive">private</span> E164Utils() {
-    }
+    <span class="kd">private</span> <span class="nf">E164Utils</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * @param value phone number
      * @return Whether a phone is E.164 formatted
      */</span>
-    <span class="directive">public</span> <span class="directive">static</span> <span class="type">boolean</span> isValid(<span class="annotation">@Nullable</span> <span class="predefined-type">String</span> value) {
-        <span class="keyword">if</span> (value == <span class="predefined-constant">null</span> || value.isEmpty()) {
-            <span class="keyword">return</span> <span class="predefined-constant">false</span>;
-        }
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isValid</span><span class="o">(</span><span class="nd">@Nullable</span> <span class="nc">String</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">value</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">value</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
 
-        <span class="predefined-type">String</span> phone = value.startsWith(PLUS_SIGN) ? value.substring(<span class="integer">1</span>) : value;
-        <span class="keyword">if</span> (phone.length() &gt; MAX_NUMBER_OF_DIGITS) {
-            <span class="keyword">return</span> <span class="predefined-constant">false</span>;
-        }
-        <span class="keyword">if</span> (phone.isEmpty()) {
-            <span class="keyword">return</span> <span class="predefined-constant">false</span>;
-        }
-        <span class="keyword">if</span> (!StringUtils.isDigits(phone) || phone.charAt(<span class="integer">0</span>) == <span class="string"><span class="delimiter">'</span><span class="content">0</span><span class="delimiter">'</span></span>) {
-            <span class="keyword">return</span> <span class="predefined-constant">false</span>;
-        }
+        <span class="nc">String</span> <span class="n">phone</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="no">PLUS_SIGN</span><span class="o">)</span> <span class="o">?</span> <span class="n">value</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <span class="o">:</span> <span class="n">value</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="no">MAX_NUMBER_OF_DIGITS</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">isDigits</span><span class="o">(</span><span class="n">phone</span><span class="o">)</span> <span class="o">||</span> <span class="n">phone</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span> <span class="o">==</span> <span class="sc">'0'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
 
-        <span class="keyword">return</span> CountryCode.parseCountryCode(phone) != <span class="predefined-constant">null</span>;
-    }
-}</code></pre>
+        <span class="k">return</span> <span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="n">phone</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -756,41 +757,41 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/E164UtilsTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.params.ParameterizedTest</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.params.provider.ValueSource</span>;
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.params.ParameterizedTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.params.provider.ValueSource</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertFalse</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertFalse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
 
-<span class="type">class</span> <span class="class">E164UtilsTest</span> {
+<span class="kd">class</span> <span class="nc">E164UtilsTest</span> <span class="o">{</span>
 
-    <span class="annotation">@ParameterizedTest</span>
-    <span class="annotation">@ValueSource</span>(strings = {
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">+04630443322</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">+1415555267102345</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">+1-4155552671</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>
-    })
-    <span class="type">void</span> invalidPhones(<span class="predefined-type">String</span> phone) {
-        assertFalse(E164Utils.isValid(phone));
-    }
+    <span class="nd">@ParameterizedTest</span>
+    <span class="nd">@ValueSource</span><span class="o">(</span><span class="n">strings</span> <span class="o">=</span> <span class="o">{</span>
+            <span class="s">"+04630443322"</span><span class="o">,</span>
+            <span class="s">"+1415555267102345"</span><span class="o">,</span>
+            <span class="s">"+1-4155552671"</span><span class="o">,</span>
+            <span class="s">""</span>
+    <span class="o">})</span>
+    <span class="kt">void</span> <span class="nf">invalidPhones</span><span class="o">(</span><span class="nc">String</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">assertFalse</span><span class="o">(</span><span class="nc">E164Utils</span><span class="o">.</span><span class="na">isValid</span><span class="o">(</span><span class="n">phone</span><span class="o">));</span>
+    <span class="o">}</span>
 
-    <span class="annotation">@ParameterizedTest</span>
-    <span class="annotation">@ValueSource</span>(strings = {
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">+14155552671</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">+442071838750</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">+55115525632</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">14155552671</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">442071838750</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">55115525632</span><span class="delimiter">&quot;</span></span>,
-            <span class="string"><span class="delimiter">&quot;</span><span class="content">55115525632</span><span class="delimiter">&quot;</span></span>,
-    })
-    <span class="type">void</span> validPhones(<span class="predefined-type">String</span> phone) {
-        assertTrue(E164Utils.isValid(phone));
-    }
-}</code></pre>
+    <span class="nd">@ParameterizedTest</span>
+    <span class="nd">@ValueSource</span><span class="o">(</span><span class="n">strings</span> <span class="o">=</span> <span class="o">{</span>
+            <span class="s">"+14155552671"</span><span class="o">,</span>
+            <span class="s">"+442071838750"</span><span class="o">,</span>
+            <span class="s">"+55115525632"</span><span class="o">,</span>
+            <span class="s">"14155552671"</span><span class="o">,</span>
+            <span class="s">"442071838750"</span><span class="o">,</span>
+            <span class="s">"55115525632"</span><span class="o">,</span>
+            <span class="s">"55115525632"</span><span class="o">,</span>
+    <span class="o">})</span>
+    <span class="kt">void</span> <span class="nf">validPhones</span><span class="o">(</span><span class="nc">String</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="nc">E164Utils</span><span class="o">.</span><span class="na">isValid</span><span class="o">(</span><span class="n">phone</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 </div>
@@ -804,62 +805,62 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/E164.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.validation.Constraint</span>;
-<span class="keyword">import</span> <span class="include">jakarta.validation.Payload</span>;
-<span class="keyword">import</span> <span class="include">java.lang.annotation.Documented</span>;
-<span class="keyword">import</span> <span class="include">java.lang.annotation.ElementType</span>;
-<span class="keyword">import</span> <span class="include">java.lang.annotation.Repeatable</span>;
-<span class="keyword">import</span> <span class="include">java.lang.annotation.Retention</span>;
-<span class="keyword">import</span> <span class="include">java.lang.annotation.RetentionPolicy</span>;
-<span class="keyword">import</span> <span class="include">java.lang.annotation.Target</span>;
+<span class="kn">import</span> <span class="nn">jakarta.validation.Constraint</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.Payload</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.Documented</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.ElementType</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.Repeatable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.Retention</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.RetentionPolicy</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.Target</span><span class="o">;</span>
 
-<span class="comment">/**
+<span class="cm">/**
  * The annotated element must be a E.164 phone number.
  *
- * @see &lt;a href=&quot;https://www.itu.int/rec/T-REC-E.164/en&quot;&gt;ITU E.164 recommendation&lt;/a&gt;
- * @see &lt;a href=&quot;https://www.twilio.com/docs/glossary/what-e164&quot;&gt;E.614&lt;/a&gt;
+ * @see &lt;a href="https://www.itu.int/rec/T-REC-E.164/en"&gt;ITU E.164 recommendation&lt;/a&gt;
+ * @see &lt;a href="https://www.twilio.com/docs/glossary/what-e164"&gt;E.614&lt;/a&gt;
  */</span>
-<span class="annotation">@Target</span>({<span class="predefined-type">ElementType</span>.METHOD, <span class="predefined-type">ElementType</span>.FIELD, <span class="predefined-type">ElementType</span>.ANNOTATION_TYPE, <span class="predefined-type">ElementType</span>.PARAMETER, <span class="predefined-type">ElementType</span>.TYPE_USE})
-<span class="annotation">@Retention</span>(<span class="predefined-type">RetentionPolicy</span>.RUNTIME)
-<span class="annotation">@Repeatable</span>(E164.List.class)
-<span class="annotation">@Documented</span>
-<span class="annotation">@Constraint</span>(validatedBy = {})
-<span class="directive">public</span> <span class="annotation">@interface</span> E164 {
+<span class="nd">@Target</span><span class="o">({</span><span class="nc">ElementType</span><span class="o">.</span><span class="na">METHOD</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">ANNOTATION_TYPE</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">PARAMETER</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">TYPE_USE</span><span class="o">})</span>
+<span class="nd">@Retention</span><span class="o">(</span><span class="nc">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+<span class="nd">@Repeatable</span><span class="o">(</span><span class="no">E164</span><span class="o">.</span><span class="na">List</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="nd">@Documented</span>
+<span class="nd">@Constraint</span><span class="o">(</span><span class="n">validatedBy</span> <span class="o">=</span> <span class="o">{})</span>
+<span class="kd">public</span> <span class="nd">@interface</span> <span class="no">E164</span> <span class="o">{</span>
 
-    <span class="predefined-type">String</span> MESSAGE = <span class="string"><span class="delimiter">&quot;</span><span class="content">example.micronaut.E164.message</span><span class="delimiter">&quot;</span></span>;
+    <span class="nc">String</span> <span class="no">MESSAGE</span> <span class="o">=</span> <span class="s">"example.micronaut.E164.message"</span><span class="o">;</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * @return message The error message
      */</span>
-    <span class="predefined-type">String</span> message() <span class="keyword">default</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">{</span><span class="delimiter">&quot;</span></span> + MESSAGE + <span class="string"><span class="delimiter">&quot;</span><span class="content">}</span><span class="delimiter">&quot;</span></span>;
+    <span class="nc">String</span> <span class="nf">message</span><span class="o">()</span> <span class="k">default</span> <span class="s">"{"</span> <span class="o">+</span> <span class="no">MESSAGE</span> <span class="o">+</span> <span class="s">"}"</span><span class="o">;</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * @return Groups to control the order in which constraints are evaluated,
      * or to perform validation of the partial state of a JavaBean.
      */</span>
-    <span class="predefined-type">Class</span>&lt;?&gt;<span class="type">[]</span> groups() <span class="keyword">default</span> {};
+    <span class="nc">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">groups</span><span class="o">()</span> <span class="k">default</span> <span class="o">{};</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * @return Payloads used by validation clients to associate some metadata information with a given constraint declaration
      */</span>
-    <span class="predefined-type">Class</span>&lt;? <span class="directive">extends</span> Payload&gt;<span class="type">[]</span> payload() <span class="keyword">default</span> {};
+    <span class="nc">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">Payload</span><span class="o">&gt;[]</span> <span class="nf">payload</span><span class="o">()</span> <span class="k">default</span> <span class="o">{};</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * List annotation.
      */</span>
-    <span class="annotation">@Target</span>({<span class="predefined-type">ElementType</span>.METHOD, <span class="predefined-type">ElementType</span>.FIELD, <span class="predefined-type">ElementType</span>.ANNOTATION_TYPE, <span class="predefined-type">ElementType</span>.PARAMETER, <span class="predefined-type">ElementType</span>.TYPE_USE})
-    <span class="annotation">@Retention</span>(<span class="predefined-type">RetentionPolicy</span>.RUNTIME)
-    <span class="annotation">@Documented</span>
-    <span class="annotation">@interface</span> <span class="predefined-type">List</span> {
+    <span class="nd">@Target</span><span class="o">({</span><span class="nc">ElementType</span><span class="o">.</span><span class="na">METHOD</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">ANNOTATION_TYPE</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">PARAMETER</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">TYPE_USE</span><span class="o">})</span>
+    <span class="nd">@Retention</span><span class="o">(</span><span class="nc">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+    <span class="nd">@Documented</span>
+    <span class="nd">@interface</span> <span class="nc">List</span> <span class="o">{</span>
 
-        <span class="comment">/**
+        <span class="cm">/**
          * @return An array of E164.
          */</span>
-        E164<span class="type">[]</span> value();
-    }
-}</code></pre>
+        <span class="no">E164</span><span class="o">[]</span> <span class="nf">value</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 </div>
@@ -873,23 +874,23 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/CustomValidationFactory.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.annotation.Factory</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.validation.validator.constraints.ConstraintValidator</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Factory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.validation.validator.constraints.ConstraintValidator</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
 
-<span class="annotation">@Factory</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">CustomValidationFactory</span> {
+<span class="nd">@Factory</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">CustomValidationFactory</span> <span class="o">{</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * @return A {@link ConstraintValidator} implementation of a {@link E164} constraint for type {@link String}.
      */</span>
-    <span class="annotation">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    ConstraintValidator&lt;E164, <span class="predefined-type">String</span>&gt; e164Validator() {
-        <span class="keyword">return</span> (value, annotationMetadata, context) -&gt; E164Utils.isValid(value);
-    }
-}</code></pre>
+    <span class="nd">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nc">ConstraintValidator</span><span class="o">&lt;</span><span class="no">E164</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="nf">e164Validator</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">annotationMetadata</span><span class="o">,</span> <span class="n">context</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="nc">E164Utils</span><span class="o">.</span><span class="na">isValid</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -915,31 +916,31 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/CustomValidationMessages.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.context.StaticMessageSource</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Singleton</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.context.StaticMessageSource</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
 
-<span class="comment">/**
+<span class="cm">/**
  * Adds validation messages.
  */</span>
-<span class="annotation">@Singleton</span>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">CustomValidationMessages</span> <span class="directive">extends</span> StaticMessageSource {
+<span class="nd">@Singleton</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomValidationMessages</span> <span class="kd">extends</span> <span class="nc">StaticMessageSource</span> <span class="o">{</span>
 
-    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> E164_MESSAGE = <span class="string"><span class="delimiter">&quot;</span><span class="content">must be a phone in E.164 format</span><span class="delimiter">&quot;</span></span>;
-    <span class="comment">/**
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">E164_MESSAGE</span> <span class="o">=</span> <span class="s">"must be a phone in E.164 format"</span><span class="o">;</span>
+    <span class="cm">/**
      * The message suffix to use.
      */</span>
-    <span class="directive">private</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> MESSAGE_SUFFIX = <span class="string"><span class="delimiter">&quot;</span><span class="content">.message</span><span class="delimiter">&quot;</span></span>;
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">MESSAGE_SUFFIX</span> <span class="o">=</span> <span class="s">".message"</span><span class="o">;</span>
 
-    <span class="comment">/**
+    <span class="cm">/**
      * Default constructor to initialize messages.
      * via {@link #addMessage(String, String)}
      */</span>
-    <span class="directive">public</span> CustomValidationMessages() {
-        addMessage(E164.class.getName() + MESSAGE_SUFFIX, E164_MESSAGE);
-    }
-}</code></pre>
+    <span class="kd">public</span> <span class="nf">CustomValidationMessages</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">addMessage</span><span class="o">(</span><span class="no">E164</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="no">MESSAGE_SUFFIX</span><span class="o">,</span> <span class="no">E164_MESSAGE</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 </div>
@@ -953,31 +954,31 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/Contact.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.Introspected</span>;
-<span class="keyword">import</span> <span class="include">io.micronaut.core.annotation.NonNull</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Introspected</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.validation.constraints.NotBlank</span>;
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
 
-<span class="annotation">@Introspected</span>
-<span class="directive">public</span> <span class="type">class</span> <span class="class">Contact</span> {
+<span class="nd">@Introspected</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Contact</span> <span class="o">{</span>
 
-    <span class="annotation">@E164</span>
-    <span class="annotation">@NotBlank</span>
-    <span class="annotation">@NonNull</span>
-    <span class="directive">private</span> <span class="directive">final</span> <span class="predefined-type">String</span> phone;
+    <span class="nd">@E164</span>
+    <span class="nd">@NotBlank</span>
+    <span class="nd">@NonNull</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">phone</span><span class="o">;</span>
 
-    <span class="directive">public</span> Contact(<span class="annotation">@NonNull</span> <span class="predefined-type">String</span> phone) {
-        <span class="local-variable">this</span>.phone = phone;
-    }
+    <span class="kd">public</span> <span class="nf">Contact</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">String</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">phone</span> <span class="o">=</span> <span class="n">phone</span><span class="o">;</span>
+    <span class="o">}</span>
 
 
-    <span class="annotation">@NonNull</span>
-    <span class="directive">public</span> <span class="predefined-type">String</span> getPhone() {
-        <span class="keyword">return</span> phone;
-    }
-}</code></pre>
+    <span class="nd">@NonNull</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getPhone</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">phone</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -986,39 +987,39 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/ContactTest.java</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">package</span> <span class="namespace">example.micronaut</span>;
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>;
-<span class="keyword">import</span> <span class="include">jakarta.inject.Inject</span>;
-<span class="keyword">import</span> <span class="include">org.junit.jupiter.api.Test</span>;
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">jakarta.validation.ConstraintViolation</span>;
-<span class="keyword">import</span> <span class="include">jakarta.validation.Validator</span>;
+<span class="kn">import</span> <span class="nn">jakarta.validation.ConstraintViolation</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.Validator</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">java.util.Set</span>;
+<span class="kn">import</span> <span class="nn">java.util.Set</span><span class="o">;</span>
 
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertFalse</span>;
-<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.junit.jupiter.api.Assertions.assertTrue</span>;
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertFalse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
 
-<span class="annotation">@MicronautTest</span>(startApplication = <span class="predefined-constant">false</span>) <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="type">class</span> <span class="class">ContactTest</span> {
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">startApplication</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">ContactTest</span> <span class="o">{</span>
 
-    <span class="annotation">@Inject</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="predefined-type">Validator</span> validator;
+    <span class="nd">@Inject</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nc">Validator</span> <span class="n">validator</span><span class="o">;</span>
 
-    <span class="annotation">@Test</span>
-    <span class="type">void</span> contactValidation() {
-        assertTrue(validator.validate(<span class="keyword">new</span> Contact(<span class="string"><span class="delimiter">&quot;</span><span class="content">+14155552671</span><span class="delimiter">&quot;</span></span>)).isEmpty());
-        <span class="predefined-type">Set</span>&lt;ConstraintViolation&lt;Contact&gt;&gt; violationSet = validator.validate(<span class="keyword">new</span> Contact(<span class="string"><span class="delimiter">&quot;</span><span class="content">+1-4155552671</span><span class="delimiter">&quot;</span></span>));
-        assertFalse(violationSet.isEmpty());
-        <span class="predefined-type">String</span> template = <span class="string"><span class="delimiter">&quot;</span><span class="content">{example.micronaut.E164.message}</span><span class="delimiter">&quot;</span></span>;
-        assertTrue(violationSet.stream().anyMatch(violation -&gt;
-                violation.getMessageTemplate().equals(template)
-                        &amp;&amp; violation.getInvalidValue().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">+1-4155552671</span><span class="delimiter">&quot;</span></span>)
-                        &amp;&amp; violation.getMessage().equals(<span class="string"><span class="delimiter">&quot;</span><span class="content">must be a phone in E.164 format</span><span class="delimiter">&quot;</span></span>))
-        );
-    }
-}</code></pre>
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">contactValidation</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="k">new</span> <span class="nc">Contact</span><span class="o">(</span><span class="s">"+14155552671"</span><span class="o">)).</span><span class="na">isEmpty</span><span class="o">());</span>
+        <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">ConstraintViolation</span><span class="o">&lt;</span><span class="nc">Contact</span><span class="o">&gt;&gt;</span> <span class="n">violationSet</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="k">new</span> <span class="nc">Contact</span><span class="o">(</span><span class="s">"+1-4155552671"</span><span class="o">));</span>
+        <span class="n">assertFalse</span><span class="o">(</span><span class="n">violationSet</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">());</span>
+        <span class="nc">String</span> <span class="n">template</span> <span class="o">=</span> <span class="s">"{example.micronaut.E164.message}"</span><span class="o">;</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">violationSet</span><span class="o">.</span><span class="na">stream</span><span class="o">().</span><span class="na">anyMatch</span><span class="o">(</span><span class="n">violation</span> <span class="o">-&gt;</span>
+                <span class="n">violation</span><span class="o">.</span><span class="na">getMessageTemplate</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">template</span><span class="o">)</span>
+                        <span class="o">&amp;&amp;</span> <span class="n">violation</span><span class="o">.</span><span class="na">getInvalidValue</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="s">"+1-4155552671"</span><span class="o">)</span>
+                        <span class="o">&amp;&amp;</span> <span class="n">violation</span><span class="o">.</span><span class="na">getMessage</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="s">"must be a phone in E.164 format"</span><span class="o">))</span>
+        <span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
