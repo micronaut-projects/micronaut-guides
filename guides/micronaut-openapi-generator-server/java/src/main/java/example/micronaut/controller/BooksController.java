@@ -14,7 +14,7 @@ package example.micronaut.controller;
 /*
 //tag::package[]
 package example.micronaut.controller;
-//tag::package[]
+//end::package[]
 */
 //tag::import[]
 
