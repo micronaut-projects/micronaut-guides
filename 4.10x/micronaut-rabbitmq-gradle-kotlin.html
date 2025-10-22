@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>RabbitMQ and the Micronaut Framework - Event-Driven Applications</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-rabbitmq.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="RabbitMQ and the Micronaut Framework - Event-Driven Applications"/>
+    <meta name="twitter:description" content="Use RabbitMQ to communicate between your Micronaut applications."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-rabbitmq.html">RabbitMQ and the Micronaut Framework - Event-Driven Applications</a> » <span class="breadcrumb_last" aria-current="page">gradle | kotlin</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the application</a>
+<ul class="sectlevel2">
+<li><a href="#books-microservice">4.1. Books microservice</a></li>
+<li><a href="#analytics-microservice">4.2. Analytics microservice</a></li>
+</ul>
+</li>
+<li><a href="#test-resources">5. Test Resources</a></li>
+<li><a href="#running-the-application">6. Running the application</a>
+<ul class="sectlevel2">
+<li><a href="#books-microservice-2">6.1. Books microservice</a></li>
+<li><a href="#analytics-microservice-2">6.2. Analytics microservice</a></li>
+<li><a href="#running-the-application-2">6.3. Running the application</a></li>
+</ul>
+</li>
+<li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">7. Generate a Micronaut Application Native Executable with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#graalvm-installation">7.1. GraalVM Installation</a></li>
+<li><a href="#native-executable-generation">7.2. Native Executable Generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">8. Next Steps</a></li>
+<li><a href="#license">9. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>RabbitMQ and the Micronaut Framework - Event-Driven Applications</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Use RabbitMQ to communicate between your Micronaut applications.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Iván López</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.9.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>In this guide, we will create two microservices that will use <a href="https://www.rabbitmq.com/">RabbitMQ</a> to communicate with each other in an asynchronous and decoupled way.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>RabbitMQ is an open-source message-broker software that originally implemented the Advanced Message Queuing Protocol (AMQP)
+and has since been extended with a plug-in architecture to support Streaming Text Oriented Messaging Protocol (STOMP),
+Message Queuing Telemetry Transport (MQTT), and other protocols.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-rabbitmq-gradle-kotlin.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s describe the microservices you will build through the guide.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>books</code> - It returns a list of books. It uses a domain consisting of a book name and ISBN. It also publishes a message in
+RabbitMQ every time a book is accessed.</p>
+</li>
+<li>
+<p><code>analytics</code> - It connects to RabbitMQ to update the analytics for every book (a counter). It also exposes an endpoint
+to get the analytics.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="books-microservice">4.1. Books microservice</h3>
+<div class="paragraph">
+<p>Create the <code>books</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-app <span class="nt">--features</span><span class="o">=</span>rabbitmq,reactor,graalvm example.micronaut.books <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>rabbitmq</code>, <code>reactor</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a directory named <code>books</code> and a Micronaut application inside it with default package <code>example.micronaut</code>.</p>
+</div>
+<div class="paragraph">
+<p>Create a <code>BookController</code> class to handle incoming HTTP requests into the <code>books</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/kotlin/example/micronaut/BookController.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+
+<span class="nd">@Controller</span><span class="p">(</span><span class="s">"/books"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">BookController</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">bookService</span><span class="p">:</span> <span class="nc">BookService</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="nd">@Get</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">listAll</span><span class="p">():</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">Book</span><span class="p">&gt;</span> <span class="p">=</span> <span class="n">bookService</span><span class="p">.</span><span class="nf">listAll</span><span class="p">()</span>
+
+    <span class="nd">@Get</span><span class="p">(</span><span class="s">"/{isbn}"</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="k">fun</span> <span class="nf">findBook</span><span class="p">(</span><span class="n">isbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">Book</span><span class="p">?</span> <span class="p">=</span> <span class="n">bookService</span><span class="p">.</span><span class="nf">findByIsbn</span><span class="p">(</span><span class="n">isbn</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/books</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject <code>BookService</code> using constructor injection.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>listAll</code> method to an HTTP GET request on <code>/books</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>findBook</code> method to an HTTP GET request on <code>/books/{isbn}</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous controller responds a <code>List&lt;Book&gt;</code>. Create the <code>Book</code> POJO:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/kotlin/example/micronaut/Book.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span>
+
+<span class="nd">@Serdeable</span>
+<span class="kd">data class</span> <span class="nc">Book</span><span class="p">(</span><span class="kd">val</span> <span class="py">isbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="kd">val</span> <span class="py">name</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To keep this guide simple there is no database persistence, and the list of books is kept in memory in <code>BookService</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/kotlin/example/micronaut/BookService.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">jakarta.annotation.PostConstruct</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">BookService</span> <span class="p">{</span>
+
+    <span class="k">private</span> <span class="kd">val</span> <span class="py">bookStore</span><span class="p">:</span> <span class="nc">MutableList</span><span class="p">&lt;</span><span class="nc">Book</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nf">mutableListOf</span><span class="p">()</span>
+
+    <span class="nd">@PostConstruct</span>
+    <span class="k">fun</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">bookStore</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nc">Book</span><span class="p">(</span><span class="s">"1491950358"</span><span class="p">,</span> <span class="s">"Building Microservices"</span><span class="p">))</span>
+        <span class="n">bookStore</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nc">Book</span><span class="p">(</span><span class="s">"1680502395"</span><span class="p">,</span> <span class="s">"Release It!"</span><span class="p">))</span>
+        <span class="n">bookStore</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nc">Book</span><span class="p">(</span><span class="s">"0321601912"</span><span class="p">,</span> <span class="s">"Continuous Delivery"</span><span class="p">))</span>
+    <span class="p">}</span>
+
+    <span class="k">fun</span> <span class="nf">listAll</span><span class="p">():</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">Book</span><span class="p">&gt;</span> <span class="p">=</span> <span class="n">bookStore</span>
+
+    <span class="k">fun</span> <span class="nf">findByIsbn</span><span class="p">(</span><span class="n">isbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">Book</span><span class="p">?</span> <span class="p">=</span>
+        <span class="n">bookStore</span><span class="p">.</span><span class="nf">firstOrNull</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">isbn</span> <span class="p">==</span> <span class="n">isbn</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="analytics-microservice">4.2. Analytics microservice</h3>
+<div class="paragraph">
+<p>Create the <code>analytics</code> microservice using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-app <span class="nt">--features</span><span class="o">=</span>rabbitmq,graalvm example.micronaut.analytics <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add the <code>kafka</code> and <code>graalvm</code> features.</p>
+</div>
+<div class="paragraph">
+<p>To keep this guide simple there is no database persistence, and the books analytics is kept in memory in <code>AnalyticsService</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/kotlin/example/micronaut/AnalyticsService.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">java.util.concurrent.ConcurrentHashMap</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">AnalyticsService</span> <span class="p">{</span>
+
+    <span class="k">private</span> <span class="kd">val</span> <span class="py">bookAnalytics</span><span class="p">:</span> <span class="nc">MutableMap</span><span class="p">&lt;</span><span class="nc">Book</span><span class="p">,</span> <span class="nc">Long</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nc">ConcurrentHashMap</span><span class="p">()</span> <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="k">fun</span> <span class="nf">updateBookAnalytics</span><span class="p">(</span><span class="n">book</span><span class="p">:</span> <span class="nc">Book</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="n">bookAnalytics</span><span class="p">.</span><span class="nf">compute</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="p">{</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="p">-&gt;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">return</span><span class="nd">@compute</span> <span class="mi">1L</span> <span class="k">else</span> <span class="k">return</span><span class="nd">@compute</span> <span class="n">v</span> <span class="p">+</span> <span class="mi">1</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">fun</span> <span class="nf">listAnalytics</span><span class="p">():</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">BookAnalytics</span><span class="p">&gt;</span> <span class="p">=</span> <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="n">bookAnalytics</span><span class="p">.</span><span class="n">entries</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nc">BookAnalytics</span><span class="p">(</span><span class="n">key</span><span class="p">.</span><span class="n">isbn</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Keep the books analytics in memory.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Initialize and update the analytics for the book passed as parameter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Return all the analytics.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create the <code>Book</code> POJO used by <code>AnalyticsService</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/kotlin/example/micronaut/Book.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span>
+
+<span class="nd">@Serdeable</span>
+<span class="kd">data class</span> <span class="nc">Book</span><span class="p">(</span><span class="kd">val</span> <span class="py">isbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="kd">val</span> <span class="py">name</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous service responds a <code>List&lt;BookAnalytics&gt;</code>. Create the <code>BookAnalytics</code> POJO:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/kotlin/example/micronaut/BookAnalytics.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span>
+
+<span class="nd">@Serdeable</span>
+<span class="kd">data class</span> <span class="nc">BookAnalytics</span><span class="p">(</span><span class="kd">val</span> <span class="py">bookIsbn</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="kd">val</span> <span class="py">count</span><span class="p">:</span> <span class="nc">Long</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Write a test:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/test/kotlin/example/micronaut/AnalyticsServiceTest.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
+
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">AnalyticsServiceTest</span> <span class="p">{</span>
+
+    <span class="nd">@Inject</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">analyticsService</span><span class="p">:</span> <span class="nc">AnalyticsService</span>
+
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">testUpdateBookAnalyticsAndGetAnalytics</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">b1</span> <span class="p">=</span> <span class="nc">Book</span><span class="p">(</span><span class="s">"1491950358"</span><span class="p">,</span> <span class="s">"Building Microservices"</span><span class="p">)</span>
+        <span class="kd">val</span> <span class="py">b2</span> <span class="p">=</span> <span class="nc">Book</span><span class="p">(</span><span class="s">"1680502395"</span><span class="p">,</span> <span class="s">"Release It!"</span><span class="p">)</span>
+
+        <span class="n">analyticsService</span><span class="p">.</span><span class="nf">updateBookAnalytics</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+        <span class="n">analyticsService</span><span class="p">.</span><span class="nf">updateBookAnalytics</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+        <span class="n">analyticsService</span><span class="p">.</span><span class="nf">updateBookAnalytics</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+        <span class="n">analyticsService</span><span class="p">.</span><span class="nf">updateBookAnalytics</span><span class="p">(</span><span class="n">b2</span><span class="p">)</span>
+
+        <span class="kd">val</span> <span class="py">analytics</span> <span class="p">=</span> <span class="n">analyticsService</span><span class="p">.</span><span class="nf">listAnalytics</span><span class="p">()</span>
+
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">analytics</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nf">findBookAnalytics</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">analytics</span><span class="p">).</span><span class="n">count</span><span class="p">)</span>
+        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nf">findBookAnalytics</span><span class="p">(</span><span class="n">b2</span><span class="p">,</span> <span class="n">analytics</span><span class="p">).</span><span class="n">count</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">findBookAnalytics</span><span class="p">(</span><span class="n">b</span><span class="p">:</span> <span class="nc">Book</span><span class="p">,</span> <span class="n">analytics</span><span class="p">:</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">BookAnalytics</span><span class="p">&gt;):</span> <span class="nc">BookAnalytics</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">ba</span> <span class="p">:</span> <span class="nc">BookAnalytics</span><span class="p">?</span> <span class="p">=</span> <span class="n">analytics</span><span class="p">.</span><span class="nf">filter</span> <span class="p">{</span> <span class="p">(</span><span class="n">bookIsbn</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">bookIsbn</span> <span class="p">==</span> <span class="n">b</span><span class="p">.</span><span class="n">isbn</span> <span class="p">}.</span><span class="nf">firstOrNull</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ba</span> <span class="o">?:</span> <span class="k">throw</span> <span class="nc">RuntimeException</span><span class="p">(</span><span class="s">"Book not found"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>micronaut-test-junit5</code> is added automatically to <code>build.gradle</code> (or <code>pom.xml</code>) when creating an application with the CLI. For more information, see <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">the documentation</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Just inject the collaborator and <code>@MicronautTest</code> will take care of everything.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a Controller to expose the analytics:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/kotlin/example/micronaut/AnalyticsController.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+
+<span class="nd">@Controller</span><span class="p">(</span><span class="s">"/analytics"</span><span class="p">)</span>
+<span class="kd">class</span> <span class="nc">AnalyticsController</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">analyticsService</span><span class="p">:</span> <span class="nc">AnalyticsService</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nd">@Get</span>
+    <span class="k">fun</span> <span class="nf">listAnalytics</span><span class="p">():</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">BookAnalytics</span><span class="p">&gt;</span> <span class="p">=</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="n">analyticsService</span><span class="p">.</span><span class="nf">listAnalytics</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Just expose the analytics.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The application doesn&#8217;t expose the method <code>updateBookAnalytics</code> created in <code>AnalyticsService</code>. This method will be invoked
+when reading messages from RabbitMQ.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Modify the <code>Application</code> class to use <code>dev</code> as a default environment:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>The Micronaut framework supports the concept of one or many default environments. A default environment is one that is only applied if no other environments are explicitly specified or deduced.</p>
+</div>
+</blockquote>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/kotlin/example/micronaut/Application.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.context.env.Environment.DEVELOPMENT</span>
+<span class="k">import</span> <span class="nn">io.micronaut.runtime.Micronaut.build</span>
+
+<span class="k">fun</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="nc">Array</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;)</span> <span class="p">{</span>
+    <span class="nf">build</span><span class="p">()</span>
+            <span class="p">.</span><span class="nf">args</span><span class="p">(*</span><span class="n">args</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">packages</span><span class="p">(</span><span class="s">"example.micronaut"</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">defaultEnvironments</span><span class="p">(</span><span class="nc">DEVELOPMENT</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">start</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>src/main/resources/application-dev.yml</code>. The Micronaut framework applies this configuration file only for the <code>dev</code> environment.</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/resources/application-dev.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
+  <span class="na">server</span><span class="pi">:</span>
+    <span class="na">port</span><span class="pi">:</span> <span class="s">8081</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Start the <code>analytics</code> microservice on port 8081.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="test-resources">5. Test Resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When the application is started locally&#8201;&#8212;&#8201;either under test or by <a href="#running-the-application">running the application</a>&#8201;&#8212;&#8201;resolution of the <code>rabbitmq.uri</code> property is detected and the Test Resources service will start a local RabbitMQ docker container, and inject the properties required to use this as the message broker.</p>
+</div>
+<div class="paragraph">
+<p>When running under production, you should replace this property with the location of your production message broker via an environment variable.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">RABBITMQ_URI</span><span class="o">=</span>amqp://production-server:5672</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more information, see the <a href="https://micronaut-projects.github.io/micronaut-test-resources/snapshot/guide/#modules-rabbitmq">RabbitMQ section of the Test Resources documentation</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">6. Running the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Run the <code>books</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">books</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run <code>analytics</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can run <code>curl</code> commands to test the application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/books</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">[{</span><span class="nl">"isbn"</span><span class="p">:</span><span class="s2">"1491950358"</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Building Microservices"</span><span class="p">},{</span><span class="nl">"isbn"</span><span class="p">:</span><span class="s2">"1680502395"</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Release It!"</span><span class="p">},{</span><span class="nl">"isbn"</span><span class="p">:</span><span class="s2">"0321601912"</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Continuous Delivery"</span><span class="p">}]</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/books/1491950358</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="nl">"isbn"</span><span class="p">:</span><span class="s2">"1491950358"</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Building Microservices"</span><span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8081/analytics</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">[]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Please note that getting the analytics returns an empty list because the applications are not communicating to each other (yet).</p>
+</div>
+<div class="sect2">
+<h3 id="books-microservice-2">6.1. Books microservice</h3>
+<div class="paragraph">
+<p>Via <a href="#test-resources">Test Resources</a> the Micronaut application will connect to a RabbitMQ instance running inside Docker so it is not necessary to add anything to <code>application.yml</code>.
+In case you want to change the configuration, add the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/resources/application-prod.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">rabbitmq</span><span class="pi">:</span>
+  <span class="na">uri</span><span class="pi">:</span> <span class="s">amqp://rabbitmq-server:5672</span></code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-rabbitmq-exchange-queue-and-binding">6.1.1. Create RabbitMQ exchange, queue and binding</h4>
+<div class="paragraph">
+<p>Before being able to send and receive messages using RabbitMQ it is necessary to define the exchange, queue and binding.
+One option is create them directly in the RabbitMQ Admin UI available on port 15672.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Use <code>guest</code> for both username and password.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Another option is to create them programmatically.
+Create the class <code>ChannelPoolListener</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/kotlin/example/micronaut/ChannelPoolListener.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">com.rabbitmq.client.BuiltinExchangeType</span>
+<span class="k">import</span> <span class="nn">com.rabbitmq.client.Channel</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.connect.ChannelInitializer</span>
+<span class="k">import</span> <span class="nn">java.io.IOException</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">ChannelPoolListener</span> <span class="p">:</span> <span class="nc">ChannelInitializer</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="nd">@Throws</span><span class="p">(</span><span class="nc">IOException</span><span class="o">::</span><span class="k">class</span><span class="p">)</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">channel</span><span class="p">:</span> <span class="nc">Channel</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">exchangeDeclare</span><span class="p">(</span><span class="s">"micronaut"</span><span class="p">,</span> <span class="nc">BuiltinExchangeType</span><span class="p">.</span><span class="nc">DIRECT</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">queueDeclare</span><span class="p">(</span><span class="s">"analytics"</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">queueBind</span><span class="p">(</span><span class="s">"analytics"</span><span class="p">,</span> <span class="s">"micronaut"</span><span class="p">,</span> <span class="s">"analytics"</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Define an exchange named <code>micronaut</code>. From the producer point of view everything is sent to the exchange with the appropriate routing key</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Define a queue named <code>analytics</code>. The consumer will listen for messages in that queue.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Define a binding between the exchange and the queue using the routing key <code>analytics</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-rabbitmq-client-producer">6.1.2. Create RabbitMQ client (producer)</h4>
+<div class="paragraph">
+<p>Let&#8217;s create an interface to send messages to RabbitMQ. The Micronaut framework will implement the interface at compilation time:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/kotlin/example/micronaut/AnalyticsClient.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.Binding</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.RabbitClient</span>
+
+<span class="nd">@RabbitClient</span><span class="p">(</span><span class="s">"micronaut"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">interface</span> <span class="nc">AnalyticsClient</span> <span class="p">{</span>
+
+    <span class="nd">@Binding</span><span class="p">(</span><span class="s">"analytics"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">fun</span> <span class="nf">updateAnalytics</span><span class="p">(</span><span class="n">book</span><span class="p">:</span> <span class="nc">Book</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the exchange used to send the messages.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the routing key.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Send the <code>Book</code> POJO. The Micronaut framework will automatically convert it to JSON before sending it.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="send-analytics-information-automatically">6.1.3. Send Analytics information automatically</h4>
+<div class="paragraph">
+<p>Sending a message to RabbitMQ is as simple as injecting <code>AnalyticsClient</code> and calling <code>updateAnalytics</code> method. The goal
+is to do it automatically every time a book is returned, i.e., every time there is a call to <code>http://localhost:8080/books/{isbn}</code>.
+To achieve this we will create an <a href="https://docs.micronaut.io/latest/guide/#filters">Http Server Filter</a>.
+Create the <code>AnalyticsFilter</code> class:</p>
+</div>
+<div class="listingblock">
+<div class="title">books/src/main/kotlin/example/micronaut/AnalyticsFilter.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.MutableHttpResponse</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Filter</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.filter.HttpServerFilter</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.filter.ServerFilterChain</span>
+<span class="k">import</span> <span class="nn">reactor.core.publisher.Flux</span>
+<span class="k">import</span> <span class="nn">reactor.core.publisher.Mono</span>
+<span class="k">import</span> <span class="nn">org.reactivestreams.Publisher</span>
+
+<span class="nd">@Filter</span><span class="p">(</span><span class="s">"/books/?*"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">AnalyticsFilter</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">analyticsClient</span><span class="p">:</span> <span class="nc">AnalyticsClient</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="p">:</span> <span class="nc">HttpServerFilter</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">doFilter</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;,</span> <i class="conum" data-value="4"></i><b>(4)</b>
+                          <span class="n">chain</span><span class="p">:</span> <span class="nc">ServerFilterChain</span><span class="p">):</span> <span class="nc">Publisher</span><span class="p">&lt;</span><span class="nc">MutableHttpResponse</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+            <span class="nc">Flux</span>
+                    <span class="p">.</span><span class="nf">from</span><span class="p">(</span><span class="n">chain</span><span class="p">.</span><span class="nf">proceed</span><span class="p">(</span><span class="n">request</span><span class="p">))</span> <i class="conum" data-value="5"></i><b>(5)</b>
+                    <span class="p">.</span><span class="nf">flatMap</span> <span class="p">{</span> <span class="n">response</span><span class="p">:</span> <span class="nc">MutableHttpResponse</span><span class="p">&lt;</span><span class="err">*</span><span class="p">&gt;</span> <span class="p">-&gt;</span>
+                        <span class="nc">Mono</span><span class="p">.</span><span class="nf">fromCallable</span> <span class="p">{</span>
+                            <span class="kd">val</span> <span class="py">book</span> <span class="p">=</span> <span class="n">response</span><span class="p">.</span><span class="nf">getBody</span><span class="p">(</span><span class="nc">Book</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span> <i class="conum" data-value="6"></i><b>(6)</b>
+                            <span class="n">book</span><span class="p">.</span><span class="nf">ifPresent</span> <span class="p">{</span> <span class="n">book</span><span class="p">:</span> <span class="nc">Book</span> <span class="p">-&gt;</span> <span class="n">analyticsClient</span><span class="p">.</span><span class="nf">updateAnalytics</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <span class="p">}</span> <i class="conum" data-value="7"></i><b>(7)</b>
+
+                            <span class="n">response</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@Filter</code> and define the ANT Matcher pattern to intercept all the calls to the desired URI.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The class needs to implement <code>HttpServerFilter</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Constructor injection for RabbitMQ <code>AnalyticsClient</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Override <code>doFilter</code> method.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Execute the request. This will call the controller action.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Get the response from the controller and return the body as a <code>Book</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>If the book is found, use RabbitMQ client to send a message.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="analytics-microservice-2">6.2. Analytics microservice</h3>
+<div class="sect3">
+<h4 id="create-rabbitmq-exchange-queue-and-binding-2">6.2.1. Create RabbitMQ exchange, queue and binding</h4>
+<div class="paragraph">
+<p>As we already did in Books Microservice, let&#8217;s create the class <code>ChannelPoolListener</code> to define the exchange, queue
+and binding:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/kotlin/example/micronaut/ChannelPoolListener.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">com.rabbitmq.client.BuiltinExchangeType</span>
+<span class="k">import</span> <span class="nn">com.rabbitmq.client.Channel</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.connect.ChannelInitializer</span>
+<span class="k">import</span> <span class="nn">java.io.IOException</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">ChannelPoolListener</span> <span class="p">:</span> <span class="nc">ChannelInitializer</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="nd">@Throws</span><span class="p">(</span><span class="nc">IOException</span><span class="o">::</span><span class="k">class</span><span class="p">)</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">channel</span><span class="p">:</span> <span class="nc">Channel</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">exchangeDeclare</span><span class="p">(</span><span class="s">"micronaut"</span><span class="p">,</span> <span class="nc">BuiltinExchangeType</span><span class="p">.</span><span class="nc">DIRECT</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">queueDeclare</span><span class="p">(</span><span class="s">"analytics"</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span>
+        <span class="n">channel</span><span class="p">.</span><span class="nf">queueBind</span><span class="p">(</span><span class="s">"analytics"</span><span class="p">,</span> <span class="s">"micronaut"</span><span class="p">,</span> <span class="s">"analytics"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Instead of copy-paste the class in every project it would be better to create a new Gradle (or Maven) module and
+share it among all the microservices.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="create-rabbitmq-consumer">6.2.2. Create RabbitMQ consumer</h4>
+<div class="paragraph">
+<p>Create a new class to act as a consumer of the messages sent to RabbitMQ by the Books Microservice. The Micronaut framework will
+implement the consumer at compile time. Create <code>AnalyticsListener</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics/src/main/kotlin/example/micronaut/AnalyticsListener.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="k">import</span> <span class="nn">io.micronaut.context.env.Environment</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.Queue</span>
+<span class="k">import</span> <span class="nn">io.micronaut.rabbitmq.annotation.RabbitListener</span>
+
+<span class="nd">@Requires</span><span class="p">(</span><span class="n">notEnv</span> <span class="p">=</span> <span class="p">[</span><span class="nc">Environment</span><span class="p">.</span><span class="nc">TEST</span><span class="p">])</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@RabbitListener</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">AnalyticsListener</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">analyticsService</span><span class="p">:</span> <span class="nc">AnalyticsService</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="nd">@Queue</span><span class="p">(</span><span class="s">"analytics"</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="k">fun</span> <span class="nf">updateAnalytics</span><span class="p">(</span><span class="n">book</span><span class="p">:</span> <span class="nc">Book</span><span class="p">)</span> <span class="p">=</span>
+        <span class="n">analyticsService</span><span class="p">.</span><span class="nf">updateBookAnalytics</span><span class="p">(</span><span class="n">book</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Do not load this bean for the test environment. This enable us to run the tests without having a RabbitMQ instance running.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@RabbitListener</code> to indicate that this bean will consume messages from RabbitMQ.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Constructor injection for <code>AnalyticsService</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Annotate the method with <code>@Queue</code>. This listener will listen to messages in <code>analytics</code> queue.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Call the previously created method to update the analytics for the book.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-the-application-2">6.3. Running the application</h3>
+<div class="paragraph">
+<p>Run <code>books</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">books</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 576ms. Server Running: http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Execute a <code>curl</code> request to get one book:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8080/books/1491950358</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">{</span><span class="nl">"isbn"</span><span class="p">:</span><span class="s2">"1491950358"</span><span class="p">,</span><span class="nl">"name"</span><span class="p">:</span><span class="s2">"Building Microservices"</span><span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Open RabbitMQ Admin UI on <a href="http://localhost:15672" class="bare">http://localhost:15672</a> and use <code>guest</code> for both username and password. Select <code>queues</code> and
+<code>analytics</code> queue. You can see that there is a message in the queue.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/rabbitmq-message.png" alt="rabbitmq message">
+</div>
+</div>
+<div class="paragraph">
+<p>Expand the "Get messages" option and get one message. You can see all the information: <code>exchange</code>, <code>routing key, and the
+`payload</code> serialized to JSON:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/rabbitmq-message-detail.png" alt="rabbitmq message detail">
+</div>
+</div>
+<div class="paragraph">
+<p>Run <code>analytics</code> microservice:</p>
+</div>
+<div class="listingblock">
+<div class="title">analytics</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>16:35:55.614 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 623ms. Server Running: http://localhost:8081</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The application will consume and process the message automatically after the startup. Go to RabbitMQ Admin UI and check that the message has been consumed:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/rabbitmq-message-consumed.png" alt="rabbitmq message consumed">
+</div>
+</div>
+<div class="paragraph">
+<p>Now, run a <code>curl</code> to get the analytics:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl http://localhost:8081/analytics</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="p">[{</span><span class="nl">"bookIsbn"</span><span class="p">:</span><span class="s2">"1491950358"</span><span class="p">,</span><span class="nl">"count"</span><span class="p">:</span><span class="mi">1</span><span class="p">}]</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-executable-with-graalvm">7. Generate a Micronaut Application Native Executable with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, an advanced JDK with ahead-of-time Native Image compilation, to generate a native executable of this Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="graalvm-installation">7.1. GraalVM Installation</h3>
+<div class="paragraph">
+<p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.5-graal</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for a manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the <a href="https://github.com/graalvm/graalvm-ce-builds/releases/">GraalVM Community Edition</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.2-graalce</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-executable-generation">7.2. Native Executable Generation</h3>
+<div class="paragraph">
+<p>To generate a native executable using Gradle, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native executable is created in <code>build/native/nativeCompile</code> directory and can be run with <code>build/native/nativeCompile/micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native executable or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">graalvmNative</span> <span class="o">{</span>
+    <span class="n">binaries</span> <span class="o">{</span>
+        <span class="n">main</span> <span class="o">{</span>
+            <span class="n">imageName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s1">'mn-graalvm-application'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="n">buildArgs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s1">'-Ob'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native executable name will now be <code>mn-graalvm-application</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra build arguments to <code>native-image</code>. For example, <code>-Ob</code> enables the quick build mode.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Start the native executables for the two microservices and run the same <code>curl</code> request as before to check that everything works with GraalVM.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/">RabbitMQ support</a> in the Micronaut framework.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">9. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Schedule periodic tasks inside your Micronaut applications</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-scheduled.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Schedule periodic tasks inside your Micronaut applications"/>
+    <meta name="twitter:description" content="Learn how to schedule periodic tasks inside your Micronaut microservices."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-scheduled.html">Schedule periodic tasks inside your Micronaut applications</a> » <span class="breadcrumb_last" aria-current="page">maven | kotlin</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#set-log-level-info-for-package-demo">4.1. Set log level INFO for package demo</a></li>
+<li><a href="#creating-a-job">4.2. Creating a Job</a></li>
+<li><a href="#business-logic-in-dedicated-use-cases">4.3. Business logic in dedicated Use Cases</a></li>
+<li><a href="#scheduling-a-job-manually">4.4. Scheduling a Job Manually</a></li>
+</ul>
+</li>
+<li><a href="#summary">5. Summary</a></li>
+<li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">6. Generate a Micronaut Application Native Executable with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#graalvm-installation">6.1. GraalVM Installation</a></li>
+<li><a href="#native-executable-generation">6.2. Native Executable Generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">7. Next Steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">8. Help with the Micronaut Framework</a></li>
+<li><a href="#license">9. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Schedule periodic tasks inside your Micronaut applications</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to schedule periodic tasks inside your Micronaut microservices.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.9.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>Nowadays it is pretty usual to have some kind of cron or scheduled task that needs to run every midnight, every hour, a few times a week,&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>In this guide you will learn how to use Micronaut capabilities to schedule periodic tasks inside a Micronaut microservice.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-scheduled-maven-kotlin.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="nt">--build</span><span class="o">=</span>maven <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="set-log-level-info-for-package-demo">4.1. Set log level INFO for package demo</h3>
+<div class="paragraph">
+<p>In this guide, we will use several log statements to show Job execution.</p>
+</div>
+<div class="paragraph">
+<p>Add this statement to the end of <code>logback.xml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/logback.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml">    <span class="nt">&lt;logger</span> <span class="na">name=</span><span class="s">"example.micronaut"</span> <span class="na">level=</span><span class="s">"INFO"</span><span class="nt">/&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above line configures a logger for package <code>example.micronaut</code> with log level INFO.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="creating-a-job">4.2. Creating a Job</h3>
+<div class="paragraph">
+<p>Create the <code>HelloWorldJob</code> class:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/HelloWorldJob.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.scheduling.annotation.Scheduled</span>
+<span class="k">import</span> <span class="nn">org.slf4j.LoggerFactory</span>
+<span class="k">import</span> <span class="nn">java.text.SimpleDateFormat</span>
+<span class="k">import</span> <span class="nn">java.util.Date</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">HelloWorldJob</span> <span class="p">{</span>
+
+    <span class="nd">@Scheduled</span><span class="p">(</span><span class="n">fixedDelay</span> <span class="p">=</span> <span class="s">"10s"</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">executeEveryTen</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nc">LOG</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s">"Simple Job every 10 seconds: {}"</span><span class="p">,</span> <span class="nc">SimpleDateFormat</span><span class="p">(</span><span class="s">"dd/M/yyyy hh:mm:ss"</span><span class="p">).</span><span class="nf">format</span><span class="p">(</span><span class="nc">Date</span><span class="p">()))</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Scheduled</span><span class="p">(</span><span class="n">fixedDelay</span> <span class="p">=</span> <span class="s">"45s"</span><span class="p">,</span> <span class="n">initialDelay</span> <span class="p">=</span> <span class="s">"5s"</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="k">fun</span> <span class="nf">executeEveryFourtyFive</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nc">LOG</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s">"Simple Job every 45 seconds: {}"</span><span class="p">,</span> <span class="nc">SimpleDateFormat</span><span class="p">(</span><span class="s">"dd/M/yyyy hh:mm:ss"</span><span class="p">).</span><span class="nf">format</span><span class="p">(</span><span class="nc">Date</span><span class="p">()))</span>
+    <span class="p">}</span>
+
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">LOG</span> <span class="p">=</span> <span class="nc">LoggerFactory</span><span class="p">.</span><span class="nf">getLogger</span><span class="p">(</span><span class="nc">HelloWorldJob</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject a Logger.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Create trigger every 10 seconds</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Create another trigger every 45 seconds with an initial delay of 5 seconds (5000 millis)</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now start the application. Execute the <code>./mvnw mn:run</code> command, which will start the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>After a few seconds, you will see the following output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">... Simple Job every 10 seconds :15/5/2018 12:48:02 <i class="conum" data-value="1"></i><b>(1)</b>
+... Simple Job every 45 seconds :15/5/2018 12:48:07 <i class="conum" data-value="2"></i><b>(2)</b>
+... Simple Job every 10 seconds :15/5/2018 12:48:12 <i class="conum" data-value="3"></i><b>(3)</b>
+... Simple Job every 10 seconds :15/5/2018 12:48:22
+... Simple Job every 10 seconds :15/5/2018 12:48:32
+... Simple Job every 10 seconds :15/5/2018 12:48:42
+... Simple Job every 45 seconds :15/5/2018 12:48:52 <i class="conum" data-value="4"></i><b>(4)</b>
+... Simple Job every 10 seconds :15/5/2018 12:48:52</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>First execution of 10 seconds Job after the application starts</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The 45 seconds Job starts 5 seconds after the application starts</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Second execution of 10 seconds Job 10 seconds after the first execution</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Second execution of 45 seconds Job 45 seconds after the first execution</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="business-logic-in-dedicated-use-cases">4.3. Business logic in dedicated Use Cases</h3>
+<div class="paragraph">
+<p>Although the previous example is valid, usually you don&#8217;t want to put your business logic in a Job. A better approach is
+to create an additional bean that the <code>Job</code> invokes. This approach decouples your business logic from the scheduling logic.
+Moreover, it facilitates testing and maintenance. Let&#8217;s see an example:</p>
+</div>
+<div class="paragraph">
+<p>Create the following use case:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/EmailUseCase.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">org.slf4j.LoggerFactory</span>
+<span class="k">import</span> <span class="nn">java.text.SimpleDateFormat</span>
+<span class="k">import</span> <span class="nn">java.util.Date</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">EmailUseCase</span> <span class="p">{</span>
+
+    <span class="k">fun</span> <span class="nf">send</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nc">LOG</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s">"Sending email to {} : {} at {}"</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="nc">SimpleDateFormat</span><span class="p">(</span><span class="s">"dd/M/yyyy hh:mm:ss"</span><span class="p">).</span><span class="nf">format</span><span class="p">(</span><span class="nc">Date</span><span class="p">()))</span>
+    <span class="p">}</span>
+
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">LOG</span> <span class="p">=</span> <span class="nc">LoggerFactory</span><span class="p">.</span><span class="nf">getLogger</span><span class="p">(</span><span class="nc">EmailUseCase</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then the Job:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/DailyEmailJob.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.scheduling.annotation.Scheduled</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">DailyEmailJob</span><span class="p">(</span><span class="k">protected</span> <span class="kd">val</span> <span class="py">emailUseCase</span><span class="p">:</span> <span class="nc">EmailUseCase</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="nd">@Scheduled</span><span class="p">(</span><span class="n">cron</span> <span class="p">=</span> <span class="s">"0 30 4 1/1 * ?"</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">execute</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">emailUseCase</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="s">"john.doe@micronaut.example"</span><span class="p">,</span> <span class="s">"Test Message"</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Constructor injection.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Trigger the Job once a day at 04:30 AM</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Call the injected use case</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="scheduling-a-job-manually">4.4. Scheduling a Job Manually</h3>
+<div class="paragraph">
+<p>Consider the following scenario. You want to send every user an email two hours after they register on your application and ask them about their experiences during this first interaction.</p>
+</div>
+<div class="paragraph">
+<p>For this guide, we will schedule a Job to trigger after one minute.</p>
+</div>
+<div class="paragraph">
+<p>To test it, we will call a new use case named <code>RegisterUseCase</code> twice when the application starts.</p>
+</div>
+<div class="paragraph">
+<p>Modify <code>Application.kt</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/Application.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.context.event.ApplicationEventListener</span>
+<span class="k">import</span> <span class="nn">io.micronaut.runtime.Micronaut.build</span>
+<span class="k">import</span> <span class="nn">io.micronaut.runtime.server.event.ServerStartupEvent</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="k">fun</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="nc">Array</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;)</span> <span class="p">{</span>
+    <span class="nf">build</span><span class="p">()</span>
+        <span class="p">.</span><span class="nf">args</span><span class="p">(*</span><span class="n">args</span><span class="p">)</span>
+        <span class="p">.</span><span class="nf">packages</span><span class="p">(</span><span class="s">"example.micronaut"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nf">start</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="nd">@Singleton</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">Application</span><span class="p">(</span><span class="kd">val</span> <span class="py">registerUseCase</span><span class="p">:</span> <span class="nc">RegisterUseCase</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="p">:</span> <span class="nc">ApplicationEventListener</span><span class="p">&lt;</span><span class="nc">ServerStartupEvent</span><span class="p">&gt;</span> <span class="p">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onApplicationEvent</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="nc">ServerStartupEvent</span><span class="p">)</span> <span class="p">{</span>  <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">registerUseCase</span><span class="p">.</span><span class="nf">register</span><span class="p">(</span><span class="s">"harry@micronaut.example"</span><span class="p">)</span>
+            <span class="nc">Thread</span><span class="p">.</span><span class="nf">sleep</span><span class="p">(</span><span class="mi">20000</span><span class="p">)</span>
+            <span class="n">registerUseCase</span><span class="p">.</span><span class="nf">register</span><span class="p">(</span><span class="s">"ron@micronaut.example"</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="nc">InterruptedException</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">e</span><span class="p">.</span><span class="nf">printStackTrace</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Listen to the event <code>ServerStartupEvent</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Constructor injection of <code>RegisterUseCase</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>onApplicationEvent</code> is invoked when the application starts. Subscribing to an event is as easy as implementing <code>ApplicationEventListener</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a runnable task <code>EmailTask.kt</code></p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/EmailTask.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="kd">class</span> <span class="nc">EmailTask</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">emailUseCase</span><span class="p">:</span> <span class="nc">EmailUseCase</span><span class="p">,</span> <span class="k">private</span> <span class="kd">val</span> <span class="py">email</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="k">private</span> <span class="kd">val</span> <span class="py">message</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">:</span> <span class="nc">Runnable</span> <span class="p">{</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">run</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">emailUseCase</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create <code>RegisterUseCase.kt</code>, which schedules the previous task.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/kotlin/example/micronaut/RegisterUseCase.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.scheduling.TaskExecutors</span>
+<span class="k">import</span> <span class="nn">io.micronaut.scheduling.TaskScheduler</span>
+<span class="k">import</span> <span class="nn">org.slf4j.LoggerFactory</span>
+<span class="k">import</span> <span class="nn">java.text.SimpleDateFormat</span>
+<span class="k">import</span> <span class="nn">java.time.Duration</span>
+<span class="k">import</span> <span class="nn">java.util.Date</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Named</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
+
+<span class="nd">@Singleton</span>
+<span class="kd">class</span> <span class="nc">RegisterUseCase</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">emailUseCase</span><span class="p">:</span> <span class="nc">EmailUseCase</span><span class="p">,</span> <i class="conum" data-value="1"></i><b>(1)</b>
+                      <span class="err">@</span><span class="n">param</span><span class="p">:</span><span class="nc">Named</span><span class="p">(</span><span class="nc">TaskExecutors</span><span class="p">.</span><span class="nc">SCHEDULED</span><span class="p">)</span> <span class="k">private</span> <span class="kd">val</span> <span class="py">taskScheduler</span><span class="p">:</span> <span class="nc">TaskScheduler</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="k">fun</span> <span class="nf">register</span><span class="p">(</span><span class="n">email</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nc">LOG</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s">"saving {} at {}"</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="nc">SimpleDateFormat</span><span class="p">(</span><span class="s">"dd/M/yyyy hh:mm:ss"</span><span class="p">).</span><span class="nf">format</span><span class="p">(</span><span class="nc">Date</span><span class="p">()))</span>
+        <span class="nf">scheduleFollowupEmail</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="s">"Welcome to the Micronaut framework"</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">scheduleFollowupEmail</span><span class="p">(</span><span class="n">email</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">task</span> <span class="p">=</span> <span class="nc">EmailTask</span><span class="p">(</span><span class="n">emailUseCase</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">taskScheduler</span><span class="p">.</span><span class="nf">schedule</span><span class="p">(</span><span class="nc">Duration</span><span class="p">.</span><span class="nf">ofMinutes</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">task</span><span class="p">)</span>  <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="p">}</span>
+
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">LOG</span> <span class="p">=</span> <span class="nc">LoggerFactory</span><span class="p">.</span><span class="nf">getLogger</span><span class="p">(</span><span class="nc">RegisterUseCase</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Constructor injection of <code>EmailUseCase</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>TaskScheduler</code> bean</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Create a <code>Runnable</code> task</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Schedule the task to run a minute from now</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you execute the above code, you will see the Job being executed one minute after we schedule it and with the supplied email address.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">INFO  example.micronaut.RegisterUseCase - saving harry@micronaut.example at 15/5/2018 06:25:14
+INFO  example.micronaut.RegisterUseCase - saving ron@micronaut.example at 15/5/2018 06:25:34
+INFO  example.micronaut.EmailUseCase - Sending email to harry@micronaut.example : Welcome to Micronaut at 15/5/2018 06:26:14
+INFO  example.micronaut.EmailUseCase - Sending email to ron@micronaut.example : Welcome to the Micronaut framework at 15/5/2018 06:26:34</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary">5. Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>During this guide, we learned how to configure Jobs using the <code>@Scheduled</code> annotation using fixedDelay, initialDelay,
+and cron, as well as manually configuring Jobs with a <code>TaskScheduler</code> and tasks.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-executable-with-graalvm">6. Generate a Micronaut Application Native Executable with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, an advanced JDK with ahead-of-time Native Image compilation, to generate a native executable of this Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="graalvm-installation">6.1. GraalVM Installation</h3>
+<div class="paragraph">
+<p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.5-graal</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for a manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the <a href="https://github.com/graalvm/graalvm-ce-builds/releases/">GraalVM Community Edition</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.2-graalce</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-executable-generation">6.2. Native Executable Generation</h3>
+<div class="paragraph">
+<p>To generate a native executable using Maven, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./mvnw package <span class="nt">-Dpackaging</span><span class="o">=</span>native-image</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native executable is created in the <code>target</code> directory and can be run with <code>target/micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native executable or pass additional build arguments using the <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html">Maven plugin for GraalVM Native Image building</a>. Declare the plugin as following:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.graalvm.buildtools<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>native-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>0.10.3<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;configuration&gt;</span>
+        <span class="c">&lt;!-- &lt;1&gt; --&gt;</span>
+        <span class="nt">&lt;imageName&gt;</span>mn-graalvm-application<span class="nt">&lt;/imageName&gt;</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="nt">&lt;buildArgs&gt;</span>
+	      <span class="c">&lt;!-- &lt;2&gt; --&gt;</span>
+          <span class="nt">&lt;buildArg&gt;</span>-Ob<span class="nt">&lt;/buildArg&gt;</span>
+        <span class="nt">&lt;/buildArgs&gt;</span>
+    <span class="nt">&lt;/configuration&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native executable name will now be <code>mn-graalvm-application</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra build arguments to <code>native-image</code>. For example, <code>-Ob</code> enables the quick build mode.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Execute the native executable, and you will see the log message of the Jobs appear:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>10:16:20.803 [pool-2-thread-1] INFO  example.micronaut.HelloWorldJob - Simple Job every 10 seconds: 09/12/2019 10:16:20
+10:16:20.806 [main] INFO  example.micronaut.RegisterUseCase - saving harry@micronaut.example at 09/12/2019 10:16:20
+10:16:25.804 [pool-2-thread-2] INFO  example.micronaut.HelloWorldJob - Simple Job every 45 seconds: 09/12/2019 10:16:25
+10:16:30.807 [pool-2-thread-4] INFO  example.micronaut.HelloWorldJob - Simple Job every 10 seconds: 09/12/2019 10:16:30</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">7. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">8. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">9. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
